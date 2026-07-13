@@ -126,8 +126,7 @@
         .account-box p,
         .summary-box p,
         .cloud-box p {
-            margin:
-                6px 0;
+            margin: 6px 0;
         }
 
         .card-grid {
@@ -674,25 +673,38 @@
             }
         }
 
-        async function refreshCloudCollection() {
+        /**
+         * Loads the cloud collection.
+         *
+         * announceResult controls whether the function changes the
+         * page status message after loading. Importing calls this with
+         * false so the import result remains visible.
+         */
+        async function refreshCloudCollection(
+            announceResult = true
+        ) {
             if (!currentUser) {
                 cloudSummary.classList.add(
                     "hidden"
                 );
 
-                displayStatus(
-                    "Please sign in before loading a cloud collection.",
-                    "error"
-                );
+                if (announceResult) {
+                    displayStatus(
+                        "Please sign in before loading a cloud collection.",
+                        "error"
+                    );
+                }
 
                 return;
             }
 
             refreshButton.disabled = true;
 
-            displayStatus(
-                "Loading your cloud collection..."
-            );
+            if (announceResult) {
+                displayStatus(
+                    "Loading your cloud collection..."
+                );
+            }
 
             try {
                 const {
@@ -728,10 +740,12 @@
                     "hidden"
                 );
 
-                displayStatus(
-                    "Cloud collection loaded.",
-                    "success"
-                );
+                if (announceResult) {
+                    displayStatus(
+                        "Cloud collection loaded.",
+                        "success"
+                    );
+                }
             } catch (error) {
                 console.error(
                     "Cloud collection refresh failed:",
@@ -743,6 +757,8 @@
                         "The cloud collection could not be loaded.",
                     "error"
                 );
+
+                throw error;
             } finally {
                 refreshButton.disabled = false;
             }
@@ -787,11 +803,11 @@
                         localCardIds
                     );
 
+                let finalMessage = "";
+
                 if (result?.alreadyImported) {
-                    displayStatus(
-                        "This exact browser collection was already imported. Nothing was duplicated.",
-                        "success"
-                    );
+                    finalMessage =
+                        "This exact browser collection was already imported. Nothing was duplicated.";
                 } else {
                     const importedCount =
                         result?.importedCount ?? 0;
@@ -799,7 +815,7 @@
                     const validCount =
                         result?.validCount ?? 0;
 
-                    displayStatus(
+                    finalMessage =
                         `Import complete! ${importedCount} new card${
                             importedCount === 1
                                 ? ""
@@ -808,12 +824,19 @@
                             validCount === 1
                                 ? ""
                                 : "s"
-                        } were recognized.`,
-                        "success"
-                    );
+                        } were recognized.`;
                 }
 
-                await refreshCloudCollection();
+                /*
+                 * Refresh the card display without replacing the
+                 * final import result message.
+                 */
+                await refreshCloudCollection(false);
+
+                displayStatus(
+                    finalMessage,
+                    "success"
+                );
             } catch (error) {
                 console.error(
                     "Import failed:",
@@ -887,7 +910,9 @@
 
         refreshButton.addEventListener(
             "click",
-            refreshCloudCollection
+            () => {
+                refreshCloudCollection(true);
+            }
         );
 
         initializePage();
