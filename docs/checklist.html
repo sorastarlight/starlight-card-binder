@@ -1,23 +1,395 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Checklist | Starlight Card Binder</title><link rel="stylesheet" href="css/style.css"></head><body data-page="checklist">
-<div class="sky"></div>
-<div class="site">
-  <aside class="sidebar">
-    <div class="brand">
-      <img class="logo" src="site_assets/Sora_Starlight_Logo_Primary.png" alt="Sora Starlight logo">
-      <span class="binder-ribbon">Card Binder</span>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Checklist | Starlight Card Binder
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <style>
+        .checklist-star-bits {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+
+            margin-top: 18px;
+            padding: 18px 20px;
+
+            border:
+                1px solid
+                rgba(255, 130, 200, 0.34);
+
+            border-radius: 18px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(255, 244, 252, 0.96),
+                    rgba(237, 249, 255, 0.96)
+                );
+        }
+
+        .checklist-star-bits h2 {
+            margin: 0 0 5px;
+            color: #405fa1;
+        }
+
+        .checklist-star-bits p {
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .checklist-star-bits button {
+            min-height: 46px;
+            padding: 11px 18px;
+
+            border:
+                2px solid
+                rgba(255, 130, 200, 0.45);
+
+            border-radius: 999px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ffd7ed,
+                    #dff5ff
+                );
+
+            color: #56617d;
+
+            font: inherit;
+            font-weight: 800;
+
+            cursor: not-allowed;
+            opacity: 0.76;
+        }
+    </style>
+</head>
+
+<body data-page="checklist">
+    <div class="sky"></div>
+
+    <div class="site">
+        <aside class="sidebar">
+            <div class="brand">
+                <img
+                    class="logo"
+                    src="site_assets/Sora_Starlight_Logo_Primary.png"
+                    alt="Sora Starlight logo"
+                >
+
+                <span class="binder-ribbon">
+                    Card Binder
+                </span>
+            </div>
+
+            <section class="side-card">
+                <h2 class="side-title">
+                    Collection Progress
+                </h2>
+
+                <div class="big-stat">
+                    <span data-collected>0</span>
+                    /
+                    <span data-total>0</span>
+                </div>
+
+                <div class="bar">
+                    <span data-progress></span>
+                </div>
+
+                <p>
+                    <span data-percent>0%</span>
+                    Complete ✨
+                </p>
+            </section>
+
+            <section class="side-card">
+                <h2 class="side-title">
+                    Series Progress
+                </h2>
+
+                <div
+                    id="miniSeries"
+                    class="mini-series"
+                ></div>
+            </section>
+
+            <section class="side-card filters">
+                <h2 class="side-title">
+                    Filters
+                </h2>
+
+                <label>
+                    Series
+
+                    <select data-series></select>
+                </label>
+
+                <label>
+                    Rarity
+
+                    <select data-rarity>
+                        <option>
+                            All Rarities
+                        </option>
+
+                        <option>
+                            Common
+                        </option>
+
+                        <option>
+                            Uncommon
+                        </option>
+
+                        <option>
+                            Rare
+                        </option>
+
+                        <option>
+                            Epic
+                        </option>
+
+                        <option>
+                            Legendary
+                        </option>
+                    </select>
+                </label>
+
+                <label>
+                    Sort By
+
+                    <select id="sortSelect">
+                        <option value="numberAsc">
+                            Number (Low to High)
+                        </option>
+
+                        <option value="numberDesc">
+                            Number (High to Low)
+                        </option>
+
+                        <option value="nameAsc">
+                            Name (A to Z)
+                        </option>
+
+                        <option value="rarityDesc">
+                            Rarity (Best First)
+                        </option>
+                    </select>
+                </label>
+
+                <h2 class="side-title">
+                    View
+                </h2>
+
+                <label class="checkline">
+                    <input
+                        type="radio"
+                        name="viewFilter"
+                        value="all"
+                        checked
+                    >
+
+                    All Cards
+                </label>
+
+                <label class="checkline">
+                    <input
+                        type="radio"
+                        name="viewFilter"
+                        value="collected"
+                    >
+
+                    Collected
+                </label>
+
+                <label class="checkline">
+                    <input
+                        type="radio"
+                        name="viewFilter"
+                        value="missing"
+                    >
+
+                    Not Collected
+                </label>
+
+                <button
+                    class="btn primary wide"
+                    type="button"
+                    disabled
+                    title="Duplicate conversion will be enabled with booster packs."
+                >
+                    ✦ Star Bits Exchange
+                </button>
+            </section>
+        </aside>
+
+        <main class="main">
+            <nav class="topbar">
+                <div class="nav">
+                    <a
+                        href="binder.html"
+                        data-nav="binder"
+                    >
+                        🗂️ Card Binder
+                    </a>
+
+                    <a
+                        href="collection.html"
+                        data-nav="collection"
+                    >
+                        ♡ My Collection
+                    </a>
+
+                    <a
+                        href="checklist.html"
+                        data-nav="checklist"
+                    >
+                        ☑ Checklist
+                    </a>
+
+                    <a
+                        href="socials.html"
+                        data-nav="socials"
+                    >
+                        ✉ Socials
+                    </a>
+
+                    <a
+                        href="about.html"
+                        data-nav="about"
+                    >
+                        ⓘ About
+                    </a>
+                </div>
+
+                <div class="top-actions">
+                    <input
+                        id="globalSearch"
+                        class="search"
+                        type="search"
+                        placeholder="Search cards..."
+                    >
+
+                    <button
+                        id="sfxToggle"
+                        class="sfx-toggle on"
+                        type="button"
+                        title="Sound effects"
+                    >
+                        ♪
+                    </button>
+                </div>
+            </nav>
+
+            <section class="page-head panel">
+                <p class="eyebrow">
+                    Checklist
+                </p>
+
+                <h1>
+                    Card Checklist
+                </h1>
+
+                <p>
+                    Track every card by set, rarity, collection
+                    status, and favorites.
+                </p>
+
+                <div class="checklist-star-bits">
+                    <div>
+                        <h2>
+                            ✦ Duplicate Card Exchange
+                        </h2>
+
+                        <p>
+                            Future duplicate pulls will be shown here
+                            and can be converted into Star Bits without
+                            removing your final copy.
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        disabled
+                    >
+                        Review Duplicates
+                    </button>
+                </div>
+            </section>
+
+            <section class="panel table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Card</th>
+                            <th>Name</th>
+                            <th>Series</th>
+                            <th>Artist</th>
+                            <th>Rarity</th>
+                            <th>Status</th>
+                            <th>Favorite</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="checklistBody"></tbody>
+                </table>
+            </section>
+
+            <section class="info-strip">
+                <p>
+                    <b>Starlight Mode:</b>
+                    ON hides cards until reveal. OFF lets you
+                    freely see everything.
+                </p>
+
+                <p>
+                    © 2026 Sora Starlight
+                </p>
+            </section>
+        </main>
     </div>
-    <section class="side-card"><h2 class="side-title">Collection Progress</h2><div class="big-stat"><span data-collected>0</span> / <span data-total>0</span></div><div class="bar"><span data-progress></span></div><p><span data-percent>0%</span> Complete ✨</p></section>
-    <section class="side-card"><h2 class="side-title">Series Progress</h2><div id="miniSeries" class="mini-series"></div></section>
-    <section class="side-card filters"><h2 class="side-title">Filters</h2><label>Series<select data-series></select></label><label>Rarity<select data-rarity><option>All Rarities</option><option>Common</option><option>Uncommon</option><option>Rare</option><option>Epic</option><option>Legendary</option></select></label><label>Sort By<select id="sortSelect"><option value="numberAsc">Number (Low to High)</option><option value="numberDesc">Number (High to Low)</option><option value="nameAsc">Name (A to Z)</option><option value="rarityDesc">Rarity (Best First)</option></select></label><h2 class="side-title">View</h2><label class="checkline"><input type="radio" name="viewFilter" value="all" checked> All Cards</label><label class="checkline"><input type="radio" name="viewFilter" value="collected"> Collected</label><label class="checkline"><input type="radio" name="viewFilter" value="missing"> Not Collected</label><button id="resetCollection" class="btn primary wide" type="button">↻ Reset Checklist</button></section>
-  </aside>
-  <main class="main">
-    <nav class="topbar"><div class="nav"><a href="binder.html" data-nav="binder">🗂️ Card Binder</a><a href="collection.html" data-nav="collection">♡ My Collection</a><a href="checklist.html" data-nav="checklist">☑ Checklist</a><a href="socials.html" data-nav="socials">✉ Socials</a><a href="about.html" data-nav="about">ⓘ About</a></div><div class="top-actions"><input id="globalSearch" class="search" type="search" placeholder="Search cards..."><button id="sfxToggle" class="sfx-toggle on" type="button" title="Sound effects">♪</button></div></nav>
-    <section class="page-head panel"><p class="eyebrow">Checklist</p><h1>Card Checklist</h1><p>Track every card by set, rarity, collection status, and favorites.</p></section>
-    <section class="panel table-wrap"><table class="table"><thead><tr><th>Card</th><th>Name</th><th>Series</th><th>Artist</th><th>Rarity</th><th>Status</th><th>Favorite</th></tr></thead><tbody id="checklistBody"></tbody></table></section>
-    <section class="info-strip"><p><b>Starlight Mode:</b> ON hides cards until reveal. OFF lets you freely see everything.</p><p>© 2026 Sora Starlight</p></section>
-  </main>
-</div>
-<div id="cardOverlay" aria-live="polite"></div>
-<script src="js/app.js"></script>
-<script>document.querySelectorAll('[data-nav]').forEach(link=>{if(link.dataset.nav===document.body.dataset.page)link.classList.add('active')});</script>
-</body></html>
+
+    <div
+        id="cardOverlay"
+        aria-live="polite"
+    ></div>
+
+    <!--
+        Cloud synchronization finishes before app.js starts.
+    -->
+    <script
+        type="module"
+        src="js/cloud-collection.js"
+    ></script>
+
+    <script>
+        document
+            .querySelectorAll("[data-nav]")
+            .forEach(link => {
+                if (
+                    link.dataset.nav ===
+                    document.body.dataset.page
+                ) {
+                    link.classList.add(
+                        "active"
+                    );
+                }
+            });
+    </script>
+</body>
+</html>
