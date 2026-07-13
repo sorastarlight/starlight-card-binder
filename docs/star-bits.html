@@ -63,6 +63,11 @@
             text-decoration: none;
         }
 
+        .bits-nav a:hover,
+        .bits-nav a:focus-visible {
+            background: rgba(107, 198, 248, 0.16);
+        }
+
         .bits-panel {
             padding: 32px;
 
@@ -319,8 +324,16 @@
             font: inherit;
             font-weight: 900;
 
-            cursor: not-allowed;
-            opacity: 0.65;
+            cursor: pointer;
+
+            box-shadow:
+                0 9px 24px
+                rgba(255, 130, 200, 0.24);
+        }
+
+        .exchange-button:disabled {
+            cursor: wait;
+            opacity: 0.62;
         }
 
         .empty-state {
@@ -348,12 +361,107 @@
             text-align: center;
         }
 
+        .page-status.success {
+            color: var(--bits-success);
+        }
+
         .page-status.error {
             color: var(--bits-error);
         }
 
+        .confirm-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+
+            display: grid;
+            place-items: center;
+
+            padding: 20px;
+
+            background: rgba(31, 42, 72, 0.6);
+            backdrop-filter: blur(8px);
+        }
+
+        .confirm-dialog {
+            width: min(100%, 520px);
+            padding: 27px;
+
+            border: 2px solid rgba(255, 130, 200, 0.52);
+            border-radius: 23px;
+
+            background: #ffffff;
+
+            box-shadow:
+                0 24px 70px
+                rgba(20, 28, 58, 0.32);
+
+            text-align: center;
+        }
+
+        .confirm-dialog h2 {
+            margin: 0 0 10px;
+            color: #405fa1;
+        }
+
+        .confirm-dialog p {
+            line-height: 1.6;
+        }
+
+        .confirm-warning {
+            padding: 13px;
+
+            border-radius: 13px;
+
+            background: rgba(254, 211, 52, 0.18);
+
+            color: #735800;
+            font-weight: 700;
+        }
+
+        .confirm-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 11px;
+
+            margin-top: 20px;
+        }
+
+        .confirm-actions button {
+            min-height: 47px;
+            padding: 11px 20px;
+
+            border-radius: 999px;
+
+            font: inherit;
+            font-weight: 900;
+
+            cursor: pointer;
+        }
+
+        .confirm-cancel {
+            border: 2px solid rgba(107, 198, 248, 0.52);
+
+            background: #ffffff;
+            color: #405fa1;
+        }
+
+        .confirm-convert {
+            border: 0;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--bits-gold),
+                    var(--bits-pink)
+                );
+
+            color: #ffffff;
+        }
+
         .hidden {
-            display: none;
+            display: none !important;
         }
 
         @media (max-width: 820px) {
@@ -398,6 +506,10 @@
 
             .duplicate-card {
                 padding: 9px;
+            }
+
+            .confirm-actions button {
+                width: 100%;
             }
         }
     </style>
@@ -520,12 +632,12 @@
                 class="empty-state hidden"
             >
                 <h2>
-                    No Duplicates Yet
+                    No Duplicates Available
                 </h2>
 
                 <p>
-                    Your extra copies will appear here after you
-                    begin opening Daily Boosters and reward packs.
+                    Your extra copies will appear here after
+                    opening Daily Boosters and reward packs.
                 </p>
             </section>
 
@@ -533,22 +645,22 @@
                 id="exchange-box"
                 class="exchange-box hidden"
             >
-                <h2 id="exchange-heading">
-                    Conversion Preview
+                <h2>
+                    Conversion Available
                 </h2>
 
                 <p id="exchange-description"></p>
 
                 <button
+                    id="exchange-button"
                     class="exchange-button"
                     type="button"
-                    disabled
                 >
                     Convert All Duplicates
                 </button>
 
                 <p>
-                    Conversion will be activated in the next update.
+                    One permanent copy of every card is protected.
                 </p>
             </section>
 
@@ -563,11 +675,54 @@
         </section>
     </main>
 
+    <div
+        id="confirm-overlay"
+        class="confirm-overlay hidden"
+    >
+        <section
+            class="confirm-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="confirm-heading"
+            aria-describedby="confirm-description"
+        >
+            <h2 id="confirm-heading">
+                Convert Your Duplicates?
+            </h2>
+
+            <p id="confirm-description"></p>
+
+            <p class="confirm-warning">
+                This cannot be undone. Your final copy of every
+                card will remain safely in your collection.
+            </p>
+
+            <div class="confirm-actions">
+                <button
+                    id="cancel-conversion"
+                    class="confirm-cancel"
+                    type="button"
+                >
+                    Keep My Duplicates
+                </button>
+
+                <button
+                    id="confirm-conversion"
+                    class="confirm-convert"
+                    type="button"
+                >
+                    Convert to Star Bits
+                </button>
+            </div>
+        </section>
+    </div>
+
     <script type="module">
         import { supabase } from
             "./js/supabase-client.js";
 
         import {
+            convertAllDuplicatesToStarBits,
             getStarBitsExchangePreview
         } from "./js/star-bits-service.js";
 
@@ -635,6 +790,67 @@
             document.getElementById(
                 "exchange-description"
             );
+
+        const exchangeButton =
+            document.getElementById(
+                "exchange-button"
+            );
+
+        const confirmOverlay =
+            document.getElementById(
+                "confirm-overlay"
+            );
+
+        const confirmDescription =
+            document.getElementById(
+                "confirm-description"
+            );
+
+        const cancelConversionButton =
+            document.getElementById(
+                "cancel-conversion"
+            );
+
+        const confirmConversionButton =
+            document.getElementById(
+                "confirm-conversion"
+            );
+
+        let currentPreview = null;
+        let isConverting = false;
+
+        function displayStatus(
+            message,
+            type = ""
+        ) {
+            pageStatus.textContent =
+                message;
+
+            pageStatus.classList.remove(
+                "success",
+                "error"
+            );
+
+            if (type) {
+                pageStatus.classList.add(
+                    type
+                );
+            }
+        }
+
+        function hideDynamicSections() {
+            duplicateSection.classList.add(
+                "hidden"
+            );
+
+            emptyState.classList.add(
+                "hidden"
+            );
+
+            exchangeBox.classList.add(
+                "hidden"
+            );
+        }
 
         function renderRates(rates) {
             const rarityOrder = [
@@ -733,7 +949,11 @@
                     );
 
                 quantity.textContent =
-                    `${card.totalQuantity} owned • ${card.duplicateQuantity} duplicate`;
+                    `${card.totalQuantity} owned • ${card.duplicateQuantity} duplicate${
+                        card.duplicateQuantity === 1
+                            ? ""
+                            : "s"
+                    }`;
 
                 const value =
                     document.createElement(
@@ -760,52 +980,11 @@
             }
         }
 
-        async function initializePage() {
-            const {
-                data,
-                error: userError
-            } =
-                await supabase.auth.getUser();
+        function renderPreview(preview) {
+            currentPreview =
+                preview;
 
-            if (
-                userError ||
-                !data.user
-            ) {
-                pageStatus.textContent =
-                    "Please sign in to view your Star Bits exchange.";
-
-                pageStatus.classList.add(
-                    "error"
-                );
-
-                window.setTimeout(() => {
-                    window.location.href =
-                        "./login.html";
-                }, 1400);
-
-                return;
-            }
-
-            const {
-                preview,
-                error
-            } =
-                await getStarBitsExchangePreview();
-
-            if (
-                error ||
-                !preview
-            ) {
-                pageStatus.textContent =
-                    error?.message ||
-                    "The Star Bits preview could not be loaded.";
-
-                pageStatus.classList.add(
-                    "error"
-                );
-
-                return;
-            }
+            hideDynamicSections();
 
             balanceValue.textContent =
                 String(
@@ -856,7 +1035,11 @@
                 );
 
                 exchangeDescription.textContent =
-                    `You can convert ${preview.totalDuplicateCopies} duplicate card copies into ${preview.totalExchangeValue} Star Bits. One permanent copy of every card will be kept.`;
+                    `Convert ${preview.totalDuplicateCopies} duplicate card ${
+                        preview.totalDuplicateCopies === 1
+                            ? "copy"
+                            : "copies"
+                    } into ${preview.totalExchangeValue} Star Bits.`;
 
                 exchangeBox.classList.remove(
                     "hidden"
@@ -866,10 +1049,225 @@
                     "hidden"
                 );
             }
-
-            pageStatus.textContent =
-                "Star Bits preview loaded.";
         }
+
+        async function loadPreview(
+            successMessage = ""
+        ) {
+            displayStatus(
+                "Loading your Star Bits exchange…"
+            );
+
+            const {
+                preview,
+                error
+            } =
+                await getStarBitsExchangePreview();
+
+            if (
+                error ||
+                !preview
+            ) {
+                displayStatus(
+                    error?.message ||
+                    "The Star Bits exchange could not be loaded.",
+                    "error"
+                );
+
+                return;
+            }
+
+            renderPreview(
+                preview
+            );
+
+            displayStatus(
+                successMessage ||
+                "Star Bits exchange loaded.",
+                successMessage
+                    ? "success"
+                    : ""
+            );
+        }
+
+        function openConfirmation() {
+            if (
+                !currentPreview ||
+                currentPreview.totalDuplicateCopies <= 0
+            ) {
+                return;
+            }
+
+            confirmDescription.textContent =
+                `You are about to convert ${currentPreview.totalDuplicateCopies} duplicate card ${
+                    currentPreview.totalDuplicateCopies === 1
+                        ? "copy"
+                        : "copies"
+                } into ${currentPreview.totalExchangeValue} Star Bits.`;
+
+            confirmOverlay.classList.remove(
+                "hidden"
+            );
+
+            document.body.style.overflow =
+                "hidden";
+
+            confirmConversionButton.focus();
+        }
+
+        function closeConfirmation() {
+            if (isConverting) {
+                return;
+            }
+
+            confirmOverlay.classList.add(
+                "hidden"
+            );
+
+            document.body.style.overflow =
+                "";
+
+            exchangeButton.focus();
+        }
+
+        async function performConversion() {
+            if (isConverting) {
+                return;
+            }
+
+            isConverting = true;
+
+            confirmConversionButton.disabled =
+                true;
+
+            cancelConversionButton.disabled =
+                true;
+
+            confirmConversionButton.textContent =
+                "Converting…";
+
+            displayStatus(
+                "Converting duplicate cards into Star Bits…"
+            );
+
+            try {
+                const result =
+                    await convertAllDuplicatesToStarBits();
+
+                confirmOverlay.classList.add(
+                    "hidden"
+                );
+
+                document.body.style.overflow =
+                    "";
+
+                if (result.nothingToConvert) {
+                    await loadPreview(
+                        "There were no duplicate cards left to convert."
+                    );
+
+                    return;
+                }
+
+                await loadPreview(
+                    `Conversion complete! ${result.convertedDuplicateCopies} duplicate ${
+                        result.convertedDuplicateCopies === 1
+                            ? "copy was"
+                            : "copies were"
+                    } converted into ${result.starBitsEarned} Star Bits. Your new balance is ${result.newStarBitsBalance}.`
+                );
+            } catch (error) {
+                console.error(
+                    "Star Bits conversion failed:",
+                    error
+                );
+
+                displayStatus(
+                    error.message ||
+                    "Your duplicate cards could not be converted.",
+                    "error"
+                );
+            } finally {
+                isConverting = false;
+
+                confirmConversionButton.disabled =
+                    false;
+
+                cancelConversionButton.disabled =
+                    false;
+
+                confirmConversionButton.textContent =
+                    "Convert to Star Bits";
+            }
+        }
+
+        async function initializePage() {
+            const {
+                data,
+                error
+            } =
+                await supabase.auth.getUser();
+
+            if (
+                error ||
+                !data.user
+            ) {
+                displayStatus(
+                    "Please sign in to use the Star Bits Exchange.",
+                    "error"
+                );
+
+                window.setTimeout(() => {
+                    window.location.href =
+                        "./login.html";
+                }, 1400);
+
+                return;
+            }
+
+            await loadPreview();
+        }
+
+        exchangeButton.addEventListener(
+            "click",
+            openConfirmation
+        );
+
+        cancelConversionButton.addEventListener(
+            "click",
+            closeConfirmation
+        );
+
+        confirmConversionButton.addEventListener(
+            "click",
+            performConversion
+        );
+
+        confirmOverlay.addEventListener(
+            "click",
+            event => {
+                if (
+                    event.target ===
+                    confirmOverlay
+                ) {
+                    closeConfirmation();
+                }
+            }
+        );
+
+        document.addEventListener(
+            "keydown",
+            event => {
+                if (
+                    event.key === "Escape" &&
+                    !confirmOverlay.classList.contains(
+                        "hidden"
+                    )
+                ) {
+                    closeConfirmation();
+                }
+            }
+        );
 
         initializePage();
     </script>

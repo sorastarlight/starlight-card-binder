@@ -29,3 +29,30 @@ export async function getStarBitsExchangePreview() {
         error: null
     };
 }
+
+/**
+ * Securely converts every duplicate card copy into Star Bits.
+ *
+ * Supabase keeps one permanent copy of every card and performs
+ * quantity updates, wallet crediting, and transaction logging
+ * together inside the database.
+ */
+export async function convertAllDuplicatesToStarBits() {
+    const {
+        data,
+        error
+    } = await supabase.rpc(
+        "convert_all_duplicates_to_star_bits"
+    );
+
+    if (error) {
+        console.error(
+            "Unable to convert duplicate cards:",
+            error
+        );
+
+        throw error;
+    }
+
+    return data;
+}
