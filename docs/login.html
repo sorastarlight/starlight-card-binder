@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Login | Starlight Cards</title>
+
+    <!-- Supabase JavaScript library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 24px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-family: Arial, Helvetica, sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(255, 181, 220, 0.55),
+                    transparent 38%
+                ),
+                radial-gradient(
+                    circle at bottom right,
+                    rgba(130, 210, 255, 0.55),
+                    transparent 42%
+                ),
+                linear-gradient(
+                    135deg,
+                    #fff4fb,
+                    #eef9ff
+                );
+
+            color: #313552;
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 420px;
+
+            padding: 34px;
+
+            background: rgba(255, 255, 255, 0.92);
+
+            border: 2px solid rgba(255, 143, 201, 0.35);
+            border-radius: 24px;
+
+            box-shadow:
+                0 20px 50px rgba(58, 73, 120, 0.15),
+                0 0 35px rgba(255, 151, 211, 0.15);
+
+            backdrop-filter: blur(12px);
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            text-align: center;
+            color: #ff65ad;
+        }
+
+        .subtitle {
+            margin: 0 0 26px;
+            text-align: center;
+            color: #66708e;
+        }
+
+        label {
+            display: block;
+            margin: 14px 0 7px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px 14px;
+
+            border: 1px solid #cfd8ea;
+            border-radius: 12px;
+
+            font-size: 16px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #6bc6f8;
+            box-shadow: 0 0 0 4px rgba(107, 198, 248, 0.18);
+        }
+
+        button {
+            width: 100%;
+            padding: 13px 16px;
+            margin-top: 13px;
+
+            border: none;
+            border-radius: 12px;
+
+            font-size: 16px;
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.15s ease,
+                opacity 0.15s ease;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        #create-account-button {
+            margin-top: 22px;
+
+            background: linear-gradient(
+                135deg,
+                #ff73b7,
+                #ff9fd0
+            );
+
+            color: white;
+        }
+
+        #login-button {
+            background: linear-gradient(
+                135deg,
+                #65bfee,
+                #91d8fa
+            );
+
+            color: white;
+        }
+
+        #message {
+            display: none;
+
+            margin-top: 20px;
+            padding: 13px;
+
+            border-radius: 12px;
+
+            line-height: 1.45;
+            text-align: center;
+            overflow-wrap: anywhere;
+        }
+
+        #message.info {
+            display: block;
+
+            background: #edf7ff;
+            border: 1px solid #addfff;
+
+            color: #245a78;
+        }
+
+        #message.success {
+            display: block;
+
+            background: #edfff3;
+            border: 1px solid #a7e8bd;
+
+            color: #24653b;
+        }
+
+        #message.error {
+            display: block;
+
+            background: #fff0f3;
+            border: 1px solid #ffb4c3;
+
+            color: #9b2740;
+        }
+
+        .back-link {
+            display: block;
+
+            margin-top: 22px;
+
+            text-align: center;
+            color: #64708e;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="login-box">
+        <h1>Starlight Cards ✨</h1>
+
+        <p class="subtitle">
+            Sign in or create your collector account.
+        </p>
+
+        <form id="auth-form">
+            <label for="email">Email address</label>
+
+            <input
+                id="email"
+                type="email"
+                autocomplete="email"
+                placeholder="you@example.com"
+                required
+            >
+
+            <label for="password">Password</label>
+
+            <input
+                id="password"
+                type="password"
+                autocomplete="current-password"
+                placeholder="At least 6 characters"
+                minlength="6"
+                required
+            >
+
+            <button
+                id="create-account-button"
+                type="button"
+            >
+                Create Account
+            </button>
+
+            <button
+                id="login-button"
+                type="button"
+            >
+                Log In
+            </button>
+        </form>
+
+        <div
+            id="message"
+            role="status"
+            aria-live="polite"
+        ></div>
+
+        <a class="back-link" href="index.html">
+            ← Return to the Starlight Card Binder
+        </a>
+    </main>
+
+    <script>
+        /*
+         * Replace BOTH values below with the information
+         * from your Supabase project.
+         *
+         * Do not use the service_role secret key here.
+         */
+
+        const SUPABASE_URL =
+            "https://noxfauxbfdqgoxgiwrpu.supabase.co";
+
+        const SUPABASE_PUBLIC_KEY =
+            "sb_publishable_2M6ZMyz6KXAkaKD6AI6Bvg_DxCh1-JW";
+
+        const messageBox =
+            document.getElementById("message");
+
+        const emailInput =
+            document.getElementById("email");
+
+        const passwordInput =
+            document.getElementById("password");
+
+        const createAccountButton =
+            document.getElementById("create-account-button");
+
+        const loginButton =
+            document.getElementById("login-button");
+
+        function showMessage(text, type = "info") {
+            messageBox.textContent = text;
+            messageBox.className = type;
+        }
+
+        function setButtonsDisabled(disabled) {
+            createAccountButton.disabled = disabled;
+            loginButton.disabled = disabled;
+        }
+
+        function getCredentials() {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+
+            if (!email) {
+                showMessage(
+                    "Please enter your email address.",
+                    "error"
+                );
+
+                emailInput.focus();
+                return null;
+            }
+
+            if (!password) {
+                showMessage(
+                    "Please enter a password.",
+                    "error"
+                );
+
+                passwordInput.focus();
+                return null;
+            }
+
+            if (password.length < 6) {
+                showMessage(
+                    "Your password must contain at least 6 characters.",
+                    "error"
+                );
+
+                passwordInput.focus();
+                return null;
+            }
+
+            return {
+                email,
+                password
+            };
+        }
+
+        let supabaseClient;
+
+        try {
+            if (
+                SUPABASE_URL.includes("PASTE_") ||
+                SUPABASE_PUBLIC_KEY.includes("PASTE_")
+            ) {
+                throw new Error(
+                    "Your Supabase Project URL and public key have not been added to login.html yet."
+                );
+            }
+
+            if (!window.supabase) {
+                throw new Error(
+                    "The Supabase library did not load. Check your internet connection or browser console."
+                );
+            }
+
+            supabaseClient =
+                window.supabase.createClient(
+                    SUPABASE_URL,
+                    SUPABASE_PUBLIC_KEY
+                );
+
+            console.log("Supabase client loaded successfully.");
+        } catch (error) {
+            console.error(error);
+
+            showMessage(
+                error.message,
+                "error"
+            );
+        }
+
+        async function createAccount() {
+            const credentials = getCredentials();
+
+            if (!credentials) {
+                return;
+            }
+
+            if (!supabaseClient) {
+                showMessage(
+                    "Supabase is not configured yet. Add your Project URL and public key near the bottom of login.html.",
+                    "error"
+                );
+
+                return;
+            }
+
+            try {
+                setButtonsDisabled(true);
+
+                createAccountButton.textContent =
+                    "Creating Account...";
+
+                showMessage(
+                    "Contacting Supabase...",
+                    "info"
+                );
+
+                const { data, error } =
+                    await supabaseClient.auth.signUp({
+                        email: credentials.email,
+                        password: credentials.password,
+
+                        options: {
+                            emailRedirectTo:
+                                window.location.origin +
+                                window.location.pathname
+                        }
+                    });
+
+                if (error) {
+                    throw error;
+                }
+
+                console.log(
+                    "Supabase sign-up response:",
+                    data
+                );
+
+                if (data.session) {
+                    showMessage(
+                        "Your account was created and you are now logged in! Redirecting...",
+                        "success"
+                    );
+
+                    setTimeout(() => {
+                        window.location.href = "index.html";
+                    }, 1200);
+                } else {
+                    showMessage(
+                        "Account created! Check your email for a confirmation message, then return here to log in.",
+                        "success"
+                    );
+                }
+            } catch (error) {
+                console.error(
+                    "Account creation error:",
+                    error
+                );
+
+                showMessage(
+                    error.message ||
+                    "Something went wrong while creating your account.",
+                    "error"
+                );
+            } finally {
+                setButtonsDisabled(false);
+
+                createAccountButton.textContent =
+                    "Create Account";
+            }
+        }
+
+        async function logIn() {
+            const credentials = getCredentials();
+
+            if (!credentials) {
+                return;
+            }
+
+            if (!supabaseClient) {
+                showMessage(
+                    "Supabase is not configured yet. Add your Project URL and public key near the bottom of login.html.",
+                    "error"
+                );
+
+                return;
+            }
+
+            try {
+                setButtonsDisabled(true);
+
+                loginButton.textContent =
+                    "Logging In...";
+
+                showMessage(
+                    "Logging you in...",
+                    "info"
+                );
+
+                const { data, error } =
+                    await supabaseClient.auth.signInWithPassword({
+                        email: credentials.email,
+                        password: credentials.password
+                    });
+
+                if (error) {
+                    throw error;
+                }
+
+                console.log(
+                    "Supabase login response:",
+                    data
+                );
+
+                showMessage(
+                    "Login successful! Redirecting...",
+                    "success"
+                );
+
+                setTimeout(() => {
+                    window.location.href = "index.html";
+                }, 900);
+            } catch (error) {
+                console.error(
+                    "Login error:",
+                    error
+                );
+
+                showMessage(
+                    error.message ||
+                    "Something went wrong while logging in.",
+                    "error"
+                );
+            } finally {
+                setButtonsDisabled(false);
+
+                loginButton.textContent =
+                    "Log In";
+            }
+        }
+
+        createAccountButton.addEventListener(
+            "click",
+            createAccount
+        );
+
+        loginButton.addEventListener(
+            "click",
+            logIn
+        );
+
+        document
+            .getElementById("auth-form")
+            .addEventListener(
+                "submit",
+                (event) => {
+                    event.preventDefault();
+                    logIn();
+                }
+            );
+    </script>
+</body>
+</html>
