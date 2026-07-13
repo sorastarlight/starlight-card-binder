@@ -1,273 +1,239 @@
-import { supabase } from "./supabase-client.js";
+import {
+    getCurrentUser,
+    loadCloudCollection
+} from "./collection-sync.js";
 
-const LOCAL_COLLECTION_KEY =
+const COLLECTION_KEY =
     "sora-starlight-card-binder-v5-collected";
 
+const FAVORITES_KEY =
+    "sora-starlight-card-binder-v5-favorites";
+
 /**
- * Reads the old V79.9 collection from localStorage.
+ * Loads app.js only after cloud synchronization has finished.
  *
- * Expected format:
+ * app.js is intentionally loaded as a normal classic script because
+ * the Binder uses global functions such as toggleCollected().
+ */
+function loadBinderApplication() {
+    return new Promise((resolve, reject) => {
+        if (
+            document.querySelector(
+                'script[data-starlight-app="true"]'
+            )
+        ) {
+            resolve();
+            return;
+        }
+
+        const script =
+            document.createElement("script");
+
+        script.src = "./js/app.js";
+        script.async = false;
+
+        script.dataset.starlightApp =
+            "true";
+
+        script.addEventListener(
+            "load",
+            () => {
+                console.log(
+                    "[Starlight] Binder application loaded."
+                );
+
+                resolve();
+            },
+            {
+                once: true
+            }
+        );
+
+        script.addEventListener(
+            "error",
+            () => {
+                reject(
+                    new Error(
+                        "The Binder application could not be loaded."
+                    )
+                );
+            },
+            {
+                once: true
+            }
+        );
+
+        document.body.appendChild(script);
+    });
+}
+
+/**
+ * Converts Supabase ownership rows into the same object format
+ * already used by the original Binder.
+ *
+ * Example:
  * {
  *   "s01-003": true,
  *   "s01-008": true
  * }
  */
-export function readLegacyCollection() {
-    const rawValue =
-        window.localStorage.getItem(
-            LOCAL_COLLECTION_KEY
+function createLocalStores(cloudRows) {
+    const collectedCards = {};
+    const favoriteCards = {};
+
+    for (const row of cloudRows) {
+        const cardId =
+            String(
+                row?.card_id || ""
+            ).trim();
+
+        if (!cardId) {
+            continue;
+        }
+
+        collectedCards[cardId] =
+            true;
+
+        if (
+            row.is_favorite === true
+        ) {
+            favoriteCards[cardId] =
+                true;
+        }
+    }
+
+    return {
+        collectedCards,
+        favoriteCards
+    };
+}
+
+/**
+ * Downloads the authenticated user's collection and mirrors it
+ * into the local-storage format expected by app.js.
+ */
+async function synchronizeCloudCollection() {
+    const {
+        user,
+        error: userError
+    } = await getCurrentUser();
+
+    if (
+        userError ||
+        !user
+    ) {
+        console.log(
+            "[Starlight] No signed-in account. Using this browser's local collection."
         );
 
-    if (!rawValue) {
         return {
-            exists: false,
-            cardIds: [],
-            rawValue: null
+            signedIn: false,
+            synchronized: false,
+            cardCount: 0
         };
+    }
+
+    console.log(
+        "[Starlight] Signed in as:",
+        user.email
+    );
+
+    const {
+        cards,
+        error: collectionError
+    } = await loadCloudCollection();
+
+    if (collectionError) {
+        throw collectionError;
+    }
+
+    const cloudRows =
+        Array.isArray(cards)
+            ? cards
+            : [];
+
+    const {
+        collectedCards,
+        favoriteCards
+    } = createLocalStores(
+        cloudRows
+    );
+
+    window.localStorage.setItem(
+        COLLECTION_KEY,
+        JSON.stringify(
+            collectedCards
+        )
+    );
+
+    window.localStorage.setItem(
+        FAVORITES_KEY,
+        JSON.stringify(
+            favoriteCards
+        )
+    );
+
+    const cardCount =
+        Object.keys(
+            collectedCards
+        ).length;
+
+    const favoriteCount =
+        Object.keys(
+            favoriteCards
+        ).length;
+
+    console.log(
+        `[Starlight] Cloud synchronization complete: ${cardCount} collected card(s), ${favoriteCount} favorite card(s).`
+    );
+
+    return {
+        signedIn: true,
+        synchronized: true,
+        cardCount,
+        favoriteCount
+    };
+}
+
+/**
+ * Performs cloud synchronization first, then starts the original
+ * Binder application.
+ *
+ * If Supabase is temporarily unavailable, the Binder still starts
+ * using the last local copy instead of becoming unusable.
+ */
+async function initializeStarlightBinder() {
+    document.documentElement.classList.add(
+        "starlight-cloud-loading"
+    );
+
+    try {
+        await synchronizeCloudCollection();
+    } catch (error) {
+        console.error(
+            "[Starlight] Cloud synchronization failed. Continuing with the local browser collection:",
+            error
+        );
     }
 
     try {
-        const parsedValue = JSON.parse(rawValue);
-
-        if (
-            !parsedValue ||
-            typeof parsedValue !== "object" ||
-            Array.isArray(parsedValue)
-        ) {
-            throw new Error(
-                "The saved collection is not in the expected format."
-            );
-        }
-
-        const cardIds = Object.entries(parsedValue)
-            .filter(([, isCollected]) => {
-                return isCollected === true;
-            })
-            .map(([cardId]) => {
-                return String(cardId).trim();
-            })
-            .filter(Boolean)
-            .filter((cardId, index, allCardIds) => {
-                return allCardIds.indexOf(cardId) === index;
-            })
-            .sort();
-
-        return {
-            exists: true,
-            cardIds,
-            rawValue
-        };
+        await loadBinderApplication();
     } catch (error) {
         console.error(
-            "Unable to read the local collection:",
+            "[Starlight] Binder startup failed:",
             error
         );
-
-        return {
-            exists: true,
-            cardIds: [],
-            rawValue,
-            error:
-                "The browser collection exists, but it could not be read."
-        };
-    }
-}
-
-/**
- * Creates a repeatable SHA-256 hash for the import.
- *
- * Importing the same exact local collection twice will produce
- * the same hash, allowing Supabase to reject duplicate imports.
- */
-export async function createCollectionHash(cardIds) {
-    const normalizedValue =
-        JSON.stringify(
-            [...cardIds].sort()
+    } finally {
+        document.documentElement.classList.remove(
+            "starlight-cloud-loading"
         );
 
-    const encodedValue =
-        new TextEncoder().encode(
-            normalizedValue
-        );
-
-    const hashBuffer =
-        await window.crypto.subtle.digest(
-            "SHA-256",
-            encodedValue
-        );
-
-    return Array.from(
-        new Uint8Array(hashBuffer)
-    )
-        .map(byte => {
-            return byte
-                .toString(16)
-                .padStart(2, "0");
-        })
-        .join("");
-}
-
-/**
- * Returns the current authenticated user.
- */
-export async function getCurrentUser() {
-    const {
-        data,
-        error
-    } = await supabase.auth.getUser();
-
-    if (error) {
-        console.error(
-            "Unable to retrieve the signed-in user:",
-            error
-        );
-
-        return {
-            user: null,
-            error
-        };
-    }
-
-    return {
-        user: data.user,
-        error: null
-    };
-}
-
-/**
- * Loads catalog details for a list of card IDs.
- */
-export async function loadCatalogCards(cardIds) {
-    if (!Array.isArray(cardIds) || cardIds.length === 0) {
-        return {
-            cards: [],
-            error: null
-        };
-    }
-
-    const {
-        data,
-        error
-    } = await supabase
-        .from("cards")
-        .select(`
-            id,
-            card_number,
-            name,
-            rarity,
-            thumbnail_url,
-            image_url,
-            series_id
-        `)
-        .in("id", cardIds)
-        .order("sort_order", {
-            ascending: true
-        });
-
-    if (error) {
-        console.error(
-            "Unable to load card information:",
-            error
-        );
-
-        return {
-            cards: [],
-            error
-        };
-    }
-
-    return {
-        cards: data || [],
-        error: null
-    };
-}
-
-/**
- * Imports the old browser collection through the secure
- * Supabase database function.
- */
-export async function importLegacyCollection(cardIds) {
-    if (!Array.isArray(cardIds)) {
-        throw new Error(
-            "The supplied collection is invalid."
-        );
-    }
-
-    if (cardIds.length === 0) {
-        throw new Error(
-            "There are no collected cards to import."
-        );
-    }
-
-    const importHash =
-        await createCollectionHash(cardIds);
-
-    const {
-        data,
-        error
-    } = await supabase.rpc(
-        "import_legacy_collection",
-        {
-            collected_card_ids: cardIds,
-            requested_import_hash: importHash
-        }
-    );
-
-    if (error) {
-        console.error(
-            "Collection import failed:",
-            error
-        );
-
-        throw error;
-    }
-
-    return data;
-}
-
-/**
- * Loads all cards owned by the current signed-in user.
- */
-export async function loadCloudCollection() {
-    const {
-        data,
-        error
-    } = await supabase
-        .from("user_cards")
-        .select(`
-            card_id,
-            quantity,
-            is_favorite,
-            first_obtained_at,
-            last_obtained_at,
-            cards (
-                id,
-                card_number,
-                name,
-                rarity,
-                thumbnail_url,
-                image_url,
-                series_id
+        window.dispatchEvent(
+            new CustomEvent(
+                "starlight-cloud-ready"
             )
-        `)
-        .order("first_obtained_at", {
-            ascending: true
-        });
-
-    if (error) {
-        console.error(
-            "Unable to load the cloud collection:",
-            error
         );
-
-        return {
-            cards: [],
-            error
-        };
     }
-
-    return {
-        cards: data || [],
-        error: null
-    };
 }
+
+initializeStarlightBinder();
