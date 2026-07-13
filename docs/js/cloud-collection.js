@@ -1,3 +1,5 @@
+import { supabase } from "./supabase-client.js";
+
 import {
     getCurrentUser,
     loadCloudCollection
@@ -9,9 +11,60 @@ const COLLECTION_KEY =
 const FAVORITES_KEY =
     "sora-starlight-card-binder-v5-favorites";
 
+const FAVORITE_CHECK_INTERVAL_MS = 500;
+
+let currentUser = null;
+let favoriteMonitorTimer = null;
+let previousFavoriteStore = {};
+let favoriteSyncQueue = Promise.resolve();
+
 /**
- * Converts Supabase ownership rows into the object format used
- * by the original Starlight Card Binder.
+ * Safely reads one of the Binder's object-based localStorage values.
+ */
+function readLocalObject(key) {
+    try {
+        const rawValue =
+            window.localStorage.getItem(key);
+
+        if (!rawValue) {
+            return {};
+        }
+
+        const parsedValue =
+            JSON.parse(rawValue);
+
+        if (
+            !parsedValue ||
+            typeof parsedValue !== "object" ||
+            Array.isArray(parsedValue)
+        ) {
+            return {};
+        }
+
+        return parsedValue;
+    } catch (error) {
+        console.error(
+            `[Starlight] Unable to read ${key}:`,
+            error
+        );
+
+        return {};
+    }
+}
+
+/**
+ * Writes one of the Binder's object-based localStorage values.
+ */
+function writeLocalObject(key, value) {
+    window.localStorage.setItem(
+        key,
+        JSON.stringify(value)
+    );
+}
+
+/**
+ * Converts Supabase ownership rows into the formats already used
+ * by the original Binder.
  */
 function createLocalStores(cloudRows) {
     const collectedCards = {};
@@ -39,8 +92,8 @@ function createLocalStores(cloudRows) {
 }
 
 /**
- * Downloads the signed-in user's cloud collection and mirrors
- * it into the localStorage keys already used by app.js.
+ * Downloads the signed-in user's cloud collection and mirrors it
+ * into the localStorage keys used by app.js.
  */
 async function synchronizeCloudCollection() {
     const {
@@ -49,6 +102,8 @@ async function synchronizeCloudCollection() {
     } = await getCurrentUser();
 
     if (userError || !user) {
+        currentUser = null;
+
         console.log(
             "[Starlight] No signed-in account. Using the browser collection."
         );
@@ -58,6 +113,8 @@ async function synchronizeCloudCollection() {
             synchronized: false
         };
     }
+
+    currentUser = user;
 
     console.log(
         "[Starlight] Signed in as:",
@@ -83,15 +140,19 @@ async function synchronizeCloudCollection() {
         favoriteCards
     } = createLocalStores(cloudRows);
 
-    window.localStorage.setItem(
+    writeLocalObject(
         COLLECTION_KEY,
-        JSON.stringify(collectedCards)
+        collectedCards
     );
 
-    window.localStorage.setItem(
+    writeLocalObject(
         FAVORITES_KEY,
-        JSON.stringify(favoriteCards)
+        favoriteCards
     );
+
+    previousFavoriteStore = {
+        ...favoriteCards
+    };
 
     const cardCount =
         Object.keys(collectedCards).length;
@@ -109,6 +170,164 @@ async function synchronizeCloudCollection() {
         cardCount,
         favoriteCount
     };
+}
+
+/**
+ * Saves one favorite change through the protected Supabase
+ * database function.
+ */
+async function saveFavoriteToCloud(
+    cardId,
+    favoriteState,
+    previousState
+) {
+    const {
+        data,
+        error
+    } = await supabase.rpc(
+        "set_card_favorite",
+        {
+            requested_card_id: cardId,
+            favorite_state: favoriteState
+        }
+    );
+
+    if (error) {
+        console.error(
+            `[Starlight] Favorite sync failed for ${cardId}:`,
+            error
+        );
+
+        /*
+         * Roll the browser state back if Supabase rejects the change.
+         * This normally happens if the account does not own the card.
+         */
+        const correctedStore =
+            readLocalObject(FAVORITES_KEY);
+
+        if (previousState) {
+            correctedStore[cardId] = true;
+        } else {
+            delete correctedStore[cardId];
+        }
+
+        previousFavoriteStore = {
+            ...correctedStore
+        };
+
+        writeLocalObject(
+            FAVORITES_KEY,
+            correctedStore
+        );
+
+        if (
+            typeof window.renderAll ===
+            "function"
+        ) {
+            window.renderAll();
+        }
+
+        return;
+    }
+
+    console.log(
+        `[Starlight] Favorite synchronized: ${cardId} = ${favoriteState}`,
+        data
+    );
+}
+
+/**
+ * Detects changes made by app.js to the local favorites object and
+ * sends those changes to Supabase.
+ */
+function checkForFavoriteChanges() {
+    if (!currentUser) {
+        return;
+    }
+
+    const latestFavoriteStore =
+        readLocalObject(FAVORITES_KEY);
+
+    const allCardIds =
+        new Set([
+            ...Object.keys(previousFavoriteStore),
+            ...Object.keys(latestFavoriteStore)
+        ]);
+
+    const changes = [];
+
+    for (const cardId of allCardIds) {
+        const previousState =
+            previousFavoriteStore[cardId] === true;
+
+        const latestState =
+            latestFavoriteStore[cardId] === true;
+
+        if (previousState === latestState) {
+            continue;
+        }
+
+        changes.push({
+            cardId,
+            previousState,
+            latestState
+        });
+    }
+
+    if (changes.length === 0) {
+        return;
+    }
+
+    /*
+     * Update our snapshot immediately so the same UI change is not
+     * submitted repeatedly while the network request is running.
+     */
+    previousFavoriteStore = {
+        ...latestFavoriteStore
+    };
+
+    for (const change of changes) {
+        favoriteSyncQueue =
+            favoriteSyncQueue
+                .then(() => {
+                    return saveFavoriteToCloud(
+                        change.cardId,
+                        change.latestState,
+                        change.previousState
+                    );
+                })
+                .catch(error => {
+                    console.error(
+                        "[Starlight] Favorite synchronization queue failed:",
+                        error
+                    );
+                });
+    }
+}
+
+/**
+ * Watches the favorite storage object for changes made by app.js.
+ */
+function startFavoriteMonitor() {
+    if (
+        !currentUser ||
+        favoriteMonitorTimer
+    ) {
+        return;
+    }
+
+    previousFavoriteStore =
+        readLocalObject(FAVORITES_KEY);
+
+    favoriteMonitorTimer =
+        window.setInterval(
+            checkForFavoriteChanges,
+            FAVORITE_CHECK_INTERVAL_MS
+        );
+
+    console.log(
+        "[Starlight] Cloud favorite synchronization enabled."
+    );
 }
 
 /**
@@ -166,11 +385,8 @@ function loadBinderApplication() {
 }
 
 /**
- * app.js normally initializes through DOMContentLoaded.
- *
- * Because we intentionally load app.js after cloud sync, the real
- * DOMContentLoaded event may already have happened. This sends a
- * replacement event so the existing Binder startup code runs.
+ * app.js normally initializes through DOMContentLoaded. Because it
+ * loads after cloud synchronization, we send a replacement event.
  */
 function startBinderApplication() {
     if (document.readyState === "loading") {
@@ -187,11 +403,8 @@ function startBinderApplication() {
 }
 
 /**
- * Synchronizes the cloud collection first, then loads and starts
- * the original Binder.
- *
- * If Supabase is unavailable, the Binder still starts using the
- * most recent browser copy.
+ * Synchronizes cloud ownership, starts the original Binder, and
+ * then begins monitoring favorites.
  */
 async function initializeStarlightBinder() {
     document.documentElement.classList.add(
@@ -211,6 +424,8 @@ async function initializeStarlightBinder() {
         await loadBinderApplication();
 
         startBinderApplication();
+
+        startFavoriteMonitor();
     } catch (error) {
         console.error(
             "[Starlight] Binder startup failed:",
