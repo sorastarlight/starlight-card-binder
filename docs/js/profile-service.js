@@ -1,7 +1,7 @@
 import { supabase } from "./supabase-client.js";
 
 /**
- * Returns the signed-in user's profile.
+ * Returns the signed-in user's private profile settings.
  */
 export async function loadOwnProfile() {
     const {
@@ -57,7 +57,7 @@ export async function loadOwnProfile() {
 }
 
 /**
- * Updates the signed-in user's public collector profile.
+ * Updates the signed-in user's collector profile.
  */
 export async function updateCollectorProfile({
     username,
@@ -105,7 +105,7 @@ export async function updateCollectorProfile({
 }
 
 /**
- * Sets the user's main profile-showcase card.
+ * Sets the signed-in user's main showcase card.
  */
 export async function setProfileFavoriteCard(
     cardId
@@ -184,6 +184,58 @@ export async function loadOwnedProfileCards() {
                     );
                 }),
 
+        error: null
+    };
+}
+
+/**
+ * Loads a public, unlisted, private, or missing collector profile.
+ *
+ * Privacy filtering happens inside the protected database function.
+ */
+export async function loadPublicCollectorProfile(
+    username
+) {
+    const normalizedUsername =
+        String(username || "")
+            .trim()
+            .toLowerCase();
+
+    if (!normalizedUsername) {
+        return {
+            result: null,
+            error:
+                new Error(
+                    "A collector username is required."
+                )
+        };
+    }
+
+    const {
+        data,
+        error
+    } = await supabase.rpc(
+        "get_public_collector_profile",
+        {
+            requested_username:
+                normalizedUsername
+        }
+    );
+
+    if (error) {
+        console.error(
+            "Unable to load collector profile:",
+            error
+        );
+
+        return {
+            result: null,
+            error
+        };
+    }
+
+    return {
+        result: data,
         error: null
     };
 }

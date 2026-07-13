@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Collector Profile | Starlight Card Binder
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <style>
+        :root {
+            --collector-blue: #6bc6f8;
+            --collector-pink: #ff82c8;
+            --collector-gold: #fed334;
+            --collector-dark: #30344f;
+            --collector-muted: #6b7089;
+            --collector-panel: rgba(255, 255, 255, 0.95);
+            --collector-border: rgba(107, 198, 248, 0.46);
+            --collector-error: #b4233f;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+        }
+
+        .collector-page {
+            width: min(100%, 1120px);
+            margin: 0 auto;
+            padding: 28px 18px 60px;
+        }
+
+        .collector-nav {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+
+            margin-bottom: 20px;
+            padding: 14px 18px;
+
+            border: 1px solid var(--collector-border);
+            border-radius: 18px;
+
+            background: var(--collector-panel);
+
+            box-shadow:
+                0 10px 28px
+                rgba(61, 83, 132, 0.12);
+        }
+
+        .collector-nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .collector-nav a {
+            padding: 9px 14px;
+
+            border-radius: 999px;
+
+            color: #405fa1;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .collector-nav a:hover,
+        .collector-nav a:focus-visible {
+            background: rgba(107, 198, 248, 0.15);
+        }
+
+        .collector-shell {
+            overflow: hidden;
+
+            border: 2px solid var(--collector-border);
+            border-radius: 28px;
+
+            background: var(--collector-panel);
+
+            box-shadow:
+                0 22px 60px
+                rgba(61, 83, 132, 0.17);
+        }
+
+        .collector-banner {
+            min-height: 170px;
+
+            background:
+                radial-gradient(
+                    circle at 20% 30%,
+                    rgba(255, 255, 255, 0.82),
+                    transparent 26%
+                ),
+                radial-gradient(
+                    circle at 74% 22%,
+                    rgba(255, 255, 255, 0.65),
+                    transparent 22%
+                ),
+                linear-gradient(
+                    125deg,
+                    var(--collector-blue),
+                    #c3eaff 43%,
+                    #ffd2eb 73%,
+                    var(--collector-pink)
+                );
+
+            position: relative;
+        }
+
+        .collector-banner::after {
+            content: "✦  ⋆  ✧  ⋆  ✦";
+
+            position: absolute;
+            inset: 0;
+
+            display: grid;
+            place-items: center;
+
+            color: rgba(255, 255, 255, 0.76);
+
+            font-size: clamp(2rem, 8vw, 5.4rem);
+            letter-spacing: 0.18em;
+        }
+
+        .collector-header {
+            display: grid;
+            grid-template-columns: 150px minmax(0, 1fr);
+            gap: 22px;
+            align-items: end;
+
+            padding: 0 30px 28px;
+        }
+
+        .collector-avatar {
+            width: 150px;
+            aspect-ratio: 1;
+
+            margin-top: -70px;
+
+            display: grid;
+            place-items: center;
+
+            border: 7px solid #ffffff;
+            border-radius: 50%;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--collector-blue),
+                    var(--collector-pink)
+                );
+
+            color: #ffffff;
+
+            font-size: 3rem;
+            font-weight: 900;
+
+            box-shadow:
+                0 12px 28px
+                rgba(61, 83, 132, 0.2);
+
+            position: relative;
+            z-index: 1;
+        }
+
+        .collector-identity {
+            padding-top: 18px;
+        }
+
+        .collector-identity h1 {
+            margin: 0;
+
+            color: #405fa1;
+
+            font-size:
+                clamp(
+                    2rem,
+                    6vw,
+                    3.4rem
+                );
+        }
+
+        .collector-username {
+            margin: 5px 0 0;
+
+            color: var(--collector-pink);
+            font-weight: 900;
+        }
+
+        .collector-bio {
+            max-width: 700px;
+            margin: 15px 0 0;
+
+            color: var(--collector-dark);
+            line-height: 1.62;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .collector-member {
+            margin: 10px 0 0;
+
+            color: var(--collector-muted);
+            font-size: 0.92rem;
+        }
+
+        .collector-content {
+            padding: 0 30px 34px;
+        }
+
+        .collector-section {
+            margin-top: 25px;
+            padding: 24px;
+
+            border: 1px solid var(--collector-border);
+            border-radius: 21px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(244, 251, 255, 0.92),
+                    rgba(255, 246, 252, 0.92)
+                );
+        }
+
+        .collector-section h2 {
+            margin: 0 0 17px;
+
+            color: #405fa1;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(
+                    4,
+                    minmax(0, 1fr)
+                );
+            gap: 14px;
+        }
+
+        .stat-card {
+            min-width: 0;
+            padding: 18px 14px;
+
+            border: 1px solid rgba(255, 130, 200, 0.3);
+            border-radius: 16px;
+
+            background: #ffffff;
+
+            text-align: center;
+        }
+
+        .stat-card strong {
+            display: block;
+
+            color: #405fa1;
+
+            font-size: clamp(1.7rem, 4vw, 2.5rem);
+        }
+
+        .stat-card span {
+            display: block;
+            margin-top: 5px;
+
+            color: var(--collector-muted);
+            font-weight: 700;
+        }
+
+        .rarity-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(
+                    5,
+                    minmax(0, 1fr)
+                );
+            gap: 11px;
+        }
+
+        .rarity-count {
+            padding: 13px 9px;
+
+            border-radius: 14px;
+
+            background: #ffffff;
+            text-align: center;
+
+            font-weight: 800;
+        }
+
+        .rarity-count strong {
+            display: block;
+            margin-top: 5px;
+
+            font-size: 1.5rem;
+        }
+
+        .series-list {
+            display: grid;
+            gap: 14px;
+        }
+
+        .series-row {
+            padding: 15px;
+
+            border: 1px solid rgba(107, 198, 248, 0.34);
+            border-radius: 15px;
+
+            background: #ffffff;
+        }
+
+        .series-row-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 14px;
+
+            margin-bottom: 9px;
+
+            font-weight: 800;
+        }
+
+        .series-bar {
+            height: 12px;
+            overflow: hidden;
+
+            border-radius: 999px;
+
+            background: #eaf2f8;
+        }
+
+        .series-bar span {
+            display: block;
+            height: 100%;
+
+            border-radius: inherit;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    var(--collector-blue),
+                    var(--collector-pink)
+                );
+        }
+
+        .showcase-layout {
+            display: grid;
+            grid-template-columns:
+                minmax(210px, 330px)
+                minmax(0, 1fr);
+            gap: 27px;
+            align-items: center;
+        }
+
+        .showcase-card-image {
+            width: 100%;
+
+            border-radius: 18px;
+
+            box-shadow:
+                0 16px 36px
+                rgba(61, 83, 132, 0.22);
+        }
+
+        .showcase-copy h3 {
+            margin: 0 0 8px;
+
+            color: #405fa1;
+
+            font-size: 2rem;
+        }
+
+        .showcase-copy p {
+            line-height: 1.55;
+        }
+
+        .favorite-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(
+                    auto-fill,
+                    minmax(150px, 1fr)
+                );
+            gap: 17px;
+        }
+
+        .favorite-card {
+            min-width: 0;
+            padding: 13px;
+
+            border: 1px solid rgba(255, 130, 200, 0.31);
+            border-radius: 17px;
+
+            background: #ffffff;
+            text-align: center;
+        }
+
+        .favorite-card img {
+            width: 100%;
+            aspect-ratio: 5 / 7;
+
+            border-radius: 11px;
+
+            object-fit: cover;
+
+            box-shadow:
+                0 9px 20px
+                rgba(61, 83, 132, 0.13);
+        }
+
+        .favorite-card h3 {
+            margin: 10px 0 4px;
+
+            color: #405fa1;
+            font-size: 1rem;
+            overflow-wrap: anywhere;
+        }
+
+        .favorite-card p {
+            margin: 0;
+
+            color: var(--collector-muted);
+            font-size: 0.87rem;
+        }
+
+        .collector-state {
+            padding: 70px 25px;
+
+            text-align: center;
+        }
+
+        .collector-state h1 {
+            margin: 0 0 12px;
+
+            color: #405fa1;
+        }
+
+        .collector-state p {
+            max-width: 600px;
+            margin: 0 auto;
+
+            color: var(--collector-muted);
+            line-height: 1.6;
+        }
+
+        .collector-state.error h1 {
+            color: var(--collector-error);
+        }
+
+        .collector-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+
+            margin-top: 22px;
+        }
+
+        .collector-button {
+            min-height: 48px;
+            padding: 11px 20px;
+
+            border: 2px solid rgba(107, 198, 248, 0.5);
+            border-radius: 999px;
+
+            background: #ffffff;
+            color: #405fa1;
+
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .collector-button.primary {
+            border-color: transparent;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--collector-blue),
+                    var(--collector-pink)
+                );
+
+            color: #ffffff;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 850px) {
+            .stat-grid {
+                grid-template-columns:
+                    repeat(
+                        2,
+                        minmax(0, 1fr)
+                    );
+            }
+
+            .rarity-grid {
+                grid-template-columns:
+                    repeat(
+                        2,
+                        minmax(0, 1fr)
+                    );
+            }
+
+            .showcase-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .showcase-card-image {
+                max-width: 330px;
+                margin: 0 auto;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .collector-page {
+                padding: 12px 10px 35px;
+            }
+
+            .collector-header {
+                grid-template-columns: 1fr;
+                gap: 8px;
+
+                padding: 0 18px 24px;
+                text-align: center;
+            }
+
+            .collector-avatar {
+                width: 120px;
+                margin: -60px auto 0;
+            }
+
+            .collector-content {
+                padding: 0 15px 24px;
+            }
+
+            .collector-section {
+                padding: 18px 14px;
+            }
+
+            .stat-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .rarity-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .collector-nav {
+                justify-content: center;
+            }
+
+            .collector-nav-links {
+                justify-content: center;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sky"></div>
+
+    <main class="collector-page">
+        <nav class="collector-nav">
+            <div class="collector-nav-links">
+                <a href="./binder.html">
+                    🗂️ Binder
+                </a>
+
+                <a href="./collection.html">
+                    ♡ My Collection
+                </a>
+
+                <a href="./checklist.html">
+                    ☑ Checklist
+                </a>
+            </div>
+
+            <div class="collector-nav-links">
+                <a href="./profile-settings.html">
+                    ⚙ My Profile
+                </a>
+
+                <a href="./login.html">
+                    Sign In
+                </a>
+            </div>
+        </nav>
+
+        <section
+            id="loading-state"
+            class="collector-shell collector-state"
+        >
+            <h1>
+                Loading Collector Profile…
+            </h1>
+
+            <p>
+                Gathering cards, favorites, and a tasteful
+                quantity of sparkles.
+            </p>
+        </section>
+
+        <section
+            id="missing-state"
+            class="collector-shell collector-state hidden"
+        >
+            <h1>
+                Collector Not Found
+            </h1>
+
+            <p>
+                This collector profile does not exist or has
+                not completed setup yet.
+            </p>
+
+            <div class="collector-actions">
+                <a
+                    class="collector-button primary"
+                    href="./binder.html"
+                >
+                    Open the Binder
+                </a>
+            </div>
+        </section>
+
+        <section
+            id="private-state"
+            class="collector-shell collector-state hidden"
+        >
+            <h1>
+                Private Collector Profile
+            </h1>
+
+            <p>
+                This collector has chosen to keep their
+                Starlight profile private.
+            </p>
+
+            <div class="collector-actions">
+                <a
+                    class="collector-button primary"
+                    href="./binder.html"
+                >
+                    Open the Binder
+                </a>
+            </div>
+        </section>
+
+        <section
+            id="error-state"
+            class="collector-shell collector-state error hidden"
+        >
+            <h1>
+                Profile Could Not Be Loaded
+            </h1>
+
+            <p id="error-message">
+                Something went wrong while loading this profile.
+            </p>
+
+            <div class="collector-actions">
+                <button
+                    id="retry-button"
+                    class="collector-button primary"
+                    type="button"
+                >
+                    Try Again
+                </button>
+            </div>
+        </section>
+
+        <article
+            id="profile-content"
+            class="collector-shell hidden"
+        >
+            <div class="collector-banner"></div>
+
+            <header class="collector-header">
+                <div
+                    id="collector-avatar"
+                    class="collector-avatar"
+                    aria-hidden="true"
+                >
+                    ✦
+                </div>
+
+                <div class="collector-identity">
+                    <h1 id="collector-display-name">
+                        Collector
+                    </h1>
+
+                    <p
+                        id="collector-username"
+                        class="collector-username"
+                    ></p>
+
+                    <p
+                        id="collector-bio"
+                        class="collector-bio"
+                    ></p>
+
+                    <p
+                        id="collector-member"
+                        class="collector-member"
+                    ></p>
+                </div>
+            </header>
+
+            <div class="collector-content">
+                <section
+                    id="stats-section"
+                    class="collector-section hidden"
+                >
+                    <h2>
+                        ✨ Collection Overview
+                    </h2>
+
+                    <div class="stat-grid">
+                        <div class="stat-card">
+                            <strong id="unique-card-count">
+                                0
+                            </strong>
+
+                            <span>
+                                Unique Cards
+                            </span>
+                        </div>
+
+                        <div class="stat-card">
+                            <strong id="total-copy-count">
+                                0
+                            </strong>
+
+                            <span>
+                                Total Copies
+                            </span>
+                        </div>
+
+                        <div class="stat-card">
+                            <strong id="catalog-total">
+                                0
+                            </strong>
+
+                            <span>
+                                Available Cards
+                            </span>
+                        </div>
+
+                        <div class="stat-card">
+                            <strong id="completion-percent">
+                                0%
+                            </strong>
+
+                            <span>
+                                Complete
+                            </span>
+                        </div>
+                    </div>
+                </section>
+
+                <section
+                    id="showcase-section"
+                    class="collector-section hidden"
+                >
+                    <h2>
+                        🌟 Main Showcase Card
+                    </h2>
+
+                    <div class="showcase-layout">
+                        <img
+                            id="showcase-card-image"
+                            class="showcase-card-image"
+                            src=""
+                            alt=""
+                        >
+
+                        <div class="showcase-copy">
+                            <p class="eyebrow">
+                                Featured Card
+                            </p>
+
+                            <h3 id="showcase-card-name"></h3>
+
+                            <p id="showcase-card-details"></p>
+
+                            <p id="showcase-card-description"></p>
+
+                            <p id="showcase-card-artist"></p>
+                        </div>
+                    </div>
+                </section>
+
+                <section
+                    id="rarity-section"
+                    class="collector-section hidden"
+                >
+                    <h2>
+                        💎 Rarity Collection
+                    </h2>
+
+                    <div
+                        id="rarity-grid"
+                        class="rarity-grid"
+                    ></div>
+                </section>
+
+                <section
+                    id="series-section"
+                    class="collector-section hidden"
+                >
+                    <h2>
+                        📚 Series Progress
+                    </h2>
+
+                    <div
+                        id="series-list"
+                        class="series-list"
+                    ></div>
+                </section>
+
+                <section
+                    id="favorites-section"
+                    class="collector-section hidden"
+                >
+                    <h2>
+                        💖 Favorite Cards
+                    </h2>
+
+                    <div
+                        id="favorite-grid"
+                        class="favorite-grid"
+                    ></div>
+                </section>
+            </div>
+        </article>
+    </main>
+
+    <script type="module">
+        import {
+            loadPublicCollectorProfile
+        } from "./js/profile-service.js";
+
+        const loadingState =
+            document.getElementById(
+                "loading-state"
+            );
+
+        const missingState =
+            document.getElementById(
+                "missing-state"
+            );
+
+        const privateState =
+            document.getElementById(
+                "private-state"
+            );
+
+        const errorState =
+            document.getElementById(
+                "error-state"
+            );
+
+        const errorMessage =
+            document.getElementById(
+                "error-message"
+            );
+
+        const retryButton =
+            document.getElementById(
+                "retry-button"
+            );
+
+        const profileContent =
+            document.getElementById(
+                "profile-content"
+            );
+
+        const displayNameElement =
+            document.getElementById(
+                "collector-display-name"
+            );
+
+        const usernameElement =
+            document.getElementById(
+                "collector-username"
+            );
+
+        const bioElement =
+            document.getElementById(
+                "collector-bio"
+            );
+
+        const memberElement =
+            document.getElementById(
+                "collector-member"
+            );
+
+        const avatarElement =
+            document.getElementById(
+                "collector-avatar"
+            );
+
+        const statsSection =
+            document.getElementById(
+                "stats-section"
+            );
+
+        const showcaseSection =
+            document.getElementById(
+                "showcase-section"
+            );
+
+        const raritySection =
+            document.getElementById(
+                "rarity-section"
+            );
+
+        const seriesSection =
+            document.getElementById(
+                "series-section"
+            );
+
+        const favoritesSection =
+            document.getElementById(
+                "favorites-section"
+            );
+
+        const uniqueCardCount =
+            document.getElementById(
+                "unique-card-count"
+            );
+
+        const totalCopyCount =
+            document.getElementById(
+                "total-copy-count"
+            );
+
+        const catalogTotal =
+            document.getElementById(
+                "catalog-total"
+            );
+
+        const completionPercent =
+            document.getElementById(
+                "completion-percent"
+            );
+
+        const showcaseCardImage =
+            document.getElementById(
+                "showcase-card-image"
+            );
+
+        const showcaseCardName =
+            document.getElementById(
+                "showcase-card-name"
+            );
+
+        const showcaseCardDetails =
+            document.getElementById(
+                "showcase-card-details"
+            );
+
+        const showcaseCardDescription =
+            document.getElementById(
+                "showcase-card-description"
+            );
+
+        const showcaseCardArtist =
+            document.getElementById(
+                "showcase-card-artist"
+            );
+
+        const rarityGrid =
+            document.getElementById(
+                "rarity-grid"
+            );
+
+        const seriesList =
+            document.getElementById(
+                "series-list"
+            );
+
+        const favoriteGrid =
+            document.getElementById(
+                "favorite-grid"
+            );
+
+        const username =
+            new URLSearchParams(
+                window.location.search
+            )
+                .get("username")
+                ?.trim()
+                .toLowerCase() ||
+            "";
+
+        function hideAllStates() {
+            loadingState.classList.add(
+                "hidden"
+            );
+
+            missingState.classList.add(
+                "hidden"
+            );
+
+            privateState.classList.add(
+                "hidden"
+            );
+
+            errorState.classList.add(
+                "hidden"
+            );
+
+            profileContent.classList.add(
+                "hidden"
+            );
+        }
+
+        function formatMemberDate(value) {
+            if (!value) {
+                return "";
+            }
+
+            const date =
+                new Date(value);
+
+            if (
+                Number.isNaN(
+                    date.getTime()
+                )
+            ) {
+                return "";
+            }
+
+            return date.toLocaleDateString(
+                undefined,
+                {
+                    year: "numeric",
+                    month: "long"
+                }
+            );
+        }
+
+        function getInitial(
+            displayName
+        ) {
+            const firstCharacter =
+                String(displayName || "")
+                    .trim()
+                    .charAt(0)
+                    .toUpperCase();
+
+            return firstCharacter || "✦";
+        }
+
+        function renderRarityCounts(
+            rarityCounts
+        ) {
+            const rarityOrder = [
+                "Common",
+                "Uncommon",
+                "Rare",
+                "Epic",
+                "Legendary"
+            ];
+
+            rarityGrid.replaceChildren();
+
+            for (const rarity of rarityOrder) {
+                const item =
+                    document.createElement(
+                        "div"
+                    );
+
+                item.className =
+                    `rarity-count rarity-${rarity.toLowerCase()}`;
+
+                const label =
+                    document.createElement(
+                        "span"
+                    );
+
+                label.textContent =
+                    rarity;
+
+                const count =
+                    document.createElement(
+                        "strong"
+                    );
+
+                count.textContent =
+                    String(
+                        rarityCounts?.[rarity] ??
+                        0
+                    );
+
+                item.append(
+                    label,
+                    count
+                );
+
+                rarityGrid.append(item);
+            }
+        }
+
+        function renderSeriesProgress(
+            seriesProgress
+        ) {
+            seriesList.replaceChildren();
+
+            for (
+                const series of
+                seriesProgress || []
+            ) {
+                const owned =
+                    Number(series.owned || 0);
+
+                const total =
+                    Number(series.total || 0);
+
+                const percent =
+                    total > 0
+                        ? Math.round(
+                            (
+                                owned /
+                                total
+                            ) * 100
+                        )
+                        : 0;
+
+                const row =
+                    document.createElement(
+                        "div"
+                    );
+
+                row.className =
+                    "series-row";
+
+                const header =
+                    document.createElement(
+                        "div"
+                    );
+
+                header.className =
+                    "series-row-header";
+
+                const name =
+                    document.createElement(
+                        "span"
+                    );
+
+                name.textContent =
+                    `Series ${series.seriesId}: ${series.seriesName}`;
+
+                const count =
+                    document.createElement(
+                        "span"
+                    );
+
+                count.textContent =
+                    `${owned} / ${total}`;
+
+                header.append(
+                    name,
+                    count
+                );
+
+                const bar =
+                    document.createElement(
+                        "div"
+                    );
+
+                bar.className =
+                    "series-bar";
+
+                const fill =
+                    document.createElement(
+                        "span"
+                    );
+
+                fill.style.width =
+                    `${percent}%`;
+
+                bar.append(fill);
+
+                row.append(
+                    header,
+                    bar
+                );
+
+                seriesList.append(row);
+            }
+        }
+
+        function renderFavoriteCards(
+            cards
+        ) {
+            favoriteGrid.replaceChildren();
+
+            for (const card of cards || []) {
+                const article =
+                    document.createElement(
+                        "article"
+                    );
+
+                article.className =
+                    "favorite-card";
+
+                const image =
+                    document.createElement(
+                        "img"
+                    );
+
+                image.src =
+                    card.thumbnailUrl ||
+                    card.imageUrl ||
+                    "";
+
+                image.alt =
+                    `${card.name} card artwork`;
+
+                image.loading =
+                    "lazy";
+
+                const name =
+                    document.createElement(
+                        "h3"
+                    );
+
+                name.textContent =
+                    `#${card.cardNumber} ${card.name}`;
+
+                const details =
+                    document.createElement(
+                        "p"
+                    );
+
+                details.textContent =
+                    `${card.rarity} • ${card.seriesName}`;
+
+                article.append(
+                    image,
+                    name,
+                    details
+                );
+
+                favoriteGrid.append(
+                    article
+                );
+            }
+        }
+
+        function renderProfile(result) {
+            const profile =
+                result.profile;
+
+            const collection =
+                result.collection;
+
+            const showcaseCard =
+                result.showcaseCard;
+
+            const favoriteCards =
+                result.favoriteCards || [];
+
+            document.title =
+                `${profile.displayName} | Starlight Card Binder`;
+
+            displayNameElement.textContent =
+                profile.displayName ||
+                profile.username;
+
+            usernameElement.textContent =
+                `@${profile.username}`;
+
+            bioElement.textContent =
+                profile.bio ||
+                "A Starlight Card collector.";
+
+            const memberDate =
+                formatMemberDate(
+                    profile.memberSince
+                );
+
+            memberElement.textContent =
+                memberDate
+                    ? `Collector since ${memberDate}`
+                    : "";
+
+            avatarElement.textContent =
+                getInitial(
+                    profile.displayName ||
+                    profile.username
+                );
+
+            if (
+                profile.showCollectionStats &&
+                collection
+            ) {
+                uniqueCardCount.textContent =
+                    String(
+                        collection.uniqueCards ??
+                        0
+                    );
+
+                totalCopyCount.textContent =
+                    String(
+                        collection.totalCopies ??
+                        0
+                    );
+
+                catalogTotal.textContent =
+                    String(
+                        collection.catalogTotal ??
+                        0
+                    );
+
+                completionPercent.textContent =
+                    `${collection.completionPercent ?? 0}%`;
+
+                renderRarityCounts(
+                    collection.rarityCounts
+                );
+
+                renderSeriesProgress(
+                    collection.seriesProgress
+                );
+
+                statsSection.classList.remove(
+                    "hidden"
+                );
+
+                raritySection.classList.remove(
+                    "hidden"
+                );
+
+                seriesSection.classList.remove(
+                    "hidden"
+                );
+            }
+
+            if (
+                profile.showFeaturedCards &&
+                showcaseCard
+            ) {
+                showcaseCardImage.src =
+                    showcaseCard.imageUrl ||
+                    showcaseCard.thumbnailUrl ||
+                    "";
+
+                showcaseCardImage.alt =
+                    `${showcaseCard.name} card artwork`;
+
+                showcaseCardName.textContent =
+                    `#${showcaseCard.cardNumber} ${showcaseCard.name}`;
+
+                showcaseCardDetails.textContent =
+                    `${showcaseCard.rarity} • ${showcaseCard.seriesName}`;
+
+                showcaseCardDescription.textContent =
+                    showcaseCard.description ||
+                    "";
+
+                showcaseCardArtist.textContent =
+                    showcaseCard.artist
+                        ? `Artwork by ${showcaseCard.artist}`
+                        : "";
+
+                showcaseSection.classList.remove(
+                    "hidden"
+                );
+            }
+
+            if (
+                profile.showFavorites &&
+                favoriteCards.length > 0
+            ) {
+                renderFavoriteCards(
+                    favoriteCards
+                );
+
+                favoritesSection.classList.remove(
+                    "hidden"
+                );
+            }
+
+            profileContent.classList.remove(
+                "hidden"
+            );
+        }
+
+        async function loadProfile() {
+            hideAllStates();
+
+            loadingState.classList.remove(
+                "hidden"
+            );
+
+            if (!username) {
+                hideAllStates();
+
+                missingState.classList.remove(
+                    "hidden"
+                );
+
+                return;
+            }
+
+            const {
+                result,
+                error
+            } =
+                await loadPublicCollectorProfile(
+                    username
+                );
+
+            hideAllStates();
+
+            if (error) {
+                errorMessage.textContent =
+                    error.message ||
+                    "Something went wrong while loading this profile.";
+
+                errorState.classList.remove(
+                    "hidden"
+                );
+
+                return;
+            }
+
+            if (
+                !result ||
+                result.found !== true
+            ) {
+                missingState.classList.remove(
+                    "hidden"
+                );
+
+                return;
+            }
+
+            if (result.private === true) {
+                privateState.classList.remove(
+                    "hidden"
+                );
+
+                return;
+            }
+
+            renderProfile(result);
+        }
+
+        retryButton.addEventListener(
+            "click",
+            loadProfile
+        );
+
+        loadProfile();
+    </script>
+</body>
+</html>
