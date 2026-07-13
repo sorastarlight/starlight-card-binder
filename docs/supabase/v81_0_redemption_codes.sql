@@ -85,18 +85,11 @@ on public.reward_code_redemptions(user_id);
 
 alter table public.reward_code_redemptions enable row level security;
 
-drop policy if exists
-    "Users can view their own code redemptions"
-on public.reward_code_redemptions;
-
-create policy
-    "Users can view their own code redemptions"
+create policy "Users can view their own code redemptions"
 on public.reward_code_redemptions
 for select
 to authenticated
-using (
-    (select auth.uid()) = user_id
-);
+using ((select auth.uid()) = user_id);
 
 -- ------------------------------------------------------------
 -- 5. ADMIN CHECK HELPER
@@ -199,7 +192,7 @@ begin
         end if;
     end if;
 
-    generated_hash := encode(extensions.digest(normalized_code, 'sha256'), 'hex');
+    generated_hash := encode(digest(normalized_code, 'sha256'), 'hex');
 
     insert into public.reward_codes (
         code_hash,
@@ -356,7 +349,7 @@ begin
         raise exception 'Enter a redemption code.';
     end if;
 
-    generated_hash := encode(extensions.digest(normalized_code, 'sha256'), 'hex');
+    generated_hash := encode(digest(normalized_code, 'sha256'), 'hex');
 
     select * into selected_code
     from public.reward_codes
