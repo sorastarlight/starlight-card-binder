@@ -11,6 +11,9 @@ const COLLECTION_KEY =
 const FAVORITES_KEY =
     "sora-starlight-card-binder-v5-favorites";
 
+const QUANTITIES_KEY =
+    "sora-starlight-card-binder-v80-quantities";
+
 const FAVORITE_CHECK_INTERVAL_MS = 500;
 
 let currentUser = null;
@@ -69,6 +72,7 @@ function writeLocalObject(key, value) {
 function createLocalStores(cloudRows) {
     const collectedCards = {};
     const favoriteCards = {};
+    const quantities = {};
 
     for (const row of cloudRows) {
         const cardId =
@@ -79,6 +83,7 @@ function createLocalStores(cloudRows) {
         }
 
         collectedCards[cardId] = true;
+        quantities[cardId] = Math.max(1, Number(row.quantity || 1));
 
         if (row.is_favorite === true) {
             favoriteCards[cardId] = true;
@@ -87,7 +92,8 @@ function createLocalStores(cloudRows) {
 
     return {
         collectedCards,
-        favoriteCards
+        favoriteCards,
+        quantities
     };
 }
 
@@ -137,7 +143,8 @@ async function synchronizeCloudCollection() {
 
     const {
         collectedCards,
-        favoriteCards
+        favoriteCards,
+        quantities
     } = createLocalStores(cloudRows);
 
     writeLocalObject(
@@ -148,6 +155,11 @@ async function synchronizeCloudCollection() {
     writeLocalObject(
         FAVORITES_KEY,
         favoriteCards
+    );
+
+    writeLocalObject(
+        QUANTITIES_KEY,
+        quantities
     );
 
     previousFavoriteStore = {

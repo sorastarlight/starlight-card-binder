@@ -18,6 +18,7 @@ const SFX = {
 };
 const STORAGE_KEY = "sora-starlight-card-binder-v5-collected";
 const FAVORITES_KEY = "sora-starlight-card-binder-v5-favorites";
+const QUANTITIES_KEY = "sora-starlight-card-binder-v80-quantities";
 const MODE_KEY = "sora-starlight-card-binder-v5-starlight-mode";
 const SFX_KEY = "sora-starlight-card-binder-v7-sfx";
 const CARD_CACHE_KEY = "sora-starlight-card-binder-v66-card-cache";
@@ -45,6 +46,8 @@ function readStore(key) { try { return JSON.parse(localStorage.getItem(key)) || 
 function writeStore(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
 function isCollected(id) { return !!readStore(STORAGE_KEY)[id]; }
 function isFavorite(id) { return !!readStore(FAVORITES_KEY)[id]; }
+function getCardQuantity(id) { return Math.max(isCollected(id) ? 1 : 0, Number(readStore(QUANTITIES_KEY)[id] || 0)); }
+function quantityBadgesHtml(id) { const q=getCardQuantity(id); if(q<=0) return ""; return `<span class="quantity-badge">×${q}</span>${q>1?`<span class="duplicate-badge">+${q-1} Extra</span>`:""}`; }
 function percent(part, total) { return total ? Math.round((part / total) * 100) : 0; }
 function padNumber(value, fallback) { return String(value || fallback).padStart(3, "0"); }
 function rarityClass(card) { return `rarity-${String(card?.rarity || "common").toLowerCase().replace(/[^a-z0-9]/g, '')}`; }
@@ -587,6 +590,7 @@ function renderDetail() {
       <p><b>Series</b><span>${esc(selected.series)}</span></p>
       <p><b>Card Number</b><span>${esc(selected.number)} / ${String(cards.length).padStart(3,'0')}</span></p>
       <p><b>Artist</b><span>${esc(selected.artist)}</span></p>
+      <p><b>Owned</b><span>×${getCardQuantity(selected.id)}</span></p>
     </div>
     <p class="description"><b>Description</b><br>${esc(getVisibleDescription(selected))}</p>
   </div>
@@ -674,7 +678,7 @@ function renderGridPage(target, mode) {
   wrap.classList.toggle('empty-grid', !list.length);
   wrap.innerHTML = list.length ? list.map(c => {
     const got = isCollected(c.id); const hidden = starlightMode && !got;
-    return `<article class="collection-card ${rarityClass(c)}"><div class="collection-image"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"></div><h3>${esc(getVisibleName(c))}</h3><p>${esc(c.number)} • <span class="rarity-text ${rarityClass(c)}">${esc(getVisibleRarity(c))}</span> • ${esc(c.series)}</p><div class="card-buttons">${starlightMode ? `<button class="icon-btn" onclick="toggleCollected('${esc(c.id)}')">${got?'✓ Collected':'✨ Reveal'}</button>` : ''}<button class="icon-btn" onclick="toggleFavorite('${esc(c.id)}')">${isFavorite(c.id)?'★':'☆'}</button></div></article>`;
+    return `<article class="collection-card ${rarityClass(c)}"><div class="collection-image">${quantityBadgesHtml(c.id)}<img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"></div><h3>${esc(getVisibleName(c))}</h3><p>${esc(c.number)} • <span class="rarity-text ${rarityClass(c)}">${esc(getVisibleRarity(c))}</span> • ${esc(c.series)}</p><div class="card-buttons">${starlightMode ? `<button class="icon-btn" onclick="toggleCollected('${esc(c.id)}')">${got?'✓ Collected':'✨ Reveal'}</button>` : ''}<button class="icon-btn" onclick="toggleFavorite('${esc(c.id)}')">${isFavorite(c.id)?'★':'☆'}</button></div></article>`;
   }).join('') : `<div class="empty-state"><h2>${mode === 'favorites' ? 'No favorites yet' : 'No cards here yet'}</h2><p>${mode === 'favorites' ? 'Tap the star on your favorite cards and this showcase will sparkle to life.' : 'Go reveal some shiny cardboard chaos in the binder, then this section will fill up beautifully.'}</p><a class="btn primary" href="binder.html">Open Binder</a></div>`;
   renderFavoritesShowcase();
   attachTileTilts();
@@ -685,7 +689,7 @@ function renderFavoritesShowcase() {
   const showcase = $('#favoriteShowcase'); if (!showcase) return;
   const favs = cards.filter(c => isFavorite(c.id));
   if (!favs.length) { showcase.innerHTML = `<div class="empty-state trophy-empty"><h2>Favorite Showcase</h2><p>Star a card to put it on the Starlight stage. Your favorites will scroll here like a tiny idol parade.</p><a class="btn primary" href="binder.html">Find Favorites</a></div>`; return; }
-  showcase.innerHTML = `<div class="favorite-carousel-head"><h2>Favorite Showcase 💖</h2><p>${favs.length} favorite card${favs.length===1?'':'s'} saved in this browser.</p></div><div class="favorite-carousel">${favs.map((c,i)=>{ const hidden = starlightMode && !isCollected(c.id); return `<button class="fav-spot ${rarityClass(c)}" style="--i:${i}" onclick="selected=cards.find(x=>x.id==='${esc(c.id)}');selectedIndex=cards.findIndex(x=>x.id==='${esc(c.id)}');openFullView('favorites')"><span class="fav-image"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}"></span><span>${esc(getVisibleName(c))}</span></button>`}).join('')}</div>`;
+  showcase.innerHTML = `<div class="favorite-carousel-head"><h2>Favorite Showcase 💖</h2><p>${favs.length} favorite card${favs.length===1?'':'s'} saved in this browser.</p></div><div class="favorite-carousel">${favs.map((c,i)=>{ const hidden = starlightMode && !isCollected(c.id); return `<button class="fav-spot ${rarityClass(c)}" style="--i:${i}" onclick="selected=cards.find(x=>x.id==='${esc(c.id)}');selectedIndex=cards.findIndex(x=>x.id==='${esc(c.id)}');openFullView('favorites')"><span class="fav-image">${quantityBadgesHtml(c.id)}<img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}"></span><span>${esc(getVisibleName(c))}</span></button>`}).join('')}</div>`;
   attachTileTilts();
   attachBinderHoverSfx();
 }
@@ -741,7 +745,7 @@ function renderChecklist() {
   const body = $('#checklistBody'); if (!body) return;
   body.innerHTML = cards.map(c => {
     const got = isCollected(c.id); const hidden = starlightMode && !got;
-    return `<tr class="item"><td><div class="check-card"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"><span>${esc(c.number)}</span></div></td><td>${esc(getVisibleName(c))}</td><td>${esc(c.series)}</td><td>${esc(c.artist)}</td><td><span class="rarity-text ${rarityClass(c)}">${esc(getVisibleRarity(c))}</span></td><td>${starlightMode ? `<button class="icon-btn" onclick="toggleCollected('${esc(c.id)}')">${got?'✓ Collected':'✨ Reveal'}</button>` : '<span class="soft-note">Visible</span>'}</td><td><button class="icon-btn" onclick="toggleFavorite('${esc(c.id)}')">${isFavorite(c.id)?'★':'☆'}</button></td></tr>`;
+    return `<tr class="item"><td><div class="check-card"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"><span>${esc(c.number)}</span></div></td><td>${esc(getVisibleName(c))}</td><td>${esc(c.series)}</td><td>${esc(c.artist)}</td><td><span class="rarity-text ${rarityClass(c)}">${esc(getVisibleRarity(c))}</span></td><td><b>×${getCardQuantity(c.id)}</b>${getCardQuantity(c.id)>1?`<br><small>+${getCardQuantity(c.id)-1} extra</small>`:""}</td><td>${starlightMode ? `<button class="icon-btn" onclick="toggleCollected('${esc(c.id)}')">${got?'✓ Collected':'✨ Reveal'}</button>` : '<span class="soft-note">Visible</span>'}</td><td><button class="icon-btn" onclick="toggleFavorite('${esc(c.id)}')">${isFavorite(c.id)?'★':'☆'}</button></td></tr>`;
   }).join('');
 }
 function renderAbout() {
@@ -802,7 +806,6 @@ document.addEventListener('DOMContentLoaded', () => {
   loadCards();
   $('#prevPage')?.addEventListener('click', () => { page = Math.max(1, page - 1); renderAll(); playSfx('page'); });
   $('#nextPage')?.addEventListener('click', () => { page += 1; renderAll(); playSfx('page'); });
-  $('#resetCollection')?.addEventListener('click', () => { if (confirm("Reset this browser's checklist and favorites?")) { playSfx('reset'); localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(FAVORITES_KEY); renderAll(); } });
   $('#pastelToggle')?.addEventListener('click', () => { starlightMode = !starlightMode; localStorage.setItem(MODE_KEY, starlightMode ? 'on' : 'off'); renderAll(); });
   $('#sfxToggle')?.addEventListener('click', () => { sfxOn = !sfxOn; localStorage.setItem(SFX_KEY, sfxOn ? 'on' : 'off'); renderAll(); });
   $('#exportData')?.addEventListener('click', exportCollectionData);
@@ -911,6 +914,7 @@ function renderV61Card(card, i) {
     <button class="v61-card-btn" type="button" data-v61-card="${esc(card.id)}" aria-label="View ${esc(getVisibleName(card))}">
       <img class="${hidden?'obscured':''}" src="${esc(img)}" alt="${esc(getVisibleName(card))}" loading="lazy" onerror="this.src='${CARD_BACK_URL}'">
       <span class="badge">${esc(card.number)}</span>
+      ${quantityBadgesHtml(card.id)}
     </button>
     ${starlightMode ? `<button class="v61-reveal" type="button" data-reveal="${esc(card.id)}">${got?'✓ Collected':'✨ Reveal'}</button>` : ''}
   </article>`;
@@ -951,6 +955,7 @@ function renderV62Showcase(inSeriesSelect = false) {
         <p><b>Series</b><span>${esc(card.series)}</span></p>
         <p><b>Card Number</b><span>${esc(card.number)} / ${String(cards.length).padStart(3,'0')}</span></p>
         <p><b>Artist</b><span>${esc(card.artist)}</span></p>
+        <p><b>Owned</b><span>×${getCardQuantity(card.id)}</span></p>
       </div>
       <p class="v62-description"><b>Description</b><br>${esc(getVisibleDescription(card))}</p>
     </div>

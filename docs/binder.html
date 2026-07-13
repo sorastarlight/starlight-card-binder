@@ -16,6 +16,7 @@
         rel="stylesheet"
         href="css/style.css"
     >
+    <link rel="stylesheet" href="css/v80-8-ui.css">
 </head>
 
 <body data-page="binder">
@@ -54,6 +55,21 @@
                     <span data-percent>0%</span>
                     Complete ✨
                 </p>
+            </section>
+
+
+            <section class="side-card economy-card">
+                <h2 class="side-title">✦ Star Bits</h2>
+                <div class="economy-stat"><span>Balance</span><strong data-star-bits>...</strong></div>
+                <div class="economy-stat"><span>Duplicates</span><strong data-duplicates>...</strong></div>
+                <a class="economy-link" href="star-bits.html">Open Exchange</a>
+            </section>
+
+            <section class="side-card economy-card">
+                <h2 class="side-title">✨ Daily Booster</h2>
+                <p data-daily-status>Checking...</p>
+                <span class="daily-countdown" data-daily-countdown></span>
+                <a class="daily-widget-link" href="daily-booster.html">View Daily Pack</a>
             </section>
 
             <section class="side-card">
@@ -165,53 +181,20 @@
                     Not Collected
                 </label>
 
-                <button
-                    id="resetCollection"
-                    class="btn primary wide"
-                    type="button"
-                >
-                    ↻ Reset Checklist
-                </button>
+                <a class="btn primary wide" href="star-bits.html">✦ Star Bits Exchange</a>
             </section>
         </aside>
 
         <main class="main">
             <nav class="topbar">
                 <div class="nav">
-                    <a
-                        href="binder.html"
-                        data-nav="binder"
-                    >
-                        🗂️ Card Binder
-                    </a>
 
-                    <a
-                        href="collection.html"
-                        data-nav="collection"
-                    >
-                        ♡ My Collection
-                    </a>
-
-                    <a
-                        href="checklist.html"
-                        data-nav="checklist"
-                    >
-                        ☑ Checklist
-                    </a>
-
-                    <a
-                        href="socials.html"
-                        data-nav="socials"
-                    >
-                        ✉ Socials
-                    </a>
-
-                    <a
-                        href="about.html"
-                        data-nav="about"
-                    >
-                        ⓘ About
-                    </a>
+                    <a href="binder.html" data-nav="binder">🗂 Binder</a>
+                    <a href="collection.html" data-nav="collection">♡ Collection</a>
+                    <a href="daily-booster.html" data-nav="daily">✨ Daily Booster</a>
+                    <a href="star-bits.html" data-nav="bits">✦ Star Bits</a>
+                    <a href="checklist.html" data-nav="checklist">☑ Checklist</a>
+                    <a href="profile-settings.html" data-nav="profile">⚙ Profile</a>
                 </div>
 
                 <div class="top-actions">
@@ -300,6 +283,12 @@
                 class="v62-showcase"
                 aria-label="Selected card showcase"
             ></aside>
+
+            <div class="site-footer-links">
+                <a href="about.html">About</a>
+                <a href="socials.html">Socials</a>
+                <a href="profile-settings.html">Profile Settings</a>
+            </div>
         </main>
     </div>
 
@@ -316,6 +305,7 @@
         type="module"
         src="js/cloud-collection.js"
     ></script>
+    <script type="module" src="js/site-dashboard.js"></script>
 
     <script>
         document

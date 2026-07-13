@@ -16,6 +16,7 @@
         rel="stylesheet"
         href="css/style.css"
     >
+    <link rel="stylesheet" href="css/v80-8-ui.css">
 
     <style>
         .star-bits-panel {
@@ -170,6 +171,21 @@
                 </p>
             </section>
 
+
+            <section class="side-card economy-card">
+                <h2 class="side-title">✦ Star Bits</h2>
+                <div class="economy-stat"><span>Balance</span><strong data-star-bits>...</strong></div>
+                <div class="economy-stat"><span>Duplicates</span><strong data-duplicates>...</strong></div>
+                <a class="economy-link" href="star-bits.html">Open Exchange</a>
+            </section>
+
+            <section class="side-card economy-card">
+                <h2 class="side-title">✨ Daily Booster</h2>
+                <p data-daily-status>Checking...</p>
+                <span class="daily-countdown" data-daily-countdown></span>
+                <a class="daily-widget-link" href="daily-booster.html">View Daily Pack</a>
+            </section>
+
             <section class="side-card">
                 <h2 class="side-title">
                     Series Progress
@@ -279,54 +295,20 @@
                     Not Collected
                 </label>
 
-                <button
-                    class="btn primary wide"
-                    type="button"
-                    disabled
-                    title="Duplicate conversion will be added with the booster system."
-                >
-                    ✦ Star Bits Exchange
-                </button>
+                <a class="btn primary wide" href="star-bits.html">✦ Star Bits Exchange</a>
             </section>
         </aside>
 
         <main class="main">
             <nav class="topbar">
                 <div class="nav">
-                    <a
-                        href="binder.html"
-                        data-nav="binder"
-                    >
-                        🗂️ Card Binder
-                    </a>
 
-                    <a
-                        href="collection.html"
-                        data-nav="collection"
-                    >
-                        ♡ My Collection
-                    </a>
-
-                    <a
-                        href="checklist.html"
-                        data-nav="checklist"
-                    >
-                        ☑ Checklist
-                    </a>
-
-                    <a
-                        href="socials.html"
-                        data-nav="socials"
-                    >
-                        ✉ Socials
-                    </a>
-
-                    <a
-                        href="about.html"
-                        data-nav="about"
-                    >
-                        ⓘ About
-                    </a>
+                    <a href="binder.html" data-nav="binder">🗂 Binder</a>
+                    <a href="collection.html" data-nav="collection">♡ Collection</a>
+                    <a href="daily-booster.html" data-nav="daily">✨ Daily Booster</a>
+                    <a href="star-bits.html" data-nav="bits">✦ Star Bits</a>
+                    <a href="checklist.html" data-nav="checklist">☑ Checklist</a>
+                    <a href="profile-settings.html" data-nav="profile">⚙ Profile</a>
                 </div>
 
                 <div class="top-actions">
@@ -362,6 +344,26 @@
                     here with their full artwork and favorites.
                 </p>
 
+
+                <section class="collector-profile-card" aria-label="Collector progression">
+                    <h2>⭐ Collector Profile</h2>
+                    <div class="collector-level-line">
+                        <span class="collector-level">Level <span data-collector-level>1</span></span>
+                        <span class="collector-xp"><span data-collector-points>0</span> / <span data-next-level-points>25</span> Collector Points</span>
+                    </div>
+                    <div class="collector-progress"><span data-level-progress style="width:0%"></span></div>
+                    <div class="collector-stat-grid">
+                        <div class="collector-stat"><strong data-collected>0</strong><span>Unique Cards</span></div>
+                        <div class="collector-stat"><strong data-total-copies>0</strong><span>Total Copies</span></div>
+                        <div class="collector-stat"><strong data-favorite-count>0</strong><span>Favorites</span></div>
+                        <div class="collector-stat"><strong data-duplicates>0</strong><span>Duplicates</span></div>
+                        <div class="collector-stat"><strong data-star-bits>0</strong><span>Star Bits</span></div>
+                    </div>
+                    <div class="collection-tools" style="margin-top:16px">
+                        <a class="btn primary" href="profile-settings.html">Edit Profile</a>
+                        <a class="btn" data-public-profile-link href="profile-settings.html">View Public Profile</a>
+                    </div>
+                </section>
                 <div class="collection-tools">
                     <button
                         id="exportData"
@@ -397,8 +399,7 @@
                         </h2>
 
                         <p>
-                            Extra copies will eventually be convertible
-                            into Star Bits. Your first copy of every card
+                            Extra copies can be converted into Star Bits. Your first copy of every card
                             will always remain safely in your collection.
                         </p>
 
@@ -420,18 +421,8 @@
                     </div>
 
                     <div>
-                        <button
-                            id="openStarBitsExchange"
-                            class="star-bits-action"
-                            type="button"
-                            disabled
-                        >
-                            Convert Duplicates
-                        </button>
-
-                        <small class="star-bits-note">
-                            Coming with booster packs
-                        </small>
+                        <a id="openStarBitsExchange" class="star-bits-action" href="star-bits.html">Convert Duplicates</a>
+                        <small class="star-bits-note">One copy is always protected</small>
                     </div>
                 </section>
             </section>
@@ -466,6 +457,12 @@
                 class="grid-page hidden-favorite-grid"
             ></section>
 
+
+            <div class="site-footer-links">
+                <a href="about.html">About</a>
+                <a href="socials.html">Socials</a>
+                <a href="profile-settings.html">Profile Settings</a>
+            </div>
             <section class="info-strip">
                 <p>
                     <b>Starlight Mode:</b>
@@ -492,6 +489,7 @@
         type="module"
         src="js/cloud-collection.js"
     ></script>
+    <script type="module" src="js/site-dashboard.js"></script>
 
     <script>
         document
