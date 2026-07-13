@@ -1,0 +1,27 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Card Binder | Starlight Card Binder</title><link rel="stylesheet" href="css/style.css"></head><body data-page="binder">
+<div class="sky"></div>
+<div class="site">
+  <aside class="sidebar">
+    <div class="brand">
+      <img class="logo" src="site_assets/Sora_Starlight_Logo_Primary.png" alt="Sora Starlight logo">
+      <span class="binder-ribbon">Card Binder</span>
+    </div>
+    <section class="side-card"><h2 class="side-title">Collection Progress</h2><div class="big-stat"><span data-collected>0</span> / <span data-total>0</span></div><div class="bar"><span data-progress></span></div><p><span data-percent>0%</span> Complete ✨</p></section>
+    <section class="side-card"><h2 class="side-title">Series Progress</h2><div id="miniSeries" class="mini-series"></div></section>
+    <section class="side-card filters"><h2 class="side-title">Filters</h2><label>Series<select data-series></select></label><label>Rarity<select data-rarity><option>All Rarities</option><option>Common</option><option>Uncommon</option><option>Rare</option><option>Epic</option><option>Legendary</option></select></label><label>Sort By<select id="sortSelect"><option value="numberAsc">Number (Low to High)</option><option value="numberDesc">Number (High to Low)</option><option value="nameAsc">Name (A to Z)</option><option value="rarityDesc">Rarity (Best First)</option></select></label><h2 class="side-title">View</h2><label class="checkline"><input type="radio" name="viewFilter" value="all" checked> All Cards</label><label class="checkline"><input type="radio" name="viewFilter" value="collected"> Collected</label><label class="checkline"><input type="radio" name="viewFilter" value="missing"> Not Collected</label><button id="resetCollection" class="btn primary wide" type="button">↻ Reset Checklist</button></section>
+  </aside>
+  <main class="main">
+    <nav class="topbar"><div class="nav"><a href="binder.html" data-nav="binder">🗂️ Card Binder</a><a href="collection.html" data-nav="collection">♡ My Collection</a><a href="checklist.html" data-nav="checklist">☑ Checklist</a><a href="socials.html" data-nav="socials">✉ Socials</a><a href="about.html" data-nav="about">ⓘ About</a></div><div class="top-actions"><input id="globalSearch" class="search" type="search" placeholder="Search cards..."><button id="sfxToggle" class="sfx-toggle on" type="button" title="Sound effects">♪</button></div></nav>
+    <section class="series-hero panel v61-hero">
+      <div class="hero-copy"><p class="eyebrow">Starlight Cards</p><h1 id="seriesHeroTitle">Starlight Card Series Binder</h1><p id="seriesHeroDescription">Choose a booster pack to begin collecting.</p><div id="seriesHeroStats" class="series-stats"></div></div>
+      <div class="starlight-mode"><span>Starlight Mode</span><button id="pastelToggle" class="toggle-pill on" type="button"><span></span></button><button class="help-dot" type="button" aria-label="What is Starlight Mode?">?</button><p class="mode-tip">Starlight Mode ON keeps cards mysterious until you reveal them, like collecting shiny Starlight cards on stream and unlocking them here. Turn it OFF to freely preview every card!</p></div>
+    </section>
+    <section id="seriesLanding" class="v61-series-stage" aria-label="Choose a series booster pack"></section>
+    <section id="seriesGridStage" class="v61-card-stage" aria-label="Selected card series"></section>
+    <aside id="v62Showcase" class="v62-showcase" aria-label="Selected card showcase"></aside>
+  </main>
+</div>
+<div id="cardOverlay" aria-live="polite"></div>
+<script src="js/app.js"></script>
+<script>document.querySelectorAll('[data-nav]').forEach(link=>{if(link.dataset.nav===document.body.dataset.page)link.classList.add('active')});</script>
+</body></html>
