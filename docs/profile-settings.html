@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Collector Profile | Starlight Card Binder
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <style>
+        :root {
+            --profile-blue:
+                #6bc6f8;
+
+            --profile-pink:
+                #ff82c8;
+
+            --profile-dark:
+                #30344f;
+
+            --profile-muted:
+                #6b7089;
+
+            --profile-error:
+                #b4233f;
+
+            --profile-success:
+                #167048;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .profile-settings-page {
+            width:
+                min(
+                    100%,
+                    980px
+                );
+
+            margin:
+                28px auto;
+
+            padding:
+                0 18px 40px;
+        }
+
+        .profile-settings-panel {
+            padding:
+                30px;
+
+            border:
+                2px solid
+                rgba(
+                    107,
+                    198,
+                    248,
+                    0.46
+                );
+
+            border-radius:
+                26px;
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.94
+                );
+
+            box-shadow:
+                0 18px 50px
+                rgba(
+                    70,
+                    92,
+                    145,
+                    0.16
+                );
+        }
+
+        .profile-settings-header {
+            margin-bottom:
+                26px;
+
+            text-align:
+                center;
+        }
+
+        .profile-settings-header h1 {
+            margin:
+                0 0 10px;
+
+            color:
+                #405fa1;
+
+            font-size:
+                clamp(
+                    2rem,
+                    6vw,
+                    3.2rem
+                );
+        }
+
+        .profile-settings-header p {
+            margin:
+                0 auto;
+
+            max-width:
+                650px;
+
+            color:
+                var(
+                    --profile-muted
+                );
+
+            line-height:
+                1.6;
+        }
+
+        .profile-section {
+            margin-top:
+                22px;
+
+            padding:
+                22px;
+
+            border:
+                1px solid
+                rgba(
+                    107,
+                    198,
+                    248,
+                    0.36
+                );
+
+            border-radius:
+                18px;
+
+            background:
+                rgba(
+                    242,
+                    249,
+                    255,
+                    0.74
+                );
+        }
+
+        .profile-section h2 {
+            margin:
+                0 0 16px;
+
+            color:
+                #405fa1;
+        }
+
+        .profile-grid {
+            display:
+                grid;
+
+            grid-template-columns:
+                repeat(
+                    2,
+                    minmax(
+                        0,
+                        1fr
+                    )
+                );
+
+            gap:
+                18px;
+        }
+
+        .profile-field {
+            min-width:
+                0;
+        }
+
+        .profile-field.full {
+            grid-column:
+                1 / -1;
+        }
+
+        .profile-field label,
+        .profile-field legend {
+            display:
+                block;
+
+            margin-bottom:
+                7px;
+
+            color:
+                var(
+                    --profile-dark
+                );
+
+            font-weight:
+                800;
+        }
+
+        .profile-field input,
+        .profile-field textarea,
+        .profile-field select {
+            width:
+                100%;
+
+            min-height:
+                48px;
+
+            padding:
+                12px 14px;
+
+            border:
+                2px solid
+                rgba(
+                    75,
+                    105,
+                    155,
+                    0.24
+                );
+
+            border-radius:
+                12px;
+
+            background:
+                #ffffff;
+
+            color:
+                var(
+                    --profile-dark
+                );
+
+            font:
+                inherit;
+        }
+
+        .profile-field textarea {
+            min-height:
+                112px;
+
+            resize:
+                vertical;
+        }
+
+        .profile-field input:focus,
+        .profile-field textarea:focus,
+        .profile-field select:focus {
+            outline:
+                3px solid
+                rgba(
+                    107,
+                    198,
+                    248,
+                    0.28
+                );
+
+            border-color:
+                var(
+                    --profile-blue
+                );
+        }
+
+        .profile-help {
+            display:
+                block;
+
+            margin-top:
+                7px;
+
+            color:
+                var(
+                    --profile-muted
+                );
+
+            font-size:
+                0.9rem;
+
+            line-height:
+                1.4;
+        }
+
+        .visibility-options {
+            display:
+                grid;
+
+            gap:
+                10px;
+        }
+
+        .visibility-option {
+            display:
+                grid;
+
+            grid-template-columns:
+                auto 1fr;
+
+            gap:
+                10px;
+
+            align-items:
+                start;
+
+            padding:
+                13px;
+
+            border:
+                1px solid
+                rgba(
+                    107,
+                    198,
+                    248,
+                    0.32
+                );
+
+            border-radius:
+                12px;
+
+            background:
+                #ffffff;
+        }
+
+        .visibility-option input {
+            margin-top:
+                4px;
+        }
+
+        .visibility-option strong {
+            display:
+                block;
+
+            margin-bottom:
+                3px;
+
+            color:
+                #405fa1;
+        }
+
+        .visibility-option span {
+            color:
+                var(
+                    --profile-muted
+                );
+
+            line-height:
+                1.4;
+        }
+
+        .profile-switches {
+            display:
+                grid;
+
+            gap:
+                12px;
+        }
+
+        .profile-switch {
+            display:
+                flex;
+
+            gap:
+                10px;
+
+            align-items:
+                flex-start;
+
+            padding:
+                13px;
+
+            border:
+                1px solid
+                rgba(
+                    255,
+                    130,
+                    200,
+                    0.28
+                );
+
+            border-radius:
+                12px;
+
+            background:
+                #ffffff;
+        }
+
+        .profile-switch input {
+            margin-top:
+                4px;
+        }
+
+        .favorite-card-preview {
+            display:
+                grid;
+
+            grid-template-columns:
+                110px 1fr;
+
+            gap:
+                16px;
+
+            align-items:
+                center;
+
+            margin-top:
+                16px;
+
+            padding:
+                15px;
+
+            border:
+                1px solid
+                rgba(
+                    255,
+                    130,
+                    200,
+                    0.30
+                );
+
+            border-radius:
+                16px;
+
+            background:
+                #ffffff;
+        }
+
+        .favorite-card-preview img {
+            width:
+                100%;
+
+            aspect-ratio:
+                5 / 7;
+
+            border-radius:
+                10px;
+
+            object-fit:
+                cover;
+
+            background:
+                #edf4fa;
+        }
+
+        .profile-actions {
+            display:
+                flex;
+
+            flex-wrap:
+                wrap;
+
+            justify-content:
+                center;
+
+            gap:
+                12px;
+
+            margin-top:
+                26px;
+        }
+
+        .profile-button,
+        .profile-link {
+            min-height:
+                50px;
+
+            padding:
+                12px 22px;
+
+            border:
+                2px solid
+                transparent;
+
+            border-radius:
+                999px;
+
+            font:
+                inherit;
+
+            font-weight:
+                800;
+
+            text-decoration:
+                none;
+
+            cursor:
+                pointer;
+        }
+
+        .profile-button.primary,
+        .profile-link.primary {
+            background:
+                linear-gradient(
+                    135deg,
+                    var(
+                        --profile-blue
+                    ),
+                    var(
+                        --profile-pink
+                    )
+                );
+
+            color:
+                #ffffff;
+        }
+
+        .profile-link.secondary {
+            border-color:
+                rgba(
+                    107,
+                    198,
+                    248,
+                    0.58
+                );
+
+            background:
+                #ffffff;
+
+            color:
+                #405fa1;
+        }
+
+        .profile-button:disabled {
+            cursor:
+                wait;
+
+            opacity:
+                0.62;
+        }
+
+        .profile-status {
+            min-height:
+                28px;
+
+            margin:
+                22px 0 0;
+
+            font-weight:
+                800;
+
+            line-height:
+                1.5;
+
+            text-align:
+                center;
+        }
+
+        .profile-status.success {
+            color:
+                var(
+                    --profile-success
+                );
+        }
+
+        .profile-status.error {
+            color:
+                var(
+                    --profile-error
+                );
+        }
+
+        .hidden {
+            display:
+                none;
+        }
+
+        @media (
+            max-width:
+                700px
+        ) {
+            .profile-grid {
+                grid-template-columns:
+                    1fr;
+            }
+
+            .profile-field.full {
+                grid-column:
+                    auto;
+            }
+
+            .favorite-card-preview {
+                grid-template-columns:
+                    85px 1fr;
+            }
+
+            .profile-button,
+            .profile-link {
+                width:
+                    100%;
+
+                text-align:
+                    center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sky"></div>
+
+    <main class="profile-settings-page">
+        <section class="profile-settings-panel">
+            <header class="profile-settings-header">
+                <p class="eyebrow">
+                    Collector Profile
+                </p>
+
+                <h1>
+                    Create Your Starlight Profile
+                </h1>
+
+                <p>
+                    Choose how other collectors see you and
+                    which parts of your collection are shared.
+                </p>
+            </header>
+
+            <form id="profile-form">
+                <section class="profile-section">
+                    <h2>
+                        Collector Identity
+                    </h2>
+
+                    <div class="profile-grid">
+                        <div class="profile-field">
+                            <label for="username">
+                                Username
+                            </label>
+
+                            <input
+                                id="username"
+                                name="username"
+                                type="text"
+                                minlength="3"
+                                maxlength="24"
+                                pattern="[a-z0-9_]{3,24}"
+                                autocomplete="username"
+                                required
+                            >
+
+                            <small class="profile-help">
+                                Lowercase letters, numbers,
+                                and underscores only.
+                            </small>
+                        </div>
+
+                        <div class="profile-field">
+                            <label for="display-name">
+                                Display Name
+                            </label>
+
+                            <input
+                                id="display-name"
+                                name="display-name"
+                                type="text"
+                                maxlength="40"
+                                autocomplete="nickname"
+                                required
+                            >
+
+                            <small class="profile-help">
+                                This is the friendly name shown
+                                at the top of your profile.
+                            </small>
+                        </div>
+
+                        <div class="profile-field full">
+                            <label for="bio">
+                                Short Bio
+                            </label>
+
+                            <textarea
+                                id="bio"
+                                name="bio"
+                                maxlength="240"
+                                placeholder="Tell visitors a little about your collection..."
+                            ></textarea>
+
+                            <small class="profile-help">
+                                <span id="bio-count">
+                                    0
+                                </span>
+                                / 240 characters
+                            </small>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="profile-section">
+                    <h2>
+                        Profile Visibility
+                    </h2>
+
+                    <div class="visibility-options">
+                        <label class="visibility-option">
+                            <input
+                                type="radio"
+                                name="profile-visibility"
+                                value="public"
+                                checked
+                            >
+
+                            <span>
+                                <strong>
+                                    Public
+                                </strong>
+
+                                Anyone can view your profile
+                                and allowed collection details.
+                            </span>
+                        </label>
+
+                        <label class="visibility-option">
+                            <input
+                                type="radio"
+                                name="profile-visibility"
+                                value="unlisted"
+                            >
+
+                            <span>
+                                <strong>
+                                    Unlisted
+                                </strong>
+
+                                People with the direct link can
+                                view it, but it will not appear
+                                in collector directories.
+                            </span>
+                        </label>
+
+                        <label class="visibility-option">
+                            <input
+                                type="radio"
+                                name="profile-visibility"
+                                value="private"
+                            >
+
+                            <span>
+                                <strong>
+                                    Private
+                                </strong>
+
+                                Only you can view your profile.
+                            </span>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="profile-section">
+                    <h2>
+                        Collection Display
+                    </h2>
+
+                    <div class="profile-switches">
+                        <label class="profile-switch">
+                            <input
+                                id="show-collection-stats"
+                                type="checkbox"
+                                checked
+                            >
+
+                            <span>
+                                Show collection counts,
+                                completion percentages,
+                                and rarity statistics.
+                            </span>
+                        </label>
+
+                        <label class="profile-switch">
+                            <input
+                                id="show-favorites"
+                                type="checkbox"
+                                checked
+                            >
+
+                            <span>
+                                Show cards marked as favorites.
+                            </span>
+                        </label>
+
+                        <label class="profile-switch">
+                            <input
+                                id="show-featured-cards"
+                                type="checkbox"
+                                checked
+                            >
+
+                            <span>
+                                Show your main showcase card
+                                and future featured cards.
+                            </span>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="profile-section">
+                    <h2>
+                        Main Showcase Card
+                    </h2>
+
+                    <div class="profile-field">
+                        <label for="favorite-card">
+                            Select an owned card
+                        </label>
+
+                        <select id="favorite-card">
+                            <option value="">
+                                No showcase card selected
+                            </option>
+                        </select>
+                    </div>
+
+                    <div
+                        id="favorite-card-preview"
+                        class="favorite-card-preview hidden"
+                    >
+                        <img
+                            id="favorite-card-image"
+                            src=""
+                            alt=""
+                        >
+
+                        <div>
+                            <h3 id="favorite-card-name"></h3>
+
+                            <p id="favorite-card-details"></p>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="profile-actions">
+                    <button
+                        id="save-profile-button"
+                        class="profile-button primary"
+                        type="submit"
+                    >
+                        Save My Profile
+                    </button>
+
+                    <a
+                        class="profile-link secondary"
+                        href="./binder.html"
+                    >
+                        Return to Binder
+                    </a>
+
+                    <a
+                        id="view-profile-link"
+                        class="profile-link primary hidden"
+                        href="#"
+                    >
+                        View My Profile
+                    </a>
+                </div>
+
+                <p
+                    id="profile-status"
+                    class="profile-status"
+                    role="status"
+                    aria-live="polite"
+                ></p>
+            </form>
+        </section>
+    </main>
+
+    <script type="module">
+        import {
+            loadOwnProfile,
+            loadOwnedProfileCards,
+            setProfileFavoriteCard,
+            updateCollectorProfile
+        } from "./js/profile-service.js";
+
+        const form =
+            document.getElementById(
+                "profile-form"
+            );
+
+        const usernameInput =
+            document.getElementById(
+                "username"
+            );
+
+        const displayNameInput =
+            document.getElementById(
+                "display-name"
+            );
+
+        const bioInput =
+            document.getElementById(
+                "bio"
+            );
+
+        const bioCount =
+            document.getElementById(
+                "bio-count"
+            );
+
+        const showCollectionStatsInput =
+            document.getElementById(
+                "show-collection-stats"
+            );
+
+        const showFavoritesInput =
+            document.getElementById(
+                "show-favorites"
+            );
+
+        const showFeaturedCardsInput =
+            document.getElementById(
+                "show-featured-cards"
+            );
+
+        const favoriteCardSelect =
+            document.getElementById(
+                "favorite-card"
+            );
+
+        const favoriteCardPreview =
+            document.getElementById(
+                "favorite-card-preview"
+            );
+
+        const favoriteCardImage =
+            document.getElementById(
+                "favorite-card-image"
+            );
+
+        const favoriteCardName =
+            document.getElementById(
+                "favorite-card-name"
+            );
+
+        const favoriteCardDetails =
+            document.getElementById(
+                "favorite-card-details"
+            );
+
+        const saveButton =
+            document.getElementById(
+                "save-profile-button"
+            );
+
+        const viewProfileLink =
+            document.getElementById(
+                "view-profile-link"
+            );
+
+        const statusElement =
+            document.getElementById(
+                "profile-status"
+            );
+
+        let ownedCards = [];
+        let existingProfile = null;
+
+        function displayStatus(
+            message,
+            type = ""
+        ) {
+            statusElement.textContent =
+                message;
+
+            statusElement.classList.remove(
+                "success",
+                "error"
+            );
+
+            if (type) {
+                statusElement.classList.add(
+                    type
+                );
+            }
+        }
+
+        function setLoading(
+            isLoading
+        ) {
+            saveButton.disabled =
+                isLoading;
+
+            saveButton.textContent =
+                isLoading
+                    ? "Saving..."
+                    : "Save My Profile";
+        }
+
+        function updateBioCount() {
+            bioCount.textContent =
+                String(
+                    bioInput.value.length
+                );
+        }
+
+        function selectedVisibility() {
+            return (
+                document.querySelector(
+                    'input[name="profile-visibility"]:checked'
+                )?.value ||
+                "public"
+            );
+        }
+
+        function updateProfileLink(
+            username
+        ) {
+            if (!username) {
+                viewProfileLink.classList.add(
+                    "hidden"
+                );
+
+                return;
+            }
+
+            viewProfileLink.href =
+                `./collector.html?username=${encodeURIComponent(
+                    username
+                )}`;
+
+            viewProfileLink.classList.remove(
+                "hidden"
+            );
+        }
+
+        function renderFavoriteCardPreview() {
+            const selectedCard =
+                ownedCards.find(card => {
+                    return (
+                        card.id ===
+                        favoriteCardSelect.value
+                    );
+                });
+
+            if (!selectedCard) {
+                favoriteCardPreview.classList.add(
+                    "hidden"
+                );
+
+                favoriteCardImage.src =
+                    "";
+
+                favoriteCardImage.alt =
+                    "";
+
+                return;
+            }
+
+            favoriteCardImage.src =
+                selectedCard.thumbnail_url ||
+                selectedCard.image_url ||
+                "";
+
+            favoriteCardImage.alt =
+                `${selectedCard.name} card artwork`;
+
+            favoriteCardName.textContent =
+                `#${selectedCard.card_number} ${selectedCard.name}`;
+
+            favoriteCardDetails.textContent =
+                `${selectedCard.rarity} • Series ${selectedCard.series_id}`;
+
+            favoriteCardPreview.classList.remove(
+                "hidden"
+            );
+        }
+
+        function fillProfileForm(
+            profile
+        ) {
+            usernameInput.value =
+                profile.username || "";
+
+            displayNameInput.value =
+                profile.display_name ||
+                "";
+
+            bioInput.value =
+                profile.bio ||
+                "";
+
+            showCollectionStatsInput.checked =
+                profile.show_collection_stats !==
+                false;
+
+            showFavoritesInput.checked =
+                profile.show_favorites !==
+                false;
+
+            showFeaturedCardsInput.checked =
+                profile.show_featured_cards !==
+                false;
+
+            const visibilityInput =
+                document.querySelector(
+                    `input[name="profile-visibility"][value="${profile.profile_visibility || "public"}"]`
+                );
+
+            if (visibilityInput) {
+                visibilityInput.checked =
+                    true;
+            }
+
+            favoriteCardSelect.value =
+                profile.favorite_card_id ||
+                "";
+
+            updateBioCount();
+            updateProfileLink(
+                profile.onboarding_complete
+                    ? profile.username
+                    : ""
+            );
+
+            renderFavoriteCardPreview();
+        }
+
+        async function initializePage() {
+            displayStatus(
+                "Loading your collector profile..."
+            );
+
+            const [
+                profileResult,
+                cardsResult
+            ] = await Promise.all([
+                loadOwnProfile(),
+                loadOwnedProfileCards()
+            ]);
+
+            if (
+                profileResult.error ||
+                !profileResult.user ||
+                !profileResult.profile
+            ) {
+                console.error(
+                    "Unable to load profile:",
+                    profileResult.error
+                );
+
+                displayStatus(
+                    "Please sign in before creating a collector profile.",
+                    "error"
+                );
+
+                window.setTimeout(() => {
+                    window.location.href =
+                        "./login.html";
+                }, 1500);
+
+                return;
+            }
+
+            existingProfile =
+                profileResult.profile;
+
+            ownedCards =
+                cardsResult.cards || [];
+
+            favoriteCardSelect.innerHTML =
+                `
+                    <option value="">
+                        No showcase card selected
+                    </option>
+                ` +
+                ownedCards
+                    .map(card => {
+                        return `
+                            <option value="${card.id}">
+                                #${card.card_number}
+                                ${card.name}
+                                — ${card.rarity}
+                            </option>
+                        `;
+                    })
+                    .join("");
+
+            fillProfileForm(
+                existingProfile
+            );
+
+            displayStatus(
+                existingProfile.onboarding_complete
+                    ? "Your profile is ready to edit."
+                    : "Choose your collector identity to finish setting up your account.",
+                "success"
+            );
+        }
+
+        bioInput.addEventListener(
+            "input",
+            updateBioCount
+        );
+
+        favoriteCardSelect.addEventListener(
+            "change",
+            renderFavoriteCardPreview
+        );
+
+        usernameInput.addEventListener(
+            "input",
+            () => {
+                usernameInput.value =
+                    usernameInput.value
+                        .toLowerCase()
+                        .replace(
+                            /[^a-z0-9_]/g,
+                            ""
+                        );
+            }
+        );
+
+        form.addEventListener(
+            "submit",
+            async event => {
+                event.preventDefault();
+
+                displayStatus("");
+
+                const username =
+                    usernameInput.value
+                        .trim()
+                        .toLowerCase();
+
+                const displayName =
+                    displayNameInput.value
+                        .trim();
+
+                const bio =
+                    bioInput.value
+                        .trim();
+
+                if (
+                    !/^[a-z0-9_]{3,24}$/.test(
+                        username
+                    )
+                ) {
+                    displayStatus(
+                        "Username must be 3–24 characters using lowercase letters, numbers, or underscores.",
+                        "error"
+                    );
+
+                    usernameInput.focus();
+                    return;
+                }
+
+                if (
+                    !displayName ||
+                    displayName.length > 40
+                ) {
+                    displayStatus(
+                        "Display name must be between 1 and 40 characters.",
+                        "error"
+                    );
+
+                    displayNameInput.focus();
+                    return;
+                }
+
+                if (
+                    bio.length > 240
+                ) {
+                    displayStatus(
+                        "Bio must be 240 characters or fewer.",
+                        "error"
+                    );
+
+                    bioInput.focus();
+                    return;
+                }
+
+                setLoading(true);
+
+                try {
+                    const result =
+                        await updateCollectorProfile({
+                            username,
+                            displayName,
+                            bio,
+                            visibility:
+                                selectedVisibility(),
+
+                            showCollectionStats:
+                                showCollectionStatsInput.checked,
+
+                            showFavorites:
+                                showFavoritesInput.checked,
+
+                            showFeaturedCards:
+                                showFeaturedCardsInput.checked
+                        });
+
+                    await setProfileFavoriteCard(
+                        favoriteCardSelect.value ||
+                        null
+                    );
+
+                    updateProfileLink(
+                        result.username
+                    );
+
+                    displayStatus(
+                        "Your Starlight collector profile was saved!",
+                        "success"
+                    );
+                } catch (error) {
+                    console.error(
+                        "Profile update failed:",
+                        error
+                    );
+
+                    displayStatus(
+                        error.message ||
+                            "Your profile could not be saved.",
+                        "error"
+                    );
+                } finally {
+                    setLoading(false);
+                }
+            }
+        );
+
+        initializePage();
+    </script>
+</body>
+</html>
