@@ -199,3 +199,27 @@ body[data-page="binder"] .series-hero {
 @keyframes shellReadyPulse{0%,100%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.045);filter:brightness(1.08)}}
 @media(max-width:1180px){.unified-nav a.shell-daily-link{font-size:.82rem}.shell-daily-ready-badge{font-size:.56rem;padding:2px 5px}}
 @media(prefers-reduced-motion:reduce){.shell-daily-ready-badge,.economy-card [data-daily-status].daily-ready{animation:none!important}}
+
+/* V82.8.2 — compact sidebar groups and clipping repair */
+@media (min-width:1181px){
+  .unified-shell .site{grid-template-columns:292px minmax(0,1fr)!important}
+  .unified-shell .sidebar{padding:12px 11px 20px!important;gap:9px!important;scrollbar-gutter:auto!important}
+}
+.unified-shell .unified-nav{padding:10px!important;gap:10px!important;overflow:visible!important}
+.unified-shell .shell-nav-section{min-width:0;gap:4px!important}
+.unified-shell .shell-nav-label{margin:0 0 5px!important;padding:8px 10px!important;border-radius:12px!important;font-size:.69rem!important}
+.unified-shell .shell-nav-label span{width:20px!important;height:20px!important}
+.unified-shell .shell-nav-subheading{margin:8px 10px 2px;padding-top:7px;border-top:1px solid rgba(107,198,248,.15);color:#8a93aa;font-size:.61rem;font-weight:950;letter-spacing:.13em;text-transform:uppercase}
+.unified-shell .unified-nav a{min-width:0;width:100%;padding:9px 10px!important;gap:7px!important;font-size:.82rem!important;border-radius:12px!important}
+.unified-shell .unified-nav a>span:not(.shell-nav-badge):not(.shell-daily-ready-badge){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.unified-shell .shell-daily-ready-badge{flex:0 0 auto;margin-left:auto;padding:2px 5px!important;font-size:.52rem!important}
+.unified-shell .shell-nav-badge{flex:0 0 auto}
+.unified-shell .brand{padding-inline:4px}
+.unified-shell .logo{max-width:205px!important}
+@media (max-height:900px) and (min-width:1181px){
+  .unified-shell .sidebar{gap:7px!important}
+  .unified-shell .unified-nav{padding:8px!important;gap:8px!important}
+  .unified-shell .unified-nav a{padding:8px 9px!important}
+  .unified-shell .shell-nav-subheading{margin-top:6px;padding-top:5px}
+  .unified-shell .side-card{padding:9px!important}
+}
