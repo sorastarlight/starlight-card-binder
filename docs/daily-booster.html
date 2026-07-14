@@ -1,11 +1,12 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Free Daily Booster | Starlight Card Binder</title>
-<link href="css/style.css" rel="stylesheet">
-<link href="css/v80-8-ui.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"/>
+<link href="css/v80-8-ui.css" rel="stylesheet"/>
 <style>
 :root{--b-blue:#6bc6f8;--b-pink:#ff82c8;--b-gold:#fed334;--b-purple:#a98cff;--b-dark:#30344f;--b-muted:#6b7089;--b-error:#b4233f}
 *{box-sizing:border-box}.daily-page{width:min(100%,1120px);margin:0 auto;padding:24px 18px 60px}.daily-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:18px;padding:12px;border:1px solid rgba(107,198,248,.36);border-radius:18px;background:rgba(255,255,255,.9)}.daily-nav a{padding:8px 14px;border-radius:999px;color:#405fa1;font-weight:850;text-decoration:none}.daily-panel{position:relative;overflow:hidden;padding:30px;border:2px solid rgba(255,130,200,.5);border-radius:30px;background:radial-gradient(circle at 50% 0,rgba(255,255,255,.99),rgba(249,243,255,.97) 50%,rgba(226,245,255,.95));box-shadow:0 24px 75px rgba(84,91,158,.22),0 0 42px rgba(255,130,200,.13)}
@@ -31,43 +32,37 @@
 <body><script src="js/embed-mode.js" type="module"></script>
 <div class="sky"></div>
 <main class="daily-page">
-<nav class="daily-nav"><a href="binder.html">🗂 Binder</a><a href="collection.html">♡ Collection</a><a href="daily-booster.html">✨ Free Daily Booster</a><a href="star-bits.html">✦ Star Bits</a><a href="redeem.html">🎟 Redeem</a><a href="profile-settings.html">⚙ Profile</a></nav>
+<nav class="daily-nav"><a href="binder.html">🗂 Binder</a><a href="collection.html">♡ Collection</a><a href="daily-booster.html">✨ Free Daily Booster</a><a href="star-bits.html">✦ Star Bits</a><a href="redeem.html">🎟 Redeem</a><a href="profile-settings.html">⚙ Profile</a><a href="booster-shop.html">🛍️ Booster Shop</a></nav>
 <section class="daily-panel">
 <header class="daily-header"><p class="eyebrow">Free Daily Reward</p><h1>✨ Free Daily Booster</h1><p>Step into the Starlight portal and reveal four cards one at a time. Your free booster resets every day at midnight Eastern Time.</p></header>
-<section class="portal-zone" id="portal-zone" aria-label="Free Daily Booster portal">
-<div class="portal-ring" aria-hidden="true"></div><div class="portal-ribbons" aria-hidden="true"><i></i><i></i><i></i></div>
-<button class="pack-trigger" id="pack-trigger" type="button" disabled aria-describedby="daily-status-description">
-<img alt="Rising Star booster pack" class="pack-image" src="site_assets/series01_rising_star_booster.png">
+<section aria-label="Free Daily Booster portal" class="portal-zone" id="portal-zone">
+<div aria-hidden="true" class="portal-ring"></div><div aria-hidden="true" class="portal-ribbons"><i></i><i></i><i></i></div>
+<button aria-describedby="daily-status-description" class="pack-trigger" disabled="" id="pack-trigger" type="button">
+<img alt="Rising Star booster pack" class="pack-image" src="site_assets/series01_rising_star_booster.png"/>
 <span class="pack-ready-label" id="pack-ready-label">Checking the stars…</span>
 </button>
 </section>
 <section class="daily-status-card"><h2 id="daily-status-heading">Checking today’s booster…</h2><p id="daily-status-description">Please wait while we check your account.</p><div class="countdown hidden" id="countdown"></div></section>
 <div class="daily-actions"><a class="daily-link primary hidden" href="login.html" id="sign-in-link">Sign In</a></div>
-<section class="booster-shop" aria-labelledby="shop-title">
-<div class="shop-head"><div><h2 id="shop-title">✦ Starlight Booster Shop</h2><p>Use Star Bits earned from duplicate cards to open another Standard Booster. It uses the same card odds as the free daily pack.</p></div><span class="shop-balance">Balance: <strong id="shop-balance">0</strong> ✦</span></div>
-<div class="shop-card"><div><h3>Standard Booster</h3><p>2 Common cards, 1 Uncommon card, and 1 guaranteed Rare-or-better card.</p><span class="shop-price">100 Star Bits</span></div><button class="shop-buy" id="buy-booster" type="button" disabled>Open for 100 ✦</button></div>
-</section>
+
 <section class="reward-section hidden" id="reward-section"><h2 id="reward-title">Your Pulls</h2><div class="reward-grid" id="reward-grid"></div></section>
 <p aria-live="polite" class="page-status" id="page-status" role="status"></p>
 </section></main>
 <script type="module">
 import { supabase } from "./js/supabase-client.js";
-import { getDailyBoosterStatus, openDailyBooster, openStarBitsBooster } from "./js/daily-booster-service.js";
-import { getStarBitsExchangePreview } from "./js/star-bits-service.js";
+import { getDailyBoosterStatus, openDailyBooster } from "./js/daily-booster-service.js";
 import { revealRewardSequence } from "./js/reward-reveal.js";
-const portal=document.getElementById('portal-zone'),pack=document.getElementById('pack-trigger'),packLabel=document.getElementById('pack-ready-label'),signIn=document.getElementById('sign-in-link'),heading=document.getElementById('daily-status-heading'),description=document.getElementById('daily-status-description'),countdown=document.getElementById('countdown'),rewardSection=document.getElementById('reward-section'),rewardGrid=document.getElementById('reward-grid'),rewardTitle=document.getElementById('reward-title'),statusText=document.getElementById('page-status'),shopBalance=document.getElementById('shop-balance'),buyButton=document.getElementById('buy-booster');
-let timer=null,currentBalance=0,isBusy=false;
+const portal=document.getElementById('portal-zone'),pack=document.getElementById('pack-trigger'),packLabel=document.getElementById('pack-ready-label'),signIn=document.getElementById('sign-in-link'),heading=document.getElementById('daily-status-heading'),description=document.getElementById('daily-status-description'),countdown=document.getElementById('countdown'),rewardSection=document.getElementById('reward-section'),rewardGrid=document.getElementById('reward-grid'),rewardTitle=document.getElementById('reward-title'),statusText=document.getElementById('page-status');
+let timer=null,isBusy=false;
 function status(message,type=''){statusText.textContent=message;statusText.className=`page-status ${type}`.trim()}
 function format(ms){const t=Math.max(0,Math.floor(ms/1000)),h=Math.floor(t/3600),m=Math.floor((t%3600)/60),s=t%60;return [h,m,s].map(v=>String(v).padStart(2,'0')).join(':')}
 function startCountdown(value){clearInterval(timer);const target=new Date(value);countdown.classList.remove('hidden');const tick=()=>{const left=target-Date.now();if(left<=0){clearInterval(timer);initialize();return}countdown.textContent=format(left)};tick();timer=setInterval(tick,1000)}
 function render(cards,title='Your Pulls'){rewardTitle.textContent=title;rewardGrid.replaceChildren();for(const card of cards||[]){const item=document.createElement('article');item.className=`reward-card rarity-${String(card.rarity||'common').toLowerCase()}`;item.innerHTML=`<img src="${card.imageUrl||card.thumbnailUrl||''}" alt="${card.name} card artwork"><h3>#${card.cardNumber} ${card.name}</h3><p>${card.rarity} • ${card.seriesName}</p><p>Quantity: ${card.quantity}</p><span class="reward-pill ${card.isDuplicate?'duplicate':''}">${card.isDuplicate?'Duplicate Pull':'New Card!'}</span>`;rewardGrid.append(item)}rewardSection.classList.remove('hidden')}
 function setPortalReady(){portal.classList.remove('is-locked');pack.disabled=false;packLabel.textContent='✨ READY TO OPEN — CLICK THE PACK ✨';heading.textContent='Your Free Booster Is Ready!';description.textContent='Click the floating pack inside the portal to begin the magical opening sequence.';countdown.classList.add('hidden')}
 function setPortalClaimed(data){portal.classList.add('is-locked');pack.disabled=true;packLabel.textContent='Free Booster Claimed';heading.textContent='Your Next Free Booster Is Charging';description.textContent='The portal will awaken again at midnight Eastern Time.';startCountdown(data.nextClaimAt);if(Array.isArray(data.cardsAwarded)&&data.cardsAwarded.length)render(data.cardsAwarded,'Today’s Free Booster')}
-async function refreshWallet(){const {preview,error}=await getStarBitsExchangePreview();if(!error&&preview){currentBalance=Number(preview.starBitsBalance||0);shopBalance.textContent=String(currentBalance);buyButton.disabled=isBusy||currentBalance<100;buyButton.textContent=currentBalance<100?'Need 100 Star Bits':'Open for 100 ✦'}}
 async function playOpening(cards,title){portal.classList.add('is-opening');await new Promise(r=>setTimeout(r,850));await revealRewardSequence(cards);portal.classList.remove('is-opening');render(cards,title);window.parent?.postMessage({type:'starlight-view-ready',view:'daily'},location.origin)}
-async function initialize(){status('');const {data,error}=await supabase.auth.getUser();if(error||!data.user){portal.classList.add('is-locked');pack.disabled=true;packLabel.textContent='Sign In to Open';heading.textContent='Sign In to Claim Your Free Booster';description.textContent='Daily and Star Bits boosters are saved to your Starlight account.';signIn.classList.remove('hidden');buyButton.disabled=true;return}signIn.classList.add('hidden');await refreshWallet();const {status:daily,error:dailyError}=await getDailyBoosterStatus();if(dailyError||!daily){status(dailyError?.message||'Could not check the free daily booster.','error');return}daily.available?setPortalReady():setPortalClaimed(daily)}
-pack.addEventListener('click',async()=>{if(isBusy||pack.disabled)return;isBusy=true;pack.disabled=true;packLabel.textContent='The stars are choosing…';try{const result=await openDailyBooster();if(result.alreadyClaimed){await initialize();return}const cards=result.cards||[];await playOpening(cards,'Your Free Daily Booster');setPortalClaimed({nextClaimAt:result.nextClaimAt,cardsAwarded:cards});await refreshWallet()}catch(error){status(error.message||'The free booster could not be opened.','error');await initialize()}finally{isBusy=false}});
-buyButton.addEventListener('click',async()=>{if(isBusy||currentBalance<100)return;if(!confirm('Spend 100 Star Bits to open a Standard Booster?'))return;isBusy=true;buyButton.disabled=true;buyButton.textContent='Opening…';try{const result=await openStarBitsBooster();currentBalance=Number(result.newStarBitsBalance||0);shopBalance.textContent=String(currentBalance);await playOpening(result.cards||[],'Your Star Bits Booster');await refreshWallet()}catch(error){status(error.message||'The Star Bits booster could not be opened.','error');await refreshWallet()}finally{isBusy=false}});
+async function initialize(){status('');const {data,error}=await supabase.auth.getUser();if(error||!data.user){portal.classList.add('is-locked');pack.disabled=true;packLabel.textContent='Sign In to Open';heading.textContent='Sign In to Claim Your Free Booster';description.textContent='Daily and Star Bits boosters are saved to your Starlight account.';signIn.classList.remove('hidden');return}signIn.classList.add('hidden');const {status:daily,error:dailyError}=await getDailyBoosterStatus();if(dailyError||!daily){status(dailyError?.message||'Could not check the free daily booster.','error');return}daily.available?setPortalReady():setPortalClaimed(daily)}
+pack.addEventListener('click',async()=>{if(isBusy||pack.disabled)return;isBusy=true;pack.disabled=true;packLabel.textContent='The stars are choosing…';try{const result=await openDailyBooster();if(result.alreadyClaimed){await initialize();return}const cards=result.cards||[];await playOpening(cards,'Your Free Daily Booster');setPortalClaimed({nextClaimAt:result.nextClaimAt,cardsAwarded:cards})}catch(error){status(error.message||'The free booster could not be opened.','error');await initialize()}finally{isBusy=false}});
 initialize();
 </script>
 </body></html>

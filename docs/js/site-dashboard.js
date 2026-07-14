@@ -43,6 +43,7 @@ async function loadEconomy() {
     document.querySelectorAll('[data-daily-status]').forEach(el=>el.textContent='Sign in to claim');
     document.querySelectorAll('[data-daily-cta]').forEach(el=>{el.classList.remove('is-loading','is-ready','is-claimed');el.classList.add('is-claimed');});
     setText('[data-daily-cta-label]', 'Sign In for Daily Booster');
+    document.querySelectorAll('[data-daily-nav-badge]').forEach(el=>{el.hidden=true;});
     return;
   }
   const [{data: preview,error:previewError},{data: daily,error:dailyError},{data: rows,error:cardsError},{data: profile}] = await Promise.all([
@@ -69,10 +70,12 @@ async function loadEconomy() {
       setText('[data-daily-countdown]', 'Free booster available now');
       setText('[data-daily-cta-label]', '🌟 CLAIM YOUR DAILY BOOSTER');
       ctas.forEach(el=>{el.classList.remove('is-loading','is-claimed');el.classList.add('is-ready');el.setAttribute('aria-label','Daily Booster available to open now');});
+      document.querySelectorAll('[data-daily-nav-badge]').forEach(el=>{el.hidden=false;el.textContent='READY';});
     } else {
       document.querySelectorAll('[data-daily-status]').forEach(el=>{el.textContent='Claimed Today';el.classList.remove('daily-ready');el.classList.add('daily-claimed');});
       setText('[data-daily-cta-label]', 'Free Booster Claimed');
       ctas.forEach(el=>{el.classList.remove('is-loading','is-ready');el.classList.add('is-claimed');el.setAttribute('aria-label','View Daily Booster countdown');});
+      document.querySelectorAll('[data-daily-nav-badge]').forEach(el=>{el.hidden=true;});
       startCountdown(daily.nextClaimAt);
     }
   }
