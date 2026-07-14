@@ -8,8 +8,17 @@ export async function loadContentStudio(){
 export async function saveSeries(payload){const {data,error}=await supabase.rpc('admin_save_series_v84',{payload});if(error)throw error;return data;}
 export async function saveCard(payload){const {data,error}=await supabase.rpc('admin_save_card_v84',{payload});if(error)throw error;return data;}
 export async function saveBooster(payload){const {data,error}=await supabase.rpc('admin_save_booster_v84',{payload});if(error)throw error;return data;}
+export async function deleteSeries(id){const {data,error}=await supabase.rpc('admin_delete_series_v841',{requested_id:id});if(error)throw error;return data;}
+export async function deleteCard(id){const {data,error}=await supabase.rpc('admin_delete_card_v841',{requested_id:id});if(error)throw error;return data;}
+export async function deleteBooster(id){const {data,error}=await supabase.rpc('admin_delete_booster_v841',{requested_id:id});if(error)throw error;return data;}
 export async function setDailyMode(mode){const {data,error}=await supabase.rpc('admin_set_daily_booster_mode',{requested_mode:mode});if(error)throw error;return data;}
 function cleanName(name){return String(name||'image').toLowerCase().replace(/[^a-z0-9._-]+/g,'-').replace(/-+/g,'-');}
+export function storagePathFromUrl(url){
+  const value=String(url||'');
+  const marker='/storage/v1/object/public/site-assets/';
+  const index=value.indexOf(marker);
+  return index>=0?decodeURIComponent(value.slice(index+marker.length)):'';
+}
 export async function uploadStudioAsset(file,folder){
   if(!(file instanceof File))throw new Error('Choose an image first.');
   if(!/^image\//.test(file.type))throw new Error('Only image files are supported.');
@@ -19,17 +28,18 @@ export async function uploadStudioAsset(file,folder){
   const path=`${folder}/${Date.now()}-${crypto.randomUUID()}-${base}.${ext}`;
   const {error}=await supabase.storage.from('site-assets').upload(path,file,{cacheControl:'3600',upsert:false,contentType:file.type});
   if(error)throw error;
-  return supabase.storage.from('site-assets').getPublicUrl(path).data.publicUrl;
+  const url=supabase.storage.from('site-assets').getPublicUrl(path).data.publicUrl;
+  return {url,path,name:file.name,size:file.size};
 }
 export async function listStudioAssets(){
-  const folders=['booster-packs','card-backs','card-fronts','thumbnails','series'];
+  const folders=['booster-packs','card-backs','card-fronts','thumbnails','series','uploads'];
   const out=[];
   for(const folder of folders){
-    const {data,error}=await supabase.storage.from('site-assets').list(folder,{limit:200,sortBy:{column:'created_at',order:'desc'}});
+    const {data,error}=await supabase.storage.from('site-assets').list(folder,{limit:300,sortBy:{column:'created_at',order:'desc'}});
     if(error)continue;
     for(const item of data||[]){if(!item.id)continue;const path=`${folder}/${item.name}`;out.push({path,name:item.name,folder,url:supabase.storage.from('site-assets').getPublicUrl(path).data.publicUrl,createdAt:item.created_at});}
   }
   return out;
 }
-export async function deleteStudioAsset(path){const {error}=await supabase.storage.from('site-assets').remove([path]);if(error)throw error;}
+export async function deleteStudioAsset(path){if(!path)throw new Error('This is a bundled site asset and cannot be deleted from Supabase. Upload a replacement instead.');const {error}=await supabase.storage.from('site-assets').remove([path]);if(error)throw error;}
 export async function saveBoosterSlot(slotId,quantity,rates){const {data,error}=await supabase.rpc('admin_update_booster_slot',{requested_slot_id:Number(slotId),requested_quantity:Number(quantity),requested_rates:rates});if(error)throw error;return data;}

@@ -208,8 +208,4 @@ hydrateAccount();
 hydrateTradeOfferBadge();
 
 
-const accountMenuButton=document.querySelector('[data-account-menu-button]');
-const accountMenu=document.querySelector('[data-account-menu]');
-accountMenuButton?.addEventListener('click',event=>{event.stopPropagation();const open=accountMenu?.hasAttribute('hidden');accountMenu?.toggleAttribute('hidden',!open);accountMenuButton.setAttribute('aria-expanded',String(open));});
-document.addEventListener('click',event=>{if(!event.target.closest('.shell-account-menu-wrap')){accountMenu?.setAttribute('hidden','');accountMenuButton?.setAttribute('aria-expanded','false')}});
 document.querySelector('[data-shell-signout]')?.addEventListener('click',async()=>{await supabase.auth.signOut();location.href='binder.html';});
