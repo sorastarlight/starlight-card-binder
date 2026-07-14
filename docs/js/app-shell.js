@@ -2,7 +2,7 @@ import { supabase } from './supabase-client.js';
 import { getMyStaffAccess } from './staff-service.js';
 import { getMyTradeOffers } from './trade-offer-service.js';
 
-const SHELL_BUILD = '82.8.6';
+const SHELL_BUILD = '82.9.0';
 const VIEW_READY_TIMEOUT_MS = 6500;
 const MAX_VIEW_RETRIES = 1;
 
@@ -15,7 +15,8 @@ const routes = {
   report:{title:'Report Profile',src:'report-profile.html'}, about:{title:'About',src:'about.html'}, socials:{title:'Socials',src:'socials.html'},
   admin:{title:'Administration Hub',src:'admin-hub.html'}, 'admin-codes':{title:'Reward Code Console',src:'admin-codes.html'},
   'admin-staff':{title:'Staff Management',src:'admin-staff.html'}, 'admin-audit':{title:'Audit Log',src:'admin-audit.html'},
-  'admin-moderation':{title:'Moderation Dashboard',src:'admin-moderation.html'}
+  'admin-moderation':{title:'Moderation Dashboard',src:'admin-moderation.html'},
+  'admin-boosters':{title:'Booster Configuration',src:'admin-boosters.html'}, 'admin-users':{title:'Registered User Directory',src:'admin-users.html'}
 };
 
 const nativeView=document.getElementById('binderNativeView');
