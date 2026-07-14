@@ -84,6 +84,20 @@
     .shop-modal.hidden{display:none}.modal-card{width:min(100%,580px);max-height:min(760px,90vh);overflow:auto;padding:24px;border:2px solid rgba(255,130,200,.46);border-radius:24px;background:linear-gradient(155deg,#fff,#f4fbff 54%,#fff1f8);box-shadow:0 28px 80px rgba(55,68,111,.28);color:var(--shop-ink)}
     .modal-head{display:flex;justify-content:space-between;align-items:start;gap:16px}.modal-head h2{margin:0;color:#405fa1}.modal-close{width:38px;height:38px;border:0;border-radius:50%;background:#fff;color:#d34c9c;font-size:1.5rem;cursor:pointer;box-shadow:0 6px 16px rgba(50,61,102,.12)}
     .modal-pack{display:grid;grid-template-columns:180px 1fr;gap:20px;margin-top:20px;align-items:start}.modal-pack img{width:100%;height:240px;object-fit:contain;filter:drop-shadow(0 12px 16px rgba(52,61,106,.24))}.modal-copy p{color:#6f7897;line-height:1.55}.contents-list{display:grid;gap:8px;margin-top:13px}.content-row{display:flex;justify-content:space-between;gap:14px;padding:10px 12px;border:1px solid rgba(107,198,248,.28);border-radius:12px;background:rgba(255,255,255,.72)}.content-row span{color:#737b98}.content-row strong{text-align:right;color:#425b9c}
+
+    .purchase-modal{position:fixed;inset:0;z-index:2200;display:grid;place-items:center;padding:20px;background:rgba(47,54,103,.48);backdrop-filter:blur(7px)}
+    .purchase-modal.hidden{display:none}
+    .purchase-card{width:min(100%,520px);padding:24px;border:2px solid rgba(255,130,200,.52);border-radius:28px;background:linear-gradient(145deg,#fff,#f7fbff 48%,#fff3fa);box-shadow:0 26px 80px rgba(48,55,110,.32),0 0 38px rgba(255,130,200,.18);text-align:center}
+    .purchase-art{width:150px;height:205px;object-fit:contain;margin:-10px auto 6px;filter:drop-shadow(0 18px 22px rgba(61,83,132,.2))}
+    .purchase-card h2{margin:6px 0;color:#405fa1;font-size:1.7rem}
+    .purchase-card p{margin:6px auto;color:#6b7089;line-height:1.5}
+    .purchase-cost{display:inline-flex;align-items:center;gap:8px;margin:12px 0;padding:9px 16px;border-radius:999px;background:linear-gradient(135deg,#fff4ba,#ffe0ef);color:#8b6500;font-weight:950}
+    .purchase-balance{font-size:.9rem}
+    .purchase-actions{display:flex;justify-content:center;gap:12px;margin-top:18px}
+    .purchase-actions button{min-width:145px;min-height:48px;padding:11px 18px;border-radius:999px;font:inherit;font-weight:950;cursor:pointer}
+    .purchase-cancel{border:2px solid rgba(107,198,248,.45);background:#fff;color:#405fa1}
+    .purchase-confirm{border:0;background:linear-gradient(135deg,#ff75bd,#b68df5,#6bc6f8);color:#fff;box-shadow:0 9px 24px rgba(255,117,189,.26)}
+    .purchase-confirm:disabled,.purchase-cancel:disabled{opacity:.6;cursor:wait}
     @media(max-width:900px){.shop-hero{grid-template-columns:1fr}.wallet-card{max-width:320px;margin:auto}.shop-title .title-top,.shop-title .title-bottom{font-size:clamp(2.8rem,10vw,4.8rem)}}
     @media(max-width:620px){.shop-page{padding:8px}.shop-shell{border-radius:20px}.shop-hero{padding:24px 14px}.shop-main{padding:20px 12px}.shop-toolbar,.shop-footer{align-items:stretch;flex-direction:column}.gallery-link{text-align:center}.modal-pack{grid-template-columns:1fr}.modal-pack img{height:190px}.section-title::after{display:none}}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
@@ -138,7 +152,7 @@
       <p id="status" class="shop-status" role="status" aria-live="polite"></p>
       <footer class="shop-footer">
         <div><strong>Turn duplicates into more pulls!</strong><span>Trade in extra cards for Star Bits and keep your collection growing.</span></div>
-        <a class="gallery-link" href="binder.html?view=star-bits" data-shell-view="star-bits">★ Go To My Star Bits</a>
+        <a class="gallery-link" href="star-bits.html" data-shell-view="star-bits">★ Go To My Star Bits</a>
       </footer>
     </section>
   </section>
@@ -148,6 +162,21 @@
   <section class="modal-card">
     <div class="modal-head"><div><p class="shop-kicker">Pack Details</p><h2 id="modal-title">Booster Pack</h2></div><button id="modal-close" class="modal-close" type="button" aria-label="Close">×</button></div>
     <div class="modal-pack"><img id="modal-image" src="" alt=""><div class="modal-copy"><p id="modal-description"></p><div id="modal-contents" class="contents-list"></div></div></div>
+  </section>
+</div>
+
+<div id="purchase-modal" class="purchase-modal hidden" role="dialog" aria-modal="true" aria-labelledby="purchase-title">
+  <section class="purchase-card">
+    <img id="purchase-image" class="purchase-art" src="" alt="">
+    <p class="shop-kicker">Confirm Your Purchase</p>
+    <h2 id="purchase-title">Open Booster Pack?</h2>
+    <p id="purchase-description">Spend Star Bits to open this booster pack.</p>
+    <div id="purchase-cost" class="purchase-cost">★ 0 Star Bits</div>
+    <p id="purchase-balance" class="purchase-balance"></p>
+    <div class="purchase-actions">
+      <button id="purchase-cancel" class="purchase-cancel" type="button">Not Yet</button>
+      <button id="purchase-confirm" class="purchase-confirm" type="button">Open Pack</button>
+    </div>
   </section>
 </div>
 
@@ -168,11 +197,20 @@ const modalTitle = document.getElementById('modal-title');
 const modalImage = document.getElementById('modal-image');
 const modalDescription = document.getElementById('modal-description');
 const modalContents = document.getElementById('modal-contents');
+const purchaseModal = document.getElementById('purchase-modal');
+const purchaseImage = document.getElementById('purchase-image');
+const purchaseTitle = document.getElementById('purchase-title');
+const purchaseDescription = document.getElementById('purchase-description');
+const purchaseCost = document.getElementById('purchase-cost');
+const purchaseBalance = document.getElementById('purchase-balance');
+const purchaseCancel = document.getElementById('purchase-cancel');
+const purchaseConfirm = document.getElementById('purchase-confirm');
 const FALLBACK_PACK = 'site_assets/series01_rising_star_booster.png';
 let currentBalance = 0;
 let currentUser = null;
 let boosterData = [];
 let busy = false;
+let pendingPurchase = null;
 
 function escapeHTML(value=''){
   return String(value).replace(/[&<>'"]/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':'&quot;'}[char]));
@@ -255,6 +293,47 @@ function openDetails(id){
   modal.classList.remove('hidden');document.body.style.overflow='hidden';modalClose.focus();
 }
 function closeDetails(){modal.classList.add('hidden');document.body.style.overflow=''}
+function openPurchaseModal(booster,button){
+  const cost=Number(button.dataset.cost)||0;
+  pendingPurchase={booster,button,cost};
+  purchaseImage.src=booster.pack_image_url||FALLBACK_PACK;
+  purchaseImage.alt=`${booster.name} booster pack`;
+  purchaseTitle.textContent=`Open “${booster.name}”?`;
+  purchaseDescription.textContent='This booster will open immediately and the cards will be saved to your collection.';
+  purchaseCost.textContent=`★ ${cost.toLocaleString()} Star Bits`;
+  purchaseBalance.textContent=`Your balance after purchase: ${(currentBalance-cost).toLocaleString()} Star Bits`;
+  purchaseModal.classList.remove('hidden');
+  document.body.style.overflow='hidden';
+  purchaseConfirm.focus();
+}
+function closePurchaseModal(){
+  if(busy)return;
+  purchaseModal.classList.add('hidden');
+  document.body.style.overflow='';
+  pendingPurchase=null;
+}
+async function confirmPurchase(){
+  if(busy||!pendingPurchase)return;
+  const {booster,button}=pendingPurchase;
+  busy=true;
+  purchaseConfirm.disabled=true;purchaseCancel.disabled=true;purchaseConfirm.textContent='Opening…';
+  button.disabled=true;button.textContent='Opening…';
+  try{
+    purchaseModal.classList.add('hidden');
+    document.body.style.overflow='';
+    const result=await openStarBitsBoosterById(booster.id);
+    await revealRewardSequence(result.cards||[],{title:booster.name,cardBackUrl:button.dataset.back||undefined});
+    pendingPurchase=null;
+    await load();
+  }catch(error){
+    say(error?.message||'This booster could not be opened.',true);
+    button.disabled=false;
+    render();
+  }finally{
+    busy=false;
+    purchaseConfirm.disabled=false;purchaseCancel.disabled=false;purchaseConfirm.textContent='Open Pack';
+  }
+}
 async function load(){
   try{
     say('');packsEl.innerHTML='<div class="empty">Preparing the Starlight Card Shop…</div>';
@@ -276,20 +355,19 @@ packsEl.addEventListener('click',async event=>{
   const details=event.target.closest('[data-details]');if(details){openDetails(details.dataset.details);return}
   const button=event.target.closest('[data-buy]');if(!button||busy)return;
   const booster=boosterData.find(item=>item.id===button.dataset.buy);if(!booster)return;
-  const cost=Number(button.dataset.cost)||0;
-  if(!confirm(`Open “${booster.name}” for ${cost.toLocaleString()} Star Bits?`))return;
-  busy=true;button.disabled=true;button.textContent='Opening…';
-  try{
-    const result=await openStarBitsBoosterById(booster.id);
-    await revealRewardSequence(result.cards||[],{title:booster.name,cardBackUrl:button.dataset.back||undefined});
-    await load();
-  }catch(error){say(error?.message||'This booster could not be opened.',true);button.disabled=false;render()}
-  finally{busy=false}
+  openPurchaseModal(booster,button);
 });
 sortEl.addEventListener('change',render);
+purchaseCancel.addEventListener('click',closePurchaseModal);
+purchaseConfirm.addEventListener('click',confirmPurchase);
+purchaseModal.addEventListener('click',event=>{if(event.target===purchaseModal)closePurchaseModal()});
 modalClose.addEventListener('click',closeDetails);
 modal.addEventListener('click',event=>{if(event.target===modal)closeDetails()});
-document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!modal.classList.contains('hidden'))closeDetails()});
+document.addEventListener('keydown',event=>{
+  if(event.key!=='Escape')return;
+  if(!purchaseModal.classList.contains('hidden'))closePurchaseModal();
+  else if(!modal.classList.contains('hidden'))closeDetails();
+});
 load();
 </script>
 </body>
