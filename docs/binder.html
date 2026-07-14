@@ -133,8 +133,15 @@
 <div class="shell-account-left"><button aria-label="Open navigation" class="shell-menu-button" id="shellMenuButton" type="button">☰</button><a class="shell-profile-link" data-shell-profile-link="" href="binder.html?view=profile"><span class="shell-avatar" data-shell-avatar="">✦</span></a><div class="shell-account-main"><strong data-shell-account-name="">Loading collector…</strong><span data-shell-account-sub="">Starlight account</span></div></div>
 <div class="shell-account-center"><input aria-label="Search cards" class="shell-search" id="globalSearch" placeholder="Search cards..." type="search"/></div>
 <div class="shell-account-actions">
+<div class="shell-signed-out-actions" data-shell-signed-out hidden>
+<a class="shell-auth-button" href="login.html?mode=signin">Log In</a>
+<a class="shell-auth-button primary" href="login.html?mode=signup">Create Account</a>
+</div>
+<div class="shell-signed-in-actions" data-shell-signed-in hidden>
 <div class="shell-account-stats"><span class="shell-stat">Lv. <b data-collector-level="">1</b></span><span class="shell-stat">✦ <b data-star-bits="">0</b></span><span class="shell-stat">Extras <b data-duplicates="">0</b></span></div>
 <a class="daily-booster-cta is-loading" data-daily-cta="" data-shell-view="daily" href="binder.html?view=daily"><span aria-hidden="true" class="daily-booster-dot"></span><span data-daily-cta-label="">Checking Daily Booster…</span></a>
+<div class="shell-account-menu-wrap"><button class="shell-account-menu-button" type="button" data-account-menu-button aria-expanded="false">Account ▾</button><div class="shell-account-menu" data-account-menu hidden><a data-shell-view="collection" href="binder.html?view=collection">My Collection</a><a data-shell-view="offers" href="binder.html?view=offers">Trade Offers</a><a data-shell-view="profile" href="binder.html?view=profile">Profile Settings</a><a class="staff-only-menu" data-shell-view="admin" href="binder.html?view=admin" hidden>Administration Hub</a><button type="button" data-shell-signout>Sign Out</button></div></div>
+</div>
 <button aria-label="Toggle sound effects" class="shell-sfx-button sfx-toggle on" id="sfxToggle" title="Turn sound effects on or off" type="button">♪</button>
 </div>
 </section>

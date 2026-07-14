@@ -2,7 +2,7 @@ import { supabase } from './supabase-client.js';
 import { getMyStaffAccess } from './staff-service.js';
 import { getMyTradeOffers } from './trade-offer-service.js';
 
-const SHELL_BUILD = '83.0.0';
+const SHELL_BUILD = '84.0.0';
 const VIEW_READY_TIMEOUT_MS = 6500;
 const MAX_VIEW_RETRIES = 1;
 
@@ -16,7 +16,7 @@ const routes = {
   admin:{title:'Administration Hub',src:'admin-hub.html'}, 'admin-codes':{title:'Reward Code Console',src:'admin-codes.html'},
   'admin-staff':{title:'Staff Management',src:'admin-staff.html'}, 'admin-audit':{title:'Audit Log',src:'admin-audit.html'},
   'admin-moderation':{title:'Moderation Dashboard',src:'admin-moderation.html'},
-  'admin-boosters':{title:'Booster Configuration',src:'admin-boosters.html'}, 'admin-users':{title:'Registered User Directory',src:'admin-users.html'}
+  'admin-boosters':{title:'Starlight Content Studio',src:'admin-boosters.html'}, 'admin-users':{title:'Registered User Directory',src:'admin-users.html'}
 };
 
 const nativeView=document.getElementById('binderNativeView');
@@ -150,9 +150,17 @@ async function hydrateTradeOfferBadge(){
 }
 
 async function hydrateAccount(){
+  const signedOut=document.querySelector('[data-shell-signed-out]');
+  const signedIn=document.querySelector('[data-shell-signed-in]');
   try{
     const {data}=await supabase.auth.getUser();const user=data?.user;
-    if(!user){document.querySelector('[data-shell-account-name]').textContent='Guest Collector';return;}
+    if(!user){
+      signedOut?.removeAttribute('hidden');signedIn?.setAttribute('hidden','');
+      document.querySelector('[data-shell-account-name]').textContent='Welcome to Starlight Cards';
+      document.querySelector('[data-shell-account-sub]').textContent='Log in or create an account to collect cards';
+      return;
+    }
+    signedOut?.setAttribute('hidden','');signedIn?.removeAttribute('hidden');
     const {data:profile}=await supabase.from('profiles').select('username,display_name,onboarding_complete,avatar_url,selected_title_id').eq('id',user.id).maybeSingle();
     profileUsername=profile?.username||'';
     const name=profile?.display_name||profile?.username||user.email||'Collector';
@@ -165,6 +173,7 @@ async function hydrateAccount(){
     const access=await getMyStaffAccess();
     if(access?.isStaff)document.querySelector('.unified-nav')?.classList.add('has-staff-access');
     document.querySelectorAll('.staff-link').forEach(el=>el.classList.toggle('visible',Boolean(access?.isStaff)));
+    document.querySelector('.staff-only-menu')?.toggleAttribute('hidden',!access?.isStaff);
   }catch(e){console.warn('[Starlight] Shell account hydration failed',e)}
 }
 
@@ -197,3 +206,10 @@ const initial=new URLSearchParams(location.search).get('view')||'binder';
 navigate(initial,{push:false});
 hydrateAccount();
 hydrateTradeOfferBadge();
+
+
+const accountMenuButton=document.querySelector('[data-account-menu-button]');
+const accountMenu=document.querySelector('[data-account-menu]');
+accountMenuButton?.addEventListener('click',event=>{event.stopPropagation();const open=accountMenu?.hasAttribute('hidden');accountMenu?.toggleAttribute('hidden',!open);accountMenuButton.setAttribute('aria-expanded',String(open));});
+document.addEventListener('click',event=>{if(!event.target.closest('.shell-account-menu-wrap')){accountMenu?.setAttribute('hidden','');accountMenuButton?.setAttribute('aria-expanded','false')}});
+document.querySelector('[data-shell-signout]')?.addEventListener('click',async()=>{await supabase.auth.signOut();location.href='binder.html';});

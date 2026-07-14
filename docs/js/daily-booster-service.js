@@ -26,3 +26,9 @@ export async function openStarBitsBooster() {
     }
     return data;
 }
+
+export async function openStarBitsBoosterById(boosterId) {
+    const { data, error } = await supabase.rpc("open_star_bits_booster_by_id", { requested_booster_id: boosterId });
+    if (error) throw error;
+    return data;
+}

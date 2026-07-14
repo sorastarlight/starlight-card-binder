@@ -669,6 +669,9 @@
             confirmPasswordInput
         );
 
+        const requestedMode = new URLSearchParams(window.location.search).get("mode");
+        setMode(requestedMode === "signup" ? "signup" : "signin");
+
         form.addEventListener(
             "submit",
             async event => {
