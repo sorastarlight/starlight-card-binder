@@ -50,13 +50,13 @@
 <h2 class="side-title">✦ Star Bits</h2>
 <div class="economy-stat"><span>Balance</span><strong data-star-bits="">...</strong></div>
 <div class="economy-stat"><span>Duplicates</span><strong data-duplicates="">...</strong></div>
-<a class="economy-link" href="star-bits.html">Open Exchange</a>
+<a class="economy-link" data-shell-view="star-bits" href="binder.html?view=star-bits">Open Exchange</a>
 </section>
 <section class="side-card economy-card">
 <h2 class="side-title">✨ Daily Booster</h2>
 <p data-daily-status="">Checking...</p>
 <span class="daily-countdown" data-daily-countdown=""></span>
-<a class="daily-widget-link" href="daily-booster.html">View Daily Pack</a>
+<a class="daily-widget-link" data-shell-view="daily" href="binder.html?view=daily">View Daily Pack</a>
 </section>
 <section class="side-card">
 <h2 class="side-title">
@@ -133,30 +133,19 @@
 
                     Not Collected
                 </label>
-<a class="btn primary wide" href="star-bits.html">✦ Star Bits Exchange</a>
+<a class="btn primary wide" data-shell-view="star-bits" href="binder.html?view=star-bits">✦ Star Bits Exchange</a>
 </section>
 </aside>
 <main class="main">
 <section aria-label="Collector account summary" class="shell-account-bar">
 <div class="shell-account-left"><button aria-label="Open navigation" class="shell-menu-button" id="shellMenuButton" type="button">☰</button><a class="shell-profile-link" data-shell-profile-link="" href="binder.html?view=profile"><span class="shell-avatar" data-shell-avatar="">✦</span></a><div class="shell-account-main"><strong data-shell-account-name="">Loading collector…</strong><span data-shell-account-sub="">Starlight account</span></div></div>
-<div class="shell-account-stats"><span class="shell-stat">Lv. <b data-collector-level="">1</b></span><span class="shell-stat">✦ <b data-star-bits="">0</b></span><span class="shell-stat">Extras <b data-duplicates="">0</b></span><span class="shell-stat" data-daily-status="">Checking pack…</span></div>
-</section><nav class="topbar">
-<div class="nav">
-<a data-nav="binder" href="binder.html">🗂 Binder</a>
-<a data-nav="collection" href="collection.html">♡ Collection</a>
-<a data-nav="daily" href="daily-booster.html">✨ Daily Booster</a>
-<a data-nav="bits" href="star-bits.html">✦ Star Bits</a>
-<a data-nav="redeem" href="redeem.html">🎟 Redeem</a>
-<a data-nav="checklist" href="checklist.html">☑ Checklist</a>
-<a data-nav="profile" href="profile-settings.html">⚙ Profile</a>
+<div class="shell-account-center"><input class="shell-search" id="globalSearch" placeholder="Search cards..." type="search" aria-label="Search cards"/></div>
+<div class="shell-account-actions">
+<div class="shell-account-stats"><span class="shell-stat">Lv. <b data-collector-level="">1</b></span><span class="shell-stat">✦ <b data-star-bits="">0</b></span><span class="shell-stat">Extras <b data-duplicates="">0</b></span></div>
+<a class="daily-booster-cta is-loading" data-daily-cta="" data-shell-view="daily" href="binder.html?view=daily"><span class="daily-booster-dot" aria-hidden="true"></span><span data-daily-cta-label="">Checking Daily Booster…</span></a>
+<button class="shell-sfx-button sfx-toggle on" id="sfxToggle" title="Turn sound effects on or off" type="button" aria-label="Toggle sound effects">♪</button>
 </div>
-<div class="top-actions">
-<input class="search" id="globalSearch" placeholder="Search cards..." type="search"/>
-<button class="sfx-toggle on" id="sfxToggle" title="Sound effects" type="button">
-                        ♪
-                    </button>
-</div>
-</nav>
+</section>
 
 
 

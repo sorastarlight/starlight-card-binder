@@ -18,3 +18,31 @@ body.unified-shell .topbar .nav{display:none}
 .shell-menu-button{display:none;min-width:44px;min-height:44px;border:0;border-radius:12px;background:linear-gradient(135deg,var(--shell-blue),var(--shell-pink));color:#fff;font-size:1.25rem;font-weight:900}
 @media(max-width:900px){.shell-menu-button{display:inline-grid;place-items:center}.site{position:relative}.sidebar{transition:transform .2s ease}.unified-shell:not(.shell-menu-open) .sidebar{transform:translateX(-110%);position:fixed;z-index:1001;top:0;bottom:0;left:0;overflow:auto;box-shadow:18px 0 45px rgba(31,42,72,.24)}.unified-shell.shell-menu-open .sidebar{position:fixed;z-index:1001;top:0;bottom:0;left:0;overflow:auto;box-shadow:18px 0 45px rgba(31,42,72,.24)}.unified-shell .main{width:100%}.shell-account-bar{position:sticky;top:0;z-index:900}.shell-view-frame iframe{height:calc(100vh - 120px);min-height:620px}}
 @media(max-width:600px){.shell-account-stats .shell-stat:nth-child(n+3){display:none}.shell-account-bar{padding:10px}.shell-view-frame{border-radius:15px}.shell-view-heading{padding:10px 12px}}
+
+/* V82.1 Shell polish: integrated search, sound and magical daily CTA */
+body.unified-shell .topbar{display:none!important}
+.shell-account-bar{display:grid;grid-template-columns:minmax(210px,auto) minmax(180px,1fr) auto;align-items:center}
+.shell-account-center{min-width:0;display:flex;justify-content:center}
+.shell-search{width:min(100%,430px);min-height:42px;padding:9px 15px;border:1px solid rgba(107,198,248,.42);border-radius:999px;background:rgba(255,255,255,.94);color:#334f8d;font:inherit;box-shadow:inset 0 1px 3px rgba(61,83,132,.06);transition:border-color .16s ease,box-shadow .16s ease}
+.shell-search:focus{outline:none;border-color:rgba(255,130,200,.72);box-shadow:0 0 0 4px rgba(255,130,200,.12)}
+.shell-account-actions{display:flex;align-items:center;justify-content:flex-end;gap:9px;min-width:0}
+.shell-sfx-button{position:static!important;flex:0 0 auto;width:42px;height:42px;min-width:42px;border:0;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--shell-blue),var(--shell-pink));color:#fff;font-size:1.05rem;font-weight:950;box-shadow:0 8px 20px rgba(255,130,200,.25);cursor:pointer;transition:transform .16s ease,box-shadow .16s ease,opacity .16s ease}
+.shell-sfx-button:hover,.shell-sfx-button:focus-visible{transform:translateY(-1px) scale(1.04);box-shadow:0 10px 25px rgba(255,130,200,.34)}
+.shell-sfx-button:not(.on){opacity:.55;filter:saturate(.4)}
+.daily-booster-cta{position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;max-width:290px;padding:9px 15px;border:1px solid rgba(107,198,248,.32);border-radius:999px;background:rgba(246,250,255,.94);color:#53658f;font-size:.84rem;font-weight:950;text-decoration:none;white-space:nowrap;overflow:hidden;box-shadow:0 6px 16px rgba(61,83,132,.08);transition:transform .18s ease,box-shadow .18s ease}
+.daily-booster-cta.is-ready{border-color:rgba(255,202,75,.78);background:linear-gradient(120deg,#fff7c8 0%,#ffd8ee 42%,#dff5ff 70%,#fff7c8 100%);background-size:250% 100%;color:#8a4b75;box-shadow:0 0 0 1px rgba(255,255,255,.7) inset,0 0 17px rgba(255,130,200,.44),0 0 30px rgba(254,211,52,.3);animation:dailyCtaPulse 1.8s ease-in-out infinite,dailyCtaShimmer 4s linear infinite}
+.daily-booster-cta.is-ready::after{content:"";position:absolute;inset:-80% -35%;z-index:-1;background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.78) 48%,transparent 61%);transform:translateX(-65%) rotate(8deg);animation:dailyCtaSweep 3.6s ease-in-out infinite}
+.daily-booster-cta.is-ready:hover,.daily-booster-cta.is-ready:focus-visible{transform:translateY(-2px) scale(1.025);box-shadow:0 0 0 1px rgba(255,255,255,.8) inset,0 0 24px rgba(255,130,200,.58),0 0 38px rgba(254,211,52,.4)}
+.daily-booster-dot{display:none;width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.26),0 0 14px #fff}
+.daily-booster-cta.is-ready .daily-booster-dot{display:inline-block;animation:dailyDotPulse 1.1s ease-in-out infinite}
+.daily-booster-cta.is-claimed{background:linear-gradient(135deg,rgba(226,247,239,.94),rgba(238,246,255,.94));border-color:rgba(83,170,128,.26);color:#3c8060}
+.daily-booster-cta.is-loading{opacity:.75;pointer-events:none}
+.economy-card{padding:13px 14px!important}.economy-card .side-title{margin-bottom:8px}.economy-card .economy-stat{display:flex;justify-content:space-between;gap:10px;margin:5px 0}.economy-card .economy-link,.economy-card .daily-widget-link{display:flex;justify-content:center;margin-top:9px;padding:8px 10px;border-radius:999px;background:linear-gradient(135deg,rgba(107,198,248,.18),rgba(255,130,200,.17));color:#405fa1;font-weight:850;text-decoration:none}.economy-card [data-daily-status]{margin:2px 0 0;font-weight:850;color:#405fa1}.economy-card .daily-countdown{display:block;margin-top:4px;color:#6b7089;font-size:.84rem}
+@keyframes dailyCtaPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
+@keyframes dailyCtaShimmer{0%{background-position:0% 50%}100%{background-position:250% 50%}}
+@keyframes dailyCtaSweep{0%,55%{transform:translateX(-75%) rotate(8deg);opacity:0}65%{opacity:1}100%{transform:translateX(75%) rotate(8deg);opacity:0}}
+@keyframes dailyDotPulse{0%,100%{transform:scale(.8);opacity:.72}50%{transform:scale(1.25);opacity:1}}
+@media(prefers-reduced-motion:reduce){.daily-booster-cta.is-ready,.daily-booster-cta.is-ready::after,.daily-booster-cta.is-ready .daily-booster-dot{animation:none!important}}
+@media(max-width:1180px){.shell-account-bar{grid-template-columns:minmax(190px,auto) 1fr}.shell-account-center{grid-column:1/-1;grid-row:2}.shell-account-actions{grid-column:2;grid-row:1}.shell-search{width:100%}}
+@media(max-width:760px){.shell-account-bar{display:flex;flex-wrap:wrap}.shell-account-left{flex:1 1 190px}.shell-account-center{order:3;flex:1 0 100%}.shell-account-actions{flex:0 1 auto}.shell-account-stats{display:none}.daily-booster-cta{max-width:230px;font-size:.78rem;padding-inline:12px}}
+@media(max-width:520px){.daily-booster-cta{max-width:185px}.daily-booster-cta span[data-daily-cta-label]{overflow:hidden;text-overflow:ellipsis}.shell-sfx-button{width:39px;height:39px;min-width:39px}.shell-search{min-height:40px}}
