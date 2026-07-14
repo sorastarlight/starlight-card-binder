@@ -1,22 +1,290 @@
 import { getMyProfileExtras, setMyProfileExtras, uploadProfileImage } from './profile-extras-service.js';
 
-const fileInput=document.getElementById('profile-image-file');
-const canvas=document.getElementById('profile-image-canvas');
-const zoom=document.getElementById('profile-image-zoom');
-const saveImage=document.getElementById('save-profile-image');
-const preview=document.getElementById('profile-image-preview');
-const titleSelect=document.getElementById('collector-title-select');
-const achievementGrid=document.getElementById('achievement-grid');
-const extrasStatus=document.getElementById('profile-extras-status');
-let image=null,scale=1,offsetX=0,offsetY=0,dragging=false,lastX=0,lastY=0,currentAvatar='';
-const ctx=canvas?.getContext('2d');
-function status(msg,type=''){if(!extrasStatus)return;extrasStatus.textContent=msg;extrasStatus.className=`profile-extras-status ${type}`}
-function draw(){if(!ctx||!image)return;ctx.clearRect(0,0,canvas.width,canvas.height);const base=Math.max(canvas.width/image.width,canvas.height/image.height);const s=base*scale;const w=image.width*s,h=image.height*s;ctx.save();ctx.beginPath();ctx.arc(canvas.width/2,canvas.height/2,canvas.width/2,0,Math.PI*2);ctx.clip();ctx.drawImage(image,(canvas.width-w)/2+offsetX,(canvas.height-h)/2+offsetY,w,h);ctx.restore()}
-fileInput?.addEventListener('change',()=>{const file=fileInput.files?.[0];if(!file)return;if(file.size>1048576){status('Please choose an image that is 1 MB or smaller.','error');fileInput.value='';return}if(!file.type.startsWith('image/')){status('Please choose a PNG, JPG, or WebP image.','error');return}const img=new Image();img.onload=()=>{image=img;scale=1;offsetX=0;offsetY=0;zoom.value='1';draw();saveImage.disabled=false;status('Drag to reposition and use the slider to zoom.','success')};img.src=URL.createObjectURL(file)});
-zoom?.addEventListener('input',()=>{scale=Number(zoom.value)||1;draw()});
-canvas?.addEventListener('pointerdown',e=>{if(!image)return;dragging=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId)});
-canvas?.addEventListener('pointermove',e=>{if(!dragging)return;offsetX+=e.clientX-lastX;offsetY+=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;draw()});
-canvas?.addEventListener('pointerup',()=>dragging=false);canvas?.addEventListener('pointercancel',()=>dragging=false);
-saveImage?.addEventListener('click',async()=>{if(!image)return;saveImage.disabled=true;status('Uploading your profile image…');canvas.toBlob(async blob=>{try{if(!blob)throw new Error('Could not prepare the image.');const url=await uploadProfileImage(blob);currentAvatar=url;preview.src=url;preview.classList.remove('hidden');status('Profile image saved!','success')}catch(e){status(e.message||'Upload failed.','error')}finally{saveImage.disabled=false}},'image/webp',.86)});
-titleSelect?.addEventListener('change',async()=>{try{await setMyProfileExtras({avatarUrl:currentAvatar||null,titleId:titleSelect.value||null});status('Collector title updated.','success')}catch(e){status(e.message||'Could not update title.','error')}});
-(async()=>{try{const data=await getMyProfileExtras();currentAvatar=data.avatarUrl||'';if(currentAvatar){preview.src=currentAvatar;preview.classList.remove('hidden')}titleSelect.innerHTML='<option value="">No collector title</option>'+data.titles.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');titleSelect.value=data.selectedTitleId||'';achievementGrid.innerHTML=data.achievements.length?data.achievements.map(a=>`<article class="achievement-badge"><span>${a.icon}</span><div><strong>${a.name}</strong><small>${a.description}</small></div></article>`).join(''):'<p class="profile-help">Open packs and grow your collection to unlock achievements.</p>'}catch(e){status(e.message||'Could not load profile extras.','error')}})();
+const fileInput = document.getElementById('profile-image-file');
+const canvas = document.getElementById('profile-image-canvas');
+const zoom = document.getElementById('profile-image-zoom');
+const zoomValue = document.getElementById('profile-image-zoom-value');
+const saveImage = document.getElementById('save-profile-image');
+const cancelImage = document.getElementById('cancel-profile-image');
+const preview = document.getElementById('profile-image-preview');
+const placeholder = document.getElementById('profile-image-placeholder');
+const cropModal = document.getElementById('profile-crop-modal');
+const titleSelect = document.getElementById('collector-title-select');
+const achievementGrid = document.getElementById('achievement-grid');
+const extrasStatus = document.getElementById('profile-extras-status');
+
+let image = null;
+let scale = 1;
+let offsetX = 0;
+let offsetY = 0;
+let dragging = false;
+let lastX = 0;
+let lastY = 0;
+let currentAvatar = '';
+let objectUrl = '';
+
+const ctx = canvas?.getContext('2d');
+
+function status(message, type = '') {
+    if (!extrasStatus) return;
+    extrasStatus.textContent = message;
+    extrasStatus.className = `profile-extras-status ${type}`;
+}
+
+function setPreview(url) {
+    currentAvatar = url || '';
+
+    if (currentAvatar) {
+        preview.src = currentAvatar;
+        preview.classList.remove('hidden');
+        placeholder?.classList.add('hidden');
+    } else {
+        preview.removeAttribute('src');
+        preview.classList.add('hidden');
+        placeholder?.classList.remove('hidden');
+    }
+}
+
+function draw() {
+    if (!ctx || !image || !canvas) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const baseScale = Math.max(
+        canvas.width / image.width,
+        canvas.height / image.height
+    );
+
+    const finalScale = baseScale * scale;
+    const width = image.width * finalScale;
+    const height = image.height * finalScale;
+
+    ctx.drawImage(
+        image,
+        (canvas.width - width) / 2 + offsetX,
+        (canvas.height - height) / 2 + offsetY,
+        width,
+        height
+    );
+}
+
+function updateZoomLabel() {
+    if (zoomValue) {
+        zoomValue.textContent = `${Math.round(scale * 100)}%`;
+    }
+}
+
+function openCropModal() {
+    cropModal?.classList.remove('hidden');
+    cropModal?.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    saveImage?.focus();
+}
+
+function closeCropModal({ clearFile = true } = {}) {
+    cropModal?.classList.add('hidden');
+    cropModal?.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+
+    image = null;
+    dragging = false;
+    scale = 1;
+    offsetX = 0;
+    offsetY = 0;
+
+    if (zoom) zoom.value = '1';
+    updateZoomLabel();
+
+    if (ctx && canvas) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+        objectUrl = '';
+    }
+
+    if (clearFile && fileInput) {
+        fileInput.value = '';
+    }
+}
+
+fileInput?.addEventListener('change', () => {
+    const file = fileInput.files?.[0];
+    if (!file) return;
+
+    if (file.size > 1048576) {
+        status('Please choose an image that is 1 MB or smaller.', 'error');
+        fileInput.value = '';
+        return;
+    }
+
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+        status('Please choose a PNG, JPG, or WebP image.', 'error');
+        fileInput.value = '';
+        return;
+    }
+
+    if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+    }
+
+    objectUrl = URL.createObjectURL(file);
+
+    const selectedImage = new Image();
+
+    selectedImage.onload = () => {
+        image = selectedImage;
+        scale = 1;
+        offsetX = 0;
+        offsetY = 0;
+
+        if (zoom) zoom.value = '1';
+        updateZoomLabel();
+        draw();
+        status('Adjust your image in the popup, then save.', 'success');
+        openCropModal();
+    };
+
+    selectedImage.onerror = () => {
+        status('That image could not be opened.', 'error');
+        closeCropModal();
+    };
+
+    selectedImage.src = objectUrl;
+});
+
+zoom?.addEventListener('input', () => {
+    scale = Number(zoom.value) || 1;
+    updateZoomLabel();
+    draw();
+});
+
+canvas?.addEventListener('pointerdown', event => {
+    if (!image) return;
+
+    dragging = true;
+    lastX = event.clientX;
+    lastY = event.clientY;
+    canvas.setPointerCapture?.(event.pointerId);
+});
+
+canvas?.addEventListener('pointermove', event => {
+    if (!dragging) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / Math.max(1, rect.width);
+    const scaleY = canvas.height / Math.max(1, rect.height);
+
+    offsetX += (event.clientX - lastX) * scaleX;
+    offsetY += (event.clientY - lastY) * scaleY;
+
+    lastX = event.clientX;
+    lastY = event.clientY;
+
+    draw();
+});
+
+function endDrag(event) {
+    dragging = false;
+    if (event?.pointerId !== undefined) {
+        canvas?.releasePointerCapture?.(event.pointerId);
+    }
+}
+
+canvas?.addEventListener('pointerup', endDrag);
+canvas?.addEventListener('pointercancel', endDrag);
+
+cancelImage?.addEventListener('click', () => {
+    closeCropModal();
+    status('Profile image change cancelled.');
+});
+
+cropModal?.addEventListener('click', event => {
+    if (event.target === cropModal) {
+        closeCropModal();
+        status('Profile image change cancelled.');
+    }
+});
+
+document.addEventListener('keydown', event => {
+    if (
+        event.key === 'Escape' &&
+        cropModal &&
+        !cropModal.classList.contains('hidden')
+    ) {
+        closeCropModal();
+        status('Profile image change cancelled.');
+    }
+});
+
+saveImage?.addEventListener('click', async () => {
+    if (!image || !canvas) return;
+
+    saveImage.disabled = true;
+    saveImage.textContent = 'Saving…';
+    status('Uploading your profile image…');
+
+    canvas.toBlob(async blob => {
+        try {
+            if (!blob) {
+                throw new Error('Could not prepare the image.');
+            }
+
+            const url = await uploadProfileImage(blob);
+            setPreview(url);
+            closeCropModal({ clearFile: true });
+            status('Profile image saved!', 'success');
+        } catch (error) {
+            status(error.message || 'Upload failed.', 'error');
+        } finally {
+            saveImage.disabled = false;
+            saveImage.textContent = 'Save Profile Image';
+        }
+    }, 'image/webp', 0.86);
+});
+
+titleSelect?.addEventListener('change', async () => {
+    try {
+        await setMyProfileExtras({
+            avatarUrl: currentAvatar || null,
+            titleId: titleSelect.value || null
+        });
+
+        status('Collector title updated.', 'success');
+    } catch (error) {
+        status(error.message || 'Could not update title.', 'error');
+    }
+});
+
+(async () => {
+    try {
+        const data = await getMyProfileExtras();
+
+        setPreview(data.avatarUrl || '');
+
+        titleSelect.innerHTML =
+            '<option value="">No collector title</option>' +
+            data.titles
+                .map(title => `<option value="${title.id}">${title.name}</option>`)
+                .join('');
+
+        titleSelect.value = data.selectedTitleId || '';
+
+        achievementGrid.innerHTML = data.achievements.length
+            ? data.achievements
+                .map(achievement => `
+                    <article class="achievement-badge">
+                        <span>${achievement.icon}</span>
+                        <div>
+                            <strong>${achievement.name}</strong>
+                            <small>${achievement.description}</small>
+                        </div>
+                    </article>
+                `)
+                .join('')
+            : '<p class="profile-help">Open packs and grow your collection to unlock achievements.</p>';
+    } catch (error) {
+        status(error.message || 'Could not load profile extras.', 'error');
+    }
+})();
