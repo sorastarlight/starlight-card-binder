@@ -46,11 +46,12 @@ async function loadEconomy() {
     document.querySelectorAll('[data-daily-nav-badge]').forEach(el=>{el.hidden=true;});
     return;
   }
-  const [{data: preview,error:previewError},{data: daily,error:dailyError},{data: rows,error:cardsError},{data: profile}] = await Promise.all([
+  const [{data: preview,error:previewError},{data: daily,error:dailyError},{data: rows,error:cardsError},{data: profile},{data: wallet}] = await Promise.all([
     supabase.rpc('get_star_bits_exchange_preview'),
     supabase.rpc('get_daily_booster_status'),
     supabase.from('user_cards').select('card_id,quantity,is_favorite,cards(rarity)'),
-    supabase.from('profiles').select('username,onboarding_complete').eq('id', authData.user.id).maybeSingle()
+    supabase.from('profiles').select('username,onboarding_complete').eq('id', authData.user.id).maybeSingle(),
+    supabase.from('user_wallets').select('collector_xp').eq('user_id', authData.user.id).maybeSingle()
   ]);
   if (profile?.username && profile?.onboarding_complete) {
     document.querySelectorAll('[data-public-profile-link]').forEach(link => {
@@ -80,9 +81,11 @@ async function loadEconomy() {
     }
   }
   if (!cardsError && Array.isArray(rows)) {
-    const rarityPoints={Common:1,Uncommon:2,Rare:5,Epic:15,Legendary:50};
-    let points=0,totalCopies=0,favorites=0;
-    rows.forEach(r=>{ const q=Number(r.quantity||0); totalCopies+=q; if(r.is_favorite) favorites++; points+=(rarityPoints[r.cards?.rarity]||0)*q; });
+    let totalCopies=0,favorites=0;
+    rows.forEach(r=>{ const q=Number(r.quantity||0); totalCopies+=q; if(r.is_favorite) favorites++; });
+    // Collector XP is lifetime progression. It increases when cards are earned,
+    // but never decreases when extras are traded or converted into Star Bits.
+    const points=Math.max(0,Number(wallet?.collector_xp||0));
     const level=levelFromPoints(points);
     setText('[data-collector-level]', level.level);
     setText('[data-collector-points]', points);
