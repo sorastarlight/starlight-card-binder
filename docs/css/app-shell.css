@@ -160,3 +160,6 @@ body[data-page="binder"] .series-hero {
 /* V82.4 Wishlist & Trade navigation accent */
 .unified-nav a[data-shell-view="trades"]{background:linear-gradient(135deg,rgba(107,198,248,.08),rgba(255,130,200,.08))}
 .unified-nav a[data-shell-view="trades"]:hover{box-shadow:0 8px 22px rgba(137,112,219,.16)}
+
+/* V82.6.1 profile-owned trade navigation */
+.shell-profile-nav-group{display:grid;gap:4px}.shell-profile-nav-group>a{width:100%}.shell-profile-subnav{margin-left:22px!important;width:calc(100% - 22px)!important;font-size:.9rem!important;opacity:.92;border-left:2px solid rgba(255,130,200,.34)!important}.shell-nav-badge{display:inline-grid;place-items:center;min-width:22px;height:22px;margin-left:auto;padding:0 6px;border-radius:999px;background:linear-gradient(135deg,#fed334,#ff82c8);color:#fff;font-size:.74rem;font-weight:900;box-shadow:0 0 14px rgba(255,130,200,.4)}.shell-nav-badge[hidden]{display:none!important}

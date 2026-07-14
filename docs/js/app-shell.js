@@ -1,6 +1,7 @@
 
 import { supabase } from './supabase-client.js';
 import { getMyStaffAccess } from './staff-service.js';
+import { getMyTradeOffers } from './trade-offer-service.js';
 
 const routes = {
   binder:{title:'Card Binder',src:null}, collection:{title:'My Collection',src:'collection.html'},
@@ -42,6 +43,16 @@ function navigate(route,{push=true,extra={}}={}){
   if(heading)heading.textContent=routes[route].title; if(external){external.href=routes[route].src+(location.search||'');}
   document.title=`${routes[route].title} | Starlight Card Binder`;
 }
+async function hydrateTradeOfferBadge(){
+  const badge=document.querySelector('[data-trade-offer-badge]');
+  if(!badge)return;
+  try{
+    const offers=await getMyTradeOffers();
+    const count=(offers?.incoming||[]).filter(o=>o.status==='pending').length;
+    badge.textContent=String(count);
+    badge.hidden=count===0;
+  }catch(e){badge.hidden=true;console.warn('[Starlight] Trade offer badge failed',e)}
+}
 async function hydrateAccount(){
   try{
     const {data}=await supabase.auth.getUser(); const user=data?.user;
@@ -61,6 +72,6 @@ async function hydrateAccount(){
 document.addEventListener('click',e=>{const a=e.target.closest('[data-shell-view]');if(a){e.preventDefault();navigate(a.dataset.shellView);}});
 menuButton?.addEventListener('click',()=>document.body.classList.toggle('shell-menu-open'));
 window.addEventListener('popstate',()=>navigate(new URLSearchParams(location.search).get('view')||'binder',{push:false}));
-window.addEventListener('message',e=>{if(e.origin!==location.origin)return;if(e.data?.type==='starlight-navigate')navigate(e.data.view,{extra:e.data.params||{}})});
+window.addEventListener('message',e=>{if(e.origin!==location.origin)return;if(e.data?.type==='starlight-navigate')navigate(e.data.view,{extra:e.data.params||{}});if(e.data?.type==='starlight-trades-changed'||e.data?.type==='starlight-view-ready')hydrateTradeOfferBadge()});
 const initial=new URLSearchParams(location.search).get('view')||'binder';
-navigate(initial,{push:false}); hydrateAccount();
+navigate(initial,{push:false}); hydrateAccount(); hydrateTradeOfferBadge();
