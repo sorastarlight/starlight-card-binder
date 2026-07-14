@@ -14,7 +14,7 @@ const FAVORITES_KEY =
 const QUANTITIES_KEY =
     "sora-starlight-card-binder-v80-quantities";
 
-const FAVORITE_CHECK_INTERVAL_MS = 500;
+const FAVORITE_CHECK_INTERVAL_MS = 1500;
 
 let currentUser = null;
 let favoriteMonitorTimer = null;
@@ -253,6 +253,10 @@ async function saveFavoriteToCloud(
  * sends those changes to Supabase.
  */
 function checkForFavoriteChanges() {
+    if (document.hidden) {
+        return;
+    }
+
     if (!currentUser) {
         return;
     }

@@ -7870,3 +7870,79 @@ body[data-page="binder"].series-select #seriesLanding::after {
 
 
 /* Broad bright reflection with a pink/gold inner core. */
+
+
+/* ===== V82.8.5 Firefox / low-power performance mode ===== */
+.starlight-performance-lite *,
+.starlight-performance-lite *::before,
+.starlight-performance-lite *::after {
+  scroll-behavior: auto !important;
+}
+
+.firefox-performance-mode .panel,
+.firefox-performance-mode .side-card,
+.firefox-performance-mode .topbar,
+.firefox-performance-mode .shell-account-bar,
+.firefox-performance-mode .collector-nav,
+.firefox-performance-mode .daily-panel,
+.firefox-performance-mode .bits-panel {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.firefox-performance-mode .sky,
+.firefox-performance-mode .analyzer-bg,
+.firefox-performance-mode .reveal-magic-bg,
+.firefox-performance-mode .daily-portal::before,
+.firefox-performance-mode .daily-portal::after {
+  filter: none !important;
+}
+
+.firefox-performance-mode .collection-card,
+.firefox-performance-mode .v61-card-slot,
+.firefox-performance-mode .fav-spot,
+.firefox-performance-mode .reward-card,
+.firefox-performance-mode .duplicate-card {
+  contain: layout paint style;
+}
+
+.firefox-performance-mode .grid-page,
+.firefox-performance-mode .v61-grid,
+.firefox-performance-mode .favorite-carousel,
+.firefox-performance-mode .duplicate-grid,
+.firefox-performance-mode .reward-grid {
+  content-visibility: auto;
+  contain-intrinsic-size: 600px;
+}
+
+.firefox-performance-mode .starlight-offscreen,
+.starlight-page-hidden * {
+  animation-play-state: paused !important;
+}
+
+.firefox-performance-mode .v61-card-slot,
+.firefox-performance-mode .collection-card,
+.firefox-performance-mode .fav-spot {
+  animation: none !important;
+  transition-duration: .14s !important;
+}
+
+.firefox-performance-mode .v61-card-slot:hover,
+.firefox-performance-mode .collection-card:hover,
+.firefox-performance-mode .fav-spot:hover {
+  transform: translateY(-3px) !important;
+}
+
+.firefox-performance-mode img {
+  image-rendering: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .daily-booster-cta,
+  .shell-daily-ready-badge,
+  .economy-card [data-daily-status],
+  .unified-nav::before,
+  .shell-nav-label::after {
+    animation: none !important;
+  }
+}
