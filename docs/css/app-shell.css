@@ -282,3 +282,7 @@ body[data-page="binder"] .series-hero {
 .firefox-performance-mode .shell-view-loader{animation-duration:1.05s}
 @media(max-width:900px){.shell-view-frame iframe{min-height:560px}.shell-view-state{inset:45px 0 auto;min-height:260px}}
 @media(prefers-reduced-motion:reduce){.shell-view-loader{animation:none;border-top-color:rgba(107,198,248,.22);background:radial-gradient(circle,#ff82c8 0 18%,transparent 20%)}}
+
+/* V83 navigation hierarchy */
+.shell-nav-label-sub{margin-top:10px!important;background:linear-gradient(135deg,rgba(255,240,249,.96),rgba(235,247,255,.96))!important;border:1px solid rgba(255,130,200,.28)!important;box-shadow:0 5px 14px rgba(61,83,132,.08)!important}
+.shell-nav-label-sub span{filter:drop-shadow(0 2px 5px rgba(255,130,200,.3))}

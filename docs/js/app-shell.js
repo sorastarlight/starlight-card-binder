@@ -2,7 +2,7 @@ import { supabase } from './supabase-client.js';
 import { getMyStaffAccess } from './staff-service.js';
 import { getMyTradeOffers } from './trade-offer-service.js';
 
-const SHELL_BUILD = '82.9.0';
+const SHELL_BUILD = '83.0.0';
 const VIEW_READY_TIMEOUT_MS = 6500;
 const MAX_VIEW_RETRIES = 1;
 
