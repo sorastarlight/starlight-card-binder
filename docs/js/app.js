@@ -46,6 +46,7 @@ function isCollected(id) { return !!readStore(STORAGE_KEY)[id]; }
 function isFavorite(id) { return !!readStore(FAVORITES_KEY)[id]; }
 function getCardQuantity(id) { return Math.max(isCollected(id) ? 1 : 0, Number(readStore(QUANTITIES_KEY)[id] || 0)); }
 function quantityBadgesHtml(id) { const q=getCardQuantity(id); if(q<=0) return ""; return `<span class="quantity-badge">×${q}</span>${q>1?`<span class="duplicate-badge">+${q-1} Extra</span>`:""}`; }
+function binderRarityBadgeHtml(card) { const label=String(card?.rarity || 'Common'); return `<span class="binder-rarity-badge ${rarityClass(card)}">${esc(label)}</span>`; }
 function percent(part, total) { return total ? Math.round((part / total) * 100) : 0; }
 function padNumber(value, fallback) { return String(value || fallback).padStart(3, "0"); }
 function rarityClass(card) { return `rarity-${String(card?.rarity || "common").toLowerCase().replace(/[^a-z0-9]/g, '')}`; }
@@ -892,7 +893,8 @@ function renderV61Card(card, i) {
     <button class="v61-card-btn" type="button" data-v61-card="${esc(card.id)}" aria-label="View ${esc(getVisibleName(card))}">
       <img class="${hidden?'obscured':''}" src="${esc(img)}" alt="${esc(getVisibleName(card))}" loading="lazy" onerror="this.src='${CARD_BACK_URL}'">
       <span class="badge">${esc(card.number)}</span>
-      ${quantityBadgesHtml(card.id)}
+      ${getCardQuantity(card.id) > 0 ? `<span class="quantity-badge">×${getCardQuantity(card.id)}</span>` : ''}
+      ${binderRarityBadgeHtml(card)}
     </button>
     <span class="v61-ownership ${got ? 'owned' : 'locked'}">${got ? `Owned ×${getCardQuantity(card.id)}` : 'Not Collected'}</span>
   </article>`;
