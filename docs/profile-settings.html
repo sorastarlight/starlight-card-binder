@@ -591,7 +591,18 @@
                     center;
             }
         }
-    </style>
+    
+.profile-extras-layout{display:grid;grid-template-columns:minmax(260px,360px) minmax(0,1fr);gap:24px;align-items:start}
+.profile-image-editor,.profile-flair{padding:18px;border:1px solid rgba(107,198,248,.34);border-radius:18px;background:#fff}
+.profile-image-preview-wrap{position:relative;width:min(100%,360px);aspect-ratio:1;margin:0 auto 15px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,#e8f7ff,#ffe4f3);box-shadow:0 12px 30px rgba(61,83,132,.16)}
+.profile-image-preview,.profile-image-preview-wrap canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.profile-image-preview{z-index:0}.profile-image-preview-wrap canvas{z-index:1;cursor:grab}.profile-image-preview-wrap canvas:active{cursor:grabbing}
+.profile-upload-button{display:block;margin:10px 0;padding:11px 16px;border-radius:999px;background:linear-gradient(135deg,#dff5ff,#ffd7ed);color:#405fa1;font-weight:900;text-align:center;cursor:pointer}
+.profile-image-editor input[type="range"]{width:100%;margin:8px 0 14px}.profile-image-editor .profile-button{width:100%}
+.profile-flair select{width:100%;min-height:48px;padding:10px;border:2px solid rgba(75,105,155,.24);border-radius:12px}.profile-flair h3{margin:22px 0 12px;color:#405fa1}
+.achievement-grid{display:grid;gap:10px}.achievement-badge{display:flex;gap:12px;align-items:center;padding:12px;border:1px solid rgba(255,130,200,.28);border-radius:14px;background:linear-gradient(135deg,#fff,#f8fbff)}.achievement-badge>span{font-size:1.8rem}.achievement-badge strong,.achievement-badge small{display:block}.achievement-badge small{margin-top:3px;color:#6b7089}
+.profile-extras-status{text-align:center;font-weight:800}.profile-extras-status.success{color:#167048}.profile-extras-status.error{color:#b4233f}
+@media(max-width:760px){.profile-extras-layout{grid-template-columns:1fr}}
+</style>
 </head>
 <body><script src="js/embed-mode.js" type="module"></script>
 <div class="sky"></div>
@@ -609,7 +620,30 @@
                     which parts of your collection are shared.
                 </p>
 </header>
-<form id="profile-form">
+<form id="profile-form"><section class="profile-section profile-image-section">
+<h2>Profile Image &amp; Collector Flair</h2>
+<div class="profile-extras-layout">
+<div class="profile-image-editor">
+<div class="profile-image-preview-wrap">
+<img alt="Current profile image" class="profile-image-preview hidden" id="profile-image-preview"/>
+<canvas aria-label="Profile image crop preview" height="360" id="profile-image-canvas" width="360"></canvas>
+</div>
+<label class="profile-upload-button" for="profile-image-file">Choose Profile Image</label>
+<input accept="image/png,image/jpeg,image/webp" hidden="" id="profile-image-file" type="file"/>
+<label for="profile-image-zoom">Zoom</label>
+<input id="profile-image-zoom" max="3" min="1" step="0.01" type="range" value="1"/>
+<button class="profile-button primary" disabled="" id="save-profile-image" type="button">Save Cropped Image</button>
+<small class="profile-help">Maximum upload: 1 MB. Drag the image to reposition it, then zoom and save.</small>
+</div>
+<div class="profile-flair">
+<label for="collector-title-select"><strong>Collector Title</strong></label>
+<select id="collector-title-select"><option>Loading unlocked titles…</option></select>
+<h3>Achievements</h3>
+<div class="achievement-grid" id="achievement-grid"></div>
+</div>
+</div>
+<p aria-live="polite" class="profile-extras-status" id="profile-extras-status" role="status"></p>
+</section>
 <section class="profile-section">
 <h2>
                         Collector Identity
@@ -1213,5 +1247,5 @@
         initializePage();
     </script>
 <script src="js/staff-profile-link.js" type="module"></script>
-</body>
+<script src="js/profile-extras.js" type="module"></script></body>
 </html>

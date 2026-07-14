@@ -45,12 +45,14 @@ async function hydrateAccount(){
   try{
     const {data}=await supabase.auth.getUser(); const user=data?.user;
     if(!user){document.querySelector('[data-shell-account-name]').textContent='Guest Collector';return;}
-    const {data:profile}=await supabase.from('profiles').select('username,display_name,onboarding_complete').eq('id',user.id).maybeSingle();
+    const {data:profile}=await supabase.from('profiles').select('username,display_name,onboarding_complete,avatar_url,selected_title_id').eq('id',user.id).maybeSingle();
     profileUsername=profile?.username||'';
     const name=profile?.display_name||profile?.username||user.email||'Collector';
     document.querySelector('[data-shell-account-name]').textContent=name;
     document.querySelector('[data-shell-account-sub]').textContent=profile?.username?`@${profile.username}`:user.email;
-    document.querySelector('[data-shell-avatar]').textContent=String(name).trim().charAt(0).toUpperCase()||'✦';
+    const avatar=document.querySelector('[data-shell-avatar]');
+    if(profile?.avatar_url){avatar.textContent='';avatar.style.backgroundImage=`url(${profile.avatar_url})`;avatar.style.backgroundSize='cover';avatar.style.backgroundPosition='center'}
+    else{avatar.textContent=String(name).trim().charAt(0).toUpperCase()||'✦';}
     const link=document.querySelector('[data-shell-profile-link]'); if(link&&profileUsername)link.href=`binder.html?view=collector&username=${encodeURIComponent(profileUsername)}`;
     const access=await getMyStaffAccess(); if(access?.isStaff)document.querySelectorAll('.staff-link').forEach(el=>el.classList.add('visible'));
   }catch(e){console.warn('[Starlight] Shell account hydration failed',e)}
