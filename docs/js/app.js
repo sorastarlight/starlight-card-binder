@@ -893,10 +893,11 @@ function renderV61Card(card, i) {
     <button class="v61-card-btn" type="button" data-v61-card="${esc(card.id)}" aria-label="View ${esc(getVisibleName(card))}">
       <img class="${hidden?'obscured':''}" src="${esc(img)}" alt="${esc(getVisibleName(card))}" loading="lazy" onerror="this.src='${CARD_BACK_URL}'">
       <span class="badge">${esc(card.number)}</span>
-      ${getCardQuantity(card.id) > 0 ? `<span class="quantity-badge">×${getCardQuantity(card.id)}</span>` : ''}
-      ${binderRarityBadgeHtml(card)}
     </button>
-    <span class="v61-ownership ${got ? 'owned' : 'locked'}">${got ? `Owned ×${getCardQuantity(card.id)}` : 'Not Collected'}</span>
+    <span class="v61-ownership ${got ? 'owned' : 'locked'}">
+      <span>${got ? `Owned ×${getCardQuantity(card.id)}` : 'Not Collected'}</span>
+      ${binderRarityBadgeHtml(card)}
+    </span>
   </article>`;
 }
 

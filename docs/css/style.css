@@ -8084,3 +8084,113 @@ body[data-page="binder"] .v61-card-btn .duplicate-badge{display:none!important}
   body[data-page="binder"] .v61-grid{padding:14px;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:18px 11px}
   body[data-page="binder"] .v61-card-slot{min-height:235px;padding:9px 7px 11px}
 }
+
+
+/* ===== V84.7 Ultra-Feminine Magical Binder + Binder Footer Cleanup ===== */
+body[data-page="binder"] .v61-grid-shell{
+  padding:30px clamp(20px,3vw,42px) 44px clamp(54px,6vw,86px)!important;
+  border:3px solid #d49ad1!important;
+  background:
+    radial-gradient(circle at 16% 12%,rgba(255,255,255,.72),transparent 18%),
+    radial-gradient(circle at 84% 18%,rgba(255,232,142,.35),transparent 21%),
+    radial-gradient(circle at 50% 100%,rgba(179,226,255,.35),transparent 34%),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 4px),
+    linear-gradient(145deg,#f5b7df 0%,#d8b9ef 42%,#a9d8f4 100%)!important;
+  box-shadow:
+    0 28px 60px rgba(105,67,145,.24),
+    inset 0 0 0 2px rgba(255,255,255,.52),
+    inset 16px 0 30px rgba(109,72,147,.16),
+    inset -10px -12px 26px rgba(77,117,175,.12)!important;
+}
+body[data-page="binder"] .v61-grid-shell::before{
+  border:2px dashed rgba(255,255,255,.76)!important;
+  box-shadow:inset 0 0 0 5px rgba(255,196,226,.16);
+}
+body[data-page="binder"] .v61-grid-shell::after{
+  left:18px!important;
+  background:
+    radial-gradient(circle at 50% 10%,#fff 0 4px,#f8c9ea 5px 8px,#c887c1 9px 11px,transparent 12px),
+    radial-gradient(circle at 50% 50%,#fff 0 4px,#f8c9ea 5px 8px,#c887c1 9px 11px,transparent 12px),
+    radial-gradient(circle at 50% 90%,#fff 0 4px,#f8c9ea 5px 8px,#c887c1 9px 11px,transparent 12px),
+    linear-gradient(90deg,#b878b3,#fff4fb 46%,#d8a4cf 55%,#9a6ea9)!important;
+  box-shadow:0 4px 13px rgba(81,47,105,.25),inset 0 0 5px rgba(255,255,255,.95)!important;
+}
+body[data-page="binder"] .v61-grid-head{
+  border:1px solid rgba(255,255,255,.72)!important;
+  background:
+    radial-gradient(circle at 12% 35%,rgba(255,255,255,.85) 0 2px,transparent 3px),
+    radial-gradient(circle at 86% 30%,rgba(255,238,157,.7) 0 2px,transparent 3px),
+    linear-gradient(135deg,rgba(255,255,255,.56),rgba(255,219,239,.28),rgba(212,239,255,.26))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.72),0 10px 24px rgba(87,56,123,.15)!important;
+}
+body[data-page="binder"] .v61-grid-head::after{
+  content:"♡  ✦  ♡";
+  position:absolute;
+  right:18px;
+  bottom:8px;
+  color:rgba(255,255,255,.72);
+  font-size:.8rem;
+  letter-spacing:.35em;
+}
+body[data-page="binder"] .v61-grid{
+  padding:24px!important;
+  border:1px solid rgba(255,255,255,.72)!important;
+  background:
+    radial-gradient(circle at 14% 10%,rgba(255,255,255,.92) 0 2px,transparent 3px),
+    radial-gradient(circle at 85% 17%,rgba(255,221,116,.62) 0 2px,transparent 3px),
+    radial-gradient(circle at 68% 85%,rgba(255,255,255,.82) 0 1.5px,transparent 2.5px),
+    linear-gradient(135deg,rgba(255,246,252,.94),rgba(236,248,255,.9) 48%,rgba(249,237,255,.92))!important;
+  box-shadow:inset 0 0 28px rgba(191,127,190,.12),0 14px 30px rgba(88,55,126,.17)!important;
+}
+body[data-page="binder"] .v61-card-slot{
+  border:1px solid rgba(226,155,207,.36)!important;
+  background:
+    linear-gradient(120deg,rgba(255,255,255,.72),rgba(255,255,255,.18) 34%,transparent 35%),
+    linear-gradient(160deg,rgba(255,251,254,.82),rgba(232,241,255,.58),rgba(248,229,246,.58))!important;
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,.68),
+    inset 0 -14px 20px rgba(192,126,184,.08),
+    0 8px 18px rgba(96,61,132,.12)!important;
+}
+body[data-page="binder"] .v61-card-slot::after{
+  border-color:rgba(255,255,255,.9)!important;
+  box-shadow:inset 0 0 20px rgba(255,255,255,.45)!important;
+}
+body[data-page="binder"] .v61-card-slot::before{
+  content:"✦";
+  position:absolute;
+  right:10px;
+  top:8px;
+  color:rgba(238,151,204,.72);
+  font-size:.78rem;
+  pointer-events:none;
+}
+body[data-page="binder"] .v61-card-btn .quantity-badge,
+body[data-page="binder"] .v61-card-btn .duplicate-badge,
+body[data-page="binder"] .v61-card-btn .binder-rarity-badge{display:none!important}
+body[data-page="binder"] .v61-ownership{
+  position:relative;
+  z-index:6;
+  display:flex!important;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:7px;
+  width:100%;
+  min-height:29px;
+  margin-top:1px;
+  font-size:.78rem;
+  font-weight:900;
+}
+body[data-page="binder"] .v61-ownership .binder-rarity-badge{
+  position:static!important;
+  display:inline-flex!important;
+  min-height:23px!important;
+  padding:5px 9px!important;
+  font-size:.66rem!important;
+  box-shadow:0 3px 9px rgba(90,55,119,.16)!important;
+}
+@media(max-width:900px){
+  body[data-page="binder"] .v61-grid-shell{padding:22px 14px 32px 46px!important}
+  body[data-page="binder"] .v61-grid-shell::after{left:12px!important}
+}

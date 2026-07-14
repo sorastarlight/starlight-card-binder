@@ -4,17 +4,16 @@ const FLIP_SOUND = 'site_assets/sfx/card-flip.wav';
 
 const wait = ms => new Promise(resolve => window.setTimeout(resolve, ms));
 const frontUrl = card => card?.imageUrl || card?.image_url || card?.thumbnailUrl || card?.thumbnail_url || DEFAULT_BACK;
-const rarityName = card => String(card?.rarity || 'Common').trim().toLowerCase();
 
 function soundEnabled() {
   return localStorage.getItem(SFX_KEY) !== 'off';
 }
 
-function playFlipSound() {
+function playFlipSound(doc) {
   if (!soundEnabled()) return;
   try {
-    const audio = new Audio(new URL(FLIP_SOUND, document.baseURI).href);
-    audio.volume = 0.3;
+    const audio = new Audio(new URL(FLIP_SOUND, doc.baseURI).href);
+    audio.volume = 0.26;
     audio.play().catch(() => {});
   } catch (_) {}
 }
@@ -23,17 +22,17 @@ function preload(src) {
   return new Promise(resolve => {
     if (!src) return resolve(false);
     const image = new Image();
-    let done = false;
+    let finished = false;
     const finish = value => {
-      if (done) return;
-      done = true;
+      if (finished) return;
+      finished = true;
       resolve(value);
     };
     image.onload = () => finish(true);
     image.onerror = () => finish(false);
     image.src = src;
     image.decode?.().then(() => finish(true)).catch(() => {});
-    window.setTimeout(() => finish(false), 4000);
+    window.setTimeout(() => finish(false), 4500);
   });
 }
 
@@ -46,45 +45,44 @@ function getHost() {
   return { win: window, doc: document };
 }
 
-function installStyles(doc) {
-  if (doc.getElementById('starlight-basic-reveal-v846')) return;
-  const style = doc.createElement('style');
-  style.id = 'starlight-basic-reveal-v846';
-  style.textContent = `
-    .sr846-overlay{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;padding:18px;background:rgba(18,23,46,.76);opacity:0;transition:opacity .18s ease;overflow:auto}
-    .sr846-overlay.is-open{opacity:1}
-    .sr846-stage{width:min(94vw,520px);padding:20px 20px 22px;border:1px solid rgba(255,255,255,.42);border-radius:24px;background:linear-gradient(160deg,#344278,#5a4179);box-shadow:0 24px 65px rgba(0,0,0,.38);color:#fff;text-align:center}
-    .sr846-progress{display:flex;justify-content:center;gap:8px;margin:0 0 10px}
-    .sr846-progress span{width:10px;height:10px;border-radius:50%;background:var(--dot,#cbd2df);border:1px solid rgba(255,255,255,.72);box-shadow:0 2px 7px rgba(0,0,0,.24);opacity:.55}
-    .sr846-progress span.is-current{opacity:1;transform:scale(1.22);box-shadow:0 0 0 3px rgba(255,255,255,.2),0 0 11px var(--dot,#fff)}
-    .sr846-progress span.is-complete{opacity:.9}
-    .sr846-kicker{margin:0;font-size:.76rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
-    .sr846-card{display:block;width:min(68vw,285px);aspect-ratio:5/7;margin:14px auto 12px;padding:0;border:0;border-radius:17px;background:transparent;cursor:pointer;perspective:1100px}
-    .sr846-card-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .68s cubic-bezier(.22,.7,.2,1);will-change:transform}
-    .sr846-card.is-revealed .sr846-card-inner{transform:rotateY(180deg)}
-    .sr846-face{position:absolute;inset:0;display:block;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:17px;overflow:hidden;background:#fff;box-shadow:0 16px 36px rgba(0,0,0,.34)}
-    .sr846-face.front{transform:rotateY(180deg)}
-    .sr846-face img{width:100%;height:100%;display:block;object-fit:cover;border-radius:17px;border:2px solid rgba(255,255,255,.92);user-select:none;-webkit-user-drag:none}
-    .sr846-copy{min-height:96px}
-    .sr846-copy h2,.sr846-copy p{margin:6px 0}
-    .sr846-copy h2{font-size:1.45rem}
-    .sr846-copy p{opacity:.88}
-    .sr846-hint{font-size:.9rem;opacity:.82;margin-top:7px}
-    .sr846-next{min-width:180px;padding:11px 20px;border:0;border-radius:999px;background:linear-gradient(135deg,#fed334,#ff82c8,#6bc6f8);color:#fff;font-weight:900;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .16s ease}
-    .sr846-stage.is-revealed .sr846-next{opacity:1;pointer-events:auto}
-    @media(prefers-reduced-motion:reduce){.sr846-overlay,.sr846-card-inner,.sr846-next{transition-duration:.01ms!important}}
-  `;
-  doc.head.appendChild(style);
-}
-
 function rarityColor(value) {
   switch (String(value || '').toLowerCase()) {
-    case 'legendary': return '#fed334';
-    case 'epic': return '#ff82c8';
-    case 'rare': return '#f5a35b';
-    case 'uncommon': return '#6bc6f8';
-    default: return '#c4cad6';
+    case 'legendary': return '#f6c92f';
+    case 'epic': return '#ef72bd';
+    case 'rare': return '#ec9547';
+    case 'uncommon': return '#59b9ec';
+    default: return '#aab3c2';
   }
+}
+
+function installStyles(doc) {
+  if (doc.getElementById('starlight-basic-reveal-v847')) return;
+  const style = doc.createElement('style');
+  style.id = 'starlight-basic-reveal-v847';
+  style.textContent = `
+    .sr847-overlay{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;padding:18px;background:rgba(27,28,56,.76);opacity:0;transition:opacity .18s ease;overflow:auto}
+    .sr847-overlay.is-open{opacity:1}
+    .sr847-stage{width:min(94vw,500px);padding:18px 18px 22px;border:1px solid rgba(255,255,255,.55);border-radius:24px;background:linear-gradient(160deg,#384a80,#684c83);box-shadow:0 22px 58px rgba(0,0,0,.34);color:#fff;text-align:center}
+    .sr847-progress{display:flex;justify-content:center;gap:8px;margin:0 0 10px}
+    .sr847-progress span{width:10px;height:10px;border-radius:50%;background:var(--dot,#cbd2df);border:1px solid rgba(255,255,255,.78);box-shadow:0 2px 7px rgba(0,0,0,.22);opacity:.52}
+    .sr847-progress span.is-current{opacity:1;transform:scale(1.24);box-shadow:0 0 0 3px rgba(255,255,255,.19),0 0 11px var(--dot,#fff)}
+    .sr847-progress span.is-complete{opacity:.88}
+    .sr847-kicker{margin:0;font-size:.75rem;font-weight:900;letter-spacing:.11em;text-transform:uppercase}
+    .sr847-card{display:block;width:min(68vw,285px);aspect-ratio:5/7;margin:14px auto 12px;padding:0;border:0;border-radius:17px;background:transparent;cursor:pointer;perspective:1000px}
+    .sr847-card-shell{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .62s cubic-bezier(.22,.68,.2,1);will-change:transform}
+    .sr847-card.is-turning .sr847-card-shell{transform:rotateY(90deg)}
+    .sr847-card.is-returning .sr847-card-shell{transform:rotateY(0deg)}
+    .sr847-card img{width:100%;height:100%;display:block;object-fit:cover;border-radius:17px;border:2px solid rgba(255,255,255,.92);box-shadow:0 15px 34px rgba(0,0,0,.32);background:#fff;user-select:none;-webkit-user-drag:none}
+    .sr847-copy{min-height:94px}
+    .sr847-copy h2,.sr847-copy p{margin:6px 0}
+    .sr847-copy h2{font-size:1.42rem}
+    .sr847-copy p{opacity:.88}
+    .sr847-hint{font-size:.9rem;opacity:.82;margin-top:7px}
+    .sr847-next{min-width:180px;padding:11px 20px;border:0;border-radius:999px;background:linear-gradient(135deg,#fed334,#ff82c8,#6bc6f8);color:#fff;font-weight:900;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .16s ease}
+    .sr847-stage.is-revealed .sr847-next{opacity:1;pointer-events:auto}
+    @media(prefers-reduced-motion:reduce){.sr847-overlay,.sr847-card-shell,.sr847-next{transition-duration:.01ms!important}}
+  `;
+  doc.head.appendChild(style);
 }
 
 export function revealRewardSequence(cards = [], options = {}) {
@@ -104,41 +102,47 @@ export function revealRewardSequence(cards = [], options = {}) {
     const priorOverflow = doc.body.style.overflow;
 
     const overlay = doc.createElement('div');
-    overlay.className = 'sr846-overlay';
+    overlay.className = 'sr847-overlay';
     overlay.innerHTML = `
-      <section class="sr846-stage" role="dialog" aria-modal="true" aria-label="Card reveal">
-        <div class="sr846-progress"></div>
-        <p class="sr846-kicker"></p>
-        <button class="sr846-card" type="button" aria-label="Reveal card">
-          <span class="sr846-card-inner">
-            <span class="sr846-face back"><img alt="Card back"></span>
-            <span class="sr846-face front"><img alt="Reward card"></span>
-          </span>
+      <section class="sr847-stage" role="dialog" aria-modal="true" aria-label="Card reveal">
+        <div class="sr847-progress"></div>
+        <p class="sr847-kicker"></p>
+        <button class="sr847-card" type="button" aria-label="Reveal card">
+          <span class="sr847-card-shell"><img alt="Card back"></span>
         </button>
-        <div class="sr846-copy">
+        <div class="sr847-copy">
           <h2></h2>
           <p></p>
-          <div class="sr846-hint">Click the card to reveal it</div>
+          <div class="sr847-hint">Click the card to reveal it</div>
         </div>
-        <button class="sr846-next" type="button">Next Card</button>
+        <button class="sr847-next" type="button">Next Card</button>
       </section>`;
 
     doc.body.appendChild(overlay);
     doc.body.style.overflow = 'hidden';
     win.requestAnimationFrame(() => overlay.classList.add('is-open'));
 
-    const stage = overlay.querySelector('.sr846-stage');
-    const cardButton = overlay.querySelector('.sr846-card');
-    const backImage = overlay.querySelector('.sr846-face.back img');
-    const frontImage = overlay.querySelector('.sr846-face.front img');
+    const stage = overlay.querySelector('.sr847-stage');
+    const cardButton = overlay.querySelector('.sr847-card');
+    const shell = overlay.querySelector('.sr847-card-shell');
+    const image = overlay.querySelector('.sr847-card img');
     const title = overlay.querySelector('h2');
-    const detail = overlay.querySelector('.sr846-copy p');
-    const hint = overlay.querySelector('.sr846-hint');
-    const nextButton = overlay.querySelector('.sr846-next');
-    const kicker = overlay.querySelector('.sr846-kicker');
-    const progress = overlay.querySelector('.sr846-progress');
+    const detail = overlay.querySelector('.sr847-copy p');
+    const hint = overlay.querySelector('.sr847-hint');
+    const nextButton = overlay.querySelector('.sr847-next');
+    const kicker = overlay.querySelector('.sr847-kicker');
+    const progress = overlay.querySelector('.sr847-progress');
 
     progress.innerHTML = rewards.map(card => `<span style="--dot:${rarityColor(card.rarity)}" title="${String(card.rarity || 'Common').replace(/["<>]/g,'')}"></span>`).join('');
+
+    const resetCard = async src => {
+      shell.style.transition = 'none';
+      shell.style.transform = 'rotateY(0deg)';
+      image.src = src;
+      await wait(30);
+      shell.style.transition = '';
+      shell.style.transform = '';
+    };
 
     const prepare = async () => {
       busy = true;
@@ -146,11 +150,9 @@ export function revealRewardSequence(cards = [], options = {}) {
       const card = rewards[index];
       await Promise.all([preload(cardBack), preload(frontUrl(card))]);
       stage.classList.remove('is-revealed');
-      cardButton.classList.remove('is-revealed');
-      backImage.src = cardBack;
-      frontImage.src = frontUrl(card);
-      backImage.alt = 'Card back';
-      frontImage.alt = card.name || 'Reward card';
+      cardButton.classList.remove('is-turning','is-returning');
+      await resetCard(cardBack);
+      image.alt = 'Card back';
       title.textContent = 'Mystery Card';
       detail.textContent = 'Ready to reveal';
       hint.textContent = 'Click the card to reveal it';
@@ -160,7 +162,7 @@ export function revealRewardSequence(cards = [], options = {}) {
         dot.classList.toggle('is-current', dotIndex === index);
         dot.classList.toggle('is-complete', dotIndex < index);
       });
-      await wait(80);
+      await wait(60);
       busy = false;
     };
 
@@ -168,9 +170,15 @@ export function revealRewardSequence(cards = [], options = {}) {
       if (busy || revealed) return;
       busy = true;
       const card = rewards[index];
-      playFlipSound();
-      cardButton.classList.add('is-revealed');
-      await wait(700);
+      playFlipSound(doc);
+      cardButton.classList.add('is-turning');
+      await wait(310);
+      image.src = frontUrl(card);
+      image.alt = card.name || 'Reward card';
+      cardButton.classList.remove('is-turning');
+      cardButton.classList.add('is-returning');
+      await wait(340);
+      cardButton.classList.remove('is-returning');
       title.textContent = card.name || 'Mystery Card';
       detail.textContent = `${card.rarity || 'Common'} · ${card.seriesName || 'Starlight Cards'}${card.isDuplicate ? ' · Duplicate' : ' · New Card'}`;
       hint.textContent = index === rewards.length - 1 ? 'Click the card to view your pack summary' : 'Click the card or Next Card to continue';
@@ -191,7 +199,6 @@ export function revealRewardSequence(cards = [], options = {}) {
       if (busy) return;
       if (!revealed) return reveal();
       if (index >= rewards.length - 1) return finish();
-      busy = true;
       index += 1;
       await prepare();
     };
