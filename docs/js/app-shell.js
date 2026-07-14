@@ -6,6 +6,7 @@ const routes = {
   binder:{title:'Card Binder',src:null}, collection:{title:'My Collection',src:'collection.html'},
   daily:{title:'Daily Booster',src:'daily-booster.html'}, redeem:{title:'Redeem Code',src:'redeem.html'},
   'star-bits':{title:'Star Bits Exchange',src:'star-bits.html'}, checklist:{title:'Checklist',src:'checklist.html'},
+  trades:{title:'Wishlist & Trades',src:'trade-lists.html'},
   profile:{title:'Profile Settings',src:'profile-settings.html'}, collector:{title:'Collector Profile',src:'collector.html'},
   report:{title:'Report Profile',src:'report-profile.html'}, about:{title:'About',src:'about.html'}, socials:{title:'Socials',src:'socials.html'},
   admin:{title:'Administration Hub',src:'admin-hub.html'}, 'admin-codes':{title:'Reward Code Console',src:'admin-codes.html'},

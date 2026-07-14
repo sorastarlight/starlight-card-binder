@@ -1,5 +1,5 @@
 -- ============================================================
--- STARLIGHT CARD BINDER V82.3
+-- STARLIGHT CARD BINDER V82.3.1 HOTFIX
 -- PROFILE IMAGES, COLLECTOR TITLES, AND ACHIEVEMENTS
 -- ============================================================
 
@@ -118,7 +118,7 @@ create policy "Users update their own profile images"
 on storage.objects for update to authenticated
 using (
     bucket_id = 'profile-images'
-    and owner_id = (select auth.uid())
+    and owner_id::text = (select auth.uid())::text
 )
 with check (
     bucket_id = 'profile-images'
@@ -130,7 +130,7 @@ create policy "Users delete their own profile images"
 on storage.objects for delete to authenticated
 using (
     bucket_id = 'profile-images'
-    and owner_id = (select auth.uid())
+    and owner_id::text = (select auth.uid())::text
 );
 
 drop policy if exists "Profile images are publicly readable" on storage.objects;
@@ -246,7 +246,7 @@ begin
     set avatar_url = nullif(trim(requested_avatar_url), ''),
         selected_title_id = requested_title_id,
         updated_at = now()
-    where id = uid;
+    where id::text = uid::text;
 
     return jsonb_build_object('success', true);
 end;
@@ -265,8 +265,8 @@ begin
     if uid is null then raise exception 'You must be signed in.'; end if;
     perform public.sync_my_achievements();
     return jsonb_build_object(
-        'avatarUrl', (select avatar_url from public.profiles where id = uid),
-        'selectedTitleId', (select selected_title_id from public.profiles where id = uid),
+        'avatarUrl', (select avatar_url from public.profiles where id::text = uid::text),
+        'selectedTitleId', (select selected_title_id from public.profiles where id::text = uid::text),
         'titles', coalesce((
             select jsonb_agg(jsonb_build_object('id', t.id, 'name', t.name, 'description', t.description) order by t.sort_order)
             from public.user_titles ut join public.collector_titles t on t.id = ut.title_id
@@ -289,29 +289,62 @@ language plpgsql
 security definer
 set search_path = public
 as $$
-declare target_id uuid;
+declare
+    target_profile_id text;
+    target_user_id uuid;
 begin
-    select id into target_id from public.profiles
+    select id::text
+    into target_profile_id
+    from public.profiles
     where lower(username) = lower(trim(requested_username))
       and onboarding_complete = true
       and profile_visibility in ('public','unlisted')
     limit 1;
 
-    if target_id is null then return jsonb_build_object('found', false); end if;
+    if target_profile_id is null then
+        return jsonb_build_object('found', false);
+    end if;
+
+    begin
+        target_user_id := target_profile_id::uuid;
+    exception when invalid_text_representation then
+        return jsonb_build_object('found', false);
+    end;
 
     return jsonb_build_object(
         'found', true,
-        'avatarUrl', (select avatar_url from public.profiles where id = target_id),
+        'avatarUrl', (
+            select avatar_url
+            from public.profiles
+            where id::text = target_profile_id
+        ),
         'title', (
-            select jsonb_build_object('id', t.id, 'name', t.name, 'description', t.description)
+            select jsonb_build_object(
+                'id', t.id,
+                'name', t.name,
+                'description', t.description
+            )
             from public.profiles p
-            join public.collector_titles t on t.id = p.selected_title_id
-            where p.id = target_id
+            join public.collector_titles t
+              on t.id::text = p.selected_title_id::text
+            where p.id::text = target_profile_id
         ),
         'achievements', coalesce((
-            select jsonb_agg(jsonb_build_object('id', a.id, 'name', a.name, 'description', a.description, 'icon', a.icon, 'unlockedAt', ua.unlocked_at) order by a.sort_order)
-            from public.user_achievements ua join public.achievement_definitions a on a.id = ua.achievement_id
-            where ua.user_id = target_id and a.is_active = true
+            select jsonb_agg(
+                jsonb_build_object(
+                    'id', a.id,
+                    'name', a.name,
+                    'description', a.description,
+                    'icon', a.icon,
+                    'unlockedAt', ua.unlocked_at
+                )
+                order by a.sort_order
+            )
+            from public.user_achievements ua
+            join public.achievement_definitions a
+              on a.id = ua.achievement_id
+            where ua.user_id = target_user_id
+              and a.is_active = true
         ), '[]'::jsonb)
     );
 end;

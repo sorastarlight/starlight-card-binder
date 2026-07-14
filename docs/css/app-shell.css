@@ -157,3 +157,6 @@ body[data-page="binder"] .series-hero {
     overflow: visible !important;
   }
 }
+/* V82.4 Wishlist & Trade navigation accent */
+.unified-nav a[data-shell-view="trades"]{background:linear-gradient(135deg,rgba(107,198,248,.08),rgba(255,130,200,.08))}
+.unified-nav a[data-shell-view="trades"]:hover{box-shadow:0 8px 22px rgba(137,112,219,.16)}
