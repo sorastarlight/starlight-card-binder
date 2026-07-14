@@ -121,7 +121,7 @@
             }
         }
     </style>
-</head>
+<link href="css/collection-redesign.css" rel="stylesheet"/></head>
 <body data-page="collection"><script src="js/embed-mode.js" type="module"></script>
 <div class="sky"></div>
 <div class="site">
@@ -257,95 +257,52 @@
                     </button>
 </div>
 </nav>
-<section class="page-head panel">
-<p class="eyebrow">
-                    My Collection
-                </p>
-<h1>
-                    Collected Cards
-                </h1>
-<p>
-                    Cards saved to your Starlight account appear
-                    here with their full artwork and favorites.
-                </p>
-<section aria-label="Collector progression" class="collector-profile-card">
-<h2>⭐ Collector Profile</h2>
-<div class="collector-level-line">
-<span class="collector-level">Level <span data-collector-level="">1</span></span>
-<span class="collector-xp"><span data-collector-points="">0</span> / <span data-next-level-points="">25</span> Collector Points</span>
+<section class="collection-dashboard panel">
+<div class="collection-dashboard-copy">
+<p class="eyebrow">Your cards, all in one place</p>
+<h1>My Collection</h1>
+<p>Browse everything you own, revisit favorites, and manage duplicate cards without the clutter.</p>
 </div>
+<div aria-label="Collection summary" class="collection-summary-grid">
+<div><strong data-collected="">0</strong><span>Unique Cards</span></div>
+<div><strong data-total-copies="">0</strong><span>Total Copies</span></div>
+<div><strong data-favorite-count="">0</strong><span>Favorites</span></div>
+<div><strong data-duplicates="">0</strong><span>Extra Copies</span></div>
+<div><strong data-star-bits="">0</strong><span>Star Bits</span></div>
+</div>
+<div class="collection-level-card">
+<div><span>Collector Level</span><strong>Lv. <span data-collector-level="">1</span></strong></div>
 <div class="collector-progress"><span data-level-progress="" style="width:0%"></span></div>
-<div class="collector-stat-grid">
-<div class="collector-stat"><strong data-collected="">0</strong><span>Unique Cards</span></div>
-<div class="collector-stat"><strong data-total-copies="">0</strong><span>Total Copies</span></div>
-<div class="collector-stat"><strong data-favorite-count="">0</strong><span>Favorites</span></div>
-<div class="collector-stat"><strong data-duplicates="">0</strong><span>Duplicates</span></div>
-<div class="collector-stat"><strong data-star-bits="">0</strong><span>Star Bits</span></div>
-</div>
-<div class="collection-tools" style="margin-top:16px">
-<a class="btn primary" href="profile-settings.html">Edit Profile</a>
-<a class="btn" data-public-profile-link="" href="profile-settings.html">View Public Profile</a>
+<small><span data-collector-points="">0</span> / <span data-next-level-points="">25</span> points</small>
 </div>
 </section>
-<div class="collection-tools">
-<button class="btn primary" id="exportData" type="button">
-                        ⬇ Export Backup
-                    </button>
-<button class="btn" id="importData" type="button">
-                        ⬆ Import Backup
-                    </button>
-<input accept="application/json,.json" hidden="" id="importFile" type="file"/>
-</div>
-<section aria-labelledby="star-bits-heading" class="star-bits-panel">
-<div class="star-bits-copy">
-<h2 id="star-bits-heading">
-                            ✦ Star Bits Exchange
-                        </h2>
-<p>
-                            Extra copies can be converted into Star Bits. Your first copy of every card
-                            will always remain safely in your collection.
-                        </p>
-<div class="star-bits-stats">
-<span class="star-bits-pill">
-                                Duplicate Cards:
-                                <strong id="duplicateCardCount">
-                                    0
-                                </strong>
-</span>
-<span class="star-bits-pill">
-                                Star Bits:
-                                <strong id="starBitsBalance">
-                                    0
-                                </strong>
-</span>
-</div>
-</div>
-<div>
-<a class="star-bits-action" href="star-bits.html" id="openStarBitsExchange">Convert Duplicates</a>
-<small class="star-bits-note">One copy is always protected</small>
-</div>
+<section aria-label="Collection views" class="collection-tabs panel">
+<button class="collection-tab active" data-collection-tab="all" type="button">All Cards</button>
+<button class="collection-tab" data-collection-tab="favorites" type="button">Favorites</button>
+<button class="collection-tab" data-collection-tab="duplicates" type="button">Duplicates</button>
 </section>
-</section>
+<section class="collection-tab-panel active" data-collection-panel="all">
+<div class="collection-section-heading"><div><p class="eyebrow">Owned Cards</p><h2>All Cards</h2></div><p>Your complete cloud-synced collection.</p></div>
 <section class="grid-page" id="collectionGrid"></section>
-<section class="page-head panel">
-<p class="eyebrow">
-                    Favorites
-                </p>
-<h1>
-                    Favorite Cards
-                </h1>
-<p>
-                    Star your favorite pulls and they will live
-                    here like the tiny celebrities they are.
-                </p>
 </section>
+<section class="collection-tab-panel" data-collection-panel="favorites" hidden="">
+<div class="collection-section-heading"><div><p class="eyebrow">Personal Picks</p><h2>Favorites</h2></div><p>The cards you have starred for quick access.</p></div>
 <section class="favorite-showcase panel" id="favoriteShowcase"></section>
 <section class="grid-page hidden-favorite-grid" id="favoriteGrid"></section>
-<div class="site-footer-links">
-<a href="about.html">About</a>
-<a href="socials.html">Socials</a>
-<a href="profile-settings.html">Profile Settings</a>
+</section>
+<section class="collection-tab-panel" data-collection-panel="duplicates" hidden="">
+<div class="collection-duplicates-card panel">
+<div><p class="eyebrow">Extra Copies</p><h2>Duplicate Cards</h2><p>You currently have <strong data-duplicates="">0</strong> extra copies. Your final copy of every card is always protected.</p></div>
+<a class="btn primary" data-shell-nav="star-bits" href="star-bits.html">✦ Open Star Bits Exchange</a>
 </div>
+<div class="grid-page" id="collectionDuplicateGrid"></div>
+</section>
+
+
+
+
+
+
 <section class="info-strip">
 <p>
 <b>Collection:</b>
@@ -377,5 +334,5 @@
                 }
             });
     </script>
-</body>
+<script src="js/collection-redesign.js" type="module"></script></body>
 </html>

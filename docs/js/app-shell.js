@@ -66,7 +66,8 @@ async function hydrateAccount(){
     if(profile?.avatar_url){avatar.textContent='';avatar.style.backgroundImage=`url(${profile.avatar_url})`;avatar.style.backgroundSize='cover';avatar.style.backgroundPosition='center'}
     else{avatar.textContent=String(name).trim().charAt(0).toUpperCase()||'✦';}
     const link=document.querySelector('[data-shell-profile-link]'); if(link&&profileUsername)link.href=`binder.html?view=collector&username=${encodeURIComponent(profileUsername)}`;
-    const access=await getMyStaffAccess(); if(access?.isStaff)document.querySelectorAll('.staff-link').forEach(el=>el.classList.add('visible'));
+    const access=await getMyStaffAccess(); if(access?.isStaff)document.querySelector('.unified-nav')?.classList.toggle('has-staff-access', Boolean(access?.isStaff));
+  document.querySelectorAll('.staff-link').forEach(el=>el.classList.add('visible'));
   }catch(e){console.warn('[Starlight] Shell account hydration failed',e)}
 }
 document.addEventListener('click',e=>{const a=e.target.closest('[data-shell-view]');if(a){e.preventDefault();navigate(a.dataset.shellView);}});

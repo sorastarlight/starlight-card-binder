@@ -1,0 +1,10 @@
+
+const COLLECTION_KEY='sora-starlight-card-binder-v5-collected';
+const FAVORITES_KEY='sora-starlight-card-binder-v5-favorites';
+const SFX_KEY='sora-starlight-card-binder-v7-sfx';
+const status=document.getElementById('profileDataStatus');
+function read(key){try{return JSON.parse(localStorage.getItem(key))||{}}catch{return {}}}
+function say(message,error=false){if(!status)return;status.textContent=message;status.style.color=error?'#b4233f':'#167048'}
+document.getElementById('profileExportData')?.addEventListener('click',()=>{const payload={app:'Starlight Card Binder',version:82.7,exportedAt:new Date().toISOString(),collected:read(COLLECTION_KEY),favorites:read(FAVORITES_KEY),sfxOn:localStorage.getItem(SFX_KEY)!=='off'};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`starlight-card-binder-backup-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);say('Your collection backup was downloaded.')});
+document.getElementById('profileImportData')?.addEventListener('click',()=>document.getElementById('profileImportFile')?.click());
+document.getElementById('profileImportFile')?.addEventListener('change',event=>{const file=event.target.files?.[0];event.target.value='';if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const p=JSON.parse(String(reader.result||'{}'));if(!p.collected&&!p.favorites)throw new Error();if(p.collected&&typeof p.collected==='object')localStorage.setItem(COLLECTION_KEY,JSON.stringify(p.collected));if(p.favorites&&typeof p.favorites==='object')localStorage.setItem(FAVORITES_KEY,JSON.stringify(p.favorites));if(typeof p.sfxOn==='boolean')localStorage.setItem(SFX_KEY,p.sfxOn?'on':'off');say('Backup imported. Reload the Binder to refresh the local cache.')}catch{say('That file is not a valid Starlight Card Binder backup.',true)}};reader.readAsText(file)});
