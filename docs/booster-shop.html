@@ -1,7 +1,290 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Starlight Booster Shop</title><link rel="stylesheet" href="css/style.css"><style>*{box-sizing:border-box}.page{width:min(100%,1180px);margin:auto;padding:24px 18px 60px}.panel{padding:30px;border:2px solid rgba(255,130,200,.45);border-radius:28px;background:rgba(255,255,255,.96);box-shadow:0 22px 60px rgba(61,83,132,.16)}h1,h2{color:#405fa1}.head{text-align:center}.head p{color:#6b7089}.balance{display:inline-flex;padding:9px 15px;border-radius:999px;background:#fff8d8;color:#815f00;font-weight:900}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px;margin-top:24px}.pack{padding:18px;border:1px solid rgba(107,198,248,.3);border-radius:20px;background:linear-gradient(145deg,#fff,#fff3fa);text-align:center}.pack img{width:100%;height:260px;object-fit:contain;filter:drop-shadow(0 16px 22px rgba(61,83,132,.2))}.pack p{color:#6b7089;line-height:1.5}.price{display:inline-block;padding:7px 12px;border-radius:999px;background:rgba(254,211,52,.2);color:#805e00;font-weight:900}.buy{display:block;width:100%;margin-top:13px;padding:12px;border:0;border-radius:999px;background:linear-gradient(135deg,#6bc6f8,#ff82c8);color:#fff;font-weight:900;cursor:pointer}.buy:disabled{opacity:.55}.status{min-height:24px;text-align:center;font-weight:800}.error{color:#b4233f}.empty{padding:38px;text-align:center;color:#6b7089}</style><script src="js/firefox-performance.js" defer></script></head><body><script type="module" src="js/embed-mode.js"></script><div class="sky"></div><main class="page"><section class="panel"><header class="head"><p class="eyebrow">Spend Your Star Bits</p><h1>✦ Starlight Booster Shop</h1><p>Choose from any active booster configured by the Starlight team.</p><span class="balance">Balance: <b id="balance">0</b> ✦</span></header><div id="packs" class="grid"></div><p id="status" class="status"></p></section></main><script type="module">
-import{supabase}from'./js/supabase-client.js';import{getStarBitsExchangePreview}from'./js/star-bits-service.js';import{openStarBitsBoosterById}from'./js/daily-booster-service.js';import{revealRewardSequence}from'./js/reward-reveal.js';import{describeBoosterContents}from'./js/booster-config-service.js';
-const packs=document.getElementById('packs'),balance=document.getElementById('balance'),status=document.getElementById('status');let current=0,busy=false;
-const say=(m,e=false)=>{status.textContent=m;status.className=`status ${e?'error':''}`};
-async function load(){try{const [{data:user},{preview,error},{data:boosters,error:be}]=await Promise.all([supabase.auth.getUser(),getStarBitsExchangePreview(),supabase.from('booster_types').select('id,name,description,star_bits_cost,pack_image_url,card_back_url,reward_mode,series_id,card_count,bonus_star_bits').eq('is_active',true).eq('archived',false).gt('star_bits_cost',0).order('sort_order')]);if(be)throw be;if(error)throw error;current=Number(preview?.starBitsBalance||0);balance.textContent=current;if(!user?.user){packs.innerHTML='<div class="empty">Log in to purchase booster packs.</div>';return}packs.innerHTML=(boosters||[]).map(b=>`<article class="pack"><img src="${b.pack_image_url||'site_assets/series01_rising_star_booster.png'}" alt=""><h2>${b.name}</h2><p>${b.description||'Configured Starlight booster pack.'}</p><span class="price">${b.star_bits_cost} Star Bits</span><button class="buy" data-id="${b.id}" data-cost="${b.star_bits_cost}" data-back="${b.card_back_url||''}" ${current<Number(b.star_bits_cost)?'disabled':''}>${current<Number(b.star_bits_cost)?'Not Enough Star Bits':'Open This Booster'}</button></article>`).join('')||'<div class="empty">No booster packs are currently available.</div>';say('');window.parent?.postMessage({type:'starlight-content-ready',view:'shop'},location.origin)}catch(e){say(e.message||'Could not load the Booster Shop.',true)}}
-packs.addEventListener('click',async e=>{const btn=e.target.closest('[data-id]');if(!btn||busy)return;if(!confirm(`Spend ${btn.dataset.cost} Star Bits on this booster?`))return;busy=true;btn.disabled=true;try{const result=await openStarBitsBoosterById(btn.dataset.id);await revealRewardSequence(result.cards||[],{title:'Starlight Booster',cardBackUrl:btn.dataset.back||undefined});await load()}catch(err){say(err.message,true)}finally{busy=false}});load();
-</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Starlight Booster Shop</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/firefox-performance.js" defer></script>
+  <style>
+    *{box-sizing:border-box}
+    :root{
+      --shop-blue:#6bc6f8;
+      --shop-blue-deep:#4e6fbd;
+      --shop-pink:#ff82c8;
+      --shop-pink-deep:#db58a3;
+      --shop-lavender:#cbb9ff;
+      --shop-gold:#fed334;
+      --shop-cream:#fffdf7;
+      --shop-white:#ffffff;
+      --shop-ink:#33446f;
+      --shop-muted:#6f7897;
+      --shop-line:rgba(107,198,248,.44);
+      --shop-panel:rgba(255,255,255,.9);
+    }
+    body{min-height:100vh;background:transparent;color:var(--shop-ink)}
+    .shop-page{width:min(100%,1320px);margin:0 auto;padding:18px 16px 60px}
+    .shop-shell{overflow:hidden;border:2px solid rgba(107,198,248,.52);border-radius:30px;background:linear-gradient(145deg,rgba(255,255,255,.96),rgba(245,251,255,.96) 48%,rgba(255,244,251,.96));box-shadow:0 24px 60px rgba(74,96,155,.16),inset 0 0 0 1px rgba(255,255,255,.9)}
+    .shop-hero{position:relative;min-height:270px;padding:36px 34px 28px;display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:24px;align-items:center;overflow:hidden;background:
+      radial-gradient(circle at 76% 34%,rgba(255,130,200,.28),transparent 30%),
+      radial-gradient(circle at 28% 12%,rgba(107,198,248,.28),transparent 28%),
+      linear-gradient(120deg,#eef9ff 0%,#f8f1ff 50%,#fff1f8 100%)}
+    .shop-hero::before,.shop-hero::after{content:"";position:absolute;pointer-events:none}
+    .shop-hero::before{inset:-50px;background-image:radial-gradient(circle,rgba(255,255,255,.95) 0 1.2px,transparent 2.2px),radial-gradient(circle,rgba(254,211,52,.6) 0 1px,transparent 2px);background-size:44px 44px,70px 70px;background-position:0 0,18px 20px;opacity:.65;transform:rotate(-7deg)}
+    .shop-hero::after{width:500px;height:500px;right:-170px;top:-210px;border-radius:50%;border:2px solid rgba(255,255,255,.72);box-shadow:0 0 0 44px rgba(107,198,248,.07),0 0 0 92px rgba(255,130,200,.055)}
+    .hero-copy{position:relative;z-index:1}
+    .shop-kicker{margin:0 0 8px;color:var(--shop-pink-deep);font-size:.78rem;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+    .shop-title{margin:0;font-size:clamp(2.5rem,6vw,5rem);line-height:.98;color:var(--shop-blue-deep);text-shadow:0 3px 0 rgba(255,255,255,.95),0 8px 22px rgba(109,107,187,.18);font-family:inherit}
+    .shop-title span{background:linear-gradient(90deg,#4d70c5,#9f75db 38%,#ed73bb 72%,#d59c00);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .shop-tagline{max-width:720px;margin:20px 0 0;color:var(--shop-ink);font-size:clamp(1rem,2vw,1.24rem);font-weight:700;line-height:1.55}
+    .hero-chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+    .hero-chip{display:inline-flex;align-items:center;gap:8px;padding:9px 13px;border:1px solid rgba(107,198,248,.42);border-radius:999px;background:rgba(255,255,255,.72);color:#5065a4;font-size:.86rem;font-weight:800;box-shadow:0 6px 16px rgba(86,106,167,.08)}
+    .wallet-card{position:relative;z-index:1;padding:22px;border:2px solid rgba(255,130,200,.36);border-radius:22px;background:linear-gradient(145deg,rgba(255,255,255,.94),rgba(248,244,255,.94));box-shadow:0 16px 34px rgba(75,91,145,.14),inset 0 0 26px rgba(255,130,200,.06);text-align:center}
+    .wallet-card small{display:block;color:#7881a3;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+    .wallet-amount{display:flex;justify-content:center;align-items:center;gap:9px;margin:10px 0 5px;font-size:2rem;font-weight:1000;color:#425b9c}
+    .wallet-amount .star{color:#d7a900;filter:drop-shadow(0 0 6px rgba(254,211,52,.38))}
+    .wallet-link{display:inline-flex;margin-top:12px;padding:9px 13px;border-radius:999px;border:1px solid rgba(107,198,248,.46);background:linear-gradient(90deg,rgba(107,198,248,.14),rgba(255,130,200,.14));color:#4a65a6;text-decoration:none;font-weight:850}
+    .shop-benefits{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border-top:1px solid rgba(107,198,248,.22);border-bottom:1px solid rgba(255,130,200,.2);background:rgba(255,255,255,.64)}
+    .benefit{display:flex;gap:12px;align-items:center;padding:18px 20px;border-right:1px solid rgba(107,198,248,.18)}
+    .benefit:last-child{border-right:0}
+    .benefit-icon{flex:0 0 44px;width:44px;height:44px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(145deg,rgba(255,130,200,.22),rgba(107,198,248,.2));border:1px solid rgba(255,130,200,.32);font-size:1.2rem}
+    .benefit strong{display:block;color:#425b9c;font-size:.94rem}.benefit span{display:block;margin-top:3px;color:#747c9a;font-size:.78rem;line-height:1.35}
+    .shop-main{padding:28px 24px 34px}
+    .shop-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+    .section-title{display:flex;align-items:center;gap:10px;margin:0;color:#425b9c;font-size:1.35rem}.section-title::after{content:"";width:120px;height:2px;background:linear-gradient(90deg,rgba(255,130,200,.7),rgba(107,198,248,.5),transparent)}
+    .shop-filter{display:flex;gap:8px;align-items:center;color:#687394;font-size:.82rem;font-weight:800}
+    .shop-filter select{padding:9px 32px 9px 12px;border:1px solid var(--shop-line);border-radius:999px;background:#fff;color:#425b9c;font:inherit}
+    .pack-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:20px}
+    .pack-card{position:relative;display:flex;flex-direction:column;min-height:480px;padding:16px;border:1px solid rgba(107,198,248,.42);border-radius:22px;background:linear-gradient(165deg,rgba(255,255,255,.97),rgba(247,251,255,.97) 58%,rgba(255,244,250,.97));box-shadow:0 16px 30px rgba(67,85,139,.12);overflow:hidden;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}
+    .pack-card:hover{transform:translateY(-5px);border-color:rgba(255,130,200,.72);box-shadow:0 20px 40px rgba(73,94,153,.18),0 0 22px rgba(255,130,200,.12)}
+    .pack-card.featured{border-color:rgba(255,130,200,.76);box-shadow:0 20px 42px rgba(75,96,157,.18),0 0 24px rgba(255,130,200,.15)}
+    .pack-card::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(107,198,248,.12),transparent 40%);pointer-events:none}
+    .pack-ribbon{position:absolute;left:-38px;top:18px;width:150px;padding:6px;text-align:center;transform:rotate(-36deg);background:linear-gradient(90deg,#ff82c8,#a88be8);color:#fff;font-size:.72rem;font-weight:1000;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 5px 16px rgba(99,83,143,.18)}
+    .pack-art-wrap{position:relative;height:250px;display:grid;place-items:center;padding:8px}
+    .pack-art-wrap::after{content:"";position:absolute;inset:32px;border-radius:50%;background:radial-gradient(circle,rgba(255,130,200,.16),rgba(107,198,248,.09) 46%,transparent 70%)}
+    .pack-art{position:relative;z-index:1;max-width:100%;height:240px;object-fit:contain;filter:drop-shadow(0 16px 16px rgba(65,76,125,.22));transition:transform .22s ease}
+    .pack-card:hover .pack-art{transform:translateY(-4px) scale(1.025)}
+    .pack-copy{text-align:center;display:flex;flex-direction:column;flex:1}
+    .pack-name{margin:8px 0 5px;color:#425b9c;font-size:1.08rem;line-height:1.25}.pack-description{margin:0 auto;color:#737b98;font-size:.84rem;line-height:1.45;max-width:260px;min-height:50px}
+    .pack-meta{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin:12px 0}
+    .meta-pill{padding:6px 9px;border:1px solid rgba(107,198,248,.28);border-radius:999px;background:rgba(107,198,248,.09);color:#5b6ea7;font-size:.73rem;font-weight:800}
+    .pack-actions{margin-top:auto;display:grid;gap:9px}
+    .price-button{width:100%;min-height:48px;border:0;border-radius:999px;background:linear-gradient(90deg,#ff82c8,#b28be8 56%,#6bc6f8);color:#fff;font-weight:1000;font-size:.98rem;cursor:pointer;box-shadow:0 9px 20px rgba(221,88,163,.2);transition:transform .18s ease,filter .18s ease}
+    .price-button:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.05)}.price-button:disabled{opacity:.46;cursor:not-allowed;box-shadow:none}
+    .details-button{width:100%;padding:9px 12px;border:1px solid rgba(107,198,248,.4);border-radius:999px;background:#fff;color:#5268a6;font-weight:850;cursor:pointer}
+    .empty,.signed-out{grid-column:1/-1;padding:42px 20px;text-align:center;border:1px dashed rgba(107,198,248,.44);border-radius:20px;color:#747c9a;background:rgba(255,255,255,.68)}
+    .shop-footer{margin-top:28px;padding:20px;border:1px solid rgba(107,198,248,.32);border-radius:20px;background:linear-gradient(100deg,rgba(235,248,255,.86),rgba(255,239,248,.86));display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .shop-footer strong{display:block;color:#425b9c;font-size:1.05rem}.shop-footer span{display:block;margin-top:4px;color:#747c9a;font-size:.85rem}
+    .gallery-link{flex:0 0 auto;padding:12px 18px;border-radius:999px;background:linear-gradient(90deg,#ff82c8,#6bc6f8);color:#fff;text-decoration:none;font-weight:950;box-shadow:0 9px 20px rgba(90,137,190,.18)}
+    .shop-status{min-height:24px;margin:18px 0 0;text-align:center;color:#d7509a;font-weight:850}.shop-status:empty{display:none}.shop-status.error{display:block;color:#b4233f}
+    .shop-modal{position:fixed;inset:0;z-index:3000;display:grid;place-items:center;padding:18px;background:rgba(58,70,113,.44);backdrop-filter:blur(7px)}
+    .shop-modal.hidden{display:none}.modal-card{width:min(100%,580px);max-height:min(760px,90vh);overflow:auto;padding:24px;border:2px solid rgba(255,130,200,.46);border-radius:24px;background:linear-gradient(155deg,#ffffff,#f4fbff 54%,#fff1f8);box-shadow:0 28px 80px rgba(55,68,111,.28);color:var(--shop-ink)}
+    .modal-head{display:flex;justify-content:space-between;align-items:start;gap:16px}.modal-head h2{margin:0;color:#425b9c}.modal-close{width:38px;height:38px;border:1px solid rgba(107,198,248,.38);border-radius:50%;background:#fff;color:#5268a6;font-size:1.1rem;cursor:pointer}
+    .modal-pack{display:grid;grid-template-columns:150px 1fr;gap:20px;align-items:center;margin-top:18px}.modal-pack img{width:100%;height:210px;object-fit:contain;filter:drop-shadow(0 14px 16px rgba(72,84,130,.18))}.modal-copy p{color:#737b98;line-height:1.55}.contents-list{display:grid;gap:9px;margin-top:12px}.content-row{display:flex;justify-content:space-between;gap:16px;padding:10px 12px;border:1px solid rgba(107,198,248,.24);border-radius:12px;background:rgba(255,255,255,.76);color:#667093}.content-row strong{color:#425b9c;text-align:right}
+    @media(max-width:900px){.shop-hero{grid-template-columns:1fr}.wallet-card{max-width:320px}.shop-benefits{grid-template-columns:repeat(2,1fr)}.benefit:nth-child(2){border-right:0}}
+    @media(max-width:620px){.shop-page{padding:8px}.shop-shell{border-radius:20px}.shop-hero{padding:28px 18px}.shop-main{padding:22px 14px}.shop-benefits{grid-template-columns:1fr}.benefit{border-right:0;border-bottom:1px solid rgba(107,198,248,.18)}.shop-toolbar,.shop-footer{align-items:stretch;flex-direction:column}.gallery-link{text-align:center}.modal-pack{grid-template-columns:1fr}.modal-pack img{height:190px}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+  </style>
+</head>
+<body>
+<script type="module" src="js/embed-mode.js"></script>
+<div class="sky"></div>
+<main class="shop-page">
+  <section class="shop-shell">
+    <header class="shop-hero">
+      <div class="hero-copy">
+        <p class="shop-kicker">Magical Card Binder Shop</p>
+        <h1 class="shop-title"><span>Starlight Booster Shop</span></h1>
+        <p class="shop-tagline">Crack open wonder, chase your favorite cards, and turn every duplicate into fuel for your next magical pull.</p>
+        <div class="hero-chips">
+          <span class="hero-chip">✦ Secure Star Bits purchases</span>
+          <span class="hero-chip">♡ Every pack saves instantly</span>
+          <span class="hero-chip">☆ New cards and extras welcome</span>
+        </div>
+      </div>
+      <aside class="wallet-card" aria-label="Star Bits wallet">
+        <small>Your Star Bits</small>
+        <div class="wallet-amount"><span class="star">★</span><b id="balance">0</b></div>
+        <span id="wallet-note">Available to spend</span>
+        <a class="wallet-link" href="binder.html?view=star-bits" data-shell-view="star-bits">✦ Manage My Star Bits</a>
+      </aside>
+    </header>
+
+    <section class="shop-benefits" aria-label="Shop benefits">
+      <div class="benefit"><span class="benefit-icon">🎀</span><div><strong>Collect & Complete</strong><span>Fill your Binder and chase the cards you love.</span></div></div>
+      <div class="benefit"><span class="benefit-icon">💖</span><div><strong>Beautiful Artwork</strong><span>Every pull becomes part of your Starlight collection.</span></div></div>
+      <div class="benefit"><span class="benefit-icon">⭐</span><div><strong>Earn Star Bits</strong><span>Convert extra copies and keep the collection loop going.</span></div></div>
+      <div class="benefit"><span class="benefit-icon">🎁</span><div><strong>Free Daily Booster</strong><span>Claim one every day when the portal is ready.</span></div></div>
+    </section>
+
+    <section class="shop-main">
+      <div class="shop-toolbar">
+        <h2 class="section-title">✨ Available Booster Packs</h2>
+        <label class="shop-filter">Sort
+          <select id="sort-packs">
+            <option value="featured">Featured</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="name">Name</option>
+          </select>
+        </label>
+      </div>
+      <div id="packs" class="pack-grid" aria-live="polite"></div>
+      <p id="status" class="shop-status" role="status" aria-live="polite"></p>
+      <footer class="shop-footer">
+        <div><strong>Every pack is a new little adventure.</strong><span>Open, collect, convert extras, and come back for another shot at something special.</span></div>
+        <a class="gallery-link" href="binder.html?view=collection" data-shell-view="collection">♡ View My Collection</a>
+      </footer>
+    </section>
+  </section>
+</main>
+
+<div id="pack-modal" class="shop-modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <section class="modal-card">
+    <div class="modal-head"><div><p class="shop-kicker">Pack Details</p><h2 id="modal-title">Booster Pack</h2></div><button id="modal-close" class="modal-close" type="button" aria-label="Close">×</button></div>
+    <div class="modal-pack"><img id="modal-image" src="" alt=""><div class="modal-copy"><p id="modal-description"></p><div id="modal-contents" class="contents-list"></div></div></div>
+  </section>
+</div>
+
+<script type="module">
+import { supabase } from './js/supabase-client.js';
+import { getStarBitsExchangePreview } from './js/star-bits-service.js';
+import { openStarBitsBoosterById } from './js/daily-booster-service.js';
+import { revealRewardSequence } from './js/reward-reveal.js';
+
+const packsEl = document.getElementById('packs');
+const balanceEl = document.getElementById('balance');
+const walletNote = document.getElementById('wallet-note');
+const statusEl = document.getElementById('status');
+const sortEl = document.getElementById('sort-packs');
+const modal = document.getElementById('pack-modal');
+const modalClose = document.getElementById('modal-close');
+const modalTitle = document.getElementById('modal-title');
+const modalImage = document.getElementById('modal-image');
+const modalDescription = document.getElementById('modal-description');
+const modalContents = document.getElementById('modal-contents');
+const FALLBACK_PACK = 'site_assets/series01_rising_star_booster.png';
+let currentBalance = 0;
+let currentUser = null;
+let boosterData = [];
+let busy = false;
+
+function escapeHTML(value=''){
+  return String(value).replace(/[&<>'"]/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':'&quot;'}[char]));
+}
+function say(message='', isError=false){
+  statusEl.textContent = message;
+  statusEl.className = `shop-status${isError?' error':''}`;
+}
+function modeLabel(mode='slots'){
+  return ({slots:'Rarity Pack',series:'Series Pack',exact:'Exact Reward Pack',weighted_pool:'Custom Pool',single:'Single Card Pack',mixed:'Cards + Star Bits'})[mode] || 'Starlight Pack';
+}
+function summarizeBooster(booster){
+  if(booster.reward_mode === 'series') return `${Number(booster.card_count||1)} random card${Number(booster.card_count||1)===1?'':'s'} from one series`;
+  if(booster.reward_mode === 'single') return 'One featured card';
+  if(booster.reward_mode === 'exact') return 'A curated set of exact cards';
+  if(booster.reward_mode === 'weighted_pool') return `${Number(booster.card_count||1)} cards from a custom pool`;
+  if(booster.reward_mode === 'mixed') return `Cards plus ${Number(booster.bonus_star_bits||0)} bonus Star Bits`;
+  const slots = booster.slots || [];
+  if(!slots.length) return `${Number(booster.card_count||4)} configured cards`;
+  return slots.map(slot=>{
+    const qty=Number(slot.quantity)||0;
+    const rates=(slot.booster_slot_rates||[]).filter(rate=>Number(rate.percentage)>0);
+    const label=rates.length===1?rates[0].rarity:slot.name;
+    return `${qty} × ${label}`;
+  }).join(' • ');
+}
+function sortedBoosters(){
+  const list=[...boosterData];
+  switch(sortEl.value){
+    case 'price-low': return list.sort((a,b)=>Number(a.star_bits_cost)-Number(b.star_bits_cost));
+    case 'price-high': return list.sort((a,b)=>Number(b.star_bits_cost)-Number(a.star_bits_cost));
+    case 'name': return list.sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+    default: return list.sort((a,b)=>(Number(a.sort_order||0)-Number(b.sort_order||0))||String(a.name).localeCompare(String(b.name)));
+  }
+}
+function render(){
+  if(!currentUser){
+    packsEl.innerHTML='<div class="signed-out"><h2>Sign in to visit the shop ✨</h2><p>Your purchases and new cards need a Starlight account so they can be saved safely.</p><a class="gallery-link" href="login.html" target="_top">Log In or Create Account</a></div>';
+    return;
+  }
+  const list=sortedBoosters();
+  if(!list.length){packsEl.innerHTML='<div class="empty">No booster packs are currently available.</div>';return}
+  packsEl.innerHTML=list.map((booster,index)=>{
+    const cost=Number(booster.star_bits_cost)||0;
+    const affordable=currentBalance>=cost;
+    const image=escapeHTML(booster.pack_image_url||FALLBACK_PACK);
+    const desc=escapeHTML(booster.description||'A specially configured Starlight booster pack.');
+    const summary=escapeHTML(summarizeBooster(booster));
+    return `<article class="pack-card${index===0?' featured':''}">
+      ${index===0?'<div class="pack-ribbon">Featured</div>':''}
+      <div class="pack-art-wrap"><img class="pack-art" src="${image}" alt="${escapeHTML(booster.name)} booster pack" loading="lazy" decoding="async"></div>
+      <div class="pack-copy">
+        <h3 class="pack-name">${escapeHTML(booster.name)}</h3>
+        <p class="pack-description">${desc}</p>
+        <div class="pack-meta"><span class="meta-pill">${escapeHTML(modeLabel(booster.reward_mode))}</span><span class="meta-pill">${summary}</span></div>
+        <div class="pack-actions">
+          <button class="price-button" type="button" data-buy="${escapeHTML(booster.id)}" data-cost="${cost}" data-back="${escapeHTML(booster.card_back_url||'')}" ${affordable?'':'disabled'}>★ ${cost.toLocaleString()} Star Bits${affordable?'':' — Need More'}</button>
+          <button class="details-button" type="button" data-details="${escapeHTML(booster.id)}">What’s Inside?</button>
+        </div>
+      </div>
+    </article>`;
+  }).join('');
+}
+function openDetails(id){
+  const booster=boosterData.find(item=>item.id===id);if(!booster)return;
+  modalTitle.textContent=booster.name;
+  modalImage.src=booster.pack_image_url||FALLBACK_PACK;
+  modalImage.alt=`${booster.name} booster pack`;
+  modalDescription.textContent=booster.description||'A specially configured Starlight booster pack.';
+  const rows=[];
+  if(booster.reward_mode==='slots'&&(booster.slots||[]).length){
+    booster.slots.forEach(slot=>rows.push(`<div class="content-row"><span>${escapeHTML(slot.name)}</span><strong>${Number(slot.quantity)||0} card${Number(slot.quantity)===1?'':'s'}</strong></div>`));
+  }else{
+    rows.push(`<div class="content-row"><span>Reward Style</span><strong>${escapeHTML(modeLabel(booster.reward_mode))}</strong></div>`);
+    rows.push(`<div class="content-row"><span>Pack Contents</span><strong>${escapeHTML(summarizeBooster(booster))}</strong></div>`);
+  }
+  if(Number(booster.bonus_star_bits)>0) rows.push(`<div class="content-row"><span>Bonus</span><strong>★ ${Number(booster.bonus_star_bits).toLocaleString()} Star Bits</strong></div>`);
+  modalContents.innerHTML=rows.join('');
+  modal.classList.remove('hidden');document.body.style.overflow='hidden';modalClose.focus();
+}
+function closeDetails(){modal.classList.add('hidden');document.body.style.overflow=''}
+async function load(){
+  try{
+    say('');packsEl.innerHTML='<div class="empty">Preparing the Starlight Booster Shop…</div>';
+    const [{data:userData},{preview,error:previewError},{data:boosters,error:boosterError},{data:slots,error:slotError}] = await Promise.all([
+      supabase.auth.getUser(),
+      getStarBitsExchangePreview(),
+      supabase.from('booster_types').select('id,name,description,star_bits_cost,pack_image_url,card_back_url,reward_mode,series_id,card_count,bonus_star_bits,sort_order').eq('is_active',true).eq('archived',false).gt('star_bits_cost',0).order('sort_order'),
+      supabase.from('booster_slots').select('id,booster_id,name,quantity,sort_order,booster_slot_rates(rarity,percentage)').order('sort_order')
+    ]);
+    if(boosterError)throw boosterError;if(slotError)throw slotError;if(previewError)throw previewError;
+    currentUser=userData?.user||null;currentBalance=Number(preview?.starBitsBalance||0);balanceEl.textContent=currentBalance.toLocaleString();walletNote.textContent=currentBalance>0?'Ready for your next pull':'Convert extras to earn more';
+    const byBooster=new Map();(slots||[]).forEach(slot=>{if(!byBooster.has(slot.booster_id))byBooster.set(slot.booster_id,[]);byBooster.get(slot.booster_id).push(slot)});
+    boosterData=(boosters||[]).map(booster=>({...booster,slots:byBooster.get(booster.id)||[]}));render();
+    window.parent?.postMessage({type:'starlight-content-ready',view:'shop'},location.origin);
+  }catch(error){packsEl.innerHTML='<div class="empty">The shop could not be loaded right now.</div>';say(error?.message||'Could not load the Booster Shop.',true)}
+}
+
+packsEl.addEventListener('click',async event=>{
+  const details=event.target.closest('[data-details]');if(details){openDetails(details.dataset.details);return}
+  const button=event.target.closest('[data-buy]');if(!button||busy)return;
+  const booster=boosterData.find(item=>item.id===button.dataset.buy);if(!booster)return;
+  const cost=Number(button.dataset.cost)||0;
+  if(!confirm(`Open “${booster.name}” for ${cost.toLocaleString()} Star Bits?`))return;
+  busy=true;button.disabled=true;button.textContent='Opening…';
+  try{
+    const result=await openStarBitsBoosterById(booster.id);
+    await revealRewardSequence(result.cards||[],{title:booster.name,cardBackUrl:button.dataset.back||undefined});
+    await load();
+  }catch(error){say(error?.message||'This booster could not be opened.',true);button.disabled=false;render()}
+  finally{busy=false}
+});
+sortEl.addEventListener('change',render);
+modalClose.addEventListener('click',closeDetails);
+modal.addEventListener('click',event=>{if(event.target===modal)closeDetails()});
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!modal.classList.contains('hidden'))closeDetails()});
+load();
+</script>
+</body>
+</html>
