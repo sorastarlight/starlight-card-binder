@@ -46,3 +46,39 @@ body.unified-shell .topbar{display:none!important}
 @media(max-width:1180px){.shell-account-bar{grid-template-columns:minmax(190px,auto) 1fr}.shell-account-center{grid-column:1/-1;grid-row:2}.shell-account-actions{grid-column:2;grid-row:1}.shell-search{width:100%}}
 @media(max-width:760px){.shell-account-bar{display:flex;flex-wrap:wrap}.shell-account-left{flex:1 1 190px}.shell-account-center{order:3;flex:1 0 100%}.shell-account-actions{flex:0 1 auto}.shell-account-stats{display:none}.daily-booster-cta{max-width:230px;font-size:.78rem;padding-inline:12px}}
 @media(max-width:520px){.daily-booster-cta{max-width:185px}.daily-booster-cta span[data-daily-cta-label]{overflow:hidden;text-overflow:ellipsis}.shell-sfx-button{width:39px;height:39px;min-width:39px}.shell-search{min-height:40px}}
+
+/* V82.1.1 layout hotfix: restore the Binder's native two-column grid.
+   The unified shell wrapper must not become an extra grid item because the
+   legacy Binder layout expects its native sections to be direct children of
+   .main. */
+body.unified-shell[data-page="binder"] .shell-account-bar,
+body.unified-shell[data-page="binder"] .shell-view-frame {
+  grid-column: 1 / -1;
+}
+
+body.unified-shell[data-page="binder"] .shell-native-view:not(.hidden) {
+  display: contents;
+}
+
+body.unified-shell[data-page="binder"] .shell-native-view.hidden {
+  display: none !important;
+}
+
+body.unified-shell[data-page="binder"] .site-footer-links {
+  grid-column: 1 / -1;
+}
+
+/* Ensure embedded views always use the full application content width. */
+body.unified-shell[data-page="binder"] .shell-view-frame.active {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 1180px) {
+  body.unified-shell[data-page="binder"] .shell-account-bar,
+  body.unified-shell[data-page="binder"] .shell-view-frame,
+  body.unified-shell[data-page="binder"] .site-footer-links {
+    grid-column: 1;
+  }
+}
