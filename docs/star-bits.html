@@ -1,23 +1,14 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>
         Star Bits Exchange | Starlight Card Binder
     </title>
-
-    <link
-        rel="stylesheet"
-        href="css/style.css"
-    >
-
-    <style>
+<link href="css/style.css" rel="stylesheet"/>
+<style>
         :root {
             --bits-blue: #6bc6f8;
             --bits-pink: #ff82c8;
@@ -514,210 +505,130 @@
         }
     </style>
 </head>
-
-<body>
-    <div class="sky"></div>
-
-    <main class="bits-page">
-        <nav class="bits-nav">
-            <a href="./binder.html">
+<body><script src="js/embed-mode.js" type="module"></script>
+<div class="sky"></div>
+<main class="bits-page">
+<nav class="bits-nav">
+<a href="./binder.html">
                 🗂️ Binder
             </a>
-
-            <a href="./collection.html">
+<a href="./collection.html">
                 ♡ My Collection
             </a>
-
-            <a href="./daily-booster.html">
+<a href="./daily-booster.html">
                 ✨ Daily Booster
             </a>
-
-            <a href="./profile-settings.html">
+<a href="./profile-settings.html">
                 ⚙ My Profile
             </a>
-        </nav>
-
-        <section class="bits-panel">
-            <header class="bits-header">
-                <p class="eyebrow">
+</nav>
+<section class="bits-panel">
+<header class="bits-header">
+<p class="eyebrow">
                     Duplicate Card Exchange
                 </p>
-
-                <h1>
+<h1>
                     ✦ Star Bits Exchange
                 </h1>
-
-                <p>
+<p>
                     Extra copies can be converted into Star Bits.
                     Your final copy of every card will always stay
                     safely in your collection.
                 </p>
-            </header>
-
-            <section
-                id="summary-section"
-                class="bits-summary hidden"
-            >
-                <div class="summary-card">
-                    <strong id="balance-value">
+</header>
+<section class="bits-summary hidden" id="summary-section">
+<div class="summary-card">
+<strong id="balance-value">
                         0
                     </strong>
-
-                    <span>
+<span>
                         Star Bits
                     </span>
-                </div>
-
-                <div class="summary-card">
-                    <strong id="duplicate-card-types">
+</div>
+<div class="summary-card">
+<strong id="duplicate-card-types">
                         0
                     </strong>
-
-                    <span>
+<span>
                         Cards With Extras
                     </span>
-                </div>
-
-                <div class="summary-card">
-                    <strong id="duplicate-copy-count">
+</div>
+<div class="summary-card">
+<strong id="duplicate-copy-count">
                         0
                     </strong>
-
-                    <span>
+<span>
                         Duplicate Copies
                     </span>
-                </div>
-
-                <div class="summary-card">
-                    <strong id="exchange-value">
+</div>
+<div class="summary-card">
+<strong id="exchange-value">
                         0
                     </strong>
-
-                    <span>
+<span>
                         Available Star Bits
                     </span>
-                </div>
-            </section>
-
-            <section
-                id="rate-section"
-                class="rate-section hidden"
-            >
-                <h2>
+</div>
+</section>
+<section class="rate-section hidden" id="rate-section">
+<h2>
                     Exchange Values
                 </h2>
-
-                <div
-                    id="rate-grid"
-                    class="rate-grid"
-                ></div>
-            </section>
-
-            <section
-                id="duplicate-section"
-                class="duplicate-section hidden"
-            >
-                <h2>
+<div class="rate-grid" id="rate-grid"></div>
+</section>
+<section class="duplicate-section hidden" id="duplicate-section">
+<h2>
                     Your Duplicate Cards
                 </h2>
-
-                <div
-                    id="duplicate-grid"
-                    class="duplicate-grid"
-                ></div>
-            </section>
-
-            <section
-                id="empty-state"
-                class="empty-state hidden"
-            >
-                <h2>
+<div class="duplicate-grid" id="duplicate-grid"></div>
+</section>
+<section class="empty-state hidden" id="empty-state">
+<h2>
                     No Duplicates Available
                 </h2>
-
-                <p>
+<p>
                     Your extra copies will appear here after
                     opening Daily Boosters and reward packs.
                 </p>
-            </section>
-
-            <section
-                id="exchange-box"
-                class="exchange-box hidden"
-            >
-                <h2>
+</section>
+<section class="exchange-box hidden" id="exchange-box">
+<h2>
                     Conversion Available
                 </h2>
-
-                <p id="exchange-description"></p>
-
-                <button
-                    id="exchange-button"
-                    class="exchange-button"
-                    type="button"
-                >
+<p id="exchange-description"></p>
+<button class="exchange-button" id="exchange-button" type="button">
                     Convert All Duplicates
                 </button>
-
-                <p>
+<p>
                     One permanent copy of every card is protected.
                 </p>
-            </section>
-
-            <p
-                id="page-status"
-                class="page-status"
-                role="status"
-                aria-live="polite"
-            >
+</section>
+<p aria-live="polite" class="page-status" id="page-status" role="status">
                 Loading your Star Bits exchange…
             </p>
-        </section>
-    </main>
-
-    <div
-        id="confirm-overlay"
-        class="confirm-overlay hidden"
-    >
-        <section
-            class="confirm-dialog"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="confirm-heading"
-            aria-describedby="confirm-description"
-        >
-            <h2 id="confirm-heading">
+</section>
+</main>
+<div class="confirm-overlay hidden" id="confirm-overlay">
+<section aria-describedby="confirm-description" aria-labelledby="confirm-heading" aria-modal="true" class="confirm-dialog" role="dialog">
+<h2 id="confirm-heading">
                 Convert Your Duplicates?
             </h2>
-
-            <p id="confirm-description"></p>
-
-            <p class="confirm-warning">
+<p id="confirm-description"></p>
+<p class="confirm-warning">
                 This cannot be undone. Your final copy of every
                 card will remain safely in your collection.
             </p>
-
-            <div class="confirm-actions">
-                <button
-                    id="cancel-conversion"
-                    class="confirm-cancel"
-                    type="button"
-                >
+<div class="confirm-actions">
+<button class="confirm-cancel" id="cancel-conversion" type="button">
                     Keep My Duplicates
                 </button>
-
-                <button
-                    id="confirm-conversion"
-                    class="confirm-convert"
-                    type="button"
-                >
+<button class="confirm-convert" id="confirm-conversion" type="button">
                     Convert to Star Bits
                 </button>
-            </div>
-        </section>
-    </div>
-
-    <script type="module">
+</div>
+</section>
+</div>
+<script type="module">
         import { supabase } from
             "./js/supabase-client.js";
 

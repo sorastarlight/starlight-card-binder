@@ -1,29 +1,30 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Booster | Starlight Card Binder</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/v80-8-ui.css">
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Daily Booster | Starlight Card Binder</title>
+<link href="css/style.css" rel="stylesheet"/>
+<link href="css/v80-8-ui.css" rel="stylesheet"/>
+<style>
         .daily-page{width:min(100%,1080px);margin:0 auto;padding:28px 18px 60px}.daily-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:22px;padding:14px;border:1px solid rgba(107,198,248,.46);border-radius:18px;background:rgba(255,255,255,.94)}.daily-nav a{padding:9px 15px;border-radius:999px;color:#405fa1;font-weight:800;text-decoration:none}.daily-panel{padding:34px;border:2px solid rgba(107,198,248,.5);border-radius:28px;background:rgba(255,255,255,.95);box-shadow:0 22px 60px rgba(61,83,132,.18)}.daily-header{text-align:center}.daily-header h1{margin:0 0 12px;color:#405fa1;font-size:clamp(2.3rem,7vw,4.2rem)}.daily-header p{max-width:680px;margin:0 auto;color:#6b7089;line-height:1.6}.pack-stage{display:grid;place-items:center;min-height:360px;margin-top:28px;padding:25px;border:1px solid rgba(255,130,200,.34);border-radius:24px;background:radial-gradient(circle at center,rgba(255,255,255,.95),rgba(232,248,255,.74) 48%,rgba(255,231,246,.78));position:relative;overflow:hidden}.pack-image{width:min(100%,285px);max-height:330px;object-fit:contain;filter:drop-shadow(0 18px 24px rgba(61,83,132,.24));z-index:1}.daily-status-card{margin-top:22px;padding:21px;border:1px solid rgba(107,198,248,.42);border-radius:18px;background:linear-gradient(135deg,rgba(244,251,255,.95),rgba(255,245,251,.95));text-align:center}.daily-status-card h2{margin:0 0 8px;color:#405fa1}.countdown{margin-top:10px;color:#ff82c8;font-size:clamp(1.5rem,5vw,2.5rem);font-weight:900}.daily-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:24px}.daily-button,.daily-link{min-height:52px;padding:12px 24px;border:2px solid transparent;border-radius:999px;font:inherit;font-weight:900;text-decoration:none;cursor:pointer}.daily-button.primary,.daily-link.primary{background:linear-gradient(135deg,#6bc6f8,#ff82c8);color:#fff}.daily-link.secondary{border-color:rgba(107,198,248,.58);background:#fff;color:#405fa1}.daily-button:disabled{cursor:not-allowed;opacity:.58}.reward-section{margin-top:28px}.reward-section h2{text-align:center;color:#405fa1}.reward-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:17px;margin-top:18px}.reward-card{padding:13px;border:2px solid rgba(107,198,248,.3);border-radius:18px;background:#fff;text-align:center;box-shadow:0 12px 28px rgba(61,83,132,.14)}.reward-card img{width:100%;aspect-ratio:5/7;border-radius:11px;object-fit:cover}.reward-card h3{margin:11px 0 5px;color:#405fa1;font-size:1rem}.reward-card p{margin:4px 0;color:#6b7089;font-size:.88rem}.reward-pill{display:inline-block;margin-top:8px;padding:6px 10px;border-radius:999px;font-size:.82rem;font-weight:900;background:rgba(107,198,248,.17);color:#347da6}.reward-pill.duplicate{background:rgba(255,130,200,.14);color:#b64987}.page-status{min-height:28px;margin:22px 0 0;font-weight:800;text-align:center}.page-status.success{color:#167048}.page-status.error{color:#b4233f}.hidden{display:none!important}@media(max-width:850px){.reward-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.daily-page{padding:12px 10px 35px}.daily-panel{padding:24px 15px}.daily-button,.daily-link{width:100%;text-align:center}}
     </style>
 </head>
-<body>
+<body><script src="js/embed-mode.js" type="module"></script>
 <div class="sky"></div>
 <main class="daily-page">
-    <nav class="daily-nav">
-        <a href="binder.html">🗂 Binder</a><a href="collection.html">♡ Collection</a><a href="daily-booster.html">✨ Daily Booster</a><a href="star-bits.html">✦ Star Bits</a><a href="redeem.html">🎟 Redeem</a><a href="profile-settings.html">⚙ Profile</a>
-    </nav>
-    <section class="daily-panel">
-        <header class="daily-header"><p class="eyebrow">Free Daily Reward</p><h1>✨ Daily Booster</h1><p>Open one free pack every day. Rewards are saved to your account and revealed one card at a time.</p></header>
-        <section class="pack-stage"><img class="pack-image" src="site_assets/series01_rising_star_booster.png" alt="Rising Star booster pack"></section>
-        <section class="daily-status-card"><h2 id="daily-status-heading">Checking today’s booster…</h2><p id="daily-status-description">Please wait while we check your account.</p><div id="countdown" class="countdown hidden"></div></section>
-        <div class="daily-actions"><button id="open-pack-button" class="daily-button primary" type="button" disabled>Checking Availability…</button><a id="sign-in-link" class="daily-link primary hidden" href="login.html">Sign In</a><a class="daily-link secondary" href="binder.html">Return to Binder</a></div>
-        <section id="reward-section" class="reward-section hidden"><h2>Your Daily Pulls</h2><div id="reward-grid" class="reward-grid"></div></section>
-        <p id="page-status" class="page-status" role="status" aria-live="polite"></p>
-    </section>
+<nav class="daily-nav">
+<a href="binder.html">🗂 Binder</a><a href="collection.html">♡ Collection</a><a href="daily-booster.html">✨ Daily Booster</a><a href="star-bits.html">✦ Star Bits</a><a href="redeem.html">🎟 Redeem</a><a href="profile-settings.html">⚙ Profile</a>
+</nav>
+<section class="daily-panel">
+<header class="daily-header"><p class="eyebrow">Free Daily Reward</p><h1>✨ Daily Booster</h1><p>Open one free pack every day. Rewards are saved to your account and revealed one card at a time.</p></header>
+<section class="pack-stage"><img alt="Rising Star booster pack" class="pack-image" src="site_assets/series01_rising_star_booster.png"/></section>
+<section class="daily-status-card"><h2 id="daily-status-heading">Checking today’s booster…</h2><p id="daily-status-description">Please wait while we check your account.</p><div class="countdown hidden" id="countdown"></div></section>
+<div class="daily-actions"><button class="daily-button primary" disabled="" id="open-pack-button" type="button">Checking Availability…</button><a class="daily-link primary hidden" href="login.html" id="sign-in-link">Sign In</a><a class="daily-link secondary" href="binder.html">Return to Binder</a></div>
+<section class="reward-section hidden" id="reward-section"><h2>Your Daily Pulls</h2><div class="reward-grid" id="reward-grid"></div></section>
+<p aria-live="polite" class="page-status" id="page-status" role="status"></p>
+</section>
 </main>
 <script type="module">
 import { supabase } from "./js/supabase-client.js";

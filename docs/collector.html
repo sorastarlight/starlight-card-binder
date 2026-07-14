@@ -1,23 +1,14 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>
         Collector Profile | Starlight Card Binder
     </title>
-
-    <link
-        rel="stylesheet"
-        href="css/style.css"
-    >
-
-    <style>
+<link href="css/style.css" rel="stylesheet"/>
+<style>
         :root {
             --collector-blue: #6bc6f8;
             --collector-pink: #ff82c8;
@@ -582,287 +573,174 @@
         }
     </style>
 </head>
-
-<body>
-    <div class="sky"></div>
-
-    <main class="collector-page">
-        <nav class="collector-nav">
-            <div class="collector-nav-links">
-                <a href="./binder.html">
+<body><script src="js/embed-mode.js" type="module"></script>
+<div class="sky"></div>
+<main class="collector-page">
+<nav class="collector-nav">
+<div class="collector-nav-links">
+<a href="./binder.html">
                     🗂️ Binder
                 </a>
-
-                <a href="./collection.html">
+<a href="./collection.html">
                     ♡ My Collection
                 </a>
-
-                <a href="./checklist.html">
+<a href="./checklist.html">
                     ☑ Checklist
                 </a>
-            </div>
-
-            <div class="collector-nav-links">
-                <a href="./profile-settings.html">
+</div>
+<div class="collector-nav-links">
+<a href="./profile-settings.html">
                     ⚙ My Profile
                 </a>
-
-                <a href="./login.html">
+<a href="./login.html">
                     Sign In
                 </a>
-            </div>
-        </nav>
-
-        <section
-            id="loading-state"
-            class="collector-shell collector-state"
-        >
-            <h1>
+</div>
+</nav>
+<section class="collector-shell collector-state" id="loading-state">
+<h1>
                 Loading Collector Profile…
             </h1>
-
-            <p>
+<p>
                 Gathering cards, favorites, and a tasteful
                 quantity of sparkles.
             </p>
-        </section>
-
-        <section
-            id="missing-state"
-            class="collector-shell collector-state hidden"
-        >
-            <h1>
+</section>
+<section class="collector-shell collector-state hidden" id="missing-state">
+<h1>
                 Collector Not Found
             </h1>
-
-            <p>
+<p>
                 This collector profile does not exist or has
                 not completed setup yet.
             </p>
-
-            <div class="collector-actions">
-                <a
-                    class="collector-button primary"
-                    href="./binder.html"
-                >
+<div class="collector-actions">
+<a class="collector-button primary" href="./binder.html">
                     Open the Binder
                 </a>
-            </div>
-        </section>
-
-        <section
-            id="private-state"
-            class="collector-shell collector-state hidden"
-        >
-            <h1>
+</div>
+</section>
+<section class="collector-shell collector-state hidden" id="private-state">
+<h1>
                 Private Collector Profile
             </h1>
-
-            <p>
+<p>
                 This collector has chosen to keep their
                 Starlight profile private.
             </p>
-
-            <div class="collector-actions">
-                <a
-                    class="collector-button primary"
-                    href="./binder.html"
-                >
+<div class="collector-actions">
+<a class="collector-button primary" href="./binder.html">
                     Open the Binder
                 </a>
-            </div>
-        </section>
-
-        <section
-            id="error-state"
-            class="collector-shell collector-state error hidden"
-        >
-            <h1>
+</div>
+</section>
+<section class="collector-shell collector-state error hidden" id="error-state">
+<h1>
                 Profile Could Not Be Loaded
             </h1>
-
-            <p id="error-message">
+<p id="error-message">
                 Something went wrong while loading this profile.
             </p>
-
-            <div class="collector-actions">
-                <button
-                    id="retry-button"
-                    class="collector-button primary"
-                    type="button"
-                >
+<div class="collector-actions">
+<button class="collector-button primary" id="retry-button" type="button">
                     Try Again
                 </button>
-            </div>
-        </section>
-
-        <article
-            id="profile-content"
-            class="collector-shell hidden"
-        >
-            <div class="collector-banner"></div>
-
-            <header class="collector-header">
-                <div
-                    id="collector-avatar"
-                    class="collector-avatar"
-                    aria-hidden="true"
-                >
+</div>
+</section>
+<article class="collector-shell hidden" id="profile-content">
+<div class="collector-banner"></div>
+<header class="collector-header">
+<div aria-hidden="true" class="collector-avatar" id="collector-avatar">
                     ✦
                 </div>
-
-                <div class="collector-identity">
-                    <h1 id="collector-display-name">
+<div class="collector-identity">
+<h1 id="collector-display-name">
                         Collector
                     </h1>
-
-                    <p
-                        id="collector-username"
-                        class="collector-username"
-                    ></p>
-
-                    <p
-                        id="collector-bio"
-                        class="collector-bio"
-                    ></p>
-
-                    <p
-                        id="collector-member"
-                        class="collector-member"
-                    ></p>
-                </div>
-            </header>
-
-            <div class="collector-content">
-                <section
-                    id="stats-section"
-                    class="collector-section hidden"
-                >
-                    <h2>
+<p class="collector-username" id="collector-username"></p>
+<p class="collector-bio" id="collector-bio"></p>
+<p class="collector-member" id="collector-member"></p>
+</div>
+</header>
+<div class="collector-content">
+<section class="collector-section hidden" id="stats-section">
+<h2>
                         ✨ Collection Overview
                     </h2>
-
-                    <div class="stat-grid">
-                        <div class="stat-card">
-                            <strong id="unique-card-count">
+<div class="stat-grid">
+<div class="stat-card">
+<strong id="unique-card-count">
                                 0
                             </strong>
-
-                            <span>
+<span>
                                 Unique Cards
                             </span>
-                        </div>
-
-                        <div class="stat-card">
-                            <strong id="total-copy-count">
+</div>
+<div class="stat-card">
+<strong id="total-copy-count">
                                 0
                             </strong>
-
-                            <span>
+<span>
                                 Total Copies
                             </span>
-                        </div>
-
-                        <div class="stat-card">
-                            <strong id="catalog-total">
+</div>
+<div class="stat-card">
+<strong id="catalog-total">
                                 0
                             </strong>
-
-                            <span>
+<span>
                                 Available Cards
                             </span>
-                        </div>
-
-                        <div class="stat-card">
-                            <strong id="completion-percent">
+</div>
+<div class="stat-card">
+<strong id="completion-percent">
                                 0%
                             </strong>
-
-                            <span>
+<span>
                                 Complete
                             </span>
-                        </div>
-                    </div>
-                </section>
-
-                <section
-                    id="showcase-section"
-                    class="collector-section hidden"
-                >
-                    <h2>
+</div>
+</div>
+</section>
+<section class="collector-section hidden" id="showcase-section">
+<h2>
                         🌟 Main Showcase Card
                     </h2>
-
-                    <div class="showcase-layout">
-                        <img
-                            id="showcase-card-image"
-                            class="showcase-card-image"
-                            src=""
-                            alt=""
-                        >
-
-                        <div class="showcase-copy">
-                            <p class="eyebrow">
+<div class="showcase-layout">
+<img alt="" class="showcase-card-image" id="showcase-card-image" src=""/>
+<div class="showcase-copy">
+<p class="eyebrow">
                                 Featured Card
                             </p>
-
-                            <h3 id="showcase-card-name"></h3>
-
-                            <p id="showcase-card-details"></p>
-
-                            <p id="showcase-card-description"></p>
-
-                            <p id="showcase-card-artist"></p>
-                        </div>
-                    </div>
-                </section>
-
-                <section
-                    id="rarity-section"
-                    class="collector-section hidden"
-                >
-                    <h2>
+<h3 id="showcase-card-name"></h3>
+<p id="showcase-card-details"></p>
+<p id="showcase-card-description"></p>
+<p id="showcase-card-artist"></p>
+</div>
+</div>
+</section>
+<section class="collector-section hidden" id="rarity-section">
+<h2>
                         💎 Rarity Collection
                     </h2>
-
-                    <div
-                        id="rarity-grid"
-                        class="rarity-grid"
-                    ></div>
-                </section>
-
-                <section
-                    id="series-section"
-                    class="collector-section hidden"
-                >
-                    <h2>
+<div class="rarity-grid" id="rarity-grid"></div>
+</section>
+<section class="collector-section hidden" id="series-section">
+<h2>
                         📚 Series Progress
                     </h2>
-
-                    <div
-                        id="series-list"
-                        class="series-list"
-                    ></div>
-                </section>
-
-                <section
-                    id="favorites-section"
-                    class="collector-section hidden"
-                >
-                    <h2>
+<div class="series-list" id="series-list"></div>
+</section>
+<section class="collector-section hidden" id="favorites-section">
+<h2>
                         💖 Favorite Cards
                     </h2>
-
-                    <div
-                        id="favorite-grid"
-                        class="favorite-grid"
-                    ></div>
-                </section>
-            </div>
-        </article>
-    </main>
-
-    <script type="module">
+<div class="favorite-grid" id="favorite-grid"></div>
+</section>
+</div>
+</article>
+</main>
+<script type="module">
         import {
             loadPublicCollectorProfile
         } from "./js/profile-service.js";

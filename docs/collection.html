@@ -1,24 +1,15 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>
         My Collection | Starlight Card Binder
     </title>
-
-    <link
-        rel="stylesheet"
-        href="css/style.css"
-    >
-    <link rel="stylesheet" href="css/v80-8-ui.css">
-
-    <style>
+<link href="css/style.css" rel="stylesheet"/>
+<link href="css/v80-8-ui.css" rel="stylesheet"/>
+<style>
         .star-bits-panel {
             display: grid;
             grid-template-columns:
@@ -131,367 +122,249 @@
         }
     </style>
 </head>
-
-<body data-page="collection">
-    <div class="sky"></div>
-
-    <div class="site">
-        <aside class="sidebar">
-            <div class="brand">
-                <img
-                    class="logo"
-                    src="site_assets/Sora_Starlight_Logo_Primary.png"
-                    alt="Sora Starlight logo"
-                >
-
-                <span class="binder-ribbon">
+<body data-page="collection"><script src="js/embed-mode.js" type="module"></script>
+<div class="sky"></div>
+<div class="site">
+<aside class="sidebar">
+<div class="brand">
+<img alt="Sora Starlight logo" class="logo" src="site_assets/Sora_Starlight_Logo_Primary.png"/>
+<span class="binder-ribbon">
                     Card Binder
                 </span>
-            </div>
-
-            <section class="side-card">
-                <h2 class="side-title">
+</div>
+<section class="side-card">
+<h2 class="side-title">
                     Collection Progress
                 </h2>
-
-                <div class="big-stat">
-                    <span data-collected>0</span>
+<div class="big-stat">
+<span data-collected="">0</span>
                     /
-                    <span data-total>0</span>
-                </div>
-
-                <div class="bar">
-                    <span data-progress></span>
-                </div>
-
-                <p>
-                    <span data-percent>0%</span>
+                    <span data-total="">0</span>
+</div>
+<div class="bar">
+<span data-progress=""></span>
+</div>
+<p>
+<span data-percent="">0%</span>
                     Complete ✨
                 </p>
-            </section>
-
-
-            <section class="side-card economy-card">
-                <h2 class="side-title">✦ Star Bits</h2>
-                <div class="economy-stat"><span>Balance</span><strong data-star-bits>...</strong></div>
-                <div class="economy-stat"><span>Duplicates</span><strong data-duplicates>...</strong></div>
-                <a class="economy-link" href="star-bits.html">Open Exchange</a>
-            </section>
-
-            <section class="side-card economy-card">
-                <h2 class="side-title">✨ Daily Booster</h2>
-                <p data-daily-status>Checking...</p>
-                <span class="daily-countdown" data-daily-countdown></span>
-                <a class="daily-widget-link" href="daily-booster.html">View Daily Pack</a>
-            </section>
-
-            <section class="side-card">
-                <h2 class="side-title">
+</section>
+<section class="side-card economy-card">
+<h2 class="side-title">✦ Star Bits</h2>
+<div class="economy-stat"><span>Balance</span><strong data-star-bits="">...</strong></div>
+<div class="economy-stat"><span>Duplicates</span><strong data-duplicates="">...</strong></div>
+<a class="economy-link" href="star-bits.html">Open Exchange</a>
+</section>
+<section class="side-card economy-card">
+<h2 class="side-title">✨ Daily Booster</h2>
+<p data-daily-status="">Checking...</p>
+<span class="daily-countdown" data-daily-countdown=""></span>
+<a class="daily-widget-link" href="daily-booster.html">View Daily Pack</a>
+</section>
+<section class="side-card">
+<h2 class="side-title">
                     Series Progress
                 </h2>
-
-                <div
-                    id="miniSeries"
-                    class="mini-series"
-                ></div>
-            </section>
-
-            <section class="side-card filters">
-                <h2 class="side-title">
+<div class="mini-series" id="miniSeries"></div>
+</section>
+<section class="side-card filters">
+<h2 class="side-title">
                     Filters
                 </h2>
-
-                <label>
+<label>
                     Series
 
-                    <select data-series></select>
-                </label>
-
-                <label>
+                    <select data-series=""></select>
+</label>
+<label>
                     Rarity
 
-                    <select data-rarity>
-                        <option>
+                    <select data-rarity="">
+<option>
                             All Rarities
                         </option>
-
-                        <option>
+<option>
                             Common
                         </option>
-
-                        <option>
+<option>
                             Uncommon
                         </option>
-
-                        <option>
+<option>
                             Rare
                         </option>
-
-                        <option>
+<option>
                             Epic
                         </option>
-
-                        <option>
+<option>
                             Legendary
                         </option>
-                    </select>
-                </label>
-
-                <label>
+</select>
+</label>
+<label>
                     Sort By
 
                     <select id="sortSelect">
-                        <option value="numberAsc">
+<option value="numberAsc">
                             Number (Low to High)
                         </option>
-
-                        <option value="numberDesc">
+<option value="numberDesc">
                             Number (High to Low)
                         </option>
-
-                        <option value="nameAsc">
+<option value="nameAsc">
                             Name (A to Z)
                         </option>
-
-                        <option value="rarityDesc">
+<option value="rarityDesc">
                             Rarity (Best First)
                         </option>
-                    </select>
-                </label>
-
-                <h2 class="side-title">
+</select>
+</label>
+<h2 class="side-title">
                     View
                 </h2>
-
-                <label class="checkline">
-                    <input
-                        type="radio"
-                        name="viewFilter"
-                        value="all"
-                        checked
-                    >
+<label class="checkline">
+<input checked="" name="viewFilter" type="radio" value="all"/>
 
                     All Cards
                 </label>
-
-                <label class="checkline">
-                    <input
-                        type="radio"
-                        name="viewFilter"
-                        value="collected"
-                    >
+<label class="checkline">
+<input name="viewFilter" type="radio" value="collected"/>
 
                     Collected
                 </label>
-
-                <label class="checkline">
-                    <input
-                        type="radio"
-                        name="viewFilter"
-                        value="missing"
-                    >
+<label class="checkline">
+<input name="viewFilter" type="radio" value="missing"/>
 
                     Not Collected
                 </label>
-
-                <a class="btn primary wide" href="star-bits.html">✦ Star Bits Exchange</a>
-            </section>
-        </aside>
-
-        <main class="main">
-            <nav class="topbar">
-                <div class="nav">
-
-                    <a href="binder.html" data-nav="binder">🗂 Binder</a>
-                    <a href="collection.html" data-nav="collection">♡ Collection</a>
-                    <a href="daily-booster.html" data-nav="daily">✨ Daily Booster</a>
-                    <a href="star-bits.html" data-nav="bits">✦ Star Bits</a>
-                    <a href="redeem.html" data-nav="redeem">🎟 Redeem</a>
-                    <a href="checklist.html" data-nav="checklist">☑ Checklist</a>
-                    <a href="profile-settings.html" data-nav="profile">⚙ Profile</a>
-                </div>
-
-                <div class="top-actions">
-                    <input
-                        id="globalSearch"
-                        class="search"
-                        type="search"
-                        placeholder="Search cards..."
-                    >
-
-                    <button
-                        id="sfxToggle"
-                        class="sfx-toggle on"
-                        type="button"
-                        title="Sound effects"
-                    >
+<a class="btn primary wide" href="star-bits.html">✦ Star Bits Exchange</a>
+</section>
+</aside>
+<main class="main">
+<nav class="topbar">
+<div class="nav">
+<a data-nav="binder" href="binder.html">🗂 Binder</a>
+<a data-nav="collection" href="collection.html">♡ Collection</a>
+<a data-nav="daily" href="daily-booster.html">✨ Daily Booster</a>
+<a data-nav="bits" href="star-bits.html">✦ Star Bits</a>
+<a data-nav="redeem" href="redeem.html">🎟 Redeem</a>
+<a data-nav="checklist" href="checklist.html">☑ Checklist</a>
+<a data-nav="profile" href="profile-settings.html">⚙ Profile</a>
+</div>
+<div class="top-actions">
+<input class="search" id="globalSearch" placeholder="Search cards..." type="search"/>
+<button class="sfx-toggle on" id="sfxToggle" title="Sound effects" type="button">
                         ♪
                     </button>
-                </div>
-            </nav>
-
-            <section class="page-head panel">
-                <p class="eyebrow">
+</div>
+</nav>
+<section class="page-head panel">
+<p class="eyebrow">
                     My Collection
                 </p>
-
-                <h1>
+<h1>
                     Collected Cards
                 </h1>
-
-                <p>
+<p>
                     Cards saved to your Starlight account appear
                     here with their full artwork and favorites.
                 </p>
-
-
-                <section class="collector-profile-card" aria-label="Collector progression">
-                    <h2>⭐ Collector Profile</h2>
-                    <div class="collector-level-line">
-                        <span class="collector-level">Level <span data-collector-level>1</span></span>
-                        <span class="collector-xp"><span data-collector-points>0</span> / <span data-next-level-points>25</span> Collector Points</span>
-                    </div>
-                    <div class="collector-progress"><span data-level-progress style="width:0%"></span></div>
-                    <div class="collector-stat-grid">
-                        <div class="collector-stat"><strong data-collected>0</strong><span>Unique Cards</span></div>
-                        <div class="collector-stat"><strong data-total-copies>0</strong><span>Total Copies</span></div>
-                        <div class="collector-stat"><strong data-favorite-count>0</strong><span>Favorites</span></div>
-                        <div class="collector-stat"><strong data-duplicates>0</strong><span>Duplicates</span></div>
-                        <div class="collector-stat"><strong data-star-bits>0</strong><span>Star Bits</span></div>
-                    </div>
-                    <div class="collection-tools" style="margin-top:16px">
-                        <a class="btn primary" href="profile-settings.html">Edit Profile</a>
-                        <a class="btn" data-public-profile-link href="profile-settings.html">View Public Profile</a>
-                    </div>
-                </section>
-                <div class="collection-tools">
-                    <button
-                        id="exportData"
-                        class="btn primary"
-                        type="button"
-                    >
+<section aria-label="Collector progression" class="collector-profile-card">
+<h2>⭐ Collector Profile</h2>
+<div class="collector-level-line">
+<span class="collector-level">Level <span data-collector-level="">1</span></span>
+<span class="collector-xp"><span data-collector-points="">0</span> / <span data-next-level-points="">25</span> Collector Points</span>
+</div>
+<div class="collector-progress"><span data-level-progress="" style="width:0%"></span></div>
+<div class="collector-stat-grid">
+<div class="collector-stat"><strong data-collected="">0</strong><span>Unique Cards</span></div>
+<div class="collector-stat"><strong data-total-copies="">0</strong><span>Total Copies</span></div>
+<div class="collector-stat"><strong data-favorite-count="">0</strong><span>Favorites</span></div>
+<div class="collector-stat"><strong data-duplicates="">0</strong><span>Duplicates</span></div>
+<div class="collector-stat"><strong data-star-bits="">0</strong><span>Star Bits</span></div>
+</div>
+<div class="collection-tools" style="margin-top:16px">
+<a class="btn primary" href="profile-settings.html">Edit Profile</a>
+<a class="btn" data-public-profile-link="" href="profile-settings.html">View Public Profile</a>
+</div>
+</section>
+<div class="collection-tools">
+<button class="btn primary" id="exportData" type="button">
                         ⬇ Export Backup
                     </button>
-
-                    <button
-                        id="importData"
-                        class="btn"
-                        type="button"
-                    >
+<button class="btn" id="importData" type="button">
                         ⬆ Import Backup
                     </button>
-
-                    <input
-                        id="importFile"
-                        type="file"
-                        accept="application/json,.json"
-                        hidden
-                    >
-                </div>
-
-                <section
-                    class="star-bits-panel"
-                    aria-labelledby="star-bits-heading"
-                >
-                    <div class="star-bits-copy">
-                        <h2 id="star-bits-heading">
+<input accept="application/json,.json" hidden="" id="importFile" type="file"/>
+</div>
+<section aria-labelledby="star-bits-heading" class="star-bits-panel">
+<div class="star-bits-copy">
+<h2 id="star-bits-heading">
                             ✦ Star Bits Exchange
                         </h2>
-
-                        <p>
+<p>
                             Extra copies can be converted into Star Bits. Your first copy of every card
                             will always remain safely in your collection.
                         </p>
-
-                        <div class="star-bits-stats">
-                            <span class="star-bits-pill">
+<div class="star-bits-stats">
+<span class="star-bits-pill">
                                 Duplicate Cards:
                                 <strong id="duplicateCardCount">
                                     0
                                 </strong>
-                            </span>
-
-                            <span class="star-bits-pill">
+</span>
+<span class="star-bits-pill">
                                 Star Bits:
                                 <strong id="starBitsBalance">
                                     0
                                 </strong>
-                            </span>
-                        </div>
-                    </div>
-
-                    <div>
-                        <a id="openStarBitsExchange" class="star-bits-action" href="star-bits.html">Convert Duplicates</a>
-                        <small class="star-bits-note">One copy is always protected</small>
-                    </div>
-                </section>
-            </section>
-
-            <section
-                id="collectionGrid"
-                class="grid-page"
-            ></section>
-
-            <section class="page-head panel">
-                <p class="eyebrow">
+</span>
+</div>
+</div>
+<div>
+<a class="star-bits-action" href="star-bits.html" id="openStarBitsExchange">Convert Duplicates</a>
+<small class="star-bits-note">One copy is always protected</small>
+</div>
+</section>
+</section>
+<section class="grid-page" id="collectionGrid"></section>
+<section class="page-head panel">
+<p class="eyebrow">
                     Favorites
                 </p>
-
-                <h1>
+<h1>
                     Favorite Cards
                 </h1>
-
-                <p>
+<p>
                     Star your favorite pulls and they will live
                     here like the tiny celebrities they are.
                 </p>
-            </section>
-
-            <section
-                id="favoriteShowcase"
-                class="favorite-showcase panel"
-            ></section>
-
-            <section
-                id="favoriteGrid"
-                class="grid-page hidden-favorite-grid"
-            ></section>
-
-
-            <div class="site-footer-links">
-                <a href="about.html">About</a>
-                <a href="socials.html">Socials</a>
-                <a href="profile-settings.html">Profile Settings</a>
-            </div>
-            <section class="info-strip">
-                <p>
-                    <b>Starlight Mode:</b>
+</section>
+<section class="favorite-showcase panel" id="favoriteShowcase"></section>
+<section class="grid-page hidden-favorite-grid" id="favoriteGrid"></section>
+<div class="site-footer-links">
+<a href="about.html">About</a>
+<a href="socials.html">Socials</a>
+<a href="profile-settings.html">Profile Settings</a>
+</div>
+<section class="info-strip">
+<p>
+<b>Starlight Mode:</b>
                     ON hides cards until reveal. OFF lets you
                     freely see everything.
                 </p>
-
-                <p>
+<p>
                     © 2026 Sora Starlight
                 </p>
-            </section>
-        </main>
-    </div>
-
-    <div
-        id="cardOverlay"
-        aria-live="polite"
-    ></div>
-
-    <!--
+</section>
+</main>
+</div>
+<div aria-live="polite" id="cardOverlay"></div>
+<!--
         Cloud synchronization finishes before app.js starts.
     -->
-    <script
-        type="module"
-        src="js/cloud-collection.js"
-    ></script>
-    <script type="module" src="js/site-dashboard.js"></script>
-
-    <script>
+<script src="js/cloud-collection.js" type="module"></script>
+<script src="js/site-dashboard.js" type="module"></script>
+<script>
         document
             .querySelectorAll("[data-nav]")
             .forEach(link => {

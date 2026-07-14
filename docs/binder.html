@@ -1,311 +1,208 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>
         Card Binder | Starlight Card Binder
     </title>
-
-    <link
-        rel="stylesheet"
-        href="css/style.css"
-    >
-    <link rel="stylesheet" href="css/v80-8-ui.css">
-</head>
-
-<body data-page="binder">
-    <div class="sky"></div>
-
-    <div class="site">
-        <aside class="sidebar">
-            <div class="brand">
-                <img
-                    class="logo"
-                    src="site_assets/Sora_Starlight_Logo_Primary.png"
-                    alt="Sora Starlight logo"
-                >
-
-                <span class="binder-ribbon">
+<link href="css/style.css" rel="stylesheet"/>
+<link href="css/v80-8-ui.css" rel="stylesheet"/>
+<link href="css/app-shell.css" rel="stylesheet"/></head>
+<body class="unified-shell" data-page="binder">
+<div class="sky"></div>
+<div class="site">
+<aside class="sidebar">
+<div class="brand">
+<img alt="Sora Starlight logo" class="logo" src="site_assets/Sora_Starlight_Logo_Primary.png"/>
+<span class="binder-ribbon">
                     Card Binder
                 </span>
-            </div>
-
-            <section class="side-card">
-                <h2 class="side-title">
+</div><nav aria-label="Main navigation" class="unified-nav">
+<a data-shell-view="binder" href="binder.html?view=binder">🗂️ <span>Card Binder</span></a>
+<a data-shell-view="collection" href="binder.html?view=collection">♡ <span>My Collection</span></a>
+<a data-shell-view="daily" href="binder.html?view=daily">✨ <span>Daily Booster</span></a>
+<a data-shell-view="redeem" href="binder.html?view=redeem">🎟️ <span>Redeem Code</span></a>
+<a data-shell-view="star-bits" href="binder.html?view=star-bits">✦ <span>Star Bits</span></a>
+<a data-shell-view="checklist" href="binder.html?view=checklist">☑ <span>Checklist</span></a>
+<a data-shell-view="profile" href="binder.html?view=profile">👤 <span>My Profile</span></a>
+<a class="staff-link" data-shell-view="admin" href="binder.html?view=admin">🛠️ <span>Staff Tools</span></a>
+</nav>
+<section class="side-card">
+<h2 class="side-title">
                     Collection Progress
                 </h2>
-
-                <div class="big-stat">
-                    <span data-collected>0</span>
+<div class="big-stat">
+<span data-collected="">0</span>
                     /
-                    <span data-total>0</span>
-                </div>
-
-                <div class="bar">
-                    <span data-progress></span>
-                </div>
-
-                <p>
-                    <span data-percent>0%</span>
+                    <span data-total="">0</span>
+</div>
+<div class="bar">
+<span data-progress=""></span>
+</div>
+<p>
+<span data-percent="">0%</span>
                     Complete ✨
                 </p>
-            </section>
-
-
-            <section class="side-card economy-card">
-                <h2 class="side-title">✦ Star Bits</h2>
-                <div class="economy-stat"><span>Balance</span><strong data-star-bits>...</strong></div>
-                <div class="economy-stat"><span>Duplicates</span><strong data-duplicates>...</strong></div>
-                <a class="economy-link" href="star-bits.html">Open Exchange</a>
-            </section>
-
-            <section class="side-card economy-card">
-                <h2 class="side-title">✨ Daily Booster</h2>
-                <p data-daily-status>Checking...</p>
-                <span class="daily-countdown" data-daily-countdown></span>
-                <a class="daily-widget-link" href="daily-booster.html">View Daily Pack</a>
-            </section>
-
-            <section class="side-card">
-                <h2 class="side-title">
+</section>
+<section class="side-card economy-card">
+<h2 class="side-title">✦ Star Bits</h2>
+<div class="economy-stat"><span>Balance</span><strong data-star-bits="">...</strong></div>
+<div class="economy-stat"><span>Duplicates</span><strong data-duplicates="">...</strong></div>
+<a class="economy-link" href="star-bits.html">Open Exchange</a>
+</section>
+<section class="side-card economy-card">
+<h2 class="side-title">✨ Daily Booster</h2>
+<p data-daily-status="">Checking...</p>
+<span class="daily-countdown" data-daily-countdown=""></span>
+<a class="daily-widget-link" href="daily-booster.html">View Daily Pack</a>
+</section>
+<section class="side-card">
+<h2 class="side-title">
                     Series Progress
                 </h2>
-
-                <div
-                    id="miniSeries"
-                    class="mini-series"
-                ></div>
-            </section>
-
-            <section class="side-card filters">
-                <h2 class="side-title">
+<div class="mini-series" id="miniSeries"></div>
+</section>
+<section class="side-card filters">
+<h2 class="side-title">
                     Filters
                 </h2>
-
-                <label>
+<label>
                     Series
 
-                    <select data-series></select>
-                </label>
-
-                <label>
+                    <select data-series=""></select>
+</label>
+<label>
                     Rarity
 
-                    <select data-rarity>
-                        <option>
+                    <select data-rarity="">
+<option>
                             All Rarities
                         </option>
-
-                        <option>
+<option>
                             Common
                         </option>
-
-                        <option>
+<option>
                             Uncommon
                         </option>
-
-                        <option>
+<option>
                             Rare
                         </option>
-
-                        <option>
+<option>
                             Epic
                         </option>
-
-                        <option>
+<option>
                             Legendary
                         </option>
-                    </select>
-                </label>
-
-                <label>
+</select>
+</label>
+<label>
                     Sort By
 
                     <select id="sortSelect">
-                        <option value="numberAsc">
+<option value="numberAsc">
                             Number (Low to High)
                         </option>
-
-                        <option value="numberDesc">
+<option value="numberDesc">
                             Number (High to Low)
                         </option>
-
-                        <option value="nameAsc">
+<option value="nameAsc">
                             Name (A to Z)
                         </option>
-
-                        <option value="rarityDesc">
+<option value="rarityDesc">
                             Rarity (Best First)
                         </option>
-                    </select>
-                </label>
-
-                <h2 class="side-title">
+</select>
+</label>
+<h2 class="side-title">
                     View
                 </h2>
-
-                <label class="checkline">
-                    <input
-                        type="radio"
-                        name="viewFilter"
-                        value="all"
-                        checked
-                    >
+<label class="checkline">
+<input checked="" name="viewFilter" type="radio" value="all"/>
 
                     All Cards
                 </label>
-
-                <label class="checkline">
-                    <input
-                        type="radio"
-                        name="viewFilter"
-                        value="collected"
-                    >
+<label class="checkline">
+<input name="viewFilter" type="radio" value="collected"/>
 
                     Collected
                 </label>
-
-                <label class="checkline">
-                    <input
-                        type="radio"
-                        name="viewFilter"
-                        value="missing"
-                    >
+<label class="checkline">
+<input name="viewFilter" type="radio" value="missing"/>
 
                     Not Collected
                 </label>
-
-                <a class="btn primary wide" href="star-bits.html">✦ Star Bits Exchange</a>
-            </section>
-        </aside>
-
-        <main class="main">
-            <nav class="topbar">
-                <div class="nav">
-
-                    <a href="binder.html" data-nav="binder">🗂 Binder</a>
-                    <a href="collection.html" data-nav="collection">♡ Collection</a>
-                    <a href="daily-booster.html" data-nav="daily">✨ Daily Booster</a>
-                    <a href="star-bits.html" data-nav="bits">✦ Star Bits</a>
-                    <a href="redeem.html" data-nav="redeem">🎟 Redeem</a>
-                    <a href="checklist.html" data-nav="checklist">☑ Checklist</a>
-                    <a href="profile-settings.html" data-nav="profile">⚙ Profile</a>
-                </div>
-
-                <div class="top-actions">
-                    <input
-                        id="globalSearch"
-                        class="search"
-                        type="search"
-                        placeholder="Search cards..."
-                    >
-
-                    <button
-                        id="sfxToggle"
-                        class="sfx-toggle on"
-                        type="button"
-                        title="Sound effects"
-                    >
+<a class="btn primary wide" href="star-bits.html">✦ Star Bits Exchange</a>
+</section>
+</aside>
+<main class="main">
+<section aria-label="Collector account summary" class="shell-account-bar">
+<div class="shell-account-left"><button aria-label="Open navigation" class="shell-menu-button" id="shellMenuButton" type="button">☰</button><a class="shell-profile-link" data-shell-profile-link="" href="binder.html?view=profile"><span class="shell-avatar" data-shell-avatar="">✦</span></a><div class="shell-account-main"><strong data-shell-account-name="">Loading collector…</strong><span data-shell-account-sub="">Starlight account</span></div></div>
+<div class="shell-account-stats"><span class="shell-stat">Lv. <b data-collector-level="">1</b></span><span class="shell-stat">✦ <b data-star-bits="">0</b></span><span class="shell-stat">Extras <b data-duplicates="">0</b></span><span class="shell-stat" data-daily-status="">Checking pack…</span></div>
+</section><nav class="topbar">
+<div class="nav">
+<a data-nav="binder" href="binder.html">🗂 Binder</a>
+<a data-nav="collection" href="collection.html">♡ Collection</a>
+<a data-nav="daily" href="daily-booster.html">✨ Daily Booster</a>
+<a data-nav="bits" href="star-bits.html">✦ Star Bits</a>
+<a data-nav="redeem" href="redeem.html">🎟 Redeem</a>
+<a data-nav="checklist" href="checklist.html">☑ Checklist</a>
+<a data-nav="profile" href="profile-settings.html">⚙ Profile</a>
+</div>
+<div class="top-actions">
+<input class="search" id="globalSearch" placeholder="Search cards..." type="search"/>
+<button class="sfx-toggle on" id="sfxToggle" title="Sound effects" type="button">
                         ♪
                     </button>
-                </div>
-            </nav>
+</div>
+</nav>
 
-            <section class="series-hero panel v61-hero">
-                <div class="hero-copy">
-                    <p class="eyebrow">
+
+
+
+
+<div class="shell-native-view" id="binderNativeView"><section class="series-hero panel v61-hero">
+<div class="hero-copy">
+<p class="eyebrow">
                         Starlight Cards
                     </p>
-
-                    <h1 id="seriesHeroTitle">
+<h1 id="seriesHeroTitle">
                         Starlight Card Series Binder
                     </h1>
-
-                    <p id="seriesHeroDescription">
+<p id="seriesHeroDescription">
                         Choose a series to browse your collection.
                     </p>
-
-                    <div
-                        id="seriesHeroStats"
-                        class="series-stats"
-                    ></div>
-                </div>
-
-                <div class="starlight-mode">
-                    <span>
+<div class="series-stats" id="seriesHeroStats"></div>
+</div>
+<div class="starlight-mode">
+<span>
                         Starlight Mode
                     </span>
-
-                    <button
-                        id="pastelToggle"
-                        class="toggle-pill on"
-                        type="button"
-                    >
-                        <span></span>
-                    </button>
-
-                    <button
-                        class="help-dot"
-                        type="button"
-                        aria-label="What is Starlight Mode?"
-                    >
+<button class="toggle-pill on" id="pastelToggle" type="button">
+<span></span>
+</button>
+<button aria-label="What is Starlight Mode?" class="help-dot" type="button">
                         ?
                     </button>
-
-                    <p class="mode-tip">
+<p class="mode-tip">
                         Starlight Mode ON keeps unowned cards mysterious. Turn it OFF to preview the artwork; cards are still earned only through boosters, codes, and rewards.
                     </p>
-                </div>
-            </section>
-
-            <section
-                id="seriesLanding"
-                class="v61-series-stage"
-                aria-label="Choose a series booster pack"
-            ></section>
-
-            <section
-                id="seriesGridStage"
-                class="v61-card-stage"
-                aria-label="Selected card series"
-            ></section>
-
-            <aside
-                id="v62Showcase"
-                class="v62-showcase"
-                aria-label="Selected card showcase"
-            ></aside>
-
-            <div class="site-footer-links">
-                <a href="about.html">About</a>
-                <a href="socials.html">Socials</a>
-                <a href="profile-settings.html">Profile Settings</a>
-            </div>
-        </main>
-    </div>
-
-    <div
-        id="cardOverlay"
-        aria-live="polite"
-    ></div>
-
-    <!--
+</div>
+</section><section aria-label="Choose a series booster pack" class="v61-series-stage" id="seriesLanding"></section><section aria-label="Selected card series" class="v61-card-stage" id="seriesGridStage"></section><aside aria-label="Selected card showcase" class="v62-showcase" id="v62Showcase"></aside><div class="site-footer-links">
+<a href="about.html">About</a>
+<a href="socials.html">Socials</a>
+<a href="profile-settings.html">Profile Settings</a>
+</div></div><section aria-live="polite" class="shell-view-frame" id="shellViewFrame"><div class="shell-view-heading"><h1 id="shellViewTitle">View</h1><a href="#" id="shellOpenStandalone" rel="noopener" target="_blank">Open separately ↗</a></div><iframe id="shellViewIframe" title="Starlight Binder view"></iframe></section></main>
+</div>
+<div aria-live="polite" id="cardOverlay"></div>
+<!--
         cloud-collection.js now loads app.js only after the
         authenticated user's cloud collection has synchronized.
     -->
-    <script
-        type="module"
-        src="js/cloud-collection.js"
-    ></script>
-    <script type="module" src="js/site-dashboard.js"></script>
-
-    <script>
+<script src="js/cloud-collection.js" type="module"></script>
+<script src="js/site-dashboard.js" type="module"></script>
+<script>
         document
             .querySelectorAll("[data-nav]")
             .forEach(link => {
@@ -319,5 +216,5 @@
                 }
             });
     </script>
-</body>
+<script src="js/app-shell.js" type="module"></script></body>
 </html>
