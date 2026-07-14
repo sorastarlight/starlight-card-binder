@@ -19,3 +19,11 @@ export async function setTradeListVisibility(isPublic){
   if(error) throw error;
   return data;
 }
+
+export async function getPublicTradeLists(username){
+  const normalized=String(username||'').trim().toLowerCase();
+  if(!normalized) throw new Error('A collector username is required.');
+  const {data,error}=await supabase.rpc('get_public_trade_lists',{requested_username:normalized});
+  if(error) throw error;
+  return data;
+}
