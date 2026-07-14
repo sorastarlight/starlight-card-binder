@@ -5,7 +5,7 @@ import { getMyTradeOffers } from './trade-offer-service.js';
 
 const routes = {
   binder:{title:'Card Binder',src:null}, collection:{title:'My Collection',src:'collection.html'},
-  daily:{title:'Daily Booster',src:'daily-booster.html'}, redeem:{title:'Redeem Code',src:'redeem.html'},
+  daily:{title:'Free Daily Booster',src:'daily-booster.html'}, redeem:{title:'Redeem Code',src:'redeem.html'},
   'star-bits':{title:'Star Bits Exchange',src:'star-bits.html'}, checklist:{title:'Checklist',src:'checklist.html'},
   trades:{title:'Wishlist & Trades',src:'trade-lists.html'}, offers:{title:'Trade Offers',src:'trade-offers.html'},
   profile:{title:'Profile Settings',src:'profile-settings.html'}, collector:{title:'Collector Profile',src:'collector.html'},
@@ -18,7 +18,6 @@ const nativeView=document.getElementById('binderNativeView');
 const frameWrap=document.getElementById('shellViewFrame');
 const frame=document.getElementById('shellViewIframe');
 const heading=document.getElementById('shellViewTitle');
-const external=document.getElementById('shellOpenStandalone');
 const menuButton=document.getElementById('shellMenuButton');
 let profileUsername='';
 
@@ -40,7 +39,7 @@ function navigate(route,{push=true,extra={}}={}){
   }
   nativeView?.classList.add('hidden'); frameWrap?.classList.add('active');
   const src=buildSrc(route); if(frame && frame.src!==new URL(src,location.href).href)frame.src=src;
-  if(heading)heading.textContent=routes[route].title; if(external){external.href=routes[route].src+(location.search||'');}
+  if(heading)heading.textContent=routes[route].title;
   document.title=`${routes[route].title} | Starlight Card Binder`;
 }
 async function hydrateTradeOfferBadge(){

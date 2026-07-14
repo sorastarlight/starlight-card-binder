@@ -42,6 +42,7 @@ if (!embedded && routes[file] && file!=='binder.html' && file!=='index.html') {
     html.starlight-embedded .trade-offers-page{width:100%!important;max-width:none!important;margin:0!important;padding:14px!important}
     html.starlight-embedded .page-head:first-child{margin-top:0!important}
     html.starlight-embedded .embedded-filter-panel{margin:0 0 14px!important}
+    html.starlight-embedded .page-status:not(.error){display:none!important}
   `;
   document.head.appendChild(style);
   // Capture navigation before page-level handlers can navigate the iframe.

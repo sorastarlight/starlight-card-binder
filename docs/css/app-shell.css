@@ -166,3 +166,23 @@ body[data-page="binder"] .series-hero {
 
 /* V82.7 grouped navigation */
 .unified-nav{gap:12px}.shell-nav-section{display:grid;gap:5px}.shell-nav-label{margin:2px 8px 3px;color:#8a93aa;font-size:.7rem;font-weight:950;letter-spacing:.13em;text-transform:uppercase}.shell-nav-section+.shell-nav-section{padding-top:10px;border-top:1px solid rgba(107,198,248,.16)}.shell-nav-staff{display:none}.unified-nav.has-staff-access .shell-nav-staff{display:grid}.shell-nav-section a[data-shell-view="offers"]{margin-left:0!important;width:100%!important;font-size:inherit!important;opacity:1;border-left:0!important}.shell-nav-section a.active{background:linear-gradient(135deg,rgba(107,198,248,.22),rgba(255,130,200,.2))}.profile-section-intro{margin:-8px 0 16px;color:#6b7089;line-height:1.55}.account-data-actions{display:flex;flex-wrap:wrap;gap:10px}.account-data-actions button{cursor:pointer}.account-data-section{background:linear-gradient(145deg,rgba(250,252,255,.95),rgba(255,245,251,.88))!important}
+
+
+/* V82.8 navigation category and embedded-status polish */
+.shell-nav-label{
+  position:relative;display:flex;align-items:center;gap:8px;margin:2px 2px 7px!important;
+  padding:9px 12px;border:1px solid rgba(255,255,255,.78);border-radius:14px;
+  background:linear-gradient(135deg,rgba(107,198,248,.2),rgba(255,130,200,.18));
+  color:#52679b!important;font-size:.73rem!important;letter-spacing:.12em!important;
+  box-shadow:0 7px 18px rgba(75,92,145,.09),inset 0 1px 0 rgba(255,255,255,.9);
+  overflow:hidden
+}
+.shell-nav-label::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 28%,rgba(255,255,255,.62) 48%,transparent 68%);transform:translateX(-120%);animation:shellCategorySheen 7s ease-in-out infinite;pointer-events:none}
+.shell-nav-label span{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#fff;color:#ff79bd;box-shadow:0 0 13px rgba(255,130,200,.28);font-size:.8rem;letter-spacing:0}
+.shell-nav-section:nth-child(2) .shell-nav-label{background:linear-gradient(135deg,rgba(255,130,200,.2),rgba(254,211,52,.16));color:#84567b!important}
+.shell-nav-section:nth-child(2) .shell-nav-label span{color:#e19b18}
+.shell-view-heading{justify-content:flex-start!important}
+.shell-view-heading a{display:none!important}
+.page-status.success{display:none!important}
+@keyframes shellCategorySheen{0%,72%{transform:translateX(-120%)}88%,100%{transform:translateX(120%)}}
+@media(prefers-reduced-motion:reduce){.shell-nav-label::after{animation:none!important}}
