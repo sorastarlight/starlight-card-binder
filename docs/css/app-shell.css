@@ -82,3 +82,8 @@ body.unified-shell[data-page="binder"] .shell-view-frame.active {
     grid-column: 1;
   }
 }
+
+/* V82.2 — Starlight Mode removed; hero content now uses the full width. */
+body[data-page="binder"] .series-hero {
+  grid-template-columns: minmax(0, 1fr) !important;
+}

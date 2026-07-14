@@ -19,7 +19,6 @@ const SFX = {
 const STORAGE_KEY = "sora-starlight-card-binder-v5-collected";
 const FAVORITES_KEY = "sora-starlight-card-binder-v5-favorites";
 const QUANTITIES_KEY = "sora-starlight-card-binder-v80-quantities";
-const MODE_KEY = "sora-starlight-card-binder-v5-starlight-mode";
 const SFX_KEY = "sora-starlight-card-binder-v7-sfx";
 const CARD_CACHE_KEY = "sora-starlight-card-binder-v66-card-cache";
 const PER_PAGE = 18;
@@ -30,7 +29,6 @@ let filtered = [];
 let page = 1;
 let selectedIndex = 0;
 let selected = null;
-let starlightMode = localStorage.getItem(MODE_KEY) !== "off";
 let sfxOn = localStorage.getItem(SFX_KEY) !== "off";
 let previewFlipped = false;
 let overlayFlipped = false;
@@ -198,7 +196,7 @@ function warmCriticalAssets() {
   const urls = [CARD_BACK_URL, BOOSTER_PACK_URL, ...getSeriesGroups().map(g => g.boosterImageUrl)];
   cards.slice(0, PER_PAGE).forEach(c => {
     urls.push(c.thumbnailUrl);
-    if (isCollected(c.id) || !starlightMode) urls.push(c.imageUrl);
+    if (isCollected(c.id)) urls.push(c.imageUrl);
   });
   for (const url of urls.filter(Boolean)) {
     if (seen.has(url)) continue;
@@ -228,7 +226,7 @@ function scheduleIdleImagePreload() {
       : cards.filter(c => c.series === visibleSeries).slice(0, PER_PAGE));
     firstVisibleCards.forEach(c => {
       push(c.thumbnailUrl);
-      if (isCollected(c.id) || !starlightMode) push(c.imageUrl);
+      if (isCollected(c.id)) push(c.imageUrl);
     });
 
     const run = () => preloadImagesInBatches(urls, 4);
@@ -367,10 +365,10 @@ function applyFilters() {
   if (page > max) page = max;
 }
 
-function getVisibleImage(card) { return (!starlightMode || isCollected(card.id)) ? card.imageUrl : CARD_BACK_URL; }
-function getVisibleName(card) { return (!starlightMode || isCollected(card.id)) ? displayName(card) : "???"; }
-function getVisibleRarity(card) { return (!starlightMode || isCollected(card.id)) ? card.rarity : "Unknown"; }
-function getVisibleDescription(card) { return (!starlightMode || isCollected(card.id)) ? card.cardDescription : "This card is still hidden. Reveal it to unlock the front and description."; }
+function getVisibleImage(card) { return isCollected(card.id) ? card.imageUrl : CARD_BACK_URL; }
+function getVisibleName(card) { return isCollected(card.id) ? displayName(card) : "???"; }
+function getVisibleRarity(card) { return isCollected(card.id) ? card.rarity : "Unknown"; }
+function getVisibleDescription(card) { return isCollected(card.id) ? card.cardDescription : "This card has not been collected yet. Earn it from Daily Boosters, reward codes, or future events."; }
 
 function setCollected(id, value) {
   const store = readStore(STORAGE_KEY);
@@ -528,7 +526,6 @@ function renderShell() {
       return `<div class="mini-row"><b><span>${esc(series)}</span><span>${count} / ${list.length}</span></b><div class="bar"><span style="width:${percent(count, list.length)}%"></span></div></div>`;
     }).join("");
   }
-  $('#pastelToggle')?.classList.toggle('on', starlightMode);
   $('#sfxToggle')?.classList.toggle('on', sfxOn);
 }
 
@@ -565,7 +562,7 @@ function renderDetail() {
   if (!selected) { detail.innerHTML = '<p class="description">Select a card to view details.</p>'; return; }
   selectedIndex = Math.max(0, cards.findIndex(c => c.id === selected.id));
   const got = isCollected(selected.id);
-  const hidden = starlightMode && !got;
+  const hidden = !got;
   detail.innerHTML = `
   <div class="detail-actions top-actions-preview">
     <button class="btn primary" id="flipPreview" type="button">↻ Flip</button>
@@ -631,7 +628,7 @@ function stepFullView(dir) {
 function renderFullView() {
   const overlay = $('#cardOverlay'); if (!overlay || !selected) return;
   const got = isCollected(selected.id);
-  const hidden = starlightMode && !got;
+  const hidden = !got;
   const visibleName = getVisibleName(selected);
   const visibleRarity = getVisibleRarity(selected);
   overlay.innerHTML = `<div class="full-card-stage analyzer-full-stage ${rarityClass(selected)}" role="dialog" aria-modal="true">
@@ -671,7 +668,7 @@ function renderGridPage(target, mode) {
   if (mode === 'favorites') list = cards.filter(c => isFavorite(c.id));
   wrap.classList.toggle('empty-grid', !list.length);
   wrap.innerHTML = list.length ? list.map(c => {
-    const got = isCollected(c.id); const hidden = starlightMode && !got;
+    const got = isCollected(c.id); const hidden = !got;
     return `<article class="collection-card ${rarityClass(c)}"><div class="collection-image">${quantityBadgesHtml(c.id)}<img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"></div><h3>${esc(getVisibleName(c))}</h3><p>${esc(c.number)} • <span class="rarity-text ${rarityClass(c)}">${esc(getVisibleRarity(c))}</span> • ${esc(c.series)}</p><div class="card-buttons"><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${getCardQuantity(c.id)}` : 'Not Collected'}</span>${got ? `<button class="icon-btn" onclick="toggleFavorite('${esc(c.id)}')">${isFavorite(c.id)?'★':'☆'}</button>` : ''}</div></article>`;
   }).join('') : `<div class="empty-state"><h2>${mode === 'favorites' ? 'No favorites yet' : 'No cards here yet'}</h2><p>${mode === 'favorites' ? 'Tap the star on your favorite cards and this showcase will sparkle to life.' : 'Earn cards from Daily Boosters, redemption codes, and special rewards to fill this collection.'}</p><a class="btn primary" href="binder.html">Open Binder</a></div>`;
   renderFavoritesShowcase();
@@ -683,7 +680,7 @@ function renderFavoritesShowcase() {
   const showcase = $('#favoriteShowcase'); if (!showcase) return;
   const favs = cards.filter(c => isFavorite(c.id));
   if (!favs.length) { showcase.innerHTML = `<div class="empty-state trophy-empty"><h2>Favorite Showcase</h2><p>Star a card to put it on the Starlight stage. Your favorites will scroll here like a tiny idol parade.</p><a class="btn primary" href="binder.html">Find Favorites</a></div>`; return; }
-  showcase.innerHTML = `<div class="favorite-carousel-head"><h2>Favorite Showcase 💖</h2><p>${favs.length} favorite card${favs.length===1?'':'s'} saved to this collection.</p></div><div class="favorite-carousel">${favs.map((c,i)=>{ const hidden = starlightMode && !isCollected(c.id); return `<button class="fav-spot ${rarityClass(c)}" style="--i:${i}" onclick="selected=cards.find(x=>x.id==='${esc(c.id)}');selectedIndex=cards.findIndex(x=>x.id==='${esc(c.id)}');openFullView('favorites')"><span class="fav-image">${quantityBadgesHtml(c.id)}<img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}"></span><span>${esc(getVisibleName(c))}</span></button>`}).join('')}</div>`;
+  showcase.innerHTML = `<div class="favorite-carousel-head"><h2>Favorite Showcase 💖</h2><p>${favs.length} favorite card${favs.length===1?'':'s'} saved to this collection.</p></div><div class="favorite-carousel">${favs.map((c,i)=>{ const hidden = !isCollected(c.id); return `<button class="fav-spot ${rarityClass(c)}" style="--i:${i}" onclick="selected=cards.find(x=>x.id==='${esc(c.id)}');selectedIndex=cards.findIndex(x=>x.id==='${esc(c.id)}');openFullView('favorites')"><span class="fav-image">${quantityBadgesHtml(c.id)}<img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}"></span><span>${esc(getVisibleName(c))}</span></button>`}).join('')}</div>`;
   attachTileTilts();
   attachBinderHoverSfx();
 }
@@ -696,7 +693,6 @@ function exportCollectionData() {
     exportedAt: new Date().toISOString(),
     collected: readStore(STORAGE_KEY),
     favorites: readStore(FAVORITES_KEY),
-    starlightMode,
     sfxOn
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -722,7 +718,6 @@ function importCollectionData(file) {
       if (!collected && !favorites) throw new Error('Missing collection data');
       // Ownership is cloud-authoritative and is never imported from a browser backup.
       if (favorites) writeStore(FAVORITES_KEY, favorites);
-      if (typeof payload.starlightMode === 'boolean') { starlightMode = payload.starlightMode; localStorage.setItem(MODE_KEY, starlightMode ? 'on' : 'off'); }
       if (typeof payload.sfxOn === 'boolean') { sfxOn = payload.sfxOn; localStorage.setItem(SFX_KEY, sfxOn ? 'on' : 'off'); }
       playSfx('sparkle');
       renderAll();
@@ -738,7 +733,7 @@ function importCollectionData(file) {
 function renderChecklist() {
   const body = $('#checklistBody'); if (!body) return;
   body.innerHTML = cards.map(c => {
-    const got = isCollected(c.id); const hidden = starlightMode && !got;
+    const got = isCollected(c.id); const hidden = !got;
     return `<tr class="item"><td><div class="check-card"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"><span>${esc(c.number)}</span></div></td><td>${esc(getVisibleName(c))}</td><td>${esc(c.series)}</td><td>${esc(c.artist)}</td><td><span class="rarity-text ${rarityClass(c)}">${esc(getVisibleRarity(c))}</span></td><td><b>×${getCardQuantity(c.id)}</b>${getCardQuantity(c.id)>1?`<br><small>+${getCardQuantity(c.id)-1} extra</small>`:""}</td><td><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? 'Collected' : 'Not Collected'}</span></td><td>${got ? `<button class="icon-btn" onclick="toggleFavorite('${esc(c.id)}')">${isFavorite(c.id)?'★':'☆'}</button>` : '<span class="soft-note">—</span>'}</td></tr>`;
   }).join('');
 }
@@ -747,7 +742,7 @@ function renderAbout() {
   const groups = [...new Set(cards.map(c => c.series))];
   about.innerHTML = groups.map(series => { const list = cards.filter(c => c.series === series); const legendary = list.filter(c=>c.rarity==='Legendary').length; return `<div class="collection-card text-card"><h3>${esc(series)}</h3><p>${esc(list.find(c=>c.seriesDescription)?.seriesDescription || 'A Starlight card series.')}</p><p><b>${list.length}</b> cards • <b>${legendary}</b> Legendary</p></div>`; }).join('');
 }
-function renderAll() { document.body.classList.toggle('starlight-mode-on', starlightMode); document.body.classList.toggle('sfx-on', sfxOn); renderShell(); if (pageName === 'binder') renderBinder(); renderGridPage('#collectionGrid', 'collection'); renderGridPage('#favoriteGrid', 'favorites'); renderChecklist(); renderAbout(); updateRaritySelectClass(); }
+function renderAll() { document.body.classList.toggle('sfx-on', sfxOn); renderShell(); if (pageName === 'binder') renderBinder(); renderGridPage('#collectionGrid', 'collection'); renderGridPage('#favoriteGrid', 'favorites'); renderChecklist(); renderAbout(); updateRaritySelectClass(); }
 
 
 function startPackOpen(series) {
@@ -757,12 +752,6 @@ function startPackOpen(series) {
   document.body.classList.remove('series-select');
   renderAll();
 }
-function openModeHelp() {
-  const modal = $('#modeHelp') || (() => { const d=document.createElement('div'); d.id='modeHelp'; document.body.appendChild(d); return d; })();
-  modal.innerHTML = `<div class="mode-help-card"><button class="mode-help-close" type="button">×</button><h2>🌟 Starlight Mode</h2><p><b>ON</b> keeps cards mysterious until you reveal them, like collecting shiny Starlight cards both on stream and here in the binder.</p><p><b>OFF</b> lets you freely see every card, perfect for browsing the whole set without unlocking them first.</p></div>`;
-  modal.classList.add('open');
-}
-function closeModeHelp() { $('#modeHelp')?.classList.remove('open'); }
 
 function updateRaritySelectClass() {
   $$('[data-rarity]').forEach(select => {
@@ -784,8 +773,6 @@ document.addEventListener('click', e => {
     return;
   }
   if (e.target.closest('#backToSeries')) { document.body.classList.add('series-select'); const select = $('[data-series]'); if (select) select.value = 'All Series'; page = 1; renderAll(); return; }
-  if (e.target.closest('.help-dot')) { openModeHelp(); return; }
-  if (e.target.closest('.mode-help-close') || e.target.id === 'modeHelp') { closeModeHelp(); return; }
   const tile = e.target.closest('.card-tile');
   if (tile) { selected = cards.find(c => c.id === tile.dataset.id) || selected; selectedIndex = cards.findIndex(c => c.id === tile.dataset.id); previewFlipped = false; renderDetail(); playSfx('sparkle'); }
   if (e.target.id === 'cardOverlay') closeFullView();
@@ -798,7 +785,6 @@ document.addEventListener('DOMContentLoaded', () => {
   loadCards();
   $('#prevPage')?.addEventListener('click', () => { page = Math.max(1, page - 1); renderAll(); playSfx('page'); });
   $('#nextPage')?.addEventListener('click', () => { page += 1; renderAll(); playSfx('page'); });
-  $('#pastelToggle')?.addEventListener('click', () => { starlightMode = !starlightMode; localStorage.setItem(MODE_KEY, starlightMode ? 'on' : 'off'); renderAll(); });
   $('#sfxToggle')?.addEventListener('click', () => { sfxOn = !sfxOn; localStorage.setItem(SFX_KEY, sfxOn ? 'on' : 'off'); renderAll(); });
   $('#exportData')?.addEventListener('click', exportCollectionData);
   $('#importData')?.addEventListener('click', () => $('#importFile')?.click());
@@ -900,7 +886,7 @@ function renderV61CardGridHtml() {
 }
 function renderV61Card(card, i) {
   const got = isCollected(card.id);
-  const hidden = starlightMode && !got;
+  const hidden = !got;
   const img = getVisibleImage(card);
   return `<article class="v61-card-slot ${rarityClass(card)} ${got ? 'is-collected' : 'is-hidden'}" style="--i:${i}">
     <button class="v61-card-btn" type="button" data-v61-card="${esc(card.id)}" aria-label="View ${esc(getVisibleName(card))}">
@@ -925,7 +911,7 @@ function renderV62Showcase(inSeriesSelect = false) {
     return;
   }
   const got = isCollected(card.id);
-  const hidden = starlightMode && !got;
+  const hidden = !got;
   const visibleImage = getVisibleImage(card);
   const visibleName = getVisibleName(card);
   const visibleRarity = getVisibleRarity(card);
