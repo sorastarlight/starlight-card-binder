@@ -102,3 +102,58 @@ body[data-page="binder"] .series-hero {
 .economy-card .economy-link,.economy-card .daily-widget-link{transition:.18s ease}.economy-card .economy-link:hover,.economy-card .daily-widget-link:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(255,130,200,.16)}
 @keyframes navSheen{0%,65%{transform:translateX(-85%);opacity:0}72%{opacity:1}100%{transform:translateX(85%);opacity:0}}@keyframes activeStar{0%,100%{transform:scale(.82);opacity:.65}50%{transform:scale(1.18);opacity:1}}
 @media(prefers-reduced-motion:reduce){.unified-nav::before,.unified-nav a.active::after{animation:none!important}}
+
+/* ============================================================
+   V82.3.2 — UNIFIED SIDEBAR HEIGHT / OVERFLOW HOTFIX
+   The base compact desktop rules set .sidebar to overflow:hidden,
+   which clips navigation, economy widgets, series progress, and
+   filters when the unified shell grows taller than the viewport.
+   ============================================================ */
+.unified-shell .sidebar {
+  min-height: 0;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding-bottom: 18px;
+}
+
+.unified-shell .sidebar > * {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.unified-shell .sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.unified-shell .sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.unified-shell .sidebar::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(107,198,248,.7), rgba(255,130,200,.72));
+  background-clip: padding-box;
+}
+
+.unified-shell .sidebar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(107,198,248,.95), rgba(255,130,200,.95));
+  background-clip: padding-box;
+}
+
+/* Keep the important navigation and collection cards readable on
+   shorter desktop displays rather than compressing or clipping them. */
+@media (min-width: 1181px) {
+  .unified-shell .sidebar {
+    max-height: calc(100dvh - 24px);
+  }
+}
+
+@media (max-width: 1180px) {
+  .unified-shell .sidebar {
+    max-height: none;
+    overflow: visible !important;
+  }
+}
