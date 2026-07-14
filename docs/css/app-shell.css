@@ -223,3 +223,23 @@ body[data-page="binder"] .series-hero {
   .unified-shell .shell-nav-subheading{margin-top:6px;padding-top:5px}
   .unified-shell .side-card{padding:9px!important}
 }
+
+/* V82.8.4 — Keep the top-left logo clean and static.
+   Disable any inherited sweep/shine pseudo-elements or animations. */
+.unified-shell .brand,
+.unified-shell .brand .logo {
+  position: relative;
+  animation: none !important;
+}
+.unified-shell .brand::before,
+.unified-shell .brand::after,
+.unified-shell .brand .logo::before,
+.unified-shell .brand .logo::after {
+  content: none !important;
+  display: none !important;
+  animation: none !important;
+  background: none !important;
+}
+.unified-shell .brand .logo {
+  transition: none !important;
+}
