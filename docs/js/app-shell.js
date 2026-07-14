@@ -72,6 +72,6 @@ async function hydrateAccount(){
 document.addEventListener('click',e=>{const a=e.target.closest('[data-shell-view]');if(a){e.preventDefault();navigate(a.dataset.shellView);}});
 menuButton?.addEventListener('click',()=>document.body.classList.toggle('shell-menu-open'));
 window.addEventListener('popstate',()=>navigate(new URLSearchParams(location.search).get('view')||'binder',{push:false}));
-window.addEventListener('message',e=>{if(e.origin!==location.origin)return;if(e.data?.type==='starlight-navigate')navigate(e.data.view,{extra:e.data.params||{}});if(e.data?.type==='starlight-trades-changed'||e.data?.type==='starlight-view-ready')hydrateTradeOfferBadge()});
+window.addEventListener('message',e=>{if(e.origin!==location.origin)return;if(e.data?.type==='starlight-navigate')navigate(e.data.view,{extra:e.data.params||{}});if(e.data?.type==='starlight-trades-changed'||e.data?.type==='starlight-view-ready')hydrateTradeOfferBadge();if(e.data?.type==='starlight-view-ready')window.dispatchEvent(new CustomEvent('starlight-dashboard-refresh',{detail:e.data}))});
 const initial=new URLSearchParams(location.search).get('view')||'binder';
 navigate(initial,{push:false}); hydrateAccount(); hydrateTradeOfferBadge();

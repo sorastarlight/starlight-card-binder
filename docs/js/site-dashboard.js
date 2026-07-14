@@ -95,3 +95,4 @@ async function loadEconomy() {
 
 document.addEventListener('DOMContentLoaded', loadEconomy);
 window.addEventListener('starlight-cloud-ready', loadEconomy);
+window.addEventListener('starlight-dashboard-refresh', loadEconomy);
