@@ -8295,3 +8295,50 @@ body[data-page="binder"] .v61-grid-head::after{
   color:rgba(255,255,255,.9)!important;
   text-shadow:0 2px 8px rgba(67,42,102,.35)!important;
 }
+
+/* ============================================================
+   V84.9 — Full View Card Plate Removal
+   Removes the white card-shaped backing behind artwork while
+   preserving the card image, flip control, and analyzer panel.
+   ============================================================ */
+.analyzer-full-stage .full-card-wrap,
+.analyzer-full-stage .full-card-wrap .full-inner,
+.analyzer-full-stage .full-card-wrap .face,
+.analyzer-full-stage .full-card-wrap .face.front,
+.analyzer-full-stage .full-card-wrap .face.back,
+#fullCard3d,
+#fullCard3d .full-inner,
+#fullCard3d .face {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+.analyzer-full-stage .full-card-wrap,
+#fullCard3d {
+  padding: 0 !important;
+  overflow: visible !important;
+  filter: drop-shadow(0 22px 30px rgba(8,39,125,.30)) !important;
+}
+
+.analyzer-full-stage .full-card-wrap .full-inner,
+#fullCard3d .full-inner {
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+.analyzer-full-stage .full-card-wrap .face,
+#fullCard3d .face {
+  overflow: visible !important;
+}
+
+.analyzer-full-stage .full-card-wrap img,
+#fullCard3d img {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  outline: 0 !important;
+  display: block !important;
+}
