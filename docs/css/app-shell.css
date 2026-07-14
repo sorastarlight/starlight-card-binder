@@ -268,3 +268,17 @@ body[data-page="binder"] .series-hero {
 .firefox-performance-mode .shell-view-frame iframe {
   background: #fff;
 }
+
+/* ===== V82.8.6 Firefox reliability + single-scroll architecture ===== */
+.shell-view-frame{position:relative;min-height:560px;overflow:visible!important}
+.shell-view-frame iframe{height:720px;min-height:560px;overflow:hidden;background:#fff}
+.shell-view-state{position:absolute;z-index:5;inset:48px 0 auto;min-height:320px;display:grid;place-items:center;align-content:center;gap:10px;padding:32px;text-align:center;border-radius:0 0 22px 22px;background:linear-gradient(145deg,rgba(249,252,255,.98),rgba(255,244,251,.98));color:#64708c}
+.shell-view-state[hidden]{display:none!important}.shell-view-state strong{color:#405fa1;font-size:1.15rem}.shell-view-state p{max-width:520px;margin:0;line-height:1.55}.shell-view-retry{min-height:44px;padding:10px 18px;border:0;border-radius:999px;background:linear-gradient(135deg,#6bc6f8,#ff82c8);color:#fff;font:inherit;font-weight:900;cursor:pointer}.shell-view-retry[hidden]{display:none!important}
+.shell-view-loader{width:46px;height:46px;border:4px solid rgba(107,198,248,.22);border-top-color:#ff82c8;border-radius:50%;animation:shellViewSpin .8s linear infinite}
+.shell-view-frame.has-error iframe{visibility:hidden}.shell-view-frame.is-loading iframe{opacity:.01;pointer-events:none}.shell-view-frame:not(.is-loading) iframe{opacity:1;transition:opacity .14s ease}
+@keyframes shellViewSpin{to{transform:rotate(360deg)}}
+.firefox-performance-mode .shell-view-frame,.firefox-performance-mode .shell-view-frame iframe{contain:none!important;content-visibility:visible!important}
+.firefox-performance-mode .shell-view-frame iframe{min-height:560px!important;scroll-behavior:auto!important}
+.firefox-performance-mode .shell-view-loader{animation-duration:1.05s}
+@media(max-width:900px){.shell-view-frame iframe{min-height:560px}.shell-view-state{inset:45px 0 auto;min-height:260px}}
+@media(prefers-reduced-motion:reduce){.shell-view-loader{animation:none;border-top-color:rgba(107,198,248,.22);background:radial-gradient(circle,#ff82c8 0 18%,transparent 20%)}}
