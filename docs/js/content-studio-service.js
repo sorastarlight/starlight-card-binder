@@ -30,7 +30,7 @@ export async function uploadStudioAsset(file,folder,options={}){
   const {error}=await supabase.storage.from('site-assets').upload(path,file,{cacheControl:'31536000',upsert:options.upsert===true,contentType:file.type});
   if(error)throw error;
   const url=supabase.storage.from('site-assets').getPublicUrl(path).data.publicUrl;
-  try{await supabase.rpc('admin_register_site_asset_v8703',{asset_path:path,original_name:file.name,mime_type:file.type,file_size:file.size,public_url:url,asset_folder:folder,source_url:options.sourceUrl||null});}catch(error){console.warn('[Starlight] Asset manifest registration failed:',error);}
+  try{await supabase.rpc('admin_register_site_asset_v87',{asset_path:path,original_name:file.name,mime_type:file.type,file_size:file.size,public_url:url,asset_folder:folder});}catch(_){}
   return {url,path,name:file.name,size:file.size};
 }
 export async function listStudioAssets(){
@@ -49,74 +49,131 @@ export async function saveBoosterSlot(slotId,quantity,rates){const {data,error}=
 export async function refreshPublicCardCatalog(){notifyCardCatalogChanged('manual-refresh');return fetchFreshCardCatalog();}
 
 
-function isBundledAsset(url){
+
+function isSupabaseManagedAsset(url){
+  return String(url||'').includes('/storage/v1/object/public/site-assets/');
+}
+function isMigratableAsset(url){
   const value=String(url||'').trim();
-  if(!value || value.includes('/storage/v1/object/public/site-assets/')) return false;
-  if(!/^https?:\/\//i.test(value)) return true;
-  try{
-    const host=new URL(value).hostname.toLowerCase();
-    return host.endsWith('.pages.dev') || host==='starlightcardsbinder.pages.dev';
-  }catch(_){return false;}
+  return Boolean(value) && !isSupabaseManagedAsset(value) && !/^(data:|blob:)/i.test(value);
+}
+function cleanPathname(value){
+  try{return decodeURIComponent(new URL(value,window.location.href).pathname)}catch{return String(value||'')}
+}
+function localSourceCandidates(url){
+  const value=String(url||'').trim();
+  const pathname=cleanPathname(value);
+  const candidates=[];
+  if(pathname)candidates.push(new URL(pathname,window.location.origin).href);
+  if(!/^https?:\/\//i.test(value))candidates.push(new URL(value,window.location.href).href);
+  if(/^https?:\/\//i.test(value))candidates.push(value);
+  return [...new Set(candidates)];
 }
 function extensionFromUrl(url,fallback='png'){
   const clean=String(url||'').split('?')[0].split('#')[0];
-  const ext=(clean.match(/\.([a-z0-9]{2,5})$/i)||[])[1];
-  return (ext||fallback).toLowerCase();
+  return ((clean.match(/\.([a-z0-9]{2,5})$/i)||[])[1]||fallback).toLowerCase();
 }
-async function fetchBundledAsset(url){
-  const response=await fetch(new URL(url,window.location.href),{cache:'no-store'});
-  if(!response.ok)throw new Error(`Could not read bundled asset: ${url}`);
-  return response.blob();
+async function fetchImageBlob(url){
+  const failures=[];
+  for(const source of localSourceCandidates(url)){
+    try{
+      const response=await fetch(source,{cache:'no-store',credentials:'same-origin'});
+      if(!response.ok){failures.push(`${source}: HTTP ${response.status}`);continue;}
+      const blob=await response.blob();
+      if(!blob.type.startsWith('image/')){failures.push(`${source}: ${blob.type||'unknown content type'}`);continue;}
+      return {blob,source};
+    }catch(error){failures.push(`${source}: ${error.message}`)}
+  }
+  throw new Error(`Could not download artwork. ${failures.join(' | ')}`);
+}
+async function verifyStorageObject(path){
+  const slash=path.lastIndexOf('/');
+  const folder=slash>=0?path.slice(0,slash):'';
+  const name=slash>=0?path.slice(slash+1):path;
+  const {data,error}=await supabase.storage.from('site-assets').list(folder,{limit:100,search:name});
+  if(error)throw new Error(`Upload verification failed: ${error.message}`);
+  if(!(data||[]).some(item=>item.name===name))throw new Error(`Uploaded file was not found in Storage: ${path}`);
 }
 async function migrateUrl(url,folder,key){
-  if(!isBundledAsset(url))return {url,changed:false};
-  const blob=await fetchBundledAsset(url);
-  const ext=extensionFromUrl(url,blob.type==='image/webp'?'webp':'png');
-  const file=new File([blob],`${key}.${ext}`,{type:blob.type||`image/${ext==='jpg'?'jpeg':ext}`});
-  const uploaded=await uploadStudioAsset(file,folder,{path:`${folder}/migrated-${cleanName(key)}.${ext}`,upsert:true,sourceUrl:url});
-  return {url:uploaded.url,changed:true,path:uploaded.path};
+  if(!isMigratableAsset(url))return {url,changed:false};
+  const {blob,source}=await fetchImageBlob(url);
+  const fallback=blob.type==='image/webp'?'webp':blob.type==='image/jpeg'?'jpg':'png';
+  const ext=extensionFromUrl(source||url,fallback);
+  const type=blob.type||`image/${ext==='jpg'?'jpeg':ext}`;
+  const path=`${folder}/migrated-${cleanName(key)}.${ext}`;
+  const file=new File([blob],`${cleanName(key)}.${ext}`,{type});
+  const uploaded=await uploadStudioAsset(file,folder,{path,upsert:true});
+  await verifyStorageObject(path);
+  return {url:uploaded.url,changed:true,path,sourceUrl:url,sourceResolved:source};
 }
 export async function analyzeBundledAssets(studio){
   const rows=[];
-  for(const series of studio.series||[]){if(isBundledAsset(series.boosterImageUrl))rows.push({type:'series',id:series.id,field:'boosterImageUrl',url:series.boosterImageUrl});}
-  for(const card of studio.cards||[]){if(isBundledAsset(card.imageUrl))rows.push({type:'card',id:card.id,field:'imageUrl',url:card.imageUrl});if(isBundledAsset(card.thumbnailUrl))rows.push({type:'card',id:card.id,field:'thumbnailUrl',url:card.thumbnailUrl});}
-  for(const booster of studio.boosters||[]){if(isBundledAsset(booster.packImageUrl))rows.push({type:'booster',id:booster.id,field:'packImageUrl',url:booster.packImageUrl});if(isBundledAsset(booster.cardBackUrl))rows.push({type:'booster',id:booster.id,field:'cardBackUrl',url:booster.cardBackUrl});}
+  for(const series of studio.series||[]){if(isMigratableAsset(series.boosterImageUrl))rows.push({type:'series',id:series.id,field:'boosterImageUrl',url:series.boosterImageUrl});}
+  for(const card of studio.cards||[]){
+    if(isMigratableAsset(card.imageUrl))rows.push({type:'card',id:card.id,field:'imageUrl',url:card.imageUrl});
+    if(isMigratableAsset(card.thumbnailUrl))rows.push({type:'card',id:card.id,field:'thumbnailUrl',url:card.thumbnailUrl});
+  }
+  for(const booster of studio.boosters||[]){
+    if(isMigratableAsset(booster.packImageUrl))rows.push({type:'booster',id:booster.id,field:'packImageUrl',url:booster.packImageUrl});
+    if(isMigratableAsset(booster.cardBackUrl))rows.push({type:'booster',id:booster.id,field:'cardBackUrl',url:booster.cardBackUrl});
+  }
   return rows;
 }
 export async function migrateBundledAssetsToSupabase(studio,onProgress=()=>{}){
-  const report={updated:0,skipped:0,failed:[],assets:[]};
-  let done=0; const total=(await analyzeBundledAssets(studio)).length;
+  const {data:{user},error:userError}=await supabase.auth.getUser();
+  if(userError||!user)throw new Error('You must be signed in before migrating artwork.');
+  const candidates=await analyzeBundledAssets(studio);
+  if(!candidates.length)throw new Error('No non-Supabase artwork references were found to migrate.');
+  const report={startedAt:new Date().toISOString(),candidateAssets:candidates.length,updatedRecords:0,uploadedAssets:0,skipped:0,failed:[],assets:[]};
+  let processed=0;
+  const progress=()=>onProgress(++processed,candidates.length);
   for(const series of studio.series||[]){
-    try{const img=await migrateUrl(series.boosterImageUrl,'series',`series-${series.id}`);if(img.changed){await saveSeries({...series,boosterImageUrl:img.url});report.updated++;report.assets.push(img.path);}else report.skipped++;}catch(error){report.failed.push({type:'series',id:series.id,error:error.message});}onProgress(++done,total);
+    if(!isMigratableAsset(series.boosterImageUrl))continue;
+    try{
+      const img=await migrateUrl(series.boosterImageUrl,'series',`series-${series.id}`);
+      await saveSeries({...series,boosterImageUrl:img.url});
+      report.updatedRecords++;report.uploadedAssets++;report.assets.push(img);
+    }catch(error){report.failed.push({type:'series',id:series.id,field:'boosterImageUrl',url:series.boosterImageUrl,error:error.message});}
+    progress();
   }
   for(const card of studio.cards||[]){
-    try{
-      const front=await migrateUrl(card.imageUrl,'card-fronts',`card-${card.id}-front`);
-      const thumb=await migrateUrl(card.thumbnailUrl,'thumbnails',`card-${card.id}-thumb`);
-      if(front.changed||thumb.changed){await saveCard({...card,imageUrl:front.url||card.imageUrl,thumbnailUrl:thumb.url||front.url||card.thumbnailUrl});report.updated++;if(front.path)report.assets.push(front.path);if(thumb.path)report.assets.push(thumb.path);}else report.skipped++;
-    }catch(error){report.failed.push({type:'card',id:card.id,error:error.message});}onProgress(++done,total);
+    let changed=false,front=null,thumb=null;
+    if(isMigratableAsset(card.imageUrl)){
+      try{front=await migrateUrl(card.imageUrl,'card-fronts',`card-${card.id}-front`);report.uploadedAssets++;report.assets.push(front);}catch(error){report.failed.push({type:'card',id:card.id,field:'imageUrl',url:card.imageUrl,error:error.message});}
+      progress();
+    }
+    if(isMigratableAsset(card.thumbnailUrl)){
+      try{thumb=await migrateUrl(card.thumbnailUrl,'thumbnails',`card-${card.id}-thumb`);report.uploadedAssets++;report.assets.push(thumb);}catch(error){report.failed.push({type:'card',id:card.id,field:'thumbnailUrl',url:card.thumbnailUrl,error:error.message});}
+      progress();
+    }
+    changed=Boolean(front?.changed||thumb?.changed);
+    if(changed){
+      try{await saveCard({...card,imageUrl:front?.url||card.imageUrl,thumbnailUrl:thumb?.url||card.thumbnailUrl});report.updatedRecords++;}
+      catch(error){report.failed.push({type:'card',id:card.id,field:'database-update',error:error.message});}
+    }
   }
   for(const booster of studio.boosters||[]){
-    try{
-      const pack=await migrateUrl(booster.packImageUrl,'booster-packs',`booster-${booster.id}-pack`);
-      const back=await migrateUrl(booster.cardBackUrl,'card-backs',`booster-${booster.id}-back`);
-      if(pack.changed||back.changed){await saveBooster({...booster,packImageUrl:pack.url||booster.packImageUrl,cardBackUrl:back.url||booster.cardBackUrl});report.updated++;if(pack.path)report.assets.push(pack.path);if(back.path)report.assets.push(back.path);}else report.skipped++;
-    }catch(error){report.failed.push({type:'booster',id:booster.id,error:error.message});}onProgress(++done,total);
+    let pack=null,back=null;
+    if(isMigratableAsset(booster.packImageUrl)){
+      try{pack=await migrateUrl(booster.packImageUrl,'booster-packs',`booster-${booster.id}-pack`);report.uploadedAssets++;report.assets.push(pack);}catch(error){report.failed.push({type:'booster',id:booster.id,field:'packImageUrl',url:booster.packImageUrl,error:error.message});}
+      progress();
+    }
+    if(isMigratableAsset(booster.cardBackUrl)){
+      try{back=await migrateUrl(booster.cardBackUrl,'card-backs',`booster-${booster.id}-back`);report.uploadedAssets++;report.assets.push(back);}catch(error){report.failed.push({type:'booster',id:booster.id,field:'cardBackUrl',url:booster.cardBackUrl,error:error.message});}
+      progress();
+    }
+    if(pack?.changed||back?.changed){
+      try{await saveBooster({...booster,packImageUrl:pack?.url||booster.packImageUrl,cardBackUrl:back?.url||booster.cardBackUrl});report.updatedRecords++;}
+      catch(error){report.failed.push({type:'booster',id:booster.id,field:'database-update',error:error.message});}
+    }
   }
-  try{report.relink=await relinkMigratedAssets();report.updatedDatabaseLinks=report.relink?.totalUpdated||0;}catch(error){report.failed.push({type:'database-relink',error:error.message});}
+  report.finishedAt=new Date().toISOString();
   notifyCardCatalogChanged('asset-migration');
+  if(report.uploadedAssets===0){
+    const first=report.failed.slice(0,3).map(item=>`${item.type} ${item.id}: ${item.error}`).join(' | ');
+    throw new Error(`No artwork was uploaded. ${first||'Check Storage upload permissions and browser console.'}`);
+  }
   return report;
 }
-export async function relinkMigratedAssets(){
-  const {data,error}=await supabase.rpc('admin_relink_migrated_assets_v8703');
-  if(error)throw error;
-  notifyCardCatalogChanged('asset-relink');
-  return data;
-}
-
 export async function getSystemDiagnostics(){const {data,error}=await supabase.rpc('admin_get_system_diagnostics_v87');if(error)throw error;return data;}
-export async function exportAssetManifest(){
-  const {data,error}=await supabase.rpc('admin_get_asset_manifest_v87');
-  if(error)throw error;
-  return data||[];
-}
+export async function exportAssetManifest(){const {data,error}=await supabase.rpc('admin_get_asset_manifest_v87');if(error)throw error;return data||[];}
