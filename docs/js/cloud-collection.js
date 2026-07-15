@@ -1,4 +1,5 @@
 import { supabase } from "./supabase-client.js";
+import "./card-catalog-service.js";
 
 import {
     getCurrentUser,

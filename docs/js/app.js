@@ -1,4 +1,3 @@
-const GOOGLE_SHEETS_JSON_URL = "https://script.google.com/macros/s/AKfycbwrmpwYHjKVEHVRSAf-9CSEZiavB8B72yPwy6xPCh9-9w4g_AzS2aidUpL9yqDI0jUn/exec";
 const FALLBACK_JSON_URL = "data/cards.json";
 const CARD_BACK_URL = "site_assets/StarlightCard_Back_NewLogo.png";
 const REVEAL_CARD_BACK_URL = "/site_assets/StarlightCard_Back_NewLogo.png";
@@ -187,9 +186,8 @@ function applyLoadedCards(data, fromCache = false) {
   renderAll();
   warmCriticalAssets();
   scheduleIdleImagePreload();
-  if (!fromCache) {
-    try { localStorage.setItem(CARD_CACHE_KEY, JSON.stringify(cards)); } catch (_) {}
-  }
+  // Card metadata is cached by card-catalog-service.js.
+  // app.js no longer maintains a second catalog cache.
 }
 
 function warmCriticalAssets() {
@@ -278,29 +276,59 @@ function ensureImageReady(url) {
   });
 }
 
-async function loadCards() {
+async function loadCards(options = {}) {
+  const forceRefresh = options.forceRefresh === true;
   let renderedFromCache = false;
-  try {
-    const cached = localStorage.getItem(CARD_CACHE_KEY);
-    if (cached) {
-      applyLoadedCards(JSON.parse(cached), true);
-      renderedFromCache = true;
-    }
-  } catch (_) {}
+  const catalogService = window.StarlightCardCatalog;
+
+  if (!forceRefresh && catalogService?.getCached) {
+    try {
+      const cached = catalogService.getCached();
+      if (cached?.cards?.length) {
+        applyLoadedCards(cached.cards, true);
+        renderedFromCache = true;
+      }
+    } catch (_) {}
+  }
 
   try {
-    const response = await fetch(GOOGLE_SHEETS_JSON_URL, { cache: "no-cache" });
-    if (!response.ok) throw new Error("Google Sheets endpoint failed");
-    const data = await response.json();
-    applyLoadedCards(data, false);
-  } catch (err) {
-    console.warn("Using fallback cards.json", err);
-    if (renderedFromCache) return;
-    const response = await fetch(FALLBACK_JSON_URL, { cache: "force-cache" });
+    if (!catalogService?.fetchFresh) {
+      throw new Error("The Supabase card catalog service is unavailable.");
+    }
+
+    const fresh = await catalogService.fetchFresh();
+    applyLoadedCards(fresh.cards, false);
+    return;
+  } catch (error) {
+    console.error("[Starlight] Supabase card catalog load failed.", error);
+
+    if (renderedFromCache) {
+      return;
+    }
+
+    // Emergency offline fallback only. This file is no longer the live source.
+    const response = await fetch(FALLBACK_JSON_URL, { cache: "no-cache" });
+    if (!response.ok) {
+      throw error;
+    }
     const data = await response.json();
     applyLoadedCards(data, false);
   }
 }
+
+async function refreshCardCatalog() {
+  try {
+    await loadCards({ forceRefresh: true });
+  } catch (error) {
+    console.error("[Starlight] Card catalog refresh failed.", error);
+  }
+}
+
+window.refreshStarlightCardCatalog = refreshCardCatalog;
+
+window.addEventListener("starlight-card-catalog-updated", () => {
+  refreshCardCatalog();
+});
 
 function sortCards(list, mode) {
   list.sort((a, b) => {

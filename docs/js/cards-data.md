@@ -1,19 +1,12 @@
-# Starlight Card Binder Data Schema
+# Card catalog source
 
-The site loads card metadata from the Google Apps Script JSON endpoint in `js/app.js`.
-If the endpoint fails, it falls back to `data/cards.json`.
+The live Starlight Card Binder card catalog is loaded from Supabase.
 
-Official columns:
+- `public.cards` stores card names, numbers, rarity, artwork, thumbnail, artist, description, visibility, collectibility, pullability, weight, and series assignment.
+- `public.card_series` stores series name, description, ordering, visibility, and booster artwork.
+- `public.get_public_card_catalog_v1()` provides the public catalog used by the Binder.
+- `js/card-catalog-service.js` maintains a temporary browser cache for fast first paint, then revalidates against Supabase whenever the site starts.
 
-- `id`
-- `number`
-- `name`
-- `series`
-- `seriesDescription`
-- `rarity`
-- `imageUrl`
-- `thumbnailUrl`
-- `cardDescription`
-- `artist`
+The files under `docs/data/` are now emergency/static reference files only. Editing them does not update the live site.
 
-The `artist` column is permanent and used for creator credit in the detail panel, Full View analyzer, checklist, and search.
+Saving or deleting a card or series in **Administration Hub → Starlight Content Studio** invalidates the browser catalog cache and broadcasts a refresh to open Binder pages.

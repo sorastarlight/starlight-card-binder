@@ -1,15 +1,16 @@
 import { supabase } from './supabase-client.js';
+import { notifyCardCatalogChanged, fetchFreshCardCatalog } from './card-catalog-service.js';
 
 export async function loadContentStudio(){
   const {data,error}=await supabase.rpc('admin_get_content_studio');
   if(error)throw error;
   return data||{series:[],cards:[],boosters:[],dailyMode:'daily'};
 }
-export async function saveSeries(payload){const {data,error}=await supabase.rpc('admin_save_series_v84',{payload});if(error)throw error;return data;}
-export async function saveCard(payload){const {data,error}=await supabase.rpc('admin_save_card_v84',{payload});if(error)throw error;return data;}
+export async function saveSeries(payload){const {data,error}=await supabase.rpc('admin_save_series_v84',{payload});if(error)throw error;notifyCardCatalogChanged('series-saved');return data;}
+export async function saveCard(payload){const {data,error}=await supabase.rpc('admin_save_card_v84',{payload});if(error)throw error;notifyCardCatalogChanged('card-saved');return data;}
 export async function saveBooster(payload){const {data,error}=await supabase.rpc('admin_save_booster_v84',{payload});if(error)throw error;return data;}
-export async function deleteSeries(id){const {data,error}=await supabase.rpc('admin_delete_series_v841',{requested_id:id});if(error)throw error;return data;}
-export async function deleteCard(id){const {data,error}=await supabase.rpc('admin_delete_card_v841',{requested_id:id});if(error)throw error;return data;}
+export async function deleteSeries(id){const {data,error}=await supabase.rpc('admin_delete_series_v841',{requested_id:id});if(error)throw error;notifyCardCatalogChanged('series-deleted');return data;}
+export async function deleteCard(id){const {data,error}=await supabase.rpc('admin_delete_card_v841',{requested_id:id});if(error)throw error;notifyCardCatalogChanged('card-deleted');return data;}
 export async function deleteBooster(id){const {data,error}=await supabase.rpc('admin_delete_booster_v841',{requested_id:id});if(error)throw error;return data;}
 export async function setDailyMode(mode){const {data,error}=await supabase.rpc('admin_set_daily_booster_mode',{requested_mode:mode});if(error)throw error;return data;}
 function cleanName(name){return String(name||'image').toLowerCase().replace(/[^a-z0-9._-]+/g,'-').replace(/-+/g,'-');}
@@ -43,3 +44,5 @@ export async function listStudioAssets(){
 }
 export async function deleteStudioAsset(path){if(!path)throw new Error('This is a bundled site asset and cannot be deleted from Supabase. Upload a replacement instead.');const {error}=await supabase.storage.from('site-assets').remove([path]);if(error)throw error;}
 export async function saveBoosterSlot(slotId,quantity,rates){const {data,error}=await supabase.rpc('admin_update_booster_slot',{requested_slot_id:Number(slotId),requested_quantity:Number(quantity),requested_rates:rates});if(error)throw error;return data;}
+
+export async function refreshPublicCardCatalog(){notifyCardCatalogChanged('manual-refresh');return fetchFreshCardCatalog();}
