@@ -49,9 +49,27 @@ export async function saveBoosterSlot(slotId,quantity,rates){const {data,error}=
 export async function refreshPublicCardCatalog(){notifyCardCatalogChanged('manual-refresh');return fetchFreshCardCatalog();}
 
 
-function isBundledAsset(url){
+function isSupabaseManagedAsset(url){
   const value=String(url||'').trim();
-  return value && !/^https?:\/\//i.test(value) && !value.includes('/storage/v1/object/public/');
+  return value.includes('/storage/v1/object/public/site-assets/');
+}
+function isMigratableAsset(url){
+  const value=String(url||'').trim();
+  if(!value || isSupabaseManagedAsset(value) || /^(data:|blob:)/i.test(value))return false;
+  return true;
+}
+function resolveMigrationSource(url){
+  const value=String(url||'').trim();
+  if(!/^https?:\/\//i.test(value))return new URL(value,window.location.href).href;
+  const parsed=new URL(value);
+  const legacyHosts=new Set([
+    'starlightcardsbinder.pages.dev',
+    'sorastarlightcards.netlify.app'
+  ]);
+  if(legacyHosts.has(parsed.hostname)){
+    return new URL(parsed.pathname + parsed.search,window.location.origin).href;
+  }
+  return parsed.href;
 }
 function extensionFromUrl(url,fallback='png'){
   const clean=String(url||'').split('?')[0].split('#')[0];
@@ -59,12 +77,13 @@ function extensionFromUrl(url,fallback='png'){
   return (ext||fallback).toLowerCase();
 }
 async function fetchBundledAsset(url){
-  const response=await fetch(new URL(url,window.location.href),{cache:'no-store'});
+  const sourceUrl=resolveMigrationSource(url);
+  const response=await fetch(sourceUrl,{cache:'no-store',mode:'cors'});
   if(!response.ok)throw new Error(`Could not read bundled asset: ${url}`);
   return response.blob();
 }
 async function migrateUrl(url,folder,key){
-  if(!isBundledAsset(url))return {url,changed:false};
+  if(!isMigratableAsset(url))return {url,changed:false};
   const blob=await fetchBundledAsset(url);
   const ext=extensionFromUrl(url,blob.type==='image/webp'?'webp':'png');
   const file=new File([blob],`${key}.${ext}`,{type:blob.type||`image/${ext==='jpg'?'jpeg':ext}`});
@@ -73,9 +92,9 @@ async function migrateUrl(url,folder,key){
 }
 export async function analyzeBundledAssets(studio){
   const rows=[];
-  for(const series of studio.series||[]){if(isBundledAsset(series.boosterImageUrl))rows.push({type:'series',id:series.id,field:'boosterImageUrl',url:series.boosterImageUrl});}
-  for(const card of studio.cards||[]){if(isBundledAsset(card.imageUrl))rows.push({type:'card',id:card.id,field:'imageUrl',url:card.imageUrl});if(isBundledAsset(card.thumbnailUrl))rows.push({type:'card',id:card.id,field:'thumbnailUrl',url:card.thumbnailUrl});}
-  for(const booster of studio.boosters||[]){if(isBundledAsset(booster.packImageUrl))rows.push({type:'booster',id:booster.id,field:'packImageUrl',url:booster.packImageUrl});if(isBundledAsset(booster.cardBackUrl))rows.push({type:'booster',id:booster.id,field:'cardBackUrl',url:booster.cardBackUrl});}
+  for(const series of studio.series||[]){if(isMigratableAsset(series.boosterImageUrl))rows.push({type:'series',id:series.id,field:'boosterImageUrl',url:series.boosterImageUrl});}
+  for(const card of studio.cards||[]){if(isMigratableAsset(card.imageUrl))rows.push({type:'card',id:card.id,field:'imageUrl',url:card.imageUrl});if(isMigratableAsset(card.thumbnailUrl))rows.push({type:'card',id:card.id,field:'thumbnailUrl',url:card.thumbnailUrl});}
+  for(const booster of studio.boosters||[]){if(isMigratableAsset(booster.packImageUrl))rows.push({type:'booster',id:booster.id,field:'packImageUrl',url:booster.packImageUrl});if(isMigratableAsset(booster.cardBackUrl))rows.push({type:'booster',id:booster.id,field:'cardBackUrl',url:booster.cardBackUrl});}
   return rows;
 }
 export async function migrateBundledAssetsToSupabase(studio,onProgress=()=>{}){
