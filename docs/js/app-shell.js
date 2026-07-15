@@ -196,17 +196,25 @@ async function hydrateTradeOfferBadge(){
 }
 
 async function hydrateAccount(){
-  const signedOut=document.querySelector('[data-shell-signed-out]');
-  const signedIn=document.querySelector('[data-shell-signed-in]');
+  const signedOutNodes=[...document.querySelectorAll('[data-shell-signed-out]')];
+  const signedInNodes=[...document.querySelectorAll('[data-shell-signed-in]')];
+  const showSignedOut=()=>{
+    signedOutNodes.forEach(node=>node.removeAttribute('hidden'));
+    signedInNodes.forEach(node=>node.setAttribute('hidden',''));
+  };
+  const showSignedIn=()=>{
+    signedOutNodes.forEach(node=>node.setAttribute('hidden',''));
+    signedInNodes.forEach(node=>node.removeAttribute('hidden'));
+  };
   try{
     const {data}=await supabase.auth.getUser();const user=data?.user;
     if(!user){
-      signedOut?.removeAttribute('hidden');signedIn?.setAttribute('hidden','');
+      showSignedOut();
       document.querySelector('[data-shell-account-name]').textContent='Welcome to Starlight Cards';
       document.querySelector('[data-shell-account-sub]').textContent='Log in or create an account to collect cards';
       return;
     }
-    signedOut?.setAttribute('hidden','');signedIn?.removeAttribute('hidden');
+    showSignedIn();
     const {data:profile}=await supabase.from('profiles').select('username,display_name,onboarding_complete,avatar_url,selected_title_id').eq('id',user.id).maybeSingle();
     profileUsername=profile?.username||'';
     const name=profile?.display_name||profile?.username||user.email||'Collector';
@@ -220,7 +228,10 @@ async function hydrateAccount(){
     if(access?.isStaff)document.querySelector('.unified-nav')?.classList.add('has-staff-access');
     document.querySelectorAll('.staff-link').forEach(el=>el.classList.toggle('visible',Boolean(access?.isStaff)));
     document.querySelector('.staff-only-menu')?.toggleAttribute('hidden',!access?.isStaff);
-  }catch(e){console.warn('[Starlight] Shell account hydration failed',e)}
+  }catch(e){
+    console.warn('[Starlight] Shell account hydration failed',e);
+    showSignedOut();
+  }
 }
 
 document.addEventListener('click',e=>{const a=e.target.closest('[data-shell-view]');if(a){e.preventDefault();navigate(a.dataset.shellView);}});
