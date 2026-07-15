@@ -30,7 +30,7 @@ export async function uploadStudioAsset(file,folder,options={}){
   const {error}=await supabase.storage.from('site-assets').upload(path,file,{cacheControl:'31536000',upsert:options.upsert===true,contentType:file.type});
   if(error)throw error;
   const url=supabase.storage.from('site-assets').getPublicUrl(path).data.publicUrl;
-  try{await supabase.rpc('admin_register_site_asset_v87',{asset_path:path,original_name:file.name,mime_type:file.type,file_size:file.size,public_url:url,asset_folder:folder});}catch(_){}
+  try{await supabase.rpc('admin_register_site_asset_v8703',{asset_path:path,original_name:file.name,mime_type:file.type,file_size:file.size,public_url:url,asset_folder:folder,source_url:options.sourceUrl||null});}catch(error){console.warn('[Starlight] Asset manifest registration failed:',error);}
   return {url,path,name:file.name,size:file.size};
 }
 export async function listStudioAssets(){
@@ -49,27 +49,14 @@ export async function saveBoosterSlot(slotId,quantity,rates){const {data,error}=
 export async function refreshPublicCardCatalog(){notifyCardCatalogChanged('manual-refresh');return fetchFreshCardCatalog();}
 
 
-function isSupabaseManagedAsset(url){
+function isBundledAsset(url){
   const value=String(url||'').trim();
-  return value.includes('/storage/v1/object/public/site-assets/');
-}
-function isMigratableAsset(url){
-  const value=String(url||'').trim();
-  if(!value || isSupabaseManagedAsset(value) || /^(data:|blob:)/i.test(value))return false;
-  return true;
-}
-function resolveMigrationSource(url){
-  const value=String(url||'').trim();
-  if(!/^https?:\/\//i.test(value))return new URL(value,window.location.href).href;
-  const parsed=new URL(value);
-  const legacyHosts=new Set([
-    'starlightcardsbinder.pages.dev',
-    'sorastarlightcards.netlify.app'
-  ]);
-  if(legacyHosts.has(parsed.hostname)){
-    return new URL(parsed.pathname + parsed.search,window.location.origin).href;
-  }
-  return parsed.href;
+  if(!value || value.includes('/storage/v1/object/public/site-assets/')) return false;
+  if(!/^https?:\/\//i.test(value)) return true;
+  try{
+    const host=new URL(value).hostname.toLowerCase();
+    return host.endsWith('.pages.dev') || host==='starlightcardsbinder.pages.dev';
+  }catch(_){return false;}
 }
 function extensionFromUrl(url,fallback='png'){
   const clean=String(url||'').split('?')[0].split('#')[0];
@@ -77,24 +64,23 @@ function extensionFromUrl(url,fallback='png'){
   return (ext||fallback).toLowerCase();
 }
 async function fetchBundledAsset(url){
-  const sourceUrl=resolveMigrationSource(url);
-  const response=await fetch(sourceUrl,{cache:'no-store',mode:'cors'});
+  const response=await fetch(new URL(url,window.location.href),{cache:'no-store'});
   if(!response.ok)throw new Error(`Could not read bundled asset: ${url}`);
   return response.blob();
 }
 async function migrateUrl(url,folder,key){
-  if(!isMigratableAsset(url))return {url,changed:false};
+  if(!isBundledAsset(url))return {url,changed:false};
   const blob=await fetchBundledAsset(url);
   const ext=extensionFromUrl(url,blob.type==='image/webp'?'webp':'png');
   const file=new File([blob],`${key}.${ext}`,{type:blob.type||`image/${ext==='jpg'?'jpeg':ext}`});
-  const uploaded=await uploadStudioAsset(file,folder,{path:`${folder}/migrated-${cleanName(key)}.${ext}`,upsert:true});
+  const uploaded=await uploadStudioAsset(file,folder,{path:`${folder}/migrated-${cleanName(key)}.${ext}`,upsert:true,sourceUrl:url});
   return {url:uploaded.url,changed:true,path:uploaded.path};
 }
 export async function analyzeBundledAssets(studio){
   const rows=[];
-  for(const series of studio.series||[]){if(isMigratableAsset(series.boosterImageUrl))rows.push({type:'series',id:series.id,field:'boosterImageUrl',url:series.boosterImageUrl});}
-  for(const card of studio.cards||[]){if(isMigratableAsset(card.imageUrl))rows.push({type:'card',id:card.id,field:'imageUrl',url:card.imageUrl});if(isMigratableAsset(card.thumbnailUrl))rows.push({type:'card',id:card.id,field:'thumbnailUrl',url:card.thumbnailUrl});}
-  for(const booster of studio.boosters||[]){if(isMigratableAsset(booster.packImageUrl))rows.push({type:'booster',id:booster.id,field:'packImageUrl',url:booster.packImageUrl});if(isMigratableAsset(booster.cardBackUrl))rows.push({type:'booster',id:booster.id,field:'cardBackUrl',url:booster.cardBackUrl});}
+  for(const series of studio.series||[]){if(isBundledAsset(series.boosterImageUrl))rows.push({type:'series',id:series.id,field:'boosterImageUrl',url:series.boosterImageUrl});}
+  for(const card of studio.cards||[]){if(isBundledAsset(card.imageUrl))rows.push({type:'card',id:card.id,field:'imageUrl',url:card.imageUrl});if(isBundledAsset(card.thumbnailUrl))rows.push({type:'card',id:card.id,field:'thumbnailUrl',url:card.thumbnailUrl});}
+  for(const booster of studio.boosters||[]){if(isBundledAsset(booster.packImageUrl))rows.push({type:'booster',id:booster.id,field:'packImageUrl',url:booster.packImageUrl});if(isBundledAsset(booster.cardBackUrl))rows.push({type:'booster',id:booster.id,field:'cardBackUrl',url:booster.cardBackUrl});}
   return rows;
 }
 export async function migrateBundledAssetsToSupabase(studio,onProgress=()=>{}){
@@ -117,9 +103,17 @@ export async function migrateBundledAssetsToSupabase(studio,onProgress=()=>{}){
       if(pack.changed||back.changed){await saveBooster({...booster,packImageUrl:pack.url||booster.packImageUrl,cardBackUrl:back.url||booster.cardBackUrl});report.updated++;if(pack.path)report.assets.push(pack.path);if(back.path)report.assets.push(back.path);}else report.skipped++;
     }catch(error){report.failed.push({type:'booster',id:booster.id,error:error.message});}onProgress(++done,total);
   }
+  try{report.relink=await relinkMigratedAssets();report.updatedDatabaseLinks=report.relink?.totalUpdated||0;}catch(error){report.failed.push({type:'database-relink',error:error.message});}
   notifyCardCatalogChanged('asset-migration');
   return report;
 }
+export async function relinkMigratedAssets(){
+  const {data,error}=await supabase.rpc('admin_relink_migrated_assets_v8703');
+  if(error)throw error;
+  notifyCardCatalogChanged('asset-relink');
+  return data;
+}
+
 export async function getSystemDiagnostics(){const {data,error}=await supabase.rpc('admin_get_system_diagnostics_v87');if(error)throw error;return data;}
 export async function exportAssetManifest(){
   const {data,error}=await supabase.rpc('admin_get_asset_manifest_v87');
