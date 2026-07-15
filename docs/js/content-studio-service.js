@@ -20,16 +20,17 @@ export function storagePathFromUrl(url){
   const index=value.indexOf(marker);
   return index>=0?decodeURIComponent(value.slice(index+marker.length)):'';
 }
-export async function uploadStudioAsset(file,folder){
+export async function uploadStudioAsset(file,folder,options={}){
   if(!(file instanceof File))throw new Error('Choose an image first.');
   if(!/^image\//.test(file.type))throw new Error('Only image files are supported.');
   if(file.size>5*1024*1024)throw new Error('Images must be 5 MB or smaller.');
   const ext=(file.name.split('.').pop()||'webp').toLowerCase();
   const base=cleanName(file.name.replace(/\.[^.]+$/,''));
-  const path=`${folder}/${Date.now()}-${crypto.randomUUID()}-${base}.${ext}`;
-  const {error}=await supabase.storage.from('site-assets').upload(path,file,{cacheControl:'3600',upsert:false,contentType:file.type});
+  const path=options.path || `${folder}/${Date.now()}-${crypto.randomUUID()}-${base}.${ext}`;
+  const {error}=await supabase.storage.from('site-assets').upload(path,file,{cacheControl:'31536000',upsert:options.upsert===true,contentType:file.type});
   if(error)throw error;
   const url=supabase.storage.from('site-assets').getPublicUrl(path).data.publicUrl;
+  try{await supabase.rpc('admin_register_site_asset_v87',{asset_path:path,original_name:file.name,mime_type:file.type,file_size:file.size,public_url:url,asset_folder:folder});}catch(_){}
   return {url,path,name:file.name,size:file.size};
 }
 export async function listStudioAssets(){
@@ -42,7 +43,67 @@ export async function listStudioAssets(){
   }
   return out;
 }
-export async function deleteStudioAsset(path){if(!path)throw new Error('This is a bundled site asset and cannot be deleted from Supabase. Upload a replacement instead.');const {error}=await supabase.storage.from('site-assets').remove([path]);if(error)throw error;}
+export async function deleteStudioAsset(path){if(!path)throw new Error('This is a bundled site asset and cannot be deleted from Supabase. Upload a replacement instead.');const {error}=await supabase.storage.from('site-assets').remove([path]);if(error)throw error;try{await supabase.rpc('admin_unregister_site_asset_v87',{asset_path:path});}catch(_){}}
 export async function saveBoosterSlot(slotId,quantity,rates){const {data,error}=await supabase.rpc('admin_update_booster_slot',{requested_slot_id:Number(slotId),requested_quantity:Number(quantity),requested_rates:rates});if(error)throw error;return data;}
 
 export async function refreshPublicCardCatalog(){notifyCardCatalogChanged('manual-refresh');return fetchFreshCardCatalog();}
+
+
+function isBundledAsset(url){
+  const value=String(url||'').trim();
+  return value && !/^https?:\/\//i.test(value) && !value.includes('/storage/v1/object/public/');
+}
+function extensionFromUrl(url,fallback='png'){
+  const clean=String(url||'').split('?')[0].split('#')[0];
+  const ext=(clean.match(/\.([a-z0-9]{2,5})$/i)||[])[1];
+  return (ext||fallback).toLowerCase();
+}
+async function fetchBundledAsset(url){
+  const response=await fetch(new URL(url,window.location.href),{cache:'no-store'});
+  if(!response.ok)throw new Error(`Could not read bundled asset: ${url}`);
+  return response.blob();
+}
+async function migrateUrl(url,folder,key){
+  if(!isBundledAsset(url))return {url,changed:false};
+  const blob=await fetchBundledAsset(url);
+  const ext=extensionFromUrl(url,blob.type==='image/webp'?'webp':'png');
+  const file=new File([blob],`${key}.${ext}`,{type:blob.type||`image/${ext==='jpg'?'jpeg':ext}`});
+  const uploaded=await uploadStudioAsset(file,folder,{path:`${folder}/migrated-${cleanName(key)}.${ext}`,upsert:true});
+  return {url:uploaded.url,changed:true,path:uploaded.path};
+}
+export async function analyzeBundledAssets(studio){
+  const rows=[];
+  for(const series of studio.series||[]){if(isBundledAsset(series.boosterImageUrl))rows.push({type:'series',id:series.id,field:'boosterImageUrl',url:series.boosterImageUrl});}
+  for(const card of studio.cards||[]){if(isBundledAsset(card.imageUrl))rows.push({type:'card',id:card.id,field:'imageUrl',url:card.imageUrl});if(isBundledAsset(card.thumbnailUrl))rows.push({type:'card',id:card.id,field:'thumbnailUrl',url:card.thumbnailUrl});}
+  for(const booster of studio.boosters||[]){if(isBundledAsset(booster.packImageUrl))rows.push({type:'booster',id:booster.id,field:'packImageUrl',url:booster.packImageUrl});if(isBundledAsset(booster.cardBackUrl))rows.push({type:'booster',id:booster.id,field:'cardBackUrl',url:booster.cardBackUrl});}
+  return rows;
+}
+export async function migrateBundledAssetsToSupabase(studio,onProgress=()=>{}){
+  const report={updated:0,skipped:0,failed:[],assets:[]};
+  let done=0; const total=(await analyzeBundledAssets(studio)).length;
+  for(const series of studio.series||[]){
+    try{const img=await migrateUrl(series.boosterImageUrl,'series',`series-${series.id}`);if(img.changed){await saveSeries({...series,boosterImageUrl:img.url});report.updated++;report.assets.push(img.path);}else report.skipped++;}catch(error){report.failed.push({type:'series',id:series.id,error:error.message});}onProgress(++done,total);
+  }
+  for(const card of studio.cards||[]){
+    try{
+      const front=await migrateUrl(card.imageUrl,'card-fronts',`card-${card.id}-front`);
+      const thumb=await migrateUrl(card.thumbnailUrl,'thumbnails',`card-${card.id}-thumb`);
+      if(front.changed||thumb.changed){await saveCard({...card,imageUrl:front.url||card.imageUrl,thumbnailUrl:thumb.url||front.url||card.thumbnailUrl});report.updated++;if(front.path)report.assets.push(front.path);if(thumb.path)report.assets.push(thumb.path);}else report.skipped++;
+    }catch(error){report.failed.push({type:'card',id:card.id,error:error.message});}onProgress(++done,total);
+  }
+  for(const booster of studio.boosters||[]){
+    try{
+      const pack=await migrateUrl(booster.packImageUrl,'booster-packs',`booster-${booster.id}-pack`);
+      const back=await migrateUrl(booster.cardBackUrl,'card-backs',`booster-${booster.id}-back`);
+      if(pack.changed||back.changed){await saveBooster({...booster,packImageUrl:pack.url||booster.packImageUrl,cardBackUrl:back.url||booster.cardBackUrl});report.updated++;if(pack.path)report.assets.push(pack.path);if(back.path)report.assets.push(back.path);}else report.skipped++;
+    }catch(error){report.failed.push({type:'booster',id:booster.id,error:error.message});}onProgress(++done,total);
+  }
+  notifyCardCatalogChanged('asset-migration');
+  return report;
+}
+export async function getSystemDiagnostics(){const {data,error}=await supabase.rpc('admin_get_system_diagnostics_v87');if(error)throw error;return data;}
+export async function exportAssetManifest(){
+  const {data,error}=await supabase.rpc('admin_get_asset_manifest_v87');
+  if(error)throw error;
+  return data||[];
+}
