@@ -9,4 +9,4 @@ The live Starlight Card Binder card catalog is loaded from Supabase.
 
 The files under `docs/data/` are now emergency/static reference files only. Editing them does not update the live site.
 
-Saving or deleting a card or series in **Administration Hub → Starlight Content Studio** invalidates the browser catalog cache and broadcasts a refresh to open Binder pages.
+Saving or deleting a card or series in **Administration Hub → Starlight Card Management** invalidates the browser catalog cache and broadcasts a refresh to open Binder pages.

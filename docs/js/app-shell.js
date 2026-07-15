@@ -16,7 +16,7 @@ const routes = {
   admin:{title:'Administration Hub',src:'admin-hub.html'}, 'admin-codes':{title:'Reward Code Console',src:'admin-codes.html'},
   'admin-staff':{title:'Staff Management',src:'admin-staff.html'}, 'admin-audit':{title:'Audit Log',src:'admin-audit.html'},
   'admin-moderation':{title:'Moderation Dashboard',src:'admin-moderation.html'},
-  'admin-boosters':{title:'Starlight Content Studio',src:'admin-boosters.html'}, 'admin-users':{title:'Registered User Directory',src:'admin-users.html'}
+  'admin-boosters':{title:'Starlight Card Management',src:'admin-boosters.html'}, 'admin-users':{title:'Registered User Directory',src:'admin-users.html'}
 };
 
 const nativeView=document.getElementById('binderNativeView');
