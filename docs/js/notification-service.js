@@ -25,3 +25,14 @@ export async function adminBroadcastNotification(payload) {
   const { data, error } = await supabase.rpc('admin_broadcast_notification_v881', { payload });
   if (error) throw error; return data;
 }
+
+export async function getNotificationPreferences() {
+  const { data, error } = await supabase.rpc('get_notification_preferences_v882');
+  if (error) throw error;
+  return data || {};
+}
+export async function saveNotificationPreferences(preferences) {
+  const { data, error } = await supabase.rpc('save_notification_preferences_v882', { requested_preferences: preferences || {} });
+  if (error) throw error;
+  return data;
+}

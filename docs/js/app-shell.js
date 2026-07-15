@@ -4,7 +4,7 @@ import { getMyTradeOffers } from './trade-offer-service.js';
 import { getMyNotifications } from './notification-service.js';
 import { getActiveEvents } from './event-service.js';
 
-const SHELL_BUILD = '88.1.0';
+const SHELL_BUILD = '88.2.0';
 const VIEW_READY_TIMEOUT_MS = 6500;
 const MAX_VIEW_RETRIES = 1;
 
@@ -107,8 +107,12 @@ function navigate(route,{push=true,extra={}}={}){
   currentRoute=route;
   retryCount=0;
   const url=new URL(location.href);
+  const preserved = new Set(['view']);
+  for (const key of [...url.searchParams.keys()]) {
+    if (!preserved.has(key)) url.searchParams.delete(key);
+  }
   url.searchParams.set('view',route);
-  for(const[k,v]of Object.entries(extra||{})){if(v!=null)url.searchParams.set(k,v)}
+  for(const[k,v]of Object.entries(extra||{})){if(v!=null&&v!=='')url.searchParams.set(k,v)}
   if(push)history.pushState({view:route},'',url);
   setActive(route);
   document.body.classList.remove('shell-menu-open');
@@ -141,6 +145,20 @@ function resizeEmbeddedView(value){
   frame.style.height=`${height}px`;
 }
 
+
+
+function ensureNotificationPopover(){
+  const button=document.querySelector('.shell-notification-button');
+  if(!button||document.querySelector('.shell-notification-popover'))return;
+  const pop=document.createElement('div');
+  pop.className='shell-notification-popover';
+  pop.hidden=true;
+  pop.innerHTML='<div class="shell-popover-head"><strong>Notifications</strong><a href="binder.html?view=notifications" data-shell-view="notifications">View all</a></div><div class="shell-popover-list">Loading…</div>';
+  button.parentElement?.appendChild(pop);
+  button.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();pop.hidden=!pop.hidden;if(!pop.hidden){try{const data=await getMyNotifications(5);const rows=data?.notifications||[];pop.querySelector('.shell-popover-list').innerHTML=rows.length?rows.map(n=>`<button type="button" data-notice-route="${String(n.route||'binder')}" data-notice-params='${JSON.stringify(n.route_params||{}).replaceAll("'",'&#39;')}'><span>${n.icon||'✦'}</span><span><b>${String(n.title||'Notification')}</b><small>${String(n.body||'')}</small></span></button>`).join(''):'<p>All caught up ✨</p>'}catch{pop.querySelector('.shell-popover-list').textContent='Could not load notifications.'}}});
+  pop.addEventListener('click',e=>{const item=e.target.closest('[data-notice-route]');if(!item)return;let params={};try{params=JSON.parse(item.dataset.noticeParams||'{}')}catch{}pop.hidden=true;navigate(item.dataset.noticeRoute||'binder',{extra:params})});
+  document.addEventListener('click',e=>{if(!pop.hidden&&!pop.contains(e.target)&&e.target!==button)pop.hidden=true});
+}
 
 async function hydrateNotificationBadge(){
   document.querySelectorAll('[data-notification-badge]').forEach(b=>b.hidden=true);
@@ -219,7 +237,7 @@ window.addEventListener('pageshow',event=>{
 
 const initial=new URLSearchParams(location.search).get('view')||'binder';
 navigate(initial,{push:false});
-hydrateAccount();
+hydrateAccount().then(ensureNotificationPopover);
 hydrateTradeOfferBadge();
 hydrateNotificationBadge();
 hydrateActiveEventBanner();

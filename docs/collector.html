@@ -1290,6 +1290,22 @@
             usernameElement.textContent =
                 `@${profile.username}`;
 
+            const proposeTradeButton = document.getElementById('propose-trade-button');
+            if (proposeTradeButton && profile.username) {
+                const tradeUrl = `binder.html?view=offers&username=${encodeURIComponent(profile.username)}`;
+                proposeTradeButton.href = tradeUrl;
+                proposeTradeButton.onclick = event => {
+                    if (window.parent !== window) {
+                        event.preventDefault();
+                        window.parent.postMessage({
+                            type: 'starlight-navigate',
+                            view: 'offers',
+                            params: { username: profile.username }
+                        }, window.location.origin);
+                    }
+                };
+            }
+
             bioElement.textContent =
                 profile.bio ||
                 "A Starlight Card collector.";

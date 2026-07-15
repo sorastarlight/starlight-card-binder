@@ -777,6 +777,10 @@ function renderAll() { document.body.classList.toggle('sfx-on', sfxOn); renderSh
 function startPackOpen(series) {
   const select = $('[data-series]'); if (select) select.value = series;
   page = 1;
+  const nextSeriesCards = cards.filter(c => c.series === series);
+  selected = nextSeriesCards[0] || null;
+  selectedIndex = selected ? cards.findIndex(c => c.id === selected.id) : 0;
+  previewFlipped = false;
   playSfx('charge');
   document.body.classList.remove('series-select');
   renderAll();
@@ -935,7 +939,11 @@ function renderV62Showcase(inSeriesSelect = false) {
   if (inSeriesSelect) { panel.innerHTML = ''; return; }
   applyFilters();
   const list = filtered.length ? filtered : cards;
-  if (!selected || !cards.find(c => c.id === selected.id)) selected = list[0] || cards[0] || null;
+  if (!selected || !list.some(c => c.id === selected.id)) {
+    selected = list[0] || null;
+    selectedIndex = selected ? cards.findIndex(c => c.id === selected.id) : 0;
+    previewFlipped = false;
+  }
   const card = selected;
   if (!card) {
     panel.innerHTML = `<div class="v62-empty-showcase"><h2>Pick a Card ✨</h2><p>Select a Starlight card to preview it here.</p></div>`;
@@ -996,6 +1004,10 @@ document.addEventListener('click', e => {
     const select = $('[data-series]'); if (select) select.value = pack.dataset.v61Pack;
     document.body.classList.remove('series-select');
     page = 1;
+    const nextSeriesCards = cards.filter(c => c.series === pack.dataset.v61Pack);
+    selected = nextSeriesCards[0] || null;
+    selectedIndex = selected ? cards.findIndex(c => c.id === selected.id) : 0;
+    previewFlipped = false;
     playSfx('charge');
     renderAll();
     return;
