@@ -34,7 +34,7 @@ export async function uploadStudioAsset(file,folder,options={}){
   return {url,path,name:file.name,size:file.size};
 }
 export async function listStudioAssets(){
-  const folders=['booster-packs','card-backs','card-fronts','thumbnails','series','uploads'];
+  const folders=['booster-packs','card-backs','card-fronts','thumbnails','series','events','uploads'];
   const out=[];
   for(const folder of folders){
     const {data,error}=await supabase.storage.from('site-assets').list(folder,{limit:300,sortBy:{column:'created_at',order:'desc'}});
@@ -52,3 +52,5 @@ export async function refreshPublicCardCatalog(){notifyCardCatalogChanged('manua
 
 export async function getSystemDiagnostics(){const {data,error}=await supabase.rpc('admin_get_system_diagnostics_v87');if(error)throw error;return data;}
 export async function exportAssetManifest(){const {data,error}=await supabase.rpc('admin_get_asset_manifest_v87');if(error)throw error;return data||[];}
+
+export { getAdminEvents, saveEvent, deleteEvent } from './event-service.js';
