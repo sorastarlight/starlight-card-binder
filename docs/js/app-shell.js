@@ -4,11 +4,12 @@ import { getMyTradeOffers } from './trade-offer-service.js';
 import { getMyNotifications } from './notification-service.js';
 import { getActiveEvents } from './event-service.js';
 
-const SHELL_BUILD = '88.2.0';
+const SHELL_BUILD = '88.3.0';
 const VIEW_READY_TIMEOUT_MS = 6500;
 const MAX_VIEW_RETRIES = 1;
 
 const routes = {
+  home:{title:'Home',src:'home.html'},
   binder:{title:'Card Binder',src:null}, collection:{title:'My Collection',src:'collection.html'},
   daily:{title:'Daily Free Booster Pack',src:'daily-booster.html'}, shop:{title:'Starlight Card Shop',src:'booster-shop.html'}, events:{title:'Starlight Events',src:'events.html'}, redeem:{title:'Redeem Code',src:'redeem.html'},
   'star-bits':{title:'Star Bits Exchange',src:'star-bits.html'}, checklist:{title:'Checklist',src:'checklist.html'},
@@ -18,7 +19,7 @@ const routes = {
   admin:{title:'Administration Hub',src:'admin-hub.html'}, 'admin-codes':{title:'Reward Code Console',src:'admin-codes.html'},
   'admin-staff':{title:'Staff Management',src:'admin-staff.html'}, 'admin-audit':{title:'Audit Log',src:'admin-audit.html'},
   'admin-moderation':{title:'Moderation Dashboard',src:'admin-moderation.html'},
-  'admin-boosters':{title:'Starlight Card Management',src:'admin-boosters.html'}, 'admin-users':{title:'Registered User Directory',src:'admin-users.html'}, 'admin-notifications':{title:'Notification Broadcasts',src:'admin-notifications.html'}
+  'admin-boosters':{title:'Starlight Card Management',src:'admin-boosters.html'}, 'admin-news':{title:'News & Updates Management',src:'admin-news.html'}, 'admin-users':{title:'Registered User Directory',src:'admin-users.html'}, 'admin-notifications':{title:'Notification Broadcasts',src:'admin-notifications.html'}
 };
 
 const nativeView=document.getElementById('binderNativeView');
@@ -236,7 +237,7 @@ async function hydrateAccount(){
 
 document.addEventListener('click',e=>{const a=e.target.closest('[data-shell-view]');if(a){e.preventDefault();navigate(a.dataset.shellView);}});
 menuButton?.addEventListener('click',()=>document.body.classList.toggle('shell-menu-open'));
-window.addEventListener('popstate',()=>navigate(new URLSearchParams(location.search).get('view')||'binder',{push:false}));
+window.addEventListener('popstate',()=>navigate(new URLSearchParams(location.search).get('view')||'home',{push:false}));
 window.addEventListener('message',e=>{
   if(e.origin!==location.origin)return;
   const data=e.data||{};
@@ -263,7 +264,7 @@ window.addEventListener('pageshow',event=>{
   if(event.persisted && currentRoute!=='binder')loadEmbeddedView(currentRoute,{force:true,resetRetry:true});
 });
 
-const initial=new URLSearchParams(location.search).get('view')||'binder';
+const initial=new URLSearchParams(location.search).get('view')||'home';
 navigate(initial,{push:false});
 hydrateAccount().then(ensureNotificationPopover);
 hydrateTradeOfferBadge();
@@ -271,4 +272,4 @@ hydrateNotificationBadge();
 hydrateActiveEventBanner();
 
 
-document.querySelector('[data-shell-signout]')?.addEventListener('click',async()=>{await supabase.auth.signOut();location.href='binder.html';});
+document.querySelector('[data-shell-signout]')?.addEventListener('click',async()=>{await supabase.auth.signOut();location.href='binder.html?view=home';});
