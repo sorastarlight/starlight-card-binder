@@ -41,6 +41,7 @@
 .portal-zone.is-opening .portal-ribbons{opacity:.35;transition:opacity .2s ease}
 </style>
 <script src="js/firefox-performance.js" defer></script>
+    <link rel="stylesheet" href="css/shared-ui.css">
 </head>
 <body><script src="js/embed-mode.js" type="module"></script>
 <div class="sky"></div>
@@ -102,4 +103,5 @@ async function initialize(){status('');try{const cfg=await getPublicBoosterConfi
 pack.addEventListener('click',async()=>{if(isBusy||pack.disabled)return;isBusy=true;pack.disabled=true;packLabel.textContent='The stars are choosing…';try{const result=await openDailyBooster();if(result.alreadyClaimed){await initialize();return}const cards=result.cards||[];await playOpening(cards,'Here Are Today’s Daily Free Booster Pack Results');setPortalClaimed({nextClaimAt:result.nextClaimAt,cardsAwarded:cards});window.parent?.postMessage({type:'starlight-view-ready',view:'daily',claimed:true},location.origin)}catch(error){status(error.message||'The free booster could not be opened.','error');await initialize()}finally{isBusy=false}});
 initialize();
 </script>
+    <script src="js/shared-ui.js"></script>
 </body></html>

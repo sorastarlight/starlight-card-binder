@@ -750,9 +750,9 @@ function importCollectionData(file) {
       if (typeof payload.sfxOn === 'boolean') { sfxOn = payload.sfxOn; localStorage.setItem(SFX_KEY, sfxOn ? 'on' : 'off'); }
       playSfx('sparkle');
       renderAll();
-      alert('Your Starlight preferences and favorites were imported. Card ownership remains synced from your account.');
+      window.StarlightUI?.toast('Your Starlight preferences and favorites were imported. Card ownership remains synced from your account.','success');
     } catch (err) {
-      alert('That backup file could not be imported. Make sure it is a Starlight Card Binder JSON export.');
+      window.StarlightUI?.toast('That backup file could not be imported. Make sure it is a Starlight Card Binder JSON export.','error',5000);
       console.error(err);
     }
   };
