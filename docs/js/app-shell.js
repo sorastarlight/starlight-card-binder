@@ -103,6 +103,7 @@ function loadEmbeddedView(route,{force=false,resetRetry=false}={}){
 }
 
 function navigate(route,{push=true,extra={}}={}){
+  closeNotificationPopover();
   if(!routes[route])route='binder';
   currentRoute=route;
   retryCount=0;
@@ -147,6 +148,19 @@ function resizeEmbeddedView(value){
 
 
 
+function normalizeNotificationRoute(value){
+  const raw=String(value||'binder').trim();
+  const withoutShell=raw.replace(/^https?:\/\/[^/]+\/?/i,'').replace(/^\/?binder\.html\?view=/i,'').replace(/^\/?/,'');
+  const key=withoutShell.split(/[?&#]/)[0].toLowerCase();
+  const aliases={daily:'daily','daily-booster':'daily','daily-booster.html':'daily','free-daily-booster':'daily',notifications:'notifications','notifications.html':'notifications',collection:'collection','collection.html':'collection',offers:'offers','trade-offers':'offers','trade-offers.html':'offers',trades:'trades','trade-lists':'trades','trade-lists.html':'trades',events:'events','events.html':'events',shop:'shop','booster-shop':'shop','booster-shop.html':'shop',profile:'profile','profile-settings':'profile','profile-settings.html':'profile'};
+  return aliases[key]||key||'binder';
+}
+
+function closeNotificationPopover(){
+  const pop=document.querySelector('.shell-notification-popover');
+  if(pop)pop.hidden=true;
+}
+
 function ensureNotificationPopover(){
   const button=document.querySelector('.shell-notification-button');
   if(!button||document.querySelector('.shell-notification-popover'))return;
@@ -156,7 +170,7 @@ function ensureNotificationPopover(){
   pop.innerHTML='<div class="shell-popover-head"><strong>Notifications</strong><a href="binder.html?view=notifications" data-shell-view="notifications">View all</a></div><div class="shell-popover-list">Loading…</div>';
   button.parentElement?.appendChild(pop);
   button.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();pop.hidden=!pop.hidden;if(!pop.hidden){try{const data=await getMyNotifications(5);const rows=data?.notifications||[];pop.querySelector('.shell-popover-list').innerHTML=rows.length?rows.map(n=>`<button type="button" data-notice-route="${String(n.route||'binder')}" data-notice-params='${JSON.stringify(n.route_params||{}).replaceAll("'",'&#39;')}'><span>${n.icon||'✦'}</span><span><b>${String(n.title||'Notification')}</b><small>${String(n.body||'')}</small></span></button>`).join(''):'<p>All caught up ✨</p>'}catch{pop.querySelector('.shell-popover-list').textContent='Could not load notifications.'}}});
-  pop.addEventListener('click',e=>{const item=e.target.closest('[data-notice-route]');if(!item)return;let params={};try{params=JSON.parse(item.dataset.noticeParams||'{}')}catch{}pop.hidden=true;navigate(item.dataset.noticeRoute||'binder',{extra:params})});
+  pop.addEventListener('click',e=>{const item=e.target.closest('[data-notice-route]');if(!item)return;let params={};try{params=JSON.parse(item.dataset.noticeParams||'{}')}catch{}pop.hidden=true;navigate(normalizeNotificationRoute(item.dataset.noticeRoute),{extra:params})});
   document.addEventListener('click',e=>{if(!pop.hidden&&!pop.contains(e.target)&&e.target!==button)pop.hidden=true});
 }
 
@@ -215,7 +229,8 @@ window.addEventListener('popstate',()=>navigate(new URLSearchParams(location.sea
 window.addEventListener('message',e=>{
   if(e.origin!==location.origin)return;
   const data=e.data||{};
-  if(data.type==='starlight-navigate')navigate(data.view,{extra:data.params||{}});
+  if(data.type==='starlight-close-notifications')closeNotificationPopover();
+  if(data.type==='starlight-navigate')navigate(normalizeNotificationRoute(data.view),{extra:data.params||{}});
   if(data.type==='starlight-trades-changed'||data.type==='starlight-view-ready')hydrateTradeOfferBadge();
   if(data.type==='starlight-notifications-changed'||data.type==='starlight-view-ready')hydrateNotificationBadge();
   if(data.type==='starlight-view-ready'||data.type==='starlight-content-ready'){
@@ -225,7 +240,9 @@ window.addEventListener('message',e=>{
   if(data.type==='starlight-view-height')resizeEmbeddedView(Number(data.height));
 });
 
+frame?.addEventListener('pointerdown',closeNotificationPopover);
 frame?.addEventListener('load',()=>{
+  closeNotificationPopover();
   if(frame.src==='about:blank')return;
   // A successful document load is not enough; the child still must send its ready handshake.
   setViewState('loading');

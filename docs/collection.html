@@ -134,112 +134,6 @@
                     Card Binder
                 </span>
 </div>
-<section class="side-card">
-<h2 class="side-title">
-                    Collection Progress
-                </h2>
-<div class="big-stat">
-<span data-collected="">0</span>
-                    /
-                    <span data-total="">0</span>
-</div>
-<div class="bar">
-<span data-progress=""></span>
-</div>
-<p>
-<span data-percent="">0%</span>
-                    Complete ✨
-                </p>
-</section>
-<section class="side-card economy-card">
-<h2 class="side-title">✦ Star Bits</h2>
-<div class="economy-stat"><span>Balance</span><strong data-star-bits="">...</strong></div>
-<div class="economy-stat"><span>Duplicates</span><strong data-duplicates="">...</strong></div>
-<a class="economy-link" href="star-bits.html">Open Exchange</a>
-</section>
-<section class="side-card economy-card">
-<h2 class="side-title">✨ Daily Booster</h2>
-<p data-daily-status="">Checking...</p>
-<span class="daily-countdown" data-daily-countdown=""></span>
-<a class="daily-widget-link" href="daily-booster.html">View Daily Pack</a>
-</section>
-<section class="side-card">
-<h2 class="side-title">
-                    Series Progress
-                </h2>
-<div class="mini-series" id="miniSeries"></div>
-</section>
-<section class="side-card filters">
-<h2 class="side-title">
-                    Filters
-                </h2>
-<label>
-                    Series
-
-                    <select data-series=""></select>
-</label>
-<label>
-                    Rarity
-
-                    <select data-rarity="">
-<option>
-                            All Rarities
-                        </option>
-<option>
-                            Common
-                        </option>
-<option>
-                            Uncommon
-                        </option>
-<option>
-                            Rare
-                        </option>
-<option>
-                            Epic
-                        </option>
-<option>
-                            Legendary
-                        </option>
-</select>
-</label>
-<label>
-                    Sort By
-
-                    <select id="sortSelect">
-<option value="numberAsc">
-                            Number (Low to High)
-                        </option>
-<option value="numberDesc">
-                            Number (High to Low)
-                        </option>
-<option value="nameAsc">
-                            Name (A to Z)
-                        </option>
-<option value="rarityDesc">
-                            Rarity (Best First)
-                        </option>
-</select>
-</label>
-<h2 class="side-title">
-                    View
-                </h2>
-<label class="checkline">
-<input checked="" name="viewFilter" type="radio" value="all"/>
-
-                    All Cards
-                </label>
-<label class="checkline">
-<input name="viewFilter" type="radio" value="collected"/>
-
-                    Collected
-                </label>
-<label class="checkline">
-<input name="viewFilter" type="radio" value="missing"/>
-
-                    Not Collected
-                </label>
-<a class="btn primary wide" href="star-bits.html">✦ Star Bits Exchange</a>
-</section>
 </aside>
 <main class="main">
 <nav class="topbar">
@@ -276,6 +170,11 @@
 <div><span>Collector Level</span><strong>Lv. <span data-collector-level="">1</span></strong></div>
 <div class="collector-progress"><span data-level-progress="" style="width:0%"></span></div>
 <small><span data-collector-points="">0</span> / <span data-next-level-points="">25</span> points</small>
+</div>
+<div class="collection-progress-suite">
+<article class="collection-progress-card"><div><span>Collection Completion</span><strong><span data-collected="">0</span> / <span data-total="">0</span></strong></div><div class="collector-progress"><span data-progress="" style="width:0%"></span></div><small><span data-percent="">0%</span> complete</small></article>
+<article class="collection-progress-card"><div><span>Free Daily Booster</span><strong data-daily-status="">Checking…</strong></div><small data-daily-countdown=""></small><a data-shell-nav="daily" href="daily-booster.html">Open Daily Booster</a></article>
+<article class="collection-progress-card collection-series-progress"><div><span>Series Progress</span><strong>Your sets</strong></div><div class="mini-series" id="miniSeries"></div></article>
 </div>
 </section>
 <section aria-label="Collection views" class="collection-tabs panel">
