@@ -1,8 +1,10 @@
 import { supabase } from './supabase-client.js';
 import { getMyStaffAccess } from './staff-service.js';
 import { getMyTradeOffers } from './trade-offer-service.js';
+import { getMyNotifications } from './notification-service.js';
+import { getActiveEvents } from './event-service.js';
 
-const SHELL_BUILD = '88.0.0';
+const SHELL_BUILD = '88.1.0';
 const VIEW_READY_TIMEOUT_MS = 6500;
 const MAX_VIEW_RETRIES = 1;
 
@@ -11,12 +13,12 @@ const routes = {
   daily:{title:'Daily Free Booster Pack',src:'daily-booster.html'}, shop:{title:'Starlight Card Shop',src:'booster-shop.html'}, events:{title:'Starlight Events',src:'events.html'}, redeem:{title:'Redeem Code',src:'redeem.html'},
   'star-bits':{title:'Star Bits Exchange',src:'star-bits.html'}, checklist:{title:'Checklist',src:'checklist.html'},
   trades:{title:'Wishlist & Trades',src:'trade-lists.html'}, offers:{title:'Trade Offers',src:'trade-offers.html'},
-  profile:{title:'Profile Settings',src:'profile-settings.html'}, collector:{title:'Collector Profile',src:'collector.html'},
+  notifications:{title:'Notifications',src:'notifications.html'}, profile:{title:'Profile Settings',src:'profile-settings.html'}, collector:{title:'Collector Profile',src:'collector.html'},
   report:{title:'Report Profile',src:'report-profile.html'}, about:{title:'About',src:'about.html'}, socials:{title:'Socials',src:'socials.html'},
   admin:{title:'Administration Hub',src:'admin-hub.html'}, 'admin-codes':{title:'Reward Code Console',src:'admin-codes.html'},
   'admin-staff':{title:'Staff Management',src:'admin-staff.html'}, 'admin-audit':{title:'Audit Log',src:'admin-audit.html'},
   'admin-moderation':{title:'Moderation Dashboard',src:'admin-moderation.html'},
-  'admin-boosters':{title:'Starlight Card Management',src:'admin-boosters.html'}, 'admin-users':{title:'Registered User Directory',src:'admin-users.html'}
+  'admin-boosters':{title:'Starlight Card Management',src:'admin-boosters.html'}, 'admin-users':{title:'Registered User Directory',src:'admin-users.html'}, 'admin-notifications':{title:'Notification Broadcasts',src:'admin-notifications.html'}
 };
 
 const nativeView=document.getElementById('binderNativeView');
@@ -139,6 +141,18 @@ function resizeEmbeddedView(value){
   frame.style.height=`${height}px`;
 }
 
+
+async function hydrateNotificationBadge(){
+  document.querySelectorAll('[data-notification-badge]').forEach(b=>b.hidden=true);
+  try{
+    const data=await getMyNotifications(20);const count=Number(data?.unreadCount||0);
+    document.querySelectorAll('[data-notification-badge]').forEach(b=>{b.textContent=String(count);b.hidden=count===0});
+  }catch(e){console.warn('[Starlight] Notification badge failed',e)}
+}
+async function hydrateActiveEventBanner(){
+  const banner=document.querySelector('[data-shell-event-banner]');if(!banner)return;
+  try{const events=await getActiveEvents();const event=events?.[0];if(!event){banner.hidden=true;return}banner.hidden=false;banner.style.setProperty('--event-accent',event.accentColor||'#ff82c8');banner.querySelector('[data-shell-event-name]').textContent=event.name||'Starlight Event';const end=new Date(event.endAt);const hours=Math.max(0,Math.ceil((end-Date.now())/36e5));banner.querySelector('[data-shell-event-time]').textContent=hours>48?`${Math.ceil(hours/24)} days remaining`:`${hours} hours remaining`;if(event.bannerImageUrl)banner.style.setProperty('--event-image',`url("${String(event.bannerImageUrl).replaceAll('"','%22')}")`)}catch(e){banner.hidden=true;console.warn('[Starlight] Event banner failed',e)}
+}
 async function hydrateTradeOfferBadge(){
   const badge=document.querySelector('[data-trade-offer-badge]');
   if(!badge)return;
@@ -185,6 +199,7 @@ window.addEventListener('message',e=>{
   const data=e.data||{};
   if(data.type==='starlight-navigate')navigate(data.view,{extra:data.params||{}});
   if(data.type==='starlight-trades-changed'||data.type==='starlight-view-ready')hydrateTradeOfferBadge();
+  if(data.type==='starlight-notifications-changed'||data.type==='starlight-view-ready')hydrateNotificationBadge();
   if(data.type==='starlight-view-ready'||data.type==='starlight-content-ready'){
     markViewReady(data);
     window.dispatchEvent(new CustomEvent('starlight-dashboard-refresh',{detail:data}));
@@ -206,6 +221,8 @@ const initial=new URLSearchParams(location.search).get('view')||'binder';
 navigate(initial,{push:false});
 hydrateAccount();
 hydrateTradeOfferBadge();
+hydrateNotificationBadge();
+hydrateActiveEventBanner();
 
 
 document.querySelector('[data-shell-signout]')?.addEventListener('click',async()=>{await supabase.auth.signOut();location.href='binder.html';});
