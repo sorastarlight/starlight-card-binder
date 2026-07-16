@@ -50,3 +50,5 @@ export async function saveTwitchRule(payload){const {data,error}=await supabase.
 export async function deleteTwitchRule(id){const {data,error}=await supabase.rpc('admin_delete_twitch_reward_rule_v890',{requested_id:id});if(error)throw error;return data;}
 export async function grantManualTwitchReward(payload){const {data,error}=await supabase.rpc('admin_manual_twitch_reward_v890',{payload});if(error)throw error;return data;}
 export async function callTwitchWorker(path,body={}){const config=await getTwitchConfig();const {data:{session}}=await supabase.auth.getSession();if(!session?.access_token)throw new Error('Please sign in first.');const response=await fetch(config.workerBaseUrl+path,{method:'POST',headers:{Authorization:`Bearer ${session.access_token}`,'Content-Type':'application/json'},body:JSON.stringify(body)});const out=await response.json().catch(()=>({}));if(!response.ok)throw new Error(out.error||'Twitch request failed.');return out;}
+
+export async function getTwitchCustomRewards(){return callTwitchWorker('/admin/custom-rewards');}
