@@ -33,6 +33,26 @@ export async function uploadStudioAsset(file,folder,options={}){
   try{await supabase.rpc('admin_register_site_asset_v87',{asset_path:path,original_name:file.name,mime_type:file.type,file_size:file.size,public_url:url,asset_folder:folder});}catch(_){}
   return {url,path,name:file.name,size:file.size};
 }
+
+export async function uploadCardArtworkPair(file,baseFilename,{upsert=false}={}){
+  if(!(file instanceof File))throw new Error('Choose a card image first.');
+  const ext=(file.name.split('.').pop()||'png').toLowerCase();
+  const stem=cleanName(String(baseFilename||'card').replace(/\.[^.]+$/,''));
+  const filename=`${stem}.${ext}`;
+  const frontPath=`card-fronts/${filename}`;
+  const thumbPath=`thumbnails/${filename}`;
+  const uploaded=[];
+  try{
+    const front=await uploadStudioAsset(file,'card-fronts',{path:frontPath,upsert});
+    uploaded.push(frontPath);
+    const thumb=await uploadStudioAsset(file,'thumbnails',{path:thumbPath,upsert});
+    uploaded.push(thumbPath);
+    return {frontUrl:front.url,thumbnailUrl:thumb.url,frontPath,thumbnailPath:thumbPath,filename};
+  }catch(error){
+    if(uploaded.length)await supabase.storage.from('site-assets').remove(uploaded).catch(()=>{});
+    throw error;
+  }
+}
 export async function listStudioAssets(){
   const folders=['booster-packs','card-backs','card-fronts','thumbnails','series','events','uploads'];
   const out=[];

@@ -41,10 +41,23 @@ export async function signIn(email, password) {
 }
 
 
-export async function signInWithTwitch() {
+export async function signInWithTwitch(options = {}) {
+    // Always clear any stale local session before a signed-out OAuth flow.
+    // This prevents the browser from silently returning to the previously
+    // authenticated Starlight account.
+    await supabase.auth.signOut({ scope: 'local' }).catch(() => {});
+    for (const key of Object.keys(localStorage)) {
+        if (key.startsWith('sb-') && key.includes('auth-token')) localStorage.removeItem(key);
+    }
+    const redirect = new URL(getAuthRedirectUrl());
+    redirect.searchParams.set('oauth', 'twitch');
+    redirect.searchParams.set('intent', options.intent || 'continue');
     return await supabase.auth.signInWithOAuth({
         provider: 'twitch',
-        options: { redirectTo: getAuthRedirectUrl() }
+        options: {
+            redirectTo: redirect.toString(),
+            queryParams: { force_verify: 'true' }
+        }
     });
 }
 

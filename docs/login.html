@@ -491,7 +491,7 @@
             try {
                 twitchAuthButton.disabled = true;
                 twitchAuthButton.textContent = "Opening Twitch...";
-                const { error } = await signInWithTwitch();
+                const { error } = await signInWithTwitch({ intent: currentMode === 'signup' ? 'signup' : 'signin' });
                 if (error) throw error;
             } catch (error) {
                 displayStatus(error.message || "Unable to continue with Twitch.", "error");
@@ -651,15 +651,24 @@
             }
 
             if (data.session) {
+                const identity = data.session.user?.identities?.find(item => item.provider === 'twitch');
+                const twitchName =
+                    identity?.identity_data?.preferred_username ||
+                    identity?.identity_data?.user_name ||
+                    identity?.identity_data?.full_name ||
+                    data.session.user?.user_metadata?.preferred_username ||
+                    '';
                 displayStatus(
-                    "Your account is confirmed and you are signed in! Taking you to the binder...",
+                    twitchName
+                        ? `Signed in with Twitch as @${twitchName}. Taking you to the Binder...`
+                        : "Your account is confirmed and you are signed in! Taking you to the Binder...",
                     "success"
                 );
 
                 window.setTimeout(() => {
                     window.location.href =
                         "./binder.html";
-                }, 1500);
+                }, 1800);
             }
         }
 
