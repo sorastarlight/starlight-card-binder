@@ -3,6 +3,7 @@ import { getMyStaffAccess } from './staff-service.js';
 import { getMyTradeOffers } from './trade-offer-service.js';
 import { getMyNotifications } from './notification-service.js';
 import { getActiveEvents } from './event-service.js';
+import { getReceivedRewards } from './received-rewards-service.js';
 
 const SHELL_BUILD = '89.2.0';
 const VIEW_READY_TIMEOUT_MS = 6500;
@@ -14,12 +15,12 @@ const routes = {
   daily:{title:'Daily Free Booster Pack',src:'daily-booster.html'}, shop:{title:'Starlight Card Shop',src:'booster-shop.html'}, events:{title:'Starlight Events',src:'events.html'}, redeem:{title:'Redeem Code',src:'redeem.html'},
   'star-bits':{title:'Star Bits Exchange',src:'star-bits.html'}, checklist:{title:'Checklist',src:'checklist.html'},
   trades:{title:'Wishlist & Trades',src:'trade-lists.html'}, offers:{title:'Trade Offers',src:'trade-offers.html'},
-  notifications:{title:'Notifications',src:'notifications.html'}, rewards:{title:'Received Rewards',src:'received-rewards.html'}, profile:{title:'Profile Settings',src:'profile-settings.html'}, collector:{title:'Collector Profile',src:'collector.html'},
+  notifications:{title:'Notifications',src:'notifications.html'}, rewards:{title:'Received Gifts',src:'received-rewards.html'}, profile:{title:'Profile Settings',src:'profile-settings.html'}, collector:{title:'Collector Profile',src:'collector.html'},
   report:{title:'Report Profile',src:'report-profile.html'}, about:{title:'About',src:'about.html'}, socials:{title:'Socials',src:'socials.html'},
   admin:{title:'Administration Hub',src:'admin-hub.html'}, 'admin-codes':{title:'Reward Code Console',src:'admin-codes.html'},
   'admin-staff':{title:'Staff Management',src:'admin-staff.html'}, 'admin-audit':{title:'Audit Log',src:'admin-audit.html'},
   'admin-moderation':{title:'Moderation Dashboard',src:'admin-moderation.html'},
-  'admin-boosters':{title:'Starlight Card Management',src:'admin-boosters.html'}, 'admin-twitch':{title:'Twitch Rewards',src:'admin-twitch.html'}, 'admin-news':{title:'News & Updates Management',src:'admin-news.html'}, 'admin-users':{title:'Registered User Directory',src:'admin-users.html'}, 'admin-notifications':{title:'Notification Broadcasts',src:'admin-notifications.html'}
+  'admin-boosters':{title:'Starlight Card Management',src:'admin-boosters.html'}, 'admin-twitch':{title:'Twitch Redeems',src:'admin-twitch.html'}, 'admin-news':{title:'News & Updates Management',src:'admin-news.html'}, 'admin-users':{title:'Registered User Directory',src:'admin-users.html'}, 'admin-notifications':{title:'Notification Broadcasts',src:'admin-notifications.html'}
 };
 
 const nativeView=document.getElementById('binderNativeView');
@@ -149,7 +150,11 @@ function resizeEmbeddedView(value){
 
 
 
-function normalizeNotificationRoute(value){
+function normalizeNotificationRoute(value,notice={}){
+  const hint=`${notice.notification_type||''} ${notice.title||''} ${notice.body||''} ${notice.source_key||''}`.toLowerCase();
+  if(/reward|gift|twitch redeem|code accepted|booster.*waiting/.test(hint))return 'rewards';
+  if(/daily.*booster/.test(hint))return 'daily';
+  if(/trade/.test(hint)&&(!value||String(value).toLowerCase()==='binder'))return 'offers';
   const raw=String(value||'binder').trim();
   const withoutShell=raw.replace(/^https?:\/\/[^/]+\/?/i,'').replace(/^\/?binder\.html\?view=/i,'').replace(/^\/?/,'');
   const key=withoutShell.split(/[?&#]/)[0].toLowerCase();
@@ -170,7 +175,7 @@ function ensureNotificationPopover(){
   pop.hidden=true;
   pop.innerHTML='<div class="shell-popover-head"><strong>Notifications</strong><a href="binder.html?view=notifications" data-shell-view="notifications">View all</a></div><div class="shell-popover-list">Loading…</div>';
   button.parentElement?.appendChild(pop);
-  button.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();pop.hidden=!pop.hidden;if(!pop.hidden){try{const data=await getMyNotifications(5);const rows=data?.notifications||[];pop.querySelector('.shell-popover-list').innerHTML=rows.length?rows.map(n=>`<button type="button" data-notice-route="${String(n.route||'binder')}" data-notice-params='${JSON.stringify(n.route_params||{}).replaceAll("'",'&#39;')}'><span>${n.icon||'✦'}</span><span><b>${String(n.title||'Notification')}</b><small>${String(n.body||'')}</small></span></button>`).join(''):'<p>All caught up ✨</p>'}catch{pop.querySelector('.shell-popover-list').textContent='Could not load notifications.'}}});
+  button.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();pop.hidden=!pop.hidden;if(!pop.hidden){try{const data=await getMyNotifications(5);const rows=data?.notifications||[];pop.querySelector('.shell-popover-list').innerHTML=rows.length?rows.map(n=>`<button type="button" data-notice-route="${normalizeNotificationRoute(n.route,n)}" data-notice-params='${JSON.stringify(n.route_params||{}).replaceAll("'",'&#39;')}'><span>${n.icon||'✦'}</span><span><b>${String(n.title||'Notification')}</b><small>${String(n.body||'')}</small></span></button>`).join(''):'<p>All caught up ✨</p>'}catch{pop.querySelector('.shell-popover-list').textContent='Could not load notifications.'}}});
   pop.addEventListener('click',e=>{const item=e.target.closest('[data-notice-route]');if(!item)return;let params={};try{params=JSON.parse(item.dataset.noticeParams||'{}')}catch{}pop.hidden=true;navigate(normalizeNotificationRoute(item.dataset.noticeRoute),{extra:params})});
   document.addEventListener('click',e=>{if(!pop.hidden&&!pop.contains(e.target)&&e.target!==button)pop.hidden=true});
 }
@@ -182,6 +187,12 @@ async function hydrateNotificationBadge(){
     document.querySelectorAll('[data-notification-badge]').forEach(b=>{b.textContent=String(count);b.hidden=count===0});
   }catch(e){console.warn('[Starlight] Notification badge failed',e)}
 }
+
+async function hydrateReceivedGiftBadge(){
+  const badges=document.querySelectorAll('[data-received-reward-badge]');badges.forEach(b=>b.hidden=true);
+  try{const data=await getReceivedRewards('pending');const count=Number(data?.pendingCount??data?.rewards?.length??0);badges.forEach(b=>{b.textContent=String(count);b.hidden=count===0})}catch(e){console.warn('[Starlight] Received Gifts badge failed',e)}
+}
+
 async function hydrateActiveEventBanner(){
   const banner=document.querySelector('[data-shell-event-banner]');if(!banner)return;
   try{const events=await getActiveEvents();const event=events?.[0];if(!event){banner.hidden=true;return}banner.hidden=false;banner.style.setProperty('--event-accent',event.accentColor||'#ff82c8');banner.querySelector('[data-shell-event-name]').textContent=event.name||'Starlight Event';const end=new Date(event.endAt);const hours=Math.max(0,Math.ceil((end-Date.now())/36e5));banner.querySelector('[data-shell-event-time]').textContent=hours>48?`${Math.ceil(hours/24)} days remaining`:`${hours} hours remaining`;if(event.bannerImageUrl)banner.style.setProperty('--event-image',`url("${String(event.bannerImageUrl).replaceAll('"','%22')}")`)}catch(e){banner.hidden=true;console.warn('[Starlight] Event banner failed',e)}
@@ -245,6 +256,7 @@ window.addEventListener('message',e=>{
   if(data.type==='starlight-navigate')navigate(normalizeNotificationRoute(data.view),{extra:data.params||{}});
   if(data.type==='starlight-trades-changed'||data.type==='starlight-view-ready')hydrateTradeOfferBadge();
   if(data.type==='starlight-notifications-changed'||data.type==='starlight-view-ready')hydrateNotificationBadge();
+  if(data.type==='starlight-rewards-changed'||data.type==='starlight-view-ready'||data.type==='starlight-content-ready')hydrateReceivedGiftBadge();
   if(data.type==='starlight-view-ready'||data.type==='starlight-content-ready'){
     markViewReady(data);
     window.dispatchEvent(new CustomEvent('starlight-dashboard-refresh',{detail:data}));
@@ -269,6 +281,7 @@ navigate(initial,{push:false});
 hydrateAccount().then(ensureNotificationPopover);
 hydrateTradeOfferBadge();
 hydrateNotificationBadge();
+hydrateReceivedGiftBadge();
 hydrateActiveEventBanner();
 
 

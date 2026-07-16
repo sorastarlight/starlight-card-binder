@@ -211,7 +211,7 @@ let currentBalance = 0;
 let currentUser = null;
 let boosterData = [];
 let busy = false;
-let pendingPurchase = null;let twitchRedeems=[];
+let pendingPurchase = null;
 
 function escapeHTML(value=''){
   return String(value).replace(/[&<>'"]/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':'&quot;'}[char]));
@@ -270,7 +270,7 @@ function render(){
         <div class="pack-price"><span class="price-star">★</span><span>${cost.toLocaleString()}</span></div>
         <div class="pack-actions">
           <button class="price-button" type="button" data-buy="${escapeHTML(booster.id)}" data-cost="${cost}" data-back="${escapeHTML(booster.card_back_url||'')}" ${affordable?'':'disabled'}>${affordable?'Open Pack':'Need More Star Bits'}</button>
-          <button class="details-button" type="button" data-details="${escapeHTML(booster.id)}">What’s Inside?</button>${twitchRedeems.some(r=>r.boosterId===booster.id)?`<button class="details-button twitch-buy" type="button" data-twitch-buy="${escapeHTML(booster.id)}">Use Twitch Channel Points</button>`:''}
+          <button class="details-button" type="button" data-details="${escapeHTML(booster.id)}">What’s Inside?</button>
         </div>
       </div>
     </article>`;
@@ -338,14 +338,13 @@ async function confirmPurchase(){
 async function load(){
   try{
     say('');packsEl.innerHTML='<div class="empty">Preparing the Starlight Card Shop…</div>';
-    const [{data:userData},{preview,error:previewError},{data:boosters,error:boosterError},{data:slots,error:slotError},{data:twitchRules,error:twitchError}] = await Promise.all([
+    const [{data:userData},{preview,error:previewError},{data:boosters,error:boosterError},{data:slots,error:slotError}] = await Promise.all([
       supabase.auth.getUser(),
       getStarBitsExchangePreview(),
       supabase.from('booster_types').select('id,name,description,star_bits_cost,pack_image_url,card_back_url,reward_mode,series_id,card_count,bonus_star_bits,sort_order').eq('is_active',true).eq('archived',false).gt('star_bits_cost',0).order('sort_order'),
-      supabase.from('booster_slots').select('id,booster_id,name,quantity,sort_order,booster_slot_rates(rarity,percentage)').order('sort_order'),
-      supabase.rpc('get_twitch_shop_redeems_v892')
+      supabase.from('booster_slots').select('id,booster_id,name,quantity,sort_order,booster_slot_rates(rarity,percentage)').order('sort_order')
     ]);
-    if(boosterError)throw boosterError;if(slotError)throw slotError;if(previewError)throw previewError;if(twitchError)throw twitchError;twitchRedeems=twitchRules||[];
+    if(boosterError)throw boosterError;if(slotError)throw slotError;if(previewError)throw previewError;
     currentUser=userData?.user||null;currentBalance=Number(preview?.starBitsBalance||0);balanceEl.textContent=currentBalance.toLocaleString();walletNote.textContent=currentBalance>0?'Ready for your next pull':'Convert extras to earn more';
     const byBooster=new Map();(slots||[]).forEach(slot=>{if(!byBooster.has(slot.booster_id))byBooster.set(slot.booster_id,[]);byBooster.get(slot.booster_id).push(slot)});
     boosterData=(boosters||[]).map(booster=>({...booster,slots:byBooster.get(booster.id)||[]}));render();
@@ -355,7 +354,6 @@ async function load(){
 
 packsEl.addEventListener('click',async event=>{
   const details=event.target.closest('[data-details]');if(details){openDetails(details.dataset.details);return}
-  const twitchButton=event.target.closest('[data-twitch-buy]');if(twitchButton){const booster=boosterData.find(item=>item.id===twitchButton.dataset.twitchBuy);const rule=twitchRedeems.find(r=>r.boosterId===booster?.id);window.StarlightUI.confirm({title:'Redeem on Twitch',message:`Open twitch.tv/sorastarlight and redeem “${rule?.name||'the matching Channel Points reward'}”. Twitch does not expose your Channel Points balance to external sites, so the redemption must happen on Twitch. Your pack will then appear in Received Rewards.`,confirmText:'Open Twitch',cancelText:'Not Yet'}).then(ok=>{if(ok)window.open('https://www.twitch.tv/sorastarlight','_blank','noopener')});return}
   const button=event.target.closest('[data-buy]');if(!button||busy)return;
   const booster=boosterData.find(item=>item.id===button.dataset.buy);if(!booster)return;
   openPurchaseModal(booster,button);
