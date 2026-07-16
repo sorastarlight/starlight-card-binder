@@ -52,3 +52,5 @@ export async function grantManualTwitchReward(payload){const {data,error}=await 
 export async function callTwitchWorker(path,body={}){const config=await getTwitchConfig();const {data:{session}}=await supabase.auth.getSession();if(!session?.access_token)throw new Error('Please sign in first.');const response=await fetch(config.workerBaseUrl+path,{method:'POST',headers:{Authorization:`Bearer ${session.access_token}`,'Content-Type':'application/json'},body:JSON.stringify(body)});const out=await response.json().catch(()=>({}));if(!response.ok)throw new Error(out.error||'Twitch request failed.');return out;}
 
 export async function getTwitchCustomRewards(){return callTwitchWorker('/admin/custom-rewards');}
+
+export async function setTwitchRedeemsEnabled(enabled){const {data,error}=await supabase.rpc('admin_set_twitch_redeems_enabled_v894',{requested_enabled:Boolean(enabled)});if(error)throw error;return data;}
