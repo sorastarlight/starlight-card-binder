@@ -2,12 +2,12 @@ const params = new URLSearchParams(location.search);
 const embedded = params.get('embed') === '1';
 const file = location.pathname.split('/').pop().toLowerCase();
 const routes = {
-  'binder.html':'binder','index.html':'binder','collection.html':'collection','checklist.html':'checklist','daily-booster.html':'daily',
-  'booster-shop.html':'shop','star-bits.html':'star-bits','redeem.html':'redeem','profile-settings.html':'profile',
+  'binder.html':'binder','index.html':'binder','home.html':'home','collection.html':'collection','checklist.html':'checklist','daily-booster.html':'daily',
+  'booster-shop.html':'shop','events.html':'events','star-bits.html':'star-bits','redeem.html':'redeem','notifications.html':'notifications','profile-settings.html':'profile',
   'trade-lists.html':'trades','trade-offers.html':'offers','collector.html':'collector','report-profile.html':'report',
   'about.html':'about','socials.html':'socials','admin-hub.html':'admin','admin-codes.html':'admin-codes',
   'admin-staff.html':'admin-staff','admin-audit.html':'admin-audit','admin-moderation.html':'admin-moderation',
-  'admin-boosters.html':'admin-boosters','admin-users.html':'admin-users'
+  'admin-boosters.html':'admin-boosters','admin-news.html':'admin-news','admin-notifications.html':'admin-notifications','admin-users.html':'admin-users'
 };
 function routeForUrl(value){try{const u=new URL(value,location.href);return {u,route:routes[u.pathname.split('/').pop().toLowerCase()]||null}}catch{return {u:null,route:null}}}
 function parentNavigate(route,u){if(!route)return false;const args={type:'starlight-navigate',view:route,params:{}};if(u)for(const[k,v]of u.searchParams)if(!['embed','view','shellBuild','shellLoad','shellRetry'].includes(k))args.params[k]=v;parent.postMessage(args,location.origin);return true;}

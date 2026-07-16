@@ -4,7 +4,7 @@ import { getMyTradeOffers } from './trade-offer-service.js';
 import { getMyNotifications } from './notification-service.js';
 import { getActiveEvents } from './event-service.js';
 
-const SHELL_BUILD = '88.3.0';
+const SHELL_BUILD = '88.3.1';
 const VIEW_READY_TIMEOUT_MS = 6500;
 const MAX_VIEW_RETRIES = 1;
 
