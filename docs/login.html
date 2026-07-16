@@ -281,7 +281,8 @@
             }
         }
 
-        @media (prefers-reduced-motion: reduce) {
+        .provider-login{display:grid;gap:14px;margin:18px 0 8px}.twitch-button{background:linear-gradient(135deg,#9146ff,#c084fc)!important}.provider-divider{display:flex;align-items:center;gap:12px;color:#7a7891;font-size:.85rem;font-weight:800}.provider-divider:before,.provider-divider:after{content:"";height:1px;background:rgba(107,198,248,.35);flex:1}.provider-divider span{white-space:nowrap}
+@media (prefers-reduced-motion: reduce) {
             *,
             *::before,
             *::after {
@@ -330,7 +331,7 @@
             </button>
         </div>
 
-        <form id="auth-form">
+        <section class="provider-login" aria-label="Sign in providers"><button id="twitch-auth-button" class="primary-button twitch-button" type="button">💜 Continue with Twitch</button><div class="provider-divider"><span>or continue with email</span></div></section><form id="auth-form">
             <div class="form-group">
                 <label for="email">
                     Email Address
@@ -431,11 +432,14 @@
 
         import {
             signIn,
-            signUp
+            signUp,
+            signInWithTwitch
         } from "./js/auth.js";
 
         const form =
             document.getElementById("auth-form");
+
+        const twitchAuthButton = document.getElementById("twitch-auth-button");
 
         const emailInput =
             document.getElementById("email");
@@ -483,6 +487,19 @@
             );
 
         let currentMode = "signin";
+        twitchAuthButton.addEventListener("click", async () => {
+            try {
+                twitchAuthButton.disabled = true;
+                twitchAuthButton.textContent = "Opening Twitch...";
+                const { error } = await signInWithTwitch();
+                if (error) throw error;
+            } catch (error) {
+                displayStatus(error.message || "Unable to continue with Twitch.", "error");
+                twitchAuthButton.disabled = false;
+                twitchAuthButton.textContent = "💜 Continue with Twitch";
+            }
+        });
+
 
         function displayStatus(message, type = "") {
             statusElement.textContent = message;

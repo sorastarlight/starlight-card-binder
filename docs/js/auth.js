@@ -40,6 +40,14 @@ export async function signIn(email, password) {
     });
 }
 
+
+export async function signInWithTwitch() {
+    return await supabase.auth.signInWithOAuth({
+        provider: 'twitch',
+        options: { redirectTo: getAuthRedirectUrl() }
+    });
+}
+
 /**
  * Signs the current user out.
  */
