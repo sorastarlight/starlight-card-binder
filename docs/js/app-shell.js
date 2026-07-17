@@ -5,7 +5,7 @@ import { getMyNotifications } from './notification-service.js';
 import { getActiveEvents } from './event-service.js';
 import { getReceivedRewards } from './received-rewards-service.js';
 
-const SHELL_BUILD = '89.2.0';
+const SHELL_BUILD = '90.2.0';
 const VIEW_READY_TIMEOUT_MS = 6500;
 const MAX_VIEW_RETRIES = 1;
 
@@ -20,7 +20,7 @@ const routes = {
   admin:{title:'Administration Hub',src:'admin-hub.html'}, 'admin-codes':{title:'Reward Code Console',src:'admin-codes.html'},
   'admin-staff':{title:'Staff Management',src:'admin-staff.html'}, 'admin-audit':{title:'Audit Log',src:'admin-audit.html'},
   'admin-moderation':{title:'Moderation Dashboard',src:'admin-moderation.html'},
-  'admin-boosters':{title:'Starlight Card Management',src:'admin-boosters.html'}, 'admin-twitch':{title:'Twitch Redeems',src:'admin-twitch.html'}, 'admin-gifts':{title:'Send Gifts',src:'admin-gifts.html'}, 'admin-news':{title:'News & Updates Management',src:'admin-news.html'}, 'admin-users':{title:'Registered User Directory',src:'admin-users.html'}, 'admin-notifications':{title:'Notification Broadcasts',src:'admin-notifications.html'}
+  'admin-boosters':{title:'Starlight Card Management',src:'admin-boosters.html'}, 'admin-health':{title:'Database Health & Backup',src:'admin-health.html'}, 'admin-twitch':{title:'Twitch Redeems',src:'admin-twitch.html'}, 'admin-gifts':{title:'Send Gifts',src:'admin-gifts.html'}, 'admin-news':{title:'News & Updates Management',src:'admin-news.html'}, 'admin-users':{title:'Registered User Directory',src:'admin-users.html'}, 'admin-notifications':{title:'Notification Broadcasts',src:'admin-notifications.html'}
 };
 
 const nativeView=document.getElementById('binderNativeView');
