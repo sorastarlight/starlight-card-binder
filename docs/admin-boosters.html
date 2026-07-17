@@ -741,7 +741,7 @@ function slotsHtml(b) {
     (b.slots || [])
       .map(
         (s) =>
-          `<div class="slot-row" data-slot="${s.id}"><div class="field"><label>${esc(s.name)}</label><input data-slot-name value="${esc(s.name)}" disabled></div><div class="field"><label>Cards</label><input data-slot-qty type="number" min="1" value="${s.quantity}"></div>${["Common", "Uncommon", "Rare", "Epic", "Legendary"].map((r) => `<div class="field"><label>${r} %</label><input data-rate="${r}" type="number" min="0" max="100" step=".01" value="${s.rates?.[r] || 0}"></div>`).join("")}<button class="btn" data-save-slot>Save Slot</button><div class="full"><span class="rate-total" data-rate-total>Calculating total…</span></div></div>`,
+          `<div class="slot-row" data-slot="${s.id || ""}" data-slot-key="${esc(s.slotKey || `slot_${i + 1}`)}"><div class="field"><label>${esc(s.name)}</label><input data-slot-name value="${esc(s.name)}" disabled></div><div class="field"><label>Cards</label><input data-slot-qty type="number" min="1" value="${s.quantity}"></div>${["Common", "Uncommon", "Rare", "Epic", "Legendary"].map((r) => `<div class="field"><label>${r} %</label><input data-rate="${r}" type="number" min="0" max="100" step=".01" value="${s.rates?.[r] || 0}"></div>`).join("")}<button class="btn" data-save-slot>Save Slot</button><div class="full"><span class="rate-total" data-rate-total>Calculating total…</span></div></div>`,
       )
       .join("") ||
     '<p class="lead">This booster has no rarity slots. Use Copy Booster or a template to begin with ready-made slots.</p>'
@@ -934,6 +934,10 @@ Shop price: ${$("#eBoosterCost").value || 0} Star Bits`;
     }
   };
   $("#saveBooster").onclick = async () => {
+    const saveButton = $("#saveBooster");
+    const originalLabel = saveButton.textContent;
+    saveButton.disabled = true;
+    saveButton.textContent = "Saving…";
     try {
       const rewardCards = [...body.querySelectorAll("[data-reward-row]")].map(
         (row, i) => ({
@@ -955,19 +959,20 @@ Shop price: ${$("#eBoosterCost").value || 0} Star Bits`;
       );
       if ($("#eRewardMode").value === "slots" && invalid)
         throw new Error("Every rarity slot must total 100%.");
-      if ($("#eRewardMode").value === "slots") {
-        for (const row of body.querySelectorAll("[data-slot]")) {
-          const rates = {};
-          row.querySelectorAll("[data-rate]").forEach((x) => {
-            rates[x.dataset.rate] = Number(x.value) || 0;
-          });
-          await saveBoosterSlot(
-            row.dataset.slot,
-            row.querySelector("[data-slot-qty]").value,
-            rates,
-          );
-        }
-      }
+      const slots = [...body.querySelectorAll("[data-slot]")].map((row, index) => {
+        const rates = {};
+        row.querySelectorAll("[data-rate]").forEach((x) => {
+          rates[x.dataset.rate] = Number(x.value) || 0;
+        });
+        return {
+          id: Number(row.dataset.slot) || null,
+          slotKey: row.dataset.slotKey || `slot_${index + 1}`,
+          name: row.querySelector("[data-slot-name]")?.value || `Slot ${index + 1}`,
+          quantity: Number(row.querySelector("[data-slot-qty]").value) || 1,
+          sortOrder: index,
+          rates,
+        };
+      });
       await saveBooster({
         id: $("#eBoosterId").value,
         name: $("#eBoosterName").value,
@@ -989,10 +994,15 @@ Shop price: ${$("#eBoosterCost").value || 0} Star Bits`;
         finishIds: selectedValues($("#boosterFinishes")),
         excludePromos: $("#excludePromos").checked,
         allowDuplicates: $("#allowDuplicates").checked,
+        slots,
       });
-      await reload("Booster pack saved.");
+      await reload("Booster pack saved successfully.");
     } catch (err) {
-      say(err.message, "error");
+      console.error("[Starlight] Booster save failed", err);
+      say(err?.message || "The booster could not be saved.", "error");
+    } finally {
+      saveButton.disabled = false;
+      saveButton.textContent = originalLabel;
     }
   };
   if (b.id) {
@@ -1039,11 +1049,19 @@ Shop price: ${$("#eBoosterCost").value || 0} Star Bits`;
         }))
       )
         return;
+      const deleteButton = $("#deleteBooster");
+      const originalDeleteLabel = deleteButton.textContent;
+      deleteButton.disabled = true;
+      deleteButton.textContent = "Deleting…";
       try {
-        await safeDeleteBooster(b.id);
-        await reload("Booster safely deleted.");
+        const result = await safeDeleteBooster(b.id);
+        await reload(`Booster deleted. ${Number(result?.deletedTwitchRules || 0)} Twitch rule(s) removed and ${Number(result?.cancelledPendingGifts || 0)} pending gift(s) cancelled.`);
       } catch (e) {
-        say(e.message, "error");
+        console.error("[Starlight] Booster deletion failed", e);
+        say(e?.message || "The booster could not be deleted.", "error");
+      } finally {
+        deleteButton.disabled = false;
+        deleteButton.textContent = originalDeleteLabel;
       }
     };
   }
