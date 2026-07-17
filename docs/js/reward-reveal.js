@@ -4,6 +4,9 @@ const FLIP_SOUND = 'site_assets/sfx/card-flip.wav';
 
 const wait = ms => new Promise(resolve => window.setTimeout(resolve, ms));
 const frontUrl = card => card?.imageUrl || card?.image_url || card?.thumbnailUrl || card?.thumbnail_url || DEFAULT_BACK;
+const prettyMeta = value => String(value || '').trim().replace(/[_-]+/g,' ').replace(/\b\w/g,m=>m.toUpperCase());
+const categoryOf = card => prettyMeta(card?.categoryName || card?.category_name || card?.categoryId || card?.category_id || '');
+const subcategoryOf = card => prettyMeta(card?.subcategoryName || card?.subcategory_name || card?.subcategoryId || card?.subcategory_id || '');
 
 function soundEnabled() {
   return localStorage.getItem(SFX_KEY) !== 'off';
@@ -180,7 +183,8 @@ export function revealRewardSequence(cards = [], options = {}) {
       await wait(340);
       cardButton.classList.remove('is-returning');
       title.textContent = card.name || 'Mystery Card';
-      detail.textContent = `${card.rarity || 'Common'} · ${card.seriesName || 'Starlight Cards'}${card.isDuplicate ? ' · Duplicate' : ' · New Card'}`;
+      const identity = [card.rarity || 'Common', categoryOf(card), subcategoryOf(card)].filter(Boolean).join(' · ');
+      detail.textContent = `${identity || 'Starlight Card'}${card.isDuplicate ? ' · Duplicate' : ' · New Card'}`;
       hint.textContent = index === rewards.length - 1 ? 'Click the card to view your pack summary' : 'Click the card or Next Card to continue';
       stage.classList.add('is-revealed');
       revealed = true;

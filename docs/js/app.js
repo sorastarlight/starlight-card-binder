@@ -53,6 +53,58 @@ function displayName(card) { return String(card?.name || '').trim() || `Card ${c
 function revealButtonHtml() { return ''; }
 function revealBigButtonHtml() { return ''; }
 
+function taxonomyLabel(name, id, fallback = '') {
+  const raw = String(name || id || fallback || '').trim();
+  if (!raw) return '';
+  return raw
+    .replace(/[_-]+/g, ' ')
+    .replace(/\b\w/g, m => m.toUpperCase());
+}
+function categoryLabel(card) { return taxonomyLabel(card?.categoryName, card?.categoryId, 'Uncategorized'); }
+function subcategoryLabel(card) { return taxonomyLabel(card?.subcategoryName, card?.subcategoryId); }
+function variantLabel(card) { return taxonomyLabel(card?.variantName, card?.variantId, 'Standard Art'); }
+function finishLabel(card) { return taxonomyLabel(card?.finishName, card?.finishId, 'Standard'); }
+function distributionLabel(card) {
+  const labels = {
+    booster_pull: 'Booster Pull', redeem_code: 'Redeem Code', twitch_reward: 'Twitch Reward',
+    event_reward: 'Event Reward', admin_gift: 'Admin Gift', promo: 'Promo', special: 'Special Distribution'
+  };
+  return labels[String(card?.distributionType || '').toLowerCase()] || taxonomyLabel('', card?.distributionType, 'Booster Pull');
+}
+function isStandardMeta(value) {
+  return ['standard', 'standard art', 'booster pull', 'published'].includes(String(value || '').trim().toLowerCase());
+}
+function cardIdentityChips(card, { full = false, hidden = false } = {}) {
+  if (hidden) return `<span class="card-meta-chip muted">Details unlock when collected</span>`;
+  const chips = [
+    `<span class="card-meta-chip rarity ${rarityClass(card)}">${esc(card?.rarity || 'Common')}</span>`,
+    `<span class="card-meta-chip category">${esc(categoryLabel(card))}</span>`
+  ];
+  const sub = subcategoryLabel(card);
+  if (sub) chips.push(`<span class="card-meta-chip subcategory">${esc(sub)}</span>`);
+  const variant = variantLabel(card);
+  const finish = finishLabel(card);
+  if (full || !isStandardMeta(variant)) chips.push(`<span class="card-meta-chip variant">${esc(variant)}</span>`);
+  if (full || !isStandardMeta(finish)) chips.push(`<span class="card-meta-chip finish">${esc(finish)}</span>`);
+  return chips.join('');
+}
+function cardExpandedDetails(card) {
+  const rows = [];
+  const distribution = distributionLabel(card);
+  if (distribution) rows.push(`<p><b>Distribution</b><span>${esc(distribution)}</span></p>`);
+  if (card?.isPromo) rows.push(`<p><b>Special Status</b><span>Promo Card</span></p>`);
+  if (card?.isEventExclusive) rows.push(`<p><b>Special Status</b><span>Event Exclusive</span></p>`);
+  if (card?.availableFrom || card?.availableUntil) {
+    const from = card.availableFrom ? new Date(card.availableFrom).toLocaleDateString() : 'Always';
+    const until = card.availableUntil ? new Date(card.availableUntil).toLocaleDateString() : 'No end date';
+    rows.push(`<p><b>Availability</b><span>${esc(from)} – ${esc(until)}</span></p>`);
+  }
+  if (Array.isArray(card?.tags) && card.tags.length) {
+    rows.push(`<div class="card-tag-row">${card.tags.slice(0, 8).map(tag => `<span>${esc(tag)}</span>`).join('')}</div>`);
+  }
+  return rows.join('');
+}
+
 const activeSfx = {};
 let lastHoverSfxAt = 0;
 let lastHoverSfxId = '';
@@ -168,6 +220,22 @@ function normalize(row, i) {
     seriesDescription: String(row.seriesDescription || row.setDescription || "").trim(),
     boosterImageUrl: String(row.boosterImageUrl || row.boosterImageURL || row.packImageUrl || row.packImageURL || BOOSTER_PACK_URL).trim(),
     rarity: String(row.rarity || "Common").trim(),
+    categoryId: String(row.categoryId || row.category_id || "").trim(),
+    categoryName: String(row.categoryName || row.category_name || "").trim(),
+    subcategoryId: String(row.subcategoryId || row.subcategory_id || "").trim(),
+    subcategoryName: String(row.subcategoryName || row.subcategory_name || "").trim(),
+    variantId: String(row.variantId || row.variant_id || "").trim(),
+    variantName: String(row.variantName || row.variant_name || "").trim(),
+    finishId: String(row.finishId || row.finish_id || "").trim(),
+    finishName: String(row.finishName || row.finish_name || "").trim(),
+    collectorNumber: String(row.collectorNumber || row.collector_number || number).trim(),
+    distributionType: String(row.distributionType || row.distribution_type || "booster_pull").trim(),
+    publishStatus: String(row.publishStatus || row.publish_status || "published").trim(),
+    tags: Array.isArray(row.tags) ? row.tags : [],
+    isPromo: Boolean(row.isPromo ?? row.is_promo ?? false),
+    isEventExclusive: Boolean(row.isEventExclusive ?? row.is_event_exclusive ?? false),
+    availableFrom: String(row.availableFrom || row.available_from || "").trim(),
+    availableUntil: String(row.availableUntil || row.available_until || "").trim(),
     imageUrl: String(row.imageUrl || row.imageURL || row.image || CARD_BACK_URL).trim(),
     thumbnailUrl: String(row.thumbnailUrl || row.thumbnail || row.thumb || row.imageUrl || row.imageURL || row.image || CARD_BACK_URL).trim(),
     cardDescription: String(row.cardDescription || row.description || row.lore || "A mysterious Starlight card waiting to sparkle.").trim(),
@@ -603,16 +671,22 @@ function renderDetail() {
       <span class="face back"><img src="${CARD_BACK_URL}" alt="Card back"></span>
     </span>
   </button>
-  <div class="detail-card-info">
-    <h2>${esc(getVisibleName(selected))}</h2>
-    <span class="pill rarity-pill ${rarityClass(selected)}">${esc(getVisibleRarity(selected))}</span>
+  <div class="detail-card-info db2-card-info">
+    <div class="db2-card-heading">
+      <div>
+        <p class="db2-collector-line">${esc(selected.seriesId ? `S${String(selected.seriesId).padStart(2,'0')}` : 'Starlight')} · ${esc(selected.collectorNumber || selected.number)}</p>
+        <h2>${esc(getVisibleName(selected))}</h2>
+      </div>
+      <span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${getCardQuantity(selected.id)}` : 'Not Collected'}</span>
+    </div>
+    <div class="card-meta-chips">${cardIdentityChips(selected, { hidden })}</div>
     <div class="detail-list clean-detail-list">
       <p><b>Series</b><span>${esc(selected.series)}</span></p>
-      <p><b>Card Number</b><span>${esc(selected.number)} / ${String(cards.length).padStart(3,'0')}</span></p>
-      <p><b>Artist</b><span>${esc(selected.artist)}</span></p>
-      <p><b>Owned</b><span>×${getCardQuantity(selected.id)}</span></p>
+      <p><b>Collector Number</b><span>${esc(selected.collectorNumber || selected.number)}</span></p>
+      ${got && selected.artist ? `<p><b>Illustrator</b><span>${esc(selected.artist)}</span></p>` : ''}
     </div>
-    <p class="description"><b>Description</b><br>${esc(getVisibleDescription(selected))}</p>
+    <div class="db2-story"><b>Card Story</b><p>${esc(getVisibleDescription(selected))}</p></div>
+    ${got ? `<details class="db2-more"><summary>Collection Details</summary><div class="detail-list clean-detail-list">${cardExpandedDetails(selected)}</div></details>` : ''}
   </div>
   <div class="detail-actions">
     <span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${getCardQuantity(selected.id)}` : 'Not Collected'}</span>
@@ -675,9 +749,11 @@ function renderFullView() {
           </span>
         </div>
       </div>
-      <div class="analyzer-info-card">
-        <div class="analyzer-title-row"><div><p class="eyebrow">Card Scan Complete</p><h2>${esc(visibleName)}</h2></div><span class="rarity-text analyzer-rarity ${rarityClass(selected)}">${esc(visibleRarity)}</span></div>
-        <div class="analyzer-data-grid"><span><b>Series</b>${esc(selected.series || 'Unknown')}</span><span><b>Card #</b>${esc(selected.number || '???')}</span>${selected.artist ? `<span><b>Artist</b>${esc(selected.artist)}</span>` : ''}</div>
+      <div class="analyzer-info-card db2-full-info">
+        <div class="analyzer-title-row"><div><p class="eyebrow">Card Scan Complete</p><h2>${esc(visibleName)}</h2><p class="db2-collector-line">${esc(selected.collectorNumber || selected.number || '???')} · ${esc(selected.series || 'Unknown Series')}</p></div></div>
+        <div class="card-meta-chips">${cardIdentityChips(selected, { full: true, hidden })}</div>
+        <div class="analyzer-data-grid"><span><b>Series</b>${esc(selected.series || 'Unknown')}</span><span><b>Collector #</b>${esc(selected.collectorNumber || selected.number || '???')}</span>${got && selected.artist ? `<span><b>Illustrator</b>${esc(selected.artist)}</span>` : ''}${got ? `<span><b>Owned</b>×${getCardQuantity(selected.id)}</span>` : ''}</div>
+        ${got ? `<div class="db2-full-story"><b>Card Story</b><p>${esc(selected.cardDescription || 'No card story has been added yet.')}</p></div><details class="db2-more"><summary>Distribution & Tags</summary><div class="detail-list clean-detail-list">${cardExpandedDetails(selected)}</div></details>` : ''}
         <p class="analyzer-description">${esc(getVisibleDescription(selected))}</p>
       </div>
     </section>
@@ -698,7 +774,7 @@ function renderGridPage(target, mode) {
   wrap.classList.toggle('empty-grid', !list.length);
   wrap.innerHTML = list.length ? list.map(c => {
     const got = isCollected(c.id); const hidden = !got;
-    return `<article class="collection-card ${rarityClass(c)}"><div class="collection-image">${quantityBadgesHtml(c.id)}<img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"></div><h3>${esc(getVisibleName(c))}</h3><p>${esc(c.number)} • <span class="rarity-text ${rarityClass(c)}">${esc(getVisibleRarity(c))}</span> • ${esc(c.series)}</p><div class="card-buttons"><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${getCardQuantity(c.id)}` : 'Not Collected'}</span>${got ? `<button class="icon-btn" onclick="toggleFavorite('${esc(c.id)}')">${isFavorite(c.id)?'★':'☆'}</button>` : ''}</div></article>`;
+    return `<article class="collection-card ${rarityClass(c)}"><div class="collection-image">${quantityBadgesHtml(c.id)}<img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"></div><h3>${esc(getVisibleName(c))}</h3><p class="collection-card-number">${esc(c.collectorNumber || c.number)} • ${esc(c.series)}</p><div class="card-meta-chips compact">${cardIdentityChips(c,{hidden})}</div><div class="card-buttons"><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${getCardQuantity(c.id)}` : 'Not Collected'}</span>${got ? `<button class="icon-btn" onclick="toggleFavorite('${esc(c.id)}')">${isFavorite(c.id)?'★':'☆'}</button>` : ''}</div></article>`;
   }).join('') : `<div class="empty-state"><h2>${mode === 'favorites' ? 'No favorites yet' : 'No cards here yet'}</h2><p>${mode === 'favorites' ? 'Tap the star on your favorite cards and this showcase will sparkle to life.' : 'Earn cards from Daily Boosters, redemption codes, and special rewards to fill this collection.'}</p><a class="btn primary" href="binder.html">Open Binder</a></div>`;
   renderFavoritesShowcase();
   attachTileTilts();
@@ -763,7 +839,7 @@ function renderChecklist() {
   const body = $('#checklistBody'); if (!body) return;
   body.innerHTML = cards.map(c => {
     const got = isCollected(c.id); const hidden = !got;
-    return `<tr class="item"><td><div class="check-card"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"><span>${esc(c.number)}</span></div></td><td>${esc(getVisibleName(c))}</td><td>${esc(c.series)}</td><td>${esc(c.artist)}</td><td><span class="rarity-text ${rarityClass(c)}">${esc(getVisibleRarity(c))}</span></td><td><b>×${getCardQuantity(c.id)}</b>${getCardQuantity(c.id)>1?`<br><small>+${getCardQuantity(c.id)-1} extra</small>`:""}</td><td><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? 'Collected' : 'Not Collected'}</span></td><td>${got ? `<button class="icon-btn" onclick="toggleFavorite('${esc(c.id)}')">${isFavorite(c.id)?'★':'☆'}</button>` : '<span class="soft-note">—</span>'}</td></tr>`;
+    return `<tr class="item"><td><div class="check-card"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"><span>${esc(c.collectorNumber || c.number)}</span></div></td><td>${esc(getVisibleName(c))}</td><td>${esc(c.series)}</td><td>${hidden?'—':`<span class="card-meta-chip category">${esc(categoryLabel(c))}</span>${subcategoryLabel(c)?`<br><small>${esc(subcategoryLabel(c))}</small>`:''}`}</td><td><span class="rarity-text ${rarityClass(c)}">${esc(getVisibleRarity(c))}</span></td><td><b>×${getCardQuantity(c.id)}</b>${getCardQuantity(c.id)>1?`<br><small>+${getCardQuantity(c.id)-1} extra</small>`:""}</td><td><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? 'Collected' : 'Not Collected'}</span></td><td>${got ? `<button class="icon-btn" onclick="toggleFavorite('${esc(c.id)}')">${isFavorite(c.id)?'★':'☆'}</button>` : '<span class="soft-note">—</span>'}</td></tr>`;
   }).join('');
 }
 function renderAbout() {

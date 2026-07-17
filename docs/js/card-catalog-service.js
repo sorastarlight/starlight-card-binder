@@ -4,7 +4,7 @@ const CACHE_KEY = "sora-starlight-card-binder-v86-supabase-card-catalog";
 const LEGACY_CACHE_KEY = "sora-starlight-card-binder-v66-card-cache";
 const CHANGE_KEY = "sora-starlight-card-binder-card-catalog-change";
 const CHANNEL_NAME = "starlight-card-catalog";
-const CACHE_VERSION = 1;
+const CACHE_VERSION = 2;
 
 let channel = null;
 try {
@@ -34,12 +34,19 @@ function normalizeCatalogCard(row, index = 0) {
         categoryId: cleanText(row?.categoryId ?? row?.category_id),
         categoryName: cleanText(row?.categoryName ?? row?.category_name ?? row?.category?.name),
         subcategoryId: cleanText(row?.subcategoryId ?? row?.subcategory_id),
+        subcategoryName: cleanText(row?.subcategoryName ?? row?.subcategory_name ?? row?.subcategory?.name),
         variantId: cleanText(row?.variantId ?? row?.variant_id),
+        variantName: cleanText(row?.variantName ?? row?.variant_name ?? row?.variant?.name),
         finishId: cleanText(row?.finishId ?? row?.finish_id),
+        finishName: cleanText(row?.finishName ?? row?.finish_name ?? row?.finish?.name),
         collectorNumber: cleanText(row?.collectorNumber ?? row?.collector_number ?? cardNumber),
         distributionType: cleanText(row?.distributionType ?? row?.distribution_type ?? 'booster_pull'),
         publishStatus: cleanText(row?.publishStatus ?? row?.publish_status ?? 'published'),
         tags: Array.isArray(row?.tags) ? row.tags : [],
+        isPromo: row?.isPromo ?? row?.is_promo ?? false,
+        isEventExclusive: row?.isEventExclusive ?? row?.is_event_exclusive ?? false,
+        availableFrom: cleanText(row?.availableFrom ?? row?.available_from),
+        availableUntil: cleanText(row?.availableUntil ?? row?.available_until),
         imageUrl: cleanText(row?.imageUrl ?? row?.image_url),
         thumbnailUrl: cleanText(row?.thumbnailUrl ?? row?.thumbnail_url ?? row?.imageUrl ?? row?.image_url),
         cardDescription: cleanText(row?.cardDescription ?? row?.description),
@@ -124,6 +131,10 @@ async function fetchViaTables() {
             collector_number,
             distribution_type,
             publish_status,
+            is_promo,
+            is_event_exclusive,
+            available_from,
+            available_until,
             image_url,
             thumbnail_url,
             description,
