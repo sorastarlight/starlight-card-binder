@@ -21,7 +21,7 @@ body{min-height:100vh}.redeem-page{width:min(100%,900px);margin:auto;padding:28p
 <script type="module">
 import { supabase } from './js/supabase-client.js';
 import { redeemRewardCode } from './js/redemption-service.js';
-import { revealRewardSequence } from './js/reward-reveal.js';
+import { revealRewardSequence } from './js/reward-reveal.js?v=92.0';
 const form=document.getElementById('redeem-form'),input=document.getElementById('code'),button=document.getElementById('redeem-button'),status=document.getElementById('status'),box=document.getElementById('reward-box'),title=document.getElementById('reward-title'),description=document.getElementById('reward-description');
 function showStatus(message,type=''){status.textContent=message;status.className=`status ${type}`.trim()}
 const {data}=await supabase.auth.getUser();if(!data.user){showStatus('Please sign in before redeeming a code.','error');button.disabled=true;setTimeout(()=>location.href='login.html',1400)}
