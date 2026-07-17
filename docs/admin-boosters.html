@@ -4,6 +4,18 @@
 .booster-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.helper-card{padding:14px;border:1px solid rgba(107,198,248,.3);border-radius:14px;background:linear-gradient(135deg,#f4fbff,#fff6fb)}.helper-card h4{margin:0 0 6px;color:#405fa1}.template-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.template-choice{padding:14px;border:2px solid rgba(107,198,248,.25);border-radius:14px;background:#fff;text-align:left;cursor:pointer}.template-choice:hover{border-color:var(--p);transform:translateY(-1px)}.odds-summary{padding:14px;border-radius:14px;background:#f5f9ff;line-height:1.55}.rate-total{font-weight:900}.rate-total.good{color:#167048}.rate-total.bad{color:#b4233f}.advanced-box{margin-top:12px}.frequency-note{display:block;margin-top:5px;color:var(--muted);font-size:.8rem}.slot-presets{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.plain-preview{white-space:pre-wrap;font-family:inherit}
 
 .catalog-filters{display:grid;grid-template-columns:2fr repeat(4,minmax(140px,1fr));gap:9px;margin:12px 0 18px}.catalog-filters input,.catalog-filters select{min-height:42px;padding:9px 12px;border:2px solid rgba(107,198,248,.28);border-radius:11px;background:#fff}.taxonomy-chip{display:inline-flex;padding:5px 10px;border-radius:999px;background:linear-gradient(135deg,#eaf8ff,#fff0f8);color:#405fa1;font-weight:900;font-size:.78rem}.wizard-steps{display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 18px}.wizard-steps span{padding:7px 11px;border-radius:999px;background:#f4f9ff;color:#536184;font-weight:850;font-size:.8rem}.booster-builder-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;padding:16px;border-radius:18px;background:linear-gradient(135deg,#eef9ff,#fff1f8);margin-bottom:16px}.switch-row{display:flex;align-items:center;gap:8px;font-weight:900;color:#405fa1;white-space:nowrap}.preset-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.preset-cards .template-choice strong,.preset-cards .template-choice span{display:block}.preset-cards .template-choice span{margin-top:5px;color:var(--muted);font-size:.78rem}.field select[multiple]{min-height:130px}.card-db-item p{line-height:1.5}@media(max-width:1000px){.catalog-filters{grid-template-columns:1fr 1fr}.preset-cards{grid-template-columns:1fr}.booster-builder-head{flex-direction:column}}
+
+.chip-picker{display:flex;flex-wrap:wrap;gap:8px;padding:12px;border:2px solid rgba(107,198,248,.22);border-radius:14px;background:linear-gradient(145deg,#fff,#f7fbff)}
+.chip-picker button{border:1px solid rgba(107,198,248,.35);border-radius:999px;padding:8px 12px;background:#fff;color:#405fa1;font:inherit;font-weight:850;cursor:pointer;transition:.15s ease}
+.chip-picker button:hover{transform:translateY(-1px);border-color:var(--p)}
+.chip-picker button.selected{border-color:transparent;background:linear-gradient(135deg,var(--b),var(--p));color:#fff;box-shadow:0 6px 14px rgba(255,130,200,.18)}
+.chip-picker-tools{display:flex;gap:8px;align-items:center;margin:8px 0}.chip-picker-tools .btn{padding:7px 11px;font-size:.78rem}
+.toggle-grid{display:grid;grid-template-columns:repeat(2,minmax(220px,1fr));gap:10px}
+.toggle-card{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 14px;border:1px solid rgba(107,198,248,.28);border-radius:14px;background:linear-gradient(145deg,#fff,#f6fbff)}
+.toggle-card strong{display:block;color:#405fa1}.toggle-card small{display:block;margin-top:3px;color:var(--muted)}
+.toggle-switch{position:relative;display:inline-flex;width:52px;height:29px;flex:0 0 auto}.toggle-switch input{position:absolute;opacity:0;pointer-events:none}.toggle-switch span{position:absolute;inset:0;border-radius:999px;background:#dce5f3;box-shadow:inset 0 0 0 1px rgba(64,95,161,.12);cursor:pointer;transition:.2s}.toggle-switch span:after{content:"";position:absolute;width:23px;height:23px;left:3px;top:3px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(31,39,75,.24);transition:.2s}.toggle-switch input:checked+span{background:linear-gradient(135deg,var(--p),var(--b))}.toggle-switch input:checked+span:after{transform:translateX(23px)}
+.reference-report{max-height:340px;overflow:auto;padding:12px;border-radius:14px;background:#f5f9ff}.reference-row{display:flex;justify-content:space-between;gap:12px;padding:8px 4px;border-bottom:1px solid rgba(107,198,248,.18)}.reference-row:last-child{border-bottom:0}
+@media(max-width:700px){.toggle-grid{grid-template-columns:1fr}}
 </style><script src="js/firefox-performance.js" defer></script>    <link rel="stylesheet" href="css/shared-ui.css">
 </head><body><script src="js/embed-mode.js" type="module"></script><div class="sky"></div><main class="studio"><section class="shell"><p class="eyebrow">Administration Hub</p><h1>Starlight Card Management</h1><p class="lead">Manage series, cards, booster packs, reward pools, and uploaded artwork from one organized workspace.</p><p id="status" class="status">Loading Starlight Card Management…</p><div id="app" class="hidden"><div class="top-grid" id="metrics"></div><div class="tabs"><button class="active" data-tab="overview">Dashboard</button><button data-tab="series">Series</button><button data-tab="cards">Cards</button><button data-tab="boosters">Booster Packs</button><button data-tab="assets">Asset Library</button><button data-tab="events">Events</button><button data-tab="maintenance">Maintenance</button></div><section id="overviewTab"></section><section id="seriesTab" class="hidden"></section><section id="cardsTab" class="hidden"></section><section id="boostersTab" class="hidden"></section><section id="assetsTab" class="hidden"></section><section id="eventsTab" class="hidden"></section><section id="maintenanceTab" class="hidden"></section></div></section></main><div id="editor" class="editor hidden" role="dialog" aria-modal="true"><section class="editor-card"><div class="editor-head"><h2 id="editorTitle">Editor</h2><button id="closeEditor" class="close" aria-label="Close">×</button></div><div id="editorBody"></div></section></div>
 <script type="module">
@@ -17,6 +29,10 @@ import {
   deleteSeries,
   deleteCard,
   deleteBooster,
+  inspectBoosterReferences,
+  renameBoosterId,
+  detachBoosterFromShop,
+  safeDeleteBooster,
   setDailyMode,
   uploadStudioAsset,
   uploadCardArtworkPair,
@@ -94,6 +110,33 @@ function taxonomyOptions(items, value, emptyLabel = "Choose…") {
 }
 function selectedValues(select) {
   return [...select.selectedOptions].map((o) => o.value).filter(Boolean);
+}
+function chipPicker(id, items, selected = []) {
+  const chosen = new Set(selected || []);
+  return `<div class="chip-picker-tools"><button type="button" class="btn" data-chip-all="${id}">Select All</button><button type="button" class="btn" data-chip-clear="${id}">Clear All</button><span class="lead" id="${id}Summary">${chosen.size ? `${chosen.size} selected` : "All allowed"}</span></div><div class="chip-picker" data-chip-picker="${id}">${(items || []).filter(x=>x.isActive!==false).map(x=>`<button type="button" data-chip-value="${esc(x.id)}" class="${chosen.has(x.id) ? "selected" : ""}">${esc(x.name)}</button>`).join("")}</div><select id="${id}" multiple class="hidden">${(items || []).filter(x=>x.isActive!==false).map(x=>`<option value="${esc(x.id)}" ${chosen.has(x.id) ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select>`;
+}
+function wireChipPicker(id, onChange = () => {}) {
+  const picker = body.querySelector(`[data-chip-picker="${id}"]`), select = $(`#${id}`), summary = $(`#${id}Summary`);
+  if (!picker || !select) return;
+  const sync = (notify = true) => {
+    const selected = new Set(selectedValues(select));
+    picker.querySelectorAll("[data-chip-value]").forEach(btn => btn.classList.toggle("selected", selected.has(btn.dataset.chipValue)));
+    if (summary) summary.textContent = selected.size ? `${selected.size} selected` : "All allowed";
+    if (notify) onChange();
+  };
+  picker.onclick = e => {
+    const btn = e.target.closest("[data-chip-value]");
+    if (!btn) return;
+    const option = [...select.options].find(o => o.value === btn.dataset.chipValue);
+    if (option) option.selected = !option.selected;
+    sync();
+  };
+  body.querySelector(`[data-chip-all="${id}"]`)?.addEventListener("click",()=>{[...select.options].forEach(o=>o.selected=true);sync();});
+  body.querySelector(`[data-chip-clear="${id}"]`)?.addEventListener("click",()=>{[...select.options].forEach(o=>o.selected=false);sync();});
+  sync(false);
+}
+function toggleControl(id, label, checked, detail = "") {
+  return `<div class="toggle-card"><div><strong>${esc(label)}</strong>${detail ? `<small>${esc(detail)}</small>` : ""}</div><label class="toggle-switch"><input id="${id}" type="checkbox" ${checked ? "checked" : ""}><span></span></label></div>`;
 }
 function categoryName(id) {
   return data.categories?.find((x) => x.id === id)?.name || "Uncategorized";
@@ -722,12 +765,14 @@ function boosterEditor(
 ) {
   openEditor(
     b.id ? "Configure Booster Pack" : "Create Booster Pack",
-    `<div class="booster-builder-head"><div><span class="taxonomy-chip">Guided Booster Builder 2.0</span><h3>Build the pack in plain language</h3><p>Choose where cards come from, apply optional filters, then use a ready-made odds preset. Advanced percentages stay hidden unless you need them.</p></div><label class="switch-row"><span>Advanced Mode</span><input id="advancedBuilder" type="checkbox" ${b.builderMode === "advanced" ? "checked" : ""}></label></div><div class="form-grid"><div class="field"><label>Booster ID</label><input id="eBoosterId" value="${esc(b.id || "")}" ${b.id ? "readonly" : ""}></div><div class="field"><label>Name</label><input id="eBoosterName" value="${esc(b.name || "")}"></div><div class="field full"><label>Description</label><textarea id="eBoosterDescription">${esc(b.description || "")}</textarea></div><div class="field"><label>What does this pack award?</label><select id="eRewardMode"><option value="slots">Cards using rarity odds</option><option value="series">Random cards from one series</option><option value="exact">Exact selected cards</option><option value="weighted_pool">Custom selected card pool</option><option value="single">One exact card</option><option value="mixed">Cards + Star Bits</option></select></div><div class="field"><label>Restrict to Series</label><select id="eBoosterSeries"><option value="">All series</option>${options(data.series, b.seriesId)}</select></div><div class="field"><label>Cards Per Pack</label><input id="eBoosterCount" type="number" min="1" max="50" value="${b.cardCount || 4}"></div><div class="field"><label>Default Pull-Rate Preset</label><select id="oddsPreset"><option value="standard">Standard — Rare 70%, Epic 22%, Legendary 8%</option><option value="generous">Generous — Rare 60%, Epic 30%, Legendary 10%</option><option value="premium">Premium — Rare 45%, Epic 40%, Legendary 15%</option><option value="custom">Custom / Keep Current</option></select></div><div class="field full"><label>Optional Category Filters</label><select id="boosterCategories" multiple size="5">${(data.categories || []).map((x) => `<option value="${esc(x.id)}" ${(b.categoryIds || []).includes(x.id) ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select><small>Leave everything unselected to allow every category.</small></div><div class="field full"><label>Optional Finish Filters</label><select id="boosterFinishes" multiple size="4">${(data.finishes || []).map((x) => `<option value="${esc(x.id)}" ${(b.finishIds || []).includes(x.id) ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select><small>Leave everything unselected to allow every finish.</small></div><div class="field"><label>Bonus Star Bits</label><input id="eBoosterBits" type="number" min="0" value="${b.bonusStarBits || 0}"></div><div class="field"><label>Star Bits Cost</label><input id="eBoosterCost" type="number" min="0" value="${b.starBitsCost || 0}"></div><div class="field"><label>Sort Order</label><input id="eBoosterSort" type="number" value="${b.sortOrder || 0}"></div><div class="checks"><label><input id="excludePromos" type="checkbox" ${b.excludePromos !== false ? "checked" : ""}> Exclude promos</label><label><input id="allowDuplicates" type="checkbox" ${b.allowDuplicates !== false ? "checked" : ""}> Allow duplicate cards in one pack</label></div><div class="checks full"><label><input id="eBoosterActive" type="checkbox" ${b.isActive ? "checked" : ""}> Active</label><label><input id="eBoosterArchived" type="checkbox" ${b.archived ? "checked" : ""}> Archived</label></div><div>${imageBlock("ePackImage", b.packImageUrl, "booster-packs", "Pack Artwork")}</div><div>${imageBlock("eBackImage", b.cardBackUrl, "card-backs", "Card Back")}</div></div><div id="guidedOdds" class="reward-builder"><h3>Easy Pull Rates</h3><p class="lead">For a standard pack, keep 2 Common, 1 Uncommon, and 1 Rare-or-Better. Pick a preset and the percentages are filled automatically.</p><div class="preset-cards"><button type="button" class="template-choice" data-easy-preset="standard"><strong>Standard</strong><span>Rare 70 · Epic 22 · Legendary 8</span></button><button type="button" class="template-choice" data-easy-preset="generous"><strong>Generous</strong><span>Rare 60 · Epic 30 · Legendary 10</span></button><button type="button" class="template-choice" data-easy-preset="premium"><strong>Premium</strong><span>Rare 45 · Epic 40 · Legendary 15</span></button></div></div><div id="slotBuilder" class="reward-builder"><div class="toolbar"><div><h3>Advanced Slot Editor</h3><p class="lead">Each slot row must total exactly 100%. Only use this when a preset cannot describe your pack.</p></div><button id="balanceSlots" class="btn" type="button">Balance Automatically</button></div>${slotsHtml(b)}</div><div class="reward-builder"><h3>Pack Preview</h3><pre id="boosterPreview" class="odds-summary plain-preview"></pre></div><div id="rewardBuilder" class="reward-builder"><div class="toolbar"><div><h3>Exact Cards / Custom Pool</h3></div><button id="addReward" class="btn">＋ Add Card</button></div><div id="rewardRows">${rewardRows(b)}</div></div><div class="editor-actions"><button id="saveBooster" class="btn primary">Save Booster Pack</button>${b.id ? '<button id="copyThisBooster" class="btn">Copy Booster</button><button id="archiveBooster" class="btn archive">Archive Booster</button><button id="deleteBooster" class="btn danger">Delete Booster</button>' : ""}</div>`,
+    `<div class="booster-builder-head"><div><span class="taxonomy-chip">Guided Booster Builder 2.0</span><h3>Build the pack in plain language</h3><p>Choose where cards come from, apply optional filters, then use a ready-made odds preset. Advanced percentages stay hidden unless you need them.</p></div><div class="toggle-card"><div><strong>Advanced Mode</strong><small>Show raw slot percentages.</small></div><label class="toggle-switch"><input id="advancedBuilder" type="checkbox" ${b.builderMode === "advanced" ? "checked" : ""}><span></span></label></div></div><div class="form-grid"><div class="field"><label>Booster ID</label><input id="eBoosterId" value="${esc(b.id || "")}" ${b.id ? "readonly" : ""}></div><div class="field"><label>Name</label><input id="eBoosterName" value="${esc(b.name || "")}"></div><div class="field full"><label>Description</label><textarea id="eBoosterDescription">${esc(b.description || "")}</textarea></div><div class="field"><label>What does this pack award?</label><select id="eRewardMode"><option value="slots">Cards using rarity odds</option><option value="series">Random cards from one series</option><option value="exact">Exact selected cards</option><option value="weighted_pool">Custom selected card pool</option><option value="single">One exact card</option><option value="mixed">Cards + Star Bits</option></select></div><div class="field"><label>Restrict to Series</label><select id="eBoosterSeries"><option value="">All series</option>${options(data.series, b.seriesId)}</select></div><div class="field"><label>Cards Per Pack</label><input id="eBoosterCount" type="number" min="1" max="50" value="${b.cardCount || 4}"></div><div class="field"><label>Default Pull-Rate Preset</label><select id="oddsPreset"><option value="standard">Standard — Rare 70%, Epic 22%, Legendary 8%</option><option value="generous">Generous — Rare 60%, Epic 30%, Legendary 10%</option><option value="premium">Premium — Rare 45%, Epic 40%, Legendary 15%</option><option value="custom">Custom / Keep Current</option></select></div><div class="field full"><label>Optional Category Filters</label>${chipPicker("boosterCategories", data.categories || [], b.categoryIds || [])}<small>Leave everything cleared to allow every category.</small></div><div class="field full"><label>Optional Finish Filters</label>${chipPicker("boosterFinishes", data.finishes || [], b.finishIds || [])}<small>Leave everything cleared to allow every finish.</small></div><div class="field"><label>Bonus Star Bits</label><input id="eBoosterBits" type="number" min="0" value="${b.bonusStarBits || 0}"></div><div class="field"><label>Star Bits Cost</label><input id="eBoosterCost" type="number" min="0" value="${b.starBitsCost || 0}"></div><div class="field"><label>Sort Order</label><input id="eBoosterSort" type="number" value="${b.sortOrder || 0}"></div><div class="toggle-grid full">${toggleControl("excludePromos","Exclude promotional cards",b.excludePromos !== false,"Promo cards will not appear in this pack.")}${toggleControl("allowDuplicates","Allow duplicates in one pack",b.allowDuplicates !== false,"The same card may be pulled more than once.")}${toggleControl("eBoosterActive","Active / Visible",b.isActive,"Collectors can see and use this booster where eligible.")}${toggleControl("eBoosterArchived","Archived",b.archived,"Keep the record but hide it from normal use.")}</div><div>${imageBlock("ePackImage", b.packImageUrl, "booster-packs", "Pack Artwork")}</div><div>${imageBlock("eBackImage", b.cardBackUrl, "card-backs", "Card Back")}</div></div><div id="guidedOdds" class="reward-builder"><h3>Easy Pull Rates</h3><p class="lead">For a standard pack, keep 2 Common, 1 Uncommon, and 1 Rare-or-Better. Pick a preset and the percentages are filled automatically.</p><div class="preset-cards"><button type="button" class="template-choice" data-easy-preset="standard"><strong>Standard</strong><span>Rare 70 · Epic 22 · Legendary 8</span></button><button type="button" class="template-choice" data-easy-preset="generous"><strong>Generous</strong><span>Rare 60 · Epic 30 · Legendary 10</span></button><button type="button" class="template-choice" data-easy-preset="premium"><strong>Premium</strong><span>Rare 45 · Epic 40 · Legendary 15</span></button></div></div><div id="slotBuilder" class="reward-builder"><div class="toolbar"><div><h3>Advanced Slot Editor</h3><p class="lead">Each slot row must total exactly 100%. Only use this when a preset cannot describe your pack.</p></div><button id="balanceSlots" class="btn" type="button">Balance Automatically</button></div>${slotsHtml(b)}</div><div class="reward-builder"><h3>Pack Preview</h3><pre id="boosterPreview" class="odds-summary plain-preview"></pre></div><div id="rewardBuilder" class="reward-builder"><div class="toolbar"><div><h3>Exact Cards / Custom Pool</h3></div><button id="addReward" class="btn">＋ Add Card</button></div><div id="rewardRows">${rewardRows(b)}</div></div><div class="editor-actions"><button id="saveBooster" class="btn primary">Save Booster Pack</button>${b.id ? '<button id="copyThisBooster" class="btn">Copy Booster</button><button id="inspectBooster" class="btn">Inspect References</button><button id="renameBooster" class="btn">Rename Booster ID</button><button id="detachBooster" class="btn archive">Detach From Card Shop</button><button id="archiveBooster" class="btn archive">Archive Booster</button><button id="deleteBooster" class="btn danger">Delete Booster Safely</button>' : ""}</div>`,
   );
   $("#eRewardMode").value = b.rewardMode || "slots";
   $("#oddsPreset").value = b.oddsPreset || "standard";
   wireUpload("ePackImage", "booster-packs");
   wireUpload("eBackImage", "card-backs");
+  wireChipPicker("boosterCategories", updatePreview);
+  wireChipPicker("boosterFinishes", updatePreview);
   const applyPreset = (name) => {
     const vals =
       name === "premium"
@@ -952,6 +997,33 @@ Shop price: ${$("#eBoosterCost").value || 0} Star Bits`;
   };
   if (b.id) {
     $("#copyThisBooster").onclick = () => copyBoosterDialog(b.id);
+    $("#inspectBooster").onclick = async () => {
+      try {
+        const report = await inspectBoosterReferences(b.id);
+        const refs = report.references || [];
+        openEditor("Booster Reference Inspector", `<p class="lead"><strong>${esc(b.name)}</strong> uses ID <code>${esc(b.id)}</code>.</p><div class="reference-report">${refs.length ? refs.map(r=>`<div class="reference-row"><span><strong>${esc(r.table)}</strong><br><small>${esc(r.column)} · ${esc(r.onDelete || "restrict")}</small></span><strong>${Number(r.count)||0}</strong></div>`).join("") : '<p>No foreign-key references were found.</p>'}</div><p class="lead">JSON metadata and historical text references are also repaired by the Rename Booster ID tool.</p><div class="editor-actions"><button id="closeReferenceReport" class="btn primary">Done</button></div>`);
+        $("#closeReferenceReport").onclick = close;
+      } catch (e) { say(e.message, "error"); }
+    };
+    $("#renameBooster").onclick = async () => {
+      openEditor("Rename Booster ID", `<p class="lead">This safely creates the new booster ID, repoints database references, repairs known metadata links, and removes the old ID.</p><div class="form-grid"><div class="field"><label>Current ID</label><input value="${esc(b.id)}" disabled></div><div class="field"><label>New Booster ID</label><input id="renameBoosterId" value="${esc(b.id)}"></div><div class="field full"><label>Booster Name</label><input id="renameBoosterName" value="${esc(b.name)}"></div></div><div class="editor-actions"><button id="confirmRenameBooster" class="btn primary">Rename & Repair References</button></div>`);
+      $("#confirmRenameBooster").onclick = async () => {
+        try {
+          const newId = $("#renameBoosterId").value.trim();
+          if (!newId || newId === b.id) throw new Error("Enter a different booster ID.");
+          if (!(await StarlightUI.confirm({title:"Rename booster ID?",message:`Change ${b.id} to ${newId} and update all references?`,confirmText:"Rename Booster"}))) return;
+          await renameBoosterId(b.id,newId,$("#renameBoosterName").value);
+          await reload(`Booster ID renamed to ${newId}.`);
+        } catch (e) { say(e.message, "error"); }
+      };
+    };
+    $("#detachBooster").onclick = async () => {
+      try {
+        if (!(await StarlightUI.confirm({title:"Detach from Card Shop?",message:"This sets the Star Bits price to 0 and disables the booster so it no longer appears as a purchasable shop pack.",confirmText:"Detach Booster"}))) return;
+        await detachBoosterFromShop(b.id);
+        await reload("Booster detached from the Card Shop.");
+      } catch(e){ say(e.message,"error"); }
+    };
     $("#archiveBooster").onclick = () => {
       $("#eBoosterArchived").checked = true;
       $("#eBoosterActive").checked = false;
@@ -961,15 +1033,15 @@ Shop price: ${$("#eBoosterCost").value || 0} Star Bits`;
       if (
         !(await StarlightUI.confirm({
           title: "Delete this booster?",
-          message: "This permanently removes the booster.",
+          message: "This permanently removes the booster only when no protected references remain. Use Inspect References first if it fails.",
           confirmText: "Delete Booster",
           danger: true,
         }))
       )
         return;
       try {
-        await deleteBooster(b.id);
-        await reload("Booster deleted.");
+        await safeDeleteBooster(b.id);
+        await reload("Booster safely deleted.");
       } catch (e) {
         say(e.message, "error");
       }

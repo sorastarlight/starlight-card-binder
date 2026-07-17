@@ -14,6 +14,10 @@ export async function createBoosterFromTemplate(templateId,newId,newName){const 
 export async function deleteSeries(id){const {data,error}=await supabase.rpc('admin_delete_series_v841',{requested_id:id});if(error)throw error;notifyCardCatalogChanged('series-deleted');return data;}
 export async function deleteCard(id){const {data,error}=await supabase.rpc('admin_delete_card_v841',{requested_id:id});if(error)throw error;notifyCardCatalogChanged('card-deleted');return data;}
 export async function deleteBooster(id){const {data,error}=await supabase.rpc('admin_delete_booster_v841',{requested_id:id});if(error)throw error;return data;}
+export async function inspectBoosterReferences(id){const {data,error}=await supabase.rpc('admin_booster_reference_report_v901',{requested_id:id});if(error)throw error;return data||{};}
+export async function renameBoosterId(oldId,newId,newName){const {data,error}=await supabase.rpc('admin_rename_booster_id_v901',{requested_old_id:oldId,requested_new_id:newId,requested_new_name:newName||null});if(error)throw error;return data;}
+export async function detachBoosterFromShop(id){const {data,error}=await supabase.rpc('admin_detach_booster_from_shop_v901',{requested_id:id});if(error)throw error;return data;}
+export async function safeDeleteBooster(id){const {data,error}=await supabase.rpc('admin_safe_delete_booster_v901',{requested_id:id});if(error)throw error;return data;}
 export async function setDailyMode(mode){const {data,error}=await supabase.rpc('admin_set_daily_booster_mode',{requested_mode:mode});if(error)throw error;return data;}
 function cleanName(name){return String(name||'image').toLowerCase().replace(/[^a-z0-9._-]+/g,'-').replace(/-+/g,'-');}
 export function storagePathFromUrl(url){
