@@ -8669,3 +8669,30 @@ body[data-page="binder"] .db2-more summary{font-size:.85rem}
 #cardOverlay .analyzer-arrow.right{right:16px!important}
 #cardOverlay .analyzer-close{position:fixed!important;top:16px!important;right:18px!important}
 @media(max-width:640px){#cardOverlay .analyzer-full-stage{padding:56px 22px 30px!important}#cardOverlay .full-card-wrap{width:min(330px,82vw)!important}}
+
+
+/* V91.2 QOL PATCH */
+.reveal-stage,
+.card-reveal-stage,
+.booster-reveal-stage{
+  display:flex !important;
+  justify-content:center !important;
+  align-items:center !important;
+  width:100% !important;
+  margin:0 auto !important;
+}
+
+.reveal-card,
+.card-reveal-card{
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+
+.modal,
+.dialog,
+.popup,
+.overlay-panel{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
