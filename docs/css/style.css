@@ -8380,3 +8380,193 @@ body[data-page="binder"] .v61-grid-head::after{
   .db2-card-heading{flex-direction:column}
   .db2-full-info .card-meta-chips{justify-content:flex-start}
 }
+
+
+/* ============================================================
+   V90.3.1 — Binder Details + Full View Layout Repair
+   ============================================================ */
+
+/* Side panel: compact, readable, and visibly Database 2.0 */
+body[data-page="binder"] .detail {
+  padding: 16px !important;
+  max-height: calc(100vh - 116px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+body[data-page="binder"] .detail-card-info.db2-card-info {
+  display: grid;
+  gap: 10px;
+}
+body[data-page="binder"] .db2-card-heading {
+  display: grid;
+  gap: 8px;
+}
+body[data-page="binder"] .db2-card-heading .ownership-status {
+  justify-self: start;
+}
+body[data-page="binder"] .db2-card-heading h2 {
+  font-size: 1.28rem;
+  line-height: 1.15;
+}
+body[data-page="binder"] .db2-card-info .card-meta-chips {
+  margin: 2px 0 6px;
+}
+body[data-page="binder"] .db2-card-info .clean-detail-list {
+  margin: 4px 0;
+}
+body[data-page="binder"] .db2-card-info .clean-detail-list p {
+  align-items: flex-start;
+  padding: 7px 0;
+}
+body[data-page="binder"] .db2-card-info .clean-detail-list p span {
+  text-align: right;
+  max-width: 62%;
+}
+body[data-page="binder"] .db2-story {
+  margin-top: 2px;
+  padding: 11px 12px;
+}
+body[data-page="binder"] .db2-more {
+  margin-top: 2px;
+}
+body[data-page="binder"] .detail-footer-actions {
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+body[data-page="binder"] .preview-card {
+  width: min(100%, 250px);
+  margin-bottom: 10px;
+}
+
+/* Full View: no more tall single-column page. */
+#cardOverlay.open {
+  overflow: auto !important;
+  align-items: center !important;
+  padding: 22px !important;
+}
+#cardOverlay .analyzer-full-stage {
+  width: min(1180px, calc(100vw - 34px)) !important;
+  height: min(760px, calc(100vh - 34px)) !important;
+  min-height: 0 !important;
+  max-height: calc(100vh - 34px) !important;
+  padding: 58px 74px 34px !important;
+  border-radius: 30px !important;
+  overflow: hidden !important;
+}
+#cardOverlay .analyzer-screen.db2-full-layout {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 1020px !important;
+  display: grid !important;
+  grid-template-columns: minmax(280px, 390px) minmax(340px, 1fr) !important;
+  grid-template-rows: auto 1fr !important;
+  grid-template-areas:
+    "actions actions"
+    "card info" !important;
+  align-items: center !important;
+  justify-items: stretch !important;
+  gap: 18px 28px !important;
+  padding: 16px 20px 18px !important;
+  overflow: hidden !important;
+}
+#cardOverlay .analyzer-actions {
+  grid-area: actions !important;
+  position: relative !important;
+  height: 34px;
+}
+#cardOverlay .analyzer-card-zone {
+  grid-area: card !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  display: grid !important;
+  place-items: center !important;
+}
+#cardOverlay .analyzer-full-stage .full-card-wrap {
+  width: min(330px, 34vw, 52vh) !important;
+  max-height: calc(100vh - 150px) !important;
+}
+#cardOverlay .analyzer-full-stage .full-card-wrap img {
+  max-height: calc(100vh - 150px) !important;
+}
+#cardOverlay .analyzer-info-card.db2-full-info {
+  grid-area: info !important;
+  width: 100% !important;
+  max-height: calc(100vh - 150px) !important;
+  overflow-y: auto !important;
+  padding: 18px 20px !important;
+  scrollbar-width: thin;
+}
+#cardOverlay .db2-full-info .card-meta-chips {
+  justify-content: flex-start !important;
+  margin: 9px 0 13px !important;
+}
+#cardOverlay .analyzer-data-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+#cardOverlay .db2-full-story {
+  padding: 12px 14px !important;
+}
+#cardOverlay .analyzer-description {
+  display: none !important; /* duplicates Card Story */
+}
+#cardOverlay .analyzer-reticle {
+  width: min(430px, 40vw, 58vh) !important;
+}
+#cardOverlay .analyzer-flip {
+  top: 0 !important;
+}
+#cardOverlay .analyzer-close {
+  top: 14px !important;
+  right: 18px !important;
+}
+#cardOverlay .analyzer-arrow.left { left: 16px !important; }
+#cardOverlay .analyzer-arrow.right { right: 16px !important; }
+
+@media (max-width: 880px) {
+  #cardOverlay.open {
+    padding: 8px !important;
+    align-items: flex-start !important;
+  }
+  #cardOverlay .analyzer-full-stage {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    max-height: none !important;
+    padding: 64px 48px 28px !important;
+    overflow: visible !important;
+  }
+  #cardOverlay .analyzer-screen.db2-full-layout {
+    height: auto !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto auto !important;
+    grid-template-areas:
+      "actions"
+      "card"
+      "info" !important;
+    overflow: visible !important;
+  }
+  #cardOverlay .analyzer-card-zone {
+    min-height: 430px !important;
+  }
+  #cardOverlay .analyzer-full-stage .full-card-wrap {
+    width: min(320px, 72vw) !important;
+    max-height: none !important;
+  }
+  #cardOverlay .analyzer-info-card.db2-full-info {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+}
+
+@media (max-width: 520px) {
+  #cardOverlay .analyzer-full-stage {
+    padding-left: 36px !important;
+    padding-right: 36px !important;
+  }
+  #cardOverlay .analyzer-screen.db2-full-layout {
+    padding: 10px !important;
+  }
+  #cardOverlay .analyzer-data-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

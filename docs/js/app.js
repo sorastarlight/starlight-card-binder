@@ -738,7 +738,7 @@ function renderFullView() {
     <div class="analyzer-bg" aria-hidden="true"><span></span><span></span><span></span></div>
     <button class="overlay-close analyzer-close" type="button" aria-label="Close">×</button>
     <button class="overlay-arrow left analyzer-arrow" type="button" aria-label="Previous card">‹</button>
-    <section class="analyzer-screen">
+    <section class="analyzer-screen db2-full-layout">
       <div class="analyzer-actions"><button class="overlay-flip analyzer-flip" type="button">↻ Flip</button></div>
       <div class="analyzer-card-zone">
         <div class="analyzer-reticle" aria-hidden="true"></div>
