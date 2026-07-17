@@ -17,6 +17,7 @@
 .reference-report{max-height:340px;overflow:auto;padding:12px;border-radius:14px;background:#f5f9ff}.reference-row{display:flex;justify-content:space-between;gap:12px;padding:8px 4px;border-bottom:1px solid rgba(107,198,248,.18)}.reference-row:last-child{border-bottom:0}
 @media(max-width:700px){.toggle-grid{grid-template-columns:1fr}}
 </style><script src="js/firefox-performance.js" defer></script>    <link rel="stylesheet" href="css/shared-ui.css">
+<link rel="stylesheet" href="css/qol-ui.css?v=91.1">
 </head><body><script src="js/embed-mode.js" type="module"></script><div class="sky"></div><main class="studio"><section class="shell"><p class="eyebrow">Administration Hub</p><h1>Starlight Card Management</h1><p class="lead">Manage series, cards, booster packs, reward pools, and uploaded artwork from one organized workspace.</p><p id="status" class="status">Loading Starlight Card Management…</p><div id="app" class="hidden"><div class="top-grid" id="metrics"></div><div class="tabs"><button class="active" data-tab="overview">Dashboard</button><button data-tab="series">Series</button><button data-tab="cards">Cards</button><button data-tab="classifications">Categories & Subcategories</button><button data-tab="boosters">Booster Packs</button><button data-tab="assets">Asset Library</button><button data-tab="events">Events</button><button data-tab="maintenance">Maintenance</button></div><section id="overviewTab"></section><section id="seriesTab" class="hidden"></section><section id="cardsTab" class="hidden"></section><section id="classificationsTab" class="hidden"></section><section id="boostersTab" class="hidden"></section><section id="assetsTab" class="hidden"></section><section id="eventsTab" class="hidden"></section><section id="maintenanceTab" class="hidden"></section></div></section></main><div id="editor" class="editor hidden" role="dialog" aria-modal="true"><section class="editor-card"><div class="editor-head"><h2 id="editorTitle">Editor</h2><button id="closeEditor" class="close" aria-label="Close">×</button></div><div id="editorBody"></div></section></div>
 <script type="module">
 import {
@@ -1673,4 +1674,5 @@ async function reload(message = "") {
 reload();
 
 </script>    <script src="js/shared-ui.js"></script>
+<script src="js/qol-ui.js?v=91.1" defer></script>
 </body></html>

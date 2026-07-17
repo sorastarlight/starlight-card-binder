@@ -602,9 +602,52 @@
             display: none;
         }
 
+
+/* V91.1 Star Bits Exchange overhaul */
+.bits-panel{padding-bottom:110px!important}
+.qol-duplicate-section{padding:20px!important}
+.duplicate-heading{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:16px}
+.duplicate-heading h2{margin:.2rem 0}
+.duplicate-heading p{margin:.25rem 0;color:#6b7089}
+.qol-bulk-toggle{display:flex;align-items:center;gap:12px;min-width:280px;padding:13px 15px;border:1px solid rgba(107,198,248,.32);border-radius:17px;background:linear-gradient(135deg,#f0f9ff,#fff0f8);cursor:pointer}
+.qol-bulk-toggle>input{position:absolute;opacity:0}
+.qol-bulk-toggle>span:nth-child(2){display:grid;gap:2px;flex:1}
+.qol-bulk-toggle small{color:#6b7089;font-weight:650}
+.qol-bulk-toggle:has(input:checked) .qol-switch-ui{background:linear-gradient(135deg,#ff82c8,#6bc6f8)}
+.qol-bulk-toggle:has(input:checked) .qol-switch-ui:after{transform:translateX(23px)}
+.qol-selection-toolbar{position:sticky;top:8px;z-index:20;padding:12px 14px;border:1px solid rgba(107,198,248,.3);border-radius:15px;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);box-shadow:0 8px 22px rgba(61,83,132,.1)}
+.qol-selection-toolbar .selected-summary{font-size:.92rem}
+.qol-selection-toolbar .selected-summary strong{color:#d9509c;font-size:1.05rem}
+.duplicate-grid{grid-template-columns:repeat(auto-fit,minmax(310px,1fr))!important;gap:14px!important}
+.duplicate-card{display:grid!important;grid-template-columns:112px 1fr!important;gap:15px!important;align-items:center!important;min-height:190px!important;padding:14px!important;text-align:left!important}
+.duplicate-card>img{width:112px!important;height:158px!important;object-fit:contain!important;margin:0!important}
+.duplicate-card-info{display:grid;gap:6px;min-width:0}
+.duplicate-card-info h3,.duplicate-card-info p{margin:0!important}
+.qol-card-toggle{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;padding:9px 10px!important;border-radius:13px!important;background:#f6faff!important}
+.qol-card-toggle>input{position:absolute!important;opacity:0!important}
+.qol-card-toggle>span:nth-child(2){display:grid;gap:2px;flex:1}
+.qol-card-toggle small{color:#6b7089;font-weight:650}
+.qol-card-toggle:after{content:"";position:relative;flex:0 0 auto;width:46px;height:26px;border-radius:999px;background:#ccd5e6;box-shadow:inset 0 2px 5px rgba(50,65,105,.14);transition:.2s}
+.qol-card-toggle:before{content:"";position:absolute;right:31px;width:18px;height:18px;border-radius:50%;background:#fff;z-index:1;box-shadow:0 3px 7px rgba(50,65,105,.2);transition:.2s}
+.qol-card-toggle:has(input:checked):after{background:linear-gradient(135deg,#ff82c8,#6bc6f8)}
+.qol-card-toggle:has(input:checked):before{transform:translateX(20px)}
+.duplicate-quantity-control{justify-content:flex-start!important}
+.exchange-box{position:sticky!important;bottom:12px!important;z-index:30!important;display:grid!important;grid-template-columns:1fr auto!important;align-items:center!important;gap:12px!important;padding:15px 18px!important;background:rgba(255,255,255,.96)!important;backdrop-filter:blur(12px);box-shadow:0 15px 42px rgba(61,83,132,.18)!important}
+.exchange-box h2,.exchange-box>p:last-child{display:none!important}
+.exchange-box #exchange-description{margin:0!important}
+.exchange-button{min-width:245px!important}
+@media(max-width:720px){
+ .duplicate-heading{align-items:stretch;flex-direction:column}
+ .qol-bulk-toggle{min-width:0}
+ .duplicate-grid{grid-template-columns:1fr!important}
+ .exchange-box{grid-template-columns:1fr!important}
+ .exchange-button{width:100%;min-width:0!important}
+}
+
 </style>
 <script src="js/firefox-performance.js" defer></script>
     <link rel="stylesheet" href="css/shared-ui.css">
+<link rel="stylesheet" href="css/qol-ui.css?v=91.1">
 </head>
 <body><script src="js/embed-mode.js" type="module"></script>
 <div class="sky"></div>
@@ -677,13 +720,21 @@
                 </h2>
 <div class="rate-grid" id="rate-grid"></div>
 </section>
-<section class="duplicate-section hidden" id="duplicate-section">
-<h2>
-                    Choose Duplicate Cards
-                </h2>
-<div class="selection-toolbar">
+<section class="duplicate-section hidden qol-duplicate-section" id="duplicate-section">
+<div class="duplicate-heading">
+  <div>
+    <p class="eyebrow">Your Extra Copies</p>
+    <h2>Choose What to Exchange</h2>
+    <p>One permanent copy of every card is automatically protected.</p>
+  </div>
+  <label class="qol-bulk-toggle">
+    <input id="select-all-toggle" class="qol-no-enhance" type="checkbox">
+    <span><strong>Select Every Extra Copy</strong><small>Fastest way to convert all available duplicates</small></span>
+    <span class="qol-switch-ui" aria-hidden="true"></span>
+  </label>
+</div>
+<div class="selection-toolbar qol-selection-toolbar">
 <div class="selection-toolbar-actions">
-<button id="select-all-duplicates" type="button">Select All</button>
 <button id="clear-duplicate-selection" type="button">Clear Selection</button>
 </div>
 <div class="selected-summary" id="selected-summary">0 copies selected · 0 Star Bits</div>
@@ -758,7 +809,7 @@
         const exchangeDescription = document.getElementById("exchange-description");
         const exchangeButton = document.getElementById("exchange-button");
         const selectedSummary = document.getElementById("selected-summary");
-        const selectAllButton = document.getElementById("select-all-duplicates");
+        const selectAllToggle = document.getElementById("select-all-toggle");
         const clearSelectionButton = document.getElementById("clear-duplicate-selection");
         const confirmOverlay = document.getElementById("confirm-overlay");
         const confirmDescription = document.getElementById("confirm-description");
@@ -805,7 +856,7 @@
 
         function updateSelectionSummary() {
             const { copies, bits } = getSelectedTotals();
-            selectedSummary.textContent = `${copies} ${copies === 1 ? "copy" : "copies"} selected · ${bits} Star Bits`;
+            selectedSummary.innerHTML = `<strong>${copies}</strong> ${copies === 1 ? "copy" : "copies"} selected <span>→</span> <strong>★ ${bits}</strong> Star Bits`;
             exchangeButton.disabled = copies <= 0;
             exchangeDescription.textContent = copies > 0
                 ? `Convert ${copies} selected duplicate ${copies === 1 ? "copy" : "copies"} into ${bits} Star Bits.`
@@ -859,11 +910,11 @@
                 value.textContent = `${card.bitsPerDuplicate} Star Bits each`;
 
                 const selectRow = document.createElement("label");
-                selectRow.className = "duplicate-select-row";
+                selectRow.className = "duplicate-select-row qol-card-toggle";
                 const checkbox = document.createElement("input");
                 checkbox.type = "checkbox";
                 const selectText = document.createElement("span");
-                selectText.textContent = "Convert copies from this card";
+                selectText.innerHTML = "<strong>Exchange this card</strong><small>Choose how many extras to convert</small>";
                 selectRow.append(checkbox, selectText);
 
                 const controls = document.createElement("div");
@@ -898,7 +949,7 @@
                     else setSelection(card.cardId, (selections.get(card.cardId) || 0) + 1, card.duplicateQuantity);
                 });
 
-                article.append(image, name, rarity, quantity, value, selectRow, controls);
+                const info=document.createElement("div");info.className="duplicate-card-info";info.append(name,rarity,quantity,value,selectRow,controls);article.append(image,info);
                 duplicateGrid.append(article);
             }
             updateSelectionSummary();
@@ -995,9 +1046,9 @@
             await loadPreview();
         }
 
-        selectAllButton.addEventListener("click", () => {
+        selectAllToggle.addEventListener("change", () => {
             for (const card of currentPreview?.duplicateCards || []) {
-                setSelection(card.cardId, card.duplicateQuantity, card.duplicateQuantity);
+                setSelection(card.cardId, selectAllToggle.checked ? card.duplicateQuantity : 0, card.duplicateQuantity);
             }
         });
 
@@ -1020,5 +1071,6 @@
         initializePage();
     </script>
     <script src="js/shared-ui.js"></script>
+<script src="js/qol-ui.js?v=91.1" defer></script>
 </body>
 </html>

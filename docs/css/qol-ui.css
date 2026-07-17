@@ -1,0 +1,141 @@
+
+/* V91.1 — Global Quality-of-Life System */
+:root{
+  --qol-blue:#6bc6f8;
+  --qol-pink:#ff82c8;
+  --qol-ink:#405fa1;
+  --qol-muted:#6b7089;
+}
+
+/* Stable app layout: sidebar + top navigation remain visible. */
+body.unified-shell{overflow:hidden!important}
+body.unified-shell .site{
+  height:100vh!important;
+  min-height:0!important;
+  overflow:hidden!important;
+}
+body.unified-shell .sidebar{
+  position:sticky!important;
+  top:0!important;
+  align-self:start!important;
+  height:100vh!important;
+  max-height:100vh!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;
+}
+body.unified-shell .main{
+  height:100vh!important;
+  min-height:0!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain;
+  scroll-behavior:smooth;
+  scrollbar-width:thin;
+}
+body.unified-shell .shell-account-bar{
+  position:sticky!important;
+  top:0!important;
+  z-index:1500!important;
+  margin-bottom:14px!important;
+  backdrop-filter:blur(14px);
+  box-shadow:0 10px 30px rgba(61,83,132,.12)!important;
+}
+body.unified-shell .shell-event-banner{
+  position:sticky;
+  top:86px;
+  z-index:1300;
+}
+html{scroll-padding-top:110px}
+@media(max-width:900px){
+  body.unified-shell{overflow:auto!important}
+  body.unified-shell .site{height:auto!important;min-height:100vh!important;overflow:visible!important}
+  body.unified-shell .main{height:auto!important;min-height:100vh!important;overflow:visible!important}
+  body.unified-shell .shell-account-bar{top:0!important}
+}
+
+/* Universal switch enhancement for ordinary checkbox fields. */
+.qol-toggle-label{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:14px!important;
+  min-height:52px;
+  padding:10px 12px!important;
+  border:1px solid rgba(107,198,248,.24);
+  border-radius:14px;
+  background:linear-gradient(135deg,rgba(247,252,255,.92),rgba(255,245,251,.9));
+  color:var(--qol-ink);
+  font-weight:850;
+  cursor:pointer;
+}
+.qol-toggle-label>input[type="checkbox"]{
+  position:absolute!important;
+  opacity:0!important;
+  pointer-events:none!important;
+}
+.qol-toggle-copy{display:grid;gap:2px;min-width:0}
+.qol-toggle-copy small{font-weight:650;color:var(--qol-muted)}
+.qol-switch-ui{
+  position:relative;
+  flex:0 0 auto;
+  width:52px;
+  height:29px;
+  border-radius:999px;
+  background:#ccd5e6;
+  box-shadow:inset 0 2px 5px rgba(50,65,105,.16);
+  transition:.2s ease;
+}
+.qol-switch-ui::after{
+  content:"";
+  position:absolute;
+  top:4px;
+  left:4px;
+  width:21px;
+  height:21px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 3px 8px rgba(49,61,103,.22);
+  transition:.2s ease;
+}
+.qol-toggle-label:has(input:checked) .qol-switch-ui{
+  background:linear-gradient(135deg,var(--qol-pink),var(--qol-blue));
+}
+.qol-toggle-label:has(input:checked) .qol-switch-ui::after{transform:translateX(23px)}
+.qol-toggle-label:focus-within{outline:3px solid rgba(107,198,248,.22);outline-offset:2px}
+
+/* Keep deliberately hidden/internal checkboxes untouched. */
+.switch input[type="checkbox"],
+.switch-row input[type="checkbox"],
+.qol-no-enhance[type="checkbox"]{position:absolute!important}
+
+/* Standard centered modal behavior across old and new pages. */
+[role="dialog"]:not(.qol-dialog-card),
+.editor:not(.hidden),
+.rule-modal:not(.hidden),
+.confirm-overlay:not(.hidden),
+.shop-modal:not(.hidden),
+.purchase-modal:not(.hidden){
+  position:fixed!important;
+  inset:0!important;
+  z-index:5000!important;
+  display:grid!important;
+  place-items:center!important;
+  padding:clamp(12px,3vw,28px)!important;
+  overflow:auto!important;
+  background:rgba(43,53,95,.48)!important;
+  backdrop-filter:blur(8px)!important;
+}
+[role="dialog"]>section,
+.editor>.card,
+.rule-modal>.rule-modal-card,
+.confirm-overlay>.confirm-dialog,
+.shop-modal>.modal-card,
+.purchase-modal>.purchase-card{
+  margin:auto!important;
+  max-height:min(88vh,850px)!important;
+  overflow:auto!important;
+  animation:qolModalIn .18s ease-out;
+}
+.hidden[role="dialog"],.editor.hidden,.rule-modal.hidden,.confirm-overlay.hidden,.shop-modal.hidden,.purchase-modal.hidden{display:none!important}
+@keyframes qolModalIn{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.qol-switch-ui,.qol-switch-ui::after{transition:none}.qol-toggle-label>input[type="checkbox"]{}[role="dialog"]>section{animation:none!important}}
