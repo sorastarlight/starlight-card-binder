@@ -8,6 +8,9 @@ export async function loadContentStudio(){
 }
 export async function saveSeries(payload){const {data,error}=await supabase.rpc('admin_save_series_v84',{payload});if(error)throw error;notifyCardCatalogChanged('series-saved');return data;}
 export async function saveCard(payload){const {data,error}=await supabase.rpc('admin_save_card_v90',{payload});if(error)throw error;notifyCardCatalogChanged('card-saved');return data;}
+
+export async function saveCardSubcategory(payload){const {data,error}=await supabase.rpc('admin_save_card_subcategory_v9021',{payload});if(error)throw error;notifyCardCatalogChanged('subcategory-saved');return data;}
+export async function deleteCardSubcategory(id){const {data,error}=await supabase.rpc('admin_delete_card_subcategory_v9021',{requested_id:id});if(error)throw error;notifyCardCatalogChanged('subcategory-deleted');return data;}
 export async function saveBooster(payload,slots=[]){const completePayload={...payload,slots:Array.isArray(slots)?slots:[]};const {data,error}=await supabase.rpc('admin_save_booster_v9011',{payload:completePayload});if(error)throw error;return data;}
 export async function cloneBooster(sourceId,newId,newName){const {data,error}=await supabase.rpc('admin_clone_booster_v897',{requested_source_id:sourceId,requested_new_id:newId,requested_new_name:newName});if(error)throw error;return data;}
 export async function createBoosterFromTemplate(templateId,newId,newName){const {data,error}=await supabase.rpc('admin_create_booster_from_template_v897',{requested_template_id:templateId,requested_new_id:newId,requested_new_name:newName});if(error)throw error;return data;}
