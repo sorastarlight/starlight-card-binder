@@ -840,7 +840,7 @@ function boosterEditor(
         out.className = `rate-total ${Math.abs(total - 100) < 0.001 ? "good" : "bad"}`;
       }
     });
-  const updatePreview = () => {
+  function updatePreview() {
     const mode = $("#eRewardMode").value,
       cats = selectedValues($("#boosterCategories")).map(categoryName),
       finishes = selectedValues($("#boosterFinishes")).map(finishName);
@@ -879,7 +879,7 @@ function boosterEditor(
 Shop price: ${$("#eBoosterCost").value || 0} Star Bits`;
     $("#boosterPreview").textContent = text;
     updateTotals();
-  };
+  }
   body.addEventListener("input", (e) => {
     if (
       e.target.matches(
