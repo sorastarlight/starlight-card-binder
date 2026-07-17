@@ -671,27 +671,22 @@ function renderDetail() {
       <span class="face back"><img src="${CARD_BACK_URL}" alt="Card back"></span>
     </span>
   </button>
-  <div class="detail-card-info db2-card-info">
-    <div class="db2-card-heading">
-      <div>
-        <p class="db2-collector-line">${esc(selected.seriesId ? `S${String(selected.seriesId).padStart(2,'0')}` : 'Starlight')} · ${esc(selected.collectorNumber || selected.number)}</p>
-        <h2>${esc(getVisibleName(selected))}</h2>
-      </div>
-      <span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${getCardQuantity(selected.id)}` : 'Not Collected'}</span>
+  <div class="detail-card-info db2-card-info v91-side-details">
+    <p class="db2-collector-line">${esc(selected.series)} · ${esc(selected.collectorNumber || selected.number)}</p>
+    <h2>${esc(getVisibleName(selected))}</h2>
+    <div class="v91-primary-facts">
+      <span class="card-meta-chip rarity ${rarityClass(selected)}">${esc(getVisibleRarity(selected))}</span>
+      <span class="card-meta-chip category">${esc(categoryLabel(selected))}</span>
+      ${subcategoryLabel(selected) ? `<span class="card-meta-chip subcategory">${esc(subcategoryLabel(selected))}</span>` : ''}
     </div>
-    <div class="card-meta-chips">${cardIdentityChips(selected, { hidden })}</div>
-    <div class="detail-list clean-detail-list">
+    <div class="detail-list clean-detail-list v91-identity-list">
       <p><b>Series</b><span>${esc(selected.series)}</span></p>
       <p><b>Collector Number</b><span>${esc(selected.collectorNumber || selected.number)}</span></p>
       ${got && selected.artist ? `<p><b>Illustrator</b><span>${esc(selected.artist)}</span></p>` : ''}
+      <p><b>Owned</b><span>${got ? `×${getCardQuantity(selected.id)}` : 'Not Collected'}</span></p>
     </div>
     <div class="db2-story"><b>Card Story</b><p>${esc(getVisibleDescription(selected))}</p></div>
-    ${got ? `<details class="db2-more"><summary>Collection Details</summary><div class="detail-list clean-detail-list">${cardExpandedDetails(selected)}</div></details>` : ''}
-  </div>
-  <div class="detail-actions">
-    <span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${getCardQuantity(selected.id)}` : 'Not Collected'}</span>
-    ${got ? `<button class="btn primary" onclick="toggleFavorite('${esc(selected.id)}')">${isFavorite(selected.id)?'★ Favorited':'♡ Favorite'}</button>` : ''}
-    
+    ${got ? `<details class="db2-more"><summary>Additional Information</summary><div class="detail-list clean-detail-list"><p><b>Variant</b><span>${esc(variantLabel(selected))}</span></p><p><b>Finish</b><span>${esc(finishLabel(selected))}</span></p>${cardExpandedDetails(selected)}</div></details>` : ''}
   </div>`;
   $('#flipPreview')?.addEventListener('click', () => { previewFlipped = !previewFlipped; flipCardImage($('#previewCard'), getVisibleImage(selected), getVisibleName(selected), previewFlipped); playSfx('flip'); });
   $('#openFullView')?.addEventListener('click', () => openFullView('filtered'));
@@ -753,7 +748,7 @@ function renderFullView() {
         <div class="analyzer-title-row"><div><p class="eyebrow">Card Scan Complete</p><h2>${esc(visibleName)}</h2><p class="db2-collector-line">${esc(selected.collectorNumber || selected.number || '???')} · ${esc(selected.series || 'Unknown Series')}</p></div></div>
         <div class="card-meta-chips">${cardIdentityChips(selected, { full: true, hidden })}</div>
         <div class="analyzer-data-grid"><span><b>Series</b>${esc(selected.series || 'Unknown')}</span><span><b>Collector #</b>${esc(selected.collectorNumber || selected.number || '???')}</span>${got && selected.artist ? `<span><b>Illustrator</b>${esc(selected.artist)}</span>` : ''}${got ? `<span><b>Owned</b>×${getCardQuantity(selected.id)}</span>` : ''}</div>
-        ${got ? `<div class="db2-full-story"><b>Card Story</b><p>${esc(selected.cardDescription || 'No card story has been added yet.')}</p></div><details class="db2-more"><summary>Distribution & Tags</summary><div class="detail-list clean-detail-list">${cardExpandedDetails(selected)}</div></details>` : ''}
+        ${got ? `<div class="db2-full-story"><b>Card Story</b><p>${esc(selected.cardDescription || 'No card story has been added yet.')}</p></div><details class="db2-more"><summary>Additional Information</summary><div class="detail-list clean-detail-list">${cardExpandedDetails(selected)}</div></details>` : ''}
         <p class="analyzer-description">${esc(getVisibleDescription(selected))}</p>
       </div>
     </section>

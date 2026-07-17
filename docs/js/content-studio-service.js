@@ -83,3 +83,12 @@ export async function getSystemDiagnostics(){const {data,error}=await supabase.r
 export async function exportAssetManifest(){const {data,error}=await supabase.rpc('admin_get_asset_manifest_v87');if(error)throw error;return data||[];}
 
 export { getAdminEvents, saveEvent, deleteEvent } from './event-service.js';
+
+export async function simulateBoosterV91(boosterId, openings=1000){
+  const {data,error}=await supabase.rpc('admin_simulate_booster_v91',{
+    requested_booster_id:boosterId,
+    requested_openings:Number(openings)||1000
+  });
+  if(error)throw error;
+  return data;
+}

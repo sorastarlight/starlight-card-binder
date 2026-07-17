@@ -8570,3 +8570,85 @@ body[data-page="binder"] .preview-card {
     grid-template-columns: 1fr !important;
   }
 }
+
+
+/* ============================================================
+   V91.0 — Coherent Card Details + Booster Builder
+   ============================================================ */
+.v91-side-details{display:grid;gap:10px}
+.v91-side-details h2{margin:0;font-size:1.35rem;line-height:1.15}
+.v91-primary-facts{display:flex;flex-wrap:wrap;gap:7px;margin:1px 0 4px}
+.v91-identity-list{margin-top:0}
+body[data-page="binder"] .detail-card-info:not(.v91-side-details){display:none!important}
+body[data-page="binder"] .v91-side-details{display:grid!important}
+body[data-page="binder"] .detail{overflow-y:auto;max-height:calc(100vh - 110px)}
+body[data-page="binder"] .db2-more summary{font-size:.85rem}
+
+/* Keep full view vertical but contained and scrollable. */
+#cardOverlay.open{overflow-y:auto!important;align-items:flex-start!important;padding:18px!important}
+#cardOverlay .analyzer-full-stage{
+  width:min(760px,calc(100vw - 30px))!important;
+  height:auto!important;
+  min-height:calc(100vh - 36px)!important;
+  max-height:none!important;
+  padding:62px 62px 34px!important;
+  overflow:visible!important;
+}
+#cardOverlay .analyzer-screen,
+#cardOverlay .analyzer-screen.db2-full-layout{
+  width:min(540px,100%)!important;
+  height:auto!important;
+  max-width:540px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:16px!important;
+  overflow:visible!important;
+  padding:10px!important;
+}
+#cardOverlay .analyzer-actions{order:0;position:relative!important;height:34px}
+#cardOverlay .analyzer-card-zone{order:1;min-height:0!important;height:auto!important}
+#cardOverlay .analyzer-info-card{order:2;width:100%!important;max-height:none!important;overflow:visible!important}
+#cardOverlay .full-card-wrap{width:min(360px,72vw)!important;max-height:none!important}
+#cardOverlay .full-card-wrap img{max-height:none!important}
+#cardOverlay .analyzer-arrow{position:fixed!important;top:50%!important}
+#cardOverlay .analyzer-close{position:fixed!important}
+
+/* Booster Builder */
+.v91-odds-details{padding:0!important;overflow:hidden}
+.v91-odds-details>summary{
+  display:flex;align-items:center;justify-content:space-between;cursor:pointer;
+  padding:18px 20px;background:linear-gradient(135deg,#fff8df,#fff2fa);
+  color:#405fa1;list-style:none
+}
+.v91-odds-details>summary::-webkit-details-marker{display:none}
+.v91-odds-details>summary span{display:grid;gap:3px}
+.v91-odds-details>summary small{color:#6d7692;font-weight:650}
+.v91-odds-details>.toolbar,.v91-odds-details>.v91-slot-card{margin-left:18px;margin-right:18px}
+.v91-slot-card{margin-bottom:14px;padding:16px;border:1px solid rgba(107,198,248,.32);border-radius:18px;background:#fff}
+.v91-slot-head{display:grid;grid-template-columns:1fr 180px auto;gap:12px;align-items:end;margin-bottom:14px}
+.v91-rate-list{display:grid;gap:9px}
+.v91-rate-row{display:grid;grid-template-columns:105px 1fr 92px;align-items:center;gap:12px}
+.v91-rate-row>label{font-weight:900;color:#405fa1}
+.v91-rate-range{width:100%;accent-color:#ff82c8}
+.v91-rate-number{display:flex;align-items:center;border:2px solid rgba(107,198,248,.28);border-radius:11px;background:#fff;overflow:hidden}
+.v91-rate-number input{width:100%;border:0!important;text-align:right;padding:8px!important}
+.v91-rate-number span{padding-right:10px;color:#6d7692;font-weight:900}
+.v91-validation-panel{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center}
+.v91-sim-controls{display:flex;gap:8px;align-items:center}
+.v91-sim-controls select{min-height:42px;padding:8px 10px;border:2px solid rgba(107,198,248,.28);border-radius:11px;background:#fff;color:#405fa1;font-weight:850}
+.v91-simulation-results{grid-column:1/-1;padding:14px;border-radius:14px;background:#f5f9ff;color:#536184}
+.v91-simulation-results.error{background:#fff0f3;color:#a52c47}
+.v91-sim-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:10px}
+.v91-sim-stat{display:grid;gap:3px;padding:10px;border-radius:12px;background:#fff;border:1px solid rgba(107,198,248,.2)}
+.v91-sim-stat span,.v91-sim-stat small{font-size:.75rem;color:#6d7692}
+.v91-sim-stat strong{font-size:1.1rem;color:#405fa1}
+.toggle-card input[type="checkbox"]{position:absolute;opacity:0;pointer-events:none}
+
+@media(max-width:760px){
+  .v91-slot-head{grid-template-columns:1fr}
+  .v91-rate-row{grid-template-columns:85px 1fr 82px}
+  .v91-validation-panel{grid-template-columns:1fr}
+  .v91-sim-controls{flex-wrap:wrap}
+  .v91-sim-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #cardOverlay .analyzer-full-stage{padding:58px 38px 28px!important}
+}
