@@ -8652,3 +8652,20 @@ body[data-page="binder"] .db2-more summary{font-size:.85rem}
   .v91-sim-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   #cardOverlay .analyzer-full-stage{padding:58px 38px 28px!important}
 }
+
+/* V91.1.2 — Full View: complete card visibility */
+#cardOverlay.open{display:grid!important;place-items:start center!important;overflow-y:auto!important;padding:24px 16px 48px!important}
+#cardOverlay .analyzer-full-stage{width:min(760px,calc(100vw - 24px))!important;max-width:760px!important;min-height:auto!important;height:auto!important;padding:58px 40px 38px!important;overflow:visible!important}
+#cardOverlay .v9112-full-view{width:100%!important;max-width:620px!important;display:flex!important;flex-direction:column!important;align-items:center!important;gap:18px!important;margin:0 auto!important;padding:0!important;overflow:visible!important}
+#cardOverlay .analyzer-card-zone{width:100%!important;display:grid!important;place-items:center!important;min-height:0!important;height:auto!important;overflow:visible!important}
+#cardOverlay .full-card-wrap{width:min(360px,72vw)!important;max-width:360px!important;max-height:none!important;margin:0 auto!important}
+#cardOverlay .full-card-wrap img{display:block!important;width:100%!important;height:auto!important;max-height:none!important;object-fit:contain!important}
+#cardOverlay .analyzer-info-card{position:relative!important;width:min(560px,100%)!important;max-width:560px!important;max-height:none!important;overflow:visible!important;margin:0 auto!important;transform:none!important}
+#cardOverlay .analyzer-actions{width:100%!important;min-height:36px!important;position:relative!important}
+#cardOverlay .analyzer-flip{position:static!important;margin:0 auto!important}
+#cardOverlay .analyzer-reticle{width:min(430px,84vw)!important;height:auto!important;aspect-ratio:3/4!important}
+#cardOverlay .analyzer-arrow{position:fixed!important;top:50%!important}
+#cardOverlay .analyzer-arrow.left{left:16px!important}
+#cardOverlay .analyzer-arrow.right{right:16px!important}
+#cardOverlay .analyzer-close{position:fixed!important;top:16px!important;right:18px!important}
+@media(max-width:640px){#cardOverlay .analyzer-full-stage{padding:56px 22px 30px!important}#cardOverlay .full-card-wrap{width:min(330px,82vw)!important}}
