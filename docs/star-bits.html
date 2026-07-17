@@ -644,10 +644,55 @@
  .exchange-button{width:100%;min-width:0!important}
 }
 
+
+/* V91.1.1 — Simplified duplicate exchange */
+.qol-card-toggle{
+  position:relative!important;
+}
+.qol-card-toggle::before,
+.qol-card-toggle::after{
+  content:none!important;
+  display:none!important;
+}
+.qol-card-toggle .qol-switch-ui{
+  display:block!important;
+}
+.qol-card-toggle:has(input:checked) .qol-switch-ui{
+  background:linear-gradient(135deg,#ff82c8,#6bc6f8)!important;
+}
+.qol-card-toggle:has(input:checked) .qol-switch-ui::after{
+  transform:translateX(23px)!important;
+}
+.duplicate-card{
+  transition:.18s ease!important;
+}
+.duplicate-card.is-selected{
+  border-color:rgba(255,130,200,.75)!important;
+  background:linear-gradient(135deg,#fff,#fff2f9)!important;
+  box-shadow:0 12px 30px rgba(221,88,163,.13)!important;
+}
+.duplicate-quantity-control{
+  display:grid!important;
+  grid-template-columns:40px minmax(70px,1fr) 40px!important;
+  gap:7px!important;
+}
+.duplicate-quantity-control button{
+  min-width:40px!important;
+  min-height:38px!important;
+}
+.duplicate-quantity-control input{
+  min-height:38px!important;
+  text-align:center!important;
+}
+.exchange-box{
+  border:1px solid rgba(255,130,200,.28)!important;
+  border-radius:18px!important;
+}
+
 </style>
 <script src="js/firefox-performance.js" defer></script>
     <link rel="stylesheet" href="css/shared-ui.css">
-<link rel="stylesheet" href="css/qol-ui.css?v=91.1">
+<link rel="stylesheet" href="css/qol-ui.css?v=91.1.1">
 </head>
 <body><script src="js/embed-mode.js" type="module"></script>
 <div class="sky"></div>
@@ -879,12 +924,19 @@
                 }
                 article.classList.toggle("is-selected", safe > 0);
             }
+            const available = currentPreview?.duplicateCards || [];
+            if (selectAllToggle && available.length) {
+                selectAllToggle.checked = available.every(card =>
+                    (selections.get(card.cardId) || 0) === Number(card.duplicateQuantity || 0)
+                );
+            }
             updateSelectionSummary();
         }
 
         function renderDuplicates(cards) {
             duplicateGrid.replaceChildren();
             selections.clear();
+            if (selectAllToggle) selectAllToggle.checked = false;
 
             for (const card of cards || []) {
                 const article = document.createElement("article");
@@ -915,7 +967,10 @@
                 checkbox.type = "checkbox";
                 const selectText = document.createElement("span");
                 selectText.innerHTML = "<strong>Exchange this card</strong><small>Choose how many extras to convert</small>";
-                selectRow.append(checkbox, selectText);
+                const switchVisual = document.createElement("span");
+                switchVisual.className = "qol-switch-ui";
+                switchVisual.setAttribute("aria-hidden","true");
+                selectRow.append(checkbox, selectText, switchVisual);
 
                 const controls = document.createElement("div");
                 controls.className = "duplicate-quantity-control";
@@ -1053,6 +1108,7 @@
         });
 
         clearSelectionButton.addEventListener("click", () => {
+            if (selectAllToggle) selectAllToggle.checked = false;
             for (const card of currentPreview?.duplicateCards || []) {
                 setSelection(card.cardId, 0, card.duplicateQuantity);
             }
@@ -1071,6 +1127,6 @@
         initializePage();
     </script>
     <script src="js/shared-ui.js"></script>
-<script src="js/qol-ui.js?v=91.1" defer></script>
+<script src="js/qol-ui.js?v=91.1.1" defer></script>
 </body>
 </html>

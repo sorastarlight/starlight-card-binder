@@ -139,3 +139,86 @@ html{scroll-padding-top:110px}
 .hidden[role="dialog"],.editor.hidden,.rule-modal.hidden,.confirm-overlay.hidden,.shop-modal.hidden,.purchase-modal.hidden{display:none!important}
 @keyframes qolModalIn{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.qol-switch-ui,.qol-switch-ui::after{transition:none}.qol-toggle-label>input[type="checkbox"]{}[role="dialog"]>section{animation:none!important}}
+
+
+/* V91.1.1 — Modal navigation and Full View repair */
+
+/* Popups own the viewport. Site navigation never sits above them. */
+body:has(#cardOverlay.open) .shell-account-bar,
+body:has([role="dialog"]:not(.hidden)) .shell-account-bar,
+body:has(.editor:not(.hidden)) .shell-account-bar,
+body:has(.rule-modal:not(.hidden)) .shell-account-bar,
+body:has(.confirm-overlay:not(.hidden)) .shell-account-bar,
+body:has(.shop-modal:not(.hidden)) .shell-account-bar,
+body:has(.purchase-modal:not(.hidden)) .shell-account-bar{
+  opacity:0!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+
+#cardOverlay.open{
+  position:fixed!important;
+  inset:0!important;
+  z-index:100000!important;
+  display:grid!important;
+  place-items:start center!important;
+  width:100vw!important;
+  height:100vh!important;
+  padding:24px!important;
+  overflow-y:auto!important;
+  background:rgba(34,43,86,.78)!important;
+  backdrop-filter:blur(12px)!important;
+}
+
+#cardOverlay .analyzer-full-stage{
+  position:relative!important;
+  inset:auto!important;
+  margin:0 auto!important;
+  transform:none!important;
+  width:min(720px,calc(100vw - 34px))!important;
+  min-height:auto!important;
+  max-width:720px!important;
+}
+
+#cardOverlay .analyzer-screen,
+#cardOverlay .analyzer-screen.db2-full-layout{
+  margin:0 auto!important;
+  width:min(540px,100%)!important;
+  max-width:540px!important;
+}
+
+#cardOverlay .analyzer-arrow{
+  z-index:100002!important;
+}
+
+#cardOverlay .analyzer-close{
+  z-index:100003!important;
+}
+
+/* Standard popup behavior: centered and unobstructed. */
+[role="dialog"]:not(.qol-dialog-card),
+.editor:not(.hidden),
+.rule-modal:not(.hidden),
+.confirm-overlay:not(.hidden),
+.shop-modal:not(.hidden),
+.purchase-modal:not(.hidden){
+  z-index:90000!important;
+}
+
+[role="dialog"]>section,
+.editor>.card,
+.rule-modal>.rule-modal-card,
+.confirm-overlay>.confirm-dialog,
+.shop-modal>.modal-card,
+.purchase-modal>.purchase-card{
+  width:min(920px,calc(100vw - 30px))!important;
+  margin:auto!important;
+}
+
+/* Keep top navigation compact on normal pages. */
+body.unified-shell .shell-account-bar{
+  min-height:70px!important;
+}
+body.unified-shell .shell-account-bar .shell-search{
+  max-width:520px!important;
+}
