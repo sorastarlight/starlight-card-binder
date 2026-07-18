@@ -699,29 +699,13 @@
 .card-convert-now:disabled{opacity:.55;cursor:wait}
 
 
-/* V92.0 — Rebuilt duplicate conversion */
-.qol-duplicate-section{padding:22px!important}
-.duplicate-grid{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(330px,1fr))!important;gap:16px!important}
-.duplicate-card{display:grid!important;grid-template-columns:118px minmax(0,1fr)!important;gap:16px!important;align-items:start!important;padding:16px!important;min-height:250px!important;border:1px solid rgba(107,198,248,.28)!important;border-radius:20px!important;background:linear-gradient(145deg,#fff,#f8fbff 58%,#fff4fa)!important;box-shadow:0 10px 28px rgba(61,83,132,.09)!important}
-.duplicate-card.is-selected{border-color:rgba(255,130,200,.7)!important;box-shadow:0 14px 34px rgba(221,88,163,.15)!important}
-.duplicate-card>img{width:118px!important;height:166px!important;object-fit:contain!important;margin:0!important;filter:drop-shadow(0 8px 12px rgba(61,83,132,.16))}
-.duplicate-card-info{display:grid!important;gap:8px!important;min-width:0!important}
-.duplicate-card-info h3,.duplicate-card-info p{margin:0!important}
-.duplicate-meta,.duplicate-owned{color:#6b7089!important;font-size:.82rem!important}
-.duplicate-convert-all{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;padding:10px 11px!important;border:1px solid rgba(107,198,248,.25)!important;border-radius:14px!important;background:#f7fbff!important;cursor:pointer!important}
-.duplicate-convert-all>input{position:absolute!important;opacity:0!important}
-.duplicate-convert-all>span:nth-child(2){display:grid;gap:2px;flex:1}
-.duplicate-convert-all small{color:#6b7089;font-weight:650}
-.duplicate-convert-all:has(input:checked) .qol-switch-ui{background:linear-gradient(135deg,#ff82c8,#6bc6f8)!important}
-.duplicate-convert-all:has(input:checked) .qol-switch-ui::after{transform:translateX(23px)!important}
-.duplicate-quantity-control{display:grid!important;grid-template-columns:46px minmax(76px,1fr) 46px!important;gap:8px!important;align-items:center!important}
-.duplicate-quantity-control button{height:42px!important;border:1px solid rgba(107,198,248,.32)!important;border-radius:12px!important;background:#fff!important;color:#405fa1!important;font-size:1.5rem!important;font-weight:900!important;cursor:pointer!important}
-.duplicate-quantity-control input{height:42px!important;width:100%!important;border:2px solid rgba(107,198,248,.28)!important;border-radius:12px!important;text-align:center!important;font-size:1.05rem!important;font-weight:900!important;color:#405fa1!important;background:#fff!important}
-.duplicate-projected{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 11px;border-radius:12px;background:linear-gradient(135deg,#fff8da,#fff1f9);color:#6a7190;font-size:.82rem}
-.duplicate-projected strong{color:#c24f91;font-size:.92rem}
-.card-convert-now{width:100%!important;min-height:44px!important;border:0!important;border-radius:13px!important;background:linear-gradient(90deg,#ff70bf,#c987ef,#69c5ff)!important;color:#fff!important;font-weight:950!important;cursor:pointer!important;box-shadow:0 9px 20px rgba(221,88,163,.18)!important}
-.card-convert-now:disabled{opacity:.45!important;cursor:not-allowed!important;box-shadow:none!important}
-@media(max-width:700px){.duplicate-grid{grid-template-columns:1fr!important}.duplicate-card{grid-template-columns:96px minmax(0,1fr)!important}.duplicate-card>img{width:96px!important;height:136px!important}}
+/* V92.0.1 — Duplicate master toggle repair */
+.duplicate-select-row{position:relative!important}
+.duplicate-select-row>input[type="checkbox"]{position:absolute!important;opacity:0!important;pointer-events:none!important}
+.duplicate-select-row .qol-switch-ui{display:block!important}
+.duplicate-select-row:has(input:checked) .qol-switch-ui{background:linear-gradient(135deg,#ff82c8,#6bc6f8)!important}
+.duplicate-select-row:has(input:checked) .qol-switch-ui::after{transform:translateX(23px)!important}
+.card-convert-now:disabled{opacity:.45!important;cursor:not-allowed!important;filter:saturate(.45)}
 
 </style>
 <script src="js/firefox-performance.js" defer></script>
@@ -949,15 +933,15 @@
 
             const article = duplicateGrid.querySelector(`[data-card-id="${CSS.escape(cardId)}"]`);
             if (article) {
-                const toggle = article.querySelector('[data-convert-all]');
+                const checkbox = article.querySelector('input[type="checkbox"]');
                 const input = article.querySelector('input[type="number"]');
-                if (toggle) toggle.checked = safe === maximum && maximum > 0;
-                if (input) input.value = String(safe);
+                if (checkbox) checkbox.checked = safe > 0;
+                if (input) {
+                    input.value = String(safe || 1);
+                    input.disabled = safe <= 0;
+                }
                 article.classList.toggle("is-selected", safe > 0);
-                const button = article.querySelector('.card-convert-now');
-                if (button) button.disabled = safe <= 0;
             }
-
             const available = currentPreview?.duplicateCards || [];
             if (selectAllToggle && available.length) {
                 selectAllToggle.checked = available.every(card =>
@@ -982,43 +966,37 @@
                 image.alt = `${card.name} card artwork`;
                 image.loading = "lazy";
 
-                const info = document.createElement("div");
-                info.className = "duplicate-card-info";
-
                 const name = document.createElement("h3");
                 name.textContent = `#${card.cardNumber} ${card.name}`;
 
-                const meta = document.createElement("p");
-                meta.className = "duplicate-meta";
-                meta.textContent = `${card.rarity} • ${card.seriesName}`;
+                const rarity = document.createElement("p");
+                rarity.textContent = `${card.rarity} • ${card.seriesName}`;
 
-                const owned = document.createElement("p");
-                owned.className = "duplicate-owned";
-                owned.textContent = `${card.totalQuantity} owned • ${card.duplicateQuantity} available to convert`;
+                const quantity = document.createElement("p");
+                quantity.textContent = `${card.totalQuantity} owned • ${card.duplicateQuantity} duplicate${card.duplicateQuantity === 1 ? "" : "s"}`;
 
                 const value = document.createElement("span");
                 value.className = "value-pill";
                 value.textContent = `${card.bitsPerDuplicate} Star Bits each`;
 
-                const allLabel = document.createElement("label");
-                allLabel.className = "duplicate-convert-all";
-                const allToggle = document.createElement("input");
-                allToggle.type = "checkbox";
-                allToggle.className = "qol-no-enhance";
-                allToggle.dataset.convertAll = "true";
-                const allCopy = document.createElement("span");
-                allCopy.innerHTML = "<strong>Convert All</strong><small>Use every duplicate copy of this card</small>";
-                const allVisual = document.createElement("span");
-                allVisual.className = "qol-switch-ui";
-                allVisual.setAttribute("aria-hidden", "true");
-                allLabel.append(allToggle, allCopy, allVisual);
+                const selectRow = document.createElement("label");
+                selectRow.className = "duplicate-select-row qol-card-toggle";
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.className = "qol-no-enhance";
+                checkbox.dataset.convertAll = "true";
+                const selectText = document.createElement("span");
+                selectText.innerHTML = "<strong>Convert All</strong><small>Use every duplicate copy of this card</small>";
+                const switchVisual = document.createElement("span");
+                switchVisual.className = "qol-switch-ui";
+                switchVisual.setAttribute("aria-hidden","true");
+                selectRow.append(checkbox, selectText, switchVisual);
 
                 const controls = document.createElement("div");
                 controls.className = "duplicate-quantity-control";
                 const minus = document.createElement("button");
                 minus.type = "button";
                 minus.textContent = "‹";
-                minus.setAttribute("aria-label", `Decrease ${card.name} quantity`);
                 const input = document.createElement("input");
                 input.type = "number";
                 input.min = "0";
@@ -1028,50 +1006,52 @@
                 const plus = document.createElement("button");
                 plus.type = "button";
                 plus.textContent = "›";
-                plus.setAttribute("aria-label", `Increase ${card.name} quantity`);
                 controls.append(minus, input, plus);
 
-                const projected = document.createElement("div");
-                projected.className = "duplicate-projected";
-                projected.innerHTML = `<span>You'll receive</span><strong>★ 0 Star Bits</strong>`;
+                checkbox.addEventListener("change", () => {
+                    setSelection(card.cardId, checkbox.checked ? Number(card.duplicateQuantity || 0) : 0, card.duplicateQuantity);
+                });
+                input.addEventListener("input", () => {
+                    if (checkbox.checked) setSelection(card.cardId, input.value, card.duplicateQuantity);
+                });
+                minus.addEventListener("click", () => {
+                    if (!checkbox.checked) checkbox.click();
+                    else setSelection(card.cardId, (selections.get(card.cardId) || 1) - 1, card.duplicateQuantity);
+                });
+                plus.addEventListener("click", () => {
+                    if (!checkbox.checked) checkbox.click();
+                    else setSelection(card.cardId, (selections.get(card.cardId) || 0) + 1, card.duplicateQuantity);
+                });
+
 
                 const convertButton = document.createElement("button");
                 convertButton.type = "button";
                 convertButton.className = "card-convert-now";
                 convertButton.textContent = "Convert Now";
                 convertButton.disabled = true;
-
-                const refreshCard = quantity => {
-                    setSelection(card.cardId, quantity, card.duplicateQuantity);
-                    const qty = selections.get(card.cardId) || 0;
-                    projected.innerHTML = `<span>You'll receive</span><strong>★ ${(qty * Number(card.bitsPerDuplicate || 0)).toLocaleString()} Star Bits</strong>`;
-                };
-
-                allToggle.addEventListener("change", () => refreshCard(allToggle.checked ? card.duplicateQuantity : 0));
-                input.addEventListener("input", () => refreshCard(input.value));
-                minus.addEventListener("click", () => refreshCard((selections.get(card.cardId) || 0) - 1));
-                plus.addEventListener("click", () => refreshCard((selections.get(card.cardId) || 0) + 1));
-
                 convertButton.addEventListener("click", async () => {
                     const qty = selections.get(card.cardId) || 0;
-                    if (qty < 1) return;
+                    if (qty < 1) {
+                        showToast("Choose at least one duplicate copy first.", "error");
+                        return;
+                    }
                     if (!window.confirm(`Convert ${qty} duplicate ${qty === 1 ? "copy" : "copies"} of ${card.name} into Star Bits?`)) return;
                     try {
                         convertButton.disabled = true;
                         convertButton.textContent = "Converting…";
                         const result = await exchangeDuplicateCards([{ cardId: card.cardId, quantity: qty }]);
-                        const earned = Number(result?.earnedStarBits ?? result?.starBitsEarned ?? result?.bitsAwarded ?? qty * Number(card.bitsPerDuplicate || 0));
+                        const earned = Number(result?.earnedStarBits ?? result?.starBitsEarned ?? result?.bitsAwarded ?? 0);
                         showToast(`Converted ${qty} ${qty === 1 ? "copy" : "copies"} for ${earned.toLocaleString()} Star Bits.`);
                         await loadPreview();
                     } catch (error) {
                         showToast(error.message || "Unable to convert this card.", "error");
+                    } finally {
                         convertButton.disabled = false;
                         convertButton.textContent = "Convert Now";
                     }
                 });
 
-                info.append(name, meta, owned, value, allLabel, controls, projected, convertButton);
-                article.append(image, info);
+                const info=document.createElement("div");info.className="duplicate-card-info";info.append(name,rarity,quantity,value,selectRow,controls,convertButton);article.append(image,info);
                 duplicateGrid.append(article);
             }
             updateSelectionSummary();
@@ -1169,13 +1149,15 @@
         }
 
         selectAllToggle.addEventListener("change", () => {
-            for (const card of currentPreview?.duplicateCards || []) {
-                setSelection(card.cardId, selectAllToggle.checked ? card.duplicateQuantity : 0, card.duplicateQuantity);
-                const article = duplicateGrid.querySelector(`[data-card-id="${CSS.escape(card.cardId)}"]`);
-                const projected = article?.querySelector('.duplicate-projected');
-                const qty = selectAllToggle.checked ? Number(card.duplicateQuantity || 0) : 0;
-                if (projected) projected.innerHTML = `<span>You'll receive</span><strong>★ ${(qty * Number(card.bitsPerDuplicate || 0)).toLocaleString()} Star Bits</strong>`;
+            const selectEverything = selectAllToggle.checked;
+            const cards = currentPreview?.duplicateCards || [];
+            for (const card of cards) {
+                const quantity = selectEverything ? Number(card.duplicateQuantity || 0) : 0;
+                setSelection(card.cardId, quantity, Number(card.duplicateQuantity || 0));
             }
+            // Preserve the user's master choice after per-card synchronization.
+            selectAllToggle.checked = selectEverything;
+            updateSelectionSummary();
         });
 
         clearSelectionButton.addEventListener("click", () => {
