@@ -146,7 +146,7 @@
 
 </style>
     <link rel="stylesheet" href="css/shared-ui.css">
-<link rel="stylesheet" href="css/qol-ui.css?v=91.1.1">
+<link rel="stylesheet" href="css/qol-ui.css?v=92.0.2">
 </head>
 <body>
 <script type="module" src="js/embed-mode.js"></script>
@@ -341,6 +341,58 @@ function render(){
     </article>`;
   }).join('');
 }
+
+function getPortalDocument(){
+  try{
+    if(window.parent && window.parent!==window && window.parent.document) return window.parent.document;
+  }catch{}
+  return document;
+}
+function ensureShopPortalStyles(targetDocument){
+  if(targetDocument.getElementById('starlight-shop-portal-styles')) return;
+  const style=targetDocument.createElement('style');
+  style.id='starlight-shop-portal-styles';
+  style.textContent=`
+    .starlight-shop-portal{
+      position:fixed!important;inset:0!important;z-index:2147483000!important;
+      display:grid!important;place-items:center!important;
+      width:100vw!important;height:100vh!important;
+      padding:clamp(14px,3vw,28px)!important;box-sizing:border-box!important;
+      overflow:auto!important;background:rgba(43,50,91,.58)!important;
+      backdrop-filter:blur(9px)!important;
+    }
+    .starlight-shop-portal.hidden{display:none!important}
+    .starlight-shop-portal .purchase-card,
+    .starlight-shop-portal .modal-card{
+      position:relative!important;inset:auto!important;transform:none!important;
+      width:min(660px,calc(100vw - 30px))!important;
+      max-height:calc(100vh - 34px)!important;overflow:auto!important;
+      margin:auto!important;border:2px solid rgba(255,130,200,.46)!important;
+      border-radius:24px!important;background:linear-gradient(155deg,#fff,#f4fbff 54%,#fff1f8)!important;
+      box-shadow:0 28px 80px rgba(38,45,88,.34)!important;color:#405fa1!important;
+    }
+    .starlight-shop-portal .purchase-card{padding:26px!important;text-align:center!important}
+    .starlight-shop-portal .modal-card{padding:24px!important}
+    @media(max-width:600px){
+      .starlight-shop-portal{padding:10px!important}
+      .starlight-shop-portal .purchase-card,
+      .starlight-shop-portal .modal-card{width:100%!important;max-height:calc(100vh - 20px)!important}
+    }
+  `;
+  targetDocument.head.append(style);
+}
+function portalModal(element){
+  const targetDocument=getPortalDocument();
+  ensureShopPortalStyles(targetDocument);
+  if(element.ownerDocument!==targetDocument) targetDocument.body.append(element);
+  element.classList.add('starlight-shop-portal');
+  targetDocument.body.style.overflow='hidden';
+}
+function releasePortalModal(element){
+  const targetDocument=element.ownerDocument;
+  targetDocument.body.style.overflow='';
+}
+
 function openDetails(id){
   const booster=boosterData.find(item=>item.id===id);if(!booster)return;
   modalTitle.textContent=booster.name;
@@ -356,9 +408,14 @@ function openDetails(id){
   }
   if(Number(booster.bonus_star_bits)>0) rows.push(`<div class="content-row"><span>Bonus</span><strong>★ ${Number(booster.bonus_star_bits).toLocaleString()} Star Bits</strong></div>`);
   modalContents.innerHTML=rows.join('');
-  modal.classList.remove('hidden');document.body.style.overflow='hidden';modalClose.focus();
+  portalModal(modal);
+  modal.classList.remove('hidden');
+  requestAnimationFrame(()=>modalClose.focus({preventScroll:true}));
 }
-function closeDetails(){modal.classList.add('hidden');document.body.style.overflow=''}
+function closeDetails(){
+  modal.classList.add('hidden');
+  releasePortalModal(modal);
+}
 function openPurchaseModal(booster,button){
   const cost=Number(button.dataset.cost)||0;
   pendingPurchase={booster,button,cost};
@@ -368,14 +425,14 @@ function openPurchaseModal(booster,button){
   purchaseDescription.textContent='This booster will open immediately and the cards will be saved to your collection.';
   purchaseCost.textContent=`★ ${cost.toLocaleString()} Star Bits`;
   purchaseBalance.textContent=`Your balance after purchase: ${(currentBalance-cost).toLocaleString()} Star Bits`;
+  portalModal(purchaseModal);
   purchaseModal.classList.remove('hidden');
-  document.body.style.overflow='hidden';
-  purchaseConfirm.focus();
+  requestAnimationFrame(()=>purchaseConfirm.focus({preventScroll:true}));
 }
 function closePurchaseModal(){
   if(busy)return;
   purchaseModal.classList.add('hidden');
-  document.body.style.overflow='';
+  releasePortalModal(purchaseModal);
   pendingPurchase=null;
 }
 async function confirmPurchase(){
@@ -386,7 +443,7 @@ async function confirmPurchase(){
   button.disabled=true;button.textContent='Opening…';
   try{
     purchaseModal.classList.add('hidden');
-    document.body.style.overflow='';
+    releasePortalModal(purchaseModal);
     const result=await openStarBitsBoosterById(booster.id);
     await revealRewardSequence(result.cards||[],{title:booster.name,cardBackUrl:button.dataset.back||undefined});
     pendingPurchase=null;
@@ -453,6 +510,6 @@ document.addEventListener('keydown',event=>{
 load();
 </script>
     <script src="js/shared-ui.js"></script>
-<script src="js/qol-ui.js?v=91.1.1" defer></script>
+<script src="js/qol-ui.js?v=92.0.2" defer></script>
 </body>
 </html>

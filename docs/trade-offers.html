@@ -6,7 +6,7 @@
 @media(max-width:980px){.trade-columns{grid-template-columns:1fr}.pick-grid{max-height:420px}}
 </style><script src="js/firefox-performance.js" defer></script>
     <link rel="stylesheet" href="css/shared-ui.css">
-<link rel="stylesheet" href="css/qol-ui.css?v=91.1.1">
+<link rel="stylesheet" href="css/qol-ui.css?v=92.0.2">
 </head><body><script src="js/embed-mode.js" type="module"></script><div class="sky"></div><main class="trade-offers-page"><section class="trade-hero"><p class="eyebrow">Collector Exchange</p><h1>🤝 Trade Offers</h1><p>Offer only duplicate cards. Every collector’s permanent first copy stays protected by the database.</p></section><div class="tabs"><button data-tab="compose" class="active">Create Offer</button><button data-tab="incoming">Incoming</button><button data-tab="outgoing">Sent</button></div><section class="trade-box"><div id="composeView" class="composer"><div id="recipientHead"></div><div id="composeMissing" class="empty"><p>Enter a collector username to start a trade offer.</p><div style="display:flex;gap:10px;max-width:520px;margin:15px auto"><input id="recipientUsername" style="flex:1;padding:11px;border:2px solid rgba(107,198,248,.35);border-radius:12px" placeholder="Collector username"><button id="loadRecipient" class="primary" type="button">Create Offer</button></div></div><div id="composeForm" hidden><div class="trade-columns"><div class="pick-panel"><h2>Your Offer</h2><div id="myCards" class="pick-grid"></div></div><div class="pick-panel"><h2>You Request</h2><div id="theirCards" class="pick-grid"></div></div></div><label><b>Optional note</b><textarea id="tradeNote" maxlength="300" placeholder="Add a friendly message..."></textarea></label><button id="sendOffer" class="primary">Send Trade Offer</button></div></div><div id="incomingView" hidden><div id="incomingList" class="offer-list"></div></div><div id="outgoingView" hidden><div id="outgoingList" class="offer-list"></div></div><p id="tradeStatus" class="status" role="status"></p></section></main><script type="module">
 import{getTradeOfferContext,createTradeOffer,getMyTradeOffers,respondToTradeOffer}from'./js/trade-offer-service.js';
 const q=new URLSearchParams(location.search);let username=q.get('username')||'';const status=document.querySelector('#tradeStatus');let context=null,offers={incoming:[],outgoing:[]};
@@ -24,5 +24,5 @@ document.addEventListener('click',async e=>{const b=e.target.closest('[data-acti
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));['compose','incoming','outgoing'].forEach(t=>document.querySelector(`#${t}View`).hidden=t!==b.dataset.tab)});
 await Promise.all([initCompose(),loadOffers()]);
 </script>    <script src="js/shared-ui.js"></script>
-<script src="js/qol-ui.js?v=91.1.1" defer></script>
+<script src="js/qol-ui.js?v=92.0.2" defer></script>
 </body></html>
