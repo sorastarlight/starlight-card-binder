@@ -1,6 +1,6 @@
 import { supabase } from '../supabase-client.js';
 import { redeemRewardCode } from '../redemption-service.js';
-import { revealRewardSequence } from '../reward-reveal.js?v=1.0.1';
+import { revealRewardSequence } from '../reward-reveal.js?v=1.1.0';
 const form=document.getElementById('redeem-form'),input=document.getElementById('code'),button=document.getElementById('redeem-button'),status=document.getElementById('status'),box=document.getElementById('reward-box'),title=document.getElementById('reward-title'),description=document.getElementById('reward-description');
 function showStatus(message,type=''){status.textContent=message;status.className=`status ${type}`.trim()}
 const {data}=await supabase.auth.getUser();if(!data.user){showStatus('Please sign in before redeeming a code.','error');button.disabled=true;setTimeout(()=>location.href='login.html',1400)}

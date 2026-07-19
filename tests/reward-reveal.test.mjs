@@ -3,8 +3,10 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
 import {
+  createRevealStackLayout,
   normalizeRevealCard,
-  normalizeRevealOptions
+  normalizeRevealOptions,
+  summarizeRevealCards
 } from '../docs/js/reward-reveal.js';
 
 test('normalizes snake_case reward cards into the canonical reveal shape', () => {
@@ -43,12 +45,34 @@ test('normalizes reveal option aliases and supplies the canonical card back', ()
   assert.match(normalizeRevealOptions({}).cardBackUrl, /StarlightCard_Back_NewLogo\.png$/);
 });
 
-test('keeps the canonical reward viewer free of timing-dependent animation machinery', async () => {
+test('builds one deterministic stack position per awarded card', () => {
+  const layout = createRevealStackLayout(12);
+
+  assert.equal(layout.length, 12);
+  assert.deepEqual(layout[0], { depth: 0, x: 0, y: 0, rotation: 0, zIndex: 12 });
+  assert.equal(layout[7].depth, 7);
+  assert.equal(layout[11].depth, 7);
+  assert.equal(layout[11].zIndex, 1);
+});
+
+test('summarizes new and duplicate cards for the result screen', () => {
+  assert.deepEqual(summarizeRevealCards([
+    { id: 'new', name: 'New Card' },
+    { id: 'duplicate', name: 'Duplicate Card', is_duplicate: true },
+    { id: 'new-again', name: 'Another New Card', isDuplicate: false }
+  ]), { total: 3, newCards: 2, duplicates: 1 });
+});
+
+test('uses deliberate motion states with a reduced-motion fallback', async () => {
   const [script, stylesheet] = await Promise.all([
     readFile(new URL('../docs/js/reward-reveal.js', import.meta.url), 'utf8'),
     readFile(new URL('../docs/css/reward-reveal.css', import.meta.url), 'utf8')
   ]);
 
-  assert.doesNotMatch(script, /\bsetTimeout\b|\bnew Audio\b|\bis-(?:opening|revealing|flipped)\b/);
-  assert.doesNotMatch(stylesheet, /@keyframes|\banimation\s*:|\btransition\s*:/i);
+  assert.doesNotMatch(script, /\bsetTimeout\b|\bnew Audio\b|\bsr931\b/);
+  assert.match(stylesheet, /@keyframes stRevealPackOpen/);
+  assert.match(stylesheet, /@keyframes stRevealCardLift/);
+  assert.match(stylesheet, /@keyframes stRevealCardFlip/);
+  assert.match(stylesheet, /@keyframes stRevealResultIn/);
+  assert.match(stylesheet, /@media \(prefers-reduced-motion: reduce\)/);
 });
