@@ -1,0 +1,295 @@
+.full-card-wrap#fullCard3d {
+  --tiltX: 0deg;
+  --tiltY: 0deg;
+  --shineX: 50%;
+  --shineY: 50%;
+  transform: rotateX(var(--tiltX)) rotateY(var(--tiltY)) translateZ(0) !important;
+  transform-style: preserve-3d !important;
+  transition: transform .22s ease, filter .22s ease !important;
+  will-change: transform;
+}
+.full-card-wrap#fullCard3d.tilting {
+  filter: drop-shadow(calc(var(--tiltY) * -1) 22px 32px rgba(8,39,125,.26));
+}
+.full-card-wrap#fullCard3d.tilting .face.front::marker { content: ""; }
+
+
+/* Booster splash overhaul: cleaner stage, stronger pack card, less clunky button. */
+.v61-series-stage,
+#seriesLanding {
+  overflow: visible !important;
+}
+.v61-splash-inner.v78-splash-inner {
+  min-height: clamp(520px, 68vh, 690px) !important;
+  padding: clamp(34px, 5vw, 64px) clamp(18px, 4vw, 48px) !important;
+  gap: clamp(26px, 4vw, 44px) !important;
+}
+.v61-splash-title {
+  padding: 18px clamp(18px, 4vw, 42px) !important;
+  border-radius: 28px !important;
+  background: linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.25)) !important;
+  border: 1px solid rgba(255,255,255,.72) !important;
+  box-shadow: 0 18px 50px rgba(56,74,165,.14), inset 0 1px 0 rgba(255,255,255,.65) !important;
+}
+.v61-pack-row.v78-pack-grid {
+  align-items: stretch !important;
+  gap: clamp(22px, 4vw, 58px) !important;
+}
+.v61-pack.v78-pack {
+  width: clamp(220px, 23vw, 292px) !important;
+  min-height: clamp(330px, 38vw, 414px) !important;
+  padding: 18px 18px 20px !important;
+  gap: 14px !important;
+  border-radius: 30px !important;
+  background:
+    radial-gradient(circle at 50% 16%, rgba(255,255,255,.88), rgba(255,255,255,.35) 36%, transparent 62%),
+    linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,226,244,.28)) !important;
+  border: 1px solid rgba(255,255,255,.76) !important;
+  box-shadow: 0 22px 55px rgba(64,63,166,.18), inset 0 1px 0 rgba(255,255,255,.62) !important;
+  transition: transform .22s ease, box-shadow .22s ease, filter .22s ease !important;
+}
+.v61-pack.v78-pack:before {
+  width: 88% !important;
+  background: radial-gradient(circle, rgba(255,247,199,.62), rgba(255,102,190,.26) 42%, rgba(114,207,255,.20) 58%, transparent 76%) !important;
+}
+.v61-pack.v78-pack:hover,
+.v61-pack.v78-pack:focus-visible {
+  transform: translateY(-8px) scale(1.025) !important;
+  box-shadow: 0 30px 68px rgba(64,63,166,.24), 0 0 34px rgba(255,83,177,.22), inset 0 1px 0 rgba(255,255,255,.72) !important;
+}
+.v61-pack.v78-pack img {
+  width: clamp(158px, 17vw, 224px) !important;
+  max-height: clamp(230px, 30vw, 310px) !important;
+  margin: 0 auto !important;
+  filter: drop-shadow(0 18px 20px rgba(47,50,140,.24)) !important;
+}
+.v61-pack.v78-pack .v61-pack-label {
+  width: min(230px, 100%) !important;
+  padding: 10px 14px !important;
+  border-radius: 18px !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.28), rgba(255,255,255,0) 40%),
+    linear-gradient(135deg, #ff7fc3 0%, #ff4fa7 54%, #df358f 100%) !important;
+  border: 1px solid rgba(255,255,255,.78) !important;
+  box-shadow: 0 0 0 3px rgba(255,255,255,.32), 0 10px 22px rgba(255,65,158,.26), inset 0 1px 0 rgba(255,255,255,.42) !important;
+  text-shadow: 0 1px 0 rgba(137,0,82,.28) !important;
+}
+.v61-pack.v78-pack .v61-pack-label .v79-pack-title-line {
+  font-size: clamp(.67rem, .95vw, .82rem) !important;
+  letter-spacing: .055em !important;
+  line-height: 1.1 !important;
+  white-space: normal !important;
+}
+.v61-pack.v78-pack .v61-pack-label small:not(.v79-pack-title-line) {
+  margin-top: 5px !important;
+  padding: 4px 10px !important;
+  font-size: clamp(.58rem, .75vw, .68rem) !important;
+  background: rgba(255,255,255,.24) !important;
+  border: 1px solid rgba(255,255,255,.22) !important;
+}
+@media (max-width: 720px) {
+  .v61-pack.v78-pack { width: min(88vw, 244px) !important; min-height: 338px !important; }
+  .v61-pack.v78-pack img { width: min(180px, 76%) !important; max-height: 252px !important; }
+}
+.full-card-wrap#fullCard3d.tilting {
+  filter: drop-shadow(0 26px 34px rgba(8,39,125,.28)) !important;
+}
+
+
+/* Remove the normal binder hero while the user is on the booster selection splash. */
+body[data-page="binder"].series-select .series-hero,
+body[data-page="binder"].series-select .v61-hero {
+  display: none !important;
+}
+
+/* Booster splash: more polished, magical-girl stage inspired by the approved mockup. */
+body[data-page="binder"].series-select #seriesLanding {
+  grid-column: 1 / -1 !important;
+  min-height: clamp(620px, calc(100vh - 120px), 860px) !important;
+  border-radius: 34px !important;
+  overflow: hidden !important;
+  background:
+    radial-gradient(circle at 50% 98%, rgba(255,255,255,.88), rgba(255,201,235,.44) 18%, transparent 44%),
+    radial-gradient(circle at 20% 25%, rgba(166,205,255,.55), transparent 34%),
+    radial-gradient(circle at 78% 18%, rgba(255,182,229,.50), transparent 30%),
+    linear-gradient(135deg, #8fb9ff 0%, #d7b8ff 34%, #ffc4e5 66%, #bce9ff 100%) !important;
+  box-shadow: 0 26px 80px rgba(77,55,178,.24), inset 0 0 0 2px rgba(255,255,255,.48), inset 0 0 38px rgba(255,105,205,.26) !important;
+}
+body[data-page="binder"].series-select #seriesLanding::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  background:
+    radial-gradient(circle, rgba(255,255,255,.95) 0 1.8px, transparent 2.8px),
+    radial-gradient(circle, rgba(255,113,201,.65) 0 1.5px, transparent 2.4px),
+    radial-gradient(circle, rgba(255,226,105,.80) 0 1.4px, transparent 2.4px),
+    linear-gradient(112deg, transparent 0 18%, rgba(255,255,255,.24) 22%, transparent 33% 65%, rgba(255,255,255,.20) 72%, transparent 84%);
+  background-size: 116px 116px, 74px 74px, 148px 148px, 100% 100% !important;
+  opacity: .9 !important;
+  animation: v797SplashTwinkle 13s linear infinite !important;
+}
+body[data-page="binder"].series-select #seriesLanding::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 12px !important;
+  border-radius: 28px !important;
+  pointer-events: none !important;
+  border: 2px solid rgba(255,169,224,.70) !important;
+  box-shadow: inset 0 0 22px rgba(255,255,255,.56), 0 0 24px rgba(255,86,189,.34) !important;
+}
+@keyframes v797SplashTwinkle {
+  to { background-position: 0 -116px, 74px -74px, -148px -148px, 0 0; }
+}
+.v61-splash-inner.v78-splash-inner {
+  min-height: clamp(620px, calc(100vh - 120px), 860px) !important;
+  gap: clamp(34px, 5vw, 64px) !important;
+  padding: clamp(44px, 6vw, 72px) clamp(16px, 5vw, 70px) !important;
+}
+.v61-splash-title {
+  position: relative !important;
+  width: min(920px, 86vw) !important;
+  padding: clamp(22px, 3.2vw, 38px) clamp(18px, 4vw, 54px) !important;
+  border-radius: 34px !important;
+  background: linear-gradient(180deg, rgba(255,255,255,.58), rgba(255,231,248,.28)) !important;
+  border: 2px solid rgba(255,255,255,.72) !important;
+  box-shadow: 0 0 0 4px rgba(255,135,211,.22), 0 18px 48px rgba(255,72,177,.24), inset 0 1px 0 rgba(255,255,255,.86) !important;
+  backdrop-filter: blur(8px) saturate(1.25) !important;
+}
+.v61-splash-title::before,
+.v61-splash-title::after {
+  content: "☆" !important;
+  position: absolute !important;
+  color: #fff2a2 !important;
+  text-shadow: 0 0 10px #fff, 0 0 18px #ff65c5 !important;
+  font-size: clamp(1.6rem, 3vw, 3rem) !important;
+  animation: v797TitleStar 2.4s ease-in-out infinite !important;
+}
+.v61-splash-title::before { left: clamp(16px, 4vw, 46px) !important; top: 50% !important; transform: translateY(-50%) rotate(-14deg) !important; }
+.v61-splash-title::after { right: clamp(16px, 4vw, 46px) !important; top: 50% !important; transform: translateY(-50%) rotate(14deg) !important; animation-delay: .6s !important; }
+@keyframes v797TitleStar { 50% { filter: brightness(1.35); opacity: .72; } }
+.v61-splash-title h2 {
+  margin: 0 !important;
+  color: #fff !important;
+  font-size: clamp(1.65rem, 4vw, 3.35rem) !important;
+  line-height: 1.05 !important;
+  font-style: normal !important;
+  font-weight: 950 !important;
+  letter-spacing: -.025em !important;
+  text-transform: none !important;
+  text-shadow: 0 3px 0 #f067ba, 0 0 12px rgba(255,255,255,.95), 0 0 28px rgba(255,67,177,.58) !important;
+}
+.v61-pack-row.v78-pack-grid {
+  position: relative !important;
+  z-index: 2 !important;
+  gap: clamp(34px, 6vw, 90px) !important;
+}
+.v61-pack.v78-pack {
+  width: clamp(245px, 24vw, 330px) !important;
+  min-height: clamp(355px, 39vw, 445px) !important;
+  border-radius: 34px !important;
+  background: linear-gradient(180deg, rgba(255,255,255,.42), rgba(255,236,249,.22)) !important;
+  border: 2px solid rgba(255,255,255,.62) !important;
+  box-shadow: 0 0 0 3px rgba(255,155,220,.20), 0 24px 60px rgba(51,48,154,.24), inset 0 0 38px rgba(255,255,255,.22) !important;
+}
+.v61-pack.v78-pack img {
+  width: clamp(172px, 18vw, 246px) !important;
+  max-height: clamp(255px, 30vw, 330px) !important;
+}
+.v61-pack.v78-pack .v61-pack-label {
+  width: min(245px, 100%) !important;
+  padding: 11px 16px 12px !important;
+  border-radius: 22px !important;
+  background: linear-gradient(180deg, #ff91cc 0%, #f04da6 55%, #ce348d 100%) !important;
+  border: 2px solid rgba(255,255,255,.72) !important;
+  box-shadow: 0 0 0 3px rgba(255,231,157,.36), 0 14px 28px rgba(210,35,132,.34), inset 0 1px 0 rgba(255,255,255,.46) !important;
+}
+.v61-pack.v78-pack .v61-pack-label .v79-pack-title-line {
+  font-size: clamp(.72rem, .95vw, .88rem) !important;
+  line-height: 1.15 !important;
+}
+.v61-pack.v78-pack .v61-pack-label small:not(.v79-pack-title-line) {
+  display: inline-flex !important;
+  justify-content: center !important;
+  justify-self: center !important;
+  margin-top: 6px !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,.24) !important;
+}
+
+
+
+
+
+
+/* Final readable flip guard: one visible image surface, no mirrored back face, simple spin swap. */
+.preview-card.simple-flip .face.back,
+.v62-preview-card.simple-flip .face.back,
+.full-card-wrap.simple-flip .face.back {
+  display: none !important;
+  transform: none !important;
+}
+.preview-card.simple-flip .preview-inner,
+.v62-preview-card.simple-flip .preview-inner,
+.full-card-wrap.simple-flip .full-inner,
+.preview-card.simple-flip.show-back .preview-inner,
+.v62-preview-card.simple-flip.show-back .preview-inner,
+.full-card-wrap.simple-flip.show-back .full-inner,
+.preview-card.simple-flip.flipped .preview-inner,
+.v62-preview-card.simple-flip.flipped .preview-inner,
+.full-card-wrap.simple-flip.flipped .full-inner {
+  transform: none !important;
+}
+.preview-card.simple-flip .face.front,
+.v62-preview-card.simple-flip .face.front,
+.full-card-wrap.simple-flip .face.front,
+.preview-card.simple-flip .face.front img,
+.v62-preview-card.simple-flip .face.front img,
+.full-card-wrap.simple-flip .face.front img,
+.preview-card.simple-flip.showing-card-back .face.front,
+.v62-preview-card.simple-flip.showing-card-back .face.front,
+.full-card-wrap.simple-flip.showing-card-back .face.front,
+.preview-card.simple-flip.showing-card-back .face.front img,
+.v62-preview-card.simple-flip.showing-card-back .face.front img,
+.full-card-wrap.simple-flip.showing-card-back .face.front img {
+  transform: none !important;
+  scale: 1 !important;
+  backface-visibility: visible !important;
+  -webkit-backface-visibility: visible !important;
+}
+.preview-card.simple-flip.flip-turning .preview-inner,
+.v62-preview-card.simple-flip.flip-turning .preview-inner,
+.full-card-wrap.simple-flip.flip-turning .full-inner {
+  animation: v797CleanReadableSpin .58s cubic-bezier(.2,.82,.18,1) both !important;
+}
+@keyframes v797CleanReadableSpin {
+  0% { transform: rotateY(0deg) scale(1) !important; filter: brightness(1); }
+  47% { transform: rotateY(88deg) scale(1.035) !important; filter: brightness(1.22) drop-shadow(0 0 18px rgba(255,88,185,.34)); }
+  53% { transform: rotateY(-88deg) scale(1.035) !important; filter: brightness(1.22) drop-shadow(0 0 18px rgba(125,220,255,.30)); }
+  100% { transform: rotateY(0deg) scale(1) !important; filter: brightness(1); }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* Rainbow film + embedded star glitter. */
+
+
+/* One premium sweep only. No particle DOM. */
+
+
+/* Broad bright reflection with a pink/gold inner core. */
+
+
+
+
+
+

@@ -1,15 +1,324 @@
-const LEGACY_KEYS=[
-  'sora-starlight-card-binder-v66-card-cache','starlightMode','starlight-mode',
-  'starlightHolographic','holographicEnabled','starlight-reveal-cache'
+const LEGACY_KEYS = [
+  'starlightMode',
+  'starlight-mode',
+  'starlightHolographic',
+  'holographicEnabled',
+  'starlight-reveal-cache'
 ];
-function cleanupLegacyStorage(){for(const key of LEGACY_KEYS)localStorage.removeItem(key);}
-function ensureToastRegion(){let el=document.querySelector('.st-toast-region');if(!el){el=document.createElement('div');el.className='st-toast-region';el.setAttribute('aria-live','polite');el.setAttribute('aria-atomic','true');document.body.append(el)}return el}
-function toast(message,type='info',timeout=3200){if(!message)return;const el=document.createElement('div');el.className=`st-toast ${type}`;el.textContent=message;ensureToastRegion().append(el);window.setTimeout(()=>el.remove(),timeout);return el}
-function confirmDialog({title='Are you sure?',message='',confirmText='Confirm',cancelText='Cancel',danger=false}={}){return new Promise(resolve=>{const prior=document.activeElement;const overlay=document.createElement('div');overlay.className='st-dialog-overlay';overlay.innerHTML=`<section class="st-dialog" role="dialog" aria-modal="true"><h2>${escapeHtml(title)}</h2><p>${escapeHtml(message)}</p><div class="st-dialog-actions"><button class="st-dialog-cancel" type="button">${escapeHtml(cancelText)}</button><button class="st-dialog-confirm${danger?' danger':''}" type="button">${escapeHtml(confirmText)}</button></div></section>`;document.body.append(overlay);document.body.style.overflow='hidden';const cancel=overlay.querySelector('.st-dialog-cancel'),ok=overlay.querySelector('.st-dialog-confirm');const finish=value=>{overlay.remove();document.body.style.overflow='';prior?.focus?.();resolve(value)};cancel.onclick=()=>finish(false);ok.onclick=()=>finish(true);overlay.onclick=e=>{if(e.target===overlay)finish(false)};overlay.onkeydown=e=>{if(e.key==='Escape')finish(false);if(e.key==='Tab'){const items=[cancel,ok],i=items.indexOf(document.activeElement),next=e.shiftKey?(i<=0?1:i-1):(i>=1?0:i+1);e.preventDefault();items[next].focus()}};ok.focus()})}
-function escapeHtml(value=''){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function stateMarkup(kind,title,message,buttonText='Retry'){return `<div class="st-view-state ${kind}">${kind==='loading'?'<div class="st-spinner" aria-hidden="true"></div>':''}<div><strong>${escapeHtml(title)}</strong><span>${escapeHtml(message)}</span>${kind==='error'?`<button type="button" data-st-retry>${escapeHtml(buttonText)}</button>`:''}</div></div>`}
-function watchRoutineStatuses(){const routine=/\b(loaded|completed|confirmed|refreshed|saved successfully|successfully loaded)\.?$/i;const process=el=>{const text=el.textContent?.trim();if(!text||!routine.test(text)||el.classList.contains('error'))return;toast(text,'success');el.textContent='';el.style.display='none'};const obs=new MutationObserver(records=>{for(const r of records){const el=r.target.nodeType===1?r.target:r.target.parentElement;if(el?.matches?.('.status,.page-status,[role="status"]'))process(el)}});document.querySelectorAll('.status,.page-status,[role="status"]').forEach(process);obs.observe(document.body,{subtree:true,childList:true,characterData:true})}
-window.StarlightUI={toast,confirm:confirmDialog,stateMarkup,cleanupLegacyStorage};
-window.addEventListener('error',e=>{if(e.message)console.error('[Starlight UI]',e.error||e.message)});
-window.addEventListener('unhandledrejection',e=>console.error('[Starlight UI] Unhandled promise rejection:',e.reason));
-document.addEventListener('DOMContentLoaded',()=>{cleanupLegacyStorage();watchRoutineStatuses()});
+
+const modalControllers = new WeakMap();
+const modalStack = [];
+const scrollSnapshots = new WeakMap();
+
+function cleanupLegacyStorage() {
+  for (const key of LEGACY_KEYS) localStorage.removeItem(key);
+}
+
+function escapeHtml(value = '') {
+  return String(value).replace(/[&<>"']/g, character => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[character]);
+}
+
+function ensureToastRegion() {
+  let region = document.querySelector('.st-toast-region');
+  if (!region) {
+    region = document.createElement('div');
+    region.className = 'st-toast-region';
+    region.setAttribute('aria-live', 'polite');
+    region.setAttribute('aria-atomic', 'true');
+    document.body.append(region);
+  }
+  return region;
+}
+
+function toast(message, type = 'info', timeout = 3200) {
+  if (!message) return null;
+  const element = document.createElement('div');
+  element.className = `st-toast ${type}`;
+  element.textContent = message;
+  ensureToastRegion().append(element);
+  window.setTimeout(() => element.remove(), timeout);
+  return element;
+}
+
+function focusableElements(root) {
+  return [...root.querySelectorAll([
+    'a[href]',
+    'button:not([disabled])',
+    'input:not([disabled]):not([type="hidden"])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])',
+    '[contenteditable="true"]'
+  ].join(','))].filter(element => !element.hidden && element.getAttribute('aria-hidden') !== 'true');
+}
+
+function lockScroll(ownerDocument) {
+  if (!scrollSnapshots.has(ownerDocument)) {
+    scrollSnapshots.set(ownerDocument, {
+      body: ownerDocument.body.style.overflow,
+      html: ownerDocument.documentElement.style.overflow
+    });
+    ownerDocument.body.style.overflow = 'hidden';
+    ownerDocument.documentElement.style.overflow = 'hidden';
+  }
+}
+
+function unlockScroll(ownerDocument) {
+  if (modalStack.some(controller => controller.isOpen && controller.element.ownerDocument === ownerDocument)) return;
+  const snapshot = scrollSnapshots.get(ownerDocument);
+  if (!snapshot) return;
+  ownerDocument.body.style.overflow = snapshot.body;
+  ownerDocument.documentElement.style.overflow = snapshot.html;
+  scrollSnapshots.delete(ownerDocument);
+}
+
+function modalKeydown(event, modal) {
+  if (!modal?.isOpen || topModal() !== modal) return;
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    modal.close(undefined, 'escape');
+    return;
+  }
+  if (event.key !== 'Tab') return;
+  const items = focusableElements(modal.dialog);
+  if (!items.length) {
+    event.preventDefault();
+    modal.dialog.focus?.();
+    return;
+  }
+  const first = items[0];
+  const last = items[items.length - 1];
+  if (event.shiftKey && modal.element.ownerDocument.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && modal.element.ownerDocument.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
+function topModal() {
+  return modalStack[modalStack.length - 1] || null;
+}
+
+function adoptModal(element, options = {}) {
+  if (!element) throw new Error('A modal element is required.');
+  if (modalControllers.has(element)) return modalControllers.get(element);
+
+  const resolveDialog = () => (
+    (typeof options.dialog === 'function' ? options.dialog(element) : options.dialog)
+    || element.querySelector('[role="dialog"]')
+    || element.firstElementChild
+    || null
+  );
+  const configureDialog = dialog => {
+    if (!dialog) return;
+    if (!dialog.hasAttribute('role')) dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    if (options.labelledBy) dialog.setAttribute('aria-labelledby', options.labelledBy);
+    if (options.describedBy) dialog.setAttribute('aria-describedby', options.describedBy);
+    if (options.label && !dialog.hasAttribute('aria-label')) dialog.setAttribute('aria-label', options.label);
+  };
+  const state = {
+    open: false,
+    priorFocus: null,
+    returnValue: undefined
+  };
+
+  configureDialog(resolveDialog());
+
+  const controller = {
+    element,
+    get dialog() { return resolveDialog() || element; },
+    get isOpen() { return state.open; },
+    get returnValue() { return state.returnValue; },
+    open({ initialFocus = options.initialFocus } = {}) {
+      if (state.open) return controller;
+      state.open = true;
+      state.returnValue = undefined;
+      const ownerDocument = element.ownerDocument;
+      const dialog = controller.dialog;
+      configureDialog(dialog);
+      state.priorFocus = ownerDocument.activeElement instanceof ownerDocument.defaultView.HTMLElement ? ownerDocument.activeElement : null;
+      element.hidden = false;
+      element.classList.remove('hidden');
+      element.setAttribute('aria-hidden', 'false');
+      element.style.zIndex = String((options.zIndex || 31000) + modalStack.length * 10);
+      modalStack.push(controller);
+      lockScroll(ownerDocument);
+      options.onOpen?.(controller);
+      element.dispatchEvent(new ownerDocument.defaultView.CustomEvent('starlight:modal-open', { detail: { controller } }));
+      ownerDocument.defaultView.requestAnimationFrame(() => {
+        element.classList.add('is-open');
+        const target = typeof initialFocus === 'string' ? dialog.querySelector(initialFocus) : initialFocus;
+        (target || focusableElements(dialog)[0] || dialog).focus?.({ preventScroll: true });
+      });
+      return controller;
+    },
+    close(value, reason = 'programmatic') {
+      if (!state.open || options.beforeClose?.({ value, reason, controller }) === false) return false;
+      state.open = false;
+      state.returnValue = value;
+      element.classList.remove('is-open');
+      element.classList.add('hidden');
+      element.hidden = true;
+      element.setAttribute('aria-hidden', 'true');
+      const index = modalStack.indexOf(controller);
+      if (index >= 0) modalStack.splice(index, 1);
+      const ownerDocument = element.ownerDocument;
+      unlockScroll(ownerDocument);
+      options.onClose?.({ value, reason, controller });
+      element.dispatchEvent(new ownerDocument.defaultView.CustomEvent('starlight:modal-close', { detail: { value, reason, controller } }));
+      if (options.restoreFocus !== false && state.priorFocus?.isConnected) state.priorFocus.focus?.({ preventScroll: true });
+      return true;
+    },
+    destroy() {
+      if (state.open) controller.close(undefined, 'destroy');
+      element.removeEventListener('click', onClick);
+      element.removeEventListener('keydown', onKeydown, true);
+      modalControllers.delete(element);
+      if (options.removeOnDestroy) element.remove();
+    }
+  };
+
+  function onClick(event) {
+    if (event.target === element && options.closeOnBackdrop !== false) controller.close(undefined, 'backdrop');
+    const closeButton = event.target.closest?.('[data-st-modal-close]');
+    if (closeButton && element.contains(closeButton)) controller.close(closeButton.dataset.stModalValue, 'button');
+  }
+
+  function onKeydown(event) {
+    modalKeydown(event, controller);
+  }
+
+  element.addEventListener('click', onClick);
+  element.addEventListener('keydown', onKeydown, true);
+  modalControllers.set(element, controller);
+  return controller;
+}
+
+function createModal({
+  title = '',
+  message = '',
+  content = '',
+  className = '',
+  actions = [],
+  closeLabel = 'Close',
+  ...options
+} = {}) {
+  const id = `st-modal-${crypto.randomUUID?.() || Date.now()}`;
+  const overlay = document.createElement('div');
+  overlay.className = `st-dialog-overlay hidden ${className}`.trim();
+  overlay.hidden = true;
+  overlay.setAttribute('aria-hidden', 'true');
+  overlay.innerHTML = `
+    <section class="st-dialog" role="dialog" aria-modal="true" aria-labelledby="${id}-title"${message ? ` aria-describedby="${id}-description"` : ''} tabindex="-1">
+      <button class="st-dialog-close" type="button" data-st-modal-close aria-label="${escapeHtml(closeLabel)}">×</button>
+      <h2 id="${id}-title">${escapeHtml(title)}</h2>
+      ${message ? `<p id="${id}-description">${escapeHtml(message)}</p>` : ''}
+      ${content ? `<div class="st-dialog-content">${content}</div>` : ''}
+      ${actions.length ? `<div class="st-dialog-actions">${actions.map(action => `
+        <button type="button" class="${escapeHtml(action.className || 'st-dialog-cancel')}" data-st-modal-value="${escapeHtml(action.value ?? '')}">${escapeHtml(action.label || 'OK')}</button>
+      `).join('')}</div>` : ''}
+    </section>`;
+  document.body.append(overlay);
+  const controller = adoptModal(overlay, { ...options, removeOnDestroy: true });
+  overlay.querySelectorAll('[data-st-modal-value]').forEach(button => {
+    button.addEventListener('click', () => controller.close(button.dataset.stModalValue, 'action'));
+  });
+  return controller;
+}
+
+function confirmDialog({
+  title = 'Are you sure?',
+  message = '',
+  confirmText = 'Confirm',
+  cancelText = 'Cancel',
+  danger = false
+} = {}) {
+  return new Promise(resolve => {
+    const modal = createModal({
+      title,
+      message,
+      closeLabel: cancelText,
+      actions: [
+        { label: cancelText, value: 'cancel', className: 'st-dialog-cancel' },
+        { label: confirmText, value: 'confirm', className: `st-dialog-confirm${danger ? ' danger' : ''}` }
+      ],
+      initialFocus: '.st-dialog-confirm',
+      onClose: ({ value }) => {
+        resolve(value === 'confirm');
+        modal.destroy();
+      }
+    });
+    modal.open();
+  });
+}
+
+function alertDialog({ title = 'Starlight Cards', message = '', buttonText = 'OK' } = {}) {
+  return new Promise(resolve => {
+    const modal = createModal({
+      title,
+      message,
+      actions: [{ label: buttonText, value: 'ok', className: 'st-dialog-confirm' }],
+      onClose: () => {
+        resolve();
+        modal.destroy();
+      }
+    });
+    modal.open();
+  });
+}
+
+function stateMarkup(kind, title, message, buttonText = 'Retry') {
+  return `<div class="st-view-state ${escapeHtml(kind)}">${kind === 'loading' ? '<div class="st-spinner" aria-hidden="true"></div>' : ''}<div><strong>${escapeHtml(title)}</strong><span>${escapeHtml(message)}</span>${kind === 'error' ? `<button type="button" data-st-retry>${escapeHtml(buttonText)}</button>` : ''}</div></div>`;
+}
+
+function watchRoutineStatuses() {
+  const routine = /\b(loaded|completed|confirmed|refreshed|saved successfully|successfully loaded)\.?$/i;
+  const process = element => {
+    const text = element.textContent?.trim();
+    if (!text || !routine.test(text) || element.classList.contains('error')) return;
+    toast(text, 'success');
+    element.textContent = '';
+    element.style.display = 'none';
+  };
+  const observer = new MutationObserver(records => {
+    for (const record of records) {
+      const element = record.target.nodeType === 1 ? record.target : record.target.parentElement;
+      if (element?.matches?.('.status,.page-status,[role="status"]')) process(element);
+    }
+  });
+  document.querySelectorAll('.status,.page-status,[role="status"]').forEach(process);
+  const observerRoot = document.body || document.documentElement;
+  if (observerRoot?.nodeType) {
+    try { observer.observe(observerRoot, { subtree: true, childList: true, characterData: true }); }
+    catch (error) { console.warn('[Starlight] Status observer unavailable.', error); }
+  }
+}
+
+window.StarlightUI = {
+  toast,
+  confirm: confirmDialog,
+  alert: alertDialog,
+  createModal,
+  adoptModal,
+  stateMarkup,
+  escapeHtml,
+  cleanupLegacyStorage
+};
+
+window.addEventListener('error', event => {
+  if (event.message) console.error('[Starlight UI]', event.error || event.message);
+});
+window.addEventListener('unhandledrejection', event => console.error('[Starlight UI] Unhandled promise rejection:', event.reason));
+document.addEventListener('DOMContentLoaded', () => {
+  cleanupLegacyStorage();
+  watchRoutineStatuses();
+});

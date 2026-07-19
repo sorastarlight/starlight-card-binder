@@ -22,6 +22,7 @@ let lastX = 0;
 let lastY = 0;
 let currentAvatar = '';
 let objectUrl = '';
+let clearFileOnClose = true;
 
 const ctx = canvas?.getContext('2d');
 
@@ -74,18 +75,7 @@ function updateZoomLabel() {
     }
 }
 
-function openCropModal() {
-    cropModal?.classList.remove('hidden');
-    cropModal?.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-    saveImage?.focus();
-}
-
-function closeCropModal({ clearFile = true } = {}) {
-    cropModal?.classList.add('hidden');
-    cropModal?.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-
+function resetCropState(clearFile = true) {
     image = null;
     dragging = false;
     scale = 1;
@@ -107,6 +97,27 @@ function closeCropModal({ clearFile = true } = {}) {
     if (clearFile && fileInput) {
         fileInput.value = '';
     }
+}
+
+const cropModalController = cropModal ? window.StarlightUI.adoptModal(cropModal, {
+    dialog: cropModal.querySelector('.profile-crop-dialog'),
+    labelledBy: 'profile-crop-heading',
+    describedBy: 'profile-crop-description',
+    initialFocus: saveImage,
+    onClose: ({ reason }) => {
+        resetCropState(clearFileOnClose);
+        clearFileOnClose = true;
+        if (reason === 'escape' || reason === 'backdrop') status('Profile image change cancelled.');
+    }
+}) : null;
+
+function openCropModal() {
+    cropModalController?.open({ initialFocus: saveImage });
+}
+
+function closeCropModal({ clearFile = true } = {}) {
+    clearFileOnClose = clearFile;
+    cropModalController?.close(undefined, 'page');
 }
 
 fileInput?.addEventListener('change', () => {
@@ -198,24 +209,6 @@ canvas?.addEventListener('pointercancel', endDrag);
 cancelImage?.addEventListener('click', () => {
     closeCropModal();
     status('Profile image change cancelled.');
-});
-
-cropModal?.addEventListener('click', event => {
-    if (event.target === cropModal) {
-        closeCropModal();
-        status('Profile image change cancelled.');
-    }
-});
-
-document.addEventListener('keydown', event => {
-    if (
-        event.key === 'Escape' &&
-        cropModal &&
-        !cropModal.classList.contains('hidden')
-    ) {
-        closeCropModal();
-        status('Profile image change cancelled.');
-    }
 });
 
 saveImage?.addEventListener('click', async () => {

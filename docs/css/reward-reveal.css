@@ -1,0 +1,238 @@
+.sr931-overlay{
+  position:fixed!important;
+  inset:0!important;
+  z-index:2147483640!important;
+  display:grid!important;
+  place-items:center!important;
+  width:100vw!important;
+  height:100vh!important;
+  padding:16px!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+  background:rgba(32,40,82,.42)!important;
+  backdrop-filter:blur(18px) saturate(1.18)!important;
+  opacity:0;
+  transition:opacity .22s ease;
+}
+.sr931-overlay.is-open{opacity:1}
+.sr931-aura{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 22% 26%,rgba(107,198,248,.34),transparent 34%),
+    radial-gradient(circle at 80% 24%,rgba(255,130,200,.34),transparent 36%),
+    radial-gradient(circle at 50% 82%,rgba(199,135,239,.26),transparent 42%);
+  filter:blur(28px);
+  animation:sr931Aura 5s ease-in-out infinite alternate;
+}
+.sr931-impact{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:0;
+  background:radial-gradient(circle,rgba(255,255,255,.96),rgba(255,255,255,.32) 18%,transparent 54%);
+  mix-blend-mode:screen;
+}
+.sr931-overlay.is-revealing.rarity-rare .sr931-impact{animation:sr931Impact .64s ease-out}
+.sr931-overlay.is-revealing.rarity-epic .sr931-impact{animation:sr931Impact .9s ease-out}
+.sr931-overlay.is-revealing.rarity-legendary .sr931-impact{animation:sr931LegendaryImpact 1.25s ease-out}
+.sr931-root{
+  position:relative;
+  z-index:2;
+  width:min(94vw,520px);
+  min-height:min(760px,calc(100vh - 32px));
+  display:grid;
+  place-items:center;
+  align-content:center;
+  gap:14px;
+  margin:auto;
+  color:#fff;
+  text-align:center;
+  box-sizing:border-box;
+}
+.sr931-pack-stage{
+  position:relative;
+  width:min(250px,56vw);
+  height:min(360px,44vh);
+  display:grid;
+  place-items:center;
+  perspective:1200px;
+  cursor:pointer;
+}
+.sr931-pack{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  filter:drop-shadow(0 20px 28px rgba(0,0,0,.34));
+  animation:sr931PackFloat 2.2s ease-in-out infinite;
+  transform-origin:center;
+}
+.sr931-pack.is-opening{
+  animation:sr931PackOpen 1.08s cubic-bezier(.16,.84,.28,1) forwards;
+}
+.sr931-pack-burst{
+  position:absolute;
+  inset:-35%;
+  opacity:0;
+  pointer-events:none;
+  background:radial-gradient(circle,rgba(255,255,255,.94),rgba(255,214,244,.44) 30%,rgba(107,198,248,.22) 48%,transparent 70%);
+  filter:blur(3px);
+}
+.sr931-pack-stage.is-bursting .sr931-pack-burst{animation:sr931Burst 1.08s ease-out}
+.sr931-deck{
+  position:relative;
+  width:min(72vw,300px);
+  aspect-ratio:5/7;
+  perspective:1400px;
+  display:none;
+}
+.sr931-deck.is-visible{display:block}
+.sr931-card{
+  position:absolute;
+  inset:0;
+  transform-style:preserve-3d;
+  transition:transform .72s cubic-bezier(.2,.78,.24,1), opacity .28s ease, filter .28s ease;
+  z-index:var(--stack,1);
+  pointer-events:none;
+  will-change:transform;
+}
+.sr931-card.is-current{pointer-events:auto;cursor:pointer}
+.sr931-card:nth-child(2){transform:translate(-8px,6px) rotate(-1.2deg)}
+.sr931-card:nth-child(3){transform:translate(-14px,11px) rotate(-2deg)}
+.sr931-card:nth-child(4){transform:translate(-20px,16px) rotate(-2.8deg)}
+.sr931-card:nth-child(n+5){transform:translate(-24px,20px) rotate(-3.2deg)}
+.sr931-face{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:18px;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+  box-shadow:0 18px 42px rgba(0,0,0,.35);
+  border:2px solid rgba(255,255,255,.92);
+  background:#fff;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+.sr931-front{transform:rotateY(180deg)}
+.sr931-card.is-flipped{transform:rotateY(180deg)!important}
+.sr931-card.is-done{
+  opacity:0;
+  pointer-events:none;
+  transform:translateX(120%) rotate(8deg) scale(.92)!important;
+}
+.sr931-card.rarity-common.is-flipped{filter:drop-shadow(0 0 9px rgba(255,255,255,.45))}
+.sr931-card.rarity-uncommon.is-flipped{filter:drop-shadow(0 0 15px rgba(89,185,236,.78))}
+.sr931-card.rarity-rare.is-flipped{filter:drop-shadow(0 0 20px rgba(236,149,71,.88));animation:sr931RareSettle .72s ease-out}
+.sr931-card.rarity-epic.is-flipped{filter:drop-shadow(0 0 25px rgba(239,114,189,.96));animation:sr931EpicSettle .9s ease-out}
+.sr931-card.rarity-legendary.is-flipped{
+  filter:drop-shadow(0 0 16px #fff6aa) drop-shadow(0 0 32px #f6c92f);
+  animation:sr931LegendaryGlow 1.8s ease-in-out infinite alternate;
+}
+.sr931-legendary-ring{
+  position:absolute;
+  inset:-22%;
+  border-radius:50%;
+  opacity:0;
+  pointer-events:none;
+  background:conic-gradient(from 0deg,transparent,rgba(246,201,47,.75),transparent,rgba(255,255,255,.9),transparent,rgba(255,130,200,.5),transparent);
+  filter:blur(12px);
+}
+.sr931-card.rarity-legendary.is-flipped .sr931-legendary-ring{
+  animation:sr931LegendaryRing 1.15s ease-out;
+}
+.sr931-copy{
+  min-height:96px;
+  display:grid;
+  align-content:center;
+  gap:5px;
+}
+.sr931-copy h2,.sr931-copy p{margin:0}
+.sr931-copy h2{font-size:1.45rem}
+.sr931-hint{font-size:.9rem;opacity:.86}
+.sr931-progress{display:flex;justify-content:center;gap:8px}
+.sr931-progress span{
+  width:10px;height:10px;border-radius:50%;
+  background:var(--dot,#cbd2df);
+  border:1px solid rgba(255,255,255,.72);
+  opacity:.45;
+}
+.sr931-progress span.is-current{opacity:1;transform:scale(1.24);box-shadow:0 0 12px var(--dot,#fff)}
+.sr931-progress span.is-complete{opacity:.82}
+.sr931-button{
+  min-width:180px;
+  min-height:44px;
+  padding:10px 20px;
+  border:0;
+  border-radius:999px;
+  background:linear-gradient(135deg,#ff82c8,#b68df5,#6bc6f8);
+  color:#fff;
+  font-weight:950;
+  cursor:pointer;
+  box-shadow:0 10px 24px rgba(45,55,105,.24);
+}
+.sr931-button[hidden]{display:none!important}
+@keyframes sr931PackFloat{
+  0%,100%{transform:translateY(0) rotate(-1deg)}
+  50%{transform:translateY(-10px) rotate(1deg)}
+}
+@keyframes sr931PackOpen{
+  0%{transform:scale(1) rotate(0)}
+  18%{transform:scale(1.03) rotate(-3deg)}
+  34%{transform:scale(1.07) rotate(4deg)}
+  50%{transform:scale(1.1) rotate(-5deg)}
+  68%{transform:scale(.98) rotate(5deg)}
+  100%{transform:scale(.12) translateY(-150px) rotate(-8deg);opacity:0}
+}
+@keyframes sr931Burst{
+  0%{opacity:0;transform:scale(.5)}
+  24%{opacity:1}
+  100%{opacity:0;transform:scale(1.25)}
+}
+@keyframes sr931Aura{
+  to{transform:scale(1.06)}
+}
+@keyframes sr931Impact{
+  0%{opacity:0;transform:scale(.72)}
+  20%{opacity:.85}
+  100%{opacity:0;transform:scale(1.18)}
+}
+@keyframes sr931LegendaryImpact{
+  0%{opacity:0;transform:scale(.58)}
+  16%{opacity:1}
+  38%{opacity:.2;transform:scale(1.08)}
+  54%{opacity:.88}
+  100%{opacity:0;transform:scale(1.42)}
+}
+@keyframes sr931RareSettle{
+  0%{transform:rotateY(180deg) scale(.94)}
+  58%{transform:rotateY(180deg) scale(1.035)}
+  100%{transform:rotateY(180deg) scale(1)}
+}
+@keyframes sr931EpicSettle{
+  0%{transform:rotateY(180deg) scale(.9)}
+  46%{transform:rotateY(180deg) scale(1.06)}
+  72%{transform:rotateY(180deg) scale(.985)}
+  100%{transform:rotateY(180deg) scale(1)}
+}
+@keyframes sr931LegendaryGlow{
+  from{filter:drop-shadow(0 0 12px #fff6aa) drop-shadow(0 0 24px #f6c92f)}
+  to{filter:drop-shadow(0 0 22px #fff9cf) drop-shadow(0 0 48px #f6c92f)}
+}
+@keyframes sr931LegendaryRing{
+  0%{opacity:0;transform:scale(.65) rotate(0)}
+  28%{opacity:1}
+  100%{opacity:0;transform:scale(1.25) rotate(110deg)}
+}
+@media(max-width:600px){
+  .sr931-root{min-height:calc(100vh - 24px)}
+  .sr931-pack-stage{height:min(320px,40vh)}
+  .sr931-deck{width:min(78vw,286px)}
+}
+@media(prefers-reduced-motion:reduce){
+  .sr931-pack,.sr931-aura,.sr931-impact,.sr931-card.is-flipped,.sr931-card.rarity-legendary.is-flipped{animation-duration:.01ms!important}
+}
+

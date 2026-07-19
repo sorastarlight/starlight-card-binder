@@ -1,0 +1,26 @@
+{
+  "cards": [
+    { "id": "c-001", "seriesId": "series-1", "rarity": "Common", "pullWeight": 1, "isPullable": true },
+    { "id": "c-002", "seriesId": "series-1", "rarity": "Uncommon", "pullWeight": 1, "isPullable": true },
+    { "id": "c-003", "seriesId": "series-1", "rarity": "Rare", "pullWeight": 1, "isPullable": true },
+    { "id": "c-004", "seriesId": "series-1", "rarity": "Epic", "pullWeight": 1, "isPullable": true },
+    { "id": "c-005", "seriesId": "series-1", "rarity": "Legendary", "pullWeight": 1, "isPullable": true }
+  ],
+  "boosters": [
+    {
+      "id": "standard-pack",
+      "name": "Standard Pack",
+      "rewardMode": "slots",
+      "seriesId": "series-1",
+      "cardCount": 4,
+      "isActive": true,
+      "packImageUrl": "site_assets/series01_rising_star_booster.png",
+      "cardBackUrl": "site_assets/StarlightCard_Back_NewLogo.png",
+      "slots": [
+        { "slotKey": "common", "name": "Common", "quantity": 2, "rates": { "Common": 100 } },
+        { "slotKey": "uncommon", "name": "Uncommon", "quantity": 1, "rates": { "Uncommon": 100 } },
+        { "slotKey": "rare-plus", "name": "Rare or Better", "quantity": 1, "rates": { "Rare": 80, "Epic": 18, "Legendary": 2 } }
+      ]
+    }
+  ]
+}

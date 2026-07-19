@@ -1,17 +1,12 @@
 const FALLBACK_JSON_URL = "data/cards.json";
 const CARD_BACK_URL = "site_assets/StarlightCard_Back_NewLogo.png";
-const REVEAL_CARD_BACK_URL = "/site_assets/StarlightCard_Back_NewLogo.png";
 const BOOSTER_PACK_URL = "site_assets/series01_rising_star_booster.png";
 const SFX = {
   flip: "site_assets/sfx/card-flip.wav",
-  reveal: "site_assets/sfx/starlight-reveal.wav",
   page: "site_assets/sfx/page-turn.wav",
   sparkle: "site_assets/sfx/sparkle-chime.wav",
-  pack: "site_assets/sfx/booster-open.wav",
   charge: "site_assets/sfx/cosmic-charge.wav",
-  legendary: "site_assets/sfx/legendary-reveal.wav",
   favorite: "site_assets/sfx/favorite-heart.wav",
-  reset: "site_assets/sfx/Sakura_Hoe_Reset.wav",
   hover: "site_assets/sfx/card_mouse_over.wav",
   analyze: "site_assets/sfx/card_analyze.wav"
 };
@@ -19,7 +14,6 @@ const STORAGE_KEY = "sora-starlight-card-binder-v5-collected";
 const FAVORITES_KEY = "sora-starlight-card-binder-v5-favorites";
 const QUANTITIES_KEY = "sora-starlight-card-binder-v80-quantities";
 const SFX_KEY = "sora-starlight-card-binder-v7-sfx";
-const CARD_CACHE_KEY = "sora-starlight-card-binder-v66-card-cache";
 const PER_PAGE = 18;
 const RARITY_SCORE = { Legendary: 5, Epic: 4, Rare: 3, Uncommon: 2, Common: 1 };
 
@@ -31,7 +25,6 @@ let selected = null;
 let sfxOn = localStorage.getItem(SFX_KEY) !== "off";
 let previewFlipped = false;
 let overlayFlipped = false;
-let revealTimers = [];
 let fullViewList = [];
 
 const $ = (s, root = document) => root.querySelector(s);
@@ -50,9 +43,6 @@ function percent(part, total) { return total ? Math.round((part / total) * 100) 
 function padNumber(value, fallback) { return String(value || fallback).padStart(3, "0"); }
 function rarityClass(card) { return `rarity-${String(card?.rarity || "common").toLowerCase().replace(/[^a-z0-9]/g, '')}`; }
 function displayName(card) { return String(card?.name || '').trim() || `Card ${card?.number || ''}`.trim(); }
-function revealButtonHtml() { return ''; }
-function revealBigButtonHtml() { return ''; }
-
 function taxonomyLabel(name, id, fallback = '') {
   const raw = String(name || id || fallback || '').trim();
   if (!raw) return '';
@@ -283,7 +273,6 @@ function scheduleIdleImagePreload() {
 
     // First-load rule: warm chrome, booster art, and currently visible card art only.
     push(CARD_BACK_URL);
-    push(typeof REVEAL_CARD_BACK_URL !== 'undefined' ? REVEAL_CARD_BACK_URL : null);
     push(BOOSTER_PACK_URL);
     getSeriesGroups().forEach(group => push(group.boosterImageUrl));
 
@@ -317,31 +306,6 @@ function preloadImagesInBatches(urls, batchSize = 4) {
     if (index < urls.length) window.setTimeout(loadNext, 90);
   };
   loadNext();
-}
-
-function warmCardForReveal(card) {
-  if (!card) return;
-  [CARD_BACK_URL, (typeof REVEAL_CARD_BACK_URL !== 'undefined' ? REVEAL_CARD_BACK_URL : null), card.thumbnailUrl, card.imageUrl].filter(Boolean).forEach(url => {
-    try {
-      const img = new Image();
-      img.decoding = "async";
-      img.loading = "eager";
-      img.src = url;
-    } catch (_) {}
-  });
-}
-
-function ensureImageReady(url) {
-  return new Promise((resolve) => {
-    if (!url) return resolve(false);
-    const img = new Image();
-    img.decoding = "async";
-    img.loading = "eager";
-    img.onload = () => resolve(true);
-    img.onerror = () => resolve(false);
-    img.src = url;
-    if (img.complete && img.naturalWidth > 0) resolve(true);
-  });
 }
 
 async function loadCards(options = {}) {
@@ -467,17 +431,6 @@ function getVisibleName(card) { return isCollected(card.id) ? displayName(card) 
 function getVisibleRarity(card) { return isCollected(card.id) ? card.rarity : "Unknown"; }
 function getVisibleDescription(card) { return isCollected(card.id) ? card.cardDescription : "This card has not been collected yet. Earn it from Daily Boosters, reward codes, or future events."; }
 
-function setCollected(id, value) {
-  const store = readStore(STORAGE_KEY);
-  if (value) store[id] = true; else delete store[id];
-  writeStore(STORAGE_KEY, store);
-}
-function toggleCollected(id) {
-  console.warn('[Starlight] Manual ownership changes are disabled. Cards are earned through rewards.');
-  selected = cards.find(c => c.id === id) || selected;
-  selectedIndex = cards.findIndex(c => c.id === id);
-  renderAll();
-}
 function toggleFavorite(id) {
   const store = readStore(FAVORITES_KEY);
   if (store[id]) delete store[id]; else store[id] = true;
@@ -485,127 +438,6 @@ function toggleFavorite(id) {
   playSfx('favorite');
   renderAll();
 }
-function burstFor(id) {
-  const tile = $(`.card-tile[data-id="${CSS.escape(id)}"]`);
-  if (!tile) return;
-  tile.classList.add('reveal-burst');
-  setTimeout(() => tile.classList.remove('reveal-burst'), 1200);
-}
-
-function startRevealAnimation(card) {
-  if (!card) return;
-  const frontUrl = card.imageUrl || card.thumbnailUrl || CARD_BACK_URL;
-  warmCardForReveal(card);
-  Promise.all([ensureImageReady(typeof REVEAL_CARD_BACK_URL !== 'undefined' ? REVEAL_CARD_BACK_URL : CARD_BACK_URL), ensureImageReady(frontUrl)]).then(([_, ok]) => {
-    runRevealAnimation(card, ok ? frontUrl : (card.thumbnailUrl || CARD_BACK_URL));
-  });
-}
-
-function runRevealAnimation(card, forcedFrontUrl) {
-  if (!card) return;
-  warmCardForReveal(card);
-  selected = card;
-  selectedIndex = cards.findIndex(c => c.id === card.id);
-  clearRevealTimers();
-
-  const overlay = $('#revealOverlay') || createRevealOverlay();
-  const r = String(card.rarity || 'Common').toLowerCase();
-  const finalSfx = r === 'legendary' ? 'legendary' : 'reveal';
-
-  const legendaryFx = r === 'legendary'
-    ? `<div class="legendary-charge-field" aria-hidden="true"><span></span><span></span><span></span></div><div class="legendary-magic-explosion" aria-hidden="true">${Array.from({length: 18}, () => '<i></i>').join('')}</div>`
-    : '';
-
-  overlay.innerHTML = `<div class="reveal-clean ${rarityClass(card)}" role="dialog" aria-modal="true">
-    <button class="reveal-clean-close" type="button" aria-label="Close reveal">×</button>
-    <div class="reveal-magic-bg" aria-hidden="true"><span></span><span></span><span></span></div>
-    <div class="reveal-clean-stars" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
-    ${legendaryFx}
-    <div class="v27-reveal-ribbons" aria-hidden="true"><i></i><i></i><i></i></div>
-    <div class="v27-reveal-orbit" aria-hidden="true"></div>
-    <div class="reveal-clean-card" aria-live="polite">
-      <div class="reveal-clean-inner">
-        <div class="reveal-clean-face reveal-clean-back"><img src="${REVEAL_CARD_BACK_URL}" alt="Card back" loading="eager" decoding="sync" onerror="this.src=\'site_assets/StarlightCard_Back_NewLogo.png\'"></div>
-        <div class="reveal-clean-face reveal-clean-front"><img src="${esc(forcedFrontUrl || card.imageUrl || card.thumbnailUrl || CARD_BACK_URL)}" alt="${esc(displayName(card))}" loading="eager" decoding="async" onerror="this.src='${CARD_BACK_URL}'"></div>
-      </div>
-    </div>
-    <div class="reveal-clean-copy">
-      <h2 class="reveal-clean-title">Card of Starlight... RELEASE!</h2>
-      <div class="reveal-card-info" aria-live="polite">
-        <h3>${esc(displayName(card))}</h3>
-        <p class="reveal-info-rarity rarity-text ${rarityClass(card)}">${esc(card.rarity)}</p>
-      </div>
-    </div>
-  </div>`;
-
-  overlay.classList.add('open', 'clean-open', 'is-animating');
-  overlay.classList.remove('is-finished');
-  document.body.classList.add('modal-open');
-
-  const stage = $('.reveal-clean', overlay);
-  const cardWrap = $('.reveal-clean-card', overlay);
-
-  const finish = () => {
-    clearRevealTimers();
-    cardWrap?.classList.add('flipped', 'revealed');
-    stage?.classList.add('phase-charge', 'phase-burst', 'phase-revealed');
-    overlay.classList.remove('is-animating');
-    overlay.classList.add('is-finished');
-    renderAll();
-  };
-  overlay._skipReveal = finish;
-
-  playSfx('charge');
-  revealTimers.push(setTimeout(() => {
-    stage?.classList.add('phase-charge');
-    cardWrap?.classList.add('charge');
-  }, 350));
-  revealTimers.push(setTimeout(() => {
-    stage?.classList.add('phase-burst');
-    cardWrap?.classList.add('burst');
-    playSfx('flip');
-  }, 1900));
-  revealTimers.push(setTimeout(() => {
-    cardWrap?.classList.add('flipped', 'revealed');
-    stage?.classList.add('phase-revealed');
-    playSfx(finalSfx);
-  }, 2850));
-  revealTimers.push(setTimeout(() => {
-    overlay.classList.remove('is-animating');
-    overlay.classList.add('is-finished');
-    renderAll();
-  }, 4100));
-
-  overlay.addEventListener('pointerdown', revealSkipHandler);
-  $('.reveal-clean-close', overlay)?.addEventListener('click', () => completeReveal(card.id));
-}
-
-function revealSkipHandler(e) {
-  const overlay = $('#revealOverlay');
-  if (!overlay) return;
-  if (e.target.closest('.reveal-clean-close')) { completeReveal(selected?.id); return; }
-  if (overlay.classList.contains('is-animating')) {
-    overlay._skipReveal?.();
-    return;
-  }
-  if (overlay.classList.contains('open')) completeReveal(selected?.id);
-}
-
-function clearRevealTimers() { revealTimers.forEach(t => clearTimeout(t)); revealTimers = []; }
-function createRevealOverlay() { const div = document.createElement('div'); div.id = 'revealOverlay'; document.body.appendChild(div); return div; }
-function completeReveal(id) {
-  clearRevealTimers();
-  const overlay = $('#revealOverlay');
-  if (overlay) {
-    overlay.classList.remove('open', 'clean-open', 'is-animating', 'is-finished');
-    overlay.removeEventListener('pointerdown', revealSkipHandler);
-    overlay._skipReveal = null;
-  }
-  document.body.classList.remove('modal-open');
-  renderAll();
-  if (id) burstFor(id);
-}
-
 function renderShell() {
   const total = cards.length;
   const got = cards.filter(c => isCollected(c.id)).length;
@@ -625,8 +457,6 @@ function renderShell() {
   }
   $('#sfxToggle')?.classList.toggle('on', sfxOn);
 }
-
-function getPageCards() { applyFilters(); return filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE); }
 
 function renderSeriesHero() {
   const f = activeFilters();
@@ -693,6 +523,27 @@ function renderDetail() {
   $('#previewCard')?.addEventListener('click', (e) => { if (!e.target.closest('#flipPreview')) openFullView('filtered'); });
 }
 
+let cardOverlayModal = null;
+function fullViewModal() {
+  const overlay = $('#cardOverlay');
+  if (!overlay || !window.StarlightUI) return null;
+  if (!cardOverlayModal) {
+    cardOverlayModal = window.StarlightUI.adoptModal(overlay, {
+      dialog: element => element.querySelector('.full-card-stage'),
+      labelledBy: 'fullViewCardTitle',
+      onOpen: () => {
+        overlay.classList.add('open');
+        document.body.classList.add('modal-open');
+      },
+      onClose: () => {
+        overlay.classList.remove('open');
+        document.body.classList.remove('modal-open');
+      }
+    });
+  }
+  return cardOverlayModal;
+}
+
 function openFullView(listMode = 'all') {
   if (!selected) return;
   if (listMode === 'favorites') {
@@ -708,10 +559,20 @@ function openFullView(listMode = 'all') {
   overlayFlipped = previewFlipped;
   renderFullView();
   playSfx('analyze');
-  $('#cardOverlay')?.classList.add('open');
-  document.body.classList.add('modal-open');
+  const modal = fullViewModal();
+  if (modal) modal.open({ initialFocus: '.overlay-close' });
+  else {
+    $('#cardOverlay')?.classList.add('open');
+    document.body.classList.add('modal-open');
+  }
 }
-function closeFullView() { $('#cardOverlay')?.classList.remove('open'); document.body.classList.remove('modal-open'); }
+function closeFullView() {
+  if (cardOverlayModal?.isOpen) cardOverlayModal.close(undefined, 'page');
+  else {
+    $('#cardOverlay')?.classList.remove('open');
+    document.body.classList.remove('modal-open');
+  }
+}
 function stepFullView(dir) {
   const list = fullViewList.length ? fullViewList : cards;
   if (!list.length) return;
@@ -729,7 +590,7 @@ function renderFullView() {
   const hidden = !got;
   const visibleName = getVisibleName(selected);
   const visibleRarity = getVisibleRarity(selected);
-  overlay.innerHTML = `<div class="full-card-stage analyzer-full-stage ${rarityClass(selected)}" role="dialog" aria-modal="true">
+  overlay.innerHTML = `<div class="full-card-stage analyzer-full-stage ${rarityClass(selected)}" role="dialog" aria-modal="true" aria-labelledby="fullViewCardTitle" tabindex="-1">
     <div class="analyzer-bg" aria-hidden="true"><span></span><span></span><span></span></div>
     <button class="overlay-close analyzer-close" type="button" aria-label="Close">×</button>
     <button class="overlay-arrow left analyzer-arrow" type="button" aria-label="Previous card">‹</button>
@@ -745,7 +606,7 @@ function renderFullView() {
         </div>
       </div>
       <div class="analyzer-info-card db2-full-info">
-        <div class="analyzer-title-row"><div><p class="eyebrow">Card Scan Complete</p><h2>${esc(visibleName)}</h2><p class="db2-collector-line">${esc(selected.collectorNumber || selected.number || '???')} · ${esc(selected.series || 'Unknown Series')}</p></div></div>
+        <div class="analyzer-title-row"><div><p class="eyebrow">Card Scan Complete</p><h2 id="fullViewCardTitle">${esc(visibleName)}</h2><p class="db2-collector-line">${esc(selected.collectorNumber || selected.number || '???')} · ${esc(selected.series || 'Unknown Series')}</p></div></div>
         <div class="card-meta-chips">${cardIdentityChips(selected, { full: true, hidden })}</div>
         <div class="analyzer-data-grid"><span><b>Series</b>${esc(selected.series || 'Unknown')}</span><span><b>Collector #</b>${esc(selected.collectorNumber || selected.number || '???')}</span>${got && selected.artist ? `<span><b>Illustrator</b>${esc(selected.artist)}</span>` : ''}${got ? `<span><b>Owned</b>×${getCardQuantity(selected.id)}</span>` : ''}</div>
         ${got ? `<div class="db2-full-story"><b>Card Story</b><p>${esc(selected.cardDescription || 'No card story has been added yet.')}</p></div><details class="db2-more"><summary>Additional Information</summary><div class="detail-list clean-detail-list">${cardExpandedDetails(selected)}</div></details>` : ''}
@@ -879,11 +740,10 @@ document.addEventListener('click', e => {
   if (e.target.closest('#backToSeries')) { document.body.classList.add('series-select'); const select = $('[data-series]'); if (select) select.value = 'All Series'; page = 1; renderAll(); return; }
   const tile = e.target.closest('.card-tile');
   if (tile) { selected = cards.find(c => c.id === tile.dataset.id) || selected; selectedIndex = cards.findIndex(c => c.id === tile.dataset.id); previewFlipped = false; renderDetail(); playSfx('sparkle'); }
-  if (e.target.id === 'cardOverlay') closeFullView();
 });
 document.addEventListener('input', e => { if (e.target.matches('#globalSearch, [data-series], [data-rarity], [name="viewFilter"], #sortSelect')) { page = 1; renderAll(); updateRaritySelectClass(); } });
 document.addEventListener('change', e => { if (e.target.matches('#globalSearch, [data-series], [data-rarity], [name="viewFilter"], #sortSelect')) { page = 1; renderAll(); updateRaritySelectClass(); } });
-document.addEventListener('keydown', e => { if ($('#cardOverlay')?.classList.contains('open')) { if (e.key === 'Escape') closeFullView(); if (e.key === 'ArrowLeft') stepFullView(-1); if (e.key === 'ArrowRight') stepFullView(1); } });
+document.addEventListener('keydown', e => { if ($('#cardOverlay')?.classList.contains('open')) { if (e.key === 'ArrowLeft') stepFullView(-1); if (e.key === 'ArrowRight') stepFullView(1); } });
 document.addEventListener('DOMContentLoaded', () => {
   if (pageName === 'binder') document.body.classList.add('series-select');
   loadCards();
@@ -1094,38 +954,3 @@ document.addEventListener('click', e => {
     return;
   }
 }, true);
-
-
-/* ===== V80.9 reusable reward reveal bridge ===== */
-window.StarlightRewardReveal = {
-  revealCard(cardLike) {
-    if (!cardLike) return;
-    const card = normalize({
-      id: cardLike.id,
-      number: cardLike.cardNumber || cardLike.number,
-      name: cardLike.name,
-      seriesId: cardLike.seriesId,
-      seriesName: cardLike.seriesName,
-      rarity: cardLike.rarity,
-      imageUrl: cardLike.imageUrl,
-      thumbnailUrl: cardLike.thumbnailUrl,
-      cardDescription: cardLike.description || cardLike.cardDescription,
-      artist: cardLike.artist
-    }, 0);
-    startRevealAnimation(card);
-  },
-  async revealSequence(cardList = []) {
-    for (const card of cardList) {
-      this.revealCard(card);
-      await new Promise(resolve => {
-        const check = window.setInterval(() => {
-          const overlay = document.getElementById('revealOverlay');
-          if (!overlay || !overlay.classList.contains('open')) {
-            window.clearInterval(check);
-            resolve();
-          }
-        }, 200);
-      });
-    }
-  }
-};

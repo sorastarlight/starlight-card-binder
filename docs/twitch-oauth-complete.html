@@ -4,10 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Twitch Connection Complete | Starlight Cards</title>
-  <style>
-    :root{font-family:Inter,ui-rounded,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#405fa1;background:linear-gradient(145deg,#edf8ff,#fff4fb 55%,#fff9df)}
-    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px}.card{width:min(520px,100%);padding:34px;text-align:center;background:rgba(255,255,255,.94);border:2px solid rgba(107,198,248,.5);border-radius:28px;box-shadow:0 24px 70px rgba(65,83,135,.18)}.spark{font-size:44px}.title{margin:10px 0;color:#405fa1}.message{color:#687696;line-height:1.6}.btn{border:0;border-radius:999px;padding:12px 22px;font-weight:900;color:white;background:linear-gradient(135deg,#ff8ecb,#70c9f7);cursor:pointer}.small{font-size:.9rem;color:#8490aa;margin-top:18px}
-  </style>
+  <link rel="stylesheet" href="css/pages/twitch-oauth-complete.css?v=1.0">
 <link rel="stylesheet" href="css/qol-ui.css?v=92.0.2">
 </head>
 <body>
@@ -18,28 +15,7 @@
     <button class="btn" id="closeButton" type="button">Return to Starlight Cards</button>
     <p class="small">If this window does not close, use the button above.</p>
   </main>
-  <script>
-    const params=new URLSearchParams(location.search);
-    const error=params.get('error')||params.get('error_description');
-    const ok=!error;
-    if(!ok){
-      document.getElementById('title').textContent='Twitch Connection Was Not Completed';
-      document.getElementById('message').textContent=error;
-    }
-    function finish(){
-      try{
-        if(window.opener&&!window.opener.closed){
-          window.opener.postMessage({type:'starlight-twitch-oauth-complete',ok,message:error||''},location.origin);
-          window.opener.focus();
-          window.close();
-          return;
-        }
-      }catch(_){ }
-      location.replace('binder.html?view='+(params.get('flow')==='broadcaster'?'admin-twitch':'profile'));
-    }
-    document.getElementById('closeButton').addEventListener('click',finish);
-    setTimeout(finish,900);
-  </script>
+  <script src="js/pages/twitch-oauth-complete-page.js?v=1.0"></script>
 <script src="js/qol-ui.js?v=92.0.2" defer></script>
 </body>
 </html>

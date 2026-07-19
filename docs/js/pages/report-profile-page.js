@@ -1,0 +1,4 @@
+import {submitProfileReport} from '../moderation-service.js';
+const params=new URLSearchParams(location.search),username=document.getElementById('username'),status=document.getElementById('status'),button=document.getElementById('submit');username.value=params.get('username')||'';
+document.getElementById('form').addEventListener('submit',async e=>{e.preventDefault();button.disabled=true;status.className='status';status.textContent='Submitting report…';try{await submitProfileReport(username.value,document.getElementById('category').value,document.getElementById('details').value);status.className='status success';status.textContent='Your report was submitted to the moderation team.';e.target.reset();username.value=params.get('username')||''}catch(err){status.className='status error';status.textContent=err.message}finally{button.disabled=false}});
+

@@ -1,0 +1,848 @@
+/* V14 refinements */
+body.series-select #globalSearch { display: none !important; }
+body.series-select .top-actions { justify-content: flex-end; }
+
+.collection-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+}
+.collection-tools .btn { min-width: 150px; }
+
+/* Hover: only the card itself lights up, no sweeping light onto nearby cards. */
+.card-tile:hover:after,
+.card-tile:focus-visible:after { display: none !important; content: none !important; animation: none !important; }
+.card-tile:hover .face,
+.card-tile:focus-visible .face {
+  box-shadow: 0 0 0 2px rgba(255,255,255,.95), 0 0 18px rgba(255,126,196,.34), 0 12px 22px rgba(37,86,190,.16) !important;
+}
+.card-tile:hover .card-inner,
+.card-tile:focus-visible .card-inner {
+  filter: brightness(1.055) saturate(1.065) drop-shadow(0 10px 18px rgba(37,86,190,.18)) !important;
+}
+
+/* V15: restore controlled 3D hover without lighting adjacent cards */
+.card-tile {
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  --glow-x: 50%;
+  --glow-y: 22%;
+}
+.card-tile .card-inner {
+  transition: transform .18s ease, filter .18s ease !important;
+  will-change: transform, filter;
+}
+.card-tile:hover .card-inner,
+.card-tile:focus-visible .card-inner {
+  transform: translateY(-8px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) scale(1.045) !important;
+  filter: brightness(1.06) saturate(1.08) drop-shadow(0 18px 24px rgba(12,52,150,.24)) !important;
+}
+.card-tile:hover .face::after,
+.card-tile:focus-visible .face::after {
+  content: "" !important;
+  display: block !important;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--glow-x) var(--glow-y), rgba(255,255,255,.42), rgba(255,255,255,.12) 22%, transparent 48%);
+  mix-blend-mode: screen;
+  animation: none !important;
+}
+.card-tile:hover::after,
+.card-tile:focus-visible::after {
+  content: none !important;
+  display: none !important;
+}
+
+
+
+
+
+
+
+/* V15: reveal end card info: name, series, then rarity on its own line. */
+
+
+
+
+
+
+/* Hover: keep the interactive 3D tilt, remove all zoom and mouse-follow glow. */
+.card-tile:hover .card-inner,
+.card-tile:focus-visible .card-inner {
+  transform: translateY(-6px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) scale(1) !important;
+  filter: brightness(1.065) saturate(1.075) drop-shadow(0 16px 22px rgba(12,52,150,.24)) !important;
+}
+.card-tile:hover .face::after,
+.card-tile:focus-visible .face::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+}
+.card-tile:hover .face,
+.card-tile:focus-visible .face {
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,.96),
+    0 0 18px rgba(255,126,196,.34),
+    0 0 28px rgba(126,214,255,.22),
+    0 14px 24px rgba(37,86,190,.18) !important;
+}
+
+/* Flip behavior: show the actual card back image, never a mirrored front. */
+.preview-inner,
+.full-inner,
+.card-inner {
+  transform-style: preserve-3d !important;
+}
+.preview-card .face,
+.full-card-wrap .face,
+.card-inner .face {
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+}
+.preview-card .face.front,
+.full-card-wrap .face.front,
+.card-inner .face.front {
+  transform: rotateY(0deg) !important;
+  opacity: 1 !important;
+  z-index: 2 !important;
+}
+.preview-card .face.back,
+.full-card-wrap .face.back,
+.card-inner .face.back {
+  transform: rotateY(180deg) !important;
+  opacity: 1 !important;
+  z-index: 1 !important;
+}
+
+.preview-card.flipped .face.back,
+.full-card-wrap.flipped .face.back,
+.card-inner.flipped .face.back {
+  z-index: 3 !important;
+}
+.preview-card .face.back img,
+.full-card-wrap .face.back img,
+.card-inner .face.back img {
+  transform: none !important;
+}
+
+
+
+
+
+
+
+
+/* Card hover: 3D tilt returns, but no zoom and no mouse-follow glare. */
+.card-tile .card-inner {
+  transition: transform .24s ease, filter .24s ease !important;
+  transform-style: preserve-3d !important;
+}
+.card-tile:hover .card-inner {
+  transform: translateY(-6px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) scale(1) !important;
+  filter: drop-shadow(0 16px 20px rgba(8,39,125,.22)) drop-shadow(0 0 14px rgba(255,120,189,.28)) !important;
+}
+.card-tile:hover .face {
+  box-shadow: 0 0 0 2px rgba(255,255,255,.95), 0 0 18px rgba(255,120,189,.30), 0 10px 24px rgba(21,91,216,.16) !important;
+}
+
+.card-tile.tap-tilt .card-inner {
+  transform: rotateX(5deg) rotateY(10deg) scale(1) !important;
+}
+.preview-card:hover .preview-inner {
+  transform: rotateX(4deg) rotateY(-5deg) scale(1) !important;
+}
+.preview-card.flipped:hover .preview-inner {
+  transform: rotateY(180deg) rotateX(4deg) scale(1) !important;
+}
+
+/* Back faces must show the actual card back, never a mirrored front. */
+.card-inner, .preview-inner, .full-inner {
+  transform-style: preserve-3d !important;
+}
+.card-inner .face,
+.preview-inner .face,
+.full-inner .face {
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+}
+.card-inner .face.front,
+.preview-inner .face.front,
+.full-inner .face.front {
+  transform: rotateY(0deg) !important;
+}
+.card-inner .face.back,
+.preview-inner .face.back,
+.full-inner .face.back {
+  transform: rotateY(180deg) !important;
+}
+.card-inner .face.back img,
+.preview-inner .face.back img,
+.full-inner .face.back img {
+  transform: none !important;
+  filter: none !important;
+}
+
+
+.face.front,
+.preview-card .face.front,
+.full-card-wrap .face.front,
+.collection-image,
+.fav-image {
+  position: relative !important;
+  overflow: hidden !important;
+}
+.collection-image,
+.fav-image {
+  display: block !important;
+  border-radius: 14px !important;
+  aspect-ratio: 2.5 / 3.5 !important;
+}
+.collection-image img,
+.fav-image img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+  border-radius: inherit !important;
+}
+
+
+
+
+
+
+
+
+/* Rarity filter colors inspired by TCG rarity vibes. */
+select[data-rarity] {
+  font-weight: 900 !important;
+  border-width: 2px !important;
+  transition: background .2s ease, border-color .2s ease, box-shadow .2s ease !important;
+}
+select[data-rarity].rarity-select-allrarities {
+  background: linear-gradient(180deg, #ffffff, #eef7ff) !important;
+  border-color: #9fc8ff !important;
+  color: #0d3f9c !important;
+}
+select[data-rarity].rarity-select-common {
+  background: linear-gradient(180deg, #ffffff, #f2f5f8) !important;
+  border-color: #aeb8c5 !important;
+  color: #4c5b6b !important;
+}
+select[data-rarity].rarity-select-uncommon {
+  background: linear-gradient(180deg, #f8fff8, #dff7e8) !important;
+  border-color: #52b96c !important;
+  color: #16723a !important;
+}
+select[data-rarity].rarity-select-rare {
+  background: linear-gradient(180deg, #f7fbff, #dcecff) !important;
+  border-color: #3b86ff !important;
+  color: #1459c7 !important;
+  box-shadow: 0 0 0 3px rgba(59,134,255,.10) !important;
+}
+select[data-rarity].rarity-select-epic {
+  background: linear-gradient(180deg, #fbf8ff, #efe2ff) !important;
+  border-color: #9a63ff !important;
+  color: #6630c9 !important;
+  box-shadow: 0 0 0 3px rgba(154,99,255,.12) !important;
+}
+select[data-rarity].rarity-select-legendary {
+  background: linear-gradient(180deg, #fffaf0, #ffe8a6) !important;
+  border-color: #d99b16 !important;
+  color: #8a5600 !important;
+  box-shadow: 0 0 0 3px rgba(255,200,74,.22), 0 0 18px rgba(255,200,74,.22) !important;
+}
+select[data-rarity] option[value="Common"], select[data-rarity] option:nth-child(2) { color:#4c5b6b; }
+select[data-rarity] option[value="Uncommon"], select[data-rarity] option:nth-child(3) { color:#16723a; }
+select[data-rarity] option[value="Rare"], select[data-rarity] option:nth-child(4) { color:#1459c7; }
+select[data-rarity] option[value="Epic"], select[data-rarity] option:nth-child(5) { color:#6630c9; }
+select[data-rarity] option[value="Legendary"], select[data-rarity] option:nth-child(6) { color:#8a5600; }
+
+
+.face.front,
+.preview-card .face.front,
+.full-card-wrap .face.front,
+.collection-image,
+.fav-image{
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+/* Flip hardening: the back face is the card-back image and never a mirrored front. */
+.preview-card .face.back,
+.full-card-wrap .face.back,
+.card-inner .face.back {
+  background: #fff !important;
+}
+.preview-card .face.back img,
+.full-card-wrap .face.back img,
+.card-inner .face.back img {
+  content: url("../../site_assets/StarlightCard_Back_NewLogo.png") !important;
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+.preview-card.flipped .face.front,
+.full-card-wrap.flipped .face.front,
+.card-inner.flipped .face.front {
+  opacity: 0 !important;
+}
+.preview-card.flipped .face.back,
+.full-card-wrap.flipped .face.back,
+.card-inner.flipped .face.back {
+  opacity: 1 !important;
+}
+.preview-card:not(.flipped) .face.back,
+.full-card-wrap:not(.flipped) .face.back {
+  opacity: 0 !important;
+}
+.preview-card:not(.flipped) .face.front,
+.full-card-wrap:not(.flipped) .face.front {
+  opacity: 1 !important;
+}
+
+/* Hover: keep 3D tilt and glow, but no zoom and no moving mouse glare. */
+.card-tile:hover .card-inner,
+.card-tile:focus-visible .card-inner {
+  transform: translateY(-6px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) scale(1) !important;
+  filter: drop-shadow(0 16px 20px rgba(8,39,125,.22)) drop-shadow(0 0 18px rgba(255,120,189,.34)) !important;
+}
+.card-tile:hover .face::after,
+.card-tile:hover .front::after,
+.card-tile:hover .card-inner::before {
+  content: none !important;
+  display: none !important;
+}
+
+
+
+
+
+
+/* =========================================================
+   V21 rarity colors + card-back flip hardening
+   ========================================================= */
+:root{
+  --rarity-common-bg:#f6f7fb;
+  --rarity-common-border:#cfd6df;
+  --rarity-common-text:#5b6572;
+  --rarity-uncommon-bg:#eaf5ff;
+  --rarity-uncommon-border:#76bfff;
+  --rarity-uncommon-text:#1267b9;
+  --rarity-rare-bg:#fff0df;
+  --rarity-rare-border:#ffb15c;
+  --rarity-rare-text:#bf6414;
+  --rarity-epic-bg:#ffe6f4;
+  --rarity-epic-border:#ff9bd3;
+  --rarity-epic-text:#d62e8a;
+  --rarity-legendary-bg:#fff6bf;
+  --rarity-legendary-border:#ffd21f;
+  --rarity-legendary-text:#9a6a00;
+}
+
+/* Rarity text/chips anywhere rarity is displayed. */
+.rarity-text,
+.pill.rarity-pill,
+.hero-pill.rarity-pill{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:max-content;
+  border-radius:999px;
+  padding:.24rem .62rem;
+  font-weight:900;
+  letter-spacing:.02em;
+  border:2px solid transparent;
+  line-height:1.1;
+  text-shadow:none!important;
+}
+.rarity-text.rarity-common,.pill.rarity-common,.hero-pill.rarity-common{background:var(--rarity-common-bg)!important;border-color:var(--rarity-common-border)!important;color:var(--rarity-common-text)!important;}
+.rarity-text.rarity-uncommon,.pill.rarity-uncommon,.hero-pill.rarity-uncommon{background:var(--rarity-uncommon-bg)!important;border-color:var(--rarity-uncommon-border)!important;color:var(--rarity-uncommon-text)!important;}
+.rarity-text.rarity-rare,.pill.rarity-rare,.hero-pill.rarity-rare{background:var(--rarity-rare-bg)!important;border-color:var(--rarity-rare-border)!important;color:var(--rarity-rare-text)!important;}
+.rarity-text.rarity-epic,.pill.rarity-epic,.hero-pill.rarity-epic{background:var(--rarity-epic-bg)!important;border-color:var(--rarity-epic-border)!important;color:var(--rarity-epic-text)!important;}
+.rarity-text.rarity-legendary,.pill.rarity-legendary,.hero-pill.rarity-legendary{background:linear-gradient(180deg,#fffdf0,#ffe66d)!important;border-color:var(--rarity-legendary-border)!important;color:var(--rarity-legendary-text)!important;box-shadow:0 0 12px rgba(255,210,31,.35)!important;}
+
+/* Rarity filter dropdown colors requested. */
+select[data-rarity].rarity-select-common{background:linear-gradient(180deg,#fff,#f4f6f9)!important;border-color:var(--rarity-common-border)!important;color:var(--rarity-common-text)!important;}
+select[data-rarity].rarity-select-uncommon{background:linear-gradient(180deg,#f9fdff,#e5f4ff)!important;border-color:var(--rarity-uncommon-border)!important;color:var(--rarity-uncommon-text)!important;}
+select[data-rarity].rarity-select-rare{background:linear-gradient(180deg,#fffaf4,#ffe9ce)!important;border-color:var(--rarity-rare-border)!important;color:var(--rarity-rare-text)!important;}
+select[data-rarity].rarity-select-epic{background:linear-gradient(180deg,#fff7fc,#ffe0f3)!important;border-color:var(--rarity-epic-border)!important;color:var(--rarity-epic-text)!important;}
+select[data-rarity].rarity-select-legendary{background:linear-gradient(180deg,#fffdf0,#ffe779)!important;border-color:var(--rarity-legendary-border)!important;color:var(--rarity-legendary-text)!important;box-shadow:0 0 0 3px rgba(255,210,31,.18),0 0 18px rgba(255,210,31,.24)!important;}
+select[data-rarity] option[value="Common"]{color:var(--rarity-common-text)!important;}
+select[data-rarity] option[value="Uncommon"]{color:var(--rarity-uncommon-text)!important;}
+select[data-rarity] option[value="Rare"]{color:var(--rarity-rare-text)!important;}
+select[data-rarity] option[value="Epic"]{color:var(--rarity-epic-text)!important;}
+select[data-rarity] option[value="Legendary"]{color:var(--rarity-legendary-text)!important;}
+
+/* Stop rarity classes from adding border/glow to whole card faces. Rarity should color labels only. */
+.rarity-legendary .face,
+.rarity-epic .face,
+.rarity-rare .face,
+.rarity-uncommon .face,
+.rarity-common .face{
+  box-shadow:0 8px 16px rgba(13,60,148,.18)!important;
+}
+
+/* Always show the official card back when any flip view is on the back side. */
+.preview-card .face.back img,
+.full-card-wrap .face.back img,
+.card-inner .face.back img{
+  content:url("../../site_assets/StarlightCard_Back_NewLogo.png")!important;
+  transform:none!important;
+  filter:none!important;
+  opacity:1!important;
+}
+.preview-card.flipped .face.front img,
+.full-card-wrap.flipped .face.front img{
+  content:url("../../site_assets/StarlightCard_Back_NewLogo.png")!important;
+  transform:none!important;
+  filter:none!important;
+  opacity:1!important;
+}
+.preview-card.flipped .face.back,
+.full-card-wrap.flipped .face.back{
+  opacity:1!important;
+}
+.preview-card.flipped .face.front,
+.full-card-wrap.flipped .face.front{
+  opacity:1!important;
+}
+
+/* =========================================================
+   V22 flip fix: official card back must never appear mirrored.
+   The previous hardening made the front face show the card back while flipped,
+   which could reveal the reverse side of the 3D plane and look mirrored.
+   This keeps the real back image on the back face only.
+   ========================================================= */
+.preview-card .face.back,
+.full-card-wrap .face.back,
+.card-inner .face.back {
+  transform: rotateY(180deg) !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+}
+.preview-card .face.front,
+.full-card-wrap .face.front,
+.card-inner .face.front {
+  transform: rotateY(0deg) !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+}
+.preview-card .face.back img,
+.full-card-wrap .face.back img,
+.card-inner .face.back img{
+  content: url("../../site_assets/StarlightCard_Back_NewLogo.png") !important;
+  transform: scaleX(1) !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+.preview-card.flipped .preview-inner,
+.preview-card.flipped:hover .preview-inner,
+.full-card-wrap.flipped .full-inner,
+.card-inner.flipped {
+  transform: rotateY(180deg) !important;
+}
+.preview-card.flipped .face.front,
+.full-card-wrap.flipped .face.front,
+.card-inner.flipped .face.front {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+.preview-card.flipped .face.back,
+.full-card-wrap.flipped .face.back,
+.card-inner.flipped .face.back {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+.preview-card.flipped .face.front img,
+.full-card-wrap.flipped .face.front img,
+.card-inner.flipped .face.front img {
+  content: normal !important;
+}
+.preview-card:not(.flipped) .face.front,
+.full-card-wrap:not(.flipped) .face.front,
+.card-inner:not(.flipped) .face.front {
+  opacity: 1 !important;
+}
+.preview-card:not(.flipped) .face.back,
+.full-card-wrap:not(.flipped) .face.back,
+.card-inner:not(.flipped) .face.back {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* =========================================================
+   V23: stable flipping, stronger card interaction, clean full-view info
+   ========================================================= */
+/* Kill the older two-face flip system for preview/full view. We now swap the
+   image source directly, so the official back can never render mirrored/blank. */
+.preview-card.simple-card-3d,
+.full-card-wrap.simple-card-3d {
+  display: grid !important;
+  place-items: center !important;
+  position: relative !important;
+  overflow: visible !important;
+  transform-style: preserve-3d !important;
+  transform: translate3d(var(--drag-x, 0px), var(--drag-y, 0px), 0) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) !important;
+  transition: transform .16s ease, filter .22s ease, box-shadow .22s ease !important;
+  will-change: transform, filter !important;
+  background: transparent !important;
+}
+.preview-card.simple-card-3d img,
+.full-card-wrap.simple-card-3d img {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 2.5 / 3.5 !important;
+  object-fit: contain !important;
+  border-radius: 18px !important;
+  box-shadow: 0 18px 42px rgba(8,39,125,.25) !important;
+  transform: translateZ(18px) !important;
+  backface-visibility: visible !important;
+  -webkit-backface-visibility: visible !important;
+}
+.preview-card.simple-card-3d:hover,
+.preview-card.simple-card-3d.tilting,
+.full-card-wrap.simple-card-3d:hover,
+.full-card-wrap.simple-card-3d.tilting {
+  filter: drop-shadow(0 22px 28px rgba(8,39,125,.26)) drop-shadow(0 0 22px rgba(255,120,189,.38)) !important;
+}
+.preview-card.simple-card-3d.quick-flip,
+.full-card-wrap.simple-card-3d.quick-flip {
+  animation: v23FlipPop .5s ease both !important;
+}
+@keyframes v23FlipPop {
+  0% { transform: translate3d(var(--drag-x,0), var(--drag-y,0), 0) rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg)) scale(1); }
+  45% { transform: translate3d(var(--drag-x,0), var(--drag-y,0), 0) rotateX(var(--tilt-x,0deg)) rotateY(88deg) scale(.985); filter: brightness(1.15); }
+  100% { transform: translate3d(var(--drag-x,0), var(--drag-y,0), 0) rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg)) scale(1); }
+}
+.full-card-wrap.simple-card-3d.is-dragging {
+  cursor: grabbing !important;
+  transition: filter .16s ease, box-shadow .16s ease !important;
+}
+.full-card-wrap.draggable-card { cursor: grab !important; touch-action: none; }
+
+/* Binder hover: dynamic tilt + glow only, no zoom, no adjacent sweeping glare. */
+.card-tile .card-inner {
+  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) scale(1) !important;
+  transition: transform .15s ease, filter .2s ease !important;
+  transform-style: preserve-3d !important;
+}
+.card-tile:hover .card-inner,
+.card-tile.tilting .card-inner,
+.card-tile:focus-visible .card-inner {
+  transform: translateY(-5px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) scale(1) !important;
+  filter: drop-shadow(0 16px 20px rgba(8,39,125,.24)) drop-shadow(0 0 18px rgba(255,120,189,.38)) brightness(1.04) !important;
+}
+.card-tile:hover .face,
+.card-tile.tilting .face {
+  box-shadow: 0 0 0 2px rgba(255,255,255,.85), 0 12px 24px rgba(13,60,148,.20), 0 0 22px rgba(255,120,189,.32) !important;
+}
+.card-tile:hover .card-inner::before,
+.card-tile:hover .card-inner::after,
+.card-tile:hover .face::before,
+.card-tile:hover .face::after,
+.slot:hover::before,
+.slot:hover::after {
+  content: none !important;
+  display: none !important;
+  opacity: 0 !important;
+  animation: none !important;
+}
+.collection-card.tilting,
+.collection-card:hover,
+.fav-spot.tilting,
+.fav-spot:hover {
+  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateY(-4px) scale(1) !important;
+  filter: drop-shadow(0 14px 20px rgba(8,39,125,.20)) drop-shadow(0 0 16px rgba(255,120,189,.25)) !important;
+}
+
+/* Cleaner full-size card information. */
+.clean-full-stage {
+  grid-template-columns: auto minmax(260px, 440px) auto !important;
+  grid-template-rows: 1fr auto !important;
+  gap: 18px 22px !important;
+  align-items: center !important;
+}
+.clean-full-stage .full-card-wrap.simple-card-3d {
+  width: min(430px, 58vw) !important;
+  max-height: 78vh !important;
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  justify-self: center !important;
+}
+.clean-full-caption {
+  grid-column: 1 / -1 !important;
+  grid-row: 2 !important;
+  width: min(760px, 92vw) !important;
+  margin: 0 auto !important;
+  padding: 16px 18px !important;
+  border-radius: 22px !important;
+  background: rgba(255,255,255,.82) !important;
+  border: 1px solid rgba(255,255,255,.9) !important;
+  box-shadow: 0 16px 36px rgba(8,39,125,.16) !important;
+  display: grid !important;
+  gap: 8px !important;
+  text-align: center !important;
+  color: var(--navy) !important;
+}
+.clean-full-caption h2 {
+  margin: 0 !important;
+  font-size: clamp(1.5rem, 3vw, 2.25rem) !important;
+  line-height: 1.05 !important;
+}
+.clean-full-caption .rarity-text { margin: 0 auto !important; }
+.full-meta {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+.full-meta span {
+  display: inline-flex !important;
+  gap: 6px !important;
+  align-items: center !important;
+  padding: 7px 11px !important;
+  border-radius: 999px !important;
+  background: rgba(229,248,255,.78) !important;
+  color: var(--blue) !important;
+  font-weight: 800 !important;
+}
+.full-meta b { color: var(--pink-hot) !important; }
+.clean-full-caption p {
+  margin: 2px auto 0 !important;
+  max-width: 680px !important;
+  color: var(--muted) !important;
+  line-height: 1.35 !important;
+}
+.detail-card-info h2 { margin-bottom: 8px !important; }
+.clean-detail-list p { align-items: center !important; }
+
+/* Reveal card can also respond to the mouse lightly once it appears. */
+
+
+
+/* V24 cleanup: cleaner flip animation, binder hover pop-out, no reveal frame */
+
+.binder-page { perspective: 1100px; }
+.slot { position: relative; z-index: 1; }
+.slot:hover { z-index: 20; }
+.card-tile {
+  transform-style: preserve-3d !important;
+  perspective: 950px;
+  overflow: visible !important;
+  animation: starlightCardFloat 5.6s ease-in-out infinite;
+  animation-delay: calc((var(--slot-i, 0) * .12s));
+  will-change: transform, filter;
+}
+.card-tile .card-inner {
+  transform-style: preserve-3d !important;
+  transition: transform .32s cubic-bezier(.2,.8,.2,1), filter .32s ease !important;
+}
+.card-tile:hover,
+.card-tile:focus-visible {
+  filter: drop-shadow(0 18px 24px rgba(22, 82, 190, .22)) drop-shadow(0 0 20px rgba(255, 120, 190, .30)) !important;
+}
+.card-tile:hover .card-inner,
+.card-tile:focus-visible .card-inner {
+  transform: translateY(-18px) translateZ(34px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) scale(1.045) !important;
+}
+.card-tile:hover .face,
+.card-tile:focus-visible .face {
+  box-shadow: 0 20px 35px rgba(31,88,190,.25), 0 0 0 2px rgba(255,255,255,.95), 0 0 26px rgba(255,126,196,.34) !important;
+  filter: brightness(1.06) saturate(1.08);
+}
+.card-tile:hover::after,
+.card-tile:hover .face::after,
+.card-tile:focus-visible::after,
+.card-tile:focus-visible .face::after { content: none !important; display: none !important; }
+@keyframes starlightCardFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* Stable image swap flip: image never mirrors, just pivots out/in. */
+.simple-card-3d { transform-style: preserve-3d; perspective: 1000px; }
+
+.simple-card-3d.flip-animating-out {
+  animation: starlightFlipOut .22s ease-in forwards !important;
+}
+.simple-card-3d.flip-animating-in {
+  animation: starlightFlipIn .28s cubic-bezier(.2,.9,.2,1) forwards !important;
+}
+@keyframes starlightFlipOut {
+  0% { transform: rotateY(0deg) translateZ(0); filter: brightness(1); }
+  100% { transform: rotateY(88deg) translateZ(8px); filter: brightness(1.35); }
+}
+@keyframes starlightFlipIn {
+  0% { transform: rotateY(-88deg) translateZ(8px); filter: brightness(1.35); }
+  100% { transform: rotateY(0deg) translateZ(0); filter: brightness(1); }
+}
+
+/* Full view: smaller, cleaner details directly under the card. */
+.clean-full-stage {
+  display: grid !important;
+  place-items: center !important;
+  grid-template-rows: 1fr auto !important;
+  gap: 12px !important;
+  padding: 70px 92px 30px !important;
+}
+.full-card-wrap {
+  width: min(390px, 44vw, 58vh) !important;
+  max-height: 66vh !important;
+  position: relative !important;
+}
+.full-card-wrap img { width: 100%; height: auto; max-height: 66vh; object-fit: contain; border-radius: 18px; display:block; }
+.clean-full-caption {
+  position: relative !important;
+  bottom: auto !important;
+  max-width: 620px !important;
+  color: var(--navy) !important;
+  text-shadow: none !important;
+  background: rgba(255,255,255,.76) !important;
+  border: 1px solid rgba(255,255,255,.94) !important;
+  box-shadow: 0 14px 32px rgba(30,80,170,.16) !important;
+  border-radius: 18px !important;
+  padding: 10px 14px !important;
+}
+.clean-full-caption h2 { font-size: 1.14rem !important; margin: 0 0 3px !important; }
+.clean-full-caption .rarity-text { font-size: .86rem !important; display: inline-block; margin-bottom: 5px; }
+.clean-full-caption .full-meta { display:flex; justify-content:center; flex-wrap:wrap; gap:8px; font-size:.78rem !important; }
+.clean-full-caption .full-meta span { background: rgba(255,255,255,.64); border-radius: 999px; padding: 4px 8px; }
+.clean-full-caption p { display:none !important; }
+.draggable-card.is-dragging { cursor: grabbing; }
+.draggable-card { cursor: grab; transition: transform .18s ease, filter .18s ease !important; }
+.draggable-card.tilting {
+  transform: translate3d(var(--drag-x, 0), var(--drag-y, 0), 0) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) !important;
+  filter: drop-shadow(0 28px 42px rgba(8,39,125,.28));
+}
+.preview-card.tilting {
+  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateY(-4px) !important;
+  filter: drop-shadow(0 18px 25px rgba(8,39,125,.22));
+}
+
+/* Reveal overlay: remove the framed panel while keeping the magic. */
+
+
+
+
+
+
+/* V25 interaction pass: stable flip, clean hover pop, cute full view */
+
+.slot { z-index: 1; }
+.slot:hover { z-index: 60 !important; }
+.card-tile { overflow: visible !important; transform-style: preserve-3d !important; perspective: 1000px !important; animation: v25CardIdleFloat 4.8s ease-in-out infinite; }
+.slot:nth-child(2n) .card-tile { animation-delay: .28s; }
+.slot:nth-child(3n) .card-tile { animation-delay: .52s; }
+@keyframes v25CardIdleFloat { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-3px); } }
+.card-tile .card-inner { transition: transform .28s cubic-bezier(.2,.85,.2,1), filter .28s ease !important; transform-style: preserve-3d !important; }
+.card-tile:hover .card-inner,
+.card-tile.tilting .card-inner,
+.card-tile:focus-visible .card-inner {
+  transform: translateY(-16px) translateZ(34px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) scale(1) !important;
+  filter: drop-shadow(0 22px 26px rgba(8,39,125,.25)) drop-shadow(0 0 22px rgba(255,120,189,.38)) brightness(1.07) saturate(1.05) !important;
+}
+.card-tile:hover .face,
+.card-tile.tilting .face,
+.card-tile:focus-visible .face {
+  box-shadow: 0 0 0 2px rgba(255,255,255,.96), 0 18px 34px rgba(13,60,148,.23), 0 0 30px rgba(255,120,189,.42) !important;
+}
+.card-tile:hover::after,
+.card-tile:hover .face::after,
+.card-tile:hover .card-inner::after,
+.card-tile:hover .card-inner::before,
+.card-tile:hover .face::before,
+.slot:hover::before,
+.slot:hover::after { content: none !important; display: none !important; opacity: 0 !important; animation: none !important; }
+
+/* Use a true turn animation for all single-image flip controls without mirroring the back art. */
+.simple-card-3d, .preview-card, .full-card-wrap { transform-style: preserve-3d !important; perspective: 1100px !important; }
+.simple-card-3d img, #previewCardImg, #fullCardImg { transform: none !important; scale: 1 !important; }
+.simple-card-3d.flip-turning,
+.preview-card.flip-turning,
+.full-card-wrap.flip-turning { animation: v25CardTurn .56s cubic-bezier(.22,.8,.22,1) both !important; }
+@keyframes v25CardTurn {
+  0% { transform: rotateY(0deg) translateZ(0); filter: brightness(1); }
+  42% { transform: rotateY(84deg) translateZ(18px); filter: brightness(1.32); }
+  58% { transform: rotateY(-82deg) translateZ(18px); filter: brightness(1.28); }
+  100% { transform: rotateY(0deg) translateZ(0); filter: brightness(1); }
+}
+.preview-card.flipped,
+.preview-card.showing-back,
+.full-card-wrap.flipped,
+.full-card-wrap.showing-back,
+.full-card-wrap .face.back,
+.preview-card .face.back { transform: none !important; }
+.full-card-wrap .face.back img,
+.preview-card .face.back img { transform: none !important; }
+
+/* Shared gentle 3D hover for preview, full view, and reveal cards. */
+.preview-card.tilting,
+.full-card-wrap.tilting,
+.preview-card:hover,
+.full-card-wrap:hover{
+  transform: translate3d(var(--drag-x, 0), var(--drag-y, 0), 0) translateY(-6px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) scale(1) !important;
+  filter: drop-shadow(0 24px 34px rgba(8,39,125,.24)) drop-shadow(0 0 24px rgba(255,120,189,.34)) brightness(1.04) !important;
+}
+.draggable-card.is-dragging { cursor: grabbing !important; }
+.draggable-card { cursor: grab !important; }
+
+/* Cute animated full-view background. */
+#cardOverlay.open {
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255,150,211,.38), transparent 30%),
+    radial-gradient(circle at 82% 16%, rgba(134,218,255,.38), transparent 28%),
+    radial-gradient(circle at 50% 86%, rgba(255,226,122,.24), transparent 36%),
+    linear-gradient(135deg, rgba(238,248,255,.94), rgba(255,226,241,.94)) !important;
+  animation: v25FullBgDrift 9s ease-in-out infinite alternate !important;
+}
+#cardOverlay.open::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,.9) 0 2px, transparent 3px),
+    radial-gradient(circle, rgba(255,120,189,.55) 0 1px, transparent 2px),
+    radial-gradient(circle, rgba(114,207,255,.55) 0 1px, transparent 2px);
+  background-size: 120px 120px, 84px 84px, 62px 62px;
+  opacity: .65;
+  animation: v25SparkleDrift 12s linear infinite;
+}
+@keyframes v25FullBgDrift { from { filter: hue-rotate(0deg); } to { filter: hue-rotate(8deg); } }
+@keyframes v25SparkleDrift { from { background-position: 0 0, 20px 40px, 50px 10px; } to { background-position: 90px -120px, -60px -40px, 120px -70px; } }
+.clean-full-stage { position: relative; z-index: 2; gap: 10px !important; }
+.clean-full-stage .full-card-wrap { width: min(390px, 44vw, 58vh) !important; }
+.dynamic-card-info.clean-full-caption {
+  width: min(640px, 88vw) !important;
+  padding: 12px 16px !important;
+  border-radius: 22px !important;
+  background: rgba(255,255,255,.80) !important;
+  border: 1px solid rgba(255,255,255,.92) !important;
+  box-shadow: 0 18px 40px rgba(18,70,150,.16) !important;
+  backdrop-filter: blur(14px) !important;
+  display: grid !important;
+  gap: 6px !important;
+}
+.dynamic-card-info .eyebrow { margin:0 !important; font-size:.68rem !important; color: var(--pink-hot) !important; }
+.dynamic-card-info h2 { margin:0 !important; font-size: clamp(1.1rem,2.3vw,1.55rem) !important; }
+.full-info-chips { display:flex; justify-content:center; flex-wrap:wrap; gap:6px; font-size:.78rem; font-weight:900; }
+.full-info-chips span { padding:5px 9px; border-radius:999px; background:rgba(229,248,255,.8); color:var(--blue); border:1px solid rgba(114,207,255,.35); }
+.dynamic-card-info .full-description { display:block !important; margin:2px auto 0 !important; max-width:560px !important; font-size:.84rem !important; line-height:1.3 !important; color:var(--muted) !important; }
+
+/* Reveal overlay without a card frame, keeping the magical effects. */
+
+
+
+
+/* Hide old image-swap flip classes if any previous CSS tries to run them. */
+.flip-animating-out, .flip-animating-in { animation: none !important; }
+
+
+
+
+

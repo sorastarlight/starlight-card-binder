@@ -1,0 +1,457 @@
+import {
+            loadOwnProfile,
+            loadOwnedProfileCards,
+            setProfileFavoriteCard,
+            updateCollectorProfile
+        } from "../profile-service.js";
+
+        const form =
+            document.getElementById(
+                "profile-form"
+            );
+
+        const usernameInput =
+            document.getElementById(
+                "username"
+            );
+
+        const displayNameInput =
+            document.getElementById(
+                "display-name"
+            );
+
+        const bioInput =
+            document.getElementById(
+                "bio"
+            );
+
+        const bioCount =
+            document.getElementById(
+                "bio-count"
+            );
+
+        const showCollectionStatsInput =
+            document.getElementById(
+                "show-collection-stats"
+            );
+
+        const showFavoritesInput =
+            document.getElementById(
+                "show-favorites"
+            );
+
+        const showFeaturedCardsInput =
+            document.getElementById(
+                "show-featured-cards"
+            );
+
+        const favoriteCardSelect =
+            document.getElementById(
+                "favorite-card"
+            );
+
+        const favoriteCardPreview =
+            document.getElementById(
+                "favorite-card-preview"
+            );
+
+        const favoriteCardImage =
+            document.getElementById(
+                "favorite-card-image"
+            );
+
+        const favoriteCardName =
+            document.getElementById(
+                "favorite-card-name"
+            );
+
+        const favoriteCardDetails =
+            document.getElementById(
+                "favorite-card-details"
+            );
+
+        const saveButton =
+            document.getElementById(
+                "save-profile-button"
+            );
+
+        const viewProfileLink =
+            document.getElementById(
+                "view-profile-link"
+            );
+
+        const statusElement =
+            document.getElementById(
+                "profile-status"
+            );
+
+        let ownedCards = [];
+        let existingProfile = null;
+
+        function displayStatus(
+            message,
+            type = ""
+        ) {
+            statusElement.textContent =
+                message;
+
+            statusElement.classList.remove(
+                "success",
+                "error"
+            );
+
+            if (type) {
+                statusElement.classList.add(
+                    type
+                );
+            }
+        }
+
+        function setLoading(
+            isLoading
+        ) {
+            saveButton.disabled =
+                isLoading;
+
+            saveButton.textContent =
+                isLoading
+                    ? "Saving..."
+                    : "Save Changes";
+        }
+
+        function updateBioCount() {
+            bioCount.textContent =
+                String(
+                    bioInput.value.length
+                );
+        }
+
+        function selectedVisibility() {
+            return (
+                document.querySelector(
+                    'input[name="profile-visibility"]:checked'
+                )?.value ||
+                "public"
+            );
+        }
+
+        function updateProfileLink(
+            username
+        ) {
+            if (!username) {
+                viewProfileLink.classList.add(
+                    "hidden"
+                );
+
+                return;
+            }
+
+            viewProfileLink.href =
+                `./collector.html?username=${encodeURIComponent(
+                    username
+                )}`;
+
+            viewProfileLink.classList.remove(
+                "hidden"
+            );
+        }
+
+        function renderFavoriteCardPreview() {
+            const selectedCard =
+                ownedCards.find(card => {
+                    return (
+                        card.id ===
+                        favoriteCardSelect.value
+                    );
+                });
+
+            if (!selectedCard) {
+                favoriteCardPreview.classList.add(
+                    "hidden"
+                );
+
+                favoriteCardImage.src =
+                    "";
+
+                favoriteCardImage.alt =
+                    "";
+
+                return;
+            }
+
+            favoriteCardImage.src =
+                selectedCard.thumbnail_url ||
+                selectedCard.image_url ||
+                "";
+
+            favoriteCardImage.alt =
+                `${selectedCard.name} card artwork`;
+
+            favoriteCardName.textContent =
+                `#${selectedCard.card_number} ${selectedCard.name}`;
+
+            favoriteCardDetails.textContent =
+                `${selectedCard.rarity} • Series ${selectedCard.series_id}`;
+
+            favoriteCardPreview.classList.remove(
+                "hidden"
+            );
+        }
+
+        function fillProfileForm(
+            profile
+        ) {
+            usernameInput.value =
+                profile.username || "";
+
+            displayNameInput.value =
+                profile.display_name ||
+                "";
+
+            bioInput.value =
+                profile.bio ||
+                "";
+
+            showCollectionStatsInput.checked =
+                profile.show_collection_stats !==
+                false;
+
+            showFavoritesInput.checked =
+                profile.show_favorites !==
+                false;
+
+            showFeaturedCardsInput.checked =
+                profile.show_featured_cards !==
+                false;
+
+            const visibilityInput =
+                document.querySelector(
+                    `input[name="profile-visibility"][value="${profile.profile_visibility || "public"}"]`
+                );
+
+            if (visibilityInput) {
+                visibilityInput.checked =
+                    true;
+            }
+
+            favoriteCardSelect.value =
+                profile.favorite_card_id ||
+                "";
+
+            updateBioCount();
+            updateProfileLink(
+                profile.onboarding_complete
+                    ? profile.username
+                    : ""
+            );
+
+            renderFavoriteCardPreview();
+        }
+
+        async function initializePage() {
+            displayStatus(
+                "Loading your collector profile..."
+            );
+
+            const [
+                profileResult,
+                cardsResult
+            ] = await Promise.all([
+                loadOwnProfile(),
+                loadOwnedProfileCards()
+            ]);
+
+            if (
+                profileResult.error ||
+                !profileResult.user ||
+                !profileResult.profile
+            ) {
+                console.error(
+                    "Unable to load profile:",
+                    profileResult.error
+                );
+
+                displayStatus(
+                    "Please sign in before creating a collector profile.",
+                    "error"
+                );
+
+                window.setTimeout(() => {
+                    window.location.href =
+                        "./login.html";
+                }, 1500);
+
+                return;
+            }
+
+            existingProfile =
+                profileResult.profile;
+
+            ownedCards =
+                cardsResult.cards || [];
+
+            favoriteCardSelect.innerHTML =
+                `
+                    <option value="">
+                        No showcase card selected
+                    </option>
+                ` +
+                ownedCards
+                    .map(card => {
+                        return `
+                            <option value="${card.id}">
+                                #${card.card_number}
+                                ${card.name}
+                                — ${card.rarity}
+                            </option>
+                        `;
+                    })
+                    .join("");
+
+            fillProfileForm(
+                existingProfile
+            );
+
+            displayStatus(
+                existingProfile.onboarding_complete
+                    ? "Your profile is ready to edit."
+                    : "Choose your collector identity to finish setting up your account.",
+                "success"
+            );
+        }
+
+        bioInput.addEventListener(
+            "input",
+            updateBioCount
+        );
+
+        favoriteCardSelect.addEventListener(
+            "change",
+            renderFavoriteCardPreview
+        );
+
+        usernameInput.addEventListener(
+            "input",
+            () => {
+                usernameInput.value =
+                    usernameInput.value
+                        .toLowerCase()
+                        .replace(
+                            /[^a-z0-9_]/g,
+                            ""
+                        );
+            }
+        );
+
+        form.addEventListener(
+            "submit",
+            async event => {
+                event.preventDefault();
+
+                displayStatus("");
+
+                const username =
+                    usernameInput.value
+                        .trim()
+                        .toLowerCase();
+
+                const displayName =
+                    displayNameInput.value
+                        .trim();
+
+                const bio =
+                    bioInput.value
+                        .trim();
+
+                if (
+                    !/^[a-z0-9_]{3,24}$/.test(
+                        username
+                    )
+                ) {
+                    displayStatus(
+                        "Username must be 3–24 characters using lowercase letters, numbers, or underscores.",
+                        "error"
+                    );
+
+                    usernameInput.focus();
+                    return;
+                }
+
+                if (
+                    !displayName ||
+                    displayName.length > 40
+                ) {
+                    displayStatus(
+                        "Display name must be between 1 and 40 characters.",
+                        "error"
+                    );
+
+                    displayNameInput.focus();
+                    return;
+                }
+
+                if (
+                    bio.length > 240
+                ) {
+                    displayStatus(
+                        "Bio must be 240 characters or fewer.",
+                        "error"
+                    );
+
+                    bioInput.focus();
+                    return;
+                }
+
+                setLoading(true);
+
+                try {
+                    const result =
+                        await updateCollectorProfile({
+                            username,
+                            displayName,
+                            bio,
+                            visibility:
+                                selectedVisibility(),
+
+                            showCollectionStats:
+                                showCollectionStatsInput.checked,
+
+                            showFavorites:
+                                showFavoritesInput.checked,
+
+                            showFeaturedCards:
+                                showFeaturedCardsInput.checked
+                        });
+
+                    await setProfileFavoriteCard(
+                        favoriteCardSelect.value ||
+                        null
+                    );
+
+                    updateProfileLink(
+                        result.username
+                    );
+
+                    displayStatus(
+                        "Your profile changes were saved.",
+                        "success"
+                    );
+                } catch (error) {
+                    console.error(
+                        "Profile update failed:",
+                        error
+                    );
+
+                    displayStatus(
+                        error.message ||
+                            "Your profile could not be saved.",
+                        "error"
+                    );
+                } finally {
+                    setLoading(false);
+                }
+            }
+        );
+
+        initializePage();
+

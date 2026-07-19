@@ -48,7 +48,7 @@ if (!embedded && routes[file] && file!=='binder.html' && file!=='index.html') {
     document.querySelectorAll('a[href]').forEach(a=>{const {route}=routeForUrl(a.getAttribute('href'));if(route)a.setAttribute('target','_top')});
     announceReady();
     if('ResizeObserver'in window){const ro=new ResizeObserver(reportHeight);ro.observe(document.documentElement);if(document.body)ro.observe(document.body)}
-    const mo=new MutationObserver(reportHeight);mo.observe(document.documentElement,{childList:true,subtree:true,attributes:true,characterData:true});
+    const mo=new MutationObserver(reportHeight),observerRoot=document.documentElement||document.body;if(observerRoot?.nodeType){try{mo.observe(observerRoot,{childList:true,subtree:true,attributes:true,characterData:true})}catch(error){console.warn('[Starlight] Embedded resize observer unavailable.',error)}}
     document.fonts?.ready?.then(reportHeight).catch(()=>{});
     document.querySelectorAll('img').forEach(img=>{if(!img.complete)img.addEventListener('load',reportHeight,{once:true})});
   });

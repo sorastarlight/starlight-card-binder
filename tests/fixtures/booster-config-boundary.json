@@ -1,0 +1,20 @@
+{
+  "cards": [
+    { "id": "legend-1", "series_id": "series-2", "rarity": "Legendary", "pull_weight": 0.25, "is_pullable": true }
+  ],
+  "boosters": [
+    {
+      "id": "boundary-pack",
+      "name": "Boundary Pack",
+      "reward_mode": "rarity_slots",
+      "series_id": "series-2",
+      "card_count": 1,
+      "is_active": true,
+      "pack_image_url": "pack.png",
+      "card_back_url": "back.png",
+      "slots": [
+        { "slot_key": "legendary", "quantity": 1, "booster_slot_rates": [{ "rarity": "Legendary", "percentage": 100 }] }
+      ]
+    }
+  ]
+}

@@ -29,7 +29,11 @@
         }
       }
     });
-    observer.observe(document.body, { childList: true, subtree: true });
+    const observerRoot = document.body || document.documentElement;
+    if (observerRoot?.nodeType) {
+      try { observer.observe(observerRoot, { childList: true, subtree: true }); }
+      catch (error) { console.warn('[Starlight] Checkbox observer unavailable.', error); }
+    }
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();

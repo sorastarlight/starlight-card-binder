@@ -1,0 +1,677 @@
+/* =========================================================
+   V68: unified clean flip behavior + preload-safe reveal
+   - Preview/sidebar and Full View use the same spin-swap animation.
+   - The back is always the real StarlightCard_Back_NewLogo.png image, never a mirrored front.
+   ========================================================= */
+.preview-card.simple-flip,
+.v62-preview-card.simple-flip,
+.full-card-wrap.simple-flip {
+  perspective: 1100px !important;
+  overflow: visible !important;
+}
+.preview-card.simple-flip .preview-inner,
+.v62-preview-card.simple-flip .preview-inner,
+.full-card-wrap.simple-flip .full-inner {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  transform: none !important;
+  transform-style: preserve-3d !important;
+  transition: none !important;
+}
+.preview-card.simple-flip .face,
+.v62-preview-card.simple-flip .face,
+.full-card-wrap.simple-flip .face {
+  position: absolute !important;
+  inset: 0 !important;
+  transform: none !important;
+  backface-visibility: visible !important;
+  -webkit-backface-visibility: visible !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+.preview-card.simple-flip .face img,
+.v62-preview-card.simple-flip .face img,
+.full-card-wrap.simple-flip .face img {
+  content: normal !important;
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+.preview-card.simple-flip:not(.show-back) .face.front,
+.v62-preview-card.simple-flip:not(.show-back) .face.front,
+.full-card-wrap.simple-flip:not(.show-back) .face.front {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+.preview-card.simple-flip.show-back .face.back,
+.v62-preview-card.simple-flip.show-back .face.back,
+.full-card-wrap.simple-flip.show-back .face.back {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+.preview-card.simple-flip.flipped .preview-inner,
+.preview-card.simple-flip.flipped:hover .preview-inner,
+.v62-preview-card.simple-flip.flipped .preview-inner,
+.v62-preview-card.simple-flip.flipped:hover .preview-inner,
+.full-card-wrap.simple-flip.flipped .full-inner,
+.full-card-wrap.simple-flip.flipped:hover .full-inner {
+  transform: none !important;
+}
+.preview-card.simple-flip.spin-flip .preview-inner,
+.v62-preview-card.simple-flip.spin-flip .preview-inner,
+.full-card-wrap.simple-flip.spin-flip .full-inner {
+  animation: v68CleanCardSpin .62s cubic-bezier(.2,.85,.18,1) both !important;
+}
+@keyframes v68CleanCardSpin {
+  0% { transform: rotateY(0deg) scale(1); filter: brightness(1); }
+  42% { transform: rotateY(86deg) scale(.985); filter: brightness(1.25); }
+  58% { transform: rotateY(86deg) scale(.985); filter: brightness(1.25); }
+  100% { transform: rotateY(0deg) scale(1); filter: brightness(1); }
+}
+
+
+/* =========================================================
+   V70: flip/reveal hardening
+   - Sidebar + Full View flips use a single visible surface so card backs are never mirrored.
+   - Back image remains preloaded and available.
+   - First reveal front image is forced visible once the reveal phase begins.
+   ========================================================= */
+.preview-card.v70-flip-mode .preview-inner,
+.v62-preview-card.v70-flip-mode .preview-inner,
+.full-card-wrap.v70-flip-mode .full-inner {
+  transform: none !important;
+  transition: none !important;
+}
+
+.preview-card.v70-flip-mode .face,
+.v62-preview-card.v70-flip-mode .face,
+.full-card-wrap.v70-flip-mode .face {
+  transform: none !important;
+  backface-visibility: visible !important;
+  -webkit-backface-visibility: visible !important;
+}
+
+.preview-card.v70-flip-mode .face.front,
+.v62-preview-card.v70-flip-mode .face.front,
+.full-card-wrap.v70-flip-mode .face.front {
+  opacity: 1 !important;
+  z-index: 2 !important;
+}
+
+.preview-card.v70-flip-mode .face.back,
+.v62-preview-card.v70-flip-mode .face.back,
+.full-card-wrap.v70-flip-mode .face.back {
+  opacity: 0 !important;
+  z-index: 1 !important;
+}
+
+.preview-card.v70-flip-mode .face img,
+.v62-preview-card.v70-flip-mode .face img,
+.full-card-wrap.v70-flip-mode .face img {
+  transform: none !important;
+  filter: none !important;
+}
+
+.preview-card.v70-flip-mode.spin-flip .preview-inner,
+.v62-preview-card.v70-flip-mode.spin-flip .preview-inner,
+.full-card-wrap.v70-flip-mode.spin-flip .full-inner {
+  animation: v70CardFlipSpin .64s cubic-bezier(.18,.82,.2,1) both !important;
+}
+
+@keyframes v70CardFlipSpin {
+  0% { transform: rotateY(0deg) scale(1); filter: brightness(1); }
+  45% { transform: rotateY(88deg) scale(.985); filter: brightness(1.22); }
+  55% { transform: rotateY(88deg) scale(.985); filter: brightness(1.22); }
+  100% { transform: rotateY(0deg) scale(1); filter: brightness(1); }
+}
+
+
+
+
+
+
+/* =========================================================
+   V71: reveal card-back path fix
+   The stylesheet lives in /css/, so card-back content URLs must use ../site_assets/.
+   This prevents the first fresh-page reveal from showing a broken image icon.
+   ========================================================= */
+
+.preview-card .face.back img,
+.v62-preview-card .face.back img,
+.full-card-wrap .face.back img {
+  content: url("../../site_assets/StarlightCard_Back_NewLogo.png") !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  transform: none !important;
+  opacity: 1 !important;
+}
+
+
+.v61-card-btn,
+.v62-preview-card .face.front,
+.preview-card .face.front,
+.full-card-wrap .face.front,
+.collection-image{
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+
+
+
+
+/* =========================================================
+   V78 booster scaling and sheet-driven series packs
+   Uses Google Sheets boosterImageUrl / series metadata.
+   ========================================================= */
+.v78-splash-inner {
+  width: min(1120px, 96vw) !important;
+  margin: 0 auto !important;
+}
+.v78-pack-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)) !important;
+  gap: clamp(16px, 2.5vw, 28px) !important;
+  align-items: stretch !important;
+  justify-items: center !important;
+}
+.v61-pack.v78-pack {
+  width: min(100%, 240px) !important;
+  min-height: 360px !important;
+  padding: 16px 14px !important;
+}
+.v61-pack.v78-pack img {
+  width: min(165px, 78%) !important;
+  max-height: 235px !important;
+  object-fit: contain !important;
+  margin: 0 auto 10px !important;
+}
+.v78-pack-desc {
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  opacity: .78;
+  font-size: .72rem !important;
+  line-height: 1.2 !important;
+  margin-top: 3px !important;
+}
+@media (max-width: 720px) {
+  .v78-pack-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+  }
+  .v61-pack.v78-pack {
+    width: min(100%, 190px) !important;
+    min-height: 300px !important;
+  }
+  .v61-pack.v78-pack img {
+    width: min(132px, 76%) !important;
+    max-height: 190px !important;
+  }
+}
+
+
+.detail-actions #previewHolo {
+  order: 3;
+}
+
+.detail-actions button[onclick^="toggleFavorite"] {
+  order: 2;
+}
+.v78-splash-inner {
+  width: min(980px, 94vw) !important;
+}
+.v78-pack-grid {
+  grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)) !important;
+  gap: clamp(12px, 2vw, 22px) !important;
+}
+.v61-pack.v78-pack {
+  width: min(100%, 205px) !important;
+  min-height: 305px !important;
+  padding: 13px 12px !important;
+}
+.v61-pack.v78-pack img {
+  width: min(138px, 74%) !important;
+  max-height: 198px !important;
+  margin-bottom: 8px !important;
+}
+.v61-pack.v78-pack .v61-pack-label small {
+  margin-top: 4px !important;
+}
+.v78-pack-desc {
+  display: none !important;
+}
+
+
+
+
+@media (max-width: 720px) {
+  .v61-pack.v78-pack {
+    width: min(100%, 170px) !important;
+    min-height: 268px !important;
+  }
+  .v61-pack.v78-pack img {
+    width: min(116px, 72%) !important;
+    max-height: 166px !important;
+  }
+}
+
+
+.detail-actions {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: stretch !important;
+  gap: 10px !important;
+}
+
+.detail-actions button[onclick^="toggleFavorite"] {
+  order: 2 !important;
+  flex: 1 1 calc(50% - 5px) !important;
+}
+
+
+.v79-pack-title-line {
+  display: block !important;
+  margin-top: 0 !important;
+  color: #14348f !important;
+  font-size: .84rem !important;
+  line-height: 1.15 !important;
+  white-space: normal !important;
+}
+.v61-pack.v78-pack {
+  width: min(100%, 195px) !important;
+  min-height: 286px !important;
+}
+.v61-pack.v78-pack img {
+  width: min(126px, 72%) !important;
+  max-height: 184px !important;
+}
+
+
+
+
+
+
+
+
+
+
+.legendary-magic-explosion i:nth-child(1){--n:0}.legendary-magic-explosion i:nth-child(2){--n:1}.legendary-magic-explosion i:nth-child(3){--n:2}.legendary-magic-explosion i:nth-child(4){--n:3}.legendary-magic-explosion i:nth-child(5){--n:4}.legendary-magic-explosion i:nth-child(6){--n:5}.legendary-magic-explosion i:nth-child(7){--n:6}.legendary-magic-explosion i:nth-child(8){--n:7}.legendary-magic-explosion i:nth-child(9){--n:8}.legendary-magic-explosion i:nth-child(10){--n:9}.legendary-magic-explosion i:nth-child(11){--n:10}.legendary-magic-explosion i:nth-child(12){--n:11}.legendary-magic-explosion i:nth-child(13){--n:12}.legendary-magic-explosion i:nth-child(14){--n:13}.legendary-magic-explosion i:nth-child(15){--n:14}.legendary-magic-explosion i:nth-child(16){--n:15}.legendary-magic-explosion i:nth-child(17){--n:16}.legendary-magic-explosion i:nth-child(18){--n:17}
+
+
+
+
+@media (max-width: 720px) {
+  .v61-pack.v78-pack { width: min(100%, 162px) !important; min-height: 250px !important; }
+  .v61-pack.v78-pack img { width: min(108px, 70%) !important; max-height: 154px !important; }
+}
+
+
+.v62-panel-buttons,
+.detail-actions:not(.top-actions-preview) {
+  display: grid !important;
+  gap: 10px !important;
+}
+
+
+/* Force flip containers back into a predictable two-face layout. */
+.preview-card.flip-card,
+.v62-preview-card.flip-card,
+.full-card-wrap.flip-card {
+  position: relative !important;
+  transform-style: preserve-3d !important;
+  perspective: 1100px !important;
+  overflow: visible !important;
+}
+.preview-card .preview-inner,
+.v62-preview-card .preview-inner,
+.full-card-wrap .full-inner {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  transform-style: preserve-3d !important;
+  transition: transform .55s cubic-bezier(.2,.8,.2,1) !important;
+}
+.preview-card .face,
+.v62-preview-card .face,
+.full-card-wrap .face {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
+}
+.preview-card .face.front,
+.v62-preview-card .face.front,
+.full-card-wrap .face.front { transform: rotateY(0deg) !important; z-index: 2 !important; }
+.preview-card .face.back,
+.v62-preview-card .face.back,
+.full-card-wrap .face.back { transform: rotateY(180deg) !important; z-index: 1 !important; }
+.preview-card.flipped .preview-inner,
+.v62-preview-card.flipped .preview-inner,
+.full-card-wrap.flipped .full-inner { transform: rotateY(180deg) !important; }
+.preview-card .face img,
+.v62-preview-card .face img,
+.full-card-wrap .face img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  border-radius: 18px !important;
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+}
+.preview-card .face.back img,
+.v62-preview-card .face.back img,
+.full-card-wrap .face.back img {
+  content: url("../../site_assets/StarlightCard_Back_NewLogo.png") !important;
+}
+.preview-card.flip-turning,
+.v62-preview-card.flip-turning,
+.full-card-wrap.flip-turning {
+  animation: v793FlipPop .58s cubic-bezier(.18,.82,.2,1) both !important;
+}
+@keyframes v793FlipPop {
+  0% { filter: brightness(1) drop-shadow(0 16px 24px rgba(8,39,125,.20)); }
+  45% { filter: brightness(1.28) drop-shadow(0 22px 30px rgba(255,120,189,.30)); }
+  100% { filter: brightness(1) drop-shadow(0 16px 24px rgba(8,39,125,.20)); }
+}
+
+
+
+
+
+/* Legendary reveal: keep the current animation, but make the card silhouette charge, glow, and pop outward. */
+
+
+
+
+
+
+
+
+
+
+
+
+.v78-splash-inner {
+  width: min(1040px, 95vw) !important;
+}
+.v78-pack-grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) !important;
+  gap: clamp(14px, 2.25vw, 26px) !important;
+}
+.v61-pack.v78-pack {
+  width: min(100%, 214px) !important;
+  min-height: 300px !important;
+  padding: 12px 11px !important;
+  gap: 10px !important;
+}
+.v61-pack.v78-pack img {
+  width: min(139px, 76%) !important;
+  max-height: 203px !important;
+  margin: 0 auto 6px !important;
+}
+.v61-pack.v78-pack .v61-pack-label {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 1px !important;
+  width: auto !important;
+  max-width: 100% !important;
+  min-width: min(172px, 100%) !important;
+  padding: 8px 14px !important;
+  border-radius: 16px !important;
+  line-height: 1.05 !important;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.55), 0 9px 20px rgba(255,80,170,.24) !important;
+}
+.v61-pack.v78-pack .v61-pack-label small {
+  margin: 0 !important;
+  font-size: .68rem !important;
+  line-height: 1.05 !important;
+  letter-spacing: .075em !important;
+}
+.v61-pack.v78-pack .v61-pack-label .v79-pack-title-line {
+  white-space: nowrap !important;
+  font-size: .74rem !important;
+  line-height: 1.05 !important;
+}
+@media (max-width: 720px) {
+  .v78-pack-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important; }
+  .v61-pack.v78-pack { width: min(100%, 178px) !important; min-height: 266px !important; padding: 10px 9px !important; }
+  .v61-pack.v78-pack img { width: min(122px, 74%) !important; max-height: 176px !important; }
+  .v61-pack.v78-pack .v61-pack-label { min-width: min(148px, 100%) !important; padding: 7px 10px !important; }
+  .v61-pack.v78-pack .v61-pack-label .v79-pack-title-line { font-size: .66rem !important; }
+}
+
+
+/* True two-face flip: never mirror the back artwork. */
+.preview-card.simple-flip,
+.v62-preview-card.simple-flip,
+.full-card-wrap.simple-flip {
+  perspective: 1200px !important;
+  transform-style: preserve-3d !important;
+  overflow: visible !important;
+}
+.preview-card.simple-flip .preview-inner,
+.v62-preview-card.simple-flip .preview-inner,
+.full-card-wrap.simple-flip .full-inner {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  transform-style: preserve-3d !important;
+  transition: transform .58s cubic-bezier(.2,.82,.2,1) !important;
+}
+.preview-card.simple-flip .face,
+.v62-preview-card.simple-flip .face,
+.full-card-wrap.simple-flip .face {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  overflow: hidden !important;
+  border-radius: inherit !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  transform-style: preserve-3d !important;
+}
+.preview-card.simple-flip .face.front,
+.v62-preview-card.simple-flip .face.front,
+.full-card-wrap.simple-flip .face.front {
+  transform: rotateY(0deg) translateZ(.1px) !important;
+  opacity: 1 !important;
+}
+.preview-card.simple-flip .face.back,
+.v62-preview-card.simple-flip .face.back,
+.full-card-wrap.simple-flip .face.back {
+  transform: rotateY(180deg) translateZ(.1px) !important;
+  opacity: 1 !important;
+}
+.preview-card.simple-flip .face img,
+.v62-preview-card.simple-flip .face img,
+.full-card-wrap.simple-flip .face img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  display: block !important;
+  transform: none !important;
+  scale: 1 !important;
+}
+.preview-card.simple-flip.flipped .preview-inner,
+.preview-card.simple-flip.show-back .preview-inner,
+.v62-preview-card.simple-flip.flipped .preview-inner,
+.v62-preview-card.simple-flip.show-back .preview-inner,
+.full-card-wrap.simple-flip.flipped .full-inner,
+.full-card-wrap.simple-flip.show-back .full-inner {
+  transform: rotateY(180deg) !important;
+}
+.preview-card.simple-flip.flip-turning .preview-inner,
+.v62-preview-card.simple-flip.flip-turning .preview-inner,
+.full-card-wrap.simple-flip.flip-turning .full-inner {
+  animation: v795SimpleCardSpin .58s cubic-bezier(.2,.82,.2,1) both !important;
+}
+@keyframes v795SimpleCardSpin {
+  0% { filter: drop-shadow(0 12px 18px rgba(8,39,125,.18)); }
+  45% { scale: 1.045; filter: drop-shadow(0 24px 34px rgba(255,79,167,.22)); }
+  100% { scale: 1; filter: drop-shadow(0 16px 24px rgba(8,39,125,.20)); }
+}
+
+
+
+
+/* Booster splash button rebuild. */
+.v61-pack.v78-pack {
+  width: min(100%, 220px) !important;
+  min-height: 304px !important;
+  padding: 13px 12px 15px !important;
+  gap: 10px !important;
+}
+.v61-pack.v78-pack img {
+  width: min(142px, 76%) !important;
+  max-height: 206px !important;
+  margin: 0 auto 4px !important;
+}
+.v61-pack.v78-pack .v61-pack-label {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 3px !important;
+  width: min(190px, 100%) !important;
+  min-width: 0 !important;
+  padding: 9px 12px !important;
+  border-radius: 14px !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,0) 42%),
+    linear-gradient(135deg, #ff65b6, #ff3f9f 54%, #e93691) !important;
+  border: 1px solid rgba(255,255,255,.72) !important;
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,.38),
+    inset 0 1px 0 rgba(255,255,255,.38),
+    0 9px 18px rgba(255,65,158,.24) !important;
+  text-shadow: 0 1px 0 rgba(137,0,82,.25) !important;
+}
+.v61-pack.v78-pack .v61-pack-label small {
+  display: block !important;
+  margin: 0 !important;
+  color: #fff !important;
+  line-height: 1.05 !important;
+  letter-spacing: .065em !important;
+  text-transform: uppercase !important;
+}
+.v61-pack.v78-pack .v61-pack-label .v79-pack-title-line {
+  font-size: .72rem !important;
+  font-weight: 950 !important;
+  white-space: normal !important;
+}
+.v61-pack.v78-pack .v61-pack-label small:not(.v79-pack-title-line) {
+  justify-self: center !important;
+  width: fit-content !important;
+  margin-top: 3px !important;
+  padding: 3px 9px !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,.22) !important;
+  font-size: .62rem !important;
+  letter-spacing: .085em !important;
+}
+.v61-pack.v78-pack:hover .v61-pack-label,
+.v61-pack.v78-pack:focus-visible .v61-pack-label {
+  transform: translateY(-2px) !important;
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,.52),
+    inset 0 1px 0 rgba(255,255,255,.42),
+    0 12px 24px rgba(255,65,158,.32) !important;
+}
+@media (max-width: 720px) {
+  .v61-pack.v78-pack { width: min(100%, 188px) !important; min-height: 278px !important; }
+  .v61-pack.v78-pack img { width: min(128px, 74%) !important; max-height: 184px !important; }
+  .v61-pack.v78-pack .v61-pack-label { width: min(164px, 100%) !important; padding: 8px 10px !important; }
+  .v61-pack.v78-pack .v61-pack-label .v79-pack-title-line { font-size: .65rem !important; }
+}
+
+
+/* Right-side preview: remove the white card plate behind the artwork. */
+.v62-showcase .v62-preview-card,
+.v62-showcase .v62-preview-card .preview-inner,
+.v62-showcase .v62-preview-card .face,
+.detail .preview-card,
+.detail .preview-card .preview-inner,
+.detail .preview-card .face {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.v62-showcase .v62-preview-card img,
+.detail .preview-card img {
+  background: transparent !important;
+  filter: drop-shadow(0 16px 24px rgba(8,39,125,.20));
+}
+
+/* One-surface spin flip: keeps the back artwork readable, never mirrored. */
+.preview-card.simple-flip,
+.v62-preview-card.simple-flip,
+.full-card-wrap.simple-flip {
+  perspective: 1400px !important;
+  transform-style: preserve-3d !important;
+}
+.preview-card.simple-flip .preview-inner,
+.v62-preview-card.simple-flip .preview-inner,
+.full-card-wrap.simple-flip .full-inner {
+  transform: none !important;
+  transition: none !important;
+  transform-style: preserve-3d !important;
+}
+.preview-card.simple-flip .face.back,
+.v62-preview-card.simple-flip .face.back,
+.full-card-wrap.simple-flip .face.back {
+  display: none !important;
+}
+.preview-card.simple-flip .face.front,
+.v62-preview-card.simple-flip .face.front,
+.full-card-wrap.simple-flip .face.front {
+  opacity: 1 !important;
+  transform: none !important;
+  backface-visibility: visible !important;
+  -webkit-backface-visibility: visible !important;
+}
+.preview-card.simple-flip .face.front img,
+.v62-preview-card.simple-flip .face.front img,
+.full-card-wrap.simple-flip .face.front img {
+  content: normal !important;
+  transform: none !important;
+  scale: 1 !important;
+  object-fit: contain !important;
+}
+.preview-card.simple-flip.flipped .preview-inner,
+.preview-card.simple-flip.show-back .preview-inner,
+.v62-preview-card.simple-flip.flipped .preview-inner,
+.v62-preview-card.simple-flip.show-back .preview-inner,
+.full-card-wrap.simple-flip.flipped .full-inner,
+.full-card-wrap.simple-flip.show-back .full-inner {
+  transform: none !important;
+}
+.preview-card.simple-flip.flip-turning .preview-inner,
+.v62-preview-card.simple-flip.flip-turning .preview-inner,
+.full-card-wrap.simple-flip.flip-turning .full-inner {
+  animation: v796ReadableSpin .64s cubic-bezier(.18,.82,.2,1) both !important;
+}
+@keyframes v796ReadableSpin {
+  0% { transform: rotateY(0deg) scale(1); filter: brightness(1) drop-shadow(0 12px 18px rgba(8,39,125,.16)); }
+  42% { transform: rotateY(88deg) scale(1.045); filter: brightness(1.26) drop-shadow(0 0 22px rgba(255,79,167,.34)); }
+  58% { transform: rotateY(-88deg) scale(1.045); filter: brightness(1.22) drop-shadow(0 0 24px rgba(114,207,255,.30)); }
+  100% { transform: rotateY(0deg) scale(1); filter: brightness(1) drop-shadow(0 15px 24px rgba(8,39,125,.20)); }
+}
+
+
+
+
+/* Full view mouse-reactive 3D tilt. */
+
+
+
+
+

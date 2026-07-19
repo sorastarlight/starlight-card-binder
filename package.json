@@ -1,0 +1,10 @@
+{
+  "name": "starlight-card-binder",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node scripts/check-javascript.mjs && node scripts/check-css-structure.mjs && node scripts/check-foundation.mjs && node scripts/validate-booster-config.mjs && node --test tests/*.test.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "validate:boosters": "node scripts/validate-booster-config.mjs"
+  }
+}

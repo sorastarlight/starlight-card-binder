@@ -1,29 +1,36 @@
-<!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>About | Starlight Card Binder</title><link href="css/style.css" rel="stylesheet"/><script src="js/firefox-performance.js" defer></script>
-    <link rel="stylesheet" href="css/shared-ui.css">
-<link rel="stylesheet" href="css/qol-ui.css?v=92.0.2">
-</head><body data-page="about"><script src="js/embed-mode.js" type="module"></script>
-<div class="sky"></div>
-<div class="site">
-<aside class="sidebar">
-<div class="brand">
-<img alt="Sora Starlight logo" class="logo" src="site_assets/Sora_Starlight_Logo_Primary.png"/>
-<span class="binder-ribbon">Card Binder</span>
-</div>
-<section class="side-card"><h2 class="side-title">Collection Progress</h2><div class="big-stat"><span data-collected="">0</span> / <span data-total="">0</span></div><div class="bar"><span data-progress=""></span></div><p><span data-percent="">0%</span> Complete ✨</p></section>
-<section class="side-card"><h2 class="side-title">Series Progress</h2><div class="mini-series" id="miniSeries"></div></section>
-<section class="side-card filters"><h2 class="side-title">Filters</h2><label>Series<select data-series=""></select></label><label>Rarity<select data-rarity=""><option>All Rarities</option><option>Common</option><option>Uncommon</option><option>Rare</option><option>Epic</option><option>Legendary</option></select></label><label>Sort By<select id="sortSelect"><option value="numberAsc">Number (Low to High)</option><option value="numberDesc">Number (High to Low)</option><option value="nameAsc">Name (A to Z)</option><option value="rarityDesc">Rarity (Best First)</option></select></label><h2 class="side-title">View</h2><label class="checkline"><input checked="" name="viewFilter" type="radio" value="all"/> All Cards</label><label class="checkline"><input name="viewFilter" type="radio" value="collected"/> Collected</label><label class="checkline"><input name="viewFilter" type="radio" value="missing"/> Not Collected</label><button class="btn primary wide" id="resetCollection" type="button">↻ Reset Checklist</button></section>
-</aside>
-<main class="main">
-<nav class="topbar"><div class="nav"><a data-nav="binder" href="binder.html">🗂️ Card Binder</a><a data-nav="collection" href="collection.html">♡ My Collection</a><a data-nav="checklist" href="checklist.html">☑ Checklist</a><a data-nav="socials" href="socials.html">✉ Socials</a><a data-nav="about" href="about.html">ⓘ About</a></div><div class="top-actions"><input class="search" id="globalSearch" placeholder="Search cards..." type="search"/><button class="sfx-toggle on" id="sfxToggle" title="Sound effects" type="button">♪</button></div></nav>
-<section class="page-head panel"><p class="eyebrow">About</p><h1>About the Starlight Card Binder</h1><p>A cute interactive collection binder for Sora Starlight cards. Reveal cards, track sets, favorite your pulls, and keep the sparkle goblin economy alive.</p></section>
-<section class="grid-page" id="seriesAbout"></section>
-<section class="info-strip"><p><b>Collection:</b> Cards are earned through Daily Boosters, reward codes, and special events.</p><p>© 2026 Sora Starlight</p></section>
-</main>
-</div>
-<div aria-live="polite" id="cardOverlay"></div>
-<script src="js/app.js"></script>
-<script>document.querySelectorAll('[data-nav]').forEach(link=>{if(link.dataset.nav===document.body.dataset.page)link.classList.add('active')});</script>
-    <script src="js/shared-ui.js"></script>
-<script src="js/qol-ui.js?v=92.0.2" defer></script>
-</body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>About | Starlight Card Binder</title>
+  <link rel="stylesheet" href="css/style.css?v=1.0.0">
+  <link rel="stylesheet" href="css/shared-ui.css?v=1.0.0">
+  <link rel="stylesheet" href="css/pages/static-info.css?v=1.0">
+  <script src="js/firefox-performance.js" defer></script>
+</head>
+<body data-page="about">
+  <script src="js/embed-mode.js" type="module"></script>
+  <div class="sky" aria-hidden="true"></div>
+  <div class="site static-info-site">
+    <main class="main">
+      <section class="page-head panel">
+        <p class="eyebrow">About</p>
+        <h1>About the Starlight Card Binder</h1>
+        <p>A cute interactive collection binder for Sora Starlight cards. Reveal cards, track sets, favorite your pulls, and keep the sparkle goblin economy alive.</p>
+      </section>
+
+      <section id="seriesAbout" class="grid-page" aria-label="Card series">
+        <div class="st-state" role="status">Loading card series…</div>
+      </section>
+
+      <section class="info-strip">
+        <p><b>Collection:</b> Cards are earned through Daily Boosters, reward codes, and special events.</p>
+        <p>© 2026 Sora Starlight</p>
+      </section>
+    </main>
+  </div>
+  <script src="js/shared-ui.js?v=1.0.0"></script>
+  <script src="js/pages/about-page.js?v=1.0" type="module"></script>
+</body>
+</html>

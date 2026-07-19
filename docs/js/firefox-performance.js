@@ -35,7 +35,11 @@
         }
       }
     });
-    observer.observe(document.documentElement, { childList: true, subtree: true });
+    const observerRoot = document.documentElement || document.body;
+    if (observerRoot?.nodeType) {
+      try { observer.observe(observerRoot, { childList: true, subtree: true }); }
+      catch (error) { console.warn('[Starlight] Image performance observer unavailable.', error); }
+    }
 
     if ('IntersectionObserver' in window) {
       const sectionObserver = new IntersectionObserver((entries) => {

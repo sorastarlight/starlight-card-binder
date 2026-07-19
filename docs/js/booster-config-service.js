@@ -8,14 +8,3 @@ export async function getPublicBoosterConfig(boosterId){
   if(slotError)throw slotError;
   return {...booster,slots:slots||[]};
 }
-
-export function describeBoosterContents(config){
-  if(!config?.slots?.length)return '';
-  return config.slots.map(slot=>{
-    const qty=Number(slot.quantity)||0;
-    const rates=slot.booster_slot_rates||[];
-    const positive=rates.filter(r=>Number(r.percentage)>0);
-    const label=positive.length===1?positive[0].rarity:slot.name;
-    return `${qty} ${label}${qty===1?' card':' cards'}`;
-  }).join(', ').replace(/, ([^,]*)$/, ', and $1');
-}

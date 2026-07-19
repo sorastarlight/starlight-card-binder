@@ -3,7 +3,7 @@ const section=document.createElement('section');section.className='profile-secti
 const account=document.querySelector('.account-data-section');account?.parentNode.insertBefore(section,account);
 const text=section.querySelector('#twitchConnectionText'),link=section.querySelector('#linkTwitchButton'),unlink=section.querySelector('#unlinkTwitchButton');
 async function load(){try{const c=await getMyTwitchConnection();if(c.linked){text.innerHTML=`Linked as <strong>${c.displayName||c.login}</strong> (@${c.login})`;link.classList.add('hidden');unlink.classList.remove('hidden')}else{text.textContent='No Twitch account linked yet.';link.classList.remove('hidden');unlink.classList.add('hidden')}}catch(e){text.textContent=e.message}}
-link.onclick=()=>{text.textContent='Opening Twitch in a secure popup…';beginTwitchLink('collector').catch(e=>text.textContent=e.message)};unlink.onclick=async()=>{if(!confirm('Unlink your Twitch account?'))return;try{await unlinkTwitch();await load()}catch(e){text.textContent=e.message}};
+link.onclick=()=>{text.textContent='Opening Twitch in a secure popup…';beginTwitchLink('collector').catch(e=>text.textContent=e.message)};unlink.onclick=async()=>{if(!(await window.StarlightUI.confirm({title:'Unlink Twitch?',message:'Your Twitch account will no longer be connected to this collector profile.',confirmText:'Unlink Twitch',danger:true})))return;try{await unlinkTwitch();await load()}catch(e){text.textContent=e.message}};
 window.addEventListener('message',async event=>{
   if(event.origin!==location.origin||event.data?.type!=='starlight-twitch-oauth-complete')return;
   if(event.data.ok===false){text.textContent=event.data.message||'Twitch connection was not completed.';return}

@@ -1,0 +1,841 @@
+/* V48 Magical Girl Binder Overhaul
+   This replaces the old binder thumbnail interaction stack with a simple, stable structure:
+   sleeve slot -> floating wrapper -> card image. No cursor tracking, no ghost layers, no blur. */
+body[data-page="binder"] .binder-book {
+  overflow: visible !important;
+  min-height: clamp(620px, 62vh, 780px) !important;
+  padding: 24px 30px 34px !important;
+  gap: 34px !important;
+  border-radius: 34px !important;
+  background:
+    radial-gradient(circle at 50% -10%, rgba(255, 193, 226, .65), transparent 30%),
+    linear-gradient(90deg, #fff6fb 0%, #fffdf8 47%, #fff5fb 100%) !important;
+  border: 2px solid rgba(255, 177, 217, .65) !important;
+  box-shadow:
+    0 28px 70px rgba(255, 120, 189, .20),
+    inset 0 0 0 4px rgba(255,255,255,.78),
+    inset 0 0 28px rgba(255, 203, 231, .55) !important;
+}
+body[data-page="binder"] .binder-book::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: -12px !important;
+  pointer-events: none !important;
+  z-index: 3 !important;
+  opacity: .85 !important;
+  background:
+    radial-gradient(circle at 9% 15%, rgba(255,128,198,.55) 0 2px, transparent 3px),
+    radial-gradient(circle at 27% 92%, rgba(255,204,97,.55) 0 2px, transparent 3px),
+    radial-gradient(circle at 51% 6%, rgba(120,214,255,.50) 0 2px, transparent 3px),
+    radial-gradient(circle at 77% 88%, rgba(255,128,198,.52) 0 2px, transparent 3px),
+    radial-gradient(circle at 94% 28%, rgba(255,204,97,.50) 0 2px, transparent 3px);
+  animation: v48BinderSparkles 6.5s ease-in-out infinite !important;
+}
+body[data-page="binder"] .binder-book:before {
+  z-index: 4 !important;
+  width: 14px !important;
+  background: linear-gradient(90deg,#cda7af,#fff7fa 45%,#cda7af) !important;
+  box-shadow: 0 0 0 1px rgba(124,82,96,.18), 0 12px 22px rgba(124,82,96,.20) !important;
+}
+body[data-page="binder"] .ring { z-index: 5 !important; }
+body[data-page="binder"] .binder-page {
+  overflow: visible !important;
+  z-index: 2 !important;
+  gap: clamp(12px, 1.25vw, 18px) !important;
+  padding: clamp(12px, 1.2vw, 18px) !important;
+  border-radius: 26px !important;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.88), rgba(255,244,250,.72)),
+    radial-gradient(circle at 20% 20%, rgba(255, 125, 193, .13), transparent 34%) !important;
+  border: 1px solid rgba(255, 178, 219, .55) !important;
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,.82),
+    inset 0 0 28px rgba(255, 207, 232, .45),
+    0 16px 32px rgba(92, 65, 120, .10) !important;
+}
+body[data-page="binder"] .starlight-slot {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: stretch !important;
+  min-width: 0 !important;
+  aspect-ratio: 2.5 / 4.25 !important;
+  padding: 8px 8px 10px !important;
+  gap: 8px !important;
+  border-radius: 20px !important;
+  overflow: visible !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.97), rgba(255,239,248,.82)) !important;
+  border: 1px solid rgba(255, 179, 221, .58) !important;
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,.78),
+    0 12px 24px rgba(66, 83, 165, .11),
+    0 0 22px rgba(255, 133, 203, .12) !important;
+  transform: none !important;
+  transition: box-shadow .25s ease, border-color .25s ease, background .25s ease !important;
+}
+body[data-page="binder"] .starlight-slot::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 6px !important;
+  border-radius: 16px !important;
+  pointer-events: none !important;
+  border: 1px dashed rgba(255, 147, 208, .25) !important;
+  opacity: .8 !important;
+}
+body[data-page="binder"] .starlight-slot.empty-slot {
+  aspect-ratio: 2.5 / 4.25 !important;
+  opacity: .40 !important;
+  background: linear-gradient(145deg, rgba(255,255,255,.55), rgba(255,235,247,.42)) !important;
+}
+body[data-page="binder"] .starlight-slot:hover,
+body[data-page="binder"] .starlight-slot:focus-within {
+  z-index: 50 !important;
+  border-color: rgba(255, 92, 174, .75) !important;
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,.92),
+    0 22px 40px rgba(255, 87, 171, .22),
+    0 0 28px rgba(255, 117, 196, .28),
+    0 0 44px rgba(117, 211, 255, .16) !important;
+}
+body[data-page="binder"] .starlight-card-float {
+  position: relative !important;
+  z-index: 2 !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  width: 100% !important;
+  overflow: visible !important;
+  transform-origin: 50% 85% !important;
+  animation: v48CardFloat 5.2s ease-in-out infinite !important;
+  animation-delay: var(--float-delay, 0s) !important;
+  transition: transform .28s cubic-bezier(.2,.85,.2,1), filter .28s ease !important;
+}
+body[data-page="binder"] .starlight-slot:hover .starlight-card-float,
+body[data-page="binder"] .starlight-slot:focus-within .starlight-card-float {
+  animation: v48CardHoverWobble 1.75s ease-in-out infinite !important;
+  transform: translateY(-12px) rotate(-1deg) !important;
+  filter: drop-shadow(0 18px 22px rgba(255, 91, 174, .26)) !important;
+}
+body[data-page="binder"] .starlight-card-tile,
+body[data-page="binder"] .starlight-card-tile:hover,
+body[data-page="binder"] .starlight-card-tile:focus-visible {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  border: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  perspective: none !important;
+  cursor: pointer !important;
+  transform: none !important;
+  filter: none !important;
+  outline: none !important;
+}
+body[data-page="binder"] .starlight-card-inner,
+body[data-page="binder"] .starlight-card-tile:hover .starlight-card-inner,
+body[data-page="binder"] .starlight-card-tile:focus-visible .starlight-card-inner,
+body[data-page="binder"] .starlight-card-tile.tilting .starlight-card-inner,
+body[data-page="binder"] .starlight-card-tile.tap-tilt .starlight-card-inner {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  transform: none !important;
+  transition: none !important;
+  filter: none !important;
+  transform-style: flat !important;
+}
+body[data-page="binder"] .starlight-binder-book .card-tile::before,
+body[data-page="binder"] .starlight-binder-book .card-tile::after,
+body[data-page="binder"] .starlight-card-tile::before,
+body[data-page="binder"] .starlight-card-tile::after,
+body[data-page="binder"] .starlight-card-inner::before,
+body[data-page="binder"] .starlight-card-inner::after,
+body[data-page="binder"] .starlight-card-tile .face::before,
+body[data-page="binder"] .starlight-card-tile .face::after {
+  display: none !important;
+  content: none !important;
+}
+body[data-page="binder"] .starlight-card-tile .face {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  overflow: hidden !important;
+  border-radius: 13px !important;
+  background: #fff !important;
+  transform: none !important;
+  backface-visibility: visible !important;
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,.78),
+    0 9px 20px rgba(32, 73, 160, .18) !important;
+}
+
+body[data-page="binder"] .starlight-card-tile .face img,
+body[data-page="binder"] .starlight-card-tile img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: cover !important;
+  display: block !important;
+  border-radius: inherit !important;
+  transform: none !important;
+  transition: filter .22s ease, opacity .22s ease !important;
+  image-rendering: auto !important;
+}
+body[data-page="binder"] .starlight-slot:hover .starlight-card-tile .face,
+body[data-page="binder"] .starlight-slot:focus-within .starlight-card-tile .face {
+  box-shadow:
+    0 0 0 3px rgba(255,255,255,.9),
+    0 0 0 5px rgba(255, 138, 204, .34),
+    0 18px 26px rgba(39, 57, 160, .22),
+    0 0 26px rgba(255, 102, 185, .32) !important;
+}
+body[data-page="binder"] .starlight-slot .badge {
+  z-index: 6 !important;
+  top: 7px !important;
+  left: 7px !important;
+  border-radius: 10px !important;
+  background: linear-gradient(180deg, #2b73ff, #1454c8) !important;
+  box-shadow: 0 4px 10px rgba(21,91,216,.25) !important;
+}
+body[data-page="binder"] .starlight-slot .fav {
+  z-index: 6 !important;
+  top: 7px !important;
+  right: 7px !important;
+  color: #ff62b5 !important;
+  filter: drop-shadow(0 2px 0 #fff) drop-shadow(0 0 6px rgba(255, 117, 196, .35)) !important;
+}
+body[data-page="binder"] .starlight-slot .tiny-reveal {
+  position: relative !important;
+  left: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  z-index: 20 !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 10px 10px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255,255,255,.70) !important;
+  color: white !important;
+  font-weight: 900 !important;
+  letter-spacing: .02em !important;
+  background: linear-gradient(180deg, #ff91cc, #ea4aa2) !important;
+  box-shadow: 0 10px 18px rgba(255, 76, 166, .22), inset 0 1px 0 rgba(255,255,255,.55) !important;
+  animation: none !important;
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease !important;
+}
+body[data-page="binder"] .starlight-slot .tiny-reveal:hover,
+body[data-page="binder"] .starlight-slot .tiny-reveal:focus-visible {
+  transform: translateY(-2px) !important;
+  filter: brightness(1.05) !important;
+  box-shadow: 0 13px 22px rgba(255, 76, 166, .28), 0 0 18px rgba(255, 130, 204, .24), inset 0 1px 0 rgba(255,255,255,.65) !important;
+}
+body[data-page="binder"] .starlight-slot.is-collected .tiny-reveal {
+  background: linear-gradient(180deg, #76d7ff, #4b96ef) !important;
+  box-shadow: 0 10px 18px rgba(75, 150, 239, .20), inset 0 1px 0 rgba(255,255,255,.55) !important;
+}
+@keyframes v48CardFloat {
+  0%,100% { transform: translateY(0) rotate(-.35deg); }
+  50% { transform: translateY(-4px) rotate(.35deg); }
+}
+@keyframes v48CardHoverWobble {
+  0%,100% { transform: translateY(-12px) rotate(-1deg); }
+  50% { transform: translateY(-15px) rotate(1deg); }
+}
+@keyframes v48BinderSparkles {
+  0%,100% { opacity: .55; transform: translateY(0); }
+  50% { opacity: .95; transform: translateY(-4px); }
+}
+@media (max-width: 900px) {
+  body[data-page="binder"] .starlight-slot { aspect-ratio: 2.5 / 4.12 !important; }
+  body[data-page="binder"] .binder-book { min-height: auto !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-page="binder"] .starlight-card-float,
+  body[data-page="binder"] .starlight-slot:hover .starlight-card-float,
+  body[data-page="binder"] .binder-book::after { animation: none !important; }
+}
+
+/* ======================================================================
+   V49 binder thumbnail geometry + hover SFX polish
+   - keep the V48 magical binder look
+   - stop thumbnail cropping by preserving the card aspect ratio
+   - make the image area use the full sleeve above the button
+   - keep the hover sound responsive without retriggering inside a card
+   ====================================================================== */
+body[data-page="binder"] .starlight-slot {
+  aspect-ratio: 2.5 / 4.18 !important;
+  padding: 7px 7px 9px !important;
+  gap: 7px !important;
+  overflow: visible !important;
+}
+
+body[data-page="binder"] .starlight-card-float {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: auto !important;
+  display: block !important;
+}
+
+body[data-page="binder"] .starlight-card-tile,
+body[data-page="binder"] .starlight-card-inner {
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+body[data-page="binder"] .starlight-card-tile .face {
+  display: grid !important;
+  place-items: center !important;
+  background: linear-gradient(180deg, #ffffff, #fff8fc) !important;
+  overflow: hidden !important;
+}
+
+body[data-page="binder"] .starlight-card-tile .face img,
+body[data-page="binder"] .starlight-card-tile img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  background: transparent !important;
+}
+
+body[data-page="binder"] .starlight-slot .tiny-reveal {
+  flex: 0 0 40px !important;
+  min-height: 40px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 12px !important;
+}
+
+body[data-page="binder"] .starlight-slot:hover .starlight-card-float,
+body[data-page="binder"] .starlight-slot:focus-within .starlight-card-float {
+  transform: translateY(-10px) rotate(-.8deg) !important;
+}
+
+@keyframes v48CardHoverWobble {
+  0%,100% { transform: translateY(-10px) rotate(-.8deg); }
+  50% { transform: translateY(-13px) rotate(.8deg); }
+}
+
+/* Keep cards from becoming blurry during the magic float/hover. */
+body[data-page="binder"] .starlight-card-float,
+body[data-page="binder"] .starlight-card-tile,
+body[data-page="binder"] .starlight-card-inner,
+body[data-page="binder"] .starlight-card-tile .face,
+body[data-page="binder"] .starlight-card-tile img {
+  will-change: transform !important;
+  transform-style: flat !important;
+  backface-visibility: hidden !important;
+}
+
+/* ======================================================================
+   V50 binder thumbnail uncrop fix
+   - make the visible card area use a true 5:7 card ratio
+   - keep the reveal/collected button as its own stable tab below the card
+   - do not touch the V49 hover sound behavior
+   ====================================================================== */
+body[data-page="binder"] .starlight-slot {
+  aspect-ratio: auto !important;
+  display: grid !important;
+  grid-template-rows: auto 40px !important;
+  align-content: start !important;
+  padding: 7px 7px 10px !important;
+  gap: 8px !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+}
+
+body[data-page="binder"] .starlight-card-float {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 5 / 7 !important;
+  min-height: 0 !important;
+  display: block !important;
+}
+
+body[data-page="binder"] .starlight-card-tile,
+body[data-page="binder"] .starlight-card-inner,
+body[data-page="binder"] .starlight-card-tile .face {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+body[data-page="binder"] .starlight-card-tile .face {
+  display: block !important;
+  overflow: hidden !important;
+  border-radius: 12px !important;
+}
+
+body[data-page="binder"] .starlight-card-tile .face img,
+body[data-page="binder"] .starlight-card-tile img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+}
+
+body[data-page="binder"] .starlight-slot .tiny-reveal {
+  grid-row: 2 !important;
+  align-self: stretch !important;
+  justify-self: stretch !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+  line-height: 1 !important;
+}
+
+body[data-page="binder"] .binder-page {
+  align-items: start !important;
+}
+
+body[data-page="binder"] .empty-slot {
+  aspect-ratio: 2.5 / 4.18 !important;
+  min-height: 100% !important;
+}
+
+/* =========================================================
+   V51: Binder/card visual overhaul hard reset
+   - Keep existing hover SFX logic intact
+   - Force the card image to occupy the full sleeve area above the button
+   - Remove old binder tilt/blur/ghost layers from the binder only
+   - Add magical-girl pastel binder frame, sleeve glow, idle float, and clean hover lift
+   ========================================================= */
+body[data-page="binder"] .binder-wrap,
+body[data-page="binder"] .binder-book,
+body[data-page="binder"] .binder-page,
+body[data-page="binder"] .slot {
+  overflow: visible !important;
+}
+
+body[data-page="binder"] .binder-book.starlight-binder-book,
+body[data-page="binder"] .binder-book {
+  min-height: 600px !important;
+  padding: 28px 34px 30px !important;
+  gap: 38px !important;
+  border-radius: 34px !important;
+  border: 2px solid rgba(255, 211, 232, .95) !important;
+  background:
+    radial-gradient(circle at 50% -4%, rgba(255, 112, 192, .24), transparent 24%),
+    linear-gradient(90deg,
+      rgba(255, 203, 226, .80) 0%,
+      rgba(255, 248, 252, .98) 5%,
+      rgba(255, 255, 255, .96) 46%,
+      rgba(255, 181, 217, .34) 50%,
+      rgba(255, 255, 255, .96) 54%,
+      rgba(255, 248, 252, .98) 95%,
+      rgba(255, 203, 226, .80) 100%) !important;
+  box-shadow:
+    0 26px 64px rgba(255, 106, 184, .18),
+    0 18px 46px rgba(21, 91, 216, .16),
+    inset 0 0 0 4px rgba(255,255,255,.82),
+    inset 0 0 0 9px rgba(255, 188, 221, .24),
+    inset 0 20px 34px rgba(255,255,255,.58),
+    inset 0 -22px 36px rgba(219, 121, 177, .08) !important;
+  transform: none !important;
+  isolation: isolate !important;
+}
+
+body[data-page="binder"] .binder-book::before {
+  width: 20px !important;
+  top: 24px !important;
+  bottom: 24px !important;
+  background:
+    linear-gradient(90deg, rgba(178, 119, 143, .26), rgba(255,255,255,.96) 34%, rgba(255, 148, 196, .44) 50%, rgba(255,255,255,.96) 66%, rgba(178, 119, 143, .26)) !important;
+  border-radius: 999px !important;
+  box-shadow:
+    0 0 0 1px rgba(176, 93, 129, .20),
+    0 12px 24px rgba(128, 73, 99, .18),
+    inset 0 0 13px rgba(255,255,255,.95) !important;
+}
+
+body[data-page="binder"] .binder-book::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+  opacity: .95 !important;
+  background:
+    radial-gradient(circle, rgba(255, 207, 75, .60) 0 2px, transparent 3px),
+    radial-gradient(circle, rgba(255, 112, 192, .45) 0 2px, transparent 3px),
+    radial-gradient(circle, rgba(114, 207, 255, .38) 0 2px, transparent 3px),
+    linear-gradient(90deg, transparent 48%, rgba(152, 94, 120, .10) 50%, transparent 52%) !important;
+  background-size: 128px 118px, 92px 86px, 156px 138px, auto !important;
+  background-position: 18px 20px, 54px 64px, 12px 34px, center !important;
+  animation: v51BinderSparkleDrift 9s linear infinite !important;
+}
+
+@keyframes v51BinderSparkleDrift {
+  0% { background-position: 18px 20px, 54px 64px, 12px 34px, center; }
+  100% { background-position: 18px -98px, 54px -22px, 12px -104px, center; }
+}
+
+body[data-page="binder"] .binder-page {
+  position: relative !important;
+  z-index: 1 !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 18px !important;
+  padding: 18px !important;
+  border-radius: 28px !important;
+  border: 1px solid rgba(255, 189, 220, .58) !important;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.88), rgba(255,239,247,.78) 58%, rgba(245,249,255,.76)),
+    repeating-linear-gradient(90deg, rgba(255, 151, 203, .035) 0 2px, transparent 2px 30px) !important;
+  box-shadow:
+    0 16px 30px rgba(238, 104, 174, .10),
+    inset 0 0 0 2px rgba(255,255,255,.78),
+    inset 0 12px 26px rgba(255,255,255,.70),
+    inset 0 -14px 26px rgba(255, 138, 200, .07) !important;
+}
+
+body[data-page="binder"] .binder-page::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 11px !important;
+  pointer-events: none !important;
+  border-radius: 22px !important;
+  border: 1px dashed rgba(255, 118, 190, .24) !important;
+  box-shadow: inset 0 0 26px rgba(114, 207, 255, .10) !important;
+}
+
+body[data-page="binder"] .ring {
+  z-index: 5 !important;
+  border-color: #bd8b98 !important;
+  background: linear-gradient(180deg, #fff8fb, #ffc9dc 58%, #e7a2ba) !important;
+  box-shadow:
+    inset 0 2px 5px rgba(255,255,255,.88),
+    inset 0 -3px 6px rgba(135, 72, 93, .30),
+    0 5px 12px rgba(111, 58, 80, .22) !important;
+}
+
+body[data-page="binder"] .slot {
+  position: relative !important;
+  z-index: 1 !important;
+  display: block !important;
+  /* This is the full physical sleeve: card area + reveal button area. */
+  aspect-ratio: 2.5 / 3.72 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border-radius: 20px !important;
+  background:
+    radial-gradient(circle at 50% 6%, rgba(255,255,255,.90), transparent 38%),
+    linear-gradient(180deg, rgba(255,255,255,.96), rgba(255, 238, 247, .80)) !important;
+  border: 1px solid rgba(255,255,255,.96) !important;
+  box-shadow:
+    0 9px 20px rgba(236, 107, 179, .10),
+    inset 0 0 0 2px rgba(255,255,255,.86),
+    inset 0 0 0 8px rgba(255, 239, 247, .55),
+    inset 0 -18px 30px rgba(255, 119, 189, .08) !important;
+  isolation: isolate !important;
+  transform: none !important;
+  animation: none !important;
+}
+
+body[data-page="binder"] .slot::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 8px 8px 46px 8px !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  border-radius: 15px !important;
+  border: 1px solid rgba(255,255,255,.92) !important;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.40), rgba(255,222,240,.18)),
+    radial-gradient(circle at center, rgba(255,120,189,.08), transparent 66%) !important;
+  box-shadow:
+    inset 0 0 20px rgba(255,255,255,.62),
+    0 0 0 1px rgba(255, 177, 216, .16) !important;
+}
+
+body[data-page="binder"] .slot::after {
+  content: "✧" !important;
+  position: absolute !important;
+  right: 9px !important;
+  top: 10px !important;
+  z-index: 6 !important;
+  pointer-events: none !important;
+  color: rgba(255, 96, 178, .78) !important;
+  font-size: 1rem !important;
+  text-shadow: 0 0 7px rgba(255,255,255,.95), 0 0 11px rgba(255, 120, 189, .38) !important;
+}
+
+body[data-page="binder"] .slot:hover,
+body[data-page="binder"] .slot:focus-within {
+  z-index: 80 !important;
+  box-shadow:
+    0 14px 30px rgba(236, 107, 179, .17),
+    0 0 24px rgba(255, 120, 189, .24),
+    inset 0 0 0 2px rgba(255,255,255,.92),
+    inset 0 0 0 8px rgba(255, 239, 247, .55) !important;
+}
+
+body[data-page="binder"] .starlight-card-float {
+  position: absolute !important;
+  left: 12px !important;
+  right: 12px !important;
+  top: 10px !important;
+  bottom: 54px !important;
+  z-index: 3 !important;
+  transform-origin: center bottom !important;
+  animation: v51CardIdleMagic 5.8s ease-in-out infinite !important;
+  animation-delay: var(--float-delay, 0s) !important;
+  will-change: transform, filter !important;
+}
+
+@keyframes v51CardIdleMagic {
+  0%, 100% { transform: translate3d(0, 0, 0) rotateZ(-.18deg); }
+  42% { transform: translate3d(0, -3px, 0) rotateZ(.22deg); }
+  72% { transform: translate3d(0, 1px, 0) rotateZ(-.10deg); }
+}
+
+body[data-page="binder"] .slot:hover .starlight-card-float,
+body[data-page="binder"] .slot:focus-within .starlight-card-float {
+  animation: v51CardLiftMagic 1.9s ease-in-out infinite !important;
+  filter:
+    drop-shadow(0 18px 22px rgba(21, 91, 216, .18))
+    drop-shadow(0 0 18px rgba(255, 120, 189, .30))
+    brightness(1.045) saturate(1.045) !important;
+}
+
+@keyframes v51CardLiftMagic {
+  0%, 100% { transform: translate3d(0, -15px, 0) rotateZ(-.65deg); }
+  35% { transform: translate3d(0, -18px, 0) rotateZ(.75deg); }
+  68% { transform: translate3d(0, -13px, 0) rotateZ(-.35deg); }
+}
+
+body[data-page="binder"] .card-tile,
+body[data-page="binder"] .card-tile:hover,
+body[data-page="binder"] .card-tile:focus-visible,
+body[data-page="binder"] .card-tile.tilting {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  overflow: visible !important;
+  transform: none !important;
+  animation: none !important;
+  filter: none !important;
+  perspective: none !important;
+  cursor: pointer !important;
+}
+
+body[data-page="binder"] .card-inner,
+body[data-page="binder"] .card-tile:hover .card-inner,
+body[data-page="binder"] .card-tile:focus-visible .card-inner,
+body[data-page="binder"] .card-tile.tilting .card-inner {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  transform: none !important;
+  animation: none !important;
+  filter: none !important;
+  transition: none !important;
+  overflow: visible !important;
+}
+
+body[data-page="binder"] .face,
+body[data-page="binder"] .card-tile:hover .face,
+body[data-page="binder"] .card-tile.tilting .face,
+body[data-page="binder"] .card-tile:focus-visible .face {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  border-radius: 13px !important;
+  overflow: hidden !important;
+  background: rgba(255,255,255,.94) !important;
+  backface-visibility: hidden !important;
+  transform: translateZ(0) !important;
+  box-shadow:
+    0 10px 18px rgba(27, 76, 168, .16),
+    0 0 0 2px rgba(255,255,255,.92),
+    0 0 16px rgba(255, 155, 207, .15) !important;
+}
+
+body[data-page="binder"] .face img,
+body[data-page="binder"] .card-tile img,
+body[data-page="binder"] .binder-book .face img,
+body[data-page="binder"] .card-tile:hover img,
+body[data-page="binder"] .card-tile.tilting img {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  transform: none !important;
+  scale: 1 !important;
+  image-rendering: auto !important;
+}
+
+body[data-page="binder"] .back { transform: rotateY(180deg) !important; }
+body[data-page="binder"] .card-tile:hover::before,
+body[data-page="binder"] .card-tile:hover::after,
+body[data-page="binder"] .card-tile:hover .card-inner::before,
+body[data-page="binder"] .card-tile:hover .card-inner::after,
+body[data-page="binder"] .card-tile:hover .face::before,
+body[data-page="binder"] .card-tile:hover .face::after {
+  content: none !important;
+  display: none !important;
+}
+
+body[data-page="binder"] .badge {
+  top: 7px !important;
+  left: 7px !important;
+  z-index: 8 !important;
+  border-radius: 999px !important;
+  padding: 4px 8px !important;
+  background: linear-gradient(180deg, #337aff, #0d4abe) !important;
+  box-shadow: 0 4px 10px rgba(13, 74, 190, .22), inset 0 1px 0 rgba(255,255,255,.35) !important;
+}
+
+body[data-page="binder"] .fav {
+  top: 8px !important;
+  right: 8px !important;
+  z-index: 8 !important;
+  color: #ff66b6 !important;
+}
+
+body[data-page="binder"] .tiny-reveal,
+body[data-page="binder"] .slot .tiny-reveal {
+  position: absolute !important;
+  left: 13px !important;
+  right: 13px !important;
+  bottom: 10px !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  transform: none !important;
+  z-index: 12 !important;
+  border-radius: 999px !important;
+  padding: 10px 12px !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  color: #fff !important;
+  background: linear-gradient(180deg, #ff9bd2, #e64c9e 70%, #d93b91) !important;
+  box-shadow:
+    0 10px 18px rgba(255, 79, 167, .25),
+    inset 0 1px 0 rgba(255,255,255,.45) !important;
+  pointer-events: auto !important;
+}
+
+body[data-page="binder"] .tiny-reveal:hover,
+body[data-page="binder"] .tiny-reveal:focus-visible {
+  bottom: 10px !important;
+  transform: translateY(-1px) !important;
+  box-shadow:
+    0 12px 22px rgba(255, 79, 167, .32),
+    0 0 0 5px rgba(255, 120, 189, .16),
+    inset 0 1px 0 rgba(255,255,255,.55) !important;
+}
+
+body[data-page="binder"] .is-collected .tiny-reveal {
+  background: linear-gradient(180deg, #7ed9ff, #4c9cf1 70%, #367dd9) !important;
+}
+
+body[data-page="binder"] .obscured {
+  filter: brightness(.82) saturate(.92) blur(.25px) !important;
+}
+
+@media (max-width: 1260px) {
+  body[data-page="binder"] .binder-book { padding: 22px 24px 26px !important; gap: 28px !important; }
+  body[data-page="binder"] .binder-page { gap: 14px !important; padding: 14px !important; }
+  body[data-page="binder"] .starlight-card-float { left: 10px !important; right: 10px !important; top: 9px !important; bottom: 52px !important; }
+}
+
+/* V52 binder geometry reset: card artwork fills the actual card area, not a stretched sleeve. */
+body[data-page="binder"] .binder-book,
+body[data-page="binder"] .binder-page,
+body[data-page="binder"] .slot {
+  overflow: visible !important;
+}
+
+body[data-page="binder"] .binder-page {
+  align-content: start !important;
+  align-items: start !important;
+  grid-auto-rows: auto !important;
+  gap: 18px !important;
+}
+
+body[data-page="binder"] .slot {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-items: stretch !important;
+  aspect-ratio: 2.5 / 4.12 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 10px 10px 12px !important;
+}
+
+body[data-page="binder"] .slot::before {
+  inset: 7px 7px 7px 7px !important;
+}
+
+body[data-page="binder"] .starlight-card-float {
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: auto !important;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 2.5 / 3.5 !important;
+  flex: 0 0 auto !important;
+  z-index: 3 !important;
+}
+
+
+
+
+
+body[data-page="binder"] .tiny-reveal,
+body[data-page="binder"] .slot .tiny-reveal {
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  display: block !important;
+  width: 100% !important;
+  margin: 10px auto 0 !important;
+  padding: 10px 10px !important;
+  flex: 0 0 auto !important;
+}
+
+body[data-page="binder"] .tiny-reveal:hover,
+body[data-page="binder"] .tiny-reveal:focus-visible {
+  bottom: auto !important;
+  transform: translateY(-1px) !important;
+}
+
+body[data-page="binder"] .slot:hover .starlight-card-float,
+body[data-page="binder"] .slot:focus-within .starlight-card-float {
+  animation: v52CardLiftMagic 1.9s ease-in-out infinite !important;
+}
+
+@keyframes v52CardLiftMagic {
+  0%, 100% { transform: translate3d(0, -10px, 0) rotateZ(-.55deg); }
+  35% { transform: translate3d(0, -13px, 0) rotateZ(.65deg); }
+  68% { transform: translate3d(0, -8px, 0) rotateZ(-.25deg); }
+}
+
+@media (max-width: 1260px) {
+  body[data-page="binder"] .slot { padding: 9px 9px 11px !important; }
+  body[data-page="binder"] .binder-page { gap: 15px !important; }
+}
+
+
+
+

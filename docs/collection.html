@@ -7,122 +7,11 @@
 <title>
         My Collection | Starlight Card Binder
     </title>
-<link href="css/style.css" rel="stylesheet"/>
+<link href="css/style.css?v=1.0.0" rel="stylesheet"/>
 <link href="css/v80-8-ui.css" rel="stylesheet"/>
-<style>
-        .star-bits-panel {
-            display: grid;
-            grid-template-columns:
-                minmax(0, 1fr)
-                auto;
-            align-items: center;
-            gap: 20px;
-
-            margin-top: 22px;
-            padding: 22px;
-
-            border:
-                2px solid
-                rgba(255, 130, 200, 0.34);
-
-            border-radius: 20px;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    rgba(255, 244, 252, 0.96),
-                    rgba(237, 249, 255, 0.96)
-                );
-
-            box-shadow:
-                0 12px 30px
-                rgba(91, 109, 164, 0.12);
-        }
-
-        .star-bits-copy h2 {
-            margin: 0 0 8px;
-            color: #405fa1;
-        }
-
-        .star-bits-copy p {
-            margin: 0;
-            line-height: 1.55;
-        }
-
-        .star-bits-stats {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 14px;
-        }
-
-        .star-bits-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-
-            min-height: 38px;
-            padding: 8px 14px;
-
-            border:
-                1px solid
-                rgba(107, 198, 248, 0.42);
-
-            border-radius: 999px;
-
-            background: #ffffff;
-
-            color: #405fa1;
-            font-weight: 800;
-        }
-
-        .star-bits-action {
-            min-width: 220px;
-            min-height: 52px;
-            padding: 12px 20px;
-
-            border:
-                2px solid
-                rgba(255, 130, 200, 0.48);
-
-            border-radius: 999px;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #ffd7ed,
-                    #dff5ff
-                );
-
-            color: #56617d;
-
-            font: inherit;
-            font-weight: 800;
-
-            cursor: pointer;
-        }
-
-        .star-bits-note {
-            display: block;
-            margin-top: 8px;
-
-            color: #6b7089;
-            font-size: 0.88rem;
-            text-align: center;
-        }
-
-        @media (max-width: 760px) {
-            .star-bits-panel {
-                grid-template-columns: 1fr;
-            }
-
-            .star-bits-action {
-                width: 100%;
-            }
-        }
-    </style>
+<link rel="stylesheet" href="css/pages/collection.css?v=1.0">
 <link href="css/collection-redesign.css" rel="stylesheet"/><script src="js/firefox-performance.js" defer></script>
-    <link rel="stylesheet" href="css/shared-ui.css">
+    <link rel="stylesheet" href="css/shared-ui.css?v=1.0.0">
 <link rel="stylesheet" href="css/qol-ui.css?v=92.0.2">
 </head>
 <body data-page="collection"><script src="js/embed-mode.js" type="module"></script>
@@ -169,11 +58,11 @@
 </div>
 <div class="collection-level-card">
 <div><span>Collector Level</span><strong>Lv. <span data-collector-level="">1</span></strong></div>
-<div class="collector-progress"><span data-level-progress="" style="width:0%"></span></div>
+<div class="collector-progress"><span data-level-progress=""></span></div>
 <small><span data-collector-points="">0</span> / <span data-next-level-points="">25</span> points</small>
 </div>
 <div class="collection-progress-suite">
-<article class="collection-progress-card"><div><span>Collection Completion</span><strong><span data-collected="">0</span> / <span data-total="">0</span></strong></div><div class="collector-progress"><span data-progress="" style="width:0%"></span></div><small><span data-percent="">0%</span> complete</small></article>
+<article class="collection-progress-card"><div><span>Collection Completion</span><strong><span data-collected="">0</span> / <span data-total="">0</span></strong></div><div class="collector-progress"><span data-progress=""></span></div><small><span data-percent="">0%</span> complete</small></article>
 <article class="collection-progress-card"><div><span>Free Daily Booster</span><strong data-daily-status="">Checking…</strong></div><small data-daily-countdown=""></small><a data-shell-nav="daily" href="daily-booster.html">Open Daily Booster</a></article>
 <article class="collection-progress-card collection-series-progress"><div><span>Series Progress</span><strong>Your sets</strong></div><div class="mini-series" id="miniSeries"></div></article>
 </div>
@@ -216,27 +105,14 @@
 </section>
 </main>
 </div>
-<div aria-live="polite" id="cardOverlay"></div>
+<div aria-hidden="true" aria-live="polite" id="cardOverlay" hidden></div>
 <!--
         Cloud synchronization finishes before app.js starts.
     -->
 <script src="js/cloud-collection.js" type="module"></script>
 <script src="js/site-dashboard.js" type="module"></script>
-<script>
-        document
-            .querySelectorAll("[data-nav]")
-            .forEach(link => {
-                if (
-                    link.dataset.nav ===
-                    document.body.dataset.page
-                ) {
-                    link.classList.add(
-                        "active"
-                    );
-                }
-            });
-    </script>
-<script src="js/collection-redesign.js" type="module"></script>    <script src="js/shared-ui.js"></script>
+<script src="js/pages/collection-page.js?v=1.0"></script>
+<script src="js/collection-redesign.js" type="module"></script>    <script src="js/shared-ui.js?v=1.0.0"></script>
 <script src="js/qol-ui.js?v=92.0.2" defer></script>
 </body>
 </html>

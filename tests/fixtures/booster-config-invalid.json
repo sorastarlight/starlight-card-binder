@@ -1,0 +1,19 @@
+{
+  "cards": [
+    { "id": "duplicate", "rarity": "Common", "pullWeight": 1 },
+    { "id": "duplicate", "rarity": "Mythic", "pullWeight": -1 }
+  ],
+  "boosters": [
+    {
+      "id": "broken-pack",
+      "name": "",
+      "rewardMode": "slots",
+      "cardCount": 0,
+      "isActive": true,
+      "slots": [
+        { "slotKey": "broken", "quantity": 0, "rates": { "Common": 50, "Legendary": 20, "Mythic": 40 } }
+      ]
+    },
+    { "id": "broken-pack", "name": "Duplicate", "rewardMode": "weighted_pool", "cardCount": 1, "isActive": true, "rewardCards": [] }
+  ]
+}

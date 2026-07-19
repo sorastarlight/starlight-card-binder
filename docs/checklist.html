@@ -7,70 +7,11 @@
 <title>
         Checklist | Starlight Card Binder
     </title>
-<link href="css/style.css" rel="stylesheet"/>
+<link href="css/style.css?v=1.0.0" rel="stylesheet"/>
 <link href="css/v80-8-ui.css" rel="stylesheet"/>
-<style>
-        .checklist-star-bits {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 18px;
-
-            margin-top: 18px;
-            padding: 18px 20px;
-
-            border:
-                1px solid
-                rgba(255, 130, 200, 0.34);
-
-            border-radius: 18px;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    rgba(255, 244, 252, 0.96),
-                    rgba(237, 249, 255, 0.96)
-                );
-        }
-
-        .checklist-star-bits h2 {
-            margin: 0 0 5px;
-            color: #405fa1;
-        }
-
-        .checklist-star-bits p {
-            margin: 0;
-            line-height: 1.5;
-        }
-
-        .checklist-star-bits button {
-            min-height: 46px;
-            padding: 11px 18px;
-
-            border:
-                2px solid
-                rgba(255, 130, 200, 0.45);
-
-            border-radius: 999px;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #ffd7ed,
-                    #dff5ff
-                );
-
-            color: #56617d;
-
-            font: inherit;
-            font-weight: 800;
-
-            cursor: pointer;
-        }
-    </style>
+<link rel="stylesheet" href="css/pages/checklist.css?v=1.0">
 <script src="js/firefox-performance.js" defer></script>
-    <link rel="stylesheet" href="css/shared-ui.css">
+    <link rel="stylesheet" href="css/shared-ui.css?v=1.0.0">
 <link rel="stylesheet" href="css/qol-ui.css?v=92.0.2">
 </head>
 <body data-page="checklist"><script src="js/embed-mode.js" type="module"></script>
@@ -260,27 +201,14 @@
 </section>
 </main>
 </div>
-<div aria-live="polite" id="cardOverlay"></div>
+<div aria-hidden="true" aria-live="polite" id="cardOverlay" hidden></div>
 <!--
         Cloud synchronization finishes before app.js starts.
     -->
 <script src="js/cloud-collection.js" type="module"></script>
 <script src="js/site-dashboard.js" type="module"></script>
-<script>
-        document
-            .querySelectorAll("[data-nav]")
-            .forEach(link => {
-                if (
-                    link.dataset.nav ===
-                    document.body.dataset.page
-                ) {
-                    link.classList.add(
-                        "active"
-                    );
-                }
-            });
-    </script>
-    <script src="js/shared-ui.js"></script>
+<script src="js/pages/checklist-page.js?v=1.0"></script>
+    <script src="js/shared-ui.js?v=1.0.0"></script>
 <script src="js/qol-ui.js?v=92.0.2" defer></script>
 </body>
 </html>

@@ -9,15 +9,6 @@ export async function getStarBitsExchangePreview() {
     return { preview: data, error: null };
 }
 
-export async function convertAllDuplicatesToStarBits() {
-    const { data, error } = await supabase.rpc("convert_all_duplicates_to_star_bits");
-    if (error) {
-        console.error("Unable to convert duplicate cards:", error);
-        throw error;
-    }
-    return data;
-}
-
 /**
  * Converts only the duplicate quantities selected by the user.
  * selections must be an array like:

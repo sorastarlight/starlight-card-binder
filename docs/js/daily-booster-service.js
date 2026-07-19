@@ -18,15 +18,6 @@ export async function openDailyBooster() {
     return data;
 }
 
-export async function openStarBitsBooster() {
-    const { data, error } = await supabase.rpc("open_star_bits_booster");
-    if (error) {
-        console.error("Unable to open Star Bits booster:", error);
-        throw error;
-    }
-    return data;
-}
-
 export async function openStarBitsBoosterById(boosterId) {
     const { data, error } = await supabase.rpc("open_star_bits_booster_by_id", { requested_booster_id: boosterId });
     if (error) throw error;
