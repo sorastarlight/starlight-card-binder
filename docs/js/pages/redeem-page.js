@@ -1,8 +1,7 @@
 import { supabase } from '../supabase-client.js';
 import { redeemRewardCode } from '../redemption-service.js';
-import { revealRewardSequence } from '../reward-reveal.js?v=1.0.0';
+import { revealRewardSequence } from '../reward-reveal.js?v=1.0.1';
 const form=document.getElementById('redeem-form'),input=document.getElementById('code'),button=document.getElementById('redeem-button'),status=document.getElementById('status'),box=document.getElementById('reward-box'),title=document.getElementById('reward-title'),description=document.getElementById('reward-description');
 function showStatus(message,type=''){status.textContent=message;status.className=`status ${type}`.trim()}
 const {data}=await supabase.auth.getUser();if(!data.user){showStatus('Please sign in before redeeming a code.','error');button.disabled=true;setTimeout(()=>location.href='login.html',1400)}
 form.addEventListener('submit',async e=>{e.preventDefault();button.disabled=true;button.textContent='Redeeming…';box.classList.add('hidden');showStatus('Checking your code…');try{const result=await redeemRewardCode(input.value);if(!result?.success){showStatus(result?.message||'That code could not be redeemed.','error');return}title.textContent=result.label||'Reward Ready!';description.textContent='Your reward is waiting in Received Gifts, where you can open it when you are ready.';box.classList.remove('hidden');showStatus('Code accepted! Opening Received Gifts…','success');input.value='';setTimeout(()=>{window.parent!==window?window.parent.postMessage({type:'starlight-navigate',view:'rewards'},location.origin):location.href='binder.html?view=rewards'},850)}catch(error){showStatus(error.message||'The code could not be redeemed.','error')}finally{button.disabled=false;button.textContent='Redeem Code'}});
-

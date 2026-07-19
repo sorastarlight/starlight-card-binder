@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 
 import {
   normalizeRevealCard,
@@ -40,4 +41,14 @@ test('normalizes reveal option aliases and supplies the canonical card back', ()
   });
 
   assert.match(normalizeRevealOptions({}).cardBackUrl, /StarlightCard_Back_NewLogo\.png$/);
+});
+
+test('keeps the canonical reward viewer free of timing-dependent animation machinery', async () => {
+  const [script, stylesheet] = await Promise.all([
+    readFile(new URL('../docs/js/reward-reveal.js', import.meta.url), 'utf8'),
+    readFile(new URL('../docs/css/reward-reveal.css', import.meta.url), 'utf8')
+  ]);
+
+  assert.doesNotMatch(script, /\bsetTimeout\b|\bnew Audio\b|\bis-(?:opening|revealing|flipped)\b/);
+  assert.doesNotMatch(stylesheet, /@keyframes|\banimation\s*:|\btransition\s*:/i);
 });
