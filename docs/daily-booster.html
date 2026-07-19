@@ -88,7 +88,7 @@
 <script type="module">
 import { supabase } from "./js/supabase-client.js";
 import { getDailyBoosterStatus, openDailyBooster } from "./js/daily-booster-service.js";
-import { revealRewardSequence } from "./js/reward-reveal.js";
+import { revealRewardSequence } from "./js/reward-reveal.js?v=93.0";
 import { getPublicBoosterConfig } from "./js/booster-config-service.js";
 const packImage=document.getElementById('daily-pack-image'),portal=document.getElementById('portal-zone'),pack=document.getElementById('pack-trigger'),packLabel=document.getElementById('pack-ready-label'),signIn=document.getElementById('sign-in-link'),heading=document.getElementById('daily-status-heading'),description=document.getElementById('daily-status-description'),countdown=document.getElementById('countdown'),rewardSection=document.getElementById('reward-section'),rewardGrid=document.getElementById('reward-grid'),rewardTitle=document.getElementById('reward-title'),statusText=document.getElementById('page-status');
 let timer=null,isBusy=false;
