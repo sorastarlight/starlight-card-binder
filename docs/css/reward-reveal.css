@@ -1,5 +1,5 @@
 /*
- * Approved reveal presentation baseline: v1.5.5.
+ * Approved reveal presentation baseline: v1.5.6.
  * Keep its motion contract intact unless this version and its regression test
  * are intentionally advanced together.
  */
@@ -708,6 +708,10 @@
   pointer-events: none;
 }
 
+.st-r3-card-front.card-finish-holographic {
+  display: block;
+}
+
 .st-r3-energy {
   position: absolute;
   z-index: 3;
@@ -974,6 +978,7 @@
 .st-r3-badge.rarity-rare { color:#bf6414; background:#fff0df; border-color:#ffb15c; }
 .st-r3-badge.rarity-epic { color:#d62e8a; background:#ffe6f4; border-color:#ff9bd3; }
 .st-r3-badge.rarity-legendary { color:#9a6a00; background:linear-gradient(180deg,#fffdf0,#ffe66d); border-color:#ffd21f; box-shadow:0 0 12px rgba(255,210,31,.35); }
+.st-r3-badge.finish-holographic { color:#70458f; background:linear-gradient(120deg,#fff0fa,#eafaff 48%,#fff8ca); border-color:#d8a4f2; box-shadow:0 0 14px rgba(116,213,255,.3); }
 .st-r3-badge.is-new,
 .st-r3-result-status.is-new { color:#fff; background:#176847; border-color:rgba(255,255,255,.36); }
 .st-r3-badge.is-duplicate,
@@ -1091,9 +1096,17 @@
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28), 0 0 22px rgba(255, 230, 138, 0.42);
 }
 
+.st-r3-result-art {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2.5 / 3.5;
+  border-radius: 13px 13px 0 0;
+}
+
 .st-r3-result-image {
   display: block;
   width: 100%;
+  height: 100%;
   aspect-ratio: 2.5 / 3.5;
   object-fit: cover;
   background: #eae8f4;

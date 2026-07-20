@@ -177,7 +177,7 @@ function renderCardLibrary() {
       )
       .map(
         (c) =>
-          `<article class="item card-db-item"><img src="${esc(c.thumbnailUrl || c.imageUrl)}" alt=""><h3>${esc(c.collectorNumber || c.cardNumber)} · ${esc(c.name)}</h3><div class="item-meta"><span><span class="taxonomy-chip">${esc(categoryName(c.categoryId))}</span>${c.subcategoryId?` <span class="subcategory-badge">${esc(subcategoryName(c.subcategoryId))}</span>`:""}</span><span>${esc(c.rarity)}</span></div><p>${esc(data.series.find((s) => s.id === c.seriesId)?.name || c.seriesId)}<br>${esc(variantName(c.variantId))} · ${esc(finishName(c.finishId))}<br>${esc(distributionName(c.distributionType || "booster_pull"))} · ${esc(c.publishStatus || "published")}</p><button class="btn" data-edit-card="${esc(c.id)}">Edit Card</button></article>`,
+          `<article class="item card-db-item"><span class="card-db-art ${window.StarlightUI?.cardFinishClass?.(c) || ''}"><img src="${esc(c.thumbnailUrl || c.imageUrl)}" alt="${esc(c.name)} card artwork"></span><h3>${esc(c.collectorNumber || c.cardNumber)} · ${esc(c.name)}</h3><div class="item-meta"><span><span class="taxonomy-chip">${esc(categoryName(c.categoryId))}</span>${c.subcategoryId?` <span class="subcategory-badge">${esc(subcategoryName(c.subcategoryId))}</span>`:""}</span><span>${esc(c.rarity)}</span></div><p>${esc(data.series.find((s) => s.id === c.seriesId)?.name || c.seriesId)}<br>${esc(variantName(c.variantId))} · ${esc(finishName(c.finishId))}<br>${esc(distributionName(c.distributionType || "booster_pull"))} · ${esc(c.publishStatus || "published")}</p><button class="btn" data-edit-card="${esc(c.id)}">Edit Card</button></article>`,
       )
       .join("") || '<div class="empty">No matching cards.</div>';
 }

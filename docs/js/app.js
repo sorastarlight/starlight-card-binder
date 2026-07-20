@@ -53,6 +53,8 @@ function categoryLabel(card) { return taxonomyLabel(card?.categoryName, card?.ca
 function subcategoryLabel(card) { return taxonomyLabel(card?.subcategoryName, card?.subcategoryId); }
 function variantLabel(card) { return taxonomyLabel(card?.variantName, card?.variantId, 'Standard Art'); }
 function finishLabel(card) { return taxonomyLabel(card?.finishName, card?.finishId, 'Standard'); }
+function cardFinishClass(card, visible = true) { return window.StarlightUI?.cardFinishClass?.(card, visible) || ''; }
+function isHolographicCard(card) { return window.StarlightUI?.isHolographicCard?.(card) === true; }
 function distributionLabel(card) {
   const labels = {
     booster_pull: 'Booster Pull', redeem_code: 'Redeem Code', twitch_reward: 'Twitch Reward',
@@ -536,9 +538,9 @@ function renderDetail() {
     <button class="btn primary" id="flipPreview" type="button">↻ Flip</button>
     <button class="btn" id="openFullView" type="button">⛶ Full View</button>
   </div>
-  <button class="preview-card flip-card simple-flip ${previewFlipped ? 'show-back showing-card-back' : ''} ${rarityClass(selected)}" id="previewCard" type="button" aria-label="Open full card view">
+  <button class="preview-card flip-card simple-flip ${previewFlipped ? 'show-back showing-card-back' : ''} ${rarityClass(selected)}" id="previewCard" type="button" aria-label="Open full card view" data-holographic="${got && isHolographicCard(selected)}">
     <span class="preview-inner">
-      <span class="face front"><img class="${hidden && !previewFlipped?'obscured':''}" src="${esc(previewFlipped ? CARD_BACK_URL : getVisibleImage(selected))}" alt="${esc(previewFlipped ? 'Card back' : getVisibleName(selected))}" onerror="this.src='${CARD_BACK_URL}'"></span>
+      <span class="face front ${cardFinishClass(selected, got && !previewFlipped)}"><img class="${hidden && !previewFlipped?'obscured':''}" src="${esc(previewFlipped ? CARD_BACK_URL : getVisibleImage(selected))}" alt="${esc(previewFlipped ? 'Card back' : getVisibleName(selected))}" onerror="this.src='${CARD_BACK_URL}'"></span>
       <span class="face back"><img src="${CARD_BACK_URL}" alt="Card back"></span>
     </span>
   </button>
@@ -639,9 +641,9 @@ function renderFullView() {
       <div class="analyzer-actions"><button class="overlay-flip analyzer-flip" type="button">↻ Flip</button></div>
       <div class="analyzer-card-zone">
         <div class="analyzer-reticle" aria-hidden="true"></div>
-        <div class="full-card-wrap flip-card simple-flip ${overlayFlipped?'show-back showing-card-back':''} ${rarityClass(selected)}" id="fullCard3d" aria-label="${esc(overlayFlipped ? 'Card back' : visibleName)}">
+        <div class="full-card-wrap flip-card simple-flip ${overlayFlipped?'show-back showing-card-back':''} ${rarityClass(selected)}" id="fullCard3d" aria-label="${esc(overlayFlipped ? 'Card back' : visibleName)}" data-holographic="${got && isHolographicCard(selected)}">
           <span class="full-inner">
-            <span class="face front"><img class="${hidden && !overlayFlipped?'obscured':''}" src="${esc(overlayFlipped ? CARD_BACK_URL : getVisibleImage(selected))}" alt="${esc(overlayFlipped ? 'Card back' : visibleName)}" onerror="this.src='${CARD_BACK_URL}'"></span>
+            <span class="face front ${cardFinishClass(selected, got && !overlayFlipped)}"><img class="${hidden && !overlayFlipped?'obscured':''}" src="${esc(overlayFlipped ? CARD_BACK_URL : getVisibleImage(selected))}" alt="${esc(overlayFlipped ? 'Card back' : visibleName)}" onerror="this.src='${CARD_BACK_URL}'"></span>
             <span class="face back"><img src="${CARD_BACK_URL}" alt="Card back"></span>
           </span>
         </div>
@@ -679,7 +681,7 @@ function renderGridPage(target, mode) {
   wrap.innerHTML = list.length ? list.map(c => {
     const got = isCollected(c.id); const hidden = !got;
     const quantity = getCardQuantity(c.id);
-    return `<article class="collection-card ${rarityClass(c)}"><div class="collection-image"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"></div><h3>${esc(getVisibleName(c))}</h3><p class="collection-card-number">${esc(c.collectorNumber || c.number)} • ${esc(c.series)}</p><div class="card-meta-chips compact">${cardIdentityChips(c,{hidden})}</div>${mode === 'duplicates' ? `<p class="duplicate-copy-summary"><strong>${quantity}</strong> total copies · <strong>${quantity - 1}</strong> exchangeable</p>` : ''}<div class="card-buttons"><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${quantity}` : 'Not Collected'}</span>${got ? `<button class="icon-btn" onclick="toggleFavorite('${esc(c.id)}')" aria-label="${isFavorite(c.id) ? 'Remove from favorites' : 'Add to favorites'}">${isFavorite(c.id)?'★':'☆'}</button>` : ''}</div></article>`;
+    return `<article class="collection-card ${rarityClass(c)}"><div class="collection-image ${cardFinishClass(c, got)}"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"></div><h3>${esc(getVisibleName(c))}</h3><p class="collection-card-number">${esc(c.collectorNumber || c.number)} • ${esc(c.series)}</p><div class="card-meta-chips compact">${cardIdentityChips(c,{hidden})}</div>${mode === 'duplicates' ? `<p class="duplicate-copy-summary"><strong>${quantity}</strong> total copies · <strong>${quantity - 1}</strong> exchangeable</p>` : ''}<div class="card-buttons"><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${quantity}` : 'Not Collected'}</span>${got ? `<button class="icon-btn" onclick="toggleFavorite('${esc(c.id)}')" aria-label="${isFavorite(c.id) ? 'Remove from favorites' : 'Add to favorites'}">${isFavorite(c.id)?'★':'☆'}</button>` : ''}</div></article>`;
   }).join('') : `<div class="empty-state"><h2>${baseList.length ? 'No cards match these filters' : (mode === 'favorites' ? 'No favorites yet' : 'No cards here yet')}</h2><p>${baseList.length ? 'Try resetting one or more filters to see additional cards.' : (mode === 'favorites' ? 'Tap the star on your favorite cards and this showcase will sparkle to life.' : 'Earn cards from Daily Boosters, redemption codes, and special rewards to fill this collection.')}</p>${baseList.length ? '<button class="btn primary" type="button" data-reset-card-filters>Reset Filters</button>' : '<a class="btn primary" href="binder.html">Open Binder</a>'}</div>`;
   attachTileTilts();
   attachBinderHoverSfx();
@@ -690,7 +692,7 @@ function renderFavoritesShowcase() {
   const allFavorites = cards.filter(c => isFavorite(c.id));
   const favs = filterCardList(allFavorites, activeFilters(), { respectOwnership: false });
   if (!favs.length) { showcase.innerHTML = `<div class="empty-state trophy-empty"><h2>${allFavorites.length ? 'No favorites match these filters' : 'Favorite Showcase'}</h2><p>${allFavorites.length ? 'Reset the filters to bring the rest of your favorite cards back into view.' : 'Star a card to put it on the Starlight stage. Your favorites will scroll here like a tiny idol parade.'}</p>${allFavorites.length ? '<button class="btn primary" type="button" data-reset-card-filters>Reset Filters</button>' : '<a class="btn primary" href="binder.html">Find Favorites</a>'}</div>`; return; }
-  showcase.innerHTML = `<div class="favorite-carousel-head"><h2>Favorite Showcase 💖</h2><p>${favs.length} favorite card${favs.length===1?'':'s'} saved to this collection.</p></div><div class="favorite-carousel">${favs.map((c,i)=>{ const hidden = !isCollected(c.id); return `<button class="fav-spot ${rarityClass(c)}" style="--i:${i}" onclick="selected=cards.find(x=>x.id==='${esc(c.id)}');selectedIndex=cards.findIndex(x=>x.id==='${esc(c.id)}');openFullView('favorites')"><span class="fav-image"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}"></span><span>${esc(getVisibleName(c))}</span></button>`}).join('')}</div>`;
+  showcase.innerHTML = `<div class="favorite-carousel-head"><h2>Favorite Showcase 💖</h2><p>${favs.length} favorite card${favs.length===1?'':'s'} saved to this collection.</p></div><div class="favorite-carousel">${favs.map((c,i)=>{ const got = isCollected(c.id); const hidden = !got; return `<button class="fav-spot ${rarityClass(c)}" style="--i:${i}" onclick="selected=cards.find(x=>x.id==='${esc(c.id)}');selectedIndex=cards.findIndex(x=>x.id==='${esc(c.id)}');openFullView('favorites')"><span class="fav-image ${cardFinishClass(c, got)}"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}"></span><span>${esc(getVisibleName(c))}</span></button>`}).join('')}</div>`;
   attachTileTilts();
   attachBinderHoverSfx();
 }
@@ -830,6 +832,7 @@ function flipCardImage(cardEl, frontUrl, frontAlt, showBack) {
   // V79.6: one visible surface + mid-spin image swap.
   // This keeps the official back artwork readable instead of mirrored/reversed during the flip.
   const frontImg = cardEl.querySelector('.face.front img');
+  const frontFace = cardEl.querySelector('.face.front');
   cardEl.classList.remove('flip-turning', 'flipped', 'show-back', 'showing-card-back');
   void cardEl.offsetWidth;
   cardEl.classList.add('flip-turning');
@@ -843,6 +846,7 @@ function flipCardImage(cardEl, frontUrl, frontAlt, showBack) {
     }
     cardEl.classList.toggle('show-back', !!showBack);
     cardEl.classList.toggle('showing-card-back', !!showBack);
+    frontFace?.classList.toggle('card-finish-holographic', !showBack && cardEl.dataset.holographic === 'true');
   }, 280);
 
   window.setTimeout(() => cardEl.classList.remove('flip-turning'), 640);
@@ -921,7 +925,7 @@ function renderV61Card(card, i) {
   const img = getVisibleImage(card);
   return `<article class="v61-card-slot ${rarityClass(card)} ${got ? 'is-collected' : 'is-hidden'}" style="--i:${i}">
     <button class="v61-card-btn" type="button" data-v61-card="${esc(card.id)}" aria-label="View ${esc(getVisibleName(card))}">
-      <img class="${hidden?'obscured':''}" src="${esc(img)}" alt="${esc(getVisibleName(card))}" loading="lazy" onerror="this.src='${CARD_BACK_URL}'">
+      <span class="v61-card-art ${cardFinishClass(card, got)}"><img class="${hidden?'obscured':''}" src="${esc(img)}" alt="${esc(getVisibleName(card))}" loading="lazy" onerror="this.src='${CARD_BACK_URL}'"></span>
       <span class="badge">${esc(card.number)}</span>
     </button>
     <span class="v61-ownership ${got ? 'owned' : 'locked'}">
@@ -962,9 +966,9 @@ function renderV62Showcase(inSeriesSelect = false) {
       <button class="btn primary" id="v62Flip" type="button">↻ Flip</button>
       <button class="btn" id="v62Full" type="button">⛶ Full View</button>
     </div>
-    <button class="v62-preview-card flip-card simple-flip ${previewFlipped ? 'show-back showing-card-back' : ''}" id="v62PreviewCard" type="button" aria-label="Open full view for ${esc(visibleName)}">
+    <button class="v62-preview-card flip-card simple-flip ${previewFlipped ? 'show-back showing-card-back' : ''}" id="v62PreviewCard" type="button" aria-label="Open full view for ${esc(visibleName)}" data-holographic="${got && isHolographicCard(card)}">
       <span class="preview-inner">
-        <span class="face front"><img class="${hidden && !previewFlipped?'obscured':''}" src="${esc(previewFlipped ? CARD_BACK_URL : visibleImage)}" alt="${esc(previewFlipped ? 'Card back' : visibleName)}" onerror="this.src='${CARD_BACK_URL}'"></span>
+        <span class="face front ${cardFinishClass(card, got && !previewFlipped)}"><img class="${hidden && !previewFlipped?'obscured':''}" src="${esc(previewFlipped ? CARD_BACK_URL : visibleImage)}" alt="${esc(previewFlipped ? 'Card back' : visibleName)}" onerror="this.src='${CARD_BACK_URL}'"></span>
         <span class="face back"><img src="${CARD_BACK_URL}" alt="Starlight card back"></span>
       </span>
     </button>

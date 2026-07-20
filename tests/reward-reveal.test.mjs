@@ -42,6 +42,8 @@ test('normalizes snake_case reward cards into the canonical reveal shape', () =>
     rarity_name: 'LEGENDARY',
     category_name: 'event_cards',
     subcategory_id: 'summer-2026',
+    finish_id: 'holographic',
+    finish_name: 'Holographic',
     is_duplicate: 1
   });
 
@@ -51,6 +53,8 @@ test('normalizes snake_case reward cards into the canonical reveal shape', () =>
   assert.equal(card.rarity, 'legendary');
   assert.equal(card.categoryName, 'Event Cards');
   assert.equal(card.subcategoryName, 'Summer 2026');
+  assert.equal(card.finishId, 'holographic');
+  assert.equal(card.finishName, 'Holographic');
   assert.equal(card.isDuplicate, true);
 });
 
@@ -145,8 +149,8 @@ test('locks the approved reveal presentation and motion baseline', async () => {
   const stylesheet = await readFile(new URL('../docs/css/reward-reveal.css', import.meta.url), 'utf8');
   const contractHash = createHash('sha256').update(normalizeMotionContract(stylesheet)).digest('hex');
 
-  assert.equal(REVEAL_PRESENTATION_VERSION, '1.5.5');
-  assert.match(stylesheet, /Approved reveal presentation baseline: v1\.5\.5/);
+  assert.equal(REVEAL_PRESENTATION_VERSION, '1.5.6');
+  assert.match(stylesheet, /Approved reveal presentation baseline: v1\.5\.6/);
   assert.equal(contractHash, '15a418208b0fe1d208ab050955c7254722d2e80a884d84a92ac57ef2af6c8377');
 });
 
@@ -212,7 +216,7 @@ test('keeps every production reward entry point on the canonical reveal engine',
   ].map(file => readFile(new URL(`../docs/js/pages/${file}`, import.meta.url), 'utf8')));
 
   consumers.forEach(source => {
-    assert.match(source, /reward-reveal\.js\?v=1\.5\.5/);
+    assert.match(source, /reward-reveal\.js\?v=1\.5\.6/);
     assert.match(source, /revealRewardSequence\s*\(/);
     assert.doesNotMatch(source, /@keyframes|stR3CardSpin|stR3PackTop/);
   });

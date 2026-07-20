@@ -22,6 +22,22 @@
 .pill,.badge,.st-badge{border-radius:var(--st-radius-pill)}
 input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
 .collection-card,.link-card,.st-card{border-radius:var(--st-radius-md)}
+/* Finish effects are applied to artwork surfaces by the shared card-finish API. */
+.card-finish-holographic{--st-holo-radius:6.5% / 4.7%;position:relative;display:block;overflow:hidden;border-radius:var(--st-holo-radius);isolation:isolate}
+.card-finish-holographic>img{z-index:0}
+.face.card-finish-holographic,.st-r3-card-front.card-finish-holographic{position:absolute}
+.v61-card-art{position:absolute;inset:0;display:block;border-radius:10px}
+.reward-card-art{display:block;width:100%;border-radius:12px}
+.reward-card-art>img{display:block;width:100%;height:auto;border-radius:inherit}
+.card-db-art{display:block;width:100%;border-radius:14px}
+.card-db-art>img{display:block;width:100%;height:auto;border-radius:inherit}
+.card-finish-holographic::before,.card-finish-holographic::after{content:"";position:absolute;z-index:2;inset:-22%;border-radius:inherit;pointer-events:none}
+.card-finish-holographic::before{background:repeating-linear-gradient(112deg,rgba(255,76,174,.12) 0 7%,rgba(255,222,92,.4) 11%,rgba(112,255,211,.32) 17%,rgba(91,188,255,.38) 23%,rgba(188,112,255,.32) 29%,rgba(255,76,174,.12) 36%),radial-gradient(circle at var(--st-holo-x,25%) var(--st-holo-y,20%),rgba(255,255,255,.92) 0 3%,rgba(255,242,157,.55) 7%,transparent 21%);background-size:220% 220%,100% 100%;background-position:0 45%,center;mix-blend-mode:color-dodge;opacity:.58;filter:saturate(1.45) contrast(1.08);transform:rotate(-7deg) scale(1.12);animation:stHoloRainbow 5.8s ease-in-out infinite alternate}
+.card-finish-holographic::after{inset:-35%;background:linear-gradient(118deg,transparent 31%,rgba(255,255,255,.08) 40%,rgba(255,255,255,.92) 48%,rgba(170,236,255,.38) 54%,transparent 64%);mix-blend-mode:screen;opacity:.72;transform:translate3d(-38%,-12%,0) rotate(4deg);animation:stHoloGlint 4.7s cubic-bezier(.45,.05,.35,1) infinite}
+.card-finish-holographic:is(:hover,:focus-visible)::before,:is(:hover,:focus-visible)>.card-finish-holographic::before{opacity:.82;animation-duration:2.4s}
+.card-finish-holographic:is(:hover,:focus-visible)::after,:is(:hover,:focus-visible)>.card-finish-holographic::after{animation-duration:2.1s}
+@keyframes stHoloRainbow{0%{background-position:0 35%,center;transform:rotate(-8deg) scale(1.12);opacity:.46}52%{background-position:95% 60%,center;opacity:.7}100%{background-position:180% 38%,center;transform:rotate(7deg) scale(1.16);opacity:.54}}
+@keyframes stHoloGlint{0%,18%{transform:translate3d(-45%,-16%,0) rotate(4deg);opacity:.12}48%{opacity:.82}72%,100%{transform:translate3d(42%,14%,0) rotate(4deg);opacity:.14}}
 .st-toast-region{position:fixed;right:18px;bottom:18px;z-index:30000;display:grid;gap:10px;width:min(380px,calc(100vw - 28px));pointer-events:none}
 .st-toast{pointer-events:auto;padding:13px 16px;border:1px solid rgba(107,198,248,.48);border-radius:16px;background:rgba(255,255,255,.97);box-shadow:0 15px 38px rgba(45,62,105,.22);color:var(--st-ui-ink);font-weight:800;line-height:1.45;animation:stToastIn .22s ease-out}
 .st-toast.success{border-color:rgba(70,176,127,.5)}.st-toast.error{border-color:rgba(180,35,63,.5);color:var(--st-ui-danger)}.st-toast.info{border-color:rgba(255,130,200,.5)}
@@ -34,4 +50,4 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
 .st-view-state{display:grid;place-items:center;min-height:220px;padding:28px;text-align:center;color:var(--st-ui-muted)}.st-view-state strong{display:block;color:#405fa1;font-size:1.25rem;margin-bottom:7px}.st-view-state button{margin-top:15px;padding:10px 18px;border:0;border-radius:999px;background:linear-gradient(135deg,var(--st-ui-blue),var(--st-ui-pink));color:#fff;font-weight:900;cursor:pointer}.st-spinner{width:38px;height:38px;margin:0 auto 14px;border:4px solid rgba(107,198,248,.2);border-top-color:var(--st-ui-pink);border-radius:50%;animation:stSpin .8s linear infinite}@keyframes stSpin{to{transform:rotate(360deg)}}
 :focus-visible{outline:3px solid rgba(255,130,200,.75)!important;outline-offset:3px!important}
 .status:empty,.page-status:empty,[role="status"]:empty{display:none!important}
-@media(prefers-reduced-motion:reduce){.st-toast,.st-spinner{animation:none!important}.st-dialog-overlay{backdrop-filter:none}.st-dialog-overlay,.st-dialog,.st-button{transition:none!important}}
+@media(prefers-reduced-motion:reduce){.st-toast,.st-spinner,.card-finish-holographic::before,.card-finish-holographic::after{animation:none!important}.card-finish-holographic::before{background-position:42% 50%,center;opacity:.48}.card-finish-holographic::after{transform:translate3d(8%,0,0) rotate(4deg);opacity:.32}.st-dialog-overlay{backdrop-filter:none}.st-dialog-overlay,.st-dialog,.st-button{transition:none!important}}

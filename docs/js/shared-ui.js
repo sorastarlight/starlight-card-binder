@@ -46,6 +46,22 @@ function toast(message, type = 'info', timeout = 3200) {
   return element;
 }
 
+function isHolographicCard(card = {}) {
+  const finish = [
+    card.finishId,
+    card.finish_id,
+    card.finishName,
+    card.finish_name,
+    card.finish?.id,
+    card.finish?.name
+  ].filter(Boolean).join(' ').toLowerCase();
+  return /\bholo(?:graphic|foil)?\b/.test(finish);
+}
+
+function cardFinishClass(card, visible = true) {
+  return visible && isHolographicCard(card) ? 'card-finish-holographic' : '';
+}
+
 function focusableElements(root) {
   return [...root.querySelectorAll([
     'a[href]',
@@ -309,6 +325,8 @@ window.StarlightUI = {
   alert: alertDialog,
   createModal,
   adoptModal,
+  isHolographicCard,
+  cardFinishClass,
   stateMarkup,
   escapeHtml,
   cleanupLegacyStorage

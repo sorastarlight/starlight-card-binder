@@ -49,8 +49,14 @@ export function normalizeRevealCard(card = {}) {
     imageUrl: frontUrl(card),
     categoryName: categoryOf(card),
     subcategoryName: subcategoryOf(card),
+    finishId: card.finishId ?? card.finish_id ?? card.finish?.id ?? '',
+    finishName: card.finishName ?? card.finish_name ?? card.finish?.name ?? '',
     isDuplicate: Boolean(card.isDuplicate ?? card.is_duplicate ?? card.duplicate)
   };
+}
+
+function cardFinishClass(card) {
+  return window.StarlightUI?.cardFinishClass?.(card) || '';
 }
 
 export function normalizeRevealOptions(options = {}) {
@@ -156,7 +162,7 @@ function acquireRevealViewportLock(doc) {
   };
 }
 
-export const REVEAL_PRESENTATION_VERSION = '1.5.5';
+export const REVEAL_PRESENTATION_VERSION = '1.5.6';
 
 const REVEAL_STYLESHEET_ID = `starlight-reveal-v${REVEAL_PRESENTATION_VERSION.replace(/\./g, '')}`;
 const REVEAL_STYLESHEET_URL = new URL(
@@ -554,6 +560,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
           'st-r3-result-image',
           { loading: 'lazy' }
         );
+        const art = createElement(doc, 'span', `st-r3-result-art ${cardFinishClass(card)}`);
         const copy = createElement(doc, 'div', 'st-r3-result-copy');
         const name = createElement(doc, 'h4', '', card.name);
         const detail = createElement(doc, 'p', '', cardDescription(card) || 'Starlight Card');
@@ -565,9 +572,13 @@ export async function revealRewardSequence(cards = [], options = {}) {
           `st-r3-result-status ${card.isDuplicate ? 'is-duplicate' : 'is-new'}`,
           card.isDuplicate ? 'Duplicate' : 'New'
         );
-        badges.append(rarity, status);
+        const finish = cardFinishClass(card)
+          ? createElement(doc, 'span', 'st-r3-badge finish-holographic', 'Holographic')
+          : null;
+        badges.append(rarity, ...(finish ? [finish] : []), status);
         copy.append(name, detail, badges);
-        item.append(image, copy);
+        art.append(image);
+        item.append(art, copy);
         fragment.append(item);
       });
       resultsGrid.append(fragment);
@@ -584,6 +595,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
         { defer: true }
       );
       cardFront.replaceChildren(currentFrontImage);
+      cardFront.className = `st-r3-card-face st-r3-card-front ${cardFinishClass(card)}`.trim();
       actor.className = `st-r3-card-actor rarity-${card.rarity}`;
       actor.setAttribute('aria-label', `Reveal ${card.name}`);
       revealScene.dataset.rarity = card.rarity;
@@ -672,6 +684,9 @@ export async function revealRewardSequence(cards = [], options = {}) {
       cardMeta.textContent = cardDescription(card) || 'Starlight Card';
       cardBadges.replaceChildren(
         createElement(doc, 'span', `st-r3-badge rarity-${card.rarity}`, prettyMeta(card.rarity)),
+        ...(cardFinishClass(card)
+          ? [createElement(doc, 'span', 'st-r3-badge finish-holographic', 'Holographic')]
+          : []),
         createElement(
           doc,
           'span',
