@@ -5,11 +5,12 @@ const SFX_SETTING_KEY = 'sora-starlight-card-binder-v7-sfx';
 
 const REVEAL_SFX = Object.freeze({
   pack: new URL('../site_assets/sfx/booster-open.wav', import.meta.url).href,
-  common: new URL('../site_assets/sfx/card-flip.wav', import.meta.url).href,
-  uncommon: new URL('../site_assets/sfx/cosmic-charge.wav', import.meta.url).href,
-  rare: new URL('../site_assets/sfx/starlight-reveal.wav', import.meta.url).href,
-  epic: new URL('../site_assets/sfx/sparkle-chime.wav', import.meta.url).href,
-  legendary: new URL('../site_assets/sfx/legendary-reveal.wav', import.meta.url).href,
+  common: new URL('../site_assets/sfx/Reveal_Common_01.wav', import.meta.url).href,
+  uncommon: new URL('../site_assets/sfx/Reveal_Uncommon_01.wav', import.meta.url).href,
+  rare: new URL('../site_assets/sfx/Reveal_Rare_01.wav', import.meta.url).href,
+  epic: new URL('../site_assets/sfx/Reveal_Epic_01.wav', import.meta.url).href,
+  legendary: new URL('../site_assets/sfx/Reveal_Legendary_01.wav', import.meta.url).href,
+  results: new URL('../site_assets/sfx/Reveal_Results_01.wav', import.meta.url).href,
   return: new URL('../site_assets/sfx/page-turn.wav', import.meta.url).href
 });
 
@@ -99,14 +100,14 @@ function getHost() {
   return { win: window, doc: document };
 }
 
-const REVEAL_STYLESHEET_URL = new URL('../css/reward-reveal.css?v=1.4.0', import.meta.url).href;
+const REVEAL_STYLESHEET_URL = new URL('../css/reward-reveal.css?v=1.5.0', import.meta.url).href;
 const stylesheetLoads = new WeakMap();
 const imagePreparations = new WeakMap();
 
 function installStyles(doc) {
   if (stylesheetLoads.has(doc)) return stylesheetLoads.get(doc);
 
-  const existing = doc.getElementById('starlight-reveal-v130');
+  const existing = doc.getElementById('starlight-reveal-v150');
   if (existing?.sheet) return Promise.resolve();
 
   const link = existing || doc.createElement('link');
@@ -115,7 +116,7 @@ function installStyles(doc) {
     link.addEventListener('error', resolve, { once: true });
   });
   if (!existing) {
-    link.id = 'starlight-reveal-v130';
+    link.id = 'starlight-reveal-v150';
     link.rel = 'stylesheet';
     link.href = REVEAL_STYLESHEET_URL;
     doc.head.append(link);
@@ -269,7 +270,7 @@ function playRevealSound(win, name, activeAudio) {
   try {
     const audio = new win.Audio(source);
     audio.preload = 'auto';
-    audio.volume = name === 'legendary' ? .55 : name === 'pack' ? .46 : .38;
+    audio.volume = name === 'legendary' ? .55 : name === 'results' ? .5 : name === 'pack' ? .46 : .38;
     activeAudio.add(audio);
     audio.addEventListener('ended', () => activeAudio.delete(audio), { once: true });
     audio.play().catch(() => activeAudio.delete(audio));
@@ -558,6 +559,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
       revealScene.hidden = true;
       resultsScene.hidden = false;
       setPhase('results');
+      playRevealSound(win, 'results', activeAudio);
       liveStatus.textContent = `Reveal complete. ${resultsSummary.textContent}`;
       focusControl(doneButton);
     };
@@ -614,7 +616,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
       if (phase !== 'revealed') return;
       setPhase('returning');
       actor.disabled = true;
-      playRevealSound(win, 'return', activeAudio);
+      if (index + 1 < rewards.length) playRevealSound(win, 'return', activeAudio);
       revealScene.hidden = true;
       revealScene.classList.remove('is-revealed');
       index += 1;
