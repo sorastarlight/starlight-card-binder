@@ -6,6 +6,7 @@ import {
   createRevealStackLayout,
   normalizeRevealCard,
   normalizeRevealOptions,
+  revealSfxForRarity,
   summarizeRevealCards
 } from '../docs/js/reward-reveal.js';
 
@@ -63,21 +64,33 @@ test('summarizes new and duplicate cards for the result screen', () => {
   ]), { total: 3, newCards: 2, duplicates: 1 });
 });
 
-test('uses deliberate motion states with a reduced-motion fallback', async () => {
+test('maps each reveal rarity to its dedicated sound tier', () => {
+  assert.equal(revealSfxForRarity('LEGENDARY'), 'legendary');
+  assert.equal(revealSfxForRarity('epic'), 'epic');
+  assert.equal(revealSfxForRarity('not-a-rarity'), 'common');
+});
+
+test('uses one deliberate pack, pile, and card motion system with reduced-motion support', async () => {
   const [script, stylesheet] = await Promise.all([
     readFile(new URL('../docs/js/reward-reveal.js', import.meta.url), 'utf8'),
     readFile(new URL('../docs/css/reward-reveal.css', import.meta.url), 'utf8')
   ]);
 
-  assert.doesNotMatch(script, /\bsetTimeout\b|\bnew Audio\b|\bsr931\b/);
-  assert.match(stylesheet, /@keyframes stRevealPackOpen/);
-  assert.match(stylesheet, /@keyframes stRevealCardLift/);
-  assert.match(stylesheet, /@keyframes stRevealCardFlip/);
-  assert.match(stylesheet, /@keyframes stRevealResultIn/);
+  assert.doesNotMatch(script, /\bsetTimeout\b|\bsr931\b/);
+  assert.match(script, /new win\.Audio\(source\)/);
+  assert.match(script, /booster-open\.wav/);
+  assert.match(script, /legendary-reveal\.wav/);
+  assert.match(script, /sora-starlight-card-binder-v7-sfx/);
+  assert.match(stylesheet, /@keyframes stR3PackTop/);
+  assert.match(stylesheet, /@keyframes stR3PackBottom/);
+  assert.match(stylesheet, /@keyframes stR3CardRise/);
+  assert.match(stylesheet, /@keyframes stR3CardSpin/);
+  assert.match(stylesheet, /@keyframes stR3LegendaryRise/);
+  assert.match(stylesheet, /@keyframes stR3LegendarySpin/);
   assert.match(stylesheet, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
-test('keeps the reveal path lightweight and progressively loads card artwork', async () => {
+test('keeps the fixed-center reveal lightweight and progressively loads artwork', async () => {
   const [script, stylesheet] = await Promise.all([
     readFile(new URL('../docs/js/reward-reveal.js', import.meta.url), 'utf8'),
     readFile(new URL('../docs/css/reward-reveal.css', import.meta.url), 'utf8')
@@ -85,11 +98,39 @@ test('keeps the reveal path lightweight and progressively loads card artwork', a
 
   assert.match(script, /\{ defer: true \}/);
   assert.match(script, /createDocumentFragment\(\)/);
-  assert.match(script, /startImageLoad\(stackCards\[index \+ 1\]\.frontImage\)/);
+  assert.match(script, /prepareCurrentCard\(\)/);
+  assert.match(script, /const visibleLayers = Math\.min\(remaining, MAX_PILE_LAYERS\)/);
+  assert.match(script, /setPhase\('returning'\)/);
   assert.match(script, /computedMotionDuration\(element, win\)/);
   assert.match(script, /waitForFrames\(win, computedMotionDuration/);
+  assert.match(stylesheet, /\.st-r3-overlay[\s\S]*position: fixed !important;/);
+  assert.match(stylesheet, /\.st-r3-card-actor[\s\S]*top: 50%;[\s\S]*left: 50%;/);
+  assert.match(stylesheet, /\.st-r3-pile-button[\s\S]*top: 50%;[\s\S]*left: 50%;/);
   assert.doesNotMatch(stylesheet, /backdrop-filter\s*:/);
-  assert.doesNotMatch(stylesheet, /stRevealBackdropDrift|drop-shadow\(/);
+  assert.doesNotMatch(stylesheet, /stReveal|st-r3-backdrop-image|filter:\s*blur|drop-shadow\(/);
   assert.match(stylesheet, /will-change: transform, opacity/);
-  assert.match(stylesheet, /contain: layout paint style/);
+  assert.match(stylesheet, /\/\* Pile: static between clicks/);
+});
+
+test('keeps every production reward entry point on the canonical reveal engine', async () => {
+  const consumers = await Promise.all([
+    'daily-booster-page.js',
+    'booster-shop-page.js',
+    'received-rewards-page.js',
+    'redeem-page.js'
+  ].map(file => readFile(new URL(`../docs/js/pages/${file}`, import.meta.url), 'utf8')));
+
+  consumers.forEach(source => {
+    assert.match(source, /reward-reveal\.js\?v=1\.3\.1/);
+    assert.match(source, /revealRewardSequence\s*\(/);
+    assert.doesNotMatch(source, /@keyframes|stR3CardSpin|stR3PackTop/);
+  });
+});
+
+test('restores focus to the control that launched an embedded reveal', async () => {
+  const script = await readFile(new URL('../docs/js/reward-reveal.js', import.meta.url), 'utf8');
+
+  assert.match(script, /const returnFocus = sourceDocument\.activeElement/);
+  assert.match(script, /returnFocus\?\.isConnected/);
+  assert.match(script, /restoreFocus: false/);
 });

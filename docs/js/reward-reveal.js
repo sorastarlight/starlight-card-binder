@@ -1,6 +1,17 @@
 const DEFAULT_BACK = 'site_assets/StarlightCard_Back_NewLogo.png';
 const ALLOWED_RARITIES = new Set(['common', 'uncommon', 'rare', 'epic', 'legendary']);
-const MAX_VISUAL_STACK_DEPTH = 8;
+const MAX_PILE_LAYERS = 8;
+const SFX_SETTING_KEY = 'sora-starlight-card-binder-v7-sfx';
+
+const REVEAL_SFX = Object.freeze({
+  pack: new URL('../site_assets/sfx/booster-open.wav', import.meta.url).href,
+  common: new URL('../site_assets/sfx/card-flip.wav', import.meta.url).href,
+  uncommon: new URL('../site_assets/sfx/cosmic-charge.wav', import.meta.url).href,
+  rare: new URL('../site_assets/sfx/starlight-reveal.wav', import.meta.url).href,
+  epic: new URL('../site_assets/sfx/sparkle-chime.wav', import.meta.url).href,
+  legendary: new URL('../site_assets/sfx/legendary-reveal.wav', import.meta.url).href,
+  return: new URL('../site_assets/sfx/page-turn.wav', import.meta.url).href
+});
 
 const prettyMeta = value => String(value || '')
   .trim()
@@ -52,7 +63,7 @@ export function normalizeRevealOptions(options = {}) {
 export function createRevealStackLayout(cardCount) {
   const count = Math.max(0, Math.floor(Number(cardCount) || 0));
   return Array.from({ length: count }, (_, index) => {
-    const depth = Math.min(index, MAX_VISUAL_STACK_DEPTH - 1);
+    const depth = Math.min(index, MAX_PILE_LAYERS - 1);
     return {
       depth,
       x: depth === 0 ? 0 : depth * -3,
@@ -73,6 +84,10 @@ export function summarizeRevealCards(cards = []) {
   };
 }
 
+export function revealSfxForRarity(rarity) {
+  return rarityKey(rarity);
+}
+
 function getHost() {
   try {
     if (window.top && window.top !== window && window.top.location.origin === window.location.origin) {
@@ -84,14 +99,14 @@ function getHost() {
   return { win: window, doc: document };
 }
 
-const REVEAL_STYLESHEET_URL = new URL('../css/reward-reveal.css?v=1.2.0', import.meta.url).href;
+const REVEAL_STYLESHEET_URL = new URL('../css/reward-reveal.css?v=1.3.0', import.meta.url).href;
 const stylesheetLoads = new WeakMap();
 const imagePreparations = new WeakMap();
 
 function installStyles(doc) {
   if (stylesheetLoads.has(doc)) return stylesheetLoads.get(doc);
 
-  const existing = doc.getElementById('starlight-reveal-v120');
+  const existing = doc.getElementById('starlight-reveal-v130');
   if (existing?.sheet) return Promise.resolve();
 
   const link = existing || doc.createElement('link');
@@ -100,7 +115,7 @@ function installStyles(doc) {
     link.addEventListener('error', resolve, { once: true });
   });
   if (!existing) {
-    link.id = 'starlight-reveal-v120';
+    link.id = 'starlight-reveal-v130';
     link.rel = 'stylesheet';
     link.href = REVEAL_STYLESHEET_URL;
     doc.head.append(link);
@@ -121,7 +136,7 @@ function createImage(
   source,
   alt,
   fallback = DEFAULT_BACK,
-  className = 'st-reveal-image',
+  className = 'st-r3-image',
   { defer = false, loading = 'eager' } = {}
 ) {
   const image = createElement(doc, 'img', className);
@@ -136,6 +151,29 @@ function createImage(
     image.src = fallback;
   });
   return image;
+}
+
+function startImageLoad(image) {
+  if (!image.hasAttribute('src') && image.dataset.source) {
+    image.src = image.dataset.source;
+    delete image.dataset.source;
+  }
+}
+
+function prepareImage(image) {
+  if (imagePreparations.has(image)) return imagePreparations.get(image);
+  startImageLoad(image);
+  const preparation = (async () => {
+    if (!image.complete) {
+      await new Promise(resolve => {
+        image.addEventListener('load', resolve, { once: true });
+        image.addEventListener('error', resolve, { once: true });
+      });
+    }
+    await image.decode?.().catch(() => {});
+  })();
+  imagePreparations.set(image, preparation);
+  return preparation;
 }
 
 function nextPaint(win) {
@@ -155,16 +193,19 @@ function computedMotionDuration(element, win) {
   const nodes = [element, ...element.querySelectorAll('*')];
   return nodes.reduce((longest, node) => {
     const style = win.getComputedStyle(node);
+    const animationNames = style.animationName.split(',');
     const animationDurations = style.animationDuration.split(',').map(timeToMilliseconds);
     const animationDelays = style.animationDelay.split(',').map(timeToMilliseconds);
-    const animationIterations = style.animationIterationCount.split(',').map(value => (
-      value.trim() === 'infinite' ? 0 : Number.parseFloat(value) || 1
-    ));
-    const animationLength = animationDurations.reduce((maximum, duration, index) => Math.max(
-      maximum,
-      duration * (animationIterations[index % animationIterations.length] || 0)
-        + animationDelays[index % animationDelays.length]
-    ), 0);
+    const animationIterations = style.animationIterationCount.split(',');
+    const animationLength = animationDurations.reduce((maximum, duration, index) => {
+      const name = animationNames[index % animationNames.length]?.trim();
+      const iterations = animationIterations[index % animationIterations.length]?.trim();
+      if (!name || name === 'none' || iterations === 'infinite') return maximum;
+      return Math.max(
+        maximum,
+        duration * (Number.parseFloat(iterations) || 1) + animationDelays[index % animationDelays.length]
+      );
+    }, 0);
     const transitionDurations = style.transitionDuration.split(',').map(timeToMilliseconds);
     const transitionDelays = style.transitionDelay.split(',').map(timeToMilliseconds);
     const transitionLength = transitionDurations.reduce((maximum, duration, index) => Math.max(
@@ -200,59 +241,51 @@ async function waitForMotion(element, win) {
   await waitForFrames(win, computedMotionDuration(element, win));
 }
 
-function startImageLoad(image) {
-  if (!image.hasAttribute('src') && image.dataset.source) {
-    image.src = image.dataset.source;
-    delete image.dataset.source;
-  }
-}
-
-function prepareImage(image) {
-  if (imagePreparations.has(image)) return imagePreparations.get(image);
-  startImageLoad(image);
-  const preparation = (async () => {
-    if (!image.complete) {
-      await new Promise(resolve => {
-        image.addEventListener('load', resolve, { once: true });
-        image.addEventListener('error', resolve, { once: true });
-      });
-    }
-    await image.decode?.().catch(() => {});
-  })();
-  imagePreparations.set(image, preparation);
-  return preparation;
-}
-
 function cardDescription(card) {
   return [prettyMeta(card.rarity), card.categoryName, card.subcategoryName]
     .filter(Boolean)
     .join(' · ');
 }
 
-function createEffectLayer(doc) {
-  const layer = createElement(doc, 'div', 'st-reveal-flash');
-  layer.setAttribute('aria-hidden', 'true');
-  const ring = createElement(doc, 'span', 'st-reveal-flash-ring');
-  const ribbons = createElement(doc, 'span', 'st-reveal-ribbons');
-  for (let index = 0; index < 4; index += 1) {
-    const ribbon = createElement(doc, 'i', 'st-reveal-ribbon');
-    ribbon.style.setProperty('--ribbon-index', String(index));
-    ribbons.append(ribbon);
+function createRepeatedElements(doc, parent, count, className, propertyName) {
+  for (let index = 0; index < count; index += 1) {
+    const element = createElement(doc, 'i', className);
+    element.style.setProperty(propertyName, String(index));
+    parent.append(element);
   }
-  const sparkles = createElement(doc, 'span', 'st-reveal-sparkles');
-  for (let index = 0; index < 8; index += 1) {
-    const sparkle = createElement(doc, 'i', 'st-reveal-sparkle');
-    sparkle.style.setProperty('--sparkle-index', String(index));
-    sparkles.append(sparkle);
+}
+
+function soundEffectsEnabled(win) {
+  try {
+    return win.localStorage?.getItem(SFX_SETTING_KEY) !== 'off';
+  } catch (_) {
+    return true;
   }
-  layer.append(ring, ribbons, sparkles);
-  return layer;
+}
+
+function playRevealSound(win, name, activeAudio) {
+  const source = REVEAL_SFX[name];
+  if (!source || !soundEffectsEnabled(win) || typeof win.Audio !== 'function') return;
+  try {
+    const audio = new win.Audio(source);
+    audio.preload = 'auto';
+    audio.volume = name === 'legendary' ? .55 : name === 'pack' ? .46 : .38;
+    activeAudio.add(audio);
+    audio.addEventListener('ended', () => activeAudio.delete(audio), { once: true });
+    audio.play().catch(() => activeAudio.delete(audio));
+  } catch (_) {
+    // Audio is an enhancement; reveal interaction must continue if playback is unavailable.
+  }
 }
 
 export async function revealRewardSequence(cards = [], options = {}) {
   const rewards = cards.filter(Boolean).map(normalizeRevealCard);
   if (!rewards.length) return;
 
+  const sourceDocument = document;
+  const returnFocus = sourceDocument.activeElement instanceof sourceDocument.defaultView.HTMLElement
+    ? sourceDocument.activeElement
+    : null;
   const { win, doc } = getHost();
   const normalizedOptions = normalizeRevealOptions(options);
   const revealTitle = normalizedOptions.title || 'Your Booster Pack';
@@ -266,166 +299,160 @@ export async function revealRewardSequence(cards = [], options = {}) {
     let settled = false;
     let controller = null;
     let fallbackCleanup = null;
+    let currentFrontImage = null;
+    let resultsPopulated = false;
+    const activeAudio = new Set();
 
-    const overlay = createElement(doc, 'div', 'st-reveal-overlay');
-    const backdrop = createImage(doc, packArtwork, '', normalizedOptions.cardBackUrl, 'st-reveal-backdrop-image');
-    const dialog = createElement(doc, 'section', 'st-reveal-dialog');
-    const header = createElement(doc, 'header', 'st-reveal-header');
-    const headingGroup = createElement(doc, 'div', 'st-reveal-heading');
-    const eyebrow = createElement(doc, 'p', 'st-reveal-eyebrow', '✦ Starlight Transformation ✦');
-    const title = createElement(doc, 'h2', 'st-reveal-title', revealTitle);
-    const closeButton = createElement(doc, 'button', 'st-reveal-close', '×');
-    const liveStatus = createElement(doc, 'p', 'st-reveal-live', `${rewards.length} cards ready.`);
-    const stage = createElement(doc, 'div', 'st-reveal-stage');
-    const packStage = createElement(doc, 'section', 'st-reveal-pack-stage');
-    const packBurst = createElement(doc, 'div', 'st-reveal-pack-burst');
-    const packRing = createElement(doc, 'span', 'st-reveal-pack-ring');
-    const packButton = createElement(doc, 'button', 'st-reveal-pack-button');
-    const packImage = createImage(doc, packArtwork, `${revealTitle} pack`, normalizedOptions.cardBackUrl, 'st-reveal-pack-image');
-    const packPrompt = createElement(doc, 'p', 'st-reveal-pack-prompt', 'Tap the pack to transform ✦');
-    const packCount = createElement(
+    const overlay = createElement(doc, 'div', 'st-r3-overlay hidden');
+    const dialog = createElement(doc, 'section', 'st-r3-dialog');
+    const header = createElement(doc, 'header', 'st-r3-header');
+    const headerCopy = createElement(doc, 'div', 'st-r3-header-copy');
+    const eyebrow = createElement(doc, 'p', 'st-r3-eyebrow', 'Starlight Booster');
+    const title = createElement(doc, 'h2', 'st-r3-title', revealTitle);
+    const closeButton = createElement(doc, 'button', 'st-r3-close', '×');
+    const liveStatus = createElement(
       doc,
-      'span',
-      'st-reveal-pack-count',
-      `${rewards.length} ${rewards.length === 1 ? 'card' : 'cards'}`
+      'p',
+      'st-r3-live',
+      `${rewards.length} ${rewards.length === 1 ? 'card' : 'cards'} ready.`
     );
-    const stackStage = createElement(doc, 'section', 'st-reveal-stack-stage');
-    const stackShell = createElement(doc, 'div', 'st-reveal-stack-shell');
-    const stack = createElement(doc, 'div', 'st-reveal-stack');
-    const effectLayer = createEffectLayer(doc);
-    const revealCopy = createElement(doc, 'div', 'st-reveal-copy');
-    const cardCount = createElement(doc, 'p', 'st-reveal-count');
-    const cardName = createElement(doc, 'h3', 'st-reveal-card-name', 'Mystery Card');
-    const metadata = createElement(doc, 'p', 'st-reveal-metadata', 'Choose the top card');
-    const badges = createElement(doc, 'div', 'st-reveal-badges');
-    const progress = createElement(doc, 'div', 'st-reveal-progress');
-    const stackActions = createElement(doc, 'div', 'st-reveal-actions');
-    const revealButton = createElement(doc, 'button', 'st-reveal-button st-reveal-button-primary', 'Reveal Top Card');
-    const nextButton = createElement(doc, 'button', 'st-reveal-button st-reveal-button-primary', 'Next Card');
-    const resultsStage = createElement(doc, 'section', 'st-reveal-results');
-    const resultsHeading = createElement(doc, 'div', 'st-reveal-results-heading');
-    const resultsTitle = createElement(doc, 'h3', '', 'Your Starlight Pulls');
+    const progress = createElement(doc, 'p', 'st-r3-progress');
+    const stage = createElement(doc, 'div', 'st-r3-stage');
+
+    const packScene = createElement(doc, 'section', 'st-r3-scene st-r3-pack-scene');
+    const packButton = createElement(doc, 'button', 'st-r3-pack-button');
+    const packArt = createElement(doc, 'span', 'st-r3-pack-art');
+    const packImage = createImage(doc, packArtwork, `${revealTitle} pack`, normalizedOptions.cardBackUrl, 'st-r3-pack-image');
+    const packTop = createImage(doc, packArtwork, '', normalizedOptions.cardBackUrl, 'st-r3-pack-half st-r3-pack-top');
+    const packBottom = createImage(doc, packArtwork, '', normalizedOptions.cardBackUrl, 'st-r3-pack-half st-r3-pack-bottom');
+    const packCount = createElement(doc, 'span', 'st-r3-pack-count', `${rewards.length} ${rewards.length === 1 ? 'card' : 'cards'}`);
+    const packPrompt = createElement(doc, 'span', 'st-r3-prompt', 'Tap the booster to open');
+    const packEnergy = createElement(doc, 'span', 'st-r3-pack-energy');
+    const packCore = createElement(doc, 'i', 'st-r3-pack-core');
+    const packRing = createElement(doc, 'i', 'st-r3-pack-ring');
+    const packShards = createElement(doc, 'span', 'st-r3-pack-shards');
+
+    const pileScene = createElement(doc, 'section', 'st-r3-scene st-r3-pile-scene');
+    const pileButton = createElement(doc, 'button', 'st-r3-pile-button');
+    const pileStack = createElement(doc, 'span', 'st-r3-pile-stack');
+    const pileCount = createElement(doc, 'span', 'st-r3-pile-count');
+    const pilePrompt = createElement(doc, 'span', 'st-r3-prompt st-r3-pile-prompt');
+
+    const revealScene = createElement(doc, 'section', 'st-r3-scene st-r3-reveal-scene');
+    const energy = createElement(doc, 'span', 'st-r3-energy');
+    const energyCore = createElement(doc, 'i', 'st-r3-energy-core');
+    const energyRingOne = createElement(doc, 'i', 'st-r3-energy-ring st-r3-energy-ring-one');
+    const energyRingTwo = createElement(doc, 'i', 'st-r3-energy-ring st-r3-energy-ring-two');
+    const rays = createElement(doc, 'span', 'st-r3-rays');
+    const particles = createElement(doc, 'span', 'st-r3-particles');
+    const actor = createElement(doc, 'button', 'st-r3-card-actor');
+    const cardInner = createElement(doc, 'span', 'st-r3-card-inner');
+    const cardBack = createElement(doc, 'span', 'st-r3-card-face st-r3-card-back');
+    const cardFront = createElement(doc, 'span', 'st-r3-card-face st-r3-card-front');
+    const cardBackImage = createImage(doc, normalizedOptions.cardBackUrl, '', DEFAULT_BACK, 'st-r3-card-image');
+    const cardDetails = createElement(doc, 'div', 'st-r3-card-details');
+    const cardName = createElement(doc, 'h3', 'st-r3-card-name');
+    const cardMeta = createElement(doc, 'p', 'st-r3-card-meta');
+    const cardBadges = createElement(doc, 'div', 'st-r3-card-badges');
+    const continuePrompt = createElement(doc, 'p', 'st-r3-continue', 'Tap the revealed card to continue');
+
+    const resultsScene = createElement(doc, 'section', 'st-r3-results');
+    const resultsHeading = createElement(doc, 'div', 'st-r3-results-heading');
+    const resultsTitle = createElement(doc, 'h3', '', 'Your Cards');
     const resultsSummary = createElement(
       doc,
       'p',
       '',
       `${summary.total} total · ${summary.newCards} new · ${summary.duplicates} duplicate${summary.duplicates === 1 ? '' : 's'}`
     );
-    const resultsGrid = createElement(doc, 'div', 'st-reveal-results-grid');
-    const doneButton = createElement(doc, 'button', 'st-reveal-button st-reveal-button-primary', 'Done');
+    const resultsGrid = createElement(doc, 'div', 'st-r3-results-grid');
+    const doneButton = createElement(doc, 'button', 'st-r3-done', 'Done');
 
-    title.id = `st-reveal-title-${win.crypto?.randomUUID?.() || Date.now().toString(36)}`;
+    title.id = `st-r3-title-${win.crypto?.randomUUID?.() || Date.now().toString(36)}`;
     closeButton.type = 'button';
     closeButton.setAttribute('aria-label', 'Close booster reveal');
+    closeButton.setAttribute('data-st-modal-close', '');
     liveStatus.setAttribute('role', 'status');
     liveStatus.setAttribute('aria-live', 'polite');
     dialog.setAttribute('role', 'dialog');
     dialog.setAttribute('aria-modal', 'true');
     dialog.setAttribute('aria-labelledby', title.id);
-    dialog.dataset.phase = phase;
     dialog.tabIndex = -1;
-    packStage.setAttribute('aria-label', 'Booster pack opening');
+    dialog.dataset.phase = phase;
+    packScene.setAttribute('aria-label', 'Booster pack opening');
     packButton.type = 'button';
     packButton.setAttribute('aria-label', `Open ${revealTitle}`);
-    packBurst.setAttribute('aria-hidden', 'true');
-    packBurst.append(packRing);
-    packButton.append(packImage, packCount);
-    packStage.append(packBurst, packButton, packPrompt);
-    stackStage.hidden = true;
-    stackStage.setAttribute('aria-label', 'Card reveal stack');
-    stackShell.append(stack, effectLayer);
-    revealButton.type = 'button';
-    nextButton.type = 'button';
-    nextButton.hidden = true;
-    stackActions.append(revealButton, nextButton);
-    revealCopy.append(cardCount, cardName, metadata, badges, progress, stackActions);
-    stackStage.append(stackShell, revealCopy);
-    resultsStage.hidden = true;
-    resultsStage.setAttribute('aria-label', 'Booster results');
-    resultsHeading.append(resultsTitle, resultsSummary);
+    packTop.alt = '';
+    packBottom.alt = '';
+    packEnergy.setAttribute('aria-hidden', 'true');
+    createRepeatedElements(doc, packShards, 10, 'st-r3-pack-shard', '--shard-index');
+    packEnergy.append(packCore, packRing, packShards);
+    packArt.append(packImage, packTop, packBottom);
+    packButton.append(packArt, packCount, packPrompt);
+    packScene.append(packEnergy, packButton);
+
+    pileScene.hidden = true;
+    pileScene.setAttribute('aria-label', 'Booster card pile');
+    pileButton.type = 'button';
+    pileButton.append(pileStack, pileCount, pilePrompt);
+    pileScene.append(pileButton);
+
+    revealScene.hidden = true;
+    revealScene.setAttribute('aria-label', 'Current card reveal');
+    energy.setAttribute('aria-hidden', 'true');
+    createRepeatedElements(doc, rays, 8, 'st-r3-ray', '--ray-index');
+    createRepeatedElements(doc, particles, 12, 'st-r3-particle', '--particle-index');
+    energy.append(energyCore, energyRingOne, energyRingTwo, rays, particles);
+    actor.type = 'button';
+    actor.disabled = true;
+    cardBackImage.alt = '';
+    cardBack.append(cardBackImage);
+    cardInner.append(cardBack, cardFront);
+    actor.append(cardInner);
+    cardDetails.hidden = true;
+    cardDetails.append(cardName, cardMeta, cardBadges, continuePrompt);
+    revealScene.append(energy, actor, cardDetails);
+
+    resultsScene.hidden = true;
+    resultsScene.setAttribute('aria-label', 'Booster results');
     doneButton.type = 'button';
-    resultsStage.append(resultsHeading, resultsGrid, doneButton);
-    stage.append(packStage, stackStage, resultsStage);
-    headingGroup.append(eyebrow, title);
-    header.append(headingGroup, closeButton);
-    dialog.append(header, liveStatus, stage);
-    overlay.append(backdrop, dialog);
+    resultsHeading.append(resultsTitle, resultsSummary);
+    resultsScene.append(resultsHeading, resultsGrid, doneButton);
+
+    progress.hidden = true;
+    stage.append(packScene, pileScene, revealScene, resultsScene);
+    headerCopy.append(eyebrow, title);
+    header.append(headerCopy, closeButton);
+    dialog.append(header, liveStatus, progress, stage);
+    overlay.append(dialog);
+    overlay.hidden = true;
     doc.body.append(overlay);
 
-    const stackCards = rewards.map((card, cardIndex) => {
-      const button = createElement(doc, 'button', `st-reveal-stack-card rarity-${card.rarity}`);
-      const inner = createElement(doc, 'span', 'st-reveal-card-inner');
-      const back = createElement(doc, 'span', 'st-reveal-card-face st-reveal-card-back');
-      const front = createElement(doc, 'span', 'st-reveal-card-face st-reveal-card-front');
-      const backImage = createImage(doc, normalizedOptions.cardBackUrl, '', DEFAULT_BACK, 'st-reveal-card-image');
-      const frontImage = createImage(
-        doc,
-        card.imageUrl,
-        '',
-        DEFAULT_BACK,
-        'st-reveal-card-image',
-        { defer: true }
-      );
-      button.type = 'button';
-      button.disabled = cardIndex !== 0;
-      button.tabIndex = cardIndex === 0 ? 0 : -1;
-      button.dataset.cardIndex = String(cardIndex);
-      button.setAttribute('aria-label', `Reveal card ${cardIndex + 1} of ${rewards.length}`);
-      backImage.alt = '';
-      frontImage.alt = '';
-      back.append(backImage);
-      front.append(frontImage);
-      inner.append(back, front);
-      button.append(inner);
-      stack.append(button);
-      return { button, inner, frontImage, card };
+    const pileLayers = Array.from({ length: MAX_PILE_LAYERS }, (_, layerIndex) => {
+      const layer = createElement(doc, 'span', 'st-r3-pile-layer');
+      const image = createImage(doc, normalizedOptions.cardBackUrl, '', DEFAULT_BACK, 'st-r3-pile-image');
+      layer.style.setProperty('--layer-index', String(layerIndex));
+      image.alt = '';
+      layer.append(image);
+      pileStack.append(layer);
+      return layer;
     });
 
-    const progressItems = rewards.map((card, cardIndex) => {
-      const item = createElement(doc, 'span', `st-reveal-progress-item rarity-${card.rarity}`);
-      item.textContent = String(cardIndex + 1);
-      item.setAttribute('aria-label', `Card ${cardIndex + 1}`);
-      progress.append(item);
-      return item;
-    });
-
-    let resultsPopulated = false;
-    const populateResults = () => {
-      if (resultsPopulated) return;
-      resultsPopulated = true;
-      const fragment = doc.createDocumentFragment();
-      rewards.forEach((card, cardIndex) => {
-        const item = createElement(doc, 'article', `st-reveal-result-card rarity-${card.rarity}`);
-        item.style.setProperty('--result-index', String(Math.min(cardIndex, 8)));
-        const image = createImage(
-          doc,
-          card.imageUrl,
-          `${card.name} card artwork`,
-          DEFAULT_BACK,
-          'st-reveal-result-image',
-          { loading: 'lazy' }
-        );
-        const copy = createElement(doc, 'div', 'st-reveal-result-copy');
-        const name = createElement(doc, 'h4', '', card.name);
-        const detail = createElement(doc, 'p', '', cardDescription(card) || 'Starlight Card');
-        const status = createElement(
-          doc,
-          'span',
-          `st-reveal-result-status ${card.isDuplicate ? 'is-duplicate' : 'is-new'}`,
-          card.isDuplicate ? 'Duplicate' : 'New'
-        );
-        copy.append(name, detail, status);
-        item.append(image, copy);
-        fragment.append(item);
+    const stopAudio = () => {
+      activeAudio.forEach(audio => {
+        audio.pause();
+        audio.currentTime = 0;
       });
-      resultsGrid.append(fragment);
+      activeAudio.clear();
     };
 
     const finish = () => {
       if (settled) return;
       settled = true;
+      stopAudio();
       fallbackCleanup?.();
       overlay.remove();
+      if (returnFocus?.isConnected) returnFocus.focus?.({ preventScroll: true });
       resolve();
     };
 
@@ -439,168 +466,169 @@ export async function revealRewardSequence(cards = [], options = {}) {
       dialog.dataset.phase = nextPhase;
     };
 
-    const focusStageControl = control => {
+    const focusControl = control => {
       control.focus({ preventScroll: true });
       overlay.scrollTop = 0;
       stage.scrollTop = 0;
     };
 
-    const updateStackLayout = () => {
-      const layout = createRevealStackLayout(rewards.length - index);
-      stackCards.forEach((entry, cardIndex) => {
-        if (cardIndex < index) return;
-        const position = layout[cardIndex - index];
-        entry.button.style.setProperty('--stack-x', `${position.x}px`);
-        entry.button.style.setProperty('--stack-y', `${position.y}px`);
-        entry.button.style.setProperty('--stack-rotate', `${position.rotation}deg`);
-        entry.button.style.setProperty('--stack-z', String(position.zIndex));
-        entry.button.style.setProperty('--deal-delay', `${Math.min(cardIndex - index, 8) * 24}ms`);
-        entry.button.classList.toggle('is-stack-hidden', cardIndex - index >= MAX_VISUAL_STACK_DEPTH);
-      });
-    };
-
-    const updateProgress = () => {
-      progressItems.forEach((item, itemIndex) => {
-        item.classList.toggle('is-current', itemIndex === index);
-        item.classList.toggle('is-complete', itemIndex < index);
-        item.setAttribute('aria-current', itemIndex === index ? 'step' : 'false');
-      });
-    };
-
-    const setCurrentCard = () => {
-      const current = stackCards[index];
-      effectLayer.className = 'st-reveal-flash';
-      stackCards.forEach((entry, cardIndex) => {
-        const isCurrent = cardIndex === index;
-        entry.button.disabled = !isCurrent;
-        entry.button.tabIndex = isCurrent ? 0 : -1;
-        entry.button.classList.toggle('is-current', isCurrent);
-      });
-      current.button.setAttribute('aria-label', `Reveal card ${index + 1} of ${rewards.length}`);
-      cardCount.textContent = `Card ${index + 1} of ${rewards.length}`;
-      cardName.textContent = 'Mystery Card';
-      metadata.textContent = 'Click the top card to reveal it';
-      badges.replaceChildren();
-      revealButton.hidden = false;
-      revealButton.disabled = false;
-      nextButton.hidden = true;
-      updateStackLayout();
-      updateProgress();
-      startImageLoad(current.frontImage);
-      liveStatus.textContent = `Card ${index + 1} of ${rewards.length} is ready to reveal.`;
-    };
-
-    const showResults = async () => {
-      if (phase !== 'revealed') return;
-      setPhase('results');
-      stackStage.hidden = true;
-      populateResults();
-      resultsStage.hidden = false;
-      resultsStage.classList.add('is-visible');
-      liveStatus.textContent = `Reveal complete. ${resultsSummary.textContent}`;
-      await waitForMotion(resultsStage, win);
-      focusStageControl(doneButton);
-    };
-
-    const advance = async () => {
-      if (phase !== 'revealed') return;
-      if (index >= rewards.length - 1) {
-        await showResults();
-        return;
-      }
-
-      setPhase('advancing');
-      const current = stackCards[index];
-      nextButton.disabled = true;
-      current.button.classList.add('is-dismissing');
-      index += 1;
-      updateStackLayout();
-      await waitForMotion(current.button, win);
-      current.button.hidden = true;
-      setPhase('stack');
-      setCurrentCard();
-      focusStageControl(stackCards[index].button);
-    };
-
-    const revealCurrent = async () => {
-      if (phase !== 'stack') return;
-      setPhase('lifting');
-      const current = stackCards[index];
-      revealButton.disabled = true;
-      revealButton.hidden = true;
-      current.button.disabled = true;
-      liveStatus.textContent = `Revealing card ${index + 1} of ${rewards.length}.`;
-      await prepareImage(current.frontImage);
-      current.button.classList.add('is-lifting');
-      effectLayer.className = `st-reveal-flash rarity-${current.card.rarity} is-active`;
-      current.inner.classList.add('is-flipping');
-      await waitForMotion(current.button, win);
-      current.button.classList.remove('is-lifting');
-      current.button.classList.add('is-lifted');
-      current.inner.classList.remove('is-flipping');
-      current.button.classList.add('is-revealed');
-      current.button.setAttribute('aria-label', `${current.card.name}, ${prettyMeta(current.card.rarity)}`);
-      cardName.textContent = current.card.name;
-      metadata.textContent = cardDescription(current.card) || 'Starlight Card';
-      badges.replaceChildren(
-        createElement(doc, 'span', `st-reveal-badge rarity-${current.card.rarity}`, prettyMeta(current.card.rarity)),
-        createElement(
+    const populateResults = () => {
+      if (resultsPopulated) return;
+      resultsPopulated = true;
+      const fragment = doc.createDocumentFragment();
+      rewards.forEach(card => {
+        const item = createElement(doc, 'article', `st-r3-result-card rarity-${card.rarity}`);
+        const image = createImage(
+          doc,
+          card.imageUrl,
+          `${card.name} card artwork`,
+          DEFAULT_BACK,
+          'st-r3-result-image',
+          { loading: 'lazy' }
+        );
+        const copy = createElement(doc, 'div', 'st-r3-result-copy');
+        const name = createElement(doc, 'h4', '', card.name);
+        const detail = createElement(doc, 'p', '', cardDescription(card) || 'Starlight Card');
+        const status = createElement(
           doc,
           'span',
-          `st-reveal-badge ${current.card.isDuplicate ? 'is-duplicate' : 'is-new'}`,
-          current.card.isDuplicate ? 'Duplicate' : 'New Card'
-        )
+          `st-r3-result-status ${card.isDuplicate ? 'is-duplicate' : 'is-new'}`,
+          card.isDuplicate ? 'Duplicate' : 'New'
+        );
+        copy.append(name, detail, status);
+        item.append(image, copy);
+        fragment.append(item);
+      });
+      resultsGrid.append(fragment);
+    };
+
+    const prepareCurrentCard = () => {
+      const card = rewards[index];
+      currentFrontImage = createImage(
+        doc,
+        card.imageUrl,
+        '',
+        DEFAULT_BACK,
+        'st-r3-card-image',
+        { defer: true }
       );
-      revealButton.hidden = true;
-      nextButton.hidden = false;
-      nextButton.disabled = false;
-      nextButton.textContent = index === rewards.length - 1 ? 'View Results' : 'Next Card';
-      liveStatus.textContent = `${current.card.name}, ${prettyMeta(current.card.rarity)}. ${current.card.isDuplicate ? 'Duplicate card.' : 'New card.'}`;
-      setPhase('revealed');
-      if (stackCards[index + 1]) startImageLoad(stackCards[index + 1].frontImage);
-      focusStageControl(nextButton);
+      cardFront.replaceChildren(currentFrontImage);
+      actor.className = `st-r3-card-actor rarity-${card.rarity}`;
+      actor.setAttribute('aria-label', `Reveal ${card.name}`);
+      revealScene.dataset.rarity = card.rarity;
+      startImageLoad(currentFrontImage);
+    };
+
+    const showPile = () => {
+      const remaining = rewards.length - index;
+      const visibleLayers = Math.min(remaining, MAX_PILE_LAYERS);
+      pileLayers.forEach((layer, layerIndex) => {
+        const visible = layerIndex < visibleLayers;
+        const centeredIndex = layerIndex - (visibleLayers - 1) / 2;
+        layer.hidden = !visible;
+        layer.style.setProperty('--pile-x', `${centeredIndex * 5}px`);
+        layer.style.setProperty('--pile-y', `${(visibleLayers - layerIndex - 1) * -3}px`);
+        layer.style.setProperty('--pile-rotation', `${centeredIndex * 2.2}deg`);
+        layer.style.setProperty('--pile-z', String(layerIndex + 1));
+      });
+      pileCount.textContent = `${remaining} ${remaining === 1 ? 'card remains' : 'cards remain'}`;
+      pilePrompt.textContent = remaining === 1 ? 'Tap the last card' : 'Tap the pile to reveal a card';
+      pileButton.setAttribute('aria-label', `Reveal card ${index + 1} of ${rewards.length} from the pile`);
+      pileButton.disabled = false;
+      progress.hidden = false;
+      progress.textContent = `Card ${index + 1} of ${rewards.length}`;
+      packScene.hidden = true;
+      revealScene.hidden = true;
+      resultsScene.hidden = true;
+      pileScene.hidden = false;
+      prepareCurrentCard();
+      setPhase('pile');
+      liveStatus.textContent = `${remaining} ${remaining === 1 ? 'card remains' : 'cards remain'}.`;
+      focusControl(pileButton);
+    };
+
+    const showResults = () => {
+      populateResults();
+      progress.hidden = true;
+      packScene.hidden = true;
+      pileScene.hidden = true;
+      revealScene.hidden = true;
+      resultsScene.hidden = false;
+      setPhase('results');
+      liveStatus.textContent = `Reveal complete. ${resultsSummary.textContent}`;
+      focusControl(doneButton);
     };
 
     const openPack = async () => {
       if (phase !== 'pack') return;
-      setPhase('opening');
+      setPhase('pack-opening');
       packButton.disabled = true;
+      playRevealSound(win, 'pack', activeAudio);
       liveStatus.textContent = `Opening ${revealTitle}.`;
-      startImageLoad(stackCards[0].frontImage);
-      packStage.classList.add('is-opening');
-      await waitForMotion(packStage, win);
-      packStage.hidden = true;
-      stackStage.hidden = false;
-      stackStage.classList.add('is-entering');
-      setPhase('dealing');
-      setCurrentCard();
-      await waitForMotion(stackStage, win);
-      stackStage.classList.remove('is-entering');
-      setPhase('stack');
-      focusStageControl(stackCards[0].button);
+      packScene.classList.add('is-bursting');
+      await waitForMotion(packScene, win);
+      packScene.classList.remove('is-bursting');
+      showPile();
     };
 
-    updateStackLayout();
+    const revealFromPile = async () => {
+      if (phase !== 'pile') return;
+      const card = rewards[index];
+      setPhase('revealing');
+      pileButton.disabled = true;
+      playRevealSound(win, revealSfxForRarity(card.rarity), activeAudio);
+      liveStatus.textContent = `Revealing card ${index + 1} of ${rewards.length}.`;
+      await prepareImage(currentFrontImage);
+      pileScene.hidden = true;
+      revealScene.hidden = false;
+      cardDetails.hidden = true;
+      actor.disabled = true;
+      revealScene.classList.remove('is-revealed');
+      revealScene.classList.add('is-revealing');
+      await waitForMotion(revealScene, win);
+      revealScene.classList.remove('is-revealing');
+      revealScene.classList.add('is-revealed');
+      actor.disabled = false;
+      actor.setAttribute('aria-label', `${card.name}, ${prettyMeta(card.rarity)}. Continue to the pile.`);
+      cardName.textContent = card.name;
+      cardMeta.textContent = cardDescription(card) || 'Starlight Card';
+      cardBadges.replaceChildren(
+        createElement(doc, 'span', `st-r3-badge rarity-${card.rarity}`, prettyMeta(card.rarity)),
+        createElement(
+          doc,
+          'span',
+          `st-r3-badge ${card.isDuplicate ? 'is-duplicate' : 'is-new'}`,
+          card.isDuplicate ? 'Duplicate' : 'New Card'
+        )
+      );
+      cardDetails.hidden = false;
+      setPhase('revealed');
+      liveStatus.textContent = `${card.name}, ${prettyMeta(card.rarity)}. ${card.isDuplicate ? 'Duplicate card.' : 'New card.'}`;
+      focusControl(actor);
+    };
+
+    const returnToPile = () => {
+      if (phase !== 'revealed') return;
+      setPhase('returning');
+      actor.disabled = true;
+      playRevealSound(win, 'return', activeAudio);
+      revealScene.hidden = true;
+      revealScene.classList.remove('is-revealed');
+      index += 1;
+      if (index >= rewards.length) showResults();
+      else showPile();
+    };
+
     packButton.addEventListener('click', openPack);
-    stackCards.forEach((entry, cardIndex) => {
-      entry.button.addEventListener('click', () => {
-        if (cardIndex === index) revealCurrent();
-      });
-    });
-    revealButton.addEventListener('click', revealCurrent);
-    nextButton.addEventListener('click', advance);
+    pileButton.addEventListener('click', revealFromPile);
+    actor.addEventListener('click', returnToPile);
     doneButton.addEventListener('click', () => close('complete'));
     closeButton.addEventListener('click', () => close('button'));
-
     dialog.addEventListener('keydown', event => {
-      if (event.altKey || event.ctrlKey || event.metaKey || phase === 'opening' || phase === 'lifting' || phase === 'advancing') return;
-      if ((event.key === 'Enter' || event.key === ' ') && phase === 'stack' && doc.activeElement === stackCards[index].button) {
-        event.preventDefault();
-        revealCurrent();
-      }
+      if (event.altKey || event.ctrlKey || event.metaKey) return;
       if (event.key === 'ArrowRight' && phase === 'revealed') {
         event.preventDefault();
-        advance();
+        returnToPile();
       }
     });
 
@@ -610,6 +638,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
       labelledBy: title.id,
       closeOnBackdrop: false,
       initialFocus: packButton,
+      restoreFocus: false,
       onClose: finish
     }) || null;
 
@@ -621,14 +650,16 @@ export async function revealRewardSequence(cards = [], options = {}) {
       const onKeydown = event => {
         if (event.key === 'Escape') close('escape');
       };
+      overlay.hidden = false;
+      overlay.classList.remove('hidden');
       doc.body.style.overflow = 'hidden';
       doc.addEventListener('keydown', onKeydown);
       fallbackCleanup = () => {
         doc.removeEventListener('keydown', onKeydown);
         doc.body.style.overflow = previousOverflow;
-        previousFocus?.focus?.();
+        previousFocus?.focus?.({ preventScroll: true });
       };
-      focusStageControl(packButton);
+      focusControl(packButton);
     }
   });
 }
