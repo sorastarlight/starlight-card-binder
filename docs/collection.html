@@ -5,14 +5,15 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>
-        My Collection | Starlight Card Binder
+        My Card Collection &amp; Favorites | Starlight Card Binder
     </title>
 <link href="css/style.css?v=1.0.0" rel="stylesheet"/>
 <link href="css/v80-8-ui.css" rel="stylesheet"/>
 <link rel="stylesheet" href="css/pages/collection.css?v=1.0">
-<link href="css/collection-redesign.css" rel="stylesheet"/><script src="js/firefox-performance.js" defer></script>
+<link href="css/card-filters.css?v=1.0" rel="stylesheet"/>
+<link href="css/collection-redesign.css?v=1.1" rel="stylesheet"/><script src="js/firefox-performance.js" defer></script>
     <link rel="stylesheet" href="css/shared-ui.css?v=1.0.0">
-<link rel="stylesheet" href="css/qol-ui.css?v=92.0.2">
+<link rel="stylesheet" href="css/qol-ui.css?v=94.1.0">
 </head>
 <body data-page="collection"><script src="js/embed-mode.js" type="module"></script>
 <div class="sky"></div>
@@ -37,7 +38,6 @@
 <a data-nav="profile" href="profile-settings.html">⚙ Profile</a>
 </div>
 <div class="top-actions">
-<input class="search" id="globalSearch" placeholder="Search cards..." type="search"/>
 <button class="sfx-toggle on" id="sfxToggle" title="Sound effects" type="button">
                         ♪
                     </button>
@@ -45,9 +45,9 @@
 </nav>
 <section class="collection-dashboard panel">
 <div class="collection-dashboard-copy">
-<p class="eyebrow">Your cards, all in one place</p>
-<h1>My Collection</h1>
-<p>Browse everything you own, revisit favorites, and manage duplicate cards without the clutter.</p>
+<p class="eyebrow">My Stuff</p>
+<h1>My Card Collection &amp; Favorites</h1>
+<p>Celebrate your collection, revisit favorite cards, and understand your progress at a glance.</p>
 </div>
 <div aria-label="Collection summary" class="collection-summary-grid">
 <div><strong data-collected="">0</strong><span>Unique Cards</span></div>
@@ -63,7 +63,7 @@
 </div>
 <div class="collection-progress-suite">
 <article class="collection-progress-card"><div><span>Collection Completion</span><strong><span data-collected="">0</span> / <span data-total="">0</span></strong></div><div class="collector-progress"><span data-progress=""></span></div><small><span data-percent="">0%</span> complete</small></article>
-<article class="collection-progress-card"><div><span>Free Daily Booster</span><strong data-daily-status="">Checking…</strong></div><small data-daily-countdown=""></small><a data-shell-nav="daily" href="daily-booster.html">Open Daily Booster</a></article>
+<article class="collection-progress-card collection-highlight-card"><div><span>Collection Spotlight</span><strong data-collection-highlight="">Building your showcase…</strong></div><small data-collection-insight="">Your collection story will appear here.</small><div class="collection-rarity-breakdown" data-rarity-breakdown=""></div></article>
 <article class="collection-progress-card collection-series-progress"><div><span>Series Progress</span><strong>Your sets</strong></div><div class="mini-series" id="miniSeries"></div></article>
 </div>
 </section>
@@ -72,6 +72,7 @@
 <button class="collection-tab" data-collection-tab="favorites" type="button">Favorites</button>
 <button class="collection-tab" data-collection-tab="duplicates" type="button">Duplicates</button>
 </section>
+<section class="card-filter-panel panel" data-card-filter-context="collection" aria-label="Filter collection cards"></section>
 <section class="collection-tab-panel active" data-collection-panel="all">
 <div class="collection-section-heading"><div><p class="eyebrow">Owned Cards</p><h2>All Cards</h2></div><p>Your complete cloud-synced collection.</p></div>
 <section class="grid-page" id="collectionGrid"></section>
@@ -109,10 +110,10 @@
 <!--
         Cloud synchronization finishes before app.js starts.
     -->
-<script src="js/cloud-collection.js" type="module"></script>
+<script src="js/cloud-collection.js?v=1.1.0" type="module"></script>
 <script src="js/site-dashboard.js" type="module"></script>
 <script src="js/pages/collection-page.js?v=1.0"></script>
-<script src="js/collection-redesign.js" type="module"></script>    <script src="js/shared-ui.js?v=1.0.0"></script>
+<script src="js/collection-redesign.js?v=1.1" type="module"></script>    <script src="js/shared-ui.js?v=1.0.0"></script>
 <script src="js/qol-ui.js?v=92.0.2" defer></script>
 </body>
 </html>

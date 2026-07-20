@@ -37,7 +37,6 @@ function writeStore(key, value) { localStorage.setItem(key, JSON.stringify(value
 function isCollected(id) { return !!readStore(STORAGE_KEY)[id]; }
 function isFavorite(id) { return !!readStore(FAVORITES_KEY)[id]; }
 function getCardQuantity(id) { return Math.max(isCollected(id) ? 1 : 0, Number(readStore(QUANTITIES_KEY)[id] || 0)); }
-function quantityBadgesHtml(id) { const q=getCardQuantity(id); if(q<=0) return ""; return `<span class="quantity-badge">×${q}</span>${q>1?`<span class="duplicate-badge">+${q-1} Extra</span>`:""}`; }
 function binderRarityBadgeHtml(card) { const label=String(card?.rarity || 'Common'); return `<span class="binder-rarity-badge ${rarityClass(card)}">${esc(label)}</span>`; }
 function percent(part, total) { return total ? Math.round((part / total) * 100) : 0; }
 function padNumber(value, fallback) { return String(value || fallback).padStart(3, "0"); }
@@ -401,6 +400,25 @@ function hydrateFilters() {
   $$('[data-series]').forEach(select => select.innerHTML = series.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join(""));
 }
 
+function renderFilterControls() {
+  const host = $('[data-card-filter-context]');
+  if (!host || host.dataset.filterControlsReady === '1') return;
+  const isCollection = host.dataset.cardFilterContext === 'collection';
+  host.innerHTML = `<div class="card-filter-heading">
+      <div><p class="eyebrow">Find your cards</p><h2>${isCollection ? 'Collection Filters' : 'Binder Filters'}</h2></div>
+      <p data-filter-summary>Preparing cards…</p>
+    </div>
+    <div class="card-filter-fields">
+      ${isCollection ? `<label class="card-filter-search"><span>Search</span><input id="globalSearch" type="search" placeholder="Search names, numbers, artists…" autocomplete="off"></label>` : ''}
+      <label><span>Series</span><select data-series aria-label="Filter by series"></select></label>
+      <label><span>Rarity</span><select data-rarity aria-label="Filter by rarity"><option>All Rarities</option><option>Common</option><option>Uncommon</option><option>Rare</option><option>Epic</option><option>Legendary</option></select></label>
+      <label><span>Sort By</span><select id="sortSelect" aria-label="Sort cards"><option value="numberAsc">Number (Low to High)</option><option value="numberDesc">Number (High to Low)</option><option value="nameAsc">Name (A to Z)</option><option value="rarityDesc">Rarity (Best First)</option></select></label>
+      ${isCollection ? '' : `<fieldset class="card-filter-view"><legend>Collection Status</legend><label><input checked name="viewFilter" type="radio" value="all"> All Cards</label><label><input name="viewFilter" type="radio" value="collected"> Collected</label><label><input name="viewFilter" type="radio" value="missing"> Not Collected</label></fieldset>`}
+      <button class="card-filter-reset" type="button" data-reset-card-filters>Reset Filters</button>
+    </div>`;
+  host.dataset.filterControlsReady = '1';
+}
+
 function activeFilters() {
   return {
     q: ($('#globalSearch')?.value || '').trim().toLowerCase(),
@@ -411,17 +429,22 @@ function activeFilters() {
   };
 }
 
+function filterCardList(source, filters = activeFilters(), { respectOwnership = true } = {}) {
+  const list = source.filter(card => {
+    const haystack = `${card.number} ${card.name} ${card.series} ${card.rarity} ${card.cardDescription} ${card.artist}`.toLowerCase();
+    const seriesMatches = filters.series === 'All Series' || card.series === filters.series;
+    const rarityMatches = filters.rarity === 'All Rarities' || String(card.rarity || '').trim().toLowerCase() === String(filters.rarity || '').trim().toLowerCase();
+    const searchMatches = !filters.q || haystack.includes(filters.q);
+    const ownershipMatches = !respectOwnership || filters.view === 'all' || (filters.view === 'collected' ? isCollected(card.id) : !isCollected(card.id));
+    return seriesMatches && rarityMatches && searchMatches && ownershipMatches;
+  });
+  sortCards(list, filters.sort);
+  return list;
+}
+
 function applyFilters() {
   const f = activeFilters();
-  filtered = cards.filter(c => {
-    const hay = `${c.number} ${c.name} ${c.series} ${c.rarity} ${c.cardDescription} ${c.artist}`.toLowerCase();
-    const seriesOk = f.series === 'All Series' || c.series === f.series;
-    const rarityOk = f.rarity === 'All Rarities' || String(c.rarity || '').trim().toLowerCase() === String(f.rarity || '').trim().toLowerCase();
-    const queryOk = !f.q || hay.includes(f.q);
-    const viewOk = f.view === 'all' || (f.view === 'collected' ? isCollected(c.id) : !isCollected(c.id));
-    return seriesOk && rarityOk && queryOk && viewOk;
-  });
-  sortCards(filtered, f.sort);
+  filtered = filterCardList(cards, f);
   const max = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
   if (page > max) page = max;
 }
@@ -455,6 +478,24 @@ function renderShell() {
       return `<div class="mini-row"><b><span>${esc(series)}</span><span>${count} / ${list.length}</span></b><div class="bar"><span style="width:${percent(count, list.length)}%"></span></div></div>`;
     }).join("");
   }
+  const ownedCards = cards.filter(card => isCollected(card.id));
+  const rarityCounts = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary'].map(rarity => ({
+    rarity,
+    count: ownedCards.filter(card => String(card.rarity).toLowerCase() === rarity.toLowerCase()).length
+  }));
+  const highestRarity = [...rarityCounts].reverse().find(item => item.count > 0);
+  $$('[data-collection-highlight]').forEach(element => {
+    element.textContent = highestRarity ? `${highestRarity.count} ${highestRarity.rarity} owned` : 'Your first card awaits';
+  });
+  $$('[data-collection-insight]').forEach(element => {
+    const favoriteCount = ownedCards.filter(card => isFavorite(card.id)).length;
+    element.textContent = ownedCards.length
+      ? `${favoriteCount} favorite${favoriteCount === 1 ? '' : 's'} selected · ${p}% of the full catalog collected.`
+      : 'Collect your first card to begin building a rarity showcase.';
+  });
+  $$('[data-rarity-breakdown]').forEach(element => {
+    element.innerHTML = rarityCounts.map(item => `<span class="rarity-${item.rarity.toLowerCase()}"><b>${item.count}</b> ${item.rarity}</span>`).join('');
+  });
   $('#sfxToggle')?.classList.toggle('on', sfxOn);
 }
 
@@ -624,24 +665,32 @@ function renderFullView() {
 
 function renderGridPage(target, mode) {
   const wrap = $(target); if (!wrap) return;
-  let list = cards;
-  if (mode === 'collection') list = cards.filter(c => isCollected(c.id));
-  if (mode === 'favorites') list = cards.filter(c => isFavorite(c.id));
+  let baseList = cards;
+  if (mode === 'collection') baseList = cards.filter(c => isCollected(c.id));
+  if (mode === 'favorites') baseList = cards.filter(c => isFavorite(c.id));
+  if (mode === 'duplicates') baseList = cards.filter(c => getCardQuantity(c.id) > 1);
+  const list = filterCardList(baseList, activeFilters(), { respectOwnership: false });
+  if (mode === 'collection') {
+    $$('[data-filter-summary]').forEach(element => {
+      element.textContent = `Showing ${list.length} of ${baseList.length} owned card${baseList.length === 1 ? '' : 's'}`;
+    });
+  }
   wrap.classList.toggle('empty-grid', !list.length);
   wrap.innerHTML = list.length ? list.map(c => {
     const got = isCollected(c.id); const hidden = !got;
-    return `<article class="collection-card ${rarityClass(c)}"><div class="collection-image">${quantityBadgesHtml(c.id)}<img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"></div><h3>${esc(getVisibleName(c))}</h3><p class="collection-card-number">${esc(c.collectorNumber || c.number)} • ${esc(c.series)}</p><div class="card-meta-chips compact">${cardIdentityChips(c,{hidden})}</div><div class="card-buttons"><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${getCardQuantity(c.id)}` : 'Not Collected'}</span>${got ? `<button class="icon-btn" onclick="toggleFavorite('${esc(c.id)}')">${isFavorite(c.id)?'★':'☆'}</button>` : ''}</div></article>`;
-  }).join('') : `<div class="empty-state"><h2>${mode === 'favorites' ? 'No favorites yet' : 'No cards here yet'}</h2><p>${mode === 'favorites' ? 'Tap the star on your favorite cards and this showcase will sparkle to life.' : 'Earn cards from Daily Boosters, redemption codes, and special rewards to fill this collection.'}</p><a class="btn primary" href="binder.html">Open Binder</a></div>`;
-  renderFavoritesShowcase();
+    const quantity = getCardQuantity(c.id);
+    return `<article class="collection-card ${rarityClass(c)}"><div class="collection-image"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"></div><h3>${esc(getVisibleName(c))}</h3><p class="collection-card-number">${esc(c.collectorNumber || c.number)} • ${esc(c.series)}</p><div class="card-meta-chips compact">${cardIdentityChips(c,{hidden})}</div>${mode === 'duplicates' ? `<p class="duplicate-copy-summary"><strong>${quantity}</strong> total copies · <strong>${quantity - 1}</strong> exchangeable</p>` : ''}<div class="card-buttons"><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${quantity}` : 'Not Collected'}</span>${got ? `<button class="icon-btn" onclick="toggleFavorite('${esc(c.id)}')" aria-label="${isFavorite(c.id) ? 'Remove from favorites' : 'Add to favorites'}">${isFavorite(c.id)?'★':'☆'}</button>` : ''}</div></article>`;
+  }).join('') : `<div class="empty-state"><h2>${baseList.length ? 'No cards match these filters' : (mode === 'favorites' ? 'No favorites yet' : 'No cards here yet')}</h2><p>${baseList.length ? 'Try resetting one or more filters to see additional cards.' : (mode === 'favorites' ? 'Tap the star on your favorite cards and this showcase will sparkle to life.' : 'Earn cards from Daily Boosters, redemption codes, and special rewards to fill this collection.')}</p>${baseList.length ? '<button class="btn primary" type="button" data-reset-card-filters>Reset Filters</button>' : '<a class="btn primary" href="binder.html">Open Binder</a>'}</div>`;
   attachTileTilts();
   attachBinderHoverSfx();
 }
 
 function renderFavoritesShowcase() {
   const showcase = $('#favoriteShowcase'); if (!showcase) return;
-  const favs = cards.filter(c => isFavorite(c.id));
-  if (!favs.length) { showcase.innerHTML = `<div class="empty-state trophy-empty"><h2>Favorite Showcase</h2><p>Star a card to put it on the Starlight stage. Your favorites will scroll here like a tiny idol parade.</p><a class="btn primary" href="binder.html">Find Favorites</a></div>`; return; }
-  showcase.innerHTML = `<div class="favorite-carousel-head"><h2>Favorite Showcase 💖</h2><p>${favs.length} favorite card${favs.length===1?'':'s'} saved to this collection.</p></div><div class="favorite-carousel">${favs.map((c,i)=>{ const hidden = !isCollected(c.id); return `<button class="fav-spot ${rarityClass(c)}" style="--i:${i}" onclick="selected=cards.find(x=>x.id==='${esc(c.id)}');selectedIndex=cards.findIndex(x=>x.id==='${esc(c.id)}');openFullView('favorites')"><span class="fav-image">${quantityBadgesHtml(c.id)}<img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}"></span><span>${esc(getVisibleName(c))}</span></button>`}).join('')}</div>`;
+  const allFavorites = cards.filter(c => isFavorite(c.id));
+  const favs = filterCardList(allFavorites, activeFilters(), { respectOwnership: false });
+  if (!favs.length) { showcase.innerHTML = `<div class="empty-state trophy-empty"><h2>${allFavorites.length ? 'No favorites match these filters' : 'Favorite Showcase'}</h2><p>${allFavorites.length ? 'Reset the filters to bring the rest of your favorite cards back into view.' : 'Star a card to put it on the Starlight stage. Your favorites will scroll here like a tiny idol parade.'}</p>${allFavorites.length ? '<button class="btn primary" type="button" data-reset-card-filters>Reset Filters</button>' : '<a class="btn primary" href="binder.html">Find Favorites</a>'}</div>`; return; }
+  showcase.innerHTML = `<div class="favorite-carousel-head"><h2>Favorite Showcase 💖</h2><p>${favs.length} favorite card${favs.length===1?'':'s'} saved to this collection.</p></div><div class="favorite-carousel">${favs.map((c,i)=>{ const hidden = !isCollected(c.id); return `<button class="fav-spot ${rarityClass(c)}" style="--i:${i}" onclick="selected=cards.find(x=>x.id==='${esc(c.id)}');selectedIndex=cards.findIndex(x=>x.id==='${esc(c.id)}');openFullView('favorites')"><span class="fav-image"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}"></span><span>${esc(getVisibleName(c))}</span></button>`}).join('')}</div>`;
   attachTileTilts();
   attachBinderHoverSfx();
 }
@@ -703,7 +752,7 @@ function renderAbout() {
   const groups = [...new Set(cards.map(c => c.series))];
   about.innerHTML = groups.map(series => { const list = cards.filter(c => c.series === series); const legendary = list.filter(c=>c.rarity==='Legendary').length; return `<div class="collection-card text-card"><h3>${esc(series)}</h3><p>${esc(list.find(c=>c.seriesDescription)?.seriesDescription || 'A Starlight card series.')}</p><p><b>${list.length}</b> cards • <b>${legendary}</b> Legendary</p></div>`; }).join('');
 }
-function renderAll() { document.body.classList.toggle('sfx-on', sfxOn); renderShell(); if (pageName === 'binder') renderBinder(); renderGridPage('#collectionGrid', 'collection'); renderGridPage('#favoriteGrid', 'favorites'); renderChecklist(); renderAbout(); updateRaritySelectClass(); }
+function renderAll() { document.body.classList.toggle('sfx-on', sfxOn); renderShell(); if (pageName === 'binder') renderBinder(); renderGridPage('#collectionGrid', 'collection'); renderGridPage('#favoriteGrid', 'favorites'); renderGridPage('#collectionDuplicateGrid', 'duplicates'); renderFavoritesShowcase(); renderChecklist(); renderAbout(); updateRaritySelectClass(); }
 
 
 function startPackOpen(series) {
@@ -741,10 +790,28 @@ document.addEventListener('click', e => {
   const tile = e.target.closest('.card-tile');
   if (tile) { selected = cards.find(c => c.id === tile.dataset.id) || selected; selectedIndex = cards.findIndex(c => c.id === tile.dataset.id); previewFlipped = false; renderDetail(); playSfx('sparkle'); }
 });
-document.addEventListener('input', e => { if (e.target.matches('#globalSearch, [data-series], [data-rarity], [name="viewFilter"], #sortSelect')) { page = 1; renderAll(); updateRaritySelectClass(); } });
-document.addEventListener('change', e => { if (e.target.matches('#globalSearch, [data-series], [data-rarity], [name="viewFilter"], #sortSelect')) { page = 1; renderAll(); updateRaritySelectClass(); } });
+function applyCardFilterChange() {
+  page = 1;
+  renderAll();
+  updateRaritySelectClass();
+  window.dispatchEvent(new CustomEvent('starlight-card-filters-changed'));
+}
+document.addEventListener('input', e => { if (e.target.matches('#globalSearch, [data-series], [data-rarity], [name="viewFilter"], #sortSelect')) applyCardFilterChange(); });
+document.addEventListener('change', e => { if (e.target.matches('#globalSearch, [data-series], [data-rarity], [name="viewFilter"], #sortSelect')) applyCardFilterChange(); });
+document.addEventListener('click', e => {
+  const reset = e.target.closest('[data-reset-card-filters]');
+  if (!reset) return;
+  $('#globalSearch') && ($('#globalSearch').value = '');
+  $('[data-series]') && ($('[data-series]').value = 'All Series');
+  $('[data-rarity]') && ($('[data-rarity]').value = 'All Rarities');
+  $('#sortSelect') && ($('#sortSelect').value = 'numberAsc');
+  const allCards = $('[name="viewFilter"][value="all"]');
+  if (allCards) allCards.checked = true;
+  applyCardFilterChange();
+});
 document.addEventListener('keydown', e => { if ($('#cardOverlay')?.classList.contains('open')) { if (e.key === 'ArrowLeft') stepFullView(-1); if (e.key === 'ArrowRight') stepFullView(1); } });
 document.addEventListener('DOMContentLoaded', () => {
+  renderFilterControls();
   if (pageName === 'binder') document.body.classList.add('series-select');
   loadCards();
   $('#prevPage')?.addEventListener('click', () => { page = Math.max(1, page - 1); renderAll(); playSfx('page'); });
@@ -833,19 +900,19 @@ function renderV61SeriesLandingHtml() {
 function renderV61CardGridHtml() {
   const f = activeFilters();
   const series = f.series === 'All Series' ? ([...new Set(cards.map(c => c.series))][0] || '') : f.series;
-  let list = cards.filter(c => c.series === series);
-  const q = f.q;
-  if (f.rarity !== 'All Rarities') list = list.filter(c => String(c.rarity).toLowerCase() === String(f.rarity).toLowerCase());
-  if (q) list = list.filter(c => `${c.number} ${c.name} ${c.series} ${c.rarity} ${c.artist} ${c.cardDescription}`.toLowerCase().includes(q));
-  sortCards(list, f.sort);
+  const seriesCards = cards.filter(c => c.series === series);
+  const list = filterCardList(seriesCards, { ...f, series });
   const gotCount = list.filter(c => isCollected(c.id)).length;
+  $$('[data-filter-summary]').forEach(element => {
+    element.textContent = `Showing ${list.length} of ${seriesCards.length} cards in ${series}`;
+  });
   return `<div class="v61-grid-shell">
     <div class="v61-grid-head">
       <button id="backToSeries" class="v61-back-btn" type="button">← Back to Series</button>
       <div><h2>${esc(series)}</h2><p>Browse the set and see which Starlight cards you have earned.</p></div>
       <span class="v61-count-pill">Collected: ${gotCount} / ${list.length} ✨</span>
     </div>
-    <div class="v61-grid">${list.map((card,i)=>renderV61Card(card,i)).join('')}</div>
+    <div class="v61-grid">${list.length ? list.map((card,i)=>renderV61Card(card,i)).join('') : '<div class="empty-state"><h2>No cards match these filters</h2><p>Reset one or more filters to browse this series again.</p><button class="btn primary" type="button" data-reset-card-filters>Reset Filters</button></div>'}</div>
   </div>`;
 }
 function renderV61Card(card, i) {
@@ -869,7 +936,12 @@ function renderV62Showcase(inSeriesSelect = false) {
   if (!panel) return;
   if (inSeriesSelect) { panel.innerHTML = ''; return; }
   applyFilters();
-  const list = filtered.length ? filtered : cards;
+  const list = filtered;
+  if (!list.length) {
+    selected = null;
+    panel.innerHTML = `<div class="v62-empty-showcase"><p class="eyebrow">Selected Card</p><h2>No matching card</h2><p>Adjust or reset the Binder filters to choose a card.</p><button class="btn primary" type="button" data-reset-card-filters>Reset Filters</button></div>`;
+    return;
+  }
   if (!selected || !list.some(c => c.id === selected.id)) {
     selected = list[0] || null;
     selectedIndex = selected ? cards.findIndex(c => c.id === selected.id) : 0;

@@ -5,15 +5,15 @@ import { getMyNotifications } from './notification-service.js';
 import { getActiveEvents } from './event-service.js';
 import { getReceivedRewards } from './received-rewards-service.js';
 
-const SHELL_BUILD = '89.2.0';
+const SHELL_BUILD = '94.1.0';
 const VIEW_READY_TIMEOUT_MS = 6500;
 const MAX_VIEW_RETRIES = 1;
 
 const routes = {
   home:{title:'Home',src:'home.html'},
-  binder:{title:'Card Binder',src:null}, collection:{title:'My Collection',src:'collection.html'},
-  daily:{title:'Daily Free Booster Pack',src:'daily-booster.html'}, shop:{title:'Starlight Card Shop',src:'booster-shop.html'}, events:{title:'Starlight Events',src:'events.html'}, redeem:{title:'Redeem Code',src:'redeem.html'},
-  'star-bits':{title:'Star Bits Exchange',src:'star-bits.html'}, checklist:{title:'Checklist',src:'checklist.html'},
+  binder:{title:'The Starlight Card Series Binder',src:null}, collection:{title:'My Card Collection & Favorites',src:'collection.html'},
+  daily:{title:'Daily Free Booster Pack',src:'daily-booster.html'}, shop:{title:'Starlight Card Shop',src:'booster-shop.html'}, events:{title:'Starlight Events',src:'events.html'}, redeem:{title:'Redeem A Code',src:'redeem.html'},
+  'star-bits':{title:'Star Bits Exchange',src:'star-bits.html'}, checklist:{title:'My Checklist',src:'checklist.html'},
   trades:{title:'Wishlist & Trades',src:'trade-lists.html'}, offers:{title:'Trade Offers',src:'trade-offers.html'},
   notifications:{title:'Notifications',src:'notifications.html'}, rewards:{title:'Received Gifts',src:'received-rewards.html'}, profile:{title:'Profile Settings',src:'profile-settings.html'}, collector:{title:'Collector Profile',src:'collector.html'},
   report:{title:'Report Profile',src:'report-profile.html'}, about:{title:'About',src:'about.html'}, socials:{title:'Socials',src:'socials.html'},
@@ -28,11 +28,14 @@ const frameWrap=document.getElementById('shellViewFrame');
 const frame=document.getElementById('shellViewIframe');
 const heading=document.getElementById('shellViewTitle');
 const menuButton=document.getElementById('shellMenuButton');
+const mainContent=document.querySelector('.main');
 let profileUsername='';
 let currentRoute='binder';
 let currentLoadToken=0;
 let readyTimer=0;
 let retryCount=0;
+
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
 function ensureViewStateUi(){
   if(!frameWrap)return {};
@@ -119,12 +122,13 @@ function navigate(route,{push=true,extra={}}={}){
   if(push)history.pushState({view:route},'',url);
   setActive(route);
   document.body.classList.remove('shell-menu-open');
+  mainContent?.scrollTo({top:0,left:0,behavior:'auto'});
   if(route==='binder'){
     clearReadyTimer();
     nativeView?.classList.remove('hidden');
     frameWrap?.classList.remove('active','is-loading','has-error');
     if(frame)frame.src='about:blank';
-    document.title='Card Binder | Starlight Card Binder';
+    document.title='The Starlight Card Series Binder | Starlight Card Binder';
     return;
   }
   nativeView?.classList.add('hidden');
@@ -132,7 +136,7 @@ function navigate(route,{push=true,extra={}}={}){
   if(heading)heading.textContent=routes[route].title;
   document.title=`${routes[route].title} | Starlight Card Binder`;
   loadEmbeddedView(route,{force:true,resetRetry:true});
-  window.scrollTo({top:0,behavior:'auto'});
+  window.scrollTo({top:0,left:0,behavior:'auto'});
 }
 
 function markViewReady(data={}){
@@ -140,6 +144,12 @@ function markViewReady(data={}){
   clearReadyTimer();
   setViewState('ready');
   if(Number.isFinite(Number(data.height)))resizeEmbeddedView(Number(data.height));
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      mainContent?.scrollTo({top:0,left:0,behavior:'auto'});
+      window.scrollTo({top:0,left:0,behavior:'auto'});
+    });
+  });
 }
 
 function resizeEmbeddedView(value){

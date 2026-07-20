@@ -339,3 +339,61 @@ body[data-page="binder"] .series-hero {
 .brand{color:inherit;text-decoration:none}
 .shell-primary-links a[data-shell-view="home"]{font-weight:950}
 @media(max-width:980px){.shell-primary-links{overflow-x:auto;scrollbar-width:none}.shell-primary-links::-webkit-scrollbar{display:none}}
+
+/* V94.1 — longer, clearer navigation labels and consistent embedded headings. */
+@media (min-width: 1181px) {
+  body.unified-shell .site { grid-template-columns: minmax(286px, 310px) minmax(0, 1fr); }
+}
+.unified-nav a { align-items: flex-start; line-height: 1.25; }
+.unified-shell .unified-nav a > span:not(.shell-nav-badge):not(.shell-daily-ready-badge) {
+  min-width: 0;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+}
+.shell-nav-label { line-height: 1.3; }
+.shell-view-heading {
+  display: grid;
+  gap: 3px;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(107, 198, 248, .24);
+  background: linear-gradient(135deg, rgba(240, 250, 255, .94), rgba(255, 239, 249, .92));
+}
+.shell-view-heading p {
+  margin: 0;
+  color: #d45b9c;
+  font-size: .7rem;
+  font-weight: 950;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+.shell-view-heading h1 { margin: 0; color: #405fa1; font-size: clamp(1.25rem, 2vw, 1.7rem); }
+.unified-shell .main,
+.unified-shell .shell-view-frame { overflow-anchor: none; }
+
+@media (max-width: 1450px) {
+  .shell-account-bar-v883 {
+    grid-template-columns: minmax(220px, 1fr) auto;
+    grid-template-areas: "profile actions" "nav nav" "search search";
+  }
+  .shell-account-bar-v883 .shell-primary-links {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+  .shell-account-bar-v883 .shell-primary-links::-webkit-scrollbar { display: none; }
+  .shell-account-bar-v883 .shell-primary-links a { flex: 0 0 auto; }
+  .shell-account-bar-v883 .shell-auth-button { white-space: nowrap; }
+}
+
+@media (max-width: 520px) {
+  .shell-account-bar-v883 {
+    grid-template-columns: 1fr;
+    grid-template-areas: "profile" "actions" "nav" "search";
+  }
+  .shell-account-bar-v883 .shell-account-left,
+  .shell-account-bar-v883 .shell-account-actions { width: 100%; }
+  .shell-account-bar-v883 .shell-account-actions { justify-content: flex-start; flex-wrap: wrap; }
+  .shell-account-bar-v883 .shell-signed-out-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+}

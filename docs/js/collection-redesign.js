@@ -1,8 +1,23 @@
+const tabs = [...document.querySelectorAll('[data-collection-tab]')];
+const panels = [...document.querySelectorAll('[data-collection-panel]')];
 
-import { supabase } from './supabase-client.js';
-const tabs=[...document.querySelectorAll('[data-collection-tab]')];
-const panels=[...document.querySelectorAll('[data-collection-panel]')];
-function activate(name){tabs.forEach(b=>b.classList.toggle('active',b.dataset.collectionTab===name));panels.forEach(p=>{const on=p.dataset.collectionPanel===name;p.classList.toggle('active',on);p.hidden=!on});if(name==='duplicates')renderDuplicates()}
-tabs.forEach(b=>b.addEventListener('click',()=>activate(b.dataset.collectionTab)));
-async function renderDuplicates(){const grid=document.getElementById('collectionDuplicateGrid');if(!grid)return;grid.innerHTML='<div class="empty-state"><p>Loading duplicate cards…</p></div>';const {data,error}=await supabase.from('user_cards').select('card_id,quantity,cards(id,card_number,collector_number,name,rarity,category_id,subcategory_id,finish_id,image_url,thumbnail_url,series_id)').gt('quantity',1).order('quantity',{ascending:false});if(error){grid.innerHTML='<div class="empty-state"><h2>Could not load duplicates</h2><p>Please refresh and try again.</p></div>';return}const rows=(data||[]).filter(r=>r.cards);if(!rows.length){grid.innerHTML='<div class="empty-state"><h2>No duplicates right now</h2><p>Extra copies from boosters and rewards will appear here.</p></div>';return}grid.innerHTML=rows.map(r=>`<article class="collection-card rarity-${String(r.cards.rarity||'common').toLowerCase()}"><div class="collection-image"><img src="${r.cards.thumbnail_url||r.cards.image_url||''}" alt="${r.cards.name}"><span class="quantity-badge">×${r.quantity}</span><span class="duplicate-badge">+${r.quantity-1} Extra</span></div><h3>${r.cards.name}</h3><p>#${r.cards.collector_number||r.cards.card_number} • ${r.cards.rarity}</p><div class="card-meta-chips compact"><span class="card-meta-chip category">${String(r.cards.category_id||'Uncategorized').replace(/[_-]+/g,' ')}</span>${r.cards.subcategory_id?`<span class="card-meta-chip subcategory">${String(r.cards.subcategory_id).replace(/[_-]+/g,' ')}</span>`:''}</div></article>`).join('')}
-window.addEventListener('starlight-cloud-ready',()=>{if(document.querySelector('[data-collection-panel="duplicates"].active'))renderDuplicates()});
+function activateCollectionView(name) {
+  tabs.forEach(tab => {
+    const active = tab.dataset.collectionTab === name;
+    tab.classList.toggle('active', active);
+    tab.setAttribute('aria-selected', String(active));
+  });
+  panels.forEach(panel => {
+    const active = panel.dataset.collectionPanel === name;
+    panel.classList.toggle('active', active);
+    panel.hidden = !active;
+  });
+}
+
+tabs.forEach(tab => {
+  tab.setAttribute('role', 'tab');
+  tab.addEventListener('click', () => activateCollectionView(tab.dataset.collectionTab));
+});
+
+document.querySelector('.collection-tabs')?.setAttribute('role', 'tablist');
+activateCollectionView('all');
