@@ -15,6 +15,17 @@ The active milestone is **V1.0 — Foundation**. Unless the user explicitly chan
 - Organize work by milestone and a small, testable vertical slice. State the active milestone and acceptance criteria when beginning substantial work.
 - Do not combine a broad refactor with unrelated feature work.
 - Favor incremental migrations with compatibility adapters over a site-wide rewrite.
+- Prefer complete implementation in the repository over instructions, snippets, or replacement files for the user to apply manually.
+
+## Execution pace and scope
+
+- For routine visual, CSS, wording, and layout changes, work quickly and stay tightly scoped.
+- Inspect only the files and dependencies directly relevant to the requested change, then implement it without extended planning or a repository-wide audit.
+- Preserve existing functionality and all unrelated user changes. Do not opportunistically reformat, rename, reorganize, or clean up neighboring code.
+- Use targeted validation for routine work: review the affected diff, run the narrowest applicable check, and inspect only the changed page or component at the relevant viewport when visual behavior is involved.
+- Do not require a full-project analysis or full smoke-test matrix for routine changes.
+- Use broader analysis and validation when the work affects Supabase, authentication, purchases, security, user data, or shared application logic. These areas take precedence over the fast path because regressions can affect authorization, persistence, currency, rewards, or multiple product flows.
+- Deployment, publishing, commits, pushes, branches, worktrees, forks, and pull requests require explicit user direction. Completing an implementation does not imply permission to perform any of them.
 
 ## Repository map
 
@@ -140,7 +151,15 @@ Do not pull later-milestone work into V1.0 unless it is required to preserve exi
 
 Match validation effort to risk, but do not hand off unverified changes.
 
-For every change:
+For routine visual, CSS, wording, and layout changes:
+
+- Review only the affected diff for unintended edits and stale asset references.
+- Run the narrowest relevant syntax, structure, or targeted test command.
+- When layout or interaction changes, serve `docs/` locally and inspect the affected page or component at the relevant desktop or mobile width.
+- Check the affected page for obvious console errors or failed assets when browser validation is warranted.
+- Stop when the requested change is implemented and the targeted checks pass; do not expand into unrelated cleanup or a full-project audit.
+
+For Supabase, authentication, purchases, security, user data, shared application logic, or explicitly requested broad foundation work:
 
 - Review the diff for unintended edits, copied logic, secrets, and stale asset references.
 - Check modified JavaScript for syntax errors with an available JavaScript runtime.

@@ -22,7 +22,9 @@
   padding: 0 !important;
   overflow: hidden !important;
   color: var(--st-r3-ink);
-  background: var(--st-r3-night) !important;
+  background: rgba(7, 10, 28, 0.58) !important;
+  -webkit-backdrop-filter: blur(13px) saturate(1.16);
+  backdrop-filter: blur(13px) saturate(1.16);
   isolation: isolate;
 }
 .st-r3-overlay.hidden,
@@ -39,6 +41,34 @@
   color: inherit;
   background: transparent;
   outline: 0;
+  isolation: isolate;
+}
+.st-r3-dialog::before,
+.st-r3-dialog::after { content: ""; position: absolute; pointer-events: none; }
+.st-r3-dialog::before {
+  z-index: 0;
+  inset: -4%;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,.24) 0 2%, transparent 10%),
+    radial-gradient(circle at 50% 50%, transparent 0 18%, rgba(142,229,255,.38) 18.5% 19.4%, transparent 20% 28%, rgba(255,151,216,.3) 28.5% 29.3%, transparent 30% 39%, rgba(190,166,255,.2) 39.5% 40.3%, transparent 41%),
+    radial-gradient(ellipse at 50% 54%, rgba(103,195,255,.28), transparent 50%),
+    linear-gradient(135deg, rgba(16,35,91,.28), rgba(81,32,100,.2));
+  opacity: .92;
+  animation: stR3PortalBreathe 8s ease-in-out infinite alternate;
+}
+.st-r3-dialog::after {
+  z-index: 1;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,.84) 0 1px, transparent 1.7px),
+    radial-gradient(circle, rgba(255,182,229,.7) 0 1.2px, transparent 2px);
+  background-position: 0 0, 29px 41px;
+  background-size: 73px 73px, 127px 127px;
+  opacity: .4;
+}
+@keyframes stR3PortalBreathe {
+  from { opacity: .76; transform: scale(.985) rotate(-.35deg); }
+  to { opacity: 1; transform: scale(1.02) rotate(.35deg); }
 }
 .st-r3-header {
   position: absolute;
@@ -152,6 +182,7 @@
 }
 .st-r3-stage {
   position: absolute;
+  z-index: 2;
   inset: 0;
   width: 100%;
   height: 100%;
@@ -750,12 +781,23 @@
   z-index: 12;
   top: calc(50% + (var(--card-width) * 0.73));
   left: 50%;
-  width: min(90vw, 460px);
+  width: min(90vw, 480px);
+  padding: 13px 18px 12px;
+  border: 1px solid rgba(255,255,255,.34);
+  border-radius: 20px;
   color: #fff;
+  background: linear-gradient(135deg, rgba(17,22,62,.76), rgba(54,25,75,.68));
+  -webkit-backdrop-filter: blur(11px) saturate(1.14);
+  backdrop-filter: blur(11px) saturate(1.14);
+  box-shadow: 0 14px 36px rgba(2,4,22,.32), 0 0 28px color-mix(in srgb, var(--r3-primary) 38%, transparent);
   text-align: center;
   text-shadow: 0 2px 9px #070a1c;
   transform: translateX(-50%);
+  overflow: hidden;
 }
+.st-r3-card-details::before { content:""; position:absolute; top:0; left:14%; right:14%; height:2px; background:linear-gradient(90deg,transparent,var(--r3-primary),#fff,var(--r3-secondary),transparent); box-shadow:0 0 13px var(--r3-primary); }
+.st-r3-reveal-scene.is-revealed .st-r3-card-details { animation: stR3DetailsEnter 430ms cubic-bezier(.18,.82,.3,1) both; }
+@keyframes stR3DetailsEnter { from { opacity:0; transform:translateX(-50%) translateY(18px) scale(.94); } to { opacity:1; transform:translateX(-50%) translateY(0) scale(1); } }
 
 .st-r3-card-name {
   overflow: hidden;
@@ -764,6 +806,7 @@
   line-height: 1.15;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-shadow: 0 0 18px color-mix(in srgb, var(--r3-primary) 52%, transparent), 0 2px 8px #070a1c;
 }
 
 .st-r3-card-meta {
@@ -782,35 +825,37 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 7px;
-  margin-top: 8px;
+  margin-top: 9px;
 }
 
 .st-r3-badge,
 .st-r3-result-status {
   display: inline-flex;
   align-items: center;
-  min-height: 24px;
-  padding: 4px 9px;
-  border: 1px solid rgba(255, 255, 255, 0.34);
+  min-height: 27px;
+  padding: .24rem .62rem;
+  border: 2px solid transparent;
   border-radius: 999px;
   color: #fff;
   background: #302550;
-  font-size: 0.65rem;
+  font-size: .72rem;
   font-weight: 900;
-  letter-spacing: 0.06em;
-  line-height: 1;
-  text-transform: uppercase;
+  letter-spacing: .02em;
+  line-height: 1.1;
   text-shadow: none;
 }
-
-.st-r3-badge.rarity-uncommon { background: #136a73; }
-.st-r3-badge.rarity-rare { color: #3f2a00; background: #ffe68a; }
-.st-r3-badge.rarity-epic { background: #8d2f87; }
-.st-r3-badge.rarity-legendary { color: #432c00; background: #fff2a8; }
+.st-r3-badge.rarity-common { color:#5b6572; background:#f6f7fb; border-color:#cfd6df; }
+.st-r3-badge.rarity-uncommon { color:#1267b9; background:#eaf5ff; border-color:#76bfff; }
+.st-r3-badge.rarity-rare { color:#bf6414; background:#fff0df; border-color:#ffb15c; }
+.st-r3-badge.rarity-epic { color:#d62e8a; background:#ffe6f4; border-color:#ff9bd3; }
+.st-r3-badge.rarity-legendary { color:#9a6a00; background:linear-gradient(180deg,#fffdf0,#ffe66d); border-color:#ffd21f; box-shadow:0 0 12px rgba(255,210,31,.35); }
 .st-r3-badge.is-new,
-.st-r3-result-status.is-new { background: #176847; }
+.st-r3-result-status.is-new { color:#fff; background:#176847; border-color:rgba(255,255,255,.36); }
 .st-r3-badge.is-duplicate,
-.st-r3-result-status.is-duplicate { background: #4b4562; }
+.st-r3-result-status.is-duplicate { color:#fff; background:#4b4562; border-color:rgba(255,255,255,.28); }
+.st-r3-reveal-scene.is-revealed .st-r3-badge { animation:stR3BadgePop 360ms 120ms cubic-bezier(.2,.88,.3,1.2) both; }
+.st-r3-reveal-scene.is-revealed .st-r3-badge:nth-child(2) { animation-delay:190ms; }
+@keyframes stR3BadgePop { from { opacity:0; transform:translateY(7px) scale(.82); } to { opacity:1; transform:translateY(0) scale(1); } }
 
 .st-r3-continue {
   margin-top: 7px;
@@ -818,6 +863,7 @@
   font-size: 0.7rem;
   font-weight: 800;
 }
+.st-r3-continue::after { content:"  ✦"; color:var(--r3-primary); }
 
 /* Results are created only after the final reveal. They are the only scrolling scene. */
 .st-r3-results {
@@ -903,6 +949,8 @@
   font-weight: 650;
   line-height: 1.2;
 }
+.st-r3-result-badges { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:8px; }
+.st-r3-result-badges .st-r3-result-status { margin-top:0; }
 
 .st-r3-result-status {
   margin-top: 8px;

@@ -1,6 +1,6 @@
 import { supabase } from "../supabase-client.js";
 import { getDailyBoosterStatus, openDailyBooster } from "../daily-booster-service.js";
-import { revealRewardSequence } from "../reward-reveal.js?v=1.3.1";
+import { revealRewardSequence } from "../reward-reveal.js?v=1.4.0";
 import { getPublicBoosterConfig } from "../booster-config-service.js";
 const packImage=document.getElementById('daily-pack-image'),portal=document.getElementById('portal-zone'),pack=document.getElementById('pack-trigger'),packLabel=document.getElementById('pack-ready-label'),signIn=document.getElementById('sign-in-link'),heading=document.getElementById('daily-status-heading'),description=document.getElementById('daily-status-description'),countdown=document.getElementById('countdown'),rewardSection=document.getElementById('reward-section'),rewardGrid=document.getElementById('reward-grid'),rewardTitle=document.getElementById('reward-title'),statusText=document.getElementById('page-status');
 let timer=null,isBusy=false;

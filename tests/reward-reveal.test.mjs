@@ -87,6 +87,8 @@ test('uses one deliberate pack, pile, and card motion system with reduced-motion
   assert.match(stylesheet, /@keyframes stR3CardSpin/);
   assert.match(stylesheet, /@keyframes stR3LegendaryRise/);
   assert.match(stylesheet, /@keyframes stR3LegendarySpin/);
+  assert.match(stylesheet, /@keyframes stR3PortalBreathe/);
+  assert.match(stylesheet, /@keyframes stR3DetailsEnter/);
   assert.match(stylesheet, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
@@ -106,8 +108,13 @@ test('keeps the fixed-center reveal lightweight and progressively loads artwork'
   assert.match(stylesheet, /\.st-r3-overlay[\s\S]*position: fixed !important;/);
   assert.match(stylesheet, /\.st-r3-card-actor[\s\S]*top: 50%;[\s\S]*left: 50%;/);
   assert.match(stylesheet, /\.st-r3-pile-button[\s\S]*top: 50%;[\s\S]*left: 50%;/);
-  assert.doesNotMatch(stylesheet, /backdrop-filter\s*:/);
-  assert.doesNotMatch(stylesheet, /stReveal|st-r3-backdrop-image|filter:\s*blur|drop-shadow\(/);
+  assert.match(stylesheet, /backdrop-filter:\s*blur\(13px\)/);
+  assert.match(stylesheet, /\.st-r3-badge\.rarity-common[^}]*#f6f7fb[^}]*#cfd6df/);
+  assert.match(stylesheet, /\.st-r3-badge\.rarity-uncommon[^}]*#eaf5ff[^}]*#76bfff/);
+  assert.match(stylesheet, /\.st-r3-badge\.rarity-rare[^}]*#fff0df[^}]*#ffb15c/);
+  assert.match(stylesheet, /\.st-r3-badge\.rarity-epic[^}]*#ffe6f4[^}]*#ff9bd3/);
+  assert.match(stylesheet, /\.st-r3-badge\.rarity-legendary[^}]*#ffe66d[^}]*#ffd21f/);
+  assert.doesNotMatch(stylesheet, /stReveal|st-r3-backdrop-image|drop-shadow\(/);
   assert.match(stylesheet, /will-change: transform, opacity/);
   assert.match(stylesheet, /\/\* Pile: static between clicks/);
 });
@@ -121,7 +128,7 @@ test('keeps every production reward entry point on the canonical reveal engine',
   ].map(file => readFile(new URL(`../docs/js/pages/${file}`, import.meta.url), 'utf8')));
 
   consumers.forEach(source => {
-    assert.match(source, /reward-reveal\.js\?v=1\.3\.1/);
+    assert.match(source, /reward-reveal\.js\?v=1\.4\.0/);
     assert.match(source, /revealRewardSequence\s*\(/);
     assert.doesNotMatch(source, /@keyframes|stR3CardSpin|stR3PackTop/);
   });

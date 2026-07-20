@@ -99,7 +99,7 @@ function getHost() {
   return { win: window, doc: document };
 }
 
-const REVEAL_STYLESHEET_URL = new URL('../css/reward-reveal.css?v=1.3.0', import.meta.url).href;
+const REVEAL_STYLESHEET_URL = new URL('../css/reward-reveal.css?v=1.4.0', import.meta.url).href;
 const stylesheetLoads = new WeakMap();
 const imagePreparations = new WeakMap();
 
@@ -489,13 +489,16 @@ export async function revealRewardSequence(cards = [], options = {}) {
         const copy = createElement(doc, 'div', 'st-r3-result-copy');
         const name = createElement(doc, 'h4', '', card.name);
         const detail = createElement(doc, 'p', '', cardDescription(card) || 'Starlight Card');
+        const badges = createElement(doc, 'div', 'st-r3-result-badges');
+        const rarity = createElement(doc, 'span', `st-r3-badge rarity-${card.rarity}`, prettyMeta(card.rarity));
         const status = createElement(
           doc,
           'span',
           `st-r3-result-status ${card.isDuplicate ? 'is-duplicate' : 'is-new'}`,
           card.isDuplicate ? 'Duplicate' : 'New'
         );
-        copy.append(name, detail, status);
+        badges.append(rarity, status);
+        copy.append(name, detail, badges);
         item.append(image, copy);
         fragment.append(item);
       });
