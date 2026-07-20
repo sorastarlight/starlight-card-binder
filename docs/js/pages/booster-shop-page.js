@@ -1,7 +1,7 @@
 import { supabase } from '../supabase-client.js';
 import { getStarBitsExchangePreview } from '../star-bits-service.js';
 import { openStarBitsBoosterById } from '../daily-booster-service.js';
-import { revealRewardSequence } from '../reward-reveal.js?v=1.5.2';
+import { revealRewardSequence } from '../reward-reveal.js?v=1.5.3';
 
 const packsEl = document.getElementById('packs');
 const balanceEl = document.getElementById('balance');

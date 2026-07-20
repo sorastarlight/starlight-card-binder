@@ -100,14 +100,14 @@ function getHost() {
   return { win: window, doc: document };
 }
 
-const REVEAL_STYLESHEET_URL = new URL('../css/reward-reveal.css?v=1.5.2', import.meta.url).href;
+const REVEAL_STYLESHEET_URL = new URL('../css/reward-reveal.css?v=1.5.3', import.meta.url).href;
 const stylesheetLoads = new WeakMap();
 const imagePreparations = new WeakMap();
 
 function installStyles(doc) {
   if (stylesheetLoads.has(doc)) return stylesheetLoads.get(doc);
 
-  const existing = doc.getElementById('starlight-reveal-v152');
+  const existing = doc.getElementById('starlight-reveal-v153');
   if (existing?.sheet) return Promise.resolve();
 
   const link = existing || doc.createElement('link');
@@ -116,7 +116,7 @@ function installStyles(doc) {
     link.addEventListener('error', resolve, { once: true });
   });
   if (!existing) {
-    link.id = 'starlight-reveal-v152';
+    link.id = 'starlight-reveal-v153';
     link.rel = 'stylesheet';
     link.href = REVEAL_STYLESHEET_URL;
     doc.head.append(link);
@@ -303,6 +303,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
     let currentFrontImage = null;
     let resultsPopulated = false;
     const activeAudio = new Set();
+    const rootWasRevealLocked = doc.documentElement.classList.contains('st-r3-reveal-open');
 
     const overlay = createElement(doc, 'div', 'st-r3-overlay hidden');
     const dialog = createElement(doc, 'section', 'st-r3-dialog');
@@ -319,6 +320,8 @@ export async function revealRewardSequence(cards = [], options = {}) {
     );
     const progress = createElement(doc, 'p', 'st-r3-progress');
     const stage = createElement(doc, 'div', 'st-r3-stage');
+    overlay.dataset.phase = 'pack';
+    dialog.dataset.phase = 'pack';
 
     const packScene = createElement(doc, 'section', 'st-r3-scene st-r3-pack-scene');
     const packButton = createElement(doc, 'button', 'st-r3-pack-button');
@@ -453,6 +456,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
       stopAudio();
       fallbackCleanup?.();
       overlay.remove();
+      if (!rootWasRevealLocked) doc.documentElement.classList.remove('st-r3-reveal-open');
       if (returnFocus?.isConnected) returnFocus.focus?.({ preventScroll: true });
       resolve();
     };
@@ -464,6 +468,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
 
     const setPhase = nextPhase => {
       phase = nextPhase;
+      overlay.dataset.phase = nextPhase;
       dialog.dataset.phase = nextPhase;
     };
 
@@ -638,6 +643,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
     });
 
     const modalApi = win.StarlightUI || window.StarlightUI;
+    doc.documentElement.classList.add('st-r3-reveal-open');
     controller = modalApi?.adoptModal?.(overlay, {
       dialog,
       labelledBy: title.id,
