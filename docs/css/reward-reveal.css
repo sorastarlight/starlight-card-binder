@@ -1,3 +1,8 @@
+/*
+ * Approved reveal presentation baseline: v1.5.3.
+ * Keep its motion contract intact unless this version and its regression test
+ * are intentionally advanced together.
+ */
 :root {
   --st-r3-ink: #fffaff;
   --st-r3-muted: #d9d7ee;

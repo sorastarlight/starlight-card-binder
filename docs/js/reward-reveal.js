@@ -100,14 +100,20 @@ function getHost() {
   return { win: window, doc: document };
 }
 
-const REVEAL_STYLESHEET_URL = new URL('../css/reward-reveal.css?v=1.5.3', import.meta.url).href;
+export const REVEAL_PRESENTATION_VERSION = '1.5.3';
+
+const REVEAL_STYLESHEET_ID = `starlight-reveal-v${REVEAL_PRESENTATION_VERSION.replace(/\./g, '')}`;
+const REVEAL_STYLESHEET_URL = new URL(
+  `../css/reward-reveal.css?v=${REVEAL_PRESENTATION_VERSION}`,
+  import.meta.url
+).href;
 const stylesheetLoads = new WeakMap();
 const imagePreparations = new WeakMap();
 
 function installStyles(doc) {
   if (stylesheetLoads.has(doc)) return stylesheetLoads.get(doc);
 
-  const existing = doc.getElementById('starlight-reveal-v153');
+  const existing = doc.getElementById(REVEAL_STYLESHEET_ID);
   if (existing?.sheet) return Promise.resolve();
 
   const link = existing || doc.createElement('link');
@@ -116,7 +122,7 @@ function installStyles(doc) {
     link.addEventListener('error', resolve, { once: true });
   });
   if (!existing) {
-    link.id = 'starlight-reveal-v153';
+    link.id = REVEAL_STYLESHEET_ID;
     link.rel = 'stylesheet';
     link.href = REVEAL_STYLESHEET_URL;
     doc.head.append(link);

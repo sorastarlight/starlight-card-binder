@@ -1,14 +1,38 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFile, stat } from 'node:fs/promises';
 
 import {
   createRevealStackLayout,
   normalizeRevealCard,
   normalizeRevealOptions,
+  REVEAL_PRESENTATION_VERSION,
   revealSfxForRarity,
   summarizeRevealCards
 } from '../docs/js/reward-reveal.js';
+
+function normalizeMotionContract(stylesheet) {
+  const animationRules = [...stylesheet.matchAll(/([^{}]+)\{([^{}]*\banimation(?:-[a-z-]+)?\s*:[^{}]*)\}/g)]
+    .map(match => `${match[1]}{${match[2]}}`.replace(/\s+/g, ' ').trim());
+  const keyframes = [];
+  const keyframePattern = /@keyframes stR3[A-Za-z0-9]+\s*\{/g;
+  let match;
+
+  while ((match = keyframePattern.exec(stylesheet))) {
+    let depth = 0;
+    let end = match.index;
+    for (; end < stylesheet.length; end += 1) {
+      if (stylesheet[end] === '{') depth += 1;
+      if (stylesheet[end] === '}') depth -= 1;
+      if (depth === 0 && end > match.index) break;
+    }
+    keyframes.push(stylesheet.slice(match.index, end + 1).replace(/\s+/g, ' ').trim());
+    keyframePattern.lastIndex = end + 1;
+  }
+
+  return [...animationRules, ...keyframes].join('\n');
+}
 
 test('normalizes snake_case reward cards into the canonical reveal shape', () => {
   const card = normalizeRevealCard({
@@ -112,6 +136,15 @@ test('uses one deliberate pack, pile, and card motion system with reduced-motion
   assert.match(stylesheet, /@keyframes stR3PortalBreathe/);
   assert.match(stylesheet, /@keyframes stR3DetailsEnter/);
   assert.match(stylesheet, /@media \(prefers-reduced-motion: reduce\)/);
+});
+
+test('locks the approved reveal presentation and motion baseline', async () => {
+  const stylesheet = await readFile(new URL('../docs/css/reward-reveal.css', import.meta.url), 'utf8');
+  const contractHash = createHash('sha256').update(normalizeMotionContract(stylesheet)).digest('hex');
+
+  assert.equal(REVEAL_PRESENTATION_VERSION, '1.5.3');
+  assert.match(stylesheet, /Approved reveal presentation baseline: v1\.5\.3/);
+  assert.equal(contractHash, '9356dc5ec7798e5c9ad90eef7640ae32b0173613d6b98befe64a459406ef1371');
 });
 
 test('keeps the fixed-center reveal lightweight and progressively loads artwork', async () => {
