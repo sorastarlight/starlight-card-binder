@@ -100,7 +100,7 @@ function getHost() {
   return { win: window, doc: document };
 }
 
-export const REVEAL_PRESENTATION_VERSION = '1.5.3';
+export const REVEAL_PRESENTATION_VERSION = '1.5.4';
 
 const REVEAL_STYLESHEET_ID = `starlight-reveal-v${REVEAL_PRESENTATION_VERSION.replace(/\./g, '')}`;
 const REVEAL_STYLESHEET_URL = new URL(
