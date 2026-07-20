@@ -34,7 +34,8 @@ The active milestone is **V1.0 — Foundation**. Unless the user explicitly chan
 - `docs/css/` contains global and shared styles. `style.css` is an import-only compatibility entry point, `legacy/` contains its ordered legacy layers, and `pages/` contains route-specific styles. `shared-ui.css` and `app-shell.css` contain newer shared layers.
 - `docs/js/` contains browser ES modules and shared services. `pages/` contains route entry points. Keep data access in service modules and reusable UI behavior in focused UI modules.
 - `docs/js/reward-reveal.js` is the canonical reveal engine. Daily Boosters, Shop packs, Twitch rewards, redemption, and Received Gifts must call this engine rather than implement their own reveal sequence.
-- `docs/supabase/` contains ordered database migrations and diagnostics.
+- `supabase/migrations/` is the canonical, forward-only migration directory. `supabase/seed.sql` contains reproducible configuration data for local resets.
+- `docs/supabase/` is the legacy SQL archive and diagnostics collection. Do not add new migrations there or replay the directory wholesale.
 - `docs/data/`, `docs/cards/`, `docs/thumbs/`, and `docs/site_assets/` contain production content and artwork.
 - `legacy-v79.9/` and `docs.zip` are historical references. Do not modify or use them as production sources unless the user explicitly asks.
 - `docs/DEPLOYMENT_NOTES*.md` and version notes document prior releases; they are context, not the architectural source of truth.

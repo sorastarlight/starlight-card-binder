@@ -22,3 +22,7 @@ Desktop.ini
 # Build/dependency folders for later
 node_modules/
 dist/
+
+# Workspace-local development tools and caches
+.tools/
+.tmp-supabase-cli-cache/
