@@ -76,3 +76,20 @@ test('uses deliberate motion states with a reduced-motion fallback', async () =>
   assert.match(stylesheet, /@keyframes stRevealResultIn/);
   assert.match(stylesheet, /@media \(prefers-reduced-motion: reduce\)/);
 });
+
+test('keeps the reveal path lightweight and progressively loads card artwork', async () => {
+  const [script, stylesheet] = await Promise.all([
+    readFile(new URL('../docs/js/reward-reveal.js', import.meta.url), 'utf8'),
+    readFile(new URL('../docs/css/reward-reveal.css', import.meta.url), 'utf8')
+  ]);
+
+  assert.match(script, /\{ defer: true \}/);
+  assert.match(script, /createDocumentFragment\(\)/);
+  assert.match(script, /startImageLoad\(stackCards\[index \+ 1\]\.frontImage\)/);
+  assert.match(script, /computedMotionDuration\(element, win\)/);
+  assert.match(script, /waitForFrames\(win, computedMotionDuration/);
+  assert.doesNotMatch(stylesheet, /backdrop-filter\s*:/);
+  assert.doesNotMatch(stylesheet, /stRevealBackdropDrift|drop-shadow\(/);
+  assert.match(stylesheet, /will-change: transform, opacity/);
+  assert.match(stylesheet, /contain: layout paint style/);
+});

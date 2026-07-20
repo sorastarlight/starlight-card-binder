@@ -1,4 +1,13 @@
 .st-reveal-overlay {
+  --st-reveal-blue: var(--st-color-blue, #6bc6f8);
+  --st-reveal-pink: var(--st-color-pink, #ff82c8);
+  --st-reveal-gold: var(--st-color-gold, #fed334);
+  --st-reveal-lavender: #aa8cff;
+  --st-reveal-ink: var(--st-color-ink, #34466f);
+  --st-reveal-muted: var(--st-color-muted, #68738e);
+  --st-reveal-radius: var(--st-radius-lg, 1.5rem);
+  --st-reveal-motion-fast: var(--st-motion-fast, 160ms);
+  --st-reveal-motion-normal: var(--st-motion-normal, 240ms);
   position: fixed !important;
   inset: 0 !important;
   z-index: 2147483640 !important;
@@ -9,9 +18,10 @@
   padding: 18px !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
-  background: rgba(21, 27, 62, .72) !important;
+  background: rgba(28, 26, 70, .76) !important;
+  contain: layout paint style;
   isolation: isolate;
-  animation: stRevealOverlayIn .28s ease-out both;
+  animation: stRevealOverlayIn .2s ease-out both;
 }
 
 .st-reveal-overlay.hidden,
@@ -26,10 +36,9 @@
   width: 124%;
   height: 124%;
   object-fit: cover;
-  opacity: .5;
-  filter: blur(34px) saturate(1.35) brightness(.72);
-  transform: scale(1.08);
-  animation: stRevealBackdropDrift 8s ease-in-out infinite alternate;
+  opacity: .32;
+  filter: blur(20px) saturate(1.15) brightness(.72);
+  transform: translateZ(0) scale(1.06);
 }
 
 .st-reveal-overlay::before {
@@ -38,11 +47,24 @@
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(circle at 50% 42%, rgba(255, 255, 255, .25), transparent 32%),
-    radial-gradient(circle at 25% 25%, rgba(107, 198, 248, .3), transparent 38%),
-    radial-gradient(circle at 78% 70%, rgba(255, 130, 200, .3), transparent 40%),
-    linear-gradient(135deg, rgba(27, 35, 78, .45), rgba(62, 36, 86, .62));
-  backdrop-filter: blur(12px);
+    radial-gradient(circle at 50% 42%, rgba(255, 255, 255, .3), transparent 29%),
+    radial-gradient(circle at 22% 20%, rgba(107, 198, 248, .34), transparent 36%),
+    radial-gradient(circle at 80% 74%, rgba(255, 130, 200, .38), transparent 38%),
+    linear-gradient(135deg, rgba(27, 35, 78, .5), rgba(74, 38, 100, .68));
+}
+
+.st-reveal-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .58;
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, .92) 0 1px, transparent 1.8px),
+    radial-gradient(circle, rgba(255, 213, 238, .82) 0 1.5px, transparent 2.2px);
+  background-position: 0 0, 36px 28px;
+  background-size: 86px 86px, 122px 122px;
 }
 
 .st-reveal-dialog {
@@ -51,11 +73,12 @@
   max-height: calc(100vh - 36px);
   overflow: hidden;
   box-sizing: border-box;
-  border: 1px solid rgba(255, 255, 255, .72);
+  border: 2px solid rgba(255, 255, 255, .78);
   border-radius: 30px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, .96), rgba(244, 249, 255, .95) 54%, rgba(255, 242, 250, .96));
+  background: linear-gradient(145deg, rgba(255, 255, 255, .98), rgba(244, 249, 255, .97) 52%, rgba(255, 239, 249, .98));
   color: #30344f;
-  box-shadow: 0 30px 90px rgba(10, 16, 49, .42), 0 0 0 8px rgba(255, 255, 255, .12);
+  box-shadow: 0 28px 72px rgba(10, 16, 49, .38), 0 0 0 7px rgba(255, 255, 255, .12);
+  contain: layout paint style;
 }
 
 .st-reveal-header {
@@ -68,8 +91,10 @@
   min-height: 78px;
   padding: 18px 20px 14px;
   box-sizing: border-box;
-  border-bottom: 1px solid rgba(107, 198, 248, .25);
-  background: rgba(255, 255, 255, .82);
+  border-bottom: 1px solid rgba(255, 130, 200, .22);
+  background:
+    radial-gradient(circle at 88% 20%, rgba(254, 211, 52, .16), transparent 24%),
+    linear-gradient(110deg, rgba(255, 255, 255, .94), rgba(244, 249, 255, .9), rgba(255, 240, 249, .92));
 }
 
 .st-reveal-heading {
@@ -79,7 +104,7 @@
 
 .st-reveal-eyebrow {
   margin: 0 0 3px;
-  color: #b64987;
+  color: #bd3f89;
   font-size: .72rem;
   font-weight: 950;
   letter-spacing: .14em;
@@ -131,6 +156,7 @@
   min-height: min(720px, calc(100vh - 116px));
   max-height: calc(100vh - 116px);
   overflow: hidden;
+  contain: layout paint style;
 }
 
 .st-reveal-dialog[data-phase="results"] .st-reveal-stage {
@@ -155,6 +181,24 @@
   overflow: hidden;
 }
 
+.st-reveal-pack-stage::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: min(82%, 620px);
+  aspect-ratio: 1.8;
+  opacity: .62;
+  background:
+    radial-gradient(circle at 14% 28%, rgba(255, 255, 255, .95) 0 3px, transparent 4px),
+    radial-gradient(circle at 84% 22%, rgba(255, 159, 210, .9) 0 4px, transparent 5px),
+    radial-gradient(circle at 7% 78%, rgba(223, 247, 255, .95) 0 2px, transparent 3px),
+    radial-gradient(circle at 91% 72%, rgba(255, 248, 184, .92) 0 3px, transparent 4px);
+  pointer-events: none;
+  transform: translate(-50%, -50%) rotate(-8deg);
+}
+
 .st-reveal-pack-stage[hidden],
 .st-reveal-stack-stage[hidden],
 .st-reveal-results[hidden],
@@ -176,7 +220,19 @@
   color: #fff;
   font: inherit;
   cursor: pointer;
-  animation: stRevealPackEnter .58s cubic-bezier(.2, .82, .24, 1) both;
+  isolation: isolate;
+  animation: stRevealPackEnter .46s cubic-bezier(.2, .82, .24, 1) both;
+}
+
+.st-reveal-pack-button::before {
+  content: "";
+  position: absolute;
+  inset: 12% 4%;
+  z-index: -1;
+  border-radius: 42%;
+  background: radial-gradient(circle, rgba(255, 255, 255, .78), rgba(255, 130, 200, .32) 42%, transparent 72%);
+  filter: blur(16px);
+  transform: translateZ(0);
 }
 
 .st-reveal-pack-image {
@@ -184,8 +240,9 @@
   width: 100%;
   max-height: min(430px, 56vh);
   object-fit: contain;
-  filter: drop-shadow(0 26px 34px rgba(14, 18, 54, .42)) drop-shadow(0 0 24px rgba(255, 255, 255, .36));
-  animation: stRevealPackIdle 3s ease-in-out .58s infinite;
+  filter: none;
+  transform: translateZ(0);
+  animation: stRevealPackIdle 3.4s ease-in-out .46s infinite;
 }
 
 .st-reveal-pack-count {
@@ -195,12 +252,12 @@
   padding: 6px 14px;
   border: 1px solid rgba(255, 255, 255, .72);
   border-radius: 999px;
-  background: rgba(35, 43, 92, .72);
+  background: rgba(48, 50, 110, .82);
   color: #fff;
   font-size: .84rem;
   font-weight: 900;
   letter-spacing: .04em;
-  box-shadow: 0 10px 28px rgba(12, 19, 52, .2);
+  box-shadow: 0 8px 20px rgba(12, 19, 52, .18);
 }
 
 .st-reveal-pack-prompt {
@@ -209,11 +266,12 @@
   margin: 0;
   padding: 9px 16px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, .9);
+  border: 1px solid rgba(255, 130, 200, .24);
+  background: rgba(255, 255, 255, .94);
   color: #624b83;
   font-weight: 900;
-  box-shadow: 0 10px 24px rgba(36, 44, 92, .16);
-  animation: stRevealPromptPulse 1.8s ease-in-out infinite;
+  box-shadow: 0 8px 20px rgba(36, 44, 92, .14);
+  animation: stRevealPromptPulse 2.1s ease-in-out infinite;
 }
 
 .st-reveal-pack-burst {
@@ -251,7 +309,8 @@
 }
 
 .st-reveal-pack-stage.is-opening .st-reveal-pack-button {
-  animation: stRevealPackOpen .8s cubic-bezier(.22, .7, .24, 1) both;
+  will-change: transform, opacity;
+  animation: stRevealPackOpen .62s cubic-bezier(.22, .7, .24, 1) both;
   pointer-events: none;
 }
 
@@ -264,27 +323,28 @@
 }
 
 .st-reveal-pack-stage.is-opening .st-reveal-pack-burst {
-  animation: stRevealPackBurst .8s ease-out both;
+  will-change: transform, opacity;
+  animation: stRevealPackBurst .62s ease-out both;
 }
 
 .st-reveal-pack-stage.is-opening .st-reveal-pack-ring {
-  animation: stRevealPackRing .8s ease-out both;
+  animation: stRevealPackRing .62s ease-out both;
 }
 
 .st-reveal-pack-stage.is-opening .st-reveal-pack-burst::before {
-  animation: stRevealPackRays .8s ease-out both;
+  animation: stRevealPackRays .62s ease-out both;
 }
 
 .st-reveal-pack-stage.is-opening .st-reveal-pack-burst::after {
-  animation: stRevealPackGlow .8s ease-out both;
+  animation: stRevealPackGlow .62s ease-out both;
 }
 
 .st-reveal-stack-stage {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  align-content: start;
+  align-content: center;
   justify-items: center;
-  gap: 10px;
+  gap: 12px;
   padding: 12px 24px 16px;
 }
 
@@ -294,8 +354,10 @@
   place-items: center;
   min-width: 0;
   width: 100%;
-  min-height: min(430px, calc(42vh + 40px));
-  perspective: 1500px;
+  min-height: min(400px, calc(40vh + 44px));
+  perspective: 1400px;
+  perspective-origin: 50% 48%;
+  contain: layout style;
 }
 
 .st-reveal-stack {
@@ -303,6 +365,7 @@
   width: min(54vw, clamp(210px, 30vh, 270px));
   aspect-ratio: 5 / 7;
   transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
 }
 
 .st-reveal-stack-card {
@@ -318,8 +381,15 @@
   background: transparent;
   opacity: 1;
   transform: translate3d(var(--stack-x, 0), var(--stack-y, 0), 0) rotate(var(--stack-rotate, 0));
+  transform-origin: 50% 50%;
   transform-style: preserve-3d;
-  transition: transform .28s cubic-bezier(.2, .78, .24, 1), opacity .2s ease;
+  -webkit-transform-style: preserve-3d;
+  transition: transform .22s cubic-bezier(.2, .78, .24, 1), opacity .16s ease;
+}
+
+.st-reveal-stack-card.is-stack-hidden {
+  visibility: hidden;
+  opacity: 0;
 }
 
 .st-reveal-stack-card:disabled {
@@ -336,7 +406,8 @@
   display: block;
   border-radius: inherit;
   transform-style: preserve-3d;
-  transform: rotateY(0deg);
+  -webkit-transform-style: preserve-3d;
+  transform: translateZ(0) rotateY(0deg);
 }
 
 .st-reveal-card-face {
@@ -347,13 +418,17 @@
   border: 2px solid rgba(255, 255, 255, .95);
   border-radius: inherit;
   background: #fff;
-  box-shadow: 0 20px 46px rgba(20, 27, 68, .36), 0 0 0 1px rgba(107, 198, 248, .22);
+  box-shadow: 0 16px 34px rgba(20, 27, 68, .3), 0 0 0 1px rgba(107, 198, 248, .2);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 
+.st-reveal-card-back {
+  transform: translateZ(1px);
+}
+
 .st-reveal-card-front {
-  transform: rotateY(180deg);
+  transform: rotateY(180deg) translateZ(1px);
 }
 
 .st-reveal-card-image {
@@ -367,11 +442,13 @@
 }
 
 .st-reveal-stack-stage.is-entering .st-reveal-stack-card {
-  animation: stRevealStackDeal .48s cubic-bezier(.18, .8, .25, 1) var(--deal-delay, 0ms) both;
+  will-change: transform, opacity;
+  animation: stRevealStackDeal .36s cubic-bezier(.18, .8, .25, 1) var(--deal-delay, 0ms) both;
 }
 
 .st-reveal-stack-card.is-lifting {
-  animation: stRevealCardLift .36s cubic-bezier(.18, .82, .22, 1) both;
+  will-change: transform;
+  animation: stRevealCardLift .34s cubic-bezier(.18, .82, .22, 1) both;
 }
 
 .st-reveal-stack-card.is-lifted,
@@ -381,11 +458,12 @@
 }
 
 .st-reveal-card-inner.is-flipping {
-  animation: stRevealCardFlip .74s cubic-bezier(.2, .72, .2, 1) both;
+  will-change: transform;
+  animation: stRevealCardFlip .54s cubic-bezier(.2, .72, .2, 1) .06s both;
 }
 
 .st-reveal-stack-card.is-revealed .st-reveal-card-inner {
-  transform: rotateY(180deg);
+  transform: translateZ(0) rotateY(180deg);
 }
 
 .st-reveal-stack-card.is-revealed.rarity-uncommon .st-reveal-card-face { box-shadow: 0 20px 48px rgba(20, 27, 68, .34), 0 0 28px rgba(89, 185, 236, .7); }
@@ -394,12 +472,13 @@
 .st-reveal-stack-card.is-revealed.rarity-legendary .st-reveal-card-face { box-shadow: 0 20px 48px rgba(20, 27, 68, .34), 0 0 20px #fff6aa, 0 0 42px rgba(246, 201, 47, .9); }
 
 .st-reveal-stack-card.is-dismissing {
-  animation: stRevealCardDismiss .32s ease-in both;
+  will-change: transform, opacity;
+  animation: stRevealCardDismiss .26s cubic-bezier(.55, .05, .75, .38) both;
   pointer-events: none;
 }
 
 .st-reveal-flash {
-  --rarity-color: #fff;
+  --rarity-color: #ff91cc;
   position: absolute;
   inset: 50%;
   z-index: 40;
@@ -420,15 +499,18 @@
 
 .st-reveal-flash-ring {
   position: absolute;
-  inset: -190px;
-  border: 5px solid var(--rarity-color);
+  inset: -155px;
+  border: 3px solid var(--rarity-color);
   border-radius: 50%;
-  box-shadow: 0 0 35px var(--rarity-color), inset 0 0 28px var(--rarity-color);
+  outline: 1px solid rgba(255, 255, 255, .82);
+  outline-offset: 9px;
+  box-shadow: 0 0 22px var(--rarity-color);
   opacity: 0;
 }
 
 .st-reveal-flash.is-active .st-reveal-flash-ring {
-  animation: stRevealRarityRing .78s ease-out both;
+  will-change: transform, opacity;
+  animation: stRevealRarityRing .66s ease-out .13s both;
 }
 
 .st-reveal-ribbons,
@@ -440,45 +522,57 @@
 
 .st-reveal-ribbon {
   position: absolute;
-  left: -10px;
-  top: -4px;
+  left: -130px;
+  top: -64px;
   display: block;
-  width: 280px;
-  height: 9px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, transparent, #fff 22%, var(--rarity-color) 58%, transparent);
+  width: 260px;
+  height: 128px;
+  border: 6px solid transparent;
+  border-top-color: #ff8fca;
+  border-right-color: rgba(255, 255, 255, .88);
+  border-radius: 50%;
+  background: none;
   opacity: 0;
-  transform: rotate(calc(var(--ribbon-index) * 45deg)) translateX(40px) scaleX(.3);
-  transform-origin: 10px center;
+  transform: rotate(calc(var(--ribbon-index) * 90deg)) scale(.4);
+  transform-origin: center;
 }
 
 .st-reveal-ribbon:nth-child(even) {
-  background: linear-gradient(90deg, transparent, #dff7ff 20%, #ff8dce 62%, transparent);
+  border-top-color: #79d4ff;
+  border-right-color: #dff7ff;
 }
 
+.st-reveal-ribbon:nth-child(3) { border-top-color: #ffd85e; }
+.st-reveal-ribbon:nth-child(4) { border-top-color: #b49aff; }
+
 .st-reveal-flash.is-active .st-reveal-ribbon {
-  animation: stRevealRibbonBurst .82s cubic-bezier(.18, .7, .26, 1) both;
-  animation-delay: calc(var(--ribbon-index) * 18ms);
+  will-change: transform, opacity;
+  animation: stRevealRibbonBurst .7s cubic-bezier(.18, .7, .26, 1) both;
+  animation-delay: calc(120ms + var(--ribbon-index) * 20ms);
 }
 
 .st-reveal-sparkle {
   position: absolute;
-  left: -5px;
-  top: -5px;
+  left: -10px;
+  top: -10px;
   display: block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0 14px #fff, 0 0 24px var(--rarity-color);
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, #fff, var(--rarity-color));
+  clip-path: polygon(50% 0, 61% 38%, 100% 50%, 61% 62%, 50% 100%, 39% 62%, 0 50%, 39% 38%);
   opacity: 0;
-  transform: rotate(calc(var(--sparkle-index) * 30deg)) translateX(40px);
+  transform: rotate(calc(var(--sparkle-index) * 45deg)) translateX(34px) scale(.35);
   transform-origin: center;
 }
 
+.st-reveal-sparkle:nth-child(3n) {
+  background: linear-gradient(135deg, #fff8b8, #ff9fd2);
+}
+
 .st-reveal-flash.is-active .st-reveal-sparkle {
-  animation: stRevealSparkleBurst .78s ease-out both;
-  animation-delay: calc(var(--sparkle-index) * 12ms);
+  will-change: transform, opacity;
+  animation: stRevealSparkleBurst .64s ease-out both;
+  animation-delay: calc(150ms + var(--sparkle-index) * 11ms);
 }
 
 .st-reveal-copy {
@@ -489,11 +583,13 @@
   width: min(100%, 660px);
   padding: 14px 18px;
   box-sizing: border-box;
-  border: 1px solid rgba(107, 198, 248, .28);
+  border: 1px solid rgba(255, 130, 200, .3);
   border-radius: 24px;
-  background: rgba(255, 255, 255, .82);
+  background:
+    radial-gradient(circle at 8% 18%, rgba(254, 211, 52, .13), transparent 20%),
+    linear-gradient(135deg, rgba(255, 255, 255, .94), rgba(245, 250, 255, .92), rgba(255, 242, 250, .94));
   text-align: center;
-  box-shadow: 0 16px 42px rgba(53, 66, 122, .12);
+  box-shadow: 0 12px 30px rgba(53, 66, 122, .1);
 }
 
 .st-reveal-count {
@@ -585,6 +681,7 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 10px;
+  min-height: 48px;
   margin-top: 12px;
 }
 
@@ -600,9 +697,10 @@
 
 .st-reveal-button-primary {
   border: 0;
-  background: linear-gradient(135deg, #ff82c8, #a98cff, #6bc6f8);
+  background: linear-gradient(115deg, var(--st-reveal-pink), var(--st-reveal-lavender), var(--st-reveal-blue));
+  background-size: 160% 100%;
   color: #fff;
-  box-shadow: 0 10px 24px rgba(76, 83, 147, .22);
+  box-shadow: 0 9px 20px rgba(76, 83, 147, .2), inset 0 1px 0 rgba(255, 255, 255, .5);
 }
 
 .st-reveal-button:disabled {
@@ -651,11 +749,13 @@
   background: #fff;
   box-shadow: 0 10px 28px rgba(53, 66, 122, .12);
   opacity: 0;
+  contain: layout paint style;
 }
 
 .st-reveal-results.is-visible .st-reveal-result-card {
-  animation: stRevealResultIn .38s cubic-bezier(.2, .78, .24, 1) both;
-  animation-delay: calc(var(--result-index) * 45ms);
+  will-change: transform, opacity;
+  animation: stRevealResultIn .3s cubic-bezier(.2, .78, .24, 1) both;
+  animation-delay: calc(var(--result-index) * 28ms);
 }
 
 .st-reveal-result-card.rarity-uncommon { border-color: rgba(89, 185, 236, .62); }
@@ -721,19 +821,14 @@
   to { opacity: 1; }
 }
 
-@keyframes stRevealBackdropDrift {
-  from { transform: scale(1.08) translate3d(-1.5%, -1%, 0); }
-  to { transform: scale(1.14) translate3d(1.5%, 1%, 0); }
-}
-
 @keyframes stRevealPackEnter {
-  from { opacity: 0; transform: translateY(42px) scale(.86); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translate3d(0, 34px, 0) scale(.9) rotate(-2deg); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1) rotate(0); }
 }
 
 @keyframes stRevealPackIdle {
   0%, 100% { transform: translateY(0) rotate(-1deg); }
-  50% { transform: translateY(-10px) rotate(1deg); }
+  50% { transform: translateY(-6px) rotate(.7deg); }
 }
 
 @keyframes stRevealPromptPulse {
@@ -748,9 +843,9 @@
 
 @keyframes stRevealPackOpen {
   0% { opacity: 1; transform: scale(1) rotate(0deg); }
-  34% { opacity: 1; transform: scale(1.08) rotate(-3deg); }
-  58% { opacity: 1; transform: scale(1.13) rotate(3deg); }
-  100% { opacity: 0; transform: scale(.3) rotate(-7deg); }
+  30% { opacity: 1; transform: scale(1.045) rotate(-1.8deg); }
+  55% { opacity: 1; transform: scale(1.08) rotate(1.8deg); }
+  100% { opacity: 0; transform: scale(.62) rotate(-3deg); }
 }
 
 @keyframes stRevealPackBurst {
@@ -778,7 +873,7 @@
 }
 
 @keyframes stRevealStackDeal {
-  from { opacity: 0; transform: translate3d(0, -90px, 80px) rotate(0deg) scale(.9); }
+  from { opacity: 0; transform: translate3d(0, -58px, 60px) rotate(0deg) scale(.94); }
   to { opacity: 1; transform: translate3d(var(--stack-x, 0), var(--stack-y, 0), 0) rotate(var(--stack-rotate, 0)) scale(1); }
 }
 
@@ -788,10 +883,10 @@
 }
 
 @keyframes stRevealCardFlip {
-  0% { transform: rotateY(0deg) scale(1); }
-  45% { transform: rotateY(88deg) scale(1.055); }
-  55% { transform: rotateY(92deg) scale(1.055); }
-  100% { transform: rotateY(180deg) scale(1); }
+  0% { transform: translateZ(0) rotateY(0deg) scale(1); }
+  46% { transform: translateZ(8px) rotateY(86deg) scale(1.035); }
+  54% { transform: translateZ(8px) rotateY(94deg) scale(1.035); }
+  100% { transform: translateZ(0) rotateY(180deg) scale(1); }
 }
 
 @keyframes stRevealRarityRing {
@@ -801,15 +896,15 @@
 }
 
 @keyframes stRevealRibbonBurst {
-  0% { opacity: 0; transform: rotate(calc(var(--ribbon-index) * 45deg)) translateX(35px) scaleX(.25); }
-  26% { opacity: .96; }
-  100% { opacity: 0; transform: rotate(calc(var(--ribbon-index) * 45deg)) translateX(235px) scaleX(1); }
+  0% { opacity: 0; transform: rotate(calc(var(--ribbon-index) * 90deg - 18deg)) scale(.38); }
+  28% { opacity: .94; }
+  100% { opacity: 0; transform: rotate(calc(var(--ribbon-index) * 90deg + 24deg)) scale(1.34); }
 }
 
 @keyframes stRevealSparkleBurst {
-  0% { opacity: 0; transform: rotate(calc(var(--sparkle-index) * 30deg)) translateX(32px) scale(.35); }
+  0% { opacity: 0; transform: rotate(calc(var(--sparkle-index) * 45deg)) translateX(28px) scale(.3); }
   30% { opacity: 1; }
-  100% { opacity: 0; transform: rotate(calc(var(--sparkle-index) * 30deg)) translateX(205px) scale(1.15); }
+  100% { opacity: 0; transform: rotate(calc(var(--sparkle-index) * 45deg + 18deg)) translateX(175px) scale(1); }
 }
 
 @keyframes stRevealCardDismiss {
@@ -824,17 +919,18 @@
 
 @media (max-width: 760px) {
   .st-reveal-overlay { padding: 8px !important; }
+  .st-reveal-backdrop-image { display: none; }
   .st-reveal-dialog { width: min(100%, 560px); max-height: calc(100vh - 16px); border-radius: 22px; }
   .st-reveal-header { min-height: 68px; padding: 13px 14px 11px; }
   .st-reveal-close { width: 40px; height: 40px; }
   .st-reveal-stage { min-height: calc(100vh - 84px); max-height: calc(100vh - 84px); }
-  .st-reveal-stage { overflow-x: hidden; overflow-y: auto; }
+  .st-reveal-stage { overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; }
   .st-reveal-pack-stage,
   .st-reveal-stack-stage { min-height: calc(100vh - 84px); }
   .st-reveal-pack-stage { padding: 18px 12px; }
   .st-reveal-pack-button { width: min(66vw, 260px); }
   .st-reveal-pack-image { max-height: 46vh; }
-  .st-reveal-stack-stage { gap: 12px; padding: 16px 12px 24px; }
+  .st-reveal-stack-stage { align-content: center; gap: 12px; padding: 16px 12px 24px; }
   .st-reveal-stack-shell { min-height: min(54vh, 390px); }
   .st-reveal-stack { width: min(58vw, 230px); }
   .st-reveal-stack-card.is-lifted,

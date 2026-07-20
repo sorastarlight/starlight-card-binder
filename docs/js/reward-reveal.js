@@ -84,13 +84,14 @@ function getHost() {
   return { win: window, doc: document };
 }
 
-const REVEAL_STYLESHEET_URL = new URL('../css/reward-reveal.css?v=1.1.0', import.meta.url).href;
+const REVEAL_STYLESHEET_URL = new URL('../css/reward-reveal.css?v=1.2.0', import.meta.url).href;
 const stylesheetLoads = new WeakMap();
+const imagePreparations = new WeakMap();
 
 function installStyles(doc) {
   if (stylesheetLoads.has(doc)) return stylesheetLoads.get(doc);
 
-  const existing = doc.getElementById('starlight-reveal-v110');
+  const existing = doc.getElementById('starlight-reveal-v120');
   if (existing?.sheet) return Promise.resolve();
 
   const link = existing || doc.createElement('link');
@@ -99,7 +100,7 @@ function installStyles(doc) {
     link.addEventListener('error', resolve, { once: true });
   });
   if (!existing) {
-    link.id = 'starlight-reveal-v110';
+    link.id = 'starlight-reveal-v120';
     link.rel = 'stylesheet';
     link.href = REVEAL_STYLESHEET_URL;
     doc.head.append(link);
@@ -115,12 +116,20 @@ function createElement(doc, tagName, className, text = '') {
   return element;
 }
 
-function createImage(doc, source, alt, fallback = DEFAULT_BACK, className = 'st-reveal-image') {
+function createImage(
+  doc,
+  source,
+  alt,
+  fallback = DEFAULT_BACK,
+  className = 'st-reveal-image',
+  { defer = false, loading = 'eager' } = {}
+) {
   const image = createElement(doc, 'img', className);
   image.alt = alt;
-  image.loading = 'eager';
+  image.loading = loading;
   image.decoding = 'async';
-  image.src = source || fallback;
+  if (defer) image.dataset.source = source || fallback;
+  else if (source || fallback) image.src = source || fallback;
   image.addEventListener('error', () => {
     if (!fallback || image.dataset.fallbackApplied === 'true') return;
     image.dataset.fallbackApplied = 'true';
@@ -135,24 +144,83 @@ function nextPaint(win) {
   });
 }
 
+function timeToMilliseconds(value) {
+  const token = String(value || '').trim();
+  if (token.endsWith('ms')) return Number.parseFloat(token) || 0;
+  if (token.endsWith('s')) return (Number.parseFloat(token) || 0) * 1000;
+  return 0;
+}
+
+function computedMotionDuration(element, win) {
+  const nodes = [element, ...element.querySelectorAll('*')];
+  return nodes.reduce((longest, node) => {
+    const style = win.getComputedStyle(node);
+    const animationDurations = style.animationDuration.split(',').map(timeToMilliseconds);
+    const animationDelays = style.animationDelay.split(',').map(timeToMilliseconds);
+    const animationIterations = style.animationIterationCount.split(',').map(value => (
+      value.trim() === 'infinite' ? 0 : Number.parseFloat(value) || 1
+    ));
+    const animationLength = animationDurations.reduce((maximum, duration, index) => Math.max(
+      maximum,
+      duration * (animationIterations[index % animationIterations.length] || 0)
+        + animationDelays[index % animationDelays.length]
+    ), 0);
+    const transitionDurations = style.transitionDuration.split(',').map(timeToMilliseconds);
+    const transitionDelays = style.transitionDelay.split(',').map(timeToMilliseconds);
+    const transitionLength = transitionDurations.reduce((maximum, duration, index) => Math.max(
+      maximum,
+      duration + transitionDelays[index % transitionDelays.length]
+    ), 0);
+    return Math.max(longest, animationLength, transitionLength);
+  }, 0);
+}
+
+function waitForFrames(win, duration) {
+  if (duration <= 0) return Promise.resolve();
+  return new Promise(resolve => {
+    const start = win.performance?.now?.() ?? Date.now();
+    const tick = timestamp => {
+      const elapsed = (Number.isFinite(timestamp) ? timestamp : Date.now()) - start;
+      if (elapsed >= duration) resolve();
+      else win.requestAnimationFrame(tick);
+    };
+    win.requestAnimationFrame(tick);
+  });
+}
+
 async function waitForMotion(element, win) {
   if (win.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
   await nextPaint(win);
   const animations = element.getAnimations?.({ subtree: true }) || [];
   const finiteAnimations = animations.filter(animation => animation.effect?.getTiming?.().iterations !== Infinity);
-  await Promise.allSettled(finiteAnimations.map(animation => animation.finished));
-}
-
-async function prepareImage(image) {
-  if (image.complete) {
-    await image.decode?.().catch(() => {});
+  if (finiteAnimations.length) {
+    await Promise.allSettled(finiteAnimations.map(animation => animation.finished));
     return;
   }
-  await new Promise(resolve => {
-    image.addEventListener('load', resolve, { once: true });
-    image.addEventListener('error', resolve, { once: true });
-  });
-  await image.decode?.().catch(() => {});
+  await waitForFrames(win, computedMotionDuration(element, win));
+}
+
+function startImageLoad(image) {
+  if (!image.hasAttribute('src') && image.dataset.source) {
+    image.src = image.dataset.source;
+    delete image.dataset.source;
+  }
+}
+
+function prepareImage(image) {
+  if (imagePreparations.has(image)) return imagePreparations.get(image);
+  startImageLoad(image);
+  const preparation = (async () => {
+    if (!image.complete) {
+      await new Promise(resolve => {
+        image.addEventListener('load', resolve, { once: true });
+        image.addEventListener('error', resolve, { once: true });
+      });
+    }
+    await image.decode?.().catch(() => {});
+  })();
+  imagePreparations.set(image, preparation);
+  return preparation;
 }
 
 function cardDescription(card) {
@@ -166,13 +234,13 @@ function createEffectLayer(doc) {
   layer.setAttribute('aria-hidden', 'true');
   const ring = createElement(doc, 'span', 'st-reveal-flash-ring');
   const ribbons = createElement(doc, 'span', 'st-reveal-ribbons');
-  for (let index = 0; index < 8; index += 1) {
+  for (let index = 0; index < 4; index += 1) {
     const ribbon = createElement(doc, 'i', 'st-reveal-ribbon');
     ribbon.style.setProperty('--ribbon-index', String(index));
     ribbons.append(ribbon);
   }
   const sparkles = createElement(doc, 'span', 'st-reveal-sparkles');
-  for (let index = 0; index < 12; index += 1) {
+  for (let index = 0; index < 8; index += 1) {
     const sparkle = createElement(doc, 'i', 'st-reveal-sparkle');
     sparkle.style.setProperty('--sparkle-index', String(index));
     sparkles.append(sparkle);
@@ -204,7 +272,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
     const dialog = createElement(doc, 'section', 'st-reveal-dialog');
     const header = createElement(doc, 'header', 'st-reveal-header');
     const headingGroup = createElement(doc, 'div', 'st-reveal-heading');
-    const eyebrow = createElement(doc, 'p', 'st-reveal-eyebrow', 'Starlight Booster');
+    const eyebrow = createElement(doc, 'p', 'st-reveal-eyebrow', '✦ Starlight Transformation ✦');
     const title = createElement(doc, 'h2', 'st-reveal-title', revealTitle);
     const closeButton = createElement(doc, 'button', 'st-reveal-close', '×');
     const liveStatus = createElement(doc, 'p', 'st-reveal-live', `${rewards.length} cards ready.`);
@@ -214,7 +282,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
     const packRing = createElement(doc, 'span', 'st-reveal-pack-ring');
     const packButton = createElement(doc, 'button', 'st-reveal-pack-button');
     const packImage = createImage(doc, packArtwork, `${revealTitle} pack`, normalizedOptions.cardBackUrl, 'st-reveal-pack-image');
-    const packPrompt = createElement(doc, 'p', 'st-reveal-pack-prompt', 'Click the pack to open it');
+    const packPrompt = createElement(doc, 'p', 'st-reveal-pack-prompt', 'Tap the pack to transform ✦');
     const packCount = createElement(
       doc,
       'span',
@@ -236,7 +304,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
     const nextButton = createElement(doc, 'button', 'st-reveal-button st-reveal-button-primary', 'Next Card');
     const resultsStage = createElement(doc, 'section', 'st-reveal-results');
     const resultsHeading = createElement(doc, 'div', 'st-reveal-results-heading');
-    const resultsTitle = createElement(doc, 'h3', '', 'Your Cards');
+    const resultsTitle = createElement(doc, 'h3', '', 'Your Starlight Pulls');
     const resultsSummary = createElement(
       doc,
       'p',
@@ -290,7 +358,14 @@ export async function revealRewardSequence(cards = [], options = {}) {
       const back = createElement(doc, 'span', 'st-reveal-card-face st-reveal-card-back');
       const front = createElement(doc, 'span', 'st-reveal-card-face st-reveal-card-front');
       const backImage = createImage(doc, normalizedOptions.cardBackUrl, '', DEFAULT_BACK, 'st-reveal-card-image');
-      const frontImage = createImage(doc, card.imageUrl, '', DEFAULT_BACK, 'st-reveal-card-image');
+      const frontImage = createImage(
+        doc,
+        card.imageUrl,
+        '',
+        DEFAULT_BACK,
+        'st-reveal-card-image',
+        { defer: true }
+      );
       button.type = 'button';
       button.disabled = cardIndex !== 0;
       button.tabIndex = cardIndex === 0 ? 0 : -1;
@@ -314,23 +389,37 @@ export async function revealRewardSequence(cards = [], options = {}) {
       return item;
     });
 
-    rewards.forEach((card, cardIndex) => {
-      const item = createElement(doc, 'article', `st-reveal-result-card rarity-${card.rarity}`);
-      item.style.setProperty('--result-index', String(Math.min(cardIndex, 12)));
-      const image = createImage(doc, card.imageUrl, `${card.name} card artwork`, DEFAULT_BACK, 'st-reveal-result-image');
-      const copy = createElement(doc, 'div', 'st-reveal-result-copy');
-      const name = createElement(doc, 'h4', '', card.name);
-      const detail = createElement(doc, 'p', '', cardDescription(card) || 'Starlight Card');
-      const status = createElement(
-        doc,
-        'span',
-        `st-reveal-result-status ${card.isDuplicate ? 'is-duplicate' : 'is-new'}`,
-        card.isDuplicate ? 'Duplicate' : 'New'
-      );
-      copy.append(name, detail, status);
-      item.append(image, copy);
-      resultsGrid.append(item);
-    });
+    let resultsPopulated = false;
+    const populateResults = () => {
+      if (resultsPopulated) return;
+      resultsPopulated = true;
+      const fragment = doc.createDocumentFragment();
+      rewards.forEach((card, cardIndex) => {
+        const item = createElement(doc, 'article', `st-reveal-result-card rarity-${card.rarity}`);
+        item.style.setProperty('--result-index', String(Math.min(cardIndex, 8)));
+        const image = createImage(
+          doc,
+          card.imageUrl,
+          `${card.name} card artwork`,
+          DEFAULT_BACK,
+          'st-reveal-result-image',
+          { loading: 'lazy' }
+        );
+        const copy = createElement(doc, 'div', 'st-reveal-result-copy');
+        const name = createElement(doc, 'h4', '', card.name);
+        const detail = createElement(doc, 'p', '', cardDescription(card) || 'Starlight Card');
+        const status = createElement(
+          doc,
+          'span',
+          `st-reveal-result-status ${card.isDuplicate ? 'is-duplicate' : 'is-new'}`,
+          card.isDuplicate ? 'Duplicate' : 'New'
+        );
+        copy.append(name, detail, status);
+        item.append(image, copy);
+        fragment.append(item);
+      });
+      resultsGrid.append(fragment);
+    };
 
     const finish = () => {
       if (settled) return;
@@ -350,6 +439,12 @@ export async function revealRewardSequence(cards = [], options = {}) {
       dialog.dataset.phase = nextPhase;
     };
 
+    const focusStageControl = control => {
+      control.focus({ preventScroll: true });
+      overlay.scrollTop = 0;
+      stage.scrollTop = 0;
+    };
+
     const updateStackLayout = () => {
       const layout = createRevealStackLayout(rewards.length - index);
       stackCards.forEach((entry, cardIndex) => {
@@ -359,7 +454,8 @@ export async function revealRewardSequence(cards = [], options = {}) {
         entry.button.style.setProperty('--stack-y', `${position.y}px`);
         entry.button.style.setProperty('--stack-rotate', `${position.rotation}deg`);
         entry.button.style.setProperty('--stack-z', String(position.zIndex));
-        entry.button.style.setProperty('--deal-delay', `${Math.min(cardIndex - index, 8) * 38}ms`);
+        entry.button.style.setProperty('--deal-delay', `${Math.min(cardIndex - index, 8) * 24}ms`);
+        entry.button.classList.toggle('is-stack-hidden', cardIndex - index >= MAX_VISUAL_STACK_DEPTH);
       });
     };
 
@@ -390,6 +486,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
       nextButton.hidden = true;
       updateStackLayout();
       updateProgress();
+      startImageLoad(current.frontImage);
       liveStatus.textContent = `Card ${index + 1} of ${rewards.length} is ready to reveal.`;
     };
 
@@ -397,13 +494,12 @@ export async function revealRewardSequence(cards = [], options = {}) {
       if (phase !== 'revealed') return;
       setPhase('results');
       stackStage.hidden = true;
+      populateResults();
       resultsStage.hidden = false;
       resultsStage.classList.add('is-visible');
       liveStatus.textContent = `Reveal complete. ${resultsSummary.textContent}`;
       await waitForMotion(resultsStage, win);
-      doneButton.focus({ preventScroll: true });
-      overlay.scrollTop = 0;
-      stage.scrollTop = 0;
+      focusStageControl(doneButton);
     };
 
     const advance = async () => {
@@ -417,12 +513,13 @@ export async function revealRewardSequence(cards = [], options = {}) {
       const current = stackCards[index];
       nextButton.disabled = true;
       current.button.classList.add('is-dismissing');
+      index += 1;
+      updateStackLayout();
       await waitForMotion(current.button, win);
       current.button.hidden = true;
-      index += 1;
       setPhase('stack');
       setCurrentCard();
-      stackCards[index].button.focus();
+      focusStageControl(stackCards[index].button);
     };
 
     const revealCurrent = async () => {
@@ -430,16 +527,16 @@ export async function revealRewardSequence(cards = [], options = {}) {
       setPhase('lifting');
       const current = stackCards[index];
       revealButton.disabled = true;
+      revealButton.hidden = true;
       current.button.disabled = true;
       liveStatus.textContent = `Revealing card ${index + 1} of ${rewards.length}.`;
       await prepareImage(current.frontImage);
       current.button.classList.add('is-lifting');
+      effectLayer.className = `st-reveal-flash rarity-${current.card.rarity} is-active`;
+      current.inner.classList.add('is-flipping');
       await waitForMotion(current.button, win);
       current.button.classList.remove('is-lifting');
       current.button.classList.add('is-lifted');
-      effectLayer.className = `st-reveal-flash rarity-${current.card.rarity} is-active`;
-      current.inner.classList.add('is-flipping');
-      await waitForMotion(current.inner, win);
       current.inner.classList.remove('is-flipping');
       current.button.classList.add('is-revealed');
       current.button.setAttribute('aria-label', `${current.card.name}, ${prettyMeta(current.card.rarity)}`);
@@ -460,7 +557,8 @@ export async function revealRewardSequence(cards = [], options = {}) {
       nextButton.textContent = index === rewards.length - 1 ? 'View Results' : 'Next Card';
       liveStatus.textContent = `${current.card.name}, ${prettyMeta(current.card.rarity)}. ${current.card.isDuplicate ? 'Duplicate card.' : 'New card.'}`;
       setPhase('revealed');
-      nextButton.focus();
+      if (stackCards[index + 1]) startImageLoad(stackCards[index + 1].frontImage);
+      focusStageControl(nextButton);
     };
 
     const openPack = async () => {
@@ -468,6 +566,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
       setPhase('opening');
       packButton.disabled = true;
       liveStatus.textContent = `Opening ${revealTitle}.`;
+      startImageLoad(stackCards[0].frontImage);
       packStage.classList.add('is-opening');
       await waitForMotion(packStage, win);
       packStage.hidden = true;
@@ -478,7 +577,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
       await waitForMotion(stackStage, win);
       stackStage.classList.remove('is-entering');
       setPhase('stack');
-      stackCards[0].button.focus();
+      focusStageControl(stackCards[0].button);
     };
 
     updateStackLayout();
@@ -529,7 +628,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
         doc.body.style.overflow = previousOverflow;
         previousFocus?.focus?.();
       };
-      packButton.focus();
+      focusStageControl(packButton);
     }
   });
 }
