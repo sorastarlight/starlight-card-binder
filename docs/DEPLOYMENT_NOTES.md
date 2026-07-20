@@ -1,5 +1,10 @@
 # Deployment Notes
 
+Current stable checkpoint: **V94.0 — Stable Reveal Foundation**
+
+- Release details: `DEPLOYMENT_NOTES_V94_0.md`
+- No SQL migration is required.
+
 This folder has been cleaned of obsolete per-version note files and superseded booster hotfix scripts.
 
 Current booster runtime repair, if needed:
