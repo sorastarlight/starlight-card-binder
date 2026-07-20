@@ -1,5 +1,5 @@
 /*
- * Approved reveal presentation baseline: v1.5.4.
+ * Approved reveal presentation baseline: v1.5.5.
  * Keep its motion contract intact unless this version and its regression test
  * are intentionally advanced together.
  */
@@ -14,9 +14,16 @@
 .st-r3-reveal-open,
 .st-r3-reveal-open body {
   overflow: hidden !important;
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+  width: 100% !important;
   max-width: 100% !important;
-  overscroll-behavior: none;
+  min-width: 0 !important;
+  overscroll-behavior: none !important;
+  scrollbar-width: none !important;
 }
+.st-r3-reveal-open::-webkit-scrollbar,
+.st-r3-reveal-open body::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
 .st-r3-overlay,
 .st-r3-overlay * {
   box-sizing: border-box;
@@ -35,9 +42,9 @@
   padding: 0 !important;
   overflow: hidden !important;
   color: var(--st-r3-ink);
-  background: rgba(255, 246, 252, 0.44) !important;
-  -webkit-backdrop-filter: blur(18px) saturate(1.1);
-  backdrop-filter: blur(18px) saturate(1.1);
+  background: rgba(255, 246, 252, 0.26) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.08);
+  backdrop-filter: blur(14px) saturate(1.08);
   isolation: isolate;
 }
 .st-r3-overlay.hidden,
@@ -68,7 +75,7 @@
     radial-gradient(circle at 28% 82%, rgba(195, 174, 255, .25) 0 9%, transparent 27%),
     radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, .44), transparent 62%);
   filter: blur(12px);
-  opacity: .78;
+  opacity: .6;
   animation: stR3CuteBackdropFloat 10s ease-in-out infinite alternate;
 }
 .st-r3-dialog::after {
@@ -81,7 +88,7 @@
     radial-gradient(circle, rgba(255,255,255,.5) 0 7px, transparent 8px);
   background-position: 9px 17px, 43px 71px, 84px 26px, 21px 92px;
   background-size: 94px 94px, 137px 137px, 173px 173px, 221px 221px;
-  opacity: .58;
+  opacity: .5;
   animation: stR3CuteParticlesDrift 14s linear infinite;
 }
 @keyframes stR3CuteBackdropFloat {
@@ -100,14 +107,18 @@
   right: max(16px, env(safe-area-inset-right));
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 16px;
   pointer-events: none;
 }
 .st-r3-header-copy {
-  min-width: 0;
-  max-width: min(62vw, 520px);
-  text-shadow: 0 2px 12px #070a1c;
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 .st-r3-eyebrow,
 .st-r3-title,
@@ -493,6 +504,12 @@
 }
 
 /* Pile: the centered button stays fixed while its inner stack gently hovers. */
+.st-r3-pile-scene.is-arriving {
+  animation: stR3PileArrive 620ms cubic-bezier(.16, .84, .24, 1) both;
+  transform-origin: 50% 50%;
+  will-change: opacity, transform, filter;
+}
+
 .st-r3-pile-button {
   position: absolute;
   top: 50%;
@@ -572,6 +589,12 @@
 .st-r3-pile-prompt {
   z-index: 4;
   bottom: -84px;
+}
+
+@keyframes stR3PileArrive {
+  0% { opacity: 0; filter: blur(12px) brightness(1.7); transform: scale(.84) translateY(22px); }
+  52% { opacity: 1; filter: blur(2px) brightness(1.24); transform: scale(1.035) translateY(-4px); }
+  100% { opacity: 1; filter: none; transform: scale(1) translateY(0); }
 }
 
 @keyframes stR3PileHover {
@@ -981,13 +1004,39 @@
   overscroll-behavior: contain;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  cursor: pointer;
+  isolation: isolate;
 }
 .st-r3-results::-webkit-scrollbar { display: none; }
+.st-r3-results::before {
+  content: "";
+  position: fixed;
+  z-index: 0;
+  inset: 10% 12%;
+  border-radius: 42%;
+  background:
+    radial-gradient(circle at 30% 35%, rgba(255, 150, 213, .32), transparent 32%),
+    radial-gradient(circle at 70% 64%, rgba(129, 216, 255, .3), transparent 34%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, .52), transparent 58%);
+  filter: blur(30px);
+  pointer-events: none;
+  animation: stR3ResultsGlow 6s ease-in-out infinite alternate;
+}
+.st-r3-results > * { position: relative; z-index: 1; }
 
 .st-r3-results-heading {
-  width: min(100%, 980px);
+  width: min(100%, 680px);
   margin: 0 auto 20px;
+  padding: 14px 22px;
+  border: 1px solid rgba(255, 255, 255, .68);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, .48);
+  box-shadow: 0 16px 44px rgba(88, 51, 113, .14);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   text-align: center;
+  cursor: default;
+  animation: stR3ResultsHeadingEnter 520ms cubic-bezier(.16, .84, .24, 1) both;
 }
 
 .st-r3-results-heading h3 {
@@ -1012,6 +1061,7 @@
   gap: 14px;
   width: min(100%, 980px);
   margin: 0 auto;
+  cursor: default;
 }
 
 .st-r3-result-card {
@@ -1026,7 +1076,15 @@
   color: #1c1730;
   background: #fff;
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+  animation: stR3ResultCardEnter 560ms cubic-bezier(.16, .84, .24, 1) both;
 }
+.st-r3-result-card:nth-child(2) { animation-delay: 60ms; }
+.st-r3-result-card:nth-child(3) { animation-delay: 120ms; }
+.st-r3-result-card:nth-child(4) { animation-delay: 180ms; }
+.st-r3-result-card:nth-child(5) { animation-delay: 240ms; }
+.st-r3-result-card:nth-child(6) { animation-delay: 300ms; }
+.st-r3-result-card:nth-child(n + 7) { animation-delay: 360ms; }
 
 .st-r3-result-card.rarity-legendary {
   border-color: #ffe68a;
@@ -1085,6 +1143,31 @@
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.26);
   font: 900 0.86rem/1 system-ui, sans-serif;
   cursor: pointer;
+  animation: stR3ResultsDoneEnter 520ms 260ms cubic-bezier(.16, .84, .24, 1) both;
+}
+
+@media (hover: hover) {
+  .st-r3-result-card:hover {
+    transform: translateY(-6px) scale(1.015);
+    box-shadow: 0 20px 42px rgba(67, 39, 93, .28), 0 0 24px rgba(255, 141, 207, .24);
+  }
+}
+
+@keyframes stR3ResultsGlow {
+  from { opacity: .58; transform: scale(.96) rotate(-1deg); }
+  to { opacity: .9; transform: scale(1.04) rotate(1deg); }
+}
+@keyframes stR3ResultsHeadingEnter {
+  from { opacity: 0; transform: translateY(-18px) scale(.94); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes stR3ResultCardEnter {
+  from { opacity: 0; transform: translateY(30px) scale(.9) rotate(-1.5deg); }
+  to { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+}
+@keyframes stR3ResultsDoneEnter {
+  from { opacity: 0; transform: translateY(16px) scale(.92); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 @media (max-width: 620px) {

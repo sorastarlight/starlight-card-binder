@@ -100,7 +100,63 @@ function getHost() {
   return { win: window, doc: document };
 }
 
-export const REVEAL_PRESENTATION_VERSION = '1.5.4';
+const revealViewportLocks = new WeakMap();
+
+function acquireRevealViewportLock(doc) {
+  const existing = revealViewportLocks.get(doc);
+  if (existing) {
+    existing.count += 1;
+    return () => {
+      existing.count -= 1;
+      if (existing.count === 0) existing.restore();
+    };
+  }
+
+  const root = doc.documentElement;
+  const body = doc.body;
+  const properties = ['overflow', 'overflow-x', 'overflow-y', 'overscroll-behavior', 'width', 'max-width', 'min-width', 'scrollbar-width'];
+  const snapshots = [root, body].map(element => ({
+    element,
+    values: properties.map(property => ({
+      property,
+      value: element.style.getPropertyValue(property),
+      priority: element.style.getPropertyPriority(property)
+    }))
+  }));
+  const hadClass = root.classList.contains('st-r3-reveal-open');
+  const lock = { count: 1, restore: null };
+
+  root.classList.add('st-r3-reveal-open');
+  [root, body].forEach(element => {
+    element.style.setProperty('overflow', 'hidden', 'important');
+    element.style.setProperty('overflow-x', 'hidden', 'important');
+    element.style.setProperty('overflow-y', 'hidden', 'important');
+    element.style.setProperty('overscroll-behavior', 'none', 'important');
+    element.style.setProperty('width', '100%', 'important');
+    element.style.setProperty('max-width', '100%', 'important');
+    element.style.setProperty('min-width', '0', 'important');
+    element.style.setProperty('scrollbar-width', 'none', 'important');
+  });
+
+  lock.restore = () => {
+    snapshots.forEach(({ element, values }) => {
+      values.forEach(({ property, value, priority }) => {
+        if (value) element.style.setProperty(property, value, priority);
+        else element.style.removeProperty(property);
+      });
+    });
+    if (!hadClass) root.classList.remove('st-r3-reveal-open');
+    revealViewportLocks.delete(doc);
+  };
+  revealViewportLocks.set(doc, lock);
+
+  return () => {
+    lock.count -= 1;
+    if (lock.count === 0) lock.restore();
+  };
+}
+
+export const REVEAL_PRESENTATION_VERSION = '1.5.5';
 
 const REVEAL_STYLESHEET_ID = `starlight-reveal-v${REVEAL_PRESENTATION_VERSION.replace(/\./g, '')}`;
 const REVEAL_STYLESHEET_URL = new URL(
@@ -309,7 +365,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
     let currentFrontImage = null;
     let resultsPopulated = false;
     const activeAudio = new Set();
-    const rootWasRevealLocked = doc.documentElement.classList.contains('st-r3-reveal-open');
+    const releaseViewportLock = acquireRevealViewportLock(doc);
 
     const overlay = createElement(doc, 'div', 'st-r3-overlay hidden');
     const dialog = createElement(doc, 'section', 'st-r3-dialog');
@@ -462,7 +518,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
       stopAudio();
       fallbackCleanup?.();
       overlay.remove();
-      if (!rootWasRevealLocked) doc.documentElement.classList.remove('st-r3-reveal-open');
+      releaseViewportLock();
       if (returnFocus?.isConnected) returnFocus.focus?.({ preventScroll: true });
       resolve();
     };
@@ -534,7 +590,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
       startImageLoad(currentFrontImage);
     };
 
-    const showPile = () => {
+    const showPile = ({ fromPack = false } = {}) => {
       const remaining = rewards.length - index;
       const visibleLayers = Math.min(remaining, MAX_PILE_LAYERS);
       pileLayers.forEach((layer, layerIndex) => {
@@ -556,10 +612,16 @@ export async function revealRewardSequence(cards = [], options = {}) {
       revealScene.hidden = true;
       resultsScene.hidden = true;
       pileScene.hidden = false;
+      pileScene.classList.toggle('is-arriving', fromPack);
       prepareCurrentCard();
       setPhase('pile');
       liveStatus.textContent = `${remaining} ${remaining === 1 ? 'card remains' : 'cards remain'}.`;
       focusControl(pileButton);
+      if (fromPack) {
+        waitForMotion(pileScene, win).then(() => {
+          if (phase === 'pile') pileScene.classList.remove('is-arriving');
+        });
+      }
     };
 
     const showResults = () => {
@@ -584,7 +646,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
       packScene.classList.add('is-bursting');
       await waitForMotion(packScene, win);
       packScene.classList.remove('is-bursting');
-      showPile();
+      showPile({ fromPack: true });
     };
 
     const revealFromPile = async () => {
@@ -639,6 +701,11 @@ export async function revealRewardSequence(cards = [], options = {}) {
     pileButton.addEventListener('click', revealFromPile);
     actor.addEventListener('click', returnToPile);
     doneButton.addEventListener('click', () => close('complete'));
+    resultsScene.addEventListener('click', event => {
+      if (phase !== 'results' || event.button !== 0) return;
+      if (event.target.closest('.st-r3-result-card, .st-r3-results-heading, .st-r3-done')) return;
+      close('results-backdrop');
+    });
     closeButton.addEventListener('click', () => close('button'));
     dialog.addEventListener('keydown', event => {
       if (event.altKey || event.ctrlKey || event.metaKey) return;
@@ -649,7 +716,6 @@ export async function revealRewardSequence(cards = [], options = {}) {
     });
 
     const modalApi = win.StarlightUI || window.StarlightUI;
-    doc.documentElement.classList.add('st-r3-reveal-open');
     controller = modalApi?.adoptModal?.(overlay, {
       dialog,
       labelledBy: title.id,
@@ -662,18 +728,15 @@ export async function revealRewardSequence(cards = [], options = {}) {
     if (controller) {
       controller.open();
     } else {
-      const previousOverflow = doc.body.style.overflow;
       const previousFocus = doc.activeElement;
       const onKeydown = event => {
         if (event.key === 'Escape') close('escape');
       };
       overlay.hidden = false;
       overlay.classList.remove('hidden');
-      doc.body.style.overflow = 'hidden';
       doc.addEventListener('keydown', onKeydown);
       fallbackCleanup = () => {
         doc.removeEventListener('keydown', onKeydown);
-        doc.body.style.overflow = previousOverflow;
         previousFocus?.focus?.({ preventScroll: true });
       };
       focusControl(packButton);

@@ -134,6 +134,9 @@ test('uses one deliberate pack, pile, and card motion system with reduced-motion
   assert.match(stylesheet, /@keyframes stR3LegendaryRise/);
   assert.match(stylesheet, /@keyframes stR3LegendarySpin/);
   assert.match(stylesheet, /@keyframes stR3CuteBackdropFloat/);
+  assert.match(stylesheet, /@keyframes stR3PileArrive/);
+  assert.match(stylesheet, /@keyframes stR3ResultCardEnter/);
+  assert.match(stylesheet, /@keyframes stR3ResultsGlow/);
   assert.match(stylesheet, /@keyframes stR3DetailsEnter/);
   assert.match(stylesheet, /@media \(prefers-reduced-motion: reduce\)/);
 });
@@ -142,9 +145,9 @@ test('locks the approved reveal presentation and motion baseline', async () => {
   const stylesheet = await readFile(new URL('../docs/css/reward-reveal.css', import.meta.url), 'utf8');
   const contractHash = createHash('sha256').update(normalizeMotionContract(stylesheet)).digest('hex');
 
-  assert.equal(REVEAL_PRESENTATION_VERSION, '1.5.4');
-  assert.match(stylesheet, /Approved reveal presentation baseline: v1\.5\.4/);
-  assert.equal(contractHash, '66d3c1a794e19b31a55e37e30acf2611db13c401fd3f58eefe5eb61c115229e7');
+  assert.equal(REVEAL_PRESENTATION_VERSION, '1.5.5');
+  assert.match(stylesheet, /Approved reveal presentation baseline: v1\.5\.5/);
+  assert.equal(contractHash, '15a418208b0fe1d208ab050955c7254722d2e80a884d84a92ac57ef2af6c8377');
 });
 
 test('keeps the fixed-center reveal lightweight and progressively loads artwork', async () => {
@@ -159,13 +162,20 @@ test('keeps the fixed-center reveal lightweight and progressively loads artwork'
   assert.match(script, /const visibleLayers = Math\.min\(remaining, MAX_PILE_LAYERS\)/);
   assert.match(script, /setPhase\('returning'\)/);
   assert.match(script, /overlay\.dataset\.phase = nextPhase/);
-  assert.match(script, /st-r3-reveal-open/);
+  assert.match(script, /acquireRevealViewportLock\(doc\)/);
+  assert.match(script, /setProperty\('overflow-x', 'hidden', 'important'\)/);
+  assert.match(script, /releaseViewportLock\(\)/);
+  assert.match(script, /showPile\(\{ fromPack: true \}\)/);
+  assert.match(script, /resultsScene\.addEventListener\('click'[\s\S]*event\.target\.closest\('\.st-r3-result-card, \.st-r3-results-heading, \.st-r3-done'\)[\s\S]*close\('results-backdrop'\)/);
   assert.match(script, /computedMotionDuration\(element, win\)/);
   assert.match(script, /waitForFrames\(win, computedMotionDuration/);
   assert.match(stylesheet, /\.st-r3-overlay[\s\S]*position: fixed !important;/);
   assert.match(stylesheet, /\.st-r3-card-actor[\s\S]*top: 50%;[\s\S]*left: 50%;/);
   assert.match(stylesheet, /\.st-r3-pile-button[\s\S]*top: 50%;[\s\S]*left: 50%;/);
-  assert.match(stylesheet, /\.st-r3-overlay[\s\S]*rgba\(255, 246, 252, 0\.44\)[\s\S]*blur\(18px\)/);
+  assert.match(stylesheet, /\.st-r3-overlay[\s\S]*rgba\(255, 246, 252, 0\.26\)[\s\S]*blur\(14px\)/);
+  assert.match(stylesheet, /\.st-r3-reveal-open[\s\S]*overflow-x:\s*hidden !important[\s\S]*overflow-y:\s*hidden !important[\s\S]*scrollbar-width:\s*none !important/);
+  assert.match(stylesheet, /\.st-r3-reveal-open::-webkit-scrollbar[\s\S]*display:\s*none !important/);
+  assert.match(stylesheet, /\.st-r3-header-copy[\s\S]*clip-path:\s*inset\(50%\)/);
   assert.match(stylesheet, /@keyframes stR3CuteBackdropFloat/);
   assert.match(stylesheet, /@keyframes stR3CuteParticlesDrift/);
   assert.match(stylesheet, /@keyframes stR3PackHover/);
@@ -183,11 +193,14 @@ test('keeps the fixed-center reveal lightweight and progressively loads artwork'
   assert.match(stylesheet, /@keyframes stR3PileHover/);
   assert.match(stylesheet, /@keyframes stR3PileMagicPulse/);
   assert.match(stylesheet, /@keyframes stR3PileMagicRing/);
+  assert.match(stylesheet, /\.st-r3-pile-scene\.is-arriving[\s\S]*stR3PileArrive/);
   assert.match(stylesheet, /\.st-r3-results[\s\S]*overflow-x:\s*hidden[\s\S]*scrollbar-width:\s*none/);
   assert.match(stylesheet, /\.st-r3-results::-webkit-scrollbar\s*\{\s*display:\s*none/);
   assert.match(stylesheet, /\.st-r3-results-grid[\s\S]*display:\s*flex[\s\S]*justify-content:\s*center[\s\S]*align-items:\s*stretch/);
   assert.match(stylesheet, /\.st-r3-result-card[\s\S]*flex:\s*0 1 168px[\s\S]*width:\s*min\(100%, 168px\)/);
   assert.match(stylesheet, /\.st-r3-result-copy[\s\S]*display:\s*flex[\s\S]*flex:\s*1[\s\S]*flex-direction:\s*column/);
+  assert.match(stylesheet, /\.st-r3-result-card[\s\S]*stR3ResultCardEnter/);
+  assert.match(stylesheet, /\.st-r3-results-heading[\s\S]*stR3ResultsHeadingEnter/);
 });
 
 test('keeps every production reward entry point on the canonical reveal engine', async () => {
@@ -199,7 +212,7 @@ test('keeps every production reward entry point on the canonical reveal engine',
   ].map(file => readFile(new URL(`../docs/js/pages/${file}`, import.meta.url), 'utf8')));
 
   consumers.forEach(source => {
-    assert.match(source, /reward-reveal\.js\?v=1\.5\.4/);
+    assert.match(source, /reward-reveal\.js\?v=1\.5\.5/);
     assert.match(source, /revealRewardSequence\s*\(/);
     assert.doesNotMatch(source, /@keyframes|stR3CardSpin|stR3PackTop/);
   });
