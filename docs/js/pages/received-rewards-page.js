@@ -1,4 +1,4 @@
-import{getReceivedRewards,claimReceivedReward,dismissReceivedReward}from'../received-rewards-service.js';import{revealRewardSequence}from'../reward-reveal.js?v=1.5.0';
+import{getReceivedRewards,claimReceivedReward,dismissReceivedReward}from'../received-rewards-service.js';import{revealRewardSequence}from'../reward-reveal.js?v=1.5.1';
 const list=document.getElementById('list'),status=document.getElementById('status');let rewards=[],filter='pending';const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function label(r){const p=r.rewardPayload||{};if(r.rewardType==='star_bits')return `★ ${Number(p.amount||0).toLocaleString()} Star Bits`;if(r.rewardType==='single_card')return `${p.quantity||1} card${Number(p.quantity||1)===1?'':'s'}`;if(r.rewardType==='booster')return p.boosterName||'Booster Pack';return 'Card Bundle';}
 function sourceLabel(r){return ({twitch:'Twitch Redeem',reward_code:'Reward Code',admin_gift:'Starlight Gift',event_reward:'Event Reward'}[r.sourceType]||String(r.sourceType||'Gift').replaceAll('_',' '));}

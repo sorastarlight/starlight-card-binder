@@ -22,9 +22,9 @@
   padding: 0 !important;
   overflow: hidden !important;
   color: var(--st-r3-ink);
-  background: rgba(255, 244, 250, 0.7) !important;
-  -webkit-backdrop-filter: blur(17px) saturate(1.05);
-  backdrop-filter: blur(17px) saturate(1.05);
+  background: rgba(7, 10, 28, 0.58) !important;
+  -webkit-backdrop-filter: blur(13px) saturate(1.16);
+  backdrop-filter: blur(13px) saturate(1.16);
   isolation: isolate;
 }
 .st-r3-overlay.hidden,
@@ -49,22 +49,22 @@
   z-index: 0;
   inset: -4%;
   background:
-    radial-gradient(circle at 50% 50%, rgba(255,255,255,.82) 0 8%, transparent 25%),
-    radial-gradient(circle at 50% 50%, transparent 0 22%, rgba(255,255,255,.58) 22.5% 23.7%, transparent 24.5% 34%, rgba(255,164,215,.28) 34.6% 35.8%, transparent 36.6% 48%, rgba(255,210,236,.24) 48.5% 50%, transparent 51%),
-    radial-gradient(ellipse at 50% 54%, rgba(255,184,224,.22), transparent 58%),
-    linear-gradient(135deg, rgba(255,255,255,.28), rgba(255,198,231,.16));
-  opacity: .88;
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,.24) 0 2%, transparent 10%),
+    radial-gradient(circle at 50% 50%, transparent 0 18%, rgba(142,229,255,.38) 18.5% 19.4%, transparent 20% 28%, rgba(255,151,216,.3) 28.5% 29.3%, transparent 30% 39%, rgba(190,166,255,.2) 39.5% 40.3%, transparent 41%),
+    radial-gradient(ellipse at 50% 54%, rgba(103,195,255,.28), transparent 50%),
+    linear-gradient(135deg, rgba(16,35,91,.28), rgba(81,32,100,.2));
+  opacity: .92;
   animation: stR3PortalBreathe 8s ease-in-out infinite alternate;
 }
 .st-r3-dialog::after {
   z-index: 1;
   inset: 0;
   background-image:
-    radial-gradient(circle, rgba(255,255,255,.92) 0 1px, transparent 1.7px),
-    radial-gradient(circle, rgba(255,157,215,.46) 0 1.2px, transparent 2px);
+    radial-gradient(circle, rgba(255,255,255,.84) 0 1px, transparent 1.7px),
+    radial-gradient(circle, rgba(255,182,229,.7) 0 1.2px, transparent 2px);
   background-position: 0 0, 29px 41px;
   background-size: 73px 73px, 127px 127px;
-  opacity: .32;
+  opacity: .4;
 }
 @keyframes stR3PortalBreathe {
   from { opacity: .76; transform: scale(.985) rotate(-.35deg); }
@@ -198,7 +198,7 @@
 .st-r3-pack-scene,
 .st-r3-pile-scene,
 .st-r3-reveal-scene {
-  --card-width: clamp(207px, 35.65vh, 308px);
+  --card-width: clamp(180px, 31vh, 268px);
 }
 .st-r3-pack-button,
 .st-r3-pile-button,
@@ -434,7 +434,7 @@
   100% { opacity: 0; transform: rotate(var(--shard-angle)) translateX(min(30vmin, 220px)) scaleX(1.35); }
 }
 
-/* Pile: one centered hover loop between clicks, with magic pulsing behind the stack. */
+/* Pile: static between clicks so moving from one card to the next cannot drift. */
 .st-r3-pile-button {
   position: absolute;
   top: 50%;
@@ -445,31 +445,6 @@
   margin: 0;
   padding: 0;
   transform: translate(-50%, -50%);
-  isolation: isolate;
-}
-
-.st-r3-pile-button::before,
-.st-r3-pile-button::after {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.st-r3-pile-button::before {
-  inset: -34%;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,255,255,.84) 0 8%, rgba(255,133,203,.34) 28%, rgba(255,194,229,.16) 48%, transparent 70%);
-  filter: blur(5px);
-  animation: stR3PileMagicPulse 2.5s ease-in-out infinite;
-}
-
-.st-r3-pile-button::after {
-  inset: -18%;
-  border: 2px solid rgba(255,150,211,.38);
-  border-radius: 50%;
-  box-shadow: 0 0 24px rgba(255,117,200,.28), inset 0 0 24px rgba(255,255,255,.48);
-  animation: stR3PileMagicRing 3.2s ease-in-out infinite;
 }
 
 .st-r3-pile-stack,
@@ -483,10 +458,8 @@
 }
 
 .st-r3-pile-stack {
-  z-index: 2;
   transform: perspective(900px) rotateX(5deg) rotateY(-4deg);
   transform-style: preserve-3d;
-  animation: stR3PileHover 3.4s ease-in-out infinite;
 }
 
 .st-r3-pile-layer {
@@ -507,28 +480,11 @@
 }
 
 .st-r3-pile-count {
-  z-index: 4;
   bottom: -46px;
 }
 
 .st-r3-pile-prompt {
-  z-index: 4;
   bottom: -84px;
-}
-
-@keyframes stR3PileHover {
-  0%, 100% { transform: perspective(900px) translateY(2px) rotateX(5deg) rotateY(-4deg) rotateZ(-.4deg); }
-  50% { transform: perspective(900px) translateY(-10px) rotateX(3deg) rotateY(3deg) rotateZ(.65deg); }
-}
-
-@keyframes stR3PileMagicPulse {
-  0%, 100% { opacity: .48; transform: scale(.84); }
-  50% { opacity: .95; transform: scale(1.08); }
-}
-
-@keyframes stR3PileMagicRing {
-  0%, 100% { opacity: .32; transform: scale(.88) rotate(-4deg); }
-  50% { opacity: .78; transform: scale(1.05) rotate(4deg); }
 }
 
 /* One card actor is reused for every reveal. Rarity only changes tokens and timing. */
@@ -1027,7 +983,7 @@
   .st-r3-pack-scene,
   .st-r3-pile-scene,
   .st-r3-reveal-scene {
-    --card-width: clamp(196px, 33.35vh, 265px);
+    --card-width: clamp(170px, 29vh, 230px);
   }
 
   .st-r3-pack-button {
@@ -1048,7 +1004,7 @@
   .st-r3-pack-scene,
   .st-r3-pile-scene,
   .st-r3-reveal-scene {
-    --card-width: clamp(170px, 31.05vh, 223px);
+    --card-width: clamp(148px, 27vh, 194px);
   }
 
   .st-r3-pack-button {

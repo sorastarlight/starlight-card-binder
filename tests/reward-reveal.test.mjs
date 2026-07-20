@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { readFile, stat } from 'node:fs/promises';
 
 import {
   createRevealStackLayout,
@@ -70,6 +70,22 @@ test('maps each reveal rarity to its dedicated sound tier', () => {
   assert.equal(revealSfxForRarity('not-a-rarity'), 'common');
 });
 
+test('keeps every configured reveal sound available as a non-empty asset', async () => {
+  const files = [
+    'Reveal_01_Common.wav',
+    'Reveal_02_Uncommon.wav',
+    'Reveal_03_Rare.wav',
+    'Reveal_04_Epic.wav',
+    'Reveal_05_Legendary.wav',
+    'Reveal_Results_01.wav'
+  ];
+
+  const assets = await Promise.all(files.map(file => stat(
+    new URL(`../docs/site_assets/sfx/${file}`, import.meta.url)
+  )));
+  assets.forEach(asset => assert.ok(asset.size > 44));
+});
+
 test('uses one deliberate pack, pile, and card motion system with reduced-motion support', async () => {
   const [script, stylesheet] = await Promise.all([
     readFile(new URL('../docs/js/reward-reveal.js', import.meta.url), 'utf8'),
@@ -79,11 +95,11 @@ test('uses one deliberate pack, pile, and card motion system with reduced-motion
   assert.doesNotMatch(script, /\bsetTimeout\b|\bsr931\b/);
   assert.match(script, /new win\.Audio\(source\)/);
   assert.match(script, /booster-open\.wav/);
-  assert.match(script, /Reveal_Common_01\.wav/);
-  assert.match(script, /Reveal_Uncommon_01\.wav/);
-  assert.match(script, /Reveal_Rare_01\.wav/);
-  assert.match(script, /Reveal_Epic_01\.wav/);
-  assert.match(script, /Reveal_Legendary_01\.wav/);
+  assert.match(script, /Reveal_01_Common\.wav/);
+  assert.match(script, /Reveal_02_Uncommon\.wav/);
+  assert.match(script, /Reveal_03_Rare\.wav/);
+  assert.match(script, /Reveal_04_Epic\.wav/);
+  assert.match(script, /Reveal_05_Legendary\.wav/);
   assert.match(script, /Reveal_Results_01\.wav/);
   assert.match(script, /const showResults = \(\) => \{[\s\S]*playRevealSound\(win, 'results', activeAudio\)/);
   assert.match(script, /sora-starlight-card-binder-v7-sfx/);
@@ -114,7 +130,7 @@ test('keeps the fixed-center reveal lightweight and progressively loads artwork'
   assert.match(stylesheet, /\.st-r3-overlay[\s\S]*position: fixed !important;/);
   assert.match(stylesheet, /\.st-r3-card-actor[\s\S]*top: 50%;[\s\S]*left: 50%;/);
   assert.match(stylesheet, /\.st-r3-pile-button[\s\S]*top: 50%;[\s\S]*left: 50%;/);
-  assert.match(stylesheet, /backdrop-filter:\s*blur\(17px\)/);
+  assert.match(stylesheet, /backdrop-filter:\s*blur\(13px\)/);
   assert.match(stylesheet, /\.st-r3-badge\.rarity-common[^}]*#f6f7fb[^}]*#cfd6df/);
   assert.match(stylesheet, /\.st-r3-badge\.rarity-uncommon[^}]*#eaf5ff[^}]*#76bfff/);
   assert.match(stylesheet, /\.st-r3-badge\.rarity-rare[^}]*#fff0df[^}]*#ffb15c/);
@@ -122,8 +138,7 @@ test('keeps the fixed-center reveal lightweight and progressively loads artwork'
   assert.match(stylesheet, /\.st-r3-badge\.rarity-legendary[^}]*#ffe66d[^}]*#ffd21f/);
   assert.doesNotMatch(stylesheet, /stReveal|st-r3-backdrop-image|drop-shadow\(/);
   assert.match(stylesheet, /will-change: transform, opacity/);
-  assert.match(stylesheet, /@keyframes stR3PileHover/);
-  assert.match(stylesheet, /@keyframes stR3PileMagicPulse/);
+  assert.match(stylesheet, /\/\* Pile: static between clicks/);
 });
 
 test('keeps every production reward entry point on the canonical reveal engine', async () => {
@@ -135,7 +150,7 @@ test('keeps every production reward entry point on the canonical reveal engine',
   ].map(file => readFile(new URL(`../docs/js/pages/${file}`, import.meta.url), 'utf8')));
 
   consumers.forEach(source => {
-    assert.match(source, /reward-reveal\.js\?v=1\.5\.0/);
+    assert.match(source, /reward-reveal\.js\?v=1\.5\.1/);
     assert.match(source, /revealRewardSequence\s*\(/);
     assert.doesNotMatch(source, /@keyframes|stR3CardSpin|stR3PackTop/);
   });

@@ -5,11 +5,11 @@ const SFX_SETTING_KEY = 'sora-starlight-card-binder-v7-sfx';
 
 const REVEAL_SFX = Object.freeze({
   pack: new URL('../site_assets/sfx/booster-open.wav', import.meta.url).href,
-  common: new URL('../site_assets/sfx/Reveal_Common_01.wav', import.meta.url).href,
-  uncommon: new URL('../site_assets/sfx/Reveal_Uncommon_01.wav', import.meta.url).href,
-  rare: new URL('../site_assets/sfx/Reveal_Rare_01.wav', import.meta.url).href,
-  epic: new URL('../site_assets/sfx/Reveal_Epic_01.wav', import.meta.url).href,
-  legendary: new URL('../site_assets/sfx/Reveal_Legendary_01.wav', import.meta.url).href,
+  common: new URL('../site_assets/sfx/Reveal_01_Common.wav', import.meta.url).href,
+  uncommon: new URL('../site_assets/sfx/Reveal_02_Uncommon.wav', import.meta.url).href,
+  rare: new URL('../site_assets/sfx/Reveal_03_Rare.wav', import.meta.url).href,
+  epic: new URL('../site_assets/sfx/Reveal_04_Epic.wav', import.meta.url).href,
+  legendary: new URL('../site_assets/sfx/Reveal_05_Legendary.wav', import.meta.url).href,
   results: new URL('../site_assets/sfx/Reveal_Results_01.wav', import.meta.url).href,
   return: new URL('../site_assets/sfx/page-turn.wav', import.meta.url).href
 });
@@ -100,14 +100,14 @@ function getHost() {
   return { win: window, doc: document };
 }
 
-const REVEAL_STYLESHEET_URL = new URL('../css/reward-reveal.css?v=1.5.0', import.meta.url).href;
+const REVEAL_STYLESHEET_URL = new URL('../css/reward-reveal.css?v=1.5.1', import.meta.url).href;
 const stylesheetLoads = new WeakMap();
 const imagePreparations = new WeakMap();
 
 function installStyles(doc) {
   if (stylesheetLoads.has(doc)) return stylesheetLoads.get(doc);
 
-  const existing = doc.getElementById('starlight-reveal-v150');
+  const existing = doc.getElementById('starlight-reveal-v151');
   if (existing?.sheet) return Promise.resolve();
 
   const link = existing || doc.createElement('link');
@@ -116,7 +116,7 @@ function installStyles(doc) {
     link.addEventListener('error', resolve, { once: true });
   });
   if (!existing) {
-    link.id = 'starlight-reveal-v150';
+    link.id = 'starlight-reveal-v151';
     link.rel = 'stylesheet';
     link.href = REVEAL_STYLESHEET_URL;
     doc.head.append(link);
