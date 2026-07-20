@@ -434,7 +434,7 @@
   100% { opacity: 0; transform: rotate(var(--shard-angle)) translateX(min(30vmin, 220px)) scaleX(1.35); }
 }
 
-/* Pile: static between clicks so moving from one card to the next cannot drift. */
+/* Pile: the centered button stays fixed while its inner stack gently hovers. */
 .st-r3-pile-button {
   position: absolute;
   top: 50%;
@@ -445,6 +445,31 @@
   margin: 0;
   padding: 0;
   transform: translate(-50%, -50%);
+  isolation: isolate;
+}
+
+.st-r3-pile-button::before,
+.st-r3-pile-button::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.st-r3-pile-button::before {
+  inset: -34%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,.84) 0 8%, rgba(255,133,203,.34) 28%, rgba(255,194,229,.16) 48%, transparent 70%);
+  filter: blur(5px);
+  animation: stR3PileMagicPulse 2.5s ease-in-out infinite;
+}
+
+.st-r3-pile-button::after {
+  inset: -18%;
+  border: 2px solid rgba(255,150,211,.38);
+  border-radius: 50%;
+  box-shadow: 0 0 24px rgba(255,117,200,.28), inset 0 0 24px rgba(255,255,255,.48);
+  animation: stR3PileMagicRing 3.2s ease-in-out infinite;
 }
 
 .st-r3-pile-stack,
@@ -458,8 +483,10 @@
 }
 
 .st-r3-pile-stack {
+  z-index: 2;
   transform: perspective(900px) rotateX(5deg) rotateY(-4deg);
   transform-style: preserve-3d;
+  animation: stR3PileHover 3.4s ease-in-out infinite;
 }
 
 .st-r3-pile-layer {
@@ -480,11 +507,28 @@
 }
 
 .st-r3-pile-count {
+  z-index: 4;
   bottom: -46px;
 }
 
 .st-r3-pile-prompt {
+  z-index: 4;
   bottom: -84px;
+}
+
+@keyframes stR3PileHover {
+  0%, 100% { transform: perspective(900px) translateY(2px) rotateX(5deg) rotateY(-4deg) rotateZ(-.4deg); }
+  50% { transform: perspective(900px) translateY(-10px) rotateX(3deg) rotateY(3deg) rotateZ(.65deg); }
+}
+
+@keyframes stR3PileMagicPulse {
+  0%, 100% { opacity: .48; transform: scale(.84); }
+  50% { opacity: .95; transform: scale(1.08); }
+}
+
+@keyframes stR3PileMagicRing {
+  0%, 100% { opacity: .32; transform: scale(.88) rotate(-4deg); }
+  50% { opacity: .78; transform: scale(1.05) rotate(4deg); }
 }
 
 /* One card actor is reused for every reveal. Rarity only changes tokens and timing. */

@@ -138,7 +138,9 @@ test('keeps the fixed-center reveal lightweight and progressively loads artwork'
   assert.match(stylesheet, /\.st-r3-badge\.rarity-legendary[^}]*#ffe66d[^}]*#ffd21f/);
   assert.doesNotMatch(stylesheet, /stReveal|st-r3-backdrop-image|drop-shadow\(/);
   assert.match(stylesheet, /will-change: transform, opacity/);
-  assert.match(stylesheet, /\/\* Pile: static between clicks/);
+  assert.match(stylesheet, /@keyframes stR3PileHover/);
+  assert.match(stylesheet, /@keyframes stR3PileMagicPulse/);
+  assert.match(stylesheet, /@keyframes stR3PileMagicRing/);
 });
 
 test('keeps every production reward entry point on the canonical reveal engine', async () => {
@@ -150,7 +152,7 @@ test('keeps every production reward entry point on the canonical reveal engine',
   ].map(file => readFile(new URL(`../docs/js/pages/${file}`, import.meta.url), 'utf8')));
 
   consumers.forEach(source => {
-    assert.match(source, /reward-reveal\.js\?v=1\.5\.1/);
+    assert.match(source, /reward-reveal\.js\?v=1\.5\.2/);
     assert.match(source, /revealRewardSequence\s*\(/);
     assert.doesNotMatch(source, /@keyframes|stR3CardSpin|stR3PackTop/);
   });

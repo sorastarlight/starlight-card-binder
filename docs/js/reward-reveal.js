@@ -100,14 +100,14 @@ function getHost() {
   return { win: window, doc: document };
 }
 
-const REVEAL_STYLESHEET_URL = new URL('../css/reward-reveal.css?v=1.5.1', import.meta.url).href;
+const REVEAL_STYLESHEET_URL = new URL('../css/reward-reveal.css?v=1.5.2', import.meta.url).href;
 const stylesheetLoads = new WeakMap();
 const imagePreparations = new WeakMap();
 
 function installStyles(doc) {
   if (stylesheetLoads.has(doc)) return stylesheetLoads.get(doc);
 
-  const existing = doc.getElementById('starlight-reveal-v151');
+  const existing = doc.getElementById('starlight-reveal-v152');
   if (existing?.sheet) return Promise.resolve();
 
   const link = existing || doc.createElement('link');
@@ -116,7 +116,7 @@ function installStyles(doc) {
     link.addEventListener('error', resolve, { once: true });
   });
   if (!existing) {
-    link.id = 'starlight-reveal-v151';
+    link.id = 'starlight-reveal-v152';
     link.rel = 'stylesheet';
     link.href = REVEAL_STYLESHEET_URL;
     doc.head.append(link);
