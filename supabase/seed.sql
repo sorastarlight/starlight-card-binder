@@ -1,6 +1,5 @@
 -- Reproducible application configuration for local resets.
--- The guard keeps the seed harmless until a full production schema snapshot
--- has been pulled after the migration-history baseline.
+-- The guard keeps the seed harmless in intentionally partial environments.
 
 do $seed$
 begin

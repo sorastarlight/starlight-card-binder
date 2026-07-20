@@ -8,7 +8,9 @@
 
 Production was created through the Supabase SQL Editor before CLI history existed. `20260720160000_production_baseline.sql` is therefore a tracking marker for the already-live database through V94.1; it intentionally does not recreate historical objects.
 
-The migration ledger uses Supabase CLI's official `supabase_migrations.schema_migrations` schema. Once the CLI is run from a network-unrestricted terminal with production linked, run `supabase db pull production_schema` before creating or pushing another migration. That pull will generate the full post-baseline schema migration needed for clean local rebuilds. Until that snapshot exists, do not treat `supabase db reset` as a complete production reconstruction.
+`20260720180926_production_schema.sql` is the full post-baseline schema snapshot pulled from the linked production project. Together, the baseline marker, schema snapshot, and `seed.sql` provide the canonical starting point for clean local rebuilds and all future forward migrations.
+
+The production migration ledger uses Supabase CLI's official `supabase_migrations.schema_migrations` schema and is synchronized with both canonical migration files. Do not regenerate, rename, or edit either applied migration; add a new timestamped migration for every subsequent change.
 
 ## Forward workflow
 
