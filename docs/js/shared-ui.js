@@ -58,60 +58,24 @@ function isHolographicCard(card = {}) {
   return /\bholographic\b|\breverse[\s-]?holo\b|\bholofoil\b/.test(finishName);
 }
 
-function normalizeFinishId(card = {}) {
-  return String(card.finishId ?? card.finish_id ?? card.finish?.id ?? '')
-    .trim()
-    .toLowerCase()
-    .replace(/[_\s]+/g, '-');
-}
-
-function finishNameOf(card = {}) {
-  return String(card.finishName ?? card.finish_name ?? card.finish?.name ?? '')
-    .trim()
-    .toLowerCase();
-}
-
-function isSparkleFoilCard(card = {}) {
-  const finishId = normalizeFinishId(card);
-  if (finishId === 'sparkle-foil' || finishId === 'sparklefoil' || finishId === 'sparkle') return true;
-  return /\bsparkle([\s_-]?foil)?\b/.test(finishNameOf(card));
-}
-
-function isGoldCard(card = {}) {
-  const finishId = normalizeFinishId(card);
-  if (finishId === 'gold' || finishId === 'gold-foil' || finishId === 'gold-holo' || finishId === 'gold-holographic') {
-    return true;
-  }
-  return /\bgold([\s_-]?(foil|holo|holographic))?\b/.test(finishNameOf(card));
-}
-
 function cardFinishClass(card, visible = true) {
   if (!visible) return '';
-  // Specific finishes before generic holographic matching.
-  if (isSparkleFoilCard(card)) return 'card-finish-sparkle-foil';
-  if (isGoldCard(card)) return 'card-finish-gold';
   if (isHolographicCard(card)) return 'card-finish-holographic';
   return '';
 }
 
 function finishEffectLabel(card) {
-  if (isSparkleFoilCard(card)) return 'Sparkle Foil';
-  if (isGoldCard(card)) return 'Gold';
   if (isHolographicCard(card)) return 'Holographic';
   return '';
 }
 
 function finishEffectBadgeClass(card) {
-  if (isSparkleFoilCard(card)) return 'finish-sparkle-foil';
-  if (isGoldCard(card)) return 'finish-gold';
   if (isHolographicCard(card)) return 'finish-holographic';
   return '';
 }
 
 function finishEffectMarkup(card, visible = true) {
   if (!visible) return '';
-  if (isSparkleFoilCard(card)) return '<span class="st-sparkle-glitter" aria-hidden="true"></span>';
-  if (isGoldCard(card)) return '<span class="st-gold-spark" aria-hidden="true"></span>';
   if (isHolographicCard(card)) return '<span class="st-holo-spark" aria-hidden="true"></span>';
   return '';
 }
@@ -122,29 +86,26 @@ function holoSparkMarkup(card, visible = true) {
 
 function ensureFinishEffectLayer(element, finishClass = '') {
   if (!element) return null;
-  const layers = {
-    'card-finish-holographic': 'st-holo-spark',
-    'card-finish-sparkle-foil': 'st-sparkle-glitter',
-    'card-finish-gold': 'st-gold-spark'
-  };
-  const wanted = layers[finishClass] || '';
+  const holoSpark = element.querySelector(':scope > .st-holo-spark');
+  const glitter = element.querySelector(':scope > .st-sparkle-glitter');
+  const goldSpark = element.querySelector(':scope > .st-gold-spark');
   element.classList.remove('is-holo-lit');
+  glitter?.remove();
+  goldSpark?.remove();
 
-  for (const className of Object.values(layers)) {
-    if (className === wanted) continue;
-    element.querySelector(`:scope > .${className}`)?.remove();
+  if (finishClass === 'card-finish-holographic') {
+    if (!holoSpark) {
+      const spark = document.createElement('span');
+      spark.className = 'st-holo-spark';
+      spark.setAttribute('aria-hidden', 'true');
+      element.append(spark);
+      return spark;
+    }
+    return holoSpark;
   }
 
-  if (!wanted) return null;
-
-  const existing = element.querySelector(`:scope > .${wanted}`);
-  if (existing) return existing;
-
-  const spark = document.createElement('span');
-  spark.className = wanted;
-  spark.setAttribute('aria-hidden', 'true');
-  element.append(spark);
-  return spark;
+  holoSpark?.remove();
+  return null;
 }
 
 function ensureHoloSparkLayer(element, enabled = true) {
@@ -481,8 +442,6 @@ window.StarlightUI = {
   createModal,
   adoptModal,
   isHolographicCard,
-  isSparkleFoilCard,
-  isGoldCard,
   cardFinishClass,
   finishEffectLabel,
   finishEffectBadgeClass,

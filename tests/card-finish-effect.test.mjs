@@ -31,46 +31,12 @@ test('holographic finish is a simple always-on rainbow foil on reveal and full v
   assert.doesNotMatch(css, /--st-holo-shift/);
   assert.match(css, /prefers-reduced-motion:reduce/);
   assert.match(css, /prefers-reduced-motion:reduce[\s\S]*card-finish-holographic/);
-});
-
-test('sparkle foil finish uses visible 4-point starbursts on reveal and full view', async () => {
-  const [ui, css] = await Promise.all([
-    read('docs/js/shared-ui.js'),
-    read('docs/css/shared-ui.css')
-  ]);
-
-  assert.match(ui, /function isSparkleFoilCard\(card = \{\}\)/);
-  assert.match(ui, /finishId === 'sparkle-foil'/);
-  assert.match(ui, /card-finish-sparkle-foil/);
-  assert.match(ui, /ensureFinishEffectLayer/);
-  assert.match(ui, /finishEffectLabel/);
-  assert.match(ui, /st-sparkle-glitter/);
-  assert.match(css, /\.card-finish-sparkle-foil::before/);
-  assert.match(css, /\.st-sparkle-glitter/);
-  assert.match(css, /@keyframes stSparkleTwinkleA/);
-  assert.match(css, /animation:stSparkleTwinkleA[^;]*alternate/);
-  assert.match(css, /prefers-reduced-motion:reduce[\s\S]*card-finish-sparkle-foil/);
-});
-
-test('gold finish uses metallic gold wash with rainbow streaks and sparkles', async () => {
-  const [ui, css, badgeCss] = await Promise.all([
-    read('docs/js/shared-ui.js'),
-    read('docs/css/shared-ui.css'),
-    read('docs/css/reward-reveal.css')
-  ]);
-
-  assert.match(ui, /function isGoldCard\(card = \{\}\)/);
-  assert.match(ui, /finishId === 'gold'/);
-  assert.match(ui, /card-finish-gold/);
-  assert.match(ui, /st-gold-spark/);
-  assert.match(ui, /isGoldCard/);
-  assert.match(css, /\.card-finish-gold::before/);
-  assert.match(css, /\.st-gold-spark/);
-  assert.match(css, /@keyframes stGoldWash/);
-  assert.match(css, /@keyframes stGoldRainbow/);
-  assert.match(css, /@keyframes stGoldSparkleA/);
-  assert.match(css, /prefers-reduced-motion:reduce[\s\S]*card-finish-gold/);
-  assert.match(badgeCss, /\.st-r3-badge\.finish-gold/);
+  assert.doesNotMatch(css, /card-finish-sparkle-foil/);
+  assert.doesNotMatch(css, /card-finish-gold/);
+  assert.doesNotMatch(css, /stSparkle/);
+  assert.doesNotMatch(css, /stGold/);
+  assert.doesNotMatch(ui, /isSparkleFoilCard/);
+  assert.doesNotMatch(ui, /isGoldCard/);
 });
 
 test('finish effects are limited to reveal and full-card view surfaces', async () => {
@@ -87,7 +53,8 @@ test('finish effects are limited to reveal and full-card view surfaces', async (
   assert.match(app, /data-finish-class=/);
   assert.match(app, /ensureFinishEffectLayer/);
   assert.match(app, /attachCardDragTilt/);
-  assert.match(app, /card-finish-gold/);
+  assert.doesNotMatch(app, /isSparkleFoilCard/);
+  assert.doesNotMatch(app, /isGoldCard/);
   assert.doesNotMatch(app, /collection-image \$\{cardFinishClass/);
   assert.doesNotMatch(app, /v61-card-art \$\{cardFinishClass/);
   assert.doesNotMatch(app, /fav-image \$\{cardFinishClass/);

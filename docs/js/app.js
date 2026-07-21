@@ -55,8 +55,6 @@ function variantLabel(card) { return taxonomyLabel(card?.variantName, card?.vari
 function finishLabel(card) { return taxonomyLabel(card?.finishName, card?.finishId, 'Standard'); }
 function cardFinishClass(card, visible = true) { return window.StarlightUI?.cardFinishClass?.(card, visible) || ''; }
 function isHolographicCard(card) { return window.StarlightUI?.isHolographicCard?.(card) === true; }
-function isSparkleFoilCard(card) { return window.StarlightUI?.isSparkleFoilCard?.(card) === true; }
-function isGoldCard(card) { return window.StarlightUI?.isGoldCard?.(card) === true; }
 function holoSparkMarkup(card, visible = true) { return window.StarlightUI?.finishEffectMarkup?.(card, visible) || window.StarlightUI?.holoSparkMarkup?.(card, visible) || ''; }
 function distributionLabel(card) {
   const labels = {
