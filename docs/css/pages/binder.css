@@ -58,3 +58,27 @@ body[data-page="binder"].series-select .binder-browser-layout {
   .binder-browser-layout .v62-showcase { width: 100%; }
 }
 
+/* V1.1 binder browse chrome — clearer mobile filter / head stack */
+@media (max-width: 720px) {
+  .v61-grid-head {
+    display: grid;
+    gap: 12px;
+    align-items: start;
+  }
+
+  .v61-grid-head .v61-back-btn {
+    justify-self: start;
+  }
+
+  .v61-grid-head .v61-count-pill {
+    justify-self: start;
+  }
+
+  body[data-page="binder"] .card-filter-panel {
+    position: sticky;
+    top: 8px;
+    z-index: 4;
+  }
+}
+
+

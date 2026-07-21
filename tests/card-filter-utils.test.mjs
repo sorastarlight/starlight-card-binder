@@ -3,7 +3,10 @@ import test from 'node:test';
 
 import {
   buildCardSearchHaystack,
+  buildTradeSearchHaystack,
+  cardDisplayNumber,
   filterCardList,
+  formatBinderOwnedPill,
   resolveBinderBrowseList
 } from '../docs/js/card-filter-utils.js';
 
@@ -115,4 +118,27 @@ test('filterCardList respects collected / missing ownership views', () => {
   });
   assert.deepEqual(collected.map(card => card.id), ['a1', 'c3']);
   assert.deepEqual(missing.map(card => card.id), ['b2']);
+});
+
+test('cardDisplayNumber prefers collector numbers', () => {
+  assert.equal(cardDisplayNumber({ number: '001', collectorNumber: 'RS-001' }), 'RS-001');
+  assert.equal(cardDisplayNumber({ number: '002' }), '002');
+});
+
+test('formatBinderOwnedPill stays honest for missing view', () => {
+  assert.equal(formatBinderOwnedPill({ shown: 5, owned: 0, view: 'missing' }), 'Showing 5 not collected');
+  assert.equal(formatBinderOwnedPill({ shown: 12, owned: 8, view: 'all' }), 'Collected: 8 / 12');
+  assert.equal(formatBinderOwnedPill({ shown: 4, owned: 4, view: 'collected' }), 'Collected in view: 4');
+});
+
+test('buildTradeSearchHaystack includes collector numbers', () => {
+  const haystack = buildTradeSearchHaystack({
+    cardNumber: '014',
+    collectorNumber: 'S2-014',
+    name: 'Moonlit Stage',
+    rarity: 'Rare',
+    seriesName: 'Series II'
+  });
+  assert.match(haystack, /s2-014/);
+  assert.match(haystack, /moonlit stage/);
 });

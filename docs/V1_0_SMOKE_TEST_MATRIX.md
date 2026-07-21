@@ -44,6 +44,8 @@ Second slice: **favorites polish** — favorite/unfavorite in full view, showcas
 
 Third slice: **checklist + collection filter parity** — checklist uses shared search/filters; duplicates tab updates filter summary; Back to Series resets all binder filters.
 
+Fourth slice: **binder browse chrome + trade search** — honest owned/not-collected count pill, collector-number badges, mobile filter head stack, trade wishlist search haystack includes collector numbers.
+
 ## Fixes found during this walk
 
 1. **Shop signed-out load** — `booster-shop-page.js` no longer throws away the pack catalog when Star Bits preview fails for anonymous users (shows signed-out CTA instead of “shop could not be loaded”).

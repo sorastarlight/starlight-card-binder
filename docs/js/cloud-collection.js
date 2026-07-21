@@ -360,14 +360,14 @@ async function loadBinderApplication() {
         return;
     }
 
-    window.StarlightCardFilters = await import('./card-filter-utils.js?v=1.0.0');
+    window.StarlightCardFilters = await import('./card-filter-utils.js?v=1.1.0');
     window.StarlightFavoriteUtils = await import('./favorite-utils.js?v=1.0.0');
 
     return new Promise((resolve, reject) => {
         const script =
             document.createElement("script");
 
-        script.src = "./js/app.js?v=1.5.3";
+        script.src = "./js/app.js?v=1.5.4";
         script.async = false;
         script.dataset.starlightApp = "true";
 

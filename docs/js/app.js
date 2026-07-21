@@ -1077,11 +1077,17 @@ function renderV61CardGridHtml(browse = resolveBinderBrowse()) {
     element.textContent = browse.summary || `Showing ${list.length} of ${poolSize} cards`;
   });
   const gotCount = list.filter(c => isCollected(c.id)).length;
+  const api = window.StarlightCardFilters;
+  const countPill = api?.formatBinderOwnedPill
+    ? api.formatBinderOwnedPill({ shown: list.length, owned: gotCount, view: f.view })
+    : (f.view === 'missing'
+      ? `Showing ${list.length} not collected`
+      : `Collected: ${gotCount} / ${list.length}`);
   return `<div class="v61-grid-shell">
     <div class="v61-grid-head">
       <button id="backToSeries" class="v61-back-btn" type="button">← Back to Series</button>
       <div><h2>${esc(heading)}</h2><p>${f.q ? 'Search matches across your selected filters.' : 'Browse the set and see which Starlight cards you have earned.'}</p></div>
-      <span class="v61-count-pill">Collected: ${gotCount} / ${list.length} ✨</span>
+      <span class="v61-count-pill">${esc(countPill)}</span>
     </div>
     <div class="v61-grid">${list.length ? list.map((card,i)=>renderV61Card(card,i)).join('') : '<div class="empty-state"><h2>No cards match these filters</h2><p>Reset one or more filters to browse this series again.</p><button class="btn primary" type="button" data-reset-card-filters>Reset Filters</button></div>'}</div>
   </div>`;
@@ -1090,10 +1096,11 @@ function renderV61Card(card, i) {
   const got = isCollected(card.id);
   const hidden = !got;
   const img = getVisibleImage(card);
+  const numberLabel = window.StarlightCardFilters?.cardDisplayNumber?.(card) || String(card.collectorNumber || card.number || '');
   return `<article class="v61-card-slot ${rarityClass(card)} ${got ? 'is-collected' : 'is-hidden'}" style="--i:${i}">
     <button class="v61-card-btn" type="button" data-v61-card="${esc(card.id)}" aria-label="View ${esc(getVisibleName(card))}">
       <span class="v61-card-art"><img class="${hidden?'obscured':''}" src="${esc(img)}" alt="${esc(getVisibleName(card))}" loading="lazy" onerror="this.src='${CARD_BACK_URL}'"></span>
-      <span class="badge">${esc(card.number)}</span>
+      <span class="badge">${esc(numberLabel)}</span>
     </button>
     <span class="v61-ownership ${got ? 'owned' : 'locked'}">
       <span>${got ? `Owned ×${getCardQuantity(card.id)}` : 'Not Collected'}</span>
@@ -1144,7 +1151,7 @@ function renderV62Showcase(inSeriesSelect = false, browse = resolveBinderBrowse(
       <span class="pill rarity-pill ${rarityClass(card)}">${esc(visibleRarity)}</span>
       <div class="v62-info-list">
         <p><b>Series</b><span>${esc(card.series)}</span></p>
-        <p><b>Card Number</b><span>${esc(card.number)} / ${String(cards.length).padStart(3,'0')}</span></p>
+        <p><b>Collector Number</b><span>${esc(card.collectorNumber || card.number)}</span></p>
         <p><b>Artist</b><span>${esc(card.artist)}</span></p>
         <p><b>Owned</b><span>×${getCardQuantity(card.id)}</span></p>
       </div>

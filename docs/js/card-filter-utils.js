@@ -73,3 +73,34 @@ export function resolveBinderBrowseList(cards, filters = {}, options = {}) {
     summary
   };
 }
+
+/** Preferred on-card number label (collector number when present). */
+export function cardDisplayNumber(card = {}) {
+  const value = String(card.collectorNumber || card.number || '').trim();
+  return value;
+}
+
+/**
+ * Binder grid count pill copy that stays honest under Collected / Not Collected views.
+ */
+export function formatBinderOwnedPill({ shown = 0, owned = 0, view = 'all' } = {}) {
+  const shownCount = Math.max(0, Number(shown) || 0);
+  const ownedCount = Math.max(0, Number(owned) || 0);
+  const mode = String(view || 'all').toLowerCase();
+  if (mode === 'missing') return `Showing ${shownCount} not collected`;
+  if (mode === 'collected') return `Collected in view: ${ownedCount}`;
+  return `Collected: ${ownedCount} / ${shownCount}`;
+}
+
+/** Trade-list search haystack (card number + optional collector number). */
+export function buildTradeSearchHaystack(card = {}) {
+  return [
+    card.cardNumber,
+    card.collectorNumber,
+    card.number,
+    card.name,
+    card.rarity,
+    card.seriesName,
+    card.series
+  ].map(value => String(value ?? '')).join(' ').toLowerCase();
+}
