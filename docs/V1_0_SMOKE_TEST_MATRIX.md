@@ -42,3 +42,11 @@ These do **not** replace the matrix above, but must stay green:
 
 1. **Shop signed-out load** — `booster-shop-page.js` no longer throws away the pack catalog when Star Bits preview fails for anonymous users (shows signed-out CTA instead of “shop could not be loaded”).
 2. **Staff access signed-out** — `staff-service.js` treats `get_my_staff_access` permission denials as `{ isStaff: false }` so admin pages show the product message instead of a raw Postgres error.
+
+## Supabase project (MCP)
+
+- Project: `starlight-card-binder` (`noxfauxbfdqgoxgiwrpu`, `us-west-2`, ACTIVE_HEALTHY)
+- Client URL matches `docs/js/supabase-client.js`
+- Remote migrations: `20260720160000_production_baseline`, `20260720180926_production_schema`
+- Readiness snapshot: 3 users, 2 series, 24 cards, 3 shop boosters
+- Pending local migration (not applied until approved): `20260721180000_revoke_anon_admin_rpc_execute.sql` — revoke `anon`/`public` EXECUTE on seven admin SECURITY DEFINER RPCs
