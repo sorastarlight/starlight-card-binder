@@ -47,15 +47,15 @@ function toast(message, type = 'info', timeout = 3200) {
 }
 
 function isHolographicCard(card = {}) {
-  const finish = [
-    card.finishId,
-    card.finish_id,
-    card.finishName,
-    card.finish_name,
-    card.finish?.id,
-    card.finish?.name
-  ].filter(Boolean).join(' ').toLowerCase();
-  return /\bholo(?:graphic|foil)?\b/.test(finish);
+  const finishId = String(card.finishId ?? card.finish_id ?? card.finish?.id ?? '')
+    .trim()
+    .toLowerCase();
+  if (finishId === 'holographic' || finishId === 'reverse-holo') return true;
+
+  const finishName = String(card.finishName ?? card.finish_name ?? card.finish?.name ?? '')
+    .trim()
+    .toLowerCase();
+  return /\bholographic\b|\breverse[\s-]?holo\b|\bholofoil\b/.test(finishName);
 }
 
 function cardFinishClass(card, visible = true) {

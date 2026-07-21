@@ -1,5 +1,5 @@
 /*
- * Approved reveal presentation baseline: v1.5.6.
+ * Approved reveal presentation baseline: v1.5.7.
  * Keep its motion contract intact unless this version and its regression test
  * are intentionally advanced together.
  */
@@ -706,10 +706,6 @@
   object-fit: cover;
   user-select: none;
   pointer-events: none;
-}
-
-.st-r3-card-front.card-finish-holographic {
-  display: block;
 }
 
 .st-r3-energy {

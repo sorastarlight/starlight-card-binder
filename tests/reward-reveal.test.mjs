@@ -58,6 +58,38 @@ test('normalizes snake_case reward cards into the canonical reveal shape', () =>
   assert.equal(card.isDuplicate, true);
 });
 
+test('fills missing finish metadata from the cached card catalog when available', () => {
+  const key = 'sora-starlight-card-binder-v86-supabase-card-catalog';
+  const previous = globalThis.localStorage?.getItem?.(key);
+  const storage = {
+    getItem(name) {
+      if (name !== key) return null;
+      return JSON.stringify({
+        version: 2,
+        cards: [{ id: 's01-012', finishId: 'holographic', finishName: 'Holographic' }]
+      });
+    }
+  };
+  Object.defineProperty(globalThis, 'localStorage', {
+    configurable: true,
+    value: storage
+  });
+
+  try {
+    const card = normalizeRevealCard({
+      id: 's01-012',
+      name: 'Rising Star Card 012',
+      rarity: 'Legendary',
+      image_url: '/cards/012.png'
+    });
+    assert.equal(card.finishId, 'holographic');
+    assert.equal(card.finishName, 'Holographic');
+  } finally {
+    if (previous === undefined) delete globalThis.localStorage;
+    else Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: { getItem: () => previous } });
+  }
+});
+
 test('normalizes reveal option aliases and supplies the canonical card back', () => {
   const snakeCase = normalizeRevealOptions({
     booster_name: 'Daily Booster',
@@ -149,8 +181,8 @@ test('locks the approved reveal presentation and motion baseline', async () => {
   const stylesheet = await readFile(new URL('../docs/css/reward-reveal.css', import.meta.url), 'utf8');
   const contractHash = createHash('sha256').update(normalizeMotionContract(stylesheet)).digest('hex');
 
-  assert.equal(REVEAL_PRESENTATION_VERSION, '1.5.6');
-  assert.match(stylesheet, /Approved reveal presentation baseline: v1\.5\.6/);
+  assert.equal(REVEAL_PRESENTATION_VERSION, '1.5.7');
+  assert.match(stylesheet, /Approved reveal presentation baseline: v1\.5\.7/);
   assert.equal(contractHash, '15a418208b0fe1d208ab050955c7254722d2e80a884d84a92ac57ef2af6c8377');
 });
 
@@ -216,7 +248,7 @@ test('keeps every production reward entry point on the canonical reveal engine',
   ].map(file => readFile(new URL(`../docs/js/pages/${file}`, import.meta.url), 'utf8')));
 
   consumers.forEach(source => {
-    assert.match(source, /reward-reveal\.js\?v=1\.5\.6/);
+    assert.match(source, /reward-reveal\.js\?v=1\.5\.7/);
     assert.match(source, /revealRewardSequence\s*\(/);
     assert.doesNotMatch(source, /@keyframes|stR3CardSpin|stR3PackTop/);
   });

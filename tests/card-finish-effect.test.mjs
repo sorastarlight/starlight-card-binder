@@ -11,18 +11,17 @@ test('holographic finish uses one shared animated and accessible presentation', 
   ]);
 
   assert.match(ui, /function isHolographicCard\(card = \{\}\)/);
-  assert.match(ui, /card\.finishId/);
+  assert.match(ui, /finishId === 'holographic'/);
   assert.match(ui, /card\.finish_name/);
-  assert.match(ui, /return \/\\bholo\(\?:graphic\|foil\)\?\\b\//);
   assert.match(ui, /cardFinishClass/);
   assert.match(css, /\.card-finish-holographic::before/);
   assert.match(css, /mix-blend-mode:color-dodge/);
-  assert.match(css, /@keyframes stHoloRainbow/);
-  assert.match(css, /@keyframes stHoloGlint/);
+  assert.match(css, /@keyframes stHoloRainbowSweep/);
+  assert.match(css, /@keyframes stHoloGlare/);
   assert.match(css, /prefers-reduced-motion:reduce[^}]*card-finish-holographic/s);
 });
 
-test('core card surfaces opt into the finish-driven effect', async () => {
+test('holographic shimmer is limited to reveal and full-card view surfaces', async () => {
   const [app, reveal, daily, admin] = await Promise.all([
     read('docs/js/app.js'),
     read('docs/js/reward-reveal.js'),
@@ -30,11 +29,14 @@ test('core card surfaces opt into the finish-driven effect', async () => {
     read('docs/js/pages/admin-boosters-page.js')
   ]);
 
-  assert.match(app, /collection-image \$\{cardFinishClass\(c, got\)\}/);
-  assert.match(app, /v61-card-art \$\{cardFinishClass\(card, got\)\}/);
-  assert.match(app, /face front \$\{cardFinishClass/);
+  assert.match(app, /face front \$\{cardFinishClass\(selected, got && !overlayFlipped\)\}/);
+  assert.match(app, /data-holographic="\$\{got && isHolographicCard\(selected\)\}"/);
+  assert.match(app, /--st-holo-x/);
+  assert.doesNotMatch(app, /collection-image \$\{cardFinishClass/);
+  assert.doesNotMatch(app, /v61-card-art \$\{cardFinishClass/);
+  assert.doesNotMatch(app, /fav-image \$\{cardFinishClass/);
   assert.match(reveal, /st-r3-card-front \$\{cardFinishClass\(card\)\}/);
   assert.match(reveal, /st-r3-result-art \$\{cardFinishClass\(card\)\}/);
-  assert.match(daily, /reward-card-art \$\{finishClass\}/);
-  assert.match(admin, /card-db-art \$\{window\.StarlightUI\?\.cardFinishClass/);
+  assert.doesNotMatch(daily, /reward-card-art \$\{finishClass\}/);
+  assert.doesNotMatch(admin, /card-db-art \$\{window\.StarlightUI\?\.cardFinishClass/);
 });

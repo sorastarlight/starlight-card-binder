@@ -41,18 +41,38 @@ function frontUrl(card) {
 }
 
 export function normalizeRevealCard(card = {}) {
+  const id = card.id ?? card.cardId ?? card.card_id ?? '';
+  const catalog = lookupCatalogFinish(id);
   return {
     ...card,
-    id: card.id ?? card.cardId ?? card.card_id ?? '',
+    id,
     name: card.name ?? card.cardName ?? card.card_name ?? 'Mystery Card',
     rarity: rarityKey(card.rarity ?? card.rarityName ?? card.rarity_name),
     imageUrl: frontUrl(card),
     categoryName: categoryOf(card),
     subcategoryName: subcategoryOf(card),
-    finishId: card.finishId ?? card.finish_id ?? card.finish?.id ?? '',
-    finishName: card.finishName ?? card.finish_name ?? card.finish?.name ?? '',
+    finishId: card.finishId ?? card.finish_id ?? card.finish?.id ?? catalog.finishId ?? '',
+    finishName: card.finishName ?? card.finish_name ?? card.finish?.name ?? catalog.finishName ?? '',
     isDuplicate: Boolean(card.isDuplicate ?? card.is_duplicate ?? card.duplicate)
   };
+}
+
+function lookupCatalogFinish(cardId) {
+  if (!cardId) return {};
+  try {
+    const raw = localStorage.getItem('sora-starlight-card-binder-v86-supabase-card-catalog');
+    if (!raw) return {};
+    const cards = JSON.parse(raw)?.cards;
+    if (!Array.isArray(cards)) return {};
+    const match = cards.find(card => String(card?.id) === String(cardId));
+    if (!match) return {};
+    return {
+      finishId: match.finishId || match.finish_id || '',
+      finishName: match.finishName || match.finish_name || ''
+    };
+  } catch (_) {
+    return {};
+  }
 }
 
 function cardFinishClass(card) {
@@ -162,7 +182,7 @@ function acquireRevealViewportLock(doc) {
   };
 }
 
-export const REVEAL_PRESENTATION_VERSION = '1.5.6';
+export const REVEAL_PRESENTATION_VERSION = '1.5.7';
 
 const REVEAL_STYLESHEET_ID = `starlight-reveal-v${REVEAL_PRESENTATION_VERSION.replace(/\./g, '')}`;
 const REVEAL_STYLESHEET_URL = new URL(
