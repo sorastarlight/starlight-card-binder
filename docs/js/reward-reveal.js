@@ -79,11 +79,18 @@ function cardFinishClass(card) {
   return window.StarlightUI?.cardFinishClass?.(card) || '';
 }
 
+function finishEffectBadge(card, doc) {
+  const label = window.StarlightUI?.finishEffectLabel?.(card) || '';
+  const badgeClass = window.StarlightUI?.finishEffectBadgeClass?.(card) || '';
+  if (!label || !badgeClass) return null;
+  return createElement(doc, 'span', `st-r3-badge ${badgeClass}`, label);
+}
+
 function attachHoloSpark(element, card) {
-  const enabled = Boolean(cardFinishClass(card));
-  window.StarlightUI?.ensureHoloSparkLayer?.(element, enabled);
-  if (!enabled) return;
-  // 3D drag only on the main reveal card — result thumbs keep streaks only.
+  const finish = cardFinishClass(card);
+  window.StarlightUI?.ensureFinishEffectLayer?.(element, finish);
+  if (!finish) return;
+  // 3D drag only on the main reveal card — result thumbs keep foil only.
   const actor = element.closest?.('.st-r3-card-actor');
   if (!actor) return;
   window.StarlightUI?.attachCardDragTilt?.(actor, {
@@ -199,7 +206,7 @@ function acquireRevealViewportLock(doc) {
   };
 }
 
-export const REVEAL_PRESENTATION_VERSION = '1.5.8';
+export const REVEAL_PRESENTATION_VERSION = '1.5.9';
 
 const REVEAL_STYLESHEET_ID = `starlight-reveal-v${REVEAL_PRESENTATION_VERSION.replace(/\./g, '')}`;
 const REVEAL_STYLESHEET_URL = new URL(
@@ -609,9 +616,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
           `st-r3-result-status ${card.isDuplicate ? 'is-duplicate' : 'is-new'}`,
           card.isDuplicate ? 'Duplicate' : 'New'
         );
-        const finish = cardFinishClass(card)
-          ? createElement(doc, 'span', 'st-r3-badge finish-holographic', 'Holographic')
-          : null;
+        const finish = finishEffectBadge(card, doc);
         badges.append(rarity, ...(finish ? [finish] : []), status);
         copy.append(name, detail, badges);
         art.append(image);
@@ -721,11 +726,10 @@ export async function revealRewardSequence(cards = [], options = {}) {
       actor.setAttribute('aria-label', `${card.name}, ${prettyMeta(card.rarity)}. Continue to the pile.`);
       cardName.textContent = card.name;
       cardMeta.textContent = cardDescription(card) || 'Starlight Card';
+      const finishBadge = finishEffectBadge(card, doc);
       cardBadges.replaceChildren(
         createElement(doc, 'span', `st-r3-badge rarity-${card.rarity}`, prettyMeta(card.rarity)),
-        ...(cardFinishClass(card)
-          ? [createElement(doc, 'span', 'st-r3-badge finish-holographic', 'Holographic')]
-          : []),
+        ...(finishBadge ? [finishBadge] : []),
         createElement(
           doc,
           'span',

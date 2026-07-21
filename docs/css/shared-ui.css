@@ -163,6 +163,132 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
   from{opacity:.2;transform:scale(1.04)}
   to{opacity:.95;transform:scale(.94)}
 }
+/*
+ * Sparkle Foil — simple silver glitter finish (reveal + full-view only).
+ */
+.card-finish-sparkle-foil{
+  position:relative;
+  display:block;
+  overflow:hidden;
+  isolation:isolate;
+}
+.face.card-finish-sparkle-foil,
+.st-r3-card-front.card-finish-sparkle-foil{position:absolute;inset:0}
+.st-r3-result-art.card-finish-sparkle-foil{border-radius:13px 13px 0 0}
+.card-finish-sparkle-foil>img{position:relative;z-index:0;display:block}
+.card-finish-sparkle-foil::before,
+.card-finish-sparkle-foil::after,
+.card-finish-sparkle-foil>.st-sparkle-glitter{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:2;
+  border-radius:inherit;
+  pointer-events:none;
+}
+/* Soft metallic wash */
+.card-finish-sparkle-foil::before{
+  z-index:2;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.08) 0%,
+      rgba(220,235,255,.28) 35%,
+      rgba(255,245,210,.22) 55%,
+      rgba(255,255,255,.1) 100%
+    );
+  mix-blend-mode:soft-light;
+  opacity:.7;
+  animation:stSparkleWash 3.6s ease-in-out infinite alternate;
+}
+/* Dense glitter grain */
+.card-finish-sparkle-foil::after{
+  z-index:3;
+  background-image:
+    radial-gradient(circle at 12% 18%,rgba(255,255,255,.9) 0 .7px,transparent 1.3px),
+    radial-gradient(circle at 28% 44%,rgba(255,255,255,.75) 0 .55px,transparent 1.1px),
+    radial-gradient(circle at 46% 22%,rgba(255,250,220,.85) 0 .65px,transparent 1.2px),
+    radial-gradient(circle at 64% 58%,rgba(255,255,255,.8) 0 .5px,transparent 1px),
+    radial-gradient(circle at 78% 30%,rgba(230,245,255,.85) 0 .7px,transparent 1.3px),
+    radial-gradient(circle at 88% 70%,rgba(255,255,255,.7) 0 .45px,transparent .95px),
+    radial-gradient(circle at 34% 76%,rgba(255,255,255,.8) 0 .6px,transparent 1.15px),
+    radial-gradient(circle at 56% 86%,rgba(255,245,220,.75) 0 .5px,transparent 1px),
+    radial-gradient(circle at 8% 62%,rgba(255,255,255,.65) 0 .4px,transparent .9px),
+    radial-gradient(circle at 72% 12%,rgba(255,255,255,.8) 0 .55px,transparent 1.1px);
+  background-size:100% 100%;
+  mix-blend-mode:screen;
+  opacity:.45;
+  animation:stSparkleGrain 2.4s ease-in-out infinite alternate;
+}
+/* Twinkling sparkle bursts */
+.card-finish-sparkle-foil>.st-sparkle-glitter{
+  z-index:4;
+  content:none;
+  background-image:
+    radial-gradient(circle at 20% 26%,#fff 0 1px,transparent 1.7px),
+    radial-gradient(circle at 58% 38%,#fff 0 .8px,transparent 1.4px),
+    radial-gradient(circle at 76% 64%,#fff 0 1.1px,transparent 1.8px),
+    radial-gradient(circle at 36% 70%,#fff 0 .7px,transparent 1.3px),
+    radial-gradient(circle at 84% 22%,#fff 0 .9px,transparent 1.5px),
+    linear-gradient(0deg,transparent 46%,rgba(255,255,255,.95) 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,rgba(255,255,255,.95) 50%,transparent 54%),
+    linear-gradient(0deg,transparent 46%,rgba(255,255,255,.85) 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,rgba(255,255,255,.85) 50%,transparent 54%);
+  background-size:
+    100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,
+    14px 14px,14px 14px,12px 12px,12px 12px;
+  background-position:
+    0 0,0 0,0 0,0 0,0 0,
+    20% 26%,20% 26%,76% 64%,76% 64%;
+  background-repeat:no-repeat;
+  mix-blend-mode:screen;
+  filter:drop-shadow(0 0 2px rgba(255,255,255,.65));
+  animation:stSparkleTwinkleA 1.7s ease-in-out infinite alternate;
+}
+.card-finish-sparkle-foil>.st-sparkle-glitter::before,
+.card-finish-sparkle-foil>.st-sparkle-glitter::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  background-image:
+    radial-gradient(circle at 44% 18%,#fff 0 .85px,transparent 1.5px),
+    radial-gradient(circle at 66% 52%,#fff 0 1px,transparent 1.7px),
+    radial-gradient(circle at 18% 58%,#fff 0 .7px,transparent 1.3px),
+    linear-gradient(0deg,transparent 46%,rgba(255,255,255,.9) 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,rgba(255,255,255,.9) 50%,transparent 54%);
+  background-size:100% 100%,100% 100%,100% 100%,13px 13px,13px 13px;
+  background-position:0 0,0 0,0 0,58% 38%,58% 38%;
+  background-repeat:no-repeat;
+  mix-blend-mode:screen;
+  animation:stSparkleTwinkleB 2.2s ease-in-out infinite alternate;
+}
+.card-finish-sparkle-foil>.st-sparkle-glitter::after{
+  background-position:0 0,0 0,0 0,36% 70%,36% 70%;
+  animation-name:stSparkleTwinkleC;
+  animation-duration:2.6s;
+  animation-direction:alternate-reverse;
+}
+@keyframes stSparkleWash{
+  from{opacity:.55}
+  to{opacity:.82}
+}
+@keyframes stSparkleGrain{
+  from{opacity:.32}
+  to{opacity:.58}
+}
+@keyframes stSparkleTwinkleA{
+  from{opacity:.2;filter:drop-shadow(0 0 1px rgba(255,255,255,.3))}
+  to{opacity:.9;filter:drop-shadow(0 0 3px rgba(255,255,255,.9))}
+}
+@keyframes stSparkleTwinkleB{
+  from{opacity:.15;transform:scale(.94)}
+  to{opacity:.88;transform:scale(1.04)}
+}
+@keyframes stSparkleTwinkleC{
+  from{opacity:.22;transform:scale(1.03)}
+  to{opacity:.92;transform:scale(.95)}
+}
 /* Click-drag 3D tilt only (foil is independent) */
 .st-card-drag-tilt{
   --tiltX:0deg;
@@ -208,4 +334,4 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
 .st-view-state{display:grid;place-items:center;min-height:220px;padding:28px;text-align:center;color:var(--st-ui-muted)}.st-view-state strong{display:block;color:#405fa1;font-size:1.25rem;margin-bottom:7px}.st-view-state button{margin-top:15px;padding:10px 18px;border:0;border-radius:999px;background:linear-gradient(135deg,var(--st-ui-blue),var(--st-ui-pink));color:#fff;font-weight:900;cursor:pointer}.st-spinner{width:38px;height:38px;margin:0 auto 14px;border:4px solid rgba(107,198,248,.2);border-top-color:var(--st-ui-pink);border-radius:50%;animation:stSpin .8s linear infinite}@keyframes stSpin{to{transform:rotate(360deg)}}
 :focus-visible{outline:3px solid rgba(255,130,200,.75)!important;outline-offset:3px!important}
 .status:empty,.page-status:empty,[role="status"]:empty{display:none!important}
-@media(prefers-reduced-motion:reduce){.st-toast,.st-spinner,.card-finish-holographic::before,.card-finish-holographic::after,.card-finish-holographic>.st-holo-spark,.card-finish-holographic>.st-holo-spark::before,.card-finish-holographic>.st-holo-spark::after{animation:none!important}.card-finish-holographic::before{opacity:.5;filter:hue-rotate(40deg)}.card-finish-holographic::after{opacity:.55;background-position:45% 40%}.card-finish-holographic>.st-holo-spark{opacity:.4}.card-finish-holographic>.st-holo-spark::before,.card-finish-holographic>.st-holo-spark::after{opacity:.35}.st-card-drag-tilt,.full-card-wrap#fullCard3d{transition:none!important}.st-dialog-overlay{backdrop-filter:none}.st-dialog-overlay,.st-dialog,.st-button{transition:none!important}}
+@media(prefers-reduced-motion:reduce){.st-toast,.st-spinner,.card-finish-holographic::before,.card-finish-holographic::after,.card-finish-holographic>.st-holo-spark,.card-finish-holographic>.st-holo-spark::before,.card-finish-holographic>.st-holo-spark::after,.card-finish-sparkle-foil::before,.card-finish-sparkle-foil::after,.card-finish-sparkle-foil>.st-sparkle-glitter,.card-finish-sparkle-foil>.st-sparkle-glitter::before,.card-finish-sparkle-foil>.st-sparkle-glitter::after{animation:none!important}.card-finish-holographic::before{opacity:.5;filter:hue-rotate(40deg)}.card-finish-holographic::after{opacity:.55;background-position:45% 40%}.card-finish-holographic>.st-holo-spark{opacity:.4}.card-finish-holographic>.st-holo-spark::before,.card-finish-holographic>.st-holo-spark::after{opacity:.35}.card-finish-sparkle-foil::before{opacity:.65}.card-finish-sparkle-foil::after{opacity:.42}.card-finish-sparkle-foil>.st-sparkle-glitter{opacity:.45}.card-finish-sparkle-foil>.st-sparkle-glitter::before,.card-finish-sparkle-foil>.st-sparkle-glitter::after{opacity:.35}.st-card-drag-tilt,.full-card-wrap#fullCard3d{transition:none!important}.st-dialog-overlay{backdrop-filter:none}.st-dialog-overlay,.st-dialog,.st-button{transition:none!important}}

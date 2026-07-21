@@ -33,7 +33,27 @@ test('holographic finish is a simple always-on rainbow foil on reveal and full v
   assert.match(css, /prefers-reduced-motion:reduce[\s\S]*card-finish-holographic/);
 });
 
-test('holographic shimmer is limited to reveal and full-card view surfaces', async () => {
+test('sparkle foil finish uses a simple glitter effect on reveal and full view', async () => {
+  const [ui, css] = await Promise.all([
+    read('docs/js/shared-ui.js'),
+    read('docs/css/shared-ui.css')
+  ]);
+
+  assert.match(ui, /function isSparkleFoilCard\(card = \{\}\)/);
+  assert.match(ui, /finishId === 'sparkle-foil'/);
+  assert.match(ui, /\\bsparkle\[\\s-\]\?foil\\b/);
+  assert.match(ui, /card-finish-sparkle-foil/);
+  assert.match(ui, /ensureFinishEffectLayer/);
+  assert.match(ui, /finishEffectLabel/);
+  assert.match(ui, /st-sparkle-glitter/);
+  assert.match(css, /\.card-finish-sparkle-foil::before/);
+  assert.match(css, /\.st-sparkle-glitter/);
+  assert.match(css, /@keyframes stSparkleTwinkleA/);
+  assert.match(css, /animation:stSparkleTwinkleA[^;]*alternate/);
+  assert.match(css, /prefers-reduced-motion:reduce[\s\S]*card-finish-sparkle-foil/);
+});
+
+test('finish effects are limited to reveal and full-card view surfaces', async () => {
   const [app, reveal, daily, admin] = await Promise.all([
     read('docs/js/app.js'),
     read('docs/js/reward-reveal.js'),
@@ -43,7 +63,8 @@ test('holographic shimmer is limited to reveal and full-card view surfaces', asy
 
   assert.match(app, /face front \$\{cardFinishClass\(selected, got && !overlayFlipped\)\}/);
   assert.match(app, /holoSparkMarkup\(selected, got && !overlayFlipped\)/);
-  assert.match(app, /data-holographic="\$\{got && isHolographicCard\(selected\)\}"/);
+  assert.match(app, /data-finish-class=/);
+  assert.match(app, /ensureFinishEffectLayer/);
   assert.match(app, /attachCardDragTilt/);
   assert.doesNotMatch(app, /collection-image \$\{cardFinishClass/);
   assert.doesNotMatch(app, /v61-card-art \$\{cardFinishClass/);
@@ -51,7 +72,8 @@ test('holographic shimmer is limited to reveal and full-card view surfaces', asy
   assert.match(reveal, /st-r3-card-front \$\{cardFinishClass\(card\)\}/);
   assert.match(reveal, /st-r3-result-art \$\{cardFinishClass\(card\)\}/);
   assert.match(reveal, /attachHoloSpark\(/);
-  assert.match(reveal, /attachCardDragTilt/);
+  assert.match(reveal, /ensureFinishEffectLayer/);
+  assert.match(reveal, /finishEffectBadge/);
   assert.doesNotMatch(daily, /reward-card-art \$\{finishClass\}/);
   assert.doesNotMatch(admin, /card-db-art \$\{window\.StarlightUI\?\.cardFinishClass/);
 });

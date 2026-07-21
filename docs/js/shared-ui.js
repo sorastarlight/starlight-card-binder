@@ -58,31 +58,85 @@ function isHolographicCard(card = {}) {
   return /\bholographic\b|\breverse[\s-]?holo\b|\bholofoil\b/.test(finishName);
 }
 
+function isSparkleFoilCard(card = {}) {
+  const finishId = String(card.finishId ?? card.finish_id ?? card.finish?.id ?? '')
+    .trim()
+    .toLowerCase();
+  if (finishId === 'sparkle-foil') return true;
+
+  const finishName = String(card.finishName ?? card.finish_name ?? card.finish?.name ?? '')
+    .trim()
+    .toLowerCase();
+  return /\bsparkle[\s-]?foil\b/.test(finishName);
+}
+
 function cardFinishClass(card, visible = true) {
-  return visible && isHolographicCard(card) ? 'card-finish-holographic' : '';
+  if (!visible) return '';
+  if (isHolographicCard(card)) return 'card-finish-holographic';
+  if (isSparkleFoilCard(card)) return 'card-finish-sparkle-foil';
+  return '';
+}
+
+function finishEffectLabel(card) {
+  if (isHolographicCard(card)) return 'Holographic';
+  if (isSparkleFoilCard(card)) return 'Sparkle Foil';
+  return '';
+}
+
+function finishEffectBadgeClass(card) {
+  if (isHolographicCard(card)) return 'finish-holographic';
+  if (isSparkleFoilCard(card)) return 'finish-sparkle-foil';
+  return '';
+}
+
+function finishEffectMarkup(card, visible = true) {
+  if (!visible) return '';
+  if (isHolographicCard(card)) return '<span class="st-holo-spark" aria-hidden="true"></span>';
+  if (isSparkleFoilCard(card)) return '<span class="st-sparkle-glitter" aria-hidden="true"></span>';
+  return '';
 }
 
 function holoSparkMarkup(card, visible = true) {
-  return visible && isHolographicCard(card)
-    ? '<span class="st-holo-spark" aria-hidden="true"></span>'
-    : '';
+  return finishEffectMarkup(card, visible);
+}
+
+function ensureFinishEffectLayer(element, finishClass = '') {
+  if (!element) return null;
+  const holoSpark = element.querySelector(':scope > .st-holo-spark');
+  const glitter = element.querySelector(':scope > .st-sparkle-glitter');
+  element.classList.remove('is-holo-lit');
+
+  if (finishClass === 'card-finish-holographic') {
+    glitter?.remove();
+    if (!holoSpark) {
+      const spark = document.createElement('span');
+      spark.className = 'st-holo-spark';
+      spark.setAttribute('aria-hidden', 'true');
+      element.append(spark);
+      return spark;
+    }
+    return holoSpark;
+  }
+
+  if (finishClass === 'card-finish-sparkle-foil') {
+    holoSpark?.remove();
+    if (!glitter) {
+      const spark = document.createElement('span');
+      spark.className = 'st-sparkle-glitter';
+      spark.setAttribute('aria-hidden', 'true');
+      element.append(spark);
+      return spark;
+    }
+    return glitter;
+  }
+
+  holoSpark?.remove();
+  glitter?.remove();
+  return null;
 }
 
 function ensureHoloSparkLayer(element, enabled = true) {
-  if (!element) return null;
-  let spark = element.querySelector(':scope > .st-holo-spark');
-  if (!enabled) {
-    spark?.remove();
-    element.classList.remove('is-holo-lit');
-    return null;
-  }
-  if (!spark) {
-    spark = document.createElement('span');
-    spark.className = 'st-holo-spark';
-    spark.setAttribute('aria-hidden', 'true');
-    element.append(spark);
-  }
-  return spark;
+  return ensureFinishEffectLayer(element, enabled ? 'card-finish-holographic' : '');
 }
 
 /**
@@ -415,8 +469,13 @@ window.StarlightUI = {
   createModal,
   adoptModal,
   isHolographicCard,
+  isSparkleFoilCard,
   cardFinishClass,
+  finishEffectLabel,
+  finishEffectBadgeClass,
+  finishEffectMarkup,
   holoSparkMarkup,
+  ensureFinishEffectLayer,
   ensureHoloSparkLayer,
   attachHoloPointer,
   attachCardDragTilt,

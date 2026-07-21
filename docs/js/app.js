@@ -55,7 +55,8 @@ function variantLabel(card) { return taxonomyLabel(card?.variantName, card?.vari
 function finishLabel(card) { return taxonomyLabel(card?.finishName, card?.finishId, 'Standard'); }
 function cardFinishClass(card, visible = true) { return window.StarlightUI?.cardFinishClass?.(card, visible) || ''; }
 function isHolographicCard(card) { return window.StarlightUI?.isHolographicCard?.(card) === true; }
-function holoSparkMarkup(card, visible = true) { return window.StarlightUI?.holoSparkMarkup?.(card, visible) || ''; }
+function isSparkleFoilCard(card) { return window.StarlightUI?.isSparkleFoilCard?.(card) === true; }
+function holoSparkMarkup(card, visible = true) { return window.StarlightUI?.finishEffectMarkup?.(card, visible) || window.StarlightUI?.holoSparkMarkup?.(card, visible) || ''; }
 function distributionLabel(card) {
   const labels = {
     booster_pull: 'Booster Pull', redeem_code: 'Redeem Code', twitch_reward: 'Twitch Reward',
@@ -642,7 +643,7 @@ function renderFullView() {
       <div class="analyzer-actions"><button class="overlay-flip analyzer-flip" type="button">↻ Flip</button></div>
       <div class="analyzer-card-zone">
         <div class="analyzer-reticle" aria-hidden="true"></div>
-        <div class="full-card-wrap flip-card simple-flip ${overlayFlipped?'show-back showing-card-back':''} ${rarityClass(selected)}" id="fullCard3d" aria-label="${esc(overlayFlipped ? 'Card back' : visibleName)}" data-holographic="${got && isHolographicCard(selected)}">
+        <div class="full-card-wrap flip-card simple-flip ${overlayFlipped?'show-back showing-card-back':''} ${rarityClass(selected)}" id="fullCard3d" aria-label="${esc(overlayFlipped ? 'Card back' : visibleName)}" data-holographic="${got && isHolographicCard(selected)}" data-finish-class="${esc(got ? cardFinishClass(selected, true) : '')}">
           <span class="full-inner">
             <span class="face front ${cardFinishClass(selected, got && !overlayFlipped)}"><img class="${hidden && !overlayFlipped?'obscured':''}" src="${esc(overlayFlipped ? CARD_BACK_URL : getVisibleImage(selected))}" alt="${esc(overlayFlipped ? 'Card back' : visibleName)}" onerror="this.src='${CARD_BACK_URL}'">${holoSparkMarkup(selected, got && !overlayFlipped)}</span>
             <span class="face back"><img src="${CARD_BACK_URL}" alt="Card back"></span>
@@ -847,9 +848,10 @@ function flipCardImage(cardEl, frontUrl, frontAlt, showBack) {
     }
     cardEl.classList.toggle('show-back', !!showBack);
     cardEl.classList.toggle('showing-card-back', !!showBack);
-    const holoOn = !showBack && cardEl.dataset.holographic === 'true';
-    frontFace?.classList.toggle('card-finish-holographic', holoOn);
-    window.StarlightUI?.ensureHoloSparkLayer?.(frontFace, holoOn);
+    const finishClass = !showBack ? (cardEl.dataset.finishClass || '') : '';
+    frontFace?.classList.remove('card-finish-holographic', 'card-finish-sparkle-foil');
+    if (finishClass) frontFace?.classList.add(finishClass);
+    window.StarlightUI?.ensureFinishEffectLayer?.(frontFace, finishClass);
   }, 280);
 
   window.setTimeout(() => cardEl.classList.remove('flip-turning'), 640);
