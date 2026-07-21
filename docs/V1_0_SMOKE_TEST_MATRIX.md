@@ -50,3 +50,4 @@ These do **not** replace the matrix above, but must stay green:
 - Remote migrations: `20260720160000_production_baseline`, `20260720180926_production_schema`
 - Readiness snapshot: 3 users, 2 series, 24 cards, 3 shop boosters
 - Applied to production via MCP (2026-07-21): `20260721175802_revoke_anon_admin_rpc_execute` — verified `anon_exec=false` and `authenticated`/`service_role` retain EXECUTE
+- Pending local migration (not applied until approved): `20260721181500_revoke_anon_collector_rpc_execute.sql` — revoke `anon`/`public` EXECUTE on collector-private RPCs (daily booster, Star Bits preview, notifications, gifts, favorites, Twitch unlink) plus trigger-only helpers
