@@ -139,6 +139,7 @@
   order: 3;
 }
 
+.detail-actions button[data-toggle-favorite],
 .detail-actions button[onclick^="toggleFavorite"] {
   order: 2;
 }
@@ -184,6 +185,7 @@
   gap: 10px !important;
 }
 
+.detail-actions button[data-toggle-favorite],
 .detail-actions button[onclick^="toggleFavorite"] {
   order: 2 !important;
   flex: 1 1 calc(50% - 5px) !important;

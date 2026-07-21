@@ -115,3 +115,77 @@ body[data-page="collection"] .collection-image .duplicate-badge { display: none 
   .collection-series-progress { grid-column: auto; }
   .collection-dashboard h1 { font-size: clamp(2rem, 11vw, 3rem); }
 }
+
+/* V1.1 favorites polish: showcase + grid share one filtered list */
+.favorite-grid-list {
+  margin-top: 18px;
+}
+
+.favorite-carousel .fav-spot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 0 0 170px;
+  scroll-snap-align: start;
+  border-radius: 22px;
+  background: linear-gradient(145deg, #fff, #eaf8ff 65%, #ffe4f2);
+  padding: 12px;
+  box-shadow: 0 14px 32px rgba(34, 86, 190, .13);
+}
+
+.favorite-carousel .fav-open {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #14348f;
+  font: inherit;
+  font-weight: 900;
+  text-align: left;
+  cursor: pointer;
+  padding: 0;
+}
+
+.favorite-carousel .fav-open img {
+  width: 100%;
+  border-radius: 14px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.favorite-carousel .fav-unstar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .92);
+  box-shadow: 0 6px 16px rgba(61, 83, 132, .16);
+}
+
+#cardOverlay .analyzer-actions {
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+}
+
+#cardOverlay .analyzer-favorite {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  transform: none !important;
+  min-height: 40px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 130, 200, .22), rgba(107, 198, 248, .2));
+  color: #405fa1;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+#cardOverlay .analyzer-favorite[aria-pressed="true"] {
+  background: linear-gradient(135deg, rgba(255, 196, 80, .35), rgba(255, 130, 200, .28));
+}

@@ -16,7 +16,12 @@ function activateCollectionView(name) {
 
 tabs.forEach(tab => {
   tab.setAttribute('role', 'tab');
-  tab.addEventListener('click', () => activateCollectionView(tab.dataset.collectionTab));
+  tab.addEventListener('click', () => {
+    activateCollectionView(tab.dataset.collectionTab);
+    window.dispatchEvent(new CustomEvent('starlight-collection-tab-changed', {
+      detail: { tab: tab.dataset.collectionTab }
+    }));
+  });
 });
 
 document.querySelector('.collection-tabs')?.setAttribute('role', 'tablist');

@@ -252,6 +252,29 @@
   z-index:10!important;
   margin:0 auto!important;
 }
+.analyzer-actions{
+  gap:10px!important;
+  flex-wrap:wrap!important;
+}
+.analyzer-favorite{
+  position:relative!important;
+  top:auto!important;
+  left:auto!important;
+  transform:none!important;
+  z-index:10!important;
+  min-height:40px;
+  padding:8px 16px;
+  border:0;
+  border-radius:999px;
+  background:linear-gradient(135deg,rgba(255,130,200,.22),rgba(107,198,248,.2));
+  color:#405fa1;
+  font:inherit;
+  font-weight:900;
+  cursor:pointer;
+}
+.analyzer-favorite[aria-pressed="true"]{
+  background:linear-gradient(135deg,rgba(255,196,80,.35),rgba(255,130,200,.28));
+}
 .analyzer-card-zone{
   overflow:visible!important;
   min-height:clamp(390px,56vh,600px)!important;

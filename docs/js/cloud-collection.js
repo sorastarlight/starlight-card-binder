@@ -361,12 +361,13 @@ async function loadBinderApplication() {
     }
 
     window.StarlightCardFilters = await import('./card-filter-utils.js?v=1.0.0');
+    window.StarlightFavoriteUtils = await import('./favorite-utils.js?v=1.0.0');
 
     return new Promise((resolve, reject) => {
         const script =
             document.createElement("script");
 
-        script.src = "./js/app.js?v=1.5.1";
+        script.src = "./js/app.js?v=1.5.2";
         script.async = false;
         script.dataset.starlightApp = "true";
 

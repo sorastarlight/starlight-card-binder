@@ -26,6 +26,7 @@ let sfxOn = localStorage.getItem(SFX_KEY) !== "off";
 let previewFlipped = false;
 let overlayFlipped = false;
 let fullViewList = [];
+let fullViewListMode = 'all';
 
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
@@ -497,11 +498,53 @@ function getVisibleRarity(card) { return isCollected(card.id) ? card.rarity : "U
 function getVisibleDescription(card) { return isCollected(card.id) ? card.cardDescription : "This card has not been collected yet. Earn it from Daily Boosters, reward codes, or future events."; }
 
 function toggleFavorite(id) {
-  const store = readStore(FAVORITES_KEY);
-  if (store[id]) delete store[id]; else store[id] = true;
-  writeStore(FAVORITES_KEY, store);
+  const api = window.StarlightFavoriteUtils;
+  const previous = readStore(FAVORITES_KEY);
+  const result = api?.toggleFavoriteInStore
+    ? api.toggleFavoriteInStore(previous, id)
+    : (() => {
+      const store = { ...previous };
+      const isFavoriteNow = !store[id];
+      if (store[id]) delete store[id]; else store[id] = true;
+      return { store, isFavorite: isFavoriteNow };
+    })();
+  writeStore(FAVORITES_KEY, result.store);
   playSfx('favorite');
+
+  const overlayOpen = Boolean($('#cardOverlay')?.classList.contains('open'));
+  if (overlayOpen) {
+    const resolved = api?.resolveFullViewAfterFavoriteChange
+      ? api.resolveFullViewAfterFavoriteChange({
+        list: fullViewList,
+        selectedId: selected?.id,
+        cardId: id,
+        isFavorite: result.isFavorite,
+        listMode: fullViewListMode
+      })
+      : {
+        list: fullViewListMode === 'favorites' && !result.isFavorite
+          ? fullViewList.filter(card => card.id !== id)
+          : fullViewList,
+        selectedId: selected?.id,
+        shouldClose: false
+      };
+    fullViewList = resolved.list || [];
+    if (resolved.shouldClose || (fullViewListMode === 'favorites' && !fullViewList.length)) {
+      renderAll();
+      closeFullView();
+      return result.isFavorite;
+    }
+    if (resolved.selectedId && resolved.selectedId !== selected?.id) {
+      selected = cards.find(card => card.id === resolved.selectedId) || fullViewList[0] || selected;
+      selectedIndex = Math.max(0, fullViewList.findIndex(card => card.id === selected?.id));
+      previewFlipped = false;
+      overlayFlipped = false;
+    }
+  }
+
   renderAll();
+  if (overlayOpen && selected) renderFullView();
+  return result.isFavorite;
 }
 function renderShell() {
   const total = cards.length;
@@ -529,8 +572,11 @@ function renderShell() {
   $$('[data-collection-highlight]').forEach(element => {
     element.textContent = highestRarity ? `${highestRarity.count} ${highestRarity.rarity} owned` : 'Your first card awaits';
   });
+  const favoriteCount = cards.filter(card => isFavorite(card.id)).length;
+  $$('[data-favorite-count]').forEach(element => {
+    element.textContent = String(favoriteCount);
+  });
   $$('[data-collection-insight]').forEach(element => {
-    const favoriteCount = ownedCards.filter(card => isFavorite(card.id)).length;
     element.textContent = ownedCards.length
       ? `${favoriteCount} favorite${favoriteCount === 1 ? '' : 's'} selected · ${p}% of the full catalog collected.`
       : 'Collect your first card to begin building a rarity showcase.';
@@ -630,6 +676,7 @@ function fullViewModal() {
 
 function openFullView(listMode = 'all') {
   if (!selected) return;
+  fullViewListMode = listMode;
   if (listMode === 'favorites') {
     fullViewList = cards.filter(c => isFavorite(c.id));
   } else if (listMode === 'filtered') {
@@ -679,7 +726,10 @@ function renderFullView() {
     <button class="overlay-close analyzer-close" type="button" aria-label="Close">×</button>
     <button class="overlay-arrow left analyzer-arrow" type="button" aria-label="Previous card">‹</button>
     <section class="analyzer-screen db2-full-layout v9112-full-view">
-      <div class="analyzer-actions"><button class="overlay-flip analyzer-flip" type="button">↻ Flip</button></div>
+      <div class="analyzer-actions">
+        <button class="overlay-flip analyzer-flip" type="button">↻ Flip</button>
+        ${got ? `<button class="overlay-favorite analyzer-favorite" type="button" data-toggle-favorite="${esc(selected.id)}" aria-pressed="${isFavorite(selected.id) ? 'true' : 'false'}">${isFavorite(selected.id) ? '★ Favorited' : '♡ Favorite'}</button>` : ''}
+      </div>
       <div class="analyzer-card-zone">
         <div class="analyzer-reticle" aria-hidden="true"></div>
         <div class="full-card-wrap flip-card simple-flip ${overlayFlipped?'show-back showing-card-back':''} ${rarityClass(selected)}" id="fullCard3d" aria-label="${esc(overlayFlipped ? 'Card back' : visibleName)}" data-holographic="${got && isHolographicCard(selected)}" data-finish-class="${esc(got ? cardFinishClass(selected, true) : '')}">
@@ -713,16 +763,24 @@ function renderGridPage(target, mode) {
   if (mode === 'favorites') baseList = cards.filter(c => isFavorite(c.id));
   if (mode === 'duplicates') baseList = cards.filter(c => getCardQuantity(c.id) > 1);
   const list = filterCardList(baseList, activeFilters(), { respectOwnership: false });
-  if (mode === 'collection') {
-    $$('[data-filter-summary]').forEach(element => {
-      element.textContent = `Showing ${list.length} of ${baseList.length} owned card${baseList.length === 1 ? '' : 's'}`;
-    });
+  if (mode === 'collection' || mode === 'favorites') {
+    const activeTab = document.querySelector('[data-collection-tab].active')?.dataset.collectionTab || 'all';
+    const shouldAnnounce = (mode === 'collection' && activeTab === 'all')
+      || (mode === 'favorites' && activeTab === 'favorites');
+    if (shouldAnnounce) {
+      $$('[data-filter-summary]').forEach(element => {
+        element.textContent = mode === 'favorites'
+          ? `Showing ${list.length} of ${baseList.length} favorite${baseList.length === 1 ? '' : 's'}`
+          : `Showing ${list.length} of ${baseList.length} owned card${baseList.length === 1 ? '' : 's'}`;
+      });
+    }
   }
   wrap.classList.toggle('empty-grid', !list.length);
   wrap.innerHTML = list.length ? list.map(c => {
     const got = isCollected(c.id); const hidden = !got;
     const quantity = getCardQuantity(c.id);
-    return `<article class="collection-card ${rarityClass(c)}"><div class="collection-image"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"></div><h3>${esc(getVisibleName(c))}</h3><p class="collection-card-number">${esc(c.collectorNumber || c.number)} • ${esc(c.series)}</p><div class="card-meta-chips compact">${cardIdentityChips(c,{hidden})}</div>${mode === 'duplicates' ? `<p class="duplicate-copy-summary"><strong>${quantity}</strong> total copies · <strong>${quantity - 1}</strong> exchangeable</p>` : ''}<div class="card-buttons"><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${quantity}` : 'Not Collected'}</span>${got ? `<button class="icon-btn" onclick="toggleFavorite('${esc(c.id)}')" aria-label="${isFavorite(c.id) ? 'Remove from favorites' : 'Add to favorites'}">${isFavorite(c.id)?'★':'☆'}</button>` : ''}</div></article>`;
+    const favorited = isFavorite(c.id);
+    return `<article class="collection-card ${rarityClass(c)}"><div class="collection-image"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"></div><h3>${esc(getVisibleName(c))}</h3><p class="collection-card-number">${esc(c.collectorNumber || c.number)} • ${esc(c.series)}</p><div class="card-meta-chips compact">${cardIdentityChips(c,{hidden})}</div>${mode === 'duplicates' ? `<p class="duplicate-copy-summary"><strong>${quantity}</strong> total copies · <strong>${quantity - 1}</strong> exchangeable</p>` : ''}<div class="card-buttons"><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${quantity}` : 'Not Collected'}</span>${got ? `<button class="icon-btn" type="button" data-toggle-favorite="${esc(c.id)}" aria-label="${favorited ? 'Remove from favorites' : 'Add to favorites'}" aria-pressed="${favorited ? 'true' : 'false'}">${favorited ? '★' : '☆'}</button>` : ''}</div></article>`;
   }).join('') : `<div class="empty-state"><h2>${baseList.length ? 'No cards match these filters' : (mode === 'favorites' ? 'No favorites yet' : 'No cards here yet')}</h2><p>${baseList.length ? 'Try resetting one or more filters to see additional cards.' : (mode === 'favorites' ? 'Tap the star on your favorite cards and this showcase will sparkle to life.' : 'Earn cards from Daily Boosters, redemption codes, and special rewards to fill this collection.')}</p>${baseList.length ? '<button class="btn primary" type="button" data-reset-card-filters>Reset Filters</button>' : '<a class="btn primary" href="binder.html">Open Binder</a>'}</div>`;
   attachTileTilts();
   attachBinderHoverSfx();
@@ -732,8 +790,21 @@ function renderFavoritesShowcase() {
   const showcase = $('#favoriteShowcase'); if (!showcase) return;
   const allFavorites = cards.filter(c => isFavorite(c.id));
   const favs = filterCardList(allFavorites, activeFilters(), { respectOwnership: false });
-  if (!favs.length) { showcase.innerHTML = `<div class="empty-state trophy-empty"><h2>${allFavorites.length ? 'No favorites match these filters' : 'Favorite Showcase'}</h2><p>${allFavorites.length ? 'Reset the filters to bring the rest of your favorite cards back into view.' : 'Star a card to put it on the Starlight stage. Your favorites will scroll here like a tiny idol parade.'}</p>${allFavorites.length ? '<button class="btn primary" type="button" data-reset-card-filters>Reset Filters</button>' : '<a class="btn primary" href="binder.html">Find Favorites</a>'}</div>`; return; }
-  showcase.innerHTML = `<div class="favorite-carousel-head"><h2>Favorite Showcase 💖</h2><p>${favs.length} favorite card${favs.length===1?'':'s'} saved to this collection.</p></div><div class="favorite-carousel">${favs.map((c,i)=>{ const got = isCollected(c.id); const hidden = !got; return `<button class="fav-spot ${rarityClass(c)}" style="--i:${i}" onclick="selected=cards.find(x=>x.id==='${esc(c.id)}');selectedIndex=cards.findIndex(x=>x.id==='${esc(c.id)}');openFullView('favorites')"><span class="fav-image"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}"></span><span>${esc(getVisibleName(c))}</span></button>`}).join('')}</div>`;
+  if (!favs.length) {
+    showcase.innerHTML = `<div class="empty-state trophy-empty"><h2>${allFavorites.length ? 'No favorites match these filters' : 'Favorite Showcase'}</h2><p>${allFavorites.length ? 'Reset the filters to bring the rest of your favorite cards back into view.' : 'Star a card to put it on the Starlight stage. Your favorites will scroll here like a tiny idol parade.'}</p>${allFavorites.length ? '<button class="btn primary" type="button" data-reset-card-filters>Reset Filters</button>' : '<a class="btn primary" href="binder.html">Find Favorites</a>'}</div>`;
+    return;
+  }
+  showcase.innerHTML = `<div class="favorite-carousel-head"><h2>Favorite Showcase</h2><p>${favs.length} favorite card${favs.length === 1 ? '' : 's'} · same list as the grid below</p></div><div class="favorite-carousel">${favs.map((c, i) => {
+    const got = isCollected(c.id);
+    const hidden = !got;
+    return `<div class="fav-spot ${rarityClass(c)}" style="--i:${i}">
+      <button class="fav-open" type="button" data-open-favorite="${esc(c.id)}" aria-label="Open ${esc(getVisibleName(c))} in full view">
+        <span class="fav-image"><img class="${hidden ? 'obscured' : ''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}"></span>
+        <span>${esc(getVisibleName(c))}</span>
+      </button>
+      <button class="fav-unstar icon-btn" type="button" data-toggle-favorite="${esc(c.id)}" aria-label="Remove ${esc(getVisibleName(c))} from favorites" aria-pressed="true">★</button>
+    </div>`;
+  }).join('')}</div>`;
   attachTileTilts();
   attachBinderHoverSfx();
 }
@@ -787,7 +858,7 @@ function renderChecklist() {
   const body = $('#checklistBody'); if (!body) return;
   body.innerHTML = cards.map(c => {
     const got = isCollected(c.id); const hidden = !got;
-    return `<tr class="item"><td><div class="check-card"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"><span>${esc(c.collectorNumber || c.number)}</span></div></td><td>${esc(getVisibleName(c))}</td><td>${esc(c.series)}</td><td>${hidden?'—':`<span class="card-meta-chip category">${esc(categoryLabel(c))}</span>${subcategoryLabel(c)?`<br><small>${esc(subcategoryLabel(c))}</small>`:''}`}</td><td><span class="card-meta-chip rarity ${rarityClass(c)}">${esc(getVisibleRarity(c))}</span></td><td><b>×${getCardQuantity(c.id)}</b>${getCardQuantity(c.id)>1?`<br><small>+${getCardQuantity(c.id)-1} extra</small>`:""}</td><td><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? 'Collected' : 'Not Collected'}</span></td><td>${got ? `<button class="icon-btn" onclick="toggleFavorite('${esc(c.id)}')">${isFavorite(c.id)?'★':'☆'}</button>` : '<span class="soft-note">—</span>'}</td></tr>`;
+    return `<tr class="item"><td><div class="check-card"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"><span>${esc(c.collectorNumber || c.number)}</span></div></td><td>${esc(getVisibleName(c))}</td><td>${esc(c.series)}</td><td>${hidden?'—':`<span class="card-meta-chip category">${esc(categoryLabel(c))}</span>${subcategoryLabel(c)?`<br><small>${esc(subcategoryLabel(c))}</small>`:''}`}</td><td><span class="card-meta-chip rarity ${rarityClass(c)}">${esc(getVisibleRarity(c))}</span></td><td><b>×${getCardQuantity(c.id)}</b>${getCardQuantity(c.id)>1?`<br><small>+${getCardQuantity(c.id)-1} extra</small>`:""}</td><td><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? 'Collected' : 'Not Collected'}</span></td><td>${got ? `<button class="icon-btn" type="button" data-toggle-favorite="${esc(c.id)}" aria-label="${isFavorite(c.id) ? 'Remove from favorites' : 'Add to favorites'}" aria-pressed="${isFavorite(c.id) ? 'true' : 'false'}">${isFavorite(c.id)?'★':'☆'}</button>` : '<span class="soft-note">—</span>'}</td></tr>`;
   }).join('');
 }
 function renderAbout() {
@@ -822,6 +893,22 @@ function updateRaritySelectClass() {
 // V35: pointer tilt is handled per card by attachTiltTo().
 // The older global pointermove tilt was removed to prevent duplicate hover state and SFX jitter.
 document.addEventListener('click', e => {
+  const favoriteToggle = e.target.closest('[data-toggle-favorite]');
+  if (favoriteToggle) {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleFavorite(favoriteToggle.dataset.toggleFavorite);
+    return;
+  }
+  const openFavorite = e.target.closest('[data-open-favorite]');
+  if (openFavorite) {
+    e.preventDefault();
+    const cardId = openFavorite.dataset.openFavorite;
+    selected = cards.find(card => card.id === cardId) || selected;
+    selectedIndex = Math.max(0, cards.findIndex(card => card.id === cardId));
+    openFullView('favorites');
+    return;
+  }
   const pack = e.target.closest('[data-pack-series]');
   if (pack) {
     const select = $('[data-series]'); if (select) select.value = pack.dataset.packSeries;
@@ -852,6 +939,9 @@ function applyCardFilterChange() {
 }
 document.addEventListener('input', e => { if (e.target.matches('#globalSearch, [data-series], [data-rarity], [name="viewFilter"], #sortSelect')) applyCardFilterChange(); });
 document.addEventListener('change', e => { if (e.target.matches('#globalSearch, [data-series], [data-rarity], [name="viewFilter"], #sortSelect')) applyCardFilterChange(); });
+window.addEventListener('starlight-collection-tab-changed', () => {
+  if (pageName === 'collection') renderAll();
+});
 document.addEventListener('click', e => {
   const reset = e.target.closest('[data-reset-card-filters]');
   if (!reset) return;
@@ -1040,14 +1130,13 @@ function renderV62Showcase(inSeriesSelect = false, browse = resolveBinderBrowse(
     </div>
     <div class="v62-panel-buttons">
       <span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${getCardQuantity(card.id)}` : 'Not Collected'}</span>
-      ${got ? `<button class="btn primary" id="v62Favorite" type="button">${isFavorite(card.id)?'★ Favorited':'♡ Favorite'}</button>` : ''}
+      ${got ? `<button class="btn primary" id="v62Favorite" type="button" data-toggle-favorite="${esc(card.id)}" aria-pressed="${isFavorite(card.id) ? 'true' : 'false'}">${isFavorite(card.id)?'★ Favorited':'♡ Favorite'}</button>` : ''}
       
     </div>
   </div>`;
   $('#v62Flip')?.addEventListener('click', (e) => { e.stopPropagation(); previewFlipped = !previewFlipped; flipCardImage($('#v62PreviewCard'), getVisibleImage(card), getVisibleName(card), previewFlipped); playSfx('flip'); });
   $('#v62Full')?.addEventListener('click', (e) => { e.stopPropagation(); playSfx('analyze'); openFullView('filtered'); });
   $('#v62PreviewCard')?.addEventListener('click', () => { playSfx('analyze'); openFullView('filtered'); });
-  $('#v62Favorite')?.addEventListener('click', (e) => { e.stopPropagation(); toggleFavorite(card.id); });
 }
 
 function attachV61HoverSfx() {
