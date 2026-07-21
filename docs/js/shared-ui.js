@@ -62,6 +62,28 @@ function cardFinishClass(card, visible = true) {
   return visible && isHolographicCard(card) ? 'card-finish-holographic' : '';
 }
 
+function holoSparkMarkup(card, visible = true) {
+  return visible && isHolographicCard(card)
+    ? '<span class="st-holo-spark" aria-hidden="true"></span>'
+    : '';
+}
+
+function ensureHoloSparkLayer(element, enabled = true) {
+  if (!element) return null;
+  let spark = element.querySelector(':scope > .st-holo-spark');
+  if (!enabled) {
+    spark?.remove();
+    return null;
+  }
+  if (!spark) {
+    spark = document.createElement('span');
+    spark.className = 'st-holo-spark';
+    spark.setAttribute('aria-hidden', 'true');
+    element.append(spark);
+  }
+  return spark;
+}
+
 function focusableElements(root) {
   return [...root.querySelectorAll([
     'a[href]',
@@ -327,6 +349,8 @@ window.StarlightUI = {
   adoptModal,
   isHolographicCard,
   cardFinishClass,
+  holoSparkMarkup,
+  ensureHoloSparkLayer,
   stateMarkup,
   escapeHtml,
   cleanupLegacyStorage

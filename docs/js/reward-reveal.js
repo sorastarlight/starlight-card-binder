@@ -79,6 +79,10 @@ function cardFinishClass(card) {
   return window.StarlightUI?.cardFinishClass?.(card) || '';
 }
 
+function attachHoloSpark(element, card) {
+  window.StarlightUI?.ensureHoloSparkLayer?.(element, Boolean(cardFinishClass(card)));
+}
+
 export function normalizeRevealOptions(options = {}) {
   return {
     title: options.title || options.boosterName || options.booster_name || '',
@@ -182,7 +186,7 @@ function acquireRevealViewportLock(doc) {
   };
 }
 
-export const REVEAL_PRESENTATION_VERSION = '1.5.7';
+export const REVEAL_PRESENTATION_VERSION = '1.5.8';
 
 const REVEAL_STYLESHEET_ID = `starlight-reveal-v${REVEAL_PRESENTATION_VERSION.replace(/\./g, '')}`;
 const REVEAL_STYLESHEET_URL = new URL(
@@ -598,6 +602,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
         badges.append(rarity, ...(finish ? [finish] : []), status);
         copy.append(name, detail, badges);
         art.append(image);
+        attachHoloSpark(art, card);
         item.append(art, copy);
         fragment.append(item);
       });
@@ -616,6 +621,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
       );
       cardFront.replaceChildren(currentFrontImage);
       cardFront.className = `st-r3-card-face st-r3-card-front ${cardFinishClass(card)}`.trim();
+      attachHoloSpark(cardFront, card);
       actor.className = `st-r3-card-actor rarity-${card.rarity}`;
       actor.setAttribute('aria-label', `Reveal ${card.name}`);
       revealScene.dataset.rarity = card.rarity;
