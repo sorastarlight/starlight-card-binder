@@ -5,7 +5,7 @@ Run against a local `docs/` HTTP server (not `file://`). Exercise each journey a
 
 Mark each cell: `pass` / `fail` / `n/a` / `blocked`. Failures need a bug note before V1.0 is considered complete.
 
-Last walk: **2026-07-21** (Chromium). Signed-out pass earlier; **signed-in follow-up** as staff collector `@sorastarlight`.
+Last walk: **2026-07-21** (Chromium). Signed-out + signed-in staff collector `@sorastarlight`. Gift claim and shop purchase reveals completed.
 
 | # | Journey | Desktop | Mobile | Notes |
 |---|---------|---------|--------|-------|
@@ -13,10 +13,10 @@ Last walk: **2026-07-21** (Chromium). Signed-out pass earlier; **signed-in follo
 | 2 | Navigate through the application shell | pass | pass | Sidebar + top links swap views; deep links use `binder.html?view=…`; native binder hides when embedded views are active (no dual chrome). Mobile hamburger/account chrome usable at 390×844. |
 | 3 | Browse binder and collection views | pass | pass | Series packs open; filters show 12/12 Rising Star cards. Signed-in collection shows completion stats and card grid (24/24 unique). |
 | 4 | Open a Daily Booster | pass | blocked | Shared `st-r3` reveal opened from Daily (pack → pile → cards). READY after open is expected: unlimited daily opens enabled for testing. Mobile not re-run signed-in. |
-| 5 | Purchase and open a Shop pack | pass* | blocked | *Signed-in catalog loads (balance + packs). Details + purchase confirm use `st-dialog`. Purchase cancelled (“Not Yet”) — full buy+reveal not completed this pass. |
+| 5 | Purchase and open a Shop pack | pass | blocked | Signed-in catalog loads. Purchased Series II pack (100 Star Bits, 9,490→9,390); shared `st-r3` reveal + `st-dialog` purchase confirm. Mobile not re-run signed-in. |
 | 6 | Redeem and reveal a reward | pass* | blocked | *Redeem form loads signed-in (code input + Redeem Code). No live code redeemed this pass. |
-| 7 | Claim and reveal a Received Gift or Twitch reward | pass* | blocked | *Received Gifts lists claimable Twitch rewards (“Open Reward”). Full claim+reveal not auto-run this pass (needs explicit OK to spend gifts). |
-| 8 | Open, operate, and close each migrated modal (pointer) | pass* | blocked | *Shop pack details + purchase confirm open/close on pointer. Admin/profile crop dialogs not re-exercised this pass. |
+| 7 | Claim and reveal a Received Gift or Twitch reward | pass | blocked | Claimed a Twitch gift through shared `st-r3` reveal (Open Reward → pack → pile → cards → done). Mobile not re-run signed-in. |
+| 8 | Open, operate, and close each migrated modal (pointer) | pass | blocked | Shop pack details + purchase confirm open/close on pointer; purchase confirm used in live buy. Admin/profile crop dialogs not re-exercised this pass. |
 | 9 | Same migrated modals via keyboard | pass* | blocked | *Escape closes shop purchase confirm. Full modal keyboard matrix (focus trap/restore) still worth a manual spot-check. |
 | 10 | Staff/admin pages without exposing privileged actions | pass | pass | Signed-out admin hub keeps staff grid hidden. Signed-in staff sees Administration Hub link. |
 | 11 | Cross-browser smoke (Chromium) | pass | pass | `dataset.starlightEngine=chromium`; lite mode off on capable desktop (`starlight-engine-chromium` only). |
