@@ -12,7 +12,7 @@ Last walk: **2026-07-21** (Chromium). Signed-out pass earlier; **signed-in follo
 | 1 | Sign in and sign out | pass* | blocked | *Sign-in verified (account chrome, Sign Out, staff hub link). Sign-out not re-tested this pass to keep the session. |
 | 2 | Navigate through the application shell | pass | pass | Sidebar + top links swap views; deep links use `binder.html?view=…`; native binder hides when embedded views are active (no dual chrome). Mobile hamburger/account chrome usable at 390×844. |
 | 3 | Browse binder and collection views | pass | pass | Series packs open; filters show 12/12 Rising Star cards. Signed-in collection shows completion stats and card grid (24/24 unique). |
-| 4 | Open a Daily Booster | pass* | blocked | *Shared `st-r3` reveal opened from Daily (pack → pile → cards). UI still showed READY afterward — likely unlimited/test daily mode or status refresh gap; confirm expected. Mobile not re-run signed-in. |
+| 4 | Open a Daily Booster | pass | blocked | Shared `st-r3` reveal opened from Daily (pack → pile → cards). READY after open is expected: unlimited daily opens enabled for testing. Mobile not re-run signed-in. |
 | 5 | Purchase and open a Shop pack | pass* | blocked | *Signed-in catalog loads (balance + packs). Details + purchase confirm use `st-dialog`. Purchase cancelled (“Not Yet”) — full buy+reveal not completed this pass. |
 | 6 | Redeem and reveal a reward | pass* | blocked | *Redeem form loads signed-in (code input + Redeem Code). No live code redeemed this pass. |
 | 7 | Claim and reveal a Received Gift or Twitch reward | pass* | blocked | *Received Gifts lists claimable Twitch rewards (“Open Reward”). Full claim+reveal not auto-run this pass (needs explicit OK to spend gifts). |
