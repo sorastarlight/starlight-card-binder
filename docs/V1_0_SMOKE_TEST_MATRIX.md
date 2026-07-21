@@ -49,4 +49,4 @@ These do **not** replace the matrix above, but must stay green:
 - Client URL matches `docs/js/supabase-client.js`
 - Remote migrations: `20260720160000_production_baseline`, `20260720180926_production_schema`
 - Readiness snapshot: 3 users, 2 series, 24 cards, 3 shop boosters
-- Pending local migration (not applied until approved): `20260721180000_revoke_anon_admin_rpc_execute.sql` — revoke `anon`/`public` EXECUTE on seven admin SECURITY DEFINER RPCs
+- Applied to production via MCP (2026-07-21): `20260721175802_revoke_anon_admin_rpc_execute` — verified `anon_exec=false` and `authenticated`/`service_role` retain EXECUTE

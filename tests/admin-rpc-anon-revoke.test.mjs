@@ -5,7 +5,7 @@ import test from 'node:test';
 const read = relativePath => readFile(new URL(`../${relativePath}`, import.meta.url), 'utf8');
 
 test('forward migration revokes anon execute on admin SECURITY DEFINER RPCs', async () => {
-  const migration = await read('supabase/migrations/20260721180000_revoke_anon_admin_rpc_execute.sql');
+  const migration = await read('supabase/migrations/20260721175802_revoke_anon_admin_rpc_execute.sql');
   for (const fn of [
     'admin_delete_news_post',
     'admin_delete_user_completely_v896',
