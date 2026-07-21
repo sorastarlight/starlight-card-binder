@@ -1,8 +1,8 @@
 *{box-sizing:border-box}
     :root{
-      --shop-blue:#6bc6f8;--shop-blue-deep:#355fbd;--shop-pink:#ff82c8;--shop-pink-deep:#de4da3;
-      --shop-lavender:#cbb9ff;--shop-gold:#fed334;--shop-cream:#fffdf9;--shop-white:#fff;
-      --shop-ink:#263c82;--shop-muted:#65739a;--shop-line:rgba(107,198,248,.42);
+      --shop-blue:var(--st-color-blue, #6bc6f8);--shop-blue-deep:#355fbd;--shop-pink:var(--st-color-pink, #ff82c8);--shop-pink-deep:#de4da3;
+      --shop-lavender:#cbb9ff;--shop-gold:var(--st-color-gold, #fed334);--shop-cream:#fffdf9;--shop-white:var(--st-surface, #fff);
+      --shop-ink:var(--st-color-ink, #263c82);--shop-muted:var(--st-color-muted, #65739a);--shop-line:var(--st-line, rgba(107,198,248,.42));
     }
     body{min-height:100vh;background:transparent;color:var(--shop-ink)}
     .shop-page{width:min(100%,1380px);margin:0 auto;padding:14px 14px 56px}

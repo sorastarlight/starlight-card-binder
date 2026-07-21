@@ -1,11 +1,11 @@
 :root {
-            --bits-blue: #6bc6f8;
-            --bits-pink: #ff82c8;
-            --bits-gold: #fed334;
-            --bits-dark: #30344f;
-            --bits-muted: #6b7089;
-            --bits-success: #167048;
-            --bits-error: #b4233f;
+            --bits-blue: var(--st-color-blue, #6bc6f8);
+            --bits-pink: var(--st-color-pink, #ff82c8);
+            --bits-gold: var(--st-color-gold, #fed334);
+            --bits-dark: var(--st-color-ink, #30344f);
+            --bits-muted: var(--st-color-muted, #6b7089);
+            --bits-success: var(--st-color-success, #167048);
+            --bits-error: var(--st-color-danger, #b4233f);
         }
 
         * {
