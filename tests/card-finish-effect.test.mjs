@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 
 const read = relative => readFile(new URL(`../${relative}`, import.meta.url), 'utf8');
 
-test('holographic finish uses full-card rainbow that shifts with tilt orientation', async () => {
+test('holographic finish is a simple always-on rainbow foil on reveal and full view', async () => {
   const [ui, css] = await Promise.all([
     read('docs/js/shared-ui.js'),
     read('docs/css/shared-ui.css')
@@ -17,19 +17,16 @@ test('holographic finish uses full-card rainbow that shifts with tilt orientatio
   assert.match(ui, /ensureHoloSparkLayer/);
   assert.match(ui, /holoSparkMarkup/);
   assert.match(ui, /function attachCardDragTilt/);
-  assert.match(ui, /function setHoloFromTilt/);
-  assert.match(ui, /setHoloFromTilt\(foil, tiltX, tiltY, max\)/);
-  assert.doesNotMatch(ui, /setHoloPointer\(foil, x, y\)[\s\S]*--st-holo-x/);
   assert.match(css, /\.card-finish-holographic::before/);
-  assert.match(css, /mix-blend-mode:soft-light/);
+  assert.match(css, /mix-blend-mode:overlay/);
   assert.match(css, /\.st-holo-spark/);
-  assert.match(css, /--st-holo-shift-x/);
-  assert.match(css, /--tilt-nx/);
-  assert.match(css, /@keyframes stHoloIdleOrient/);
-  assert.match(css, /animation:stHoloIdleOrient[^;]*alternate/);
+  assert.match(css, /@keyframes stHoloHue/);
+  assert.match(css, /hue-rotate\(360deg\)/);
+  assert.match(css, /@keyframes stHoloSheen/);
+  assert.match(css, /animation:stHoloSheen[^;]*alternate/);
   assert.match(css, /\.st-card-drag-tilt/);
-  assert.doesNotMatch(css, /--st-holo-x/);
-  assert.doesNotMatch(css, /farthest-corner circle at var\(--st-holo/);
+  assert.doesNotMatch(css, /--tilt-nx/);
+  assert.doesNotMatch(css, /--st-holo-shift/);
   assert.match(css, /prefers-reduced-motion:reduce/);
   assert.match(css, /prefers-reduced-motion:reduce[\s\S]*card-finish-holographic/);
 });

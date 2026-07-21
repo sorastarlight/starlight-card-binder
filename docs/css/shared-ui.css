@@ -23,25 +23,11 @@
 input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
 .collection-card,.link-card,.st-card{border-radius:var(--st-radius-md)}
 /*
- * Holographic finish — full-card pastel rainbow foil (reveal + full-view).
- * Rainbow shifts with card 3D orientation (--tilt-nx/ny), never as a mouse spotlight.
- * Idle uses seamless alternate; drag overrides with tilt-linked shift.
+ * Holographic finish — simple always-on rainbow foil (reveal + full-view only).
+ * One full-card rainbow overlay + seamless hue cycle (0→360 is a perfect loop).
+ * 3D click-drag tilt is separate and does not drive the foil.
  */
-@property --tilt-nx{
-  syntax:"<number>";
-  inherits:true;
-  initial-value:0;
-}
-@property --tilt-ny{
-  syntax:"<number>";
-  inherits:true;
-  initial-value:0;
-}
 .card-finish-holographic{
-  --tilt-nx:0;
-  --tilt-ny:0;
-  --st-holo-shift-x:calc(50% + (var(--tilt-nx) * 44%));
-  --st-holo-shift-y:calc(50% + (var(--tilt-ny) * -44%));
   position:relative;
   display:block;
   overflow:hidden;
@@ -61,93 +47,64 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
   border-radius:inherit;
   pointer-events:none;
 }
-/* Full-surface luminous pastel rainbow + fine foil grain */
+/* Full-card rainbow foil */
 .card-finish-holographic::before{
   z-index:2;
-  background-image:
+  background:
     linear-gradient(
-      135deg,
-      #f0b6ff 0%,
-      #ffb0d8 16%,
-      #ffc4a6 32%,
-      #ffe7a8 48%,
-      #c6f5c0 64%,
-      #a6e6ff 80%,
-      #c4c2ff 92%,
-      #f0b6ff 100%
-    ),
-    repeating-linear-gradient(
       125deg,
-      rgba(255,255,255,.28) 0 2px,
-      rgba(255,255,255,.04) 6px,
-      transparent 10px 18px
-    ),
-    radial-gradient(circle at 20% 25%,rgba(255,255,255,.35) 0 .6px,transparent 1.2px),
-    radial-gradient(circle at 70% 40%,rgba(255,255,255,.28) 0 .5px,transparent 1.1px),
-    radial-gradient(circle at 40% 75%,rgba(255,255,255,.3) 0 .55px,transparent 1.15px),
-    radial-gradient(circle at 85% 70%,rgba(255,255,255,.22) 0 .45px,transparent 1px);
-  background-size:
-    240% 240%,
-    100% 100%,
-    12px 12px,15px 15px,11px 11px,14px 14px;
-  background-position:
-    var(--st-holo-shift-x) var(--st-holo-shift-y),
-    var(--st-holo-shift-x) var(--st-holo-shift-y),
-    0 0,4px 6px,8px 2px,1px 9px;
-  mix-blend-mode:soft-light;
-  opacity:.72;
-  filter:saturate(1.15) contrast(1.05);
-}
-.card-finish-holographic:not(.is-holo-lit){
-  animation:stHoloIdleOrient 7.5s ease-in-out infinite alternate;
-}
-.card-finish-holographic.is-holo-lit{
-  animation:none;
-}
-.card-finish-holographic.is-holo-lit::before{
-  opacity:.88;
+      #ff5ec8 0%,
+      #ff8a4a 18%,
+      #ffd84a 34%,
+      #5dff9a 50%,
+      #4ab8ff 66%,
+      #b06bff 82%,
+      #ff5ec8 100%
+    );
   mix-blend-mode:overlay;
+  opacity:.55;
+  animation:stHoloHue 5s linear infinite;
 }
-/* Broad pearlescent bands — orientation-linked, not a cursor hotspot */
+/* Soft metallic sheen on top of the rainbow */
 .card-finish-holographic::after{
   z-index:3;
-  background-image:
+  background:
     linear-gradient(
-      125deg,
-      transparent 10%,
-      rgba(255,200,240,.22) 28%,
-      rgba(255,255,255,.38) 42%,
-      rgba(180,230,255,.28) 56%,
-      rgba(200,180,255,.2) 70%,
-      transparent 88%
+      115deg,
+      transparent 15%,
+      rgba(255,255,255,.45) 45%,
+      rgba(255,255,255,.1) 55%,
+      transparent 80%
     );
-  background-size:220% 220%;
-  background-position:var(--st-holo-shift-x) var(--st-holo-shift-y);
+  background-size:200% 200%;
+  background-position:30% 40%;
   mix-blend-mode:soft-light;
-  opacity:.55;
+  opacity:.65;
+  animation:stHoloSheen 4s ease-in-out infinite alternate;
 }
-.card-finish-holographic.is-holo-lit::after{opacity:.7}
-/* Subtle static glitter (no mouse tracking) */
+/* Tiny glitter flecks */
 .card-finish-holographic>.st-holo-spark{
   z-index:4;
   content:none;
   background-image:
-    radial-gradient(circle at 18% 22%,#fff 0 .8px,transparent 1.5px),
-    radial-gradient(circle at 55% 35%,#fff 0 .7px,transparent 1.3px),
-    radial-gradient(circle at 72% 68%,#fff 0 .9px,transparent 1.6px),
-    radial-gradient(circle at 30% 78%,#fff 0 .6px,transparent 1.2px),
-    radial-gradient(circle at 88% 28%,#fff 0 .75px,transparent 1.4px);
-  background-repeat:no-repeat;
+    radial-gradient(circle at 16% 22%,#fff 0 1px,transparent 1.6px),
+    radial-gradient(circle at 42% 58%,#fff 0 .8px,transparent 1.4px),
+    radial-gradient(circle at 68% 30%,#fff 0 1.1px,transparent 1.8px),
+    radial-gradient(circle at 82% 72%,#fff 0 .7px,transparent 1.3px),
+    radial-gradient(circle at 28% 80%,#fff 0 .9px,transparent 1.5px);
   mix-blend-mode:screen;
-  opacity:.22;
+  opacity:.35;
 }
-.card-finish-holographic.is-holo-lit>.st-holo-spark{opacity:.32}
-/* Seamless idle: rainbow drifts with card “orientation”, then returns */
-@keyframes stHoloIdleOrient{
-  from{--tilt-nx:-.38;--tilt-ny:.28}
-  to{--tilt-nx:.4;--tilt-ny:-.3}
+/* Hue cycle is seamless: 360deg looks identical to 0deg */
+@keyframes stHoloHue{
+  to{filter:hue-rotate(360deg)}
 }
-/* Click-drag 3D tilt (release snaps back via transition) */
+/* Sheen drifts back and forth — alternate has no hard restart */
+@keyframes stHoloSheen{
+  from{background-position:20% 30%;opacity:.5}
+  to{background-position:75% 65%;opacity:.78}
+}
+/* Click-drag 3D tilt only (foil is independent) */
 .st-card-drag-tilt{
   --tiltX:0deg;
   --tiltY:0deg;
@@ -170,7 +127,6 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
   touch-action:none;
   user-select:none;
 }
-/* Reveal actor keeps its centering translate and adds drag tilt on top */
 .st-r3-reveal-scene.is-revealed .st-r3-card-actor.st-card-drag-tilt{
   transform:translate(-50%,-50%) translateY(-5px) scale(1.03) rotateX(var(--tiltX)) rotateY(var(--tiltY));
   transition:transform .3s ease,filter .3s ease;
@@ -193,4 +149,4 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
 .st-view-state{display:grid;place-items:center;min-height:220px;padding:28px;text-align:center;color:var(--st-ui-muted)}.st-view-state strong{display:block;color:#405fa1;font-size:1.25rem;margin-bottom:7px}.st-view-state button{margin-top:15px;padding:10px 18px;border:0;border-radius:999px;background:linear-gradient(135deg,var(--st-ui-blue),var(--st-ui-pink));color:#fff;font-weight:900;cursor:pointer}.st-spinner{width:38px;height:38px;margin:0 auto 14px;border:4px solid rgba(107,198,248,.2);border-top-color:var(--st-ui-pink);border-radius:50%;animation:stSpin .8s linear infinite}@keyframes stSpin{to{transform:rotate(360deg)}}
 :focus-visible{outline:3px solid rgba(255,130,200,.75)!important;outline-offset:3px!important}
 .status:empty,.page-status:empty,[role="status"]:empty{display:none!important}
-@media(prefers-reduced-motion:reduce){.st-toast,.st-spinner,.card-finish-holographic{animation:none!important}.card-finish-holographic{--tilt-nx:.12;--tilt-ny:-.08}.card-finish-holographic::before{opacity:.65}.card-finish-holographic::after{opacity:.45}.card-finish-holographic>.st-holo-spark{opacity:.18}.st-card-drag-tilt,.full-card-wrap#fullCard3d{transition:none!important}.st-dialog-overlay{backdrop-filter:none}.st-dialog-overlay,.st-dialog,.st-button{transition:none!important}}
+@media(prefers-reduced-motion:reduce){.st-toast,.st-spinner,.card-finish-holographic::before,.card-finish-holographic::after{animation:none!important}.card-finish-holographic::before{opacity:.5;filter:hue-rotate(40deg)}.card-finish-holographic::after{opacity:.55;background-position:45% 40%}.card-finish-holographic>.st-holo-spark{opacity:.28}.st-card-drag-tilt,.full-card-wrap#fullCard3d{transition:none!important}.st-dialog-overlay{backdrop-filter:none}.st-dialog-overlay,.st-dialog,.st-button{transition:none!important}}
