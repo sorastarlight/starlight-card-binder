@@ -119,7 +119,7 @@ html{scroll-padding-top:110px}
 .qol-no-enhance[type="checkbox"]{position:absolute!important}
 
 /* Unified modal frame: the overlay owns the viewport and the dialog stays a card. */
-:is(.st-dialog-overlay,.editor,.rule-modal,.test-modal,.receipt,.confirm-overlay,.shop-modal,.purchase-modal,.profile-crop-modal):not(.hidden):not([hidden]){
+:is(.st-dialog-overlay,.editor,.rule-modal,.test-modal,.receipt,.profile-crop-modal):not(.hidden):not([hidden]){
   position:fixed!important;
   inset:0!important;
   z-index:90000!important;
@@ -135,10 +135,10 @@ html{scroll-padding-top:110px}
     rgba(249,251,255,.72)!important;
   backdrop-filter:blur(14px) saturate(.96)!important;
 }
-:is(.st-dialog-overlay,.editor,.rule-modal,.test-modal,.receipt,.confirm-overlay,.shop-modal,.purchase-modal,.profile-crop-modal).hidden,
-:is(.st-dialog-overlay,.editor,.rule-modal,.test-modal,.receipt,.confirm-overlay,.shop-modal,.purchase-modal,.profile-crop-modal)[hidden]{display:none!important}
+:is(.st-dialog-overlay,.editor,.rule-modal,.test-modal,.receipt,.profile-crop-modal).hidden,
+:is(.st-dialog-overlay,.editor,.rule-modal,.test-modal,.receipt,.profile-crop-modal)[hidden]{display:none!important}
 
-:is(.st-dialog-overlay>.st-dialog,.editor>.editor-card,.editor>.card,.rule-modal>.rule-modal-card,.test-modal>.test-card,.receipt>.receipt-card,.confirm-overlay>.confirm-dialog,.shop-modal>.modal-card,.purchase-modal>.purchase-card,.profile-crop-modal>.profile-crop-dialog){
+:is(.st-dialog-overlay>.st-dialog,.editor>.editor-card,.editor>.card,.rule-modal>.rule-modal-card,.test-modal>.test-card,.receipt>.receipt-card,.profile-crop-modal>.profile-crop-dialog){
   position:relative!important;
   inset:auto!important;
   width:min(var(--qol-modal-width,920px),calc(100vw - clamp(24px,6vw,56px)))!important;
@@ -155,13 +155,14 @@ html{scroll-padding-top:110px}
   isolation:isolate;
   animation:qolModalIn .18s ease-out;
 }
-.editor>.editor-card{--qol-modal-width:1100px}
 .editor>.card{--qol-modal-width:760px}
-.rule-modal>.rule-modal-card{--qol-modal-width:1080px}
-.test-modal>.test-card,.receipt>.receipt-card,.confirm-overlay>.confirm-dialog,.profile-crop-modal>.profile-crop-dialog{--qol-modal-width:560px}
-.shop-modal>.modal-card,.purchase-modal>.purchase-card{--qol-modal-width:620px}
+.st-dialog-overlay>.st-dialog--wide{--qol-modal-width:620px}
+.st-dialog-overlay>.st-dialog--xl{--qol-modal-width:900px}
+.editor>.editor-card,.editor>.st-dialog{--qol-modal-width:1100px}
+.rule-modal>.rule-modal-card,.rule-modal>.st-dialog{--qol-modal-width:1080px}
+.test-modal>.test-card,.test-modal>.st-dialog,.receipt>.receipt-card,.receipt>.st-dialog,.profile-crop-modal>.profile-crop-dialog{--qol-modal-width:560px}
 @keyframes qolModalIn{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:none}}
-@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.qol-switch-ui,.qol-switch-ui::after{transition:none}.qol-toggle-label>input[type="checkbox"]{}:is(.st-dialog-overlay>.st-dialog,.editor>.editor-card,.editor>.card,.rule-modal>.rule-modal-card,.test-modal>.test-card,.receipt>.receipt-card,.confirm-overlay>.confirm-dialog,.shop-modal>.modal-card,.purchase-modal>.purchase-card,.profile-crop-modal>.profile-crop-dialog){animation:none!important}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.qol-switch-ui,.qol-switch-ui::after{transition:none}.qol-toggle-label>input[type="checkbox"]{}:is(.st-dialog-overlay>.st-dialog,.editor>.editor-card,.editor>.card,.rule-modal>.rule-modal-card,.test-modal>.test-card,.receipt>.receipt-card,.profile-crop-modal>.profile-crop-dialog){animation:none!important}}
 
 
 /* V91.1.1 — Modal navigation and Full View repair */

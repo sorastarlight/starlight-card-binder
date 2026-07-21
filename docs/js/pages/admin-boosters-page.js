@@ -42,7 +42,7 @@ const esc = (v) =>
       })[m],
   );
 const editorModal = window.StarlightUI.adoptModal(editor, {
-  dialog: editor.querySelector(".editor-card"),
+  dialog: editor.querySelector(".st-dialog"),
   labelledBy: "editorTitle"
 });
 function say(t, type = "") {

@@ -21,21 +21,10 @@ import { supabase } from "../supabase-client.js";
         const selectedSummary = document.getElementById("selected-summary");
         const selectAllToggle = document.getElementById("select-all-toggle");
         const clearSelectionButton = document.getElementById("clear-duplicate-selection");
-        const confirmOverlay = document.getElementById("confirm-overlay");
-        const confirmDescription = document.getElementById("confirm-description");
-        const cancelConversionButton = document.getElementById("cancel-conversion");
-        const confirmConversionButton = document.getElementById("confirm-conversion");
 
         let currentPreview = null;
         let isConverting = false;
         const selections = new Map();
-        const confirmationModal = window.StarlightUI.adoptModal(confirmOverlay, {
-            dialog: confirmOverlay.querySelector(".confirm-dialog"),
-            labelledBy: "confirm-heading",
-            describedBy: "confirm-description",
-            initialFocus: confirmConversionButton,
-            beforeClose: ({ reason }) => !isConverting || reason === "converted"
-        });
 
         function displayStatus(message = "", type = "") {
             pageStatus.textContent = message;
@@ -249,30 +238,26 @@ import { supabase } from "../supabase-client.js";
             return [...selections.entries()].map(([cardId, quantity]) => ({ cardId, quantity }));
         }
 
-        function openConfirmation() {
-            const { copies, bits } = getSelectedTotals();
-            if (copies <= 0) return;
-            confirmDescription.textContent =
-                `You are about to convert ${copies} selected duplicate ${copies === 1 ? "copy" : "copies"} into ${bits} Star Bits.`;
-            confirmationModal.open({ initialFocus: confirmConversionButton });
-        }
-
-        function closeConfirmation() {
-            if (isConverting) return;
-            confirmationModal.close(undefined, "page");
-        }
-
         async function performConversion() {
             if (isConverting) return;
+            const { copies, bits } = getSelectedTotals();
+            if (copies <= 0) return;
+
+            const confirmed = await window.StarlightUI.confirm({
+                title: "Convert Your Duplicates?",
+                message: `You are about to convert ${copies} selected duplicate ${copies === 1 ? "copy" : "copies"} into ${bits} Star Bits.`,
+                warning: "This cannot be undone. Your final copy of every card will remain safely in your collection.",
+                confirmText: "Convert to Star Bits",
+                cancelText: "Keep My Duplicates"
+            });
+            if (!confirmed) return;
+
             isConverting = true;
-            confirmConversionButton.disabled = true;
-            cancelConversionButton.disabled = true;
-            confirmConversionButton.textContent = "Converting…";
+            exchangeButton.disabled = true;
             displayStatus();
 
             try {
                 const result = await convertSelectedDuplicatesToStarBits(selectedPayload());
-                confirmationModal.close(undefined, "converted");
                 await loadPreview(
                     `Converted ${result.convertedDuplicateCopies} duplicate ${result.convertedDuplicateCopies === 1 ? "copy" : "copies"} into ${result.starBitsEarned} Star Bits.`
                 );
@@ -281,9 +266,7 @@ import { supabase } from "../supabase-client.js";
                 displayStatus(error.message || "The selected duplicate cards could not be converted.", "error");
             } finally {
                 isConverting = false;
-                confirmConversionButton.disabled = false;
-                cancelConversionButton.disabled = false;
-                confirmConversionButton.textContent = "Convert to Star Bits";
+                updateSelectionSummary();
             }
         }
 
@@ -316,8 +299,6 @@ import { supabase } from "../supabase-client.js";
             }
         });
 
-        exchangeButton.addEventListener("click", openConfirmation);
-        cancelConversionButton.addEventListener("click", closeConfirmation);
-        confirmConversionButton.addEventListener("click", performConversion);
+        exchangeButton.addEventListener("click", performConversion);
 
         initializePage();

@@ -6,7 +6,7 @@ const byId = id => document.getElementById(id);
 const escapeHtml = window.StarlightUI.escapeHtml;
 const editorElement = byId('editor');
 const editorModal = window.StarlightUI.adoptModal(editorElement, {
-  dialog: editorElement.querySelector('.card'),
+  dialog: editorElement.querySelector('.st-dialog'),
   labelledBy: 'editorTitle',
   initialFocus: '#title'
 });

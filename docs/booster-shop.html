@@ -6,12 +6,12 @@
   <title>Starlight Card Shop</title>
   <link rel="stylesheet" href="css/style.css?v=1.0.0">
   <script src="js/firefox-performance.js" defer></script>
-  <link rel="stylesheet" href="css/pages/booster-shop.css?v=1.0">
-    <link rel="stylesheet" href="css/shared-ui.css?v=1.6.6">
-<link rel="stylesheet" href="css/qol-ui.css?v=94.2.0">
+  <link rel="stylesheet" href="css/pages/booster-shop.css?v=1.1">
+    <link rel="stylesheet" href="css/shared-ui.css?v=1.6.7">
+<link rel="stylesheet" href="css/qol-ui.css?v=94.2.2">
 </head>
 <body>
-<script type="module" src="js/embed-mode.js"></script>
+<script type="module" src="js/embed-mode.js?v=1.1.1"></script>
 <div class="sky"></div>
 <main class="shop-page">
   <section class="shop-shell">
@@ -58,36 +58,42 @@
       <p id="status" class="shop-status" role="status" aria-live="polite"></p>
       <footer class="shop-footer">
         <div><strong>Turn duplicates into more pulls!</strong><span>Trade in extra cards for Star Bits and keep your collection growing.</span></div>
-        <a class="gallery-link" href="star-bits.html" data-shell-view="star-bits">★ Go To My Star Bits</a>
+        <a class="gallery-link" href="binder.html?view=star-bits" data-shell-view="star-bits">★ Go To My Star Bits</a>
       </footer>
     </section>
   </section>
 </main>
 
-<div id="pack-modal" class="shop-modal hidden" aria-hidden="true">
-  <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1">
-    <div class="modal-head"><div><p class="shop-kicker">Pack Details</p><h2 id="modal-title">Booster Pack</h2></div><button id="modal-close" class="modal-close" type="button" data-st-modal-close aria-label="Close">×</button></div>
-    <div class="modal-pack"><img id="modal-image" src="" alt=""><div class="modal-copy"><p id="modal-description"></p><div id="modal-contents" class="contents-list"></div></div></div>
+<div id="pack-modal" class="st-dialog-overlay hidden" aria-hidden="true">
+  <section class="st-dialog st-dialog--wide shop-pack-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1">
+    <button id="modal-close" class="st-dialog-close" type="button" data-st-modal-close aria-label="Close">×</button>
+    <p class="shop-kicker">Pack Details</p>
+    <h2 id="modal-title">Booster Pack</h2>
+    <div class="modal-pack st-dialog-content">
+      <img id="modal-image" src="" alt="">
+      <div class="modal-copy"><p id="modal-description"></p><div id="modal-contents" class="contents-list"></div></div>
+    </div>
   </section>
 </div>
 
-<div id="purchase-modal" class="purchase-modal hidden" aria-hidden="true">
-  <section class="purchase-card" role="dialog" aria-modal="true" aria-labelledby="purchase-title" aria-describedby="purchase-description" tabindex="-1">
+<div id="purchase-modal" class="st-dialog-overlay hidden" aria-hidden="true">
+  <section class="st-dialog shop-purchase-dialog" role="dialog" aria-modal="true" aria-labelledby="purchase-title" aria-describedby="purchase-description" tabindex="-1">
+    <button type="button" class="st-dialog-close" data-st-modal-close aria-label="Close">×</button>
     <img id="purchase-image" class="purchase-art" src="" alt="" width="170" height="225">
     <p class="shop-kicker">Confirm Your Purchase</p>
     <h2 id="purchase-title">Open Booster Pack?</h2>
     <p id="purchase-description">Spend Star Bits to open this booster pack.</p>
     <div id="purchase-cost" class="purchase-cost">★ 0 Star Bits</div>
     <p id="purchase-balance" class="purchase-balance"></p>
-    <div class="purchase-actions">
-      <button id="purchase-cancel" class="purchase-cancel" type="button">Not Yet</button>
-      <button id="purchase-confirm" class="purchase-confirm" type="button">Open Pack</button>
+    <div class="st-dialog-actions">
+      <button id="purchase-cancel" class="st-dialog-cancel" type="button">Not Yet</button>
+      <button id="purchase-confirm" class="st-dialog-confirm" type="button">Open Pack</button>
     </div>
   </section>
 </div>
 
-<script src="js/pages/booster-shop-page.js?v=1.5.8" type="module"></script>
-    <script src="js/shared-ui.js?v=1.6.6"></script>
-<script src="js/qol-ui.js?v=92.0.2" defer></script>
+<script src="js/pages/booster-shop-page.js?v=1.6.0" type="module"></script>
+    <script src="js/shared-ui.js?v=1.6.7"></script>
+<script src="js/qol-ui.js?v=94.2.2" defer></script>
 </body>
 </html>

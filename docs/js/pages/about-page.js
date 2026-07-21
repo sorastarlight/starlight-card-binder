@@ -24,7 +24,7 @@ function render(cards = []) {
   });
 
   if (!groups.size) {
-    container.innerHTML = window.StarlightUI?.stateMarkup('No published card series are available yet.', { kind: 'empty' })
+    container.innerHTML = window.StarlightUI?.stateMarkup('empty', 'No series yet', 'No published card series are available yet.')
       || '<div class="st-state">No published card series are available yet.</div>';
     return;
   }
@@ -51,7 +51,7 @@ async function load() {
   } catch (error) {
     console.error('[Starlight] Unable to load About series.', error);
     if (!cached?.cards?.length) {
-      container.innerHTML = window.StarlightUI?.stateMarkup('The card series could not be loaded. Please try again.', { kind: 'error' })
+      container.innerHTML = window.StarlightUI?.stateMarkup('error', 'Unable to load', 'The card series could not be loaded. Please try again.')
         || '<div class="st-state">The card series could not be loaded. Please try again.</div>';
     }
   }

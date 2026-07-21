@@ -10,8 +10,8 @@ test('keeps modal overlays centered without turning dialog cards into overlays',
   assert.doesNotMatch(css, /\[role="dialog"\]:not\(\.qol-dialog-card\)/);
   assert.match(css, /:is\(\.st-dialog-overlay,\.editor,\.rule-modal,\.test-modal,\.receipt/);
   assert.match(css, /place-items:center!important/);
-  assert.match(css, /\.editor>\.editor-card\{--qol-modal-width:1100px\}/);
-  assert.match(css, /\.rule-modal>\.rule-modal-card\{--qol-modal-width:1080px\}/);
+  assert.match(css, /\.editor>\.editor-card(?:,\.editor>\.st-dialog)?\{--qol-modal-width:1100px\}/);
+  assert.match(css, /\.rule-modal>\.rule-modal-card(?:,\.rule-modal>\.st-dialog)?\{--qol-modal-width:1080px\}/);
   assert.match(css, /background:linear-gradient\(145deg,rgba\(255,255,255,\.99\)/);
 });
 

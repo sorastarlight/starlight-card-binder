@@ -1,7 +1,7 @@
 import { supabase } from '../supabase-client.js';
 import { getStarBitsExchangePreview } from '../star-bits-service.js';
 import { openStarBitsBoosterById } from '../daily-booster-service.js';
-import { revealRewardSequence } from '../reward-reveal.js?v=1.5.8';
+import { revealRewardSequence } from '../reward-reveal.js?v=1.5.11';
 
 const packsEl = document.getElementById('packs');
 const balanceEl = document.getElementById('balance');
@@ -25,13 +25,13 @@ const purchaseBalance = document.getElementById('purchase-balance');
 const purchaseCancel = document.getElementById('purchase-cancel');
 const purchaseConfirm = document.getElementById('purchase-confirm');
 const detailsModalController = window.StarlightUI.adoptModal(modal, {
-  dialog: modal.querySelector('.modal-card'),
+  dialog: modal.querySelector('.st-dialog'),
   labelledBy: 'modal-title',
   initialFocus: modalClose,
   onClose: () => releasePortalModal(modal)
 });
 const purchaseModalController = window.StarlightUI.adoptModal(purchaseModal, {
-  dialog: purchaseModal.querySelector('.purchase-card'),
+  dialog: purchaseModal.querySelector('.st-dialog'),
   labelledBy: 'purchase-title',
   describedBy: 'purchase-description',
   initialFocus: purchaseConfirm,
@@ -136,9 +136,9 @@ function getPortalDocument(){
   return document;
 }
 function ensureShopPortalStyles(targetDocument){
-  if(targetDocument.getElementById('starlight-shop-portal-styles-v930')) return;
+  if(targetDocument.getElementById('starlight-shop-portal-styles-v160')) return;
   const style=targetDocument.createElement('style');
-  style.id='starlight-shop-portal-styles-v930';
+  style.id='starlight-shop-portal-styles-v160';
   style.textContent=`
     .starlight-shop-portal{
       position:fixed!important;
@@ -153,10 +153,10 @@ function ensureShopPortalStyles(targetDocument){
       overflow:auto!important;
       background:rgba(37,44,88,.64)!important;
       backdrop-filter:blur(10px)!important;
+      opacity:1!important;
     }
     .starlight-shop-portal.hidden{display:none!important}
-    .starlight-shop-portal .purchase-card,
-    .starlight-shop-portal .modal-card{
+    .starlight-shop-portal .st-dialog{
       position:relative!important;
       inset:auto!important;
       display:block!important;
@@ -169,16 +169,10 @@ function ensureShopPortalStyles(targetDocument){
       padding:clamp(18px,3vw,28px)!important;
       overflow:auto!important;
       box-sizing:border-box!important;
-      border:2px solid rgba(255,130,200,.50)!important;
-      border-radius:26px!important;
-      background:linear-gradient(155deg,#fff,#f4fbff 52%,#fff1f8)!important;
-      box-shadow:0 28px 90px rgba(28,36,79,.40),0 0 42px rgba(255,130,200,.18)!important;
-      color:#405fa1!important;
       text-align:center!important;
       scrollbar-width:thin!important;
     }
-    .starlight-shop-portal .purchase-card>*,
-    .starlight-shop-portal .modal-card>*{
+    .starlight-shop-portal .st-dialog>*{
       max-width:100%!important;
       box-sizing:border-box!important;
     }
@@ -193,17 +187,6 @@ function ensureShopPortalStyles(targetDocument){
       object-position:center!important;
       filter:drop-shadow(0 15px 20px rgba(61,83,132,.22))!important;
     }
-    .starlight-shop-portal .purchase-card h2{
-      margin:6px 0!important;
-      font-size:clamp(1.35rem,3vw,1.8rem)!important;
-      line-height:1.2!important;
-      color:#405fa1!important;
-    }
-    .starlight-shop-portal .purchase-card p{
-      margin:6px auto!important;
-      line-height:1.5!important;
-      color:#6b7089!important;
-    }
     .starlight-shop-portal .purchase-cost{
       display:inline-flex!important;
       align-items:center!important;
@@ -216,7 +199,7 @@ function ensureShopPortalStyles(targetDocument){
       color:#8b6500!important;
       font-weight:950!important;
     }
-    .starlight-shop-portal .purchase-actions{
+    .starlight-shop-portal .st-dialog-actions{
       display:flex!important;
       justify-content:center!important;
       align-items:center!important;
@@ -224,7 +207,7 @@ function ensureShopPortalStyles(targetDocument){
       gap:12px!important;
       margin-top:18px!important;
     }
-    .starlight-shop-portal .purchase-actions button{
+    .starlight-shop-portal .st-dialog-actions button{
       min-width:140px!important;
       min-height:46px!important;
       padding:10px 18px!important;
@@ -232,17 +215,6 @@ function ensureShopPortalStyles(targetDocument){
       font:inherit!important;
       font-weight:950!important;
       cursor:pointer!important;
-    }
-    .starlight-shop-portal .purchase-cancel{
-      border:2px solid rgba(107,198,248,.45)!important;
-      background:#fff!important;
-      color:#405fa1!important;
-    }
-    .starlight-shop-portal .purchase-confirm{
-      border:0!important;
-      background:linear-gradient(135deg,#ff75bd,#b68df5,#6bc6f8)!important;
-      color:#fff!important;
-      box-shadow:0 9px 24px rgba(255,117,189,.26)!important;
     }
     .starlight-shop-portal .modal-pack{
       display:grid!important;
@@ -259,16 +231,9 @@ function ensureShopPortalStyles(targetDocument){
       object-fit:contain!important;
       margin:auto!important;
     }
-    .starlight-shop-portal .modal-close{
-      position:sticky!important;
-      top:0!important;
-      float:right!important;
-      z-index:2!important;
-    }
     @media(max-width:640px){
       .starlight-shop-portal{padding:10px!important}
-      .starlight-shop-portal .purchase-card,
-      .starlight-shop-portal .modal-card{
+      .starlight-shop-portal .st-dialog{
         width:100%!important;
         max-height:calc(100vh - 20px)!important;
         padding:18px 14px!important;
@@ -280,10 +245,10 @@ function ensureShopPortalStyles(targetDocument){
       .starlight-shop-portal .modal-pack img{
         height:min(210px,30vh)!important;
       }
-      .starlight-shop-portal .purchase-actions{
+      .starlight-shop-portal .st-dialog-actions{
         flex-direction:column!important;
       }
-      .starlight-shop-portal .purchase-actions button{
+      .starlight-shop-portal .st-dialog-actions button{
         width:100%!important;
       }
     }
@@ -296,7 +261,7 @@ function portalModal(element){
   if(element.ownerDocument!==targetDocument) targetDocument.body.append(element);
   element.classList.add('starlight-shop-portal');
   targetDocument.defaultView?.requestAnimationFrame(()=>{
-    const card=element.querySelector('.purchase-card,.modal-card');
+    const card=element.querySelector('.st-dialog');
     card?.scrollTo({top:0,left:0,behavior:'instant'});
   });
 }

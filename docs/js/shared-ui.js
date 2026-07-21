@@ -370,6 +370,7 @@ function createModal({
 function confirmDialog({
   title = 'Are you sure?',
   message = '',
+  warning = '',
   confirmText = 'Confirm',
   cancelText = 'Cancel',
   danger = false
@@ -378,6 +379,7 @@ function confirmDialog({
     const modal = createModal({
       title,
       message,
+      content: warning ? `<p class="st-dialog-warning">${escapeHtml(warning)}</p>` : '',
       closeLabel: cancelText,
       actions: [
         { label: cancelText, value: 'cancel', className: 'st-dialog-cancel' },

@@ -13,9 +13,10 @@ h1,h2,h3{color:#405fa1}
 .post img{width:160px;height:100px;object-fit:cover;border-radius:12px;background:#f2f8ff}
 .post p{color:#69738f}
 .status{font-weight:850}
-.editor{position:fixed;inset:0;z-index:6000;display:grid;place-items:center;padding:18px;background:rgba(31,39,75,.64);backdrop-filter:blur(7px)}
 .editor.hidden,.editor[hidden]{display:none}
-.card{width:min(100%,900px);max-height:94vh;overflow:auto;padding:24px;border-radius:24px;background:#fff}
+.editor .st-dialog.card{width:min(100%,900px);max-height:94vh;padding:24px;text-align:left}
+.editor .toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px;padding-right:44px}
+.editor .toolbar h2{margin:0}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
 .field.full{grid-column:1/-1}
 .field label{display:block;margin-bottom:5px;color:#405fa1;font-weight:850}
