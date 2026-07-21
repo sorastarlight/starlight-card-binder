@@ -85,26 +85,38 @@ function ensureHoloSparkLayer(element, enabled = true) {
   return spark;
 }
 
-/** Pointer/tilt-driven foil boost while dragging — streaks stay visible without interaction. */
-function setHoloPointer(foil, x, y) {
+/** Drive rainbow shift from card orientation — never a mouse spotlight. */
+function setHoloFromTilt(foil, tiltXDeg, tiltYDeg, maxDeg = 16) {
   if (!foil) return;
-  const px = Math.min(1, Math.max(0, Number(x) || 0));
-  const py = Math.min(1, Math.max(0, Number(y) || 0));
-  foil.style.setProperty('--st-holo-x', `${(px * 100).toFixed(1)}%`);
-  foil.style.setProperty('--st-holo-y', `${(py * 100).toFixed(1)}%`);
+  const max = Math.max(1, Number(maxDeg) || 16);
+  const nx = Math.max(-1, Math.min(1, Number(tiltYDeg) / max));
+  const ny = Math.max(-1, Math.min(1, Number(tiltXDeg) / max));
+  foil.style.setProperty('--tilt-nx', nx.toFixed(4));
+  foil.style.setProperty('--tilt-ny', ny.toFixed(4));
+  foil.classList.add('is-holo-lit');
+}
+
+function clearHoloFromTilt(foil) {
+  if (!foil) return;
+  foil.classList.remove('is-holo-lit');
+  foil.style.removeProperty('--tilt-nx');
+  foil.style.removeProperty('--tilt-ny');
+}
+
+/** @deprecated Use setHoloFromTilt — kept as alias for older call sites. */
+function setHoloPointer(foil, _x, _y) {
+  // Intentionally ignore pointer x/y so shine never sticks to the cursor.
+  if (!foil) return;
   foil.classList.add('is-holo-lit');
 }
 
 function clearHoloPointer(foil) {
-  if (!foil) return;
-  foil.classList.remove('is-holo-lit');
-  foil.style.removeProperty('--st-holo-x');
-  foil.style.removeProperty('--st-holo-y');
+  clearHoloFromTilt(foil);
 }
 
 /**
  * Left-click / touch-drag 3D tilt. Release returns the card to its resting pose.
- * Foil glare intensifies and tracks the drag when a holographic layer is present.
+ * Rainbow foil shifts with card angle (environmental light), not cursor position.
  */
 function attachCardDragTilt(card, options = {}) {
   if (!card || card.dataset.dragTiltBound === '1') return card;
@@ -134,7 +146,9 @@ function attachCardDragTilt(card, options = {}) {
     card.style.setProperty('--tiltY', `${tiltY.toFixed(2)}deg`);
     card.classList.add('is-dragging', 'tilting');
     const foil = resolveFoil();
-    if (foil?.classList.contains('card-finish-holographic')) setHoloPointer(foil, x, y);
+    if (foil?.classList.contains('card-finish-holographic')) {
+      setHoloFromTilt(foil, tiltX, tiltY, max);
+    }
   };
 
   const endDrag = (event) => {
@@ -146,7 +160,7 @@ function attachCardDragTilt(card, options = {}) {
     card.classList.remove('is-dragging', 'tilting');
     card.style.setProperty('--tiltX', '0deg');
     card.style.setProperty('--tiltY', '0deg');
-    clearHoloPointer(resolveFoil());
+    clearHoloFromTilt(resolveFoil());
   };
 
   card.addEventListener('pointerdown', event => {
@@ -443,6 +457,8 @@ window.StarlightUI = {
   ensureHoloSparkLayer,
   attachHoloPointer,
   attachCardDragTilt,
+  setHoloFromTilt,
+  clearHoloFromTilt,
   setHoloPointer,
   clearHoloPointer,
   stateMarkup,

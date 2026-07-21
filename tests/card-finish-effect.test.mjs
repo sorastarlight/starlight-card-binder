@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 
 const read = relative => readFile(new URL(`../${relative}`, import.meta.url), 'utf8');
 
-test('holographic finish uses always-on streaks with seamless alternate motion', async () => {
+test('holographic finish uses full-card rainbow that shifts with tilt orientation', async () => {
   const [ui, css] = await Promise.all([
     read('docs/js/shared-ui.js'),
     read('docs/css/shared-ui.css')
@@ -17,17 +17,21 @@ test('holographic finish uses always-on streaks with seamless alternate motion',
   assert.match(ui, /ensureHoloSparkLayer/);
   assert.match(ui, /holoSparkMarkup/);
   assert.match(ui, /function attachCardDragTilt/);
-  assert.match(ui, /function setHoloPointer/);
+  assert.match(ui, /function setHoloFromTilt/);
+  assert.match(ui, /setHoloFromTilt\(foil, tiltX, tiltY, max\)/);
+  assert.doesNotMatch(ui, /setHoloPointer\(foil, x, y\)[\s\S]*--st-holo-x/);
   assert.match(css, /\.card-finish-holographic::before/);
-  assert.match(css, /mix-blend-mode:color-dodge/);
+  assert.match(css, /mix-blend-mode:soft-light/);
   assert.match(css, /\.st-holo-spark/);
-  assert.match(css, /repeating-linear-gradient/);
-  assert.match(css, /@keyframes stHoloStreak/);
-  assert.match(css, /animation:stHoloStreak[^;]*alternate/);
+  assert.match(css, /--st-holo-shift-x/);
+  assert.match(css, /--tilt-nx/);
+  assert.match(css, /@keyframes stHoloIdleOrient/);
+  assert.match(css, /animation:stHoloIdleOrient[^;]*alternate/);
   assert.match(css, /\.st-card-drag-tilt/);
-  assert.doesNotMatch(css, /animation:stHoloRainbowSweep/);
+  assert.doesNotMatch(css, /--st-holo-x/);
+  assert.doesNotMatch(css, /farthest-corner circle at var\(--st-holo/);
   assert.match(css, /prefers-reduced-motion:reduce/);
-  assert.match(css, /prefers-reduced-motion:reduce[\s\S]*card-finish-holographic::before/);
+  assert.match(css, /prefers-reduced-motion:reduce[\s\S]*card-finish-holographic/);
 });
 
 test('holographic shimmer is limited to reveal and full-card view surfaces', async () => {
