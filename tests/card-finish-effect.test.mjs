@@ -23,6 +23,8 @@ test('holographic finish is a simple always-on rainbow foil on reveal and full v
   assert.match(css, /@keyframes stHoloHue/);
   assert.match(css, /hue-rotate\(360deg\)/);
   assert.match(css, /@keyframes stHoloSheen/);
+  assert.match(css, /@keyframes stHoloSparkleA/);
+  assert.match(css, /animation:stHoloSparkleA[^;]*alternate/);
   assert.match(css, /animation:stHoloSheen[^;]*alternate/);
   assert.match(css, /\.st-card-drag-tilt/);
   assert.doesNotMatch(css, /--tilt-nx/);

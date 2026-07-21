@@ -82,18 +82,65 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
   opacity:.65;
   animation:stHoloSheen 4s ease-in-out infinite alternate;
 }
-/* Tiny glitter flecks */
+/* Glimmering sparkles — staggered alternate fades (no hard loop jump) */
 .card-finish-holographic>.st-holo-spark{
   z-index:4;
   content:none;
   background-image:
-    radial-gradient(circle at 16% 22%,#fff 0 1px,transparent 1.6px),
-    radial-gradient(circle at 42% 58%,#fff 0 .8px,transparent 1.4px),
-    radial-gradient(circle at 68% 30%,#fff 0 1.1px,transparent 1.8px),
-    radial-gradient(circle at 82% 72%,#fff 0 .7px,transparent 1.3px),
-    radial-gradient(circle at 28% 80%,#fff 0 .9px,transparent 1.5px);
+    radial-gradient(circle at 14% 18%,#fff 0 1.1px,transparent 1.8px),
+    radial-gradient(circle at 38% 42%,#fff 0 .8px,transparent 1.4px),
+    radial-gradient(circle at 62% 24%,#fff 0 1.2px,transparent 2px),
+    radial-gradient(circle at 78% 58%,#fff 0 .9px,transparent 1.5px),
+    radial-gradient(circle at 22% 72%,#fff 0 1px,transparent 1.7px),
+    radial-gradient(circle at 88% 34%,#fff 0 .7px,transparent 1.3px),
+    radial-gradient(circle at 48% 78%,#fff 0 1.1px,transparent 1.8px),
+    linear-gradient(0deg,transparent 46%,rgba(255,255,255,.95) 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,rgba(255,255,255,.95) 50%,transparent 54%),
+    linear-gradient(0deg,transparent 46%,rgba(255,255,255,.85) 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,rgba(255,255,255,.85) 50%,transparent 54%);
+  background-size:
+    100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,
+    16px 16px,16px 16px,12px 12px,12px 12px;
+  background-position:
+    0 0,0 0,0 0,0 0,0 0,0 0,0 0,
+    14% 18%,14% 18%,62% 24%,62% 24%;
+  background-repeat:no-repeat;
   mix-blend-mode:screen;
-  opacity:.35;
+  filter:drop-shadow(0 0 2px rgba(255,255,255,.7));
+  animation:stHoloSparkleA 1.8s ease-in-out infinite alternate;
+}
+.card-finish-holographic>.st-holo-spark::before,
+.card-finish-holographic>.st-holo-spark::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  background-image:
+    radial-gradient(circle at 30% 28%,#fff 0 .9px,transparent 1.5px),
+    radial-gradient(circle at 70% 48%,#fff 0 1.1px,transparent 1.8px),
+    radial-gradient(circle at 52% 66%,#fff 0 .7px,transparent 1.3px),
+    radial-gradient(circle at 18% 54%,#fff 0 .8px,transparent 1.4px),
+    linear-gradient(0deg,transparent 46%,rgba(255,255,255,.9) 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,rgba(255,255,255,.9) 50%,transparent 54%),
+    linear-gradient(0deg,transparent 46%,rgba(255,255,255,.8) 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,rgba(255,255,255,.8) 50%,transparent 54%);
+  background-size:
+    100% 100%,100% 100%,100% 100%,100% 100%,
+    14px 14px,14px 14px,18px 18px,18px 18px;
+  background-position:
+    0 0,0 0,0 0,0 0,
+    78% 58%,78% 58%,48% 78%,48% 78%;
+  background-repeat:no-repeat;
+  mix-blend-mode:screen;
+  animation:stHoloSparkleB 2.3s ease-in-out infinite alternate;
+}
+.card-finish-holographic>.st-holo-spark::after{
+  background-position:
+    0 0,0 0,0 0,0 0,
+    22% 72%,22% 72%,88% 34%,88% 34%;
+  animation-name:stHoloSparkleC;
+  animation-duration:2.7s;
+  animation-direction:alternate-reverse;
 }
 /* Hue cycle is seamless: 360deg looks identical to 0deg */
 @keyframes stHoloHue{
@@ -103,6 +150,18 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
 @keyframes stHoloSheen{
   from{background-position:20% 30%;opacity:.5}
   to{background-position:75% 65%;opacity:.78}
+}
+@keyframes stHoloSparkleA{
+  from{opacity:.18;filter:drop-shadow(0 0 1px rgba(255,255,255,.35))}
+  to{opacity:.85;filter:drop-shadow(0 0 4px rgba(255,255,255,.95))}
+}
+@keyframes stHoloSparkleB{
+  from{opacity:.12;transform:scale(.92)}
+  to{opacity:.9;transform:scale(1.05)}
+}
+@keyframes stHoloSparkleC{
+  from{opacity:.2;transform:scale(1.04)}
+  to{opacity:.95;transform:scale(.94)}
 }
 /* Click-drag 3D tilt only (foil is independent) */
 .st-card-drag-tilt{
@@ -149,4 +208,4 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
 .st-view-state{display:grid;place-items:center;min-height:220px;padding:28px;text-align:center;color:var(--st-ui-muted)}.st-view-state strong{display:block;color:#405fa1;font-size:1.25rem;margin-bottom:7px}.st-view-state button{margin-top:15px;padding:10px 18px;border:0;border-radius:999px;background:linear-gradient(135deg,var(--st-ui-blue),var(--st-ui-pink));color:#fff;font-weight:900;cursor:pointer}.st-spinner{width:38px;height:38px;margin:0 auto 14px;border:4px solid rgba(107,198,248,.2);border-top-color:var(--st-ui-pink);border-radius:50%;animation:stSpin .8s linear infinite}@keyframes stSpin{to{transform:rotate(360deg)}}
 :focus-visible{outline:3px solid rgba(255,130,200,.75)!important;outline-offset:3px!important}
 .status:empty,.page-status:empty,[role="status"]:empty{display:none!important}
-@media(prefers-reduced-motion:reduce){.st-toast,.st-spinner,.card-finish-holographic::before,.card-finish-holographic::after{animation:none!important}.card-finish-holographic::before{opacity:.5;filter:hue-rotate(40deg)}.card-finish-holographic::after{opacity:.55;background-position:45% 40%}.card-finish-holographic>.st-holo-spark{opacity:.28}.st-card-drag-tilt,.full-card-wrap#fullCard3d{transition:none!important}.st-dialog-overlay{backdrop-filter:none}.st-dialog-overlay,.st-dialog,.st-button{transition:none!important}}
+@media(prefers-reduced-motion:reduce){.st-toast,.st-spinner,.card-finish-holographic::before,.card-finish-holographic::after,.card-finish-holographic>.st-holo-spark,.card-finish-holographic>.st-holo-spark::before,.card-finish-holographic>.st-holo-spark::after{animation:none!important}.card-finish-holographic::before{opacity:.5;filter:hue-rotate(40deg)}.card-finish-holographic::after{opacity:.55;background-position:45% 40%}.card-finish-holographic>.st-holo-spark{opacity:.4}.card-finish-holographic>.st-holo-spark::before,.card-finish-holographic>.st-holo-spark::after{opacity:.35}.st-card-drag-tilt,.full-card-wrap#fullCard3d{transition:none!important}.st-dialog-overlay{backdrop-filter:none}.st-dialog-overlay,.st-dialog,.st-button{transition:none!important}}
