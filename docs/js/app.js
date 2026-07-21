@@ -540,9 +540,9 @@ function renderDetail() {
     <button class="btn primary" id="flipPreview" type="button">↻ Flip</button>
     <button class="btn" id="openFullView" type="button">⛶ Full View</button>
   </div>
-  <button class="preview-card flip-card simple-flip ${previewFlipped ? 'show-back showing-card-back' : ''} ${rarityClass(selected)}" id="previewCard" type="button" aria-label="Open full card view">
+  <button class="preview-card flip-card simple-flip ${previewFlipped ? 'show-back showing-card-back' : ''} ${rarityClass(selected)}" id="previewCard" type="button" aria-label="Open full card view" data-finish-class="${esc(got ? cardFinishClass(selected, true) : '')}" data-holographic="${got && isHolographicCard(selected)}">
     <span class="preview-inner">
-      <span class="face front"><img class="${hidden && !previewFlipped?'obscured':''}" src="${esc(previewFlipped ? CARD_BACK_URL : getVisibleImage(selected))}" alt="${esc(previewFlipped ? 'Card back' : getVisibleName(selected))}" onerror="this.src='${CARD_BACK_URL}'"></span>
+      <span class="face front ${cardFinishClass(selected, got && !previewFlipped)}"><img class="${hidden && !previewFlipped?'obscured':''}" src="${esc(previewFlipped ? CARD_BACK_URL : getVisibleImage(selected))}" alt="${esc(previewFlipped ? 'Card back' : getVisibleName(selected))}" onerror="this.src='${CARD_BACK_URL}'">${holoSparkMarkup(selected, got && !previewFlipped)}</span>
       <span class="face back"><img src="${CARD_BACK_URL}" alt="Card back"></span>
     </span>
   </button>
@@ -553,6 +553,7 @@ function renderDetail() {
       <span class="card-meta-chip rarity ${rarityClass(selected)}">${esc(getVisibleRarity(selected))}</span>
       <span class="card-meta-chip category">${esc(categoryLabel(selected))}</span>
       ${subcategoryLabel(selected) ? `<span class="card-meta-chip subcategory">${esc(subcategoryLabel(selected))}</span>` : ''}
+      ${got && !isStandardMeta(finishLabel(selected)) ? `<span class="card-meta-chip finish">${esc(finishLabel(selected))}</span>` : ''}
     </div>
     <div class="detail-list clean-detail-list v91-identity-list">
       <p><b>Series</b><span>${esc(selected.series)}</span></p>
@@ -961,9 +962,9 @@ function renderV62Showcase(inSeriesSelect = false) {
       <button class="btn primary" id="v62Flip" type="button">↻ Flip</button>
       <button class="btn" id="v62Full" type="button">⛶ Full View</button>
     </div>
-    <button class="v62-preview-card flip-card simple-flip ${previewFlipped ? 'show-back showing-card-back' : ''}" id="v62PreviewCard" type="button" aria-label="Open full view for ${esc(visibleName)}">
+    <button class="v62-preview-card flip-card simple-flip ${previewFlipped ? 'show-back showing-card-back' : ''}" id="v62PreviewCard" type="button" aria-label="Open full view for ${esc(visibleName)}" data-finish-class="${esc(got ? cardFinishClass(card, true) : '')}" data-holographic="${got && isHolographicCard(card)}">
       <span class="preview-inner">
-        <span class="face front"><img class="${hidden && !previewFlipped?'obscured':''}" src="${esc(previewFlipped ? CARD_BACK_URL : visibleImage)}" alt="${esc(previewFlipped ? 'Card back' : visibleName)}" onerror="this.src='${CARD_BACK_URL}'"></span>
+        <span class="face front ${cardFinishClass(card, got && !previewFlipped)}"><img class="${hidden && !previewFlipped?'obscured':''}" src="${esc(previewFlipped ? CARD_BACK_URL : visibleImage)}" alt="${esc(previewFlipped ? 'Card back' : visibleName)}" onerror="this.src='${CARD_BACK_URL}'">${holoSparkMarkup(card, got && !previewFlipped)}</span>
         <span class="face back"><img src="${CARD_BACK_URL}" alt="Starlight card back"></span>
       </span>
     </button>

@@ -61,13 +61,14 @@ function isHolographicCard(card = {}) {
 function isSparkleFoilCard(card = {}) {
   const finishId = String(card.finishId ?? card.finish_id ?? card.finish?.id ?? '')
     .trim()
-    .toLowerCase();
-  if (finishId === 'sparkle-foil') return true;
+    .toLowerCase()
+    .replace(/[_\s]+/g, '-');
+  if (finishId === 'sparkle-foil' || finishId === 'sparklefoil' || finishId === 'sparkle') return true;
 
   const finishName = String(card.finishName ?? card.finish_name ?? card.finish?.name ?? '')
     .trim()
     .toLowerCase();
-  return /\bsparkle[\s-]?foil\b/.test(finishName);
+  return /\bsparkle([\s_-]?foil)?\b/.test(finishName);
 }
 
 function cardFinishClass(card, visible = true) {

@@ -41,7 +41,6 @@ test('sparkle foil finish uses a simple glitter effect on reveal and full view',
 
   assert.match(ui, /function isSparkleFoilCard\(card = \{\}\)/);
   assert.match(ui, /finishId === 'sparkle-foil'/);
-  assert.match(ui, /\\bsparkle\[\\s-\]\?foil\\b/);
   assert.match(ui, /card-finish-sparkle-foil/);
   assert.match(ui, /ensureFinishEffectLayer/);
   assert.match(ui, /finishEffectLabel/);
@@ -62,6 +61,7 @@ test('finish effects are limited to reveal and full-card view surfaces', async (
   ]);
 
   assert.match(app, /face front \$\{cardFinishClass\(selected, got && !overlayFlipped\)\}/);
+  assert.match(app, /face front \$\{cardFinishClass\(card, got && !previewFlipped\)\}/);
   assert.match(app, /holoSparkMarkup\(selected, got && !overlayFlipped\)/);
   assert.match(app, /data-finish-class=/);
   assert.match(app, /ensureFinishEffectLayer/);
