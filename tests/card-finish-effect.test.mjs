@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 
 const read = relative => readFile(new URL(`../${relative}`, import.meta.url), 'utf8');
 
-test('holographic finish uses one shared pointer-driven foil presentation', async () => {
+test('holographic finish uses always-on streaks with seamless alternate motion', async () => {
   const [ui, css] = await Promise.all([
     read('docs/js/shared-ui.js'),
     read('docs/css/shared-ui.css')
@@ -16,16 +16,16 @@ test('holographic finish uses one shared pointer-driven foil presentation', asyn
   assert.match(ui, /cardFinishClass/);
   assert.match(ui, /ensureHoloSparkLayer/);
   assert.match(ui, /holoSparkMarkup/);
-  assert.match(ui, /function attachHoloPointer/);
+  assert.match(ui, /function attachCardDragTilt/);
   assert.match(ui, /function setHoloPointer/);
   assert.match(css, /\.card-finish-holographic::before/);
   assert.match(css, /mix-blend-mode:color-dodge/);
   assert.match(css, /\.st-holo-spark/);
-  assert.match(css, /--st-holo-x/);
-  assert.match(css, /--st-holo-y/);
-  assert.match(css, /linear-gradient/);
-  assert.doesNotMatch(css, /@keyframes stHolo/);
-  assert.doesNotMatch(css, /animation:\s*stHolo/);
+  assert.match(css, /repeating-linear-gradient/);
+  assert.match(css, /@keyframes stHoloStreak/);
+  assert.match(css, /animation:stHoloStreak[^;]*alternate/);
+  assert.match(css, /\.st-card-drag-tilt/);
+  assert.doesNotMatch(css, /animation:stHoloRainbowSweep/);
   assert.match(css, /prefers-reduced-motion:reduce/);
   assert.match(css, /prefers-reduced-motion:reduce[\s\S]*card-finish-holographic::before/);
 });
@@ -41,15 +41,14 @@ test('holographic shimmer is limited to reveal and full-card view surfaces', asy
   assert.match(app, /face front \$\{cardFinishClass\(selected, got && !overlayFlipped\)\}/);
   assert.match(app, /holoSparkMarkup\(selected, got && !overlayFlipped\)/);
   assert.match(app, /data-holographic="\$\{got && isHolographicCard\(selected\)\}"/);
-  assert.match(app, /setHoloPointer/);
-  assert.match(app, /clearHoloPointer/);
+  assert.match(app, /attachCardDragTilt/);
   assert.doesNotMatch(app, /collection-image \$\{cardFinishClass/);
   assert.doesNotMatch(app, /v61-card-art \$\{cardFinishClass/);
   assert.doesNotMatch(app, /fav-image \$\{cardFinishClass/);
   assert.match(reveal, /st-r3-card-front \$\{cardFinishClass\(card\)\}/);
   assert.match(reveal, /st-r3-result-art \$\{cardFinishClass\(card\)\}/);
   assert.match(reveal, /attachHoloSpark\(/);
-  assert.match(reveal, /attachHoloPointer/);
+  assert.match(reveal, /attachCardDragTilt/);
   assert.doesNotMatch(daily, /reward-card-art \$\{finishClass\}/);
   assert.doesNotMatch(admin, /card-db-art \$\{window\.StarlightUI\?\.cardFinishClass/);
 });

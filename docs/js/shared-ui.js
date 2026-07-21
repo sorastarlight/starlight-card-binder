@@ -85,7 +85,7 @@ function ensureHoloSparkLayer(element, enabled = true) {
   return spark;
 }
 
-/** Pointer/tilt-driven foil shine — no looping animation, so no visible restart. */
+/** Pointer/tilt-driven foil boost while dragging — streaks stay visible without interaction. */
 function setHoloPointer(foil, x, y) {
   if (!foil) return;
   const px = Math.min(1, Math.max(0, Number(x) || 0));
@@ -102,18 +102,76 @@ function clearHoloPointer(foil) {
   foil.style.removeProperty('--st-holo-y');
 }
 
-function attachHoloPointer(surface, foil = surface) {
-  if (!surface || !foil || surface.dataset.holoPointerBound === '1') return foil;
-  surface.dataset.holoPointerBound = '1';
-  surface.addEventListener('pointermove', event => {
-    if (!foil.classList.contains('card-finish-holographic')) return;
-    const rect = surface.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / Math.max(1, rect.width);
-    const y = (event.clientY - rect.top) / Math.max(1, rect.height);
-    setHoloPointer(foil, x, y);
+/**
+ * Left-click / touch-drag 3D tilt. Release returns the card to its resting pose.
+ * Foil glare intensifies and tracks the drag when a holographic layer is present.
+ */
+function attachCardDragTilt(card, options = {}) {
+  if (!card || card.dataset.dragTiltBound === '1') return card;
+  card.dataset.dragTiltBound = '1';
+  card.classList.add('st-card-drag-tilt');
+
+  const max = Number(options.max ?? 16);
+  const resolveFoil = () => {
+    if (typeof options.getFoil === 'function') return options.getFoil();
+    if (options.foil) return options.foil;
+    return card.querySelector('.card-finish-holographic') ||
+      (card.classList.contains('card-finish-holographic') ? card : null);
+  };
+
+  let dragging = false;
+  let activePointer = null;
+
+  const clamp = (value) => Math.max(-max, Math.min(max, value));
+
+  const applyTilt = (clientX, clientY) => {
+    const rect = card.getBoundingClientRect();
+    const x = (clientX - rect.left) / Math.max(1, rect.width);
+    const y = (clientY - rect.top) / Math.max(1, rect.height);
+    const tiltY = clamp((x - 0.5) * max * 2);
+    const tiltX = clamp((0.5 - y) * max * 2);
+    card.style.setProperty('--tiltX', `${tiltX.toFixed(2)}deg`);
+    card.style.setProperty('--tiltY', `${tiltY.toFixed(2)}deg`);
+    card.classList.add('is-dragging', 'tilting');
+    const foil = resolveFoil();
+    if (foil?.classList.contains('card-finish-holographic')) setHoloPointer(foil, x, y);
+  };
+
+  const endDrag = (event) => {
+    if (!dragging) return;
+    if (activePointer != null && event?.pointerId != null && event.pointerId !== activePointer) return;
+    dragging = false;
+    activePointer = null;
+    try { if (event?.pointerId != null) card.releasePointerCapture?.(event.pointerId); } catch {}
+    card.classList.remove('is-dragging', 'tilting');
+    card.style.setProperty('--tiltX', '0deg');
+    card.style.setProperty('--tiltY', '0deg');
+    clearHoloPointer(resolveFoil());
+  };
+
+  card.addEventListener('pointerdown', event => {
+    if (event.button != null && event.button !== 0) return;
+    if (options.shouldIgnore?.(event)) return;
+    if (card.classList.contains('flip-turning')) return;
+    dragging = true;
+    activePointer = event.pointerId;
+    card.setPointerCapture?.(event.pointerId);
+    applyTilt(event.clientX, event.clientY);
+    event.preventDefault();
   });
-  surface.addEventListener('pointerleave', () => clearHoloPointer(foil));
-  return foil;
+
+  card.addEventListener('pointermove', event => {
+    if (!dragging || event.pointerId !== activePointer) return;
+    applyTilt(event.clientX, event.clientY);
+  });
+
+  card.addEventListener('pointerup', endDrag);
+  card.addEventListener('pointercancel', endDrag);
+  return card;
+}
+
+function attachHoloPointer(surface, foil = surface) {
+  return attachCardDragTilt(surface, { foil, max: 16 });
 }
 
 function focusableElements(root) {
@@ -384,6 +442,7 @@ window.StarlightUI = {
   holoSparkMarkup,
   ensureHoloSparkLayer,
   attachHoloPointer,
+  attachCardDragTilt,
   setHoloPointer,
   clearHoloPointer,
   stateMarkup,

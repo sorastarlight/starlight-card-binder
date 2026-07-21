@@ -82,7 +82,18 @@ function cardFinishClass(card) {
 function attachHoloSpark(element, card) {
   const enabled = Boolean(cardFinishClass(card));
   window.StarlightUI?.ensureHoloSparkLayer?.(element, enabled);
-  if (enabled) window.StarlightUI?.attachHoloPointer?.(element, element);
+  if (!enabled) return;
+  // 3D drag only on the main reveal card — result thumbs keep streaks only.
+  const actor = element.closest?.('.st-r3-card-actor');
+  if (!actor) return;
+  window.StarlightUI?.attachCardDragTilt?.(actor, {
+    foil: element,
+    max: 14,
+    shouldIgnore: () => {
+      const scene = actor.closest('.st-r3-reveal-scene');
+      return Boolean(scene && !scene.classList.contains('is-revealed'));
+    }
+  });
 }
 
 export function normalizeRevealOptions(options = {}) {

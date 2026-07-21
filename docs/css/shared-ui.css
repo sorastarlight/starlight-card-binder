@@ -23,8 +23,9 @@
 input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
 .collection-card,.link-card,.st-card{border-radius:var(--st-radius-md)}
 /*
- * Holographic finish — Pokémon TCG–style rainbow foil (reveal + full-view only).
- * No looping CSS animations. Shine is pointer/tilt-driven via --st-holo-x/y.
+ * Holographic finish — always-on rainbow foil streaks (reveal + full-view).
+ * Streak motion uses ease-in-out + alternate only (seamless; no hard loop reset).
+ * Optional 3D view: left-click drag via .st-card-drag-tilt / #fullCard3d.
  */
 .card-finish-holographic{
   --st-holo-x:48%;
@@ -48,66 +49,61 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
   border-radius:inherit;
   pointer-events:none;
 }
-/* Spectral rainbow foil — position tracks pointer like physical card stock */
+/* Always-visible rainbow streaks + foil etch */
 .card-finish-holographic::before{
   z-index:2;
   background-image:
-    linear-gradient(
-      110deg,
-      transparent 15%,
-      #ff4d9a 28%,
-      #ff8a3d 36%,
-      #ffe566 44%,
-      #5dff9a 52%,
-      #4ab8ff 60%,
-      #b06bff 68%,
-      transparent 82%
+    repeating-linear-gradient(
+      108deg,
+      transparent 0 6px,
+      rgba(255,70,160,.55) 10px,
+      rgba(255,140,55,.62) 18px,
+      rgba(255,230,80,.72) 26px,
+      rgba(80,235,150,.55) 34px,
+      rgba(70,185,255,.65) 42px,
+      rgba(160,95,255,.55) 50px,
+      transparent 56px 64px
     ),
     repeating-linear-gradient(
       125deg,
-      rgba(255,255,255,.14) 0 1px,
-      transparent 1px 4px
+      rgba(255,255,255,.16) 0 1px,
+      transparent 1px 3px
     );
-  background-size:280% 280%, 6px 6px;
-  background-position:
-    var(--st-holo-x) var(--st-holo-y),
-    center;
+  background-size:auto, 5px 5px;
+  background-position:0 0, center;
   mix-blend-mode:color-dodge;
-  filter:brightness(.82) contrast(1.35) saturate(1.05);
-  opacity:.42;
-  transition:opacity 120ms ease;
+  filter:brightness(.88) contrast(1.32) saturate(1.08);
+  opacity:.5;
+  animation:stHoloStreak 5.8s ease-in-out infinite alternate;
 }
-.card-finish-holographic.is-holo-lit::before,
-.tilting .card-finish-holographic::before{opacity:.58}
-/* Specular hotspot + soft glare bar */
+.card-finish-holographic.is-holo-lit::before{opacity:.62;filter:brightness(.95) contrast(1.4) saturate(1.12)}
+/* Specular glare — follows drag tilt when lit; soft resting sheen otherwise */
 .card-finish-holographic::after{
   z-index:3;
   background-image:
     radial-gradient(
       farthest-corner circle at var(--st-holo-x) var(--st-holo-y),
-      rgba(255,255,255,.85) 0%,
-      rgba(255,180,220,.35) 12%,
-      rgba(140,210,255,.18) 22%,
-      transparent 45%
+      rgba(255,255,255,.8) 0%,
+      rgba(255,170,220,.32) 14%,
+      rgba(140,210,255,.16) 24%,
+      transparent 48%
     ),
     linear-gradient(
-      115deg,
-      transparent 30%,
-      rgba(255,255,255,.35) 48%,
-      rgba(180,240,255,.22) 52%,
-      transparent 70%
+      112deg,
+      transparent 28%,
+      rgba(255,120,200,.2) 40%,
+      rgba(255,255,255,.4) 50%,
+      rgba(120,210,255,.25) 60%,
+      transparent 72%
     );
-  background-size:100% 100%, 200% 200%;
-  background-position:
-    center,
-    var(--st-holo-x) var(--st-holo-y);
+  background-size:120% 120%, 220% 220%;
+  background-position:center, var(--st-holo-x) var(--st-holo-y);
   mix-blend-mode:soft-light;
-  opacity:.55;
-  transition:opacity 120ms ease;
+  opacity:.62;
+  animation:stHoloGlarePulse 4.2s ease-in-out infinite alternate;
 }
-.card-finish-holographic.is-holo-lit::after,
-.tilting .card-finish-holographic::after{opacity:.78}
-/* Static foil sparkles (no animation — they catch light via blend only) */
+.card-finish-holographic.is-holo-lit::after{opacity:.86;animation:none}
+/* Static sparkles */
 .card-finish-holographic>.st-holo-spark{
   z-index:4;
   content:none;
@@ -131,11 +127,52 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
     14% 20%,14% 20%,78% 24%,78% 24%;
   background-repeat:no-repeat;
   mix-blend-mode:screen;
-  opacity:.28;
-  transition:opacity 120ms ease;
+  opacity:.34;
 }
-.card-finish-holographic.is-holo-lit>.st-holo-spark,
-.tilting .card-finish-holographic>.st-holo-spark{opacity:.48}
+.card-finish-holographic.is-holo-lit>.st-holo-spark{opacity:.52}
+/* Seamless ping-pong (alternate) — no hard restart jump */
+@keyframes stHoloStreak{
+  from{background-position:0 0,center}
+  to{background-position:32px 32px,center}
+}
+@keyframes stHoloGlarePulse{
+  from{opacity:.52}
+  to{opacity:.72}
+}
+/* Click-drag 3D tilt (release snaps back via transition) */
+.st-card-drag-tilt{
+  --tiltX:0deg;
+  --tiltY:0deg;
+  cursor:grab;
+  touch-action:none;
+  user-select:none;
+}
+.st-card-drag-tilt:not(.st-r3-card-actor){
+  transform:rotateX(var(--tiltX)) rotateY(var(--tiltY));
+  transform-style:preserve-3d;
+  transition:transform .3s ease,filter .3s ease;
+}
+.st-card-drag-tilt.is-dragging,
+.full-card-wrap#fullCard3d.is-dragging{
+  transition:none!important;
+  cursor:grabbing;
+}
+.full-card-wrap#fullCard3d{
+  cursor:grab;
+  touch-action:none;
+  user-select:none;
+}
+/* Reveal actor keeps its centering translate and adds drag tilt on top */
+.st-r3-reveal-scene.is-revealed .st-r3-card-actor.st-card-drag-tilt{
+  transform:translate(-50%,-50%) translateY(-5px) scale(1.03) rotateX(var(--tiltX)) rotateY(var(--tiltY));
+  transition:transform .3s ease,filter .3s ease;
+}
+.st-r3-reveal-scene[data-rarity="legendary"].is-revealed .st-r3-card-actor.st-card-drag-tilt{
+  transform:translate(-50%,-50%) translateY(-5px) scale(1.1) rotateX(var(--tiltX)) rotateY(var(--tiltY));
+}
+.st-r3-reveal-scene.is-revealed .st-r3-card-actor.st-card-drag-tilt.is-dragging{
+  transition:none;
+}
 .st-toast-region{position:fixed;right:18px;bottom:18px;z-index:30000;display:grid;gap:10px;width:min(380px,calc(100vw - 28px));pointer-events:none}
 .st-toast{pointer-events:auto;padding:13px 16px;border:1px solid rgba(107,198,248,.48);border-radius:16px;background:rgba(255,255,255,.97);box-shadow:0 15px 38px rgba(45,62,105,.22);color:var(--st-ui-ink);font-weight:800;line-height:1.45;animation:stToastIn .22s ease-out}
 .st-toast.success{border-color:rgba(70,176,127,.5)}.st-toast.error{border-color:rgba(180,35,63,.5);color:var(--st-ui-danger)}.st-toast.info{border-color:rgba(255,130,200,.5)}
@@ -148,4 +185,4 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
 .st-view-state{display:grid;place-items:center;min-height:220px;padding:28px;text-align:center;color:var(--st-ui-muted)}.st-view-state strong{display:block;color:#405fa1;font-size:1.25rem;margin-bottom:7px}.st-view-state button{margin-top:15px;padding:10px 18px;border:0;border-radius:999px;background:linear-gradient(135deg,var(--st-ui-blue),var(--st-ui-pink));color:#fff;font-weight:900;cursor:pointer}.st-spinner{width:38px;height:38px;margin:0 auto 14px;border:4px solid rgba(107,198,248,.2);border-top-color:var(--st-ui-pink);border-radius:50%;animation:stSpin .8s linear infinite}@keyframes stSpin{to{transform:rotate(360deg)}}
 :focus-visible{outline:3px solid rgba(255,130,200,.75)!important;outline-offset:3px!important}
 .status:empty,.page-status:empty,[role="status"]:empty{display:none!important}
-@media(prefers-reduced-motion:reduce){.st-toast,.st-spinner{animation:none!important}.card-finish-holographic::before,.card-finish-holographic::after,.card-finish-holographic>.st-holo-spark{transition:none!important}.card-finish-holographic::before{opacity:.36;filter:brightness(.88) contrast(1.2) saturate(.95)}.card-finish-holographic::after{opacity:.45}.card-finish-holographic>.st-holo-spark{opacity:.22}.st-dialog-overlay{backdrop-filter:none}.st-dialog-overlay,.st-dialog,.st-button{transition:none!important}}
+@media(prefers-reduced-motion:reduce){.st-toast,.st-spinner,.card-finish-holographic::before,.card-finish-holographic::after{animation:none!important}.card-finish-holographic::before{opacity:.46;background-position:16px 16px,center;filter:brightness(.9) contrast(1.25) saturate(1)}.card-finish-holographic::after{opacity:.58}.card-finish-holographic>.st-holo-spark{opacity:.28}.st-card-drag-tilt,.full-card-wrap#fullCard3d{transition:none!important}.st-dialog-overlay{backdrop-filter:none}.st-dialog-overlay,.st-dialog,.st-button{transition:none!important}}

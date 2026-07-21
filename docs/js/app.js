@@ -859,25 +859,10 @@ function attachFullViewTilt() {
   const card = $('#fullCard3d');
   if (!card) return;
   const frontFace = card.querySelector('.face.front');
-  card.addEventListener('pointermove', (e) => {
-    if (card.classList.contains('flip-turning')) return;
-    const r = card.getBoundingClientRect();
-    const x = (e.clientX - r.left) / Math.max(1, r.width);
-    const y = (e.clientY - r.top) / Math.max(1, r.height);
-    const tiltY = (x - 0.5) * 8;
-    const tiltX = (0.5 - y) * 7;
-    card.style.setProperty('--tiltX', `${tiltX.toFixed(2)}deg`);
-    card.style.setProperty('--tiltY', `${tiltY.toFixed(2)}deg`);
-    if (frontFace?.classList.contains('card-finish-holographic')) {
-      window.StarlightUI?.setHoloPointer?.(frontFace, x, y);
-    }
-    card.classList.add('tilting');
-  });
-  card.addEventListener('pointerleave', () => {
-    card.classList.remove('tilting');
-    card.style.removeProperty('--tiltX');
-    card.style.removeProperty('--tiltY');
-    window.StarlightUI?.clearHoloPointer?.(frontFace);
+  window.StarlightUI?.attachCardDragTilt?.(card, {
+    max: 18,
+    getFoil: () => frontFace?.classList.contains('card-finish-holographic') ? frontFace : null,
+    shouldIgnore: event => Boolean(event.target?.closest?.('button, a, .overlay-flip'))
   });
 }
 
