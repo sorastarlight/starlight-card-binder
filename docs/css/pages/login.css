@@ -1,11 +1,11 @@
 :root {
-            --starlight-blue: #6bc6f8;
-            --starlight-pink: #ff82c8;
-            --starlight-yellow: #fed334;
-            --text-dark: #30344f;
+            --starlight-blue: var(--st-color-blue, #6bc6f8);
+            --starlight-pink: var(--st-color-pink, #ff82c8);
+            --starlight-yellow: var(--st-color-gold, #fed334);
+            --text-dark: var(--st-color-ink, #30344f);
             --panel-white: rgba(255, 255, 255, 0.94);
-            --error-red: #b4233f;
-            --success-green: #177245;
+            --error-red: var(--st-color-danger, #b4233f);
+            --success-green: var(--st-color-success, #177245);
         }
 
         * {

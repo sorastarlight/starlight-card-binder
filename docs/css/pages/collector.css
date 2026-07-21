@@ -1,12 +1,12 @@
 :root {
-            --collector-blue: #6bc6f8;
-            --collector-pink: #ff82c8;
-            --collector-gold: #fed334;
-            --collector-dark: #30344f;
-            --collector-muted: #6b7089;
+            --collector-blue: var(--st-color-blue, #6bc6f8);
+            --collector-pink: var(--st-color-pink, #ff82c8);
+            --collector-gold: var(--st-color-gold, #fed334);
+            --collector-dark: var(--st-color-ink, #30344f);
+            --collector-muted: var(--st-color-muted, #6b7089);
             --collector-panel: rgba(255, 255, 255, 0.95);
-            --collector-border: rgba(107, 198, 248, 0.46);
-            --collector-error: #b4233f;
+            --collector-border: var(--st-line, rgba(107, 198, 248, 0.46));
+            --collector-error: var(--st-color-danger, #b4233f);
         }
 
         * {

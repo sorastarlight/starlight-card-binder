@@ -1,21 +1,10 @@
 :root {
-            --profile-blue:
-                #6bc6f8;
-
-            --profile-pink:
-                #ff82c8;
-
-            --profile-dark:
-                #30344f;
-
-            --profile-muted:
-                #6b7089;
-
-            --profile-error:
-                #b4233f;
-
-            --profile-success:
-                #167048;
+            --profile-blue: var(--st-color-blue, #6bc6f8);
+            --profile-pink: var(--st-color-pink, #ff82c8);
+            --profile-dark: var(--st-color-ink, #30344f);
+            --profile-muted: var(--st-color-muted, #6b7089);
+            --profile-error: var(--st-color-danger, #b4233f);
+            --profile-success: var(--st-color-success, #167048);
         }
 
         * {

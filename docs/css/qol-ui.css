@@ -1,10 +1,10 @@
 
 /* V91.1 — Global Quality-of-Life System */
 :root{
-  --qol-blue:#6bc6f8;
-  --qol-pink:#ff82c8;
-  --qol-ink:#405fa1;
-  --qol-muted:#6b7089;
+  --qol-blue:var(--st-color-blue, #6bc6f8);
+  --qol-pink:var(--st-color-pink, #ff82c8);
+  --qol-ink:var(--st-color-ink, #405fa1);
+  --qol-muted:var(--st-color-muted, #6b7089);
 }
 
 /* Stable app layout: sidebar + top navigation remain visible. */

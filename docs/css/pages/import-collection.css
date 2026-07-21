@@ -1,13 +1,13 @@
 :root {
-            --blue: #6bc6f8;
-            --pink: #ff82c8;
-            --yellow: #fed334;
-            --dark: #30344f;
-            --muted: #6b7089;
+            --blue: var(--st-color-blue, #6bc6f8);
+            --pink: var(--st-color-pink, #ff82c8);
+            --yellow: var(--st-color-gold, #fed334);
+            --dark: var(--st-color-ink, #30344f);
+            --muted: var(--st-color-muted, #6b7089);
             --panel: rgba(255, 255, 255, 0.95);
-            --border: rgba(107, 198, 248, 0.52);
-            --success: #167048;
-            --error: #b4233f;
+            --border: var(--st-line, rgba(107, 198, 248, 0.52));
+            --success: var(--st-color-success, #167048);
+            --error: var(--st-color-danger, #b4233f);
         }
 
         * {
