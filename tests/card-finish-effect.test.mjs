@@ -33,7 +33,7 @@ test('holographic finish is a simple always-on rainbow foil on reveal and full v
   assert.match(css, /prefers-reduced-motion:reduce[\s\S]*card-finish-holographic/);
 });
 
-test('sparkle foil finish uses a simple glitter effect on reveal and full view', async () => {
+test('sparkle foil finish uses visible 4-point starbursts on reveal and full view', async () => {
   const [ui, css] = await Promise.all([
     read('docs/js/shared-ui.js'),
     read('docs/css/shared-ui.css')
@@ -52,6 +52,27 @@ test('sparkle foil finish uses a simple glitter effect on reveal and full view',
   assert.match(css, /prefers-reduced-motion:reduce[\s\S]*card-finish-sparkle-foil/);
 });
 
+test('gold finish uses metallic gold wash with rainbow streaks and sparkles', async () => {
+  const [ui, css, badgeCss] = await Promise.all([
+    read('docs/js/shared-ui.js'),
+    read('docs/css/shared-ui.css'),
+    read('docs/css/reward-reveal.css')
+  ]);
+
+  assert.match(ui, /function isGoldCard\(card = \{\}\)/);
+  assert.match(ui, /finishId === 'gold'/);
+  assert.match(ui, /card-finish-gold/);
+  assert.match(ui, /st-gold-spark/);
+  assert.match(ui, /isGoldCard/);
+  assert.match(css, /\.card-finish-gold::before/);
+  assert.match(css, /\.st-gold-spark/);
+  assert.match(css, /@keyframes stGoldWash/);
+  assert.match(css, /@keyframes stGoldRainbow/);
+  assert.match(css, /@keyframes stGoldSparkleA/);
+  assert.match(css, /prefers-reduced-motion:reduce[\s\S]*card-finish-gold/);
+  assert.match(badgeCss, /\.st-r3-badge\.finish-gold/);
+});
+
 test('finish effects are limited to reveal and full-card view surfaces', async () => {
   const [app, reveal, daily, admin] = await Promise.all([
     read('docs/js/app.js'),
@@ -66,6 +87,7 @@ test('finish effects are limited to reveal and full-card view surfaces', async (
   assert.match(app, /data-finish-class=/);
   assert.match(app, /ensureFinishEffectLayer/);
   assert.match(app, /attachCardDragTilt/);
+  assert.match(app, /card-finish-gold/);
   assert.doesNotMatch(app, /collection-image \$\{cardFinishClass/);
   assert.doesNotMatch(app, /v61-card-art \$\{cardFinishClass/);
   assert.doesNotMatch(app, /fav-image \$\{cardFinishClass/);

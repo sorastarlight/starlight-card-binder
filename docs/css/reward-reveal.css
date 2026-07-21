@@ -976,6 +976,7 @@
 .st-r3-badge.rarity-legendary { color:#9a6a00; background:linear-gradient(180deg,#fffdf0,#ffe66d); border-color:#ffd21f; box-shadow:0 0 12px rgba(255,210,31,.35); }
 .st-r3-badge.finish-holographic { color:#70458f; background:linear-gradient(120deg,#fff0fa,#eafaff 48%,#fff8ca); border-color:#d8a4f2; box-shadow:0 0 14px rgba(116,213,255,.3); }
 .st-r3-badge.finish-sparkle-foil { color:#5a6a88; background:linear-gradient(120deg,#f7fbff,#fff8e8 52%,#eef4ff); border-color:#c5d3e8; box-shadow:0 0 12px rgba(255,255,255,.45); }
+.st-r3-badge.finish-gold { color:#8a6200; background:linear-gradient(120deg,#fff8dc,#ffe08a 48%,#fff3c4); border-color:#e0b84a; box-shadow:0 0 14px rgba(255,200,80,.4); }
 .st-r3-badge.is-new,
 .st-r3-result-status.is-new { color:#fff; background:#176847; border-color:rgba(255,255,255,.36); }
 .st-r3-badge.is-duplicate,

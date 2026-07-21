@@ -56,6 +56,7 @@ function finishLabel(card) { return taxonomyLabel(card?.finishName, card?.finish
 function cardFinishClass(card, visible = true) { return window.StarlightUI?.cardFinishClass?.(card, visible) || ''; }
 function isHolographicCard(card) { return window.StarlightUI?.isHolographicCard?.(card) === true; }
 function isSparkleFoilCard(card) { return window.StarlightUI?.isSparkleFoilCard?.(card) === true; }
+function isGoldCard(card) { return window.StarlightUI?.isGoldCard?.(card) === true; }
 function holoSparkMarkup(card, visible = true) { return window.StarlightUI?.finishEffectMarkup?.(card, visible) || window.StarlightUI?.holoSparkMarkup?.(card, visible) || ''; }
 function distributionLabel(card) {
   const labels = {
@@ -850,7 +851,7 @@ function flipCardImage(cardEl, frontUrl, frontAlt, showBack) {
     cardEl.classList.toggle('show-back', !!showBack);
     cardEl.classList.toggle('showing-card-back', !!showBack);
     const finishClass = !showBack ? (cardEl.dataset.finishClass || '') : '';
-    frontFace?.classList.remove('card-finish-holographic', 'card-finish-sparkle-foil');
+    frontFace?.classList.remove('card-finish-holographic', 'card-finish-sparkle-foil', 'card-finish-gold');
     if (finishClass) frontFace?.classList.add(finishClass);
     window.StarlightUI?.ensureFinishEffectLayer?.(frontFace, finishClass);
   }, 280);

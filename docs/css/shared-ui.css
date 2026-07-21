@@ -164,7 +164,8 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
   to{opacity:.95;transform:scale(.94)}
 }
 /*
- * Sparkle Foil — bright silver glitter finish (reveal + full-view + binder preview).
+ * Sparkle Foil — opaque 4-point starbursts (TCG-style), visible on light or dark art.
+ * Avoid soft-light/screen-only stacks that wash out on bright artwork.
  */
 .card-finish-sparkle-foil{
   position:relative;
@@ -175,7 +176,8 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
 .face.card-finish-sparkle-foil,
 .st-r3-card-front.card-finish-sparkle-foil,
 .preview-card .face.card-finish-sparkle-foil,
-.v62-preview-card .face.card-finish-sparkle-foil{position:absolute;inset:0}
+.v62-preview-card .face.card-finish-sparkle-foil,
+.full-card-wrap .face.card-finish-sparkle-foil{position:absolute;inset:0}
 .st-r3-result-art.card-finish-sparkle-foil{border-radius:13px 13px 0 0}
 .card-finish-sparkle-foil>img{position:relative;z-index:0;display:block}
 .card-finish-sparkle-foil::before,
@@ -187,9 +189,177 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
   z-index:3;
   border-radius:inherit;
   pointer-events:none;
-  opacity:1;
 }
 .card-finish-sparkle-foil>.st-sparkle-glitter{
+  display:block !important;
+  position:absolute;
+  inset:0;
+  z-index:5;
+  border-radius:inherit;
+  pointer-events:none;
+}
+/* Soft silver sheen — light enough to keep art readable */
+.card-finish-sparkle-foil::before{
+  z-index:3;
+  background:
+    linear-gradient(
+      118deg,
+      rgba(255,255,255,.42) 0%,
+      rgba(200,220,255,.18) 28%,
+      transparent 48%,
+      rgba(255,240,200,.22) 68%,
+      rgba(255,255,255,.38) 100%
+    );
+  mix-blend-mode:overlay;
+  opacity:.7;
+  animation:stSparkleWash 2.8s ease-in-out infinite alternate;
+}
+/* Fine glitter dust */
+.card-finish-sparkle-foil::after{
+  z-index:4;
+  background-image:
+    radial-gradient(circle at 12% 16%,rgba(255,255,255,.95) 0 1.2px,transparent 2px),
+    radial-gradient(circle at 28% 42%,rgba(255,255,255,.9) 0 1px,transparent 1.8px),
+    radial-gradient(circle at 46% 22%,rgba(255,255,255,.95) 0 1.3px,transparent 2.1px),
+    radial-gradient(circle at 62% 58%,rgba(255,255,255,.88) 0 .9px,transparent 1.6px),
+    radial-gradient(circle at 78% 30%,rgba(255,255,255,.95) 0 1.1px,transparent 1.9px),
+    radial-gradient(circle at 88% 72%,rgba(255,255,255,.9) 0 1px,transparent 1.8px),
+    radial-gradient(circle at 18% 78%,rgba(255,255,255,.92) 0 1.15px,transparent 2px),
+    radial-gradient(circle at 54% 84%,rgba(255,255,255,.88) 0 .85px,transparent 1.5px),
+    radial-gradient(circle at 72% 12%,rgba(255,255,255,.95) 0 1px,transparent 1.7px),
+    radial-gradient(circle at 36% 68%,rgba(255,255,255,.9) 0 1.05px,transparent 1.85px);
+  opacity:.85;
+  animation:stSparkleGrain 2.1s ease-in-out infinite alternate;
+}
+/* Large TCG-style 4-point stars — normal blend so they stay visible on pale art */
+.card-finish-sparkle-foil>.st-sparkle-glitter{
+  z-index:5;
+  background-image:
+    radial-gradient(circle at 18% 22%,#fff 0 1.6px,rgba(255,255,255,.55) 2.4px,transparent 3.4px),
+    linear-gradient(0deg,transparent 46%,#fff 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,#fff 50%,transparent 54%),
+    radial-gradient(circle at 52% 38%,#fff 0 1.4px,rgba(255,255,255,.5) 2.2px,transparent 3.2px),
+    linear-gradient(0deg,transparent 46%,#fff 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,#fff 50%,transparent 54%),
+    radial-gradient(circle at 78% 58%,#fff 0 1.7px,rgba(255,255,255,.55) 2.5px,transparent 3.5px),
+    linear-gradient(0deg,transparent 46%,#fff 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,#fff 50%,transparent 54%),
+    radial-gradient(circle at 34% 72%,#fff 0 1.3px,rgba(255,255,255,.45) 2px,transparent 3px),
+    linear-gradient(0deg,transparent 46%,#fff 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,#fff 50%,transparent 54%),
+    radial-gradient(circle at 88% 24%,#fff 0 1.5px,rgba(255,255,255,.5) 2.3px,transparent 3.3px),
+    linear-gradient(0deg,transparent 46%,#fff 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,#fff 50%,transparent 54%),
+    radial-gradient(circle at 62% 82%,#fff 0 1.2px,rgba(255,255,255,.45) 1.9px,transparent 2.8px),
+    linear-gradient(0deg,transparent 46%,#fff 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,#fff 50%,transparent 54%);
+  background-size:
+    100% 100%,26px 26px,26px 26px,
+    100% 100%,22px 22px,22px 22px,
+    100% 100%,28px 28px,28px 28px,
+    100% 100%,20px 20px,20px 20px,
+    100% 100%,24px 24px,24px 24px,
+    100% 100%,18px 18px,18px 18px;
+  background-position:
+    0 0,18% 22%,18% 22%,
+    0 0,52% 38%,52% 38%,
+    0 0,78% 58%,78% 58%,
+    0 0,34% 72%,34% 72%,
+    0 0,88% 24%,88% 24%,
+    0 0,62% 82%,62% 82%;
+  background-repeat:no-repeat;
+  filter:drop-shadow(0 0 2px rgba(255,255,255,.95)) drop-shadow(0 0 6px rgba(255,255,255,.55));
+  opacity:.95;
+  animation:stSparkleTwinkleA 1.5s ease-in-out infinite alternate;
+}
+.card-finish-sparkle-foil>.st-sparkle-glitter::before,
+.card-finish-sparkle-foil>.st-sparkle-glitter::after{
+  content:"" !important;
+  display:block !important;
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  background-image:
+    radial-gradient(circle at 42% 14%,#fff 0 1.4px,rgba(255,255,255,.5) 2.2px,transparent 3.2px),
+    linear-gradient(0deg,transparent 46%,#fff 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,#fff 50%,transparent 54%),
+    radial-gradient(circle at 68% 46%,#fff 0 1.6px,rgba(255,255,255,.55) 2.4px,transparent 3.4px),
+    linear-gradient(0deg,transparent 46%,#fff 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,#fff 50%,transparent 54%),
+    radial-gradient(circle at 22% 54%,#fff 0 1.2px,rgba(255,255,255,.45) 2px,transparent 3px),
+    linear-gradient(0deg,transparent 46%,#fff 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,#fff 50%,transparent 54%);
+  background-size:
+    100% 100%,22px 22px,22px 22px,
+    100% 100%,26px 26px,26px 26px,
+    100% 100%,18px 18px,18px 18px;
+  background-position:
+    0 0,42% 14%,42% 14%,
+    0 0,68% 46%,68% 46%,
+    0 0,22% 54%,22% 54%;
+  background-repeat:no-repeat;
+  filter:drop-shadow(0 0 3px rgba(255,255,255,.85));
+  animation:stSparkleTwinkleB 2s ease-in-out infinite alternate;
+}
+.card-finish-sparkle-foil>.st-sparkle-glitter::after{
+  background-image:
+    radial-gradient(circle at 86% 36%,#fff 0 1.5px,rgba(255,255,255,.5) 2.3px,transparent 3.3px),
+    linear-gradient(0deg,transparent 46%,#fff 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,#fff 50%,transparent 54%),
+    radial-gradient(circle at 14% 40%,#fff 0 1.3px,rgba(255,255,255,.45) 2.1px,transparent 3.1px),
+    linear-gradient(0deg,transparent 46%,#fff 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,#fff 50%,transparent 54%),
+    radial-gradient(circle at 48% 88%,#fff 0 1.4px,rgba(255,255,255,.5) 2.2px,transparent 3.2px),
+    linear-gradient(0deg,transparent 46%,#fff 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,#fff 50%,transparent 54%);
+  background-position:
+    0 0,86% 36%,86% 36%,
+    0 0,14% 40%,14% 40%,
+    0 0,48% 88%,48% 88%;
+  animation-name:stSparkleTwinkleC;
+  animation-duration:2.4s;
+  animation-direction:alternate-reverse;
+}
+@keyframes stSparkleWash{
+  from{opacity:.45}
+  to{opacity:.85}
+}
+@keyframes stSparkleGrain{
+  from{opacity:.55}
+  to{opacity:.95}
+}
+@keyframes stSparkleTwinkleA{
+  from{opacity:.35;filter:drop-shadow(0 0 1px rgba(255,255,255,.5)) drop-shadow(0 0 3px rgba(255,255,255,.25))}
+  to{opacity:1;filter:drop-shadow(0 0 3px rgba(255,255,255,1)) drop-shadow(0 0 8px rgba(255,255,255,.7))}
+}
+@keyframes stSparkleTwinkleB{
+  from{opacity:.25;transform:scale(.94)}
+  to{opacity:1;transform:scale(1.04)}
+}
+@keyframes stSparkleTwinkleC{
+  from{opacity:.3;transform:scale(1.05)}
+  to{opacity:1;transform:scale(.95)}
+}
+/*
+ * Gold finish — metallic gold wash + diagonal rainbow streaks + TCG sparkles
+ * (inspired by gold holographic full-art cards).
+ */
+.card-finish-gold{
+  position:relative;
+  display:block;
+  overflow:hidden;
+  isolation:isolate;
+}
+.face.card-finish-gold,
+.st-r3-card-front.card-finish-gold,
+.preview-card .face.card-finish-gold,
+.v62-preview-card .face.card-finish-gold,
+.full-card-wrap .face.card-finish-gold{position:absolute;inset:0}
+.st-r3-result-art.card-finish-gold{border-radius:13px 13px 0 0}
+.card-finish-gold>img{position:relative;z-index:0;display:block}
+.card-finish-gold::before,
+.card-finish-gold::after{
+  content:"" !important;
   display:block !important;
   position:absolute;
   inset:0;
@@ -197,118 +367,145 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
   border-radius:inherit;
   pointer-events:none;
 }
-/* Bright metallic foil wash — intentionally obvious */
-.card-finish-sparkle-foil::before{
+.card-finish-gold>.st-gold-spark{
+  display:block !important;
+  position:absolute;
+  inset:0;
+  z-index:5;
+  border-radius:inherit;
+  pointer-events:none;
+}
+/* Warm metallic gold foil wash */
+.card-finish-gold::before{
   z-index:3;
   background:
     linear-gradient(
-      125deg,
-      rgba(255,255,255,.55) 0%,
-      rgba(210,230,255,.35) 22%,
-      rgba(255,255,255,.15) 40%,
-      rgba(255,236,190,.4) 58%,
-      rgba(255,255,255,.5) 78%,
-      rgba(200,220,255,.3) 100%
+      145deg,
+      rgba(255,236,150,.55) 0%,
+      rgba(212,160,40,.42) 22%,
+      rgba(255,210,90,.28) 42%,
+      rgba(180,120,20,.38) 62%,
+      rgba(255,228,140,.5) 82%,
+      rgba(230,175,50,.4) 100%
     );
-  mix-blend-mode:soft-light;
-  opacity:.85;
-  animation:stSparkleWash 2.8s ease-in-out infinite alternate;
-}
-/* Dense glitter field */
-.card-finish-sparkle-foil::after{
-  z-index:4;
-  background-image:
-    radial-gradient(circle at 10% 14%,#fff 0 1.1px,transparent 1.8px),
-    radial-gradient(circle at 22% 38%,#fff 0 .8px,transparent 1.4px),
-    radial-gradient(circle at 34% 18%,#fff 0 1px,transparent 1.6px),
-    radial-gradient(circle at 48% 52%,#fff 0 .7px,transparent 1.3px),
-    radial-gradient(circle at 58% 28%,#fff 0 1.2px,transparent 1.9px),
-    radial-gradient(circle at 70% 62%,#fff 0 .9px,transparent 1.5px),
-    radial-gradient(circle at 82% 20%,#fff 0 1px,transparent 1.7px),
-    radial-gradient(circle at 90% 48%,#fff 0 .75px,transparent 1.35px),
-    radial-gradient(circle at 16% 68%,#fff 0 .85px,transparent 1.45px),
-    radial-gradient(circle at 40% 78%,#fff 0 1.05px,transparent 1.7px),
-    radial-gradient(circle at 64% 84%,#fff 0 .7px,transparent 1.3px),
-    radial-gradient(circle at 86% 74%,#fff 0 .95px,transparent 1.55px),
-    radial-gradient(circle at 28% 88%,#fff 0 .6px,transparent 1.2px),
-    radial-gradient(circle at 74% 42%,#fff 0 .8px,transparent 1.4px);
-  mix-blend-mode:screen;
+  mix-blend-mode:color-dodge;
   opacity:.72;
-  animation:stSparkleGrain 2.1s ease-in-out infinite alternate;
+  animation:stGoldWash 3.2s ease-in-out infinite alternate;
 }
-/* Large twinkling star bursts */
-.card-finish-sparkle-foil>.st-sparkle-glitter{
+/* Diagonal prismatic rainbow streaks over gold */
+.card-finish-gold::after{
+  z-index:4;
+  background:
+    linear-gradient(
+      125deg,
+      transparent 8%,
+      rgba(255,110,200,.45) 18%,
+      rgba(120,220,255,.4) 28%,
+      rgba(120,255,160,.35) 38%,
+      rgba(255,230,90,.45) 48%,
+      rgba(180,120,255,.4) 58%,
+      transparent 70%,
+      rgba(255,150,90,.35) 82%,
+      transparent 92%
+    );
+  background-size:220% 220%;
+  background-position:30% 40%;
+  mix-blend-mode:overlay;
+  opacity:.7;
+  animation:stGoldRainbow 5.5s linear infinite;
+}
+/* Bright 4-point sparkles on gold foil */
+.card-finish-gold>.st-gold-spark{
   z-index:5;
-  content:none;
   background-image:
-    radial-gradient(circle at 18% 22%,#fff 0 1.3px,transparent 2.2px),
-    radial-gradient(circle at 52% 36%,#fff 0 1.1px,transparent 1.9px),
-    radial-gradient(circle at 78% 58%,#fff 0 1.4px,transparent 2.3px),
-    radial-gradient(circle at 34% 70%,#fff 0 1px,transparent 1.7px),
-    radial-gradient(circle at 88% 24%,#fff 0 1.2px,transparent 2px),
-    radial-gradient(circle at 62% 82%,#fff 0 .9px,transparent 1.6px),
-    linear-gradient(0deg,transparent 45%,#fff 50%,transparent 55%),
-    linear-gradient(90deg,transparent 45%,#fff 50%,transparent 55%),
-    linear-gradient(0deg,transparent 45%,rgba(255,255,255,.95) 50%,transparent 55%),
-    linear-gradient(90deg,transparent 45%,rgba(255,255,255,.95) 50%,transparent 55%),
-    linear-gradient(0deg,transparent 45%,rgba(255,255,255,.9) 50%,transparent 55%),
-    linear-gradient(90deg,transparent 45%,rgba(255,255,255,.9) 50%,transparent 55%);
+    radial-gradient(circle at 16% 20%,#fff 0 1.5px,rgba(255,255,220,.55) 2.3px,transparent 3.3px),
+    linear-gradient(0deg,transparent 46%,#fff 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,#fff 50%,transparent 54%),
+    radial-gradient(circle at 48% 34%,#fff 0 1.3px,rgba(255,248,200,.5) 2.1px,transparent 3.1px),
+    linear-gradient(0deg,transparent 46%,#fff 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,#fff 50%,transparent 54%),
+    radial-gradient(circle at 76% 56%,#fff 0 1.6px,rgba(255,255,220,.55) 2.4px,transparent 3.4px),
+    linear-gradient(0deg,transparent 46%,#fff 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,#fff 50%,transparent 54%),
+    radial-gradient(circle at 30% 74%,#fff 0 1.2px,rgba(255,240,180,.45) 2px,transparent 3px),
+    linear-gradient(0deg,transparent 46%,#fff 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,#fff 50%,transparent 54%),
+    radial-gradient(circle at 88% 22%,#fff 0 1.4px,rgba(255,255,210,.5) 2.2px,transparent 3.2px),
+    linear-gradient(0deg,transparent 46%,#fff 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,#fff 50%,transparent 54%);
   background-size:
-    100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,
-    22px 22px,22px 22px,16px 16px,16px 16px,18px 18px,18px 18px;
+    100% 100%,24px 24px,24px 24px,
+    100% 100%,20px 20px,20px 20px,
+    100% 100%,26px 26px,26px 26px,
+    100% 100%,18px 18px,18px 18px,
+    100% 100%,22px 22px,22px 22px;
   background-position:
-    0 0,0 0,0 0,0 0,0 0,0 0,
-    18% 22%,18% 22%,78% 58%,78% 58%,52% 36%,52% 36%;
+    0 0,16% 20%,16% 20%,
+    0 0,48% 34%,48% 34%,
+    0 0,76% 56%,76% 56%,
+    0 0,30% 74%,30% 74%,
+    0 0,88% 22%,88% 22%;
   background-repeat:no-repeat;
-  mix-blend-mode:screen;
-  filter:drop-shadow(0 0 3px rgba(255,255,255,.95));
-  animation:stSparkleTwinkleA 1.5s ease-in-out infinite alternate;
+  filter:drop-shadow(0 0 2px rgba(255,236,150,.95)) drop-shadow(0 0 6px rgba(255,200,80,.55));
+  opacity:.95;
+  animation:stGoldSparkleA 1.6s ease-in-out infinite alternate;
 }
-.card-finish-sparkle-foil>.st-sparkle-glitter::before,
-.card-finish-sparkle-foil>.st-sparkle-glitter::after{
-  content:"";
+.card-finish-gold>.st-gold-spark::before,
+.card-finish-gold>.st-gold-spark::after{
+  content:"" !important;
+  display:block !important;
   position:absolute;
   inset:0;
   border-radius:inherit;
   background-image:
-    radial-gradient(circle at 42% 16%,#fff 0 1.1px,transparent 1.9px),
-    radial-gradient(circle at 68% 48%,#fff 0 1.3px,transparent 2.1px),
-    radial-gradient(circle at 24% 56%,#fff 0 .9px,transparent 1.6px),
-    linear-gradient(0deg,transparent 45%,#fff 50%,transparent 55%),
-    linear-gradient(90deg,transparent 45%,#fff 50%,transparent 55%),
-    linear-gradient(0deg,transparent 45%,rgba(255,255,255,.9) 50%,transparent 55%),
-    linear-gradient(90deg,transparent 45%,rgba(255,255,255,.9) 50%,transparent 55%);
-  background-size:100% 100%,100% 100%,100% 100%,20px 20px,20px 20px,14px 14px,14px 14px;
-  background-position:0 0,0 0,0 0,68% 48%,68% 48%,34% 70%,34% 70%;
+    radial-gradient(circle at 58% 16%,#fff 0 1.3px,rgba(255,248,200,.5) 2.1px,transparent 3.1px),
+    linear-gradient(0deg,transparent 46%,#fff 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,#fff 50%,transparent 54%),
+    radial-gradient(circle at 24% 48%,#fff 0 1.5px,rgba(255,255,220,.55) 2.3px,transparent 3.3px),
+    linear-gradient(0deg,transparent 46%,#fff 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,#fff 50%,transparent 54%),
+    radial-gradient(circle at 70% 78%,#fff 0 1.2px,rgba(255,240,180,.45) 2px,transparent 3px),
+    linear-gradient(0deg,transparent 46%,#fff 50%,transparent 54%),
+    linear-gradient(90deg,transparent 46%,#fff 50%,transparent 54%);
+  background-size:
+    100% 100%,20px 20px,20px 20px,
+    100% 100%,24px 24px,24px 24px,
+    100% 100%,18px 18px,18px 18px;
+  background-position:
+    0 0,58% 16%,58% 16%,
+    0 0,24% 48%,24% 48%,
+    0 0,70% 78%,70% 78%;
   background-repeat:no-repeat;
-  mix-blend-mode:screen;
-  animation:stSparkleTwinkleB 2s ease-in-out infinite alternate;
+  filter:drop-shadow(0 0 3px rgba(255,230,140,.85));
+  animation:stGoldSparkleB 2.1s ease-in-out infinite alternate;
 }
-.card-finish-sparkle-foil>.st-sparkle-glitter::after{
-  background-position:0 0,0 0,0 0,88% 24%,88% 24%,62% 82%,62% 82%;
-  animation-name:stSparkleTwinkleC;
-  animation-duration:2.4s;
+.card-finish-gold>.st-gold-spark::after{
+  background-position:
+    0 0,82% 42%,82% 42%,
+    0 0,12% 68%,12% 68%,
+    0 0,44% 12%,44% 12%;
+  animation-name:stGoldSparkleC;
+  animation-duration:2.5s;
   animation-direction:alternate-reverse;
 }
-@keyframes stSparkleWash{
-  from{opacity:.65}
-  to{opacity:.95}
+@keyframes stGoldWash{
+  from{opacity:.55;filter:brightness(1)}
+  to{opacity:.88;filter:brightness(1.12)}
 }
-@keyframes stSparkleGrain{
-  from{opacity:.5}
-  to{opacity:.88}
+@keyframes stGoldRainbow{
+  to{background-position:80% 70%;filter:hue-rotate(360deg)}
 }
-@keyframes stSparkleTwinkleA{
-  from{opacity:.25;filter:drop-shadow(0 0 1px rgba(255,255,255,.4))}
-  to{opacity:1;filter:drop-shadow(0 0 5px rgba(255,255,255,1))}
+@keyframes stGoldSparkleA{
+  from{opacity:.3;filter:drop-shadow(0 0 1px rgba(255,236,150,.5)) drop-shadow(0 0 3px rgba(255,200,80,.25))}
+  to{opacity:1;filter:drop-shadow(0 0 3px rgba(255,248,200,1)) drop-shadow(0 0 8px rgba(255,210,90,.75))}
 }
-@keyframes stSparkleTwinkleB{
-  from{opacity:.2;transform:scale(.92)}
-  to{opacity:.95;transform:scale(1.06)}
+@keyframes stGoldSparkleB{
+  from{opacity:.22;transform:scale(.93)}
+  to{opacity:1;transform:scale(1.05)}
 }
-@keyframes stSparkleTwinkleC{
+@keyframes stGoldSparkleC{
   from{opacity:.28;transform:scale(1.05)}
-  to{opacity:1;transform:scale(.93)}
+  to{opacity:1;transform:scale(.94)}
 }
 /* Click-drag 3D tilt only (foil is independent) */
 .st-card-drag-tilt{
@@ -355,4 +552,4 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
 .st-view-state{display:grid;place-items:center;min-height:220px;padding:28px;text-align:center;color:var(--st-ui-muted)}.st-view-state strong{display:block;color:#405fa1;font-size:1.25rem;margin-bottom:7px}.st-view-state button{margin-top:15px;padding:10px 18px;border:0;border-radius:999px;background:linear-gradient(135deg,var(--st-ui-blue),var(--st-ui-pink));color:#fff;font-weight:900;cursor:pointer}.st-spinner{width:38px;height:38px;margin:0 auto 14px;border:4px solid rgba(107,198,248,.2);border-top-color:var(--st-ui-pink);border-radius:50%;animation:stSpin .8s linear infinite}@keyframes stSpin{to{transform:rotate(360deg)}}
 :focus-visible{outline:3px solid rgba(255,130,200,.75)!important;outline-offset:3px!important}
 .status:empty,.page-status:empty,[role="status"]:empty{display:none!important}
-@media(prefers-reduced-motion:reduce){.st-toast,.st-spinner,.card-finish-holographic::before,.card-finish-holographic::after,.card-finish-holographic>.st-holo-spark,.card-finish-holographic>.st-holo-spark::before,.card-finish-holographic>.st-holo-spark::after,.card-finish-sparkle-foil::before,.card-finish-sparkle-foil::after,.card-finish-sparkle-foil>.st-sparkle-glitter,.card-finish-sparkle-foil>.st-sparkle-glitter::before,.card-finish-sparkle-foil>.st-sparkle-glitter::after{animation:none!important}.card-finish-holographic::before{opacity:.5;filter:hue-rotate(40deg)}.card-finish-holographic::after{opacity:.55;background-position:45% 40%}.card-finish-holographic>.st-holo-spark{opacity:.4}.card-finish-holographic>.st-holo-spark::before,.card-finish-holographic>.st-holo-spark::after{opacity:.35}.card-finish-sparkle-foil::before{opacity:.8}.card-finish-sparkle-foil::after{opacity:.65}.card-finish-sparkle-foil>.st-sparkle-glitter{opacity:.7}.card-finish-sparkle-foil>.st-sparkle-glitter::before,.card-finish-sparkle-foil>.st-sparkle-glitter::after{opacity:.55}.st-card-drag-tilt,.full-card-wrap#fullCard3d{transition:none!important}.st-dialog-overlay{backdrop-filter:none}.st-dialog-overlay,.st-dialog,.st-button{transition:none!important}}
+@media(prefers-reduced-motion:reduce){.st-toast,.st-spinner,.card-finish-holographic::before,.card-finish-holographic::after,.card-finish-holographic>.st-holo-spark,.card-finish-holographic>.st-holo-spark::before,.card-finish-holographic>.st-holo-spark::after,.card-finish-sparkle-foil::before,.card-finish-sparkle-foil::after,.card-finish-sparkle-foil>.st-sparkle-glitter,.card-finish-sparkle-foil>.st-sparkle-glitter::before,.card-finish-sparkle-foil>.st-sparkle-glitter::after,.card-finish-gold::before,.card-finish-gold::after,.card-finish-gold>.st-gold-spark,.card-finish-gold>.st-gold-spark::before,.card-finish-gold>.st-gold-spark::after{animation:none!important}.card-finish-holographic::before{opacity:.5;filter:hue-rotate(40deg)}.card-finish-holographic::after{opacity:.55;background-position:45% 40%}.card-finish-holographic>.st-holo-spark{opacity:.4}.card-finish-holographic>.st-holo-spark::before,.card-finish-holographic>.st-holo-spark::after{opacity:.35}.card-finish-sparkle-foil::before{opacity:.8}.card-finish-sparkle-foil::after{opacity:.85}.card-finish-sparkle-foil>.st-sparkle-glitter{opacity:.85}.card-finish-sparkle-foil>.st-sparkle-glitter::before,.card-finish-sparkle-foil>.st-sparkle-glitter::after{opacity:.7}.card-finish-gold::before{opacity:.75}.card-finish-gold::after{opacity:.6;background-position:45% 40%}.card-finish-gold>.st-gold-spark{opacity:.85}.card-finish-gold>.st-gold-spark::before,.card-finish-gold>.st-gold-spark::after{opacity:.7}.st-card-drag-tilt,.full-card-wrap#fullCard3d{transition:none!important}.st-dialog-overlay{backdrop-filter:none}.st-dialog-overlay,.st-dialog,.st-button{transition:none!important}}
