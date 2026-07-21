@@ -1,8 +1,23 @@
 import { supabase } from './supabase-client.js';
 
+function isUnauthenticatedStaffLookup(error) {
+    const message = String(error?.message || error?.code || '').toLowerCase();
+    return (
+        error?.code === 'PGRST301' ||
+        error?.code === '42501' ||
+        /permission denied|not authenticated|jwt|unauthorized|login required/.test(message)
+    );
+}
+
 export async function getMyStaffAccess() {
     const { data, error } = await supabase.rpc('get_my_staff_access');
-    if (error) throw error;
+    if (error) {
+        // RPC is granted to authenticated only; signed-out collectors are not staff.
+        if (isUnauthenticatedStaffLookup(error)) {
+            return { isStaff: false, role: null };
+        }
+        throw error;
+    }
     return data || { isStaff: false, role: null };
 }
 

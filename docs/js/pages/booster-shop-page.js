@@ -353,10 +353,14 @@ async function load(){
       supabase.from('booster_types').select('id,name,description,star_bits_cost,pack_image_url,card_back_url,reward_mode,series_id,card_count,bonus_star_bits,sort_order').eq('is_active',true).eq('archived',false).gt('star_bits_cost',0).order('sort_order'),
       supabase.from('booster_slots').select('id,booster_id,name,quantity,sort_order,booster_slot_rates(rarity,percentage)').order('sort_order')
     ]);
-    if(boosterError)throw boosterError;if(slotError)throw slotError;if(previewError)throw previewError;
+    if(boosterError)throw boosterError;if(slotError)throw slotError;
+    // Star Bits preview requires auth; do not block browsing the public pack catalog.
     currentUser=userData?.user||null;currentBalance=Number(preview?.starBitsBalance||0);balanceEl.textContent=currentBalance.toLocaleString();walletNote.textContent=currentBalance>0?'Ready for your next pull':'Convert extras to earn more';
     const byBooster=new Map();(slots||[]).forEach(slot=>{if(!byBooster.has(slot.booster_id))byBooster.set(slot.booster_id,[]);byBooster.get(slot.booster_id).push(slot)});
     boosterData=(boosters||[]).map(booster=>({...booster,slots:byBooster.get(booster.id)||[]}));render();
+    if(previewError){
+      say(currentUser ? (previewError.message||'Star Bits balance could not be loaded.') : (previewError.message||'You must be signed in to view your Star Bits exchange.'), true);
+    }
     window.parent?.postMessage({type:'starlight-content-ready',view:'shop'},location.origin);
   }catch(error){packsEl.innerHTML='<div class="empty">The shop could not be loaded right now.</div>';say(error?.message||'Could not load the Card Shop.',true)}
 }
