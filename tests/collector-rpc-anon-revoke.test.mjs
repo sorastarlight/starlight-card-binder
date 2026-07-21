@@ -5,7 +5,7 @@ import test from 'node:test';
 const read = relativePath => readFile(new URL(`../${relativePath}`, import.meta.url), 'utf8');
 
 test('forward migration revokes anon execute on collector-private RPCs', async () => {
-  const migration = await read('supabase/migrations/20260721181500_revoke_anon_collector_rpc_execute.sql');
+  const migration = await read('supabase/migrations/20260721191343_revoke_anon_collector_rpc_execute.sql');
   for (const fn of [
     'open_daily_booster',
     'get_daily_booster_status',
