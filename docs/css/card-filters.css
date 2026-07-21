@@ -127,9 +127,14 @@
   grid-template-columns: minmax(220px, 1.4fr) repeat(3, minmax(150px, 1fr)) auto;
 }
 
+[data-card-filter-context="checklist"] .card-filter-fields {
+  grid-template-columns: minmax(220px, 1.4fr) repeat(3, minmax(140px, 1fr)) minmax(240px, 1.2fr) auto;
+}
+
 @media (max-width: 1180px) {
   .card-filter-fields,
-  [data-card-filter-context="collection"] .card-filter-fields {
+  [data-card-filter-context="collection"] .card-filter-fields,
+  [data-card-filter-context="checklist"] .card-filter-fields {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -143,7 +148,8 @@
   .card-filter-heading { align-items: flex-start; flex-direction: column; }
   .card-filter-heading > p { text-align: left; }
   .card-filter-fields,
-  [data-card-filter-context="collection"] .card-filter-fields { grid-template-columns: 1fr; }
+  [data-card-filter-context="collection"] .card-filter-fields,
+  [data-card-filter-context="checklist"] .card-filter-fields { grid-template-columns: 1fr; }
   .card-filter-view { grid-template-columns: 1fr; }
 }
 

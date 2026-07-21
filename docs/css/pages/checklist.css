@@ -57,3 +57,18 @@
             cursor: pointer;
         }
 
+/* V1.1 checklist filter panel + empty filter state */
+body[data-page="checklist"] .card-filter-panel {
+  margin: 0 0 18px;
+}
+
+body[data-page="checklist"] .checklist-empty-row td {
+  padding: 28px 18px;
+}
+
+body[data-page="checklist"] .checklist-empty-row .empty-state {
+  margin: 0 auto;
+  max-width: 420px;
+  text-align: center;
+}
+

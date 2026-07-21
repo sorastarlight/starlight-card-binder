@@ -42,6 +42,8 @@ First slice: **binder search correctness** — catalog-aware All Series search, 
 
 Second slice: **favorites polish** — favorite/unfavorite in full view, showcase star remove, visible favorites grid synced with showcase, filter summary per collection tab.
 
+Third slice: **checklist + collection filter parity** — checklist uses shared search/filters; duplicates tab updates filter summary; Back to Series resets all binder filters.
+
 ## Fixes found during this walk
 
 1. **Shop signed-out load** — `booster-shop-page.js` no longer throws away the pack catalog when Star Bits preview fails for anonymous users (shows signed-out CTA instead of “shop could not be loaded”).

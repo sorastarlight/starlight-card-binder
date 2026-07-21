@@ -92,3 +92,27 @@ test('resolveBinderBrowseList keeps series-scoped search when a series is select
   assert.equal(browse.list.length, 2);
   assert.ok(browse.list.every(card => card.series === 'Rising Star'));
 });
+
+test('filterCardList respects collected / missing ownership views', () => {
+  const owned = new Set(['a1', 'c3']);
+  const collected = filterCardList(catalog, {
+    q: '',
+    series: 'All Series',
+    rarity: 'All Rarities',
+    view: 'collected'
+  }, {
+    respectOwnership: true,
+    isCollected: id => owned.has(id)
+  });
+  const missing = filterCardList(catalog, {
+    q: '',
+    series: 'All Series',
+    rarity: 'All Rarities',
+    view: 'missing'
+  }, {
+    respectOwnership: true,
+    isCollected: id => owned.has(id)
+  });
+  assert.deepEqual(collected.map(card => card.id), ['a1', 'c3']);
+  assert.deepEqual(missing.map(card => card.id), ['b2']);
+});

@@ -22,17 +22,22 @@ test('keeps the requested collection navigation labels in the shared shell', asy
 });
 
 test('places shared card filters in the binder and collection content areas', async () => {
-  const [binder, collection, app] = await Promise.all([
+  const [binder, collection, checklist, app] = await Promise.all([
     read('docs/binder.html'),
     read('docs/collection.html'),
+    read('docs/checklist.html'),
     read('docs/js/app.js')
   ]);
 
   assert.doesNotMatch(binder, /side-card filters/);
   assert.match(binder, /data-card-filter-context="binder"/);
   assert.match(collection, /data-card-filter-context="collection"/);
+  assert.match(checklist, /data-card-filter-context="checklist"/);
+  assert.match(checklist, /css\/card-filters\.css/);
   assert.match(app, /function renderFilterControls\(\)/);
   assert.match(app, /filterCardList\(baseList, activeFilters\(\)/);
+  assert.match(app, /function renderChecklist\(\)/);
+  assert.match(app, /filterCardList\(cards, activeFilters\(\)/);
 });
 
 test('removes daily-booster promotion and floating quantity badges from My Cards', async () => {

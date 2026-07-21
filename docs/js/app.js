@@ -407,17 +407,22 @@ function hydrateFilters() {
 function renderFilterControls() {
   const host = $('[data-card-filter-context]');
   if (!host || host.dataset.filterControlsReady === '1') return;
-  const isCollection = host.dataset.cardFilterContext === 'collection';
+  const context = host.dataset.cardFilterContext || 'binder';
+  const isCollection = context === 'collection';
+  const isChecklist = context === 'checklist';
+  const title = isCollection ? 'Collection Filters' : (isChecklist ? 'Checklist Filters' : 'Binder Filters');
+  const showSearch = isCollection || isChecklist;
+  const showView = !isCollection;
   host.innerHTML = `<div class="card-filter-heading">
-      <div><p class="eyebrow">Find your cards</p><h2>${isCollection ? 'Collection Filters' : 'Binder Filters'}</h2></div>
+      <div><p class="eyebrow">Find your cards</p><h2>${title}</h2></div>
       <p data-filter-summary>Preparing cards…</p>
     </div>
     <div class="card-filter-fields">
-      ${isCollection ? `<label class="card-filter-search"><span>Search</span><input id="globalSearch" type="search" placeholder="Search names, numbers, artists…" autocomplete="off"></label>` : ''}
+      ${showSearch ? `<label class="card-filter-search"><span>Search</span><input id="globalSearch" type="search" placeholder="Search names, numbers, artists…" autocomplete="off"></label>` : ''}
       <label><span>Series</span><select data-series aria-label="Filter by series"></select></label>
       <label><span>Rarity</span><select data-rarity aria-label="Filter by rarity"><option>All Rarities</option><option>Common</option><option>Uncommon</option><option>Rare</option><option>Epic</option><option>Legendary</option></select></label>
       <label><span>Sort By</span><select id="sortSelect" aria-label="Sort cards"><option value="numberAsc">Number (Low to High)</option><option value="numberDesc">Number (High to Low)</option><option value="nameAsc">Name (A to Z)</option><option value="rarityDesc">Rarity (Best First)</option></select></label>
-      ${isCollection ? '' : `<fieldset class="card-filter-view"><legend>Collection Status</legend><label><input checked name="viewFilter" type="radio" value="all"> All Cards</label><label><input name="viewFilter" type="radio" value="collected"> Collected</label><label><input name="viewFilter" type="radio" value="missing"> Not Collected</label></fieldset>`}
+      ${showView ? `<fieldset class="card-filter-view"><legend>Collection Status</legend><label><input checked name="viewFilter" type="radio" value="all"> All Cards</label><label><input name="viewFilter" type="radio" value="collected"> Collected</label><label><input name="viewFilter" type="radio" value="missing"> Not Collected</label></fieldset>` : ''}
       <button class="card-filter-reset" type="button" data-reset-card-filters>Reset Filters</button>
     </div>`;
   host.dataset.filterControlsReady = '1';
@@ -763,15 +768,20 @@ function renderGridPage(target, mode) {
   if (mode === 'favorites') baseList = cards.filter(c => isFavorite(c.id));
   if (mode === 'duplicates') baseList = cards.filter(c => getCardQuantity(c.id) > 1);
   const list = filterCardList(baseList, activeFilters(), { respectOwnership: false });
-  if (mode === 'collection' || mode === 'favorites') {
+  if (mode === 'collection' || mode === 'favorites' || mode === 'duplicates') {
     const activeTab = document.querySelector('[data-collection-tab].active')?.dataset.collectionTab || 'all';
     const shouldAnnounce = (mode === 'collection' && activeTab === 'all')
-      || (mode === 'favorites' && activeTab === 'favorites');
+      || (mode === 'favorites' && activeTab === 'favorites')
+      || (mode === 'duplicates' && activeTab === 'duplicates');
     if (shouldAnnounce) {
       $$('[data-filter-summary]').forEach(element => {
-        element.textContent = mode === 'favorites'
-          ? `Showing ${list.length} of ${baseList.length} favorite${baseList.length === 1 ? '' : 's'}`
-          : `Showing ${list.length} of ${baseList.length} owned card${baseList.length === 1 ? '' : 's'}`;
+        if (mode === 'favorites') {
+          element.textContent = `Showing ${list.length} of ${baseList.length} favorite${baseList.length === 1 ? '' : 's'}`;
+        } else if (mode === 'duplicates') {
+          element.textContent = `Showing ${list.length} of ${baseList.length} duplicate card${baseList.length === 1 ? '' : 's'}`;
+        } else {
+          element.textContent = `Showing ${list.length} of ${baseList.length} owned card${baseList.length === 1 ? '' : 's'}`;
+        }
       });
     }
   }
@@ -856,7 +866,15 @@ function importCollectionData(file) {
 
 function renderChecklist() {
   const body = $('#checklistBody'); if (!body) return;
-  body.innerHTML = cards.map(c => {
+  const list = filterCardList(cards, activeFilters(), { respectOwnership: true });
+  $$('[data-filter-summary]').forEach(element => {
+    element.textContent = `Showing ${list.length} of ${cards.length} card${cards.length === 1 ? '' : 's'}`;
+  });
+  if (!list.length) {
+    body.innerHTML = `<tr class="item checklist-empty-row"><td colspan="8"><div class="empty-state"><h2>${cards.length ? 'No cards match these filters' : 'No cards in the checklist yet'}</h2><p>${cards.length ? 'Reset one or more filters to bring cards back into view.' : 'Cards will appear here once the Starlight catalog loads.'}</p>${cards.length ? '<button class="btn primary" type="button" data-reset-card-filters>Reset Filters</button>' : ''}</div></td></tr>`;
+    return;
+  }
+  body.innerHTML = list.map(c => {
     const got = isCollected(c.id); const hidden = !got;
     return `<tr class="item"><td><div class="check-card"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"><span>${esc(c.collectorNumber || c.number)}</span></div></td><td>${esc(getVisibleName(c))}</td><td>${esc(c.series)}</td><td>${hidden?'—':`<span class="card-meta-chip category">${esc(categoryLabel(c))}</span>${subcategoryLabel(c)?`<br><small>${esc(subcategoryLabel(c))}</small>`:''}`}</td><td><span class="card-meta-chip rarity ${rarityClass(c)}">${esc(getVisibleRarity(c))}</span></td><td><b>×${getCardQuantity(c.id)}</b>${getCardQuantity(c.id)>1?`<br><small>+${getCardQuantity(c.id)-1} extra</small>`:""}</td><td><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? 'Collected' : 'Not Collected'}</span></td><td>${got ? `<button class="icon-btn" type="button" data-toggle-favorite="${esc(c.id)}" aria-label="${isFavorite(c.id) ? 'Remove from favorites' : 'Add to favorites'}" aria-pressed="${isFavorite(c.id) ? 'true' : 'false'}">${isFavorite(c.id)?'★':'☆'}</button>` : '<span class="soft-note">—</span>'}</td></tr>`;
   }).join('');
@@ -918,11 +936,15 @@ document.addEventListener('click', e => {
   }
   if (e.target.closest('#backToSeries')) {
     document.body.classList.add('series-select');
-    const select = $('[data-series]');
-    if (select) select.value = 'All Series';
-    if ($('#globalSearch')) $('#globalSearch').value = '';
+    $('#globalSearch') && ($('#globalSearch').value = '');
+    $('[data-series]') && ($('[data-series]').value = 'All Series');
+    $('[data-rarity]') && ($('[data-rarity]').value = 'All Rarities');
+    $('#sortSelect') && ($('#sortSelect').value = 'numberAsc');
+    const allCards = $('[name="viewFilter"][value="all"]');
+    if (allCards) allCards.checked = true;
     page = 1;
     renderAll();
+    updateRaritySelectClass();
     return;
   }
   const tile = e.target.closest('.card-tile');
