@@ -100,7 +100,7 @@ function resetCropState(clearFile = true) {
 }
 
 const cropModalController = cropModal ? window.StarlightUI.adoptModal(cropModal, {
-    dialog: cropModal.querySelector('.profile-crop-dialog'),
+    dialog: cropModal.querySelector('.st-dialog'),
     labelledBy: 'profile-crop-heading',
     describedBy: 'profile-crop-description',
     initialFocus: saveImage,

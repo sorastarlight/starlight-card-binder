@@ -16,14 +16,23 @@ test('keeps modal overlays centered without turning dialog cards into overlays',
 });
 
 test('keeps every administrative popup on the shared modal controller', async () => {
-  const [boosters, news, twitch, gifts] = await Promise.all([
+  const [boosters, news, twitch, gifts, profile] = await Promise.all([
     read('docs/js/pages/admin-boosters-page.js'),
     read('docs/js/pages/admin-news-page.js'),
     read('docs/js/pages/admin-twitch-page.js'),
-    read('docs/js/pages/admin-gifts-page.js')
+    read('docs/js/pages/admin-gifts-page.js'),
+    read('docs/js/profile-extras.js')
   ]);
 
-  for (const source of [boosters, news, twitch, gifts]) {
+  for (const source of [boosters, news, twitch, gifts, profile]) {
     assert.match(source, /StarlightUI\.adoptModal/);
   }
+  assert.match(profile, /querySelector\(['"]\.st-dialog['"]\)/);
+});
+
+test('profile crop dialog uses the shared st-dialog contract', async () => {
+  const html = await read('docs/profile-settings.html');
+  assert.match(html, /st-dialog-overlay profile-crop-modal/);
+  assert.match(html, /st-dialog profile-crop-dialog/);
+  assert.match(html, /st-dialog-close/);
 });

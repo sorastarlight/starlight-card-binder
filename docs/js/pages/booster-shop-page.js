@@ -147,7 +147,7 @@ function ensureShopPortalStyles(targetDocument){
       display:grid!important;
       place-items:center!important;
       width:100vw!important;
-      height:100vh!important;
+      height:100dvh!important;
       padding:clamp(12px,2.5vw,28px)!important;
       box-sizing:border-box!important;
       overflow:auto!important;
@@ -163,7 +163,7 @@ function ensureShopPortalStyles(targetDocument){
       transform:none!important;
       width:min(620px,calc(100vw - 28px))!important;
       max-width:620px!important;
-      max-height:calc(100vh - 28px)!important;
+      max-height:calc(100dvh - 28px)!important;
       min-height:0!important;
       margin:auto!important;
       padding:clamp(18px,3vw,28px)!important;
@@ -235,7 +235,7 @@ function ensureShopPortalStyles(targetDocument){
       .starlight-shop-portal{padding:10px!important}
       .starlight-shop-portal .st-dialog{
         width:100%!important;
-        max-height:calc(100vh - 20px)!important;
+        max-height:calc(100dvh - 20px)!important;
         padding:18px 14px!important;
       }
       .starlight-shop-portal .modal-pack{

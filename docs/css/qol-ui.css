@@ -138,7 +138,7 @@ html{scroll-padding-top:110px}
 :is(.st-dialog-overlay,.editor,.rule-modal,.test-modal,.receipt,.profile-crop-modal).hidden,
 :is(.st-dialog-overlay,.editor,.rule-modal,.test-modal,.receipt,.profile-crop-modal)[hidden]{display:none!important}
 
-:is(.st-dialog-overlay>.st-dialog,.editor>.editor-card,.editor>.card,.rule-modal>.rule-modal-card,.test-modal>.test-card,.receipt>.receipt-card,.profile-crop-modal>.profile-crop-dialog){
+:is(.st-dialog-overlay>.st-dialog,.editor>.editor-card,.editor>.card,.rule-modal>.rule-modal-card,.test-modal>.test-card,.receipt>.receipt-card,.profile-crop-modal>.profile-crop-dialog,.profile-crop-modal>.st-dialog){
   position:relative!important;
   inset:auto!important;
   width:min(var(--qol-modal-width,920px),calc(100vw - clamp(24px,6vw,56px)))!important;
@@ -160,9 +160,9 @@ html{scroll-padding-top:110px}
 .st-dialog-overlay>.st-dialog--xl{--qol-modal-width:900px}
 .editor>.editor-card,.editor>.st-dialog{--qol-modal-width:1100px}
 .rule-modal>.rule-modal-card,.rule-modal>.st-dialog{--qol-modal-width:1080px}
-.test-modal>.test-card,.test-modal>.st-dialog,.receipt>.receipt-card,.receipt>.st-dialog,.profile-crop-modal>.profile-crop-dialog{--qol-modal-width:560px}
+.test-modal>.test-card,.test-modal>.st-dialog,.receipt>.receipt-card,.receipt>.st-dialog,.profile-crop-modal>.profile-crop-dialog,.profile-crop-modal>.st-dialog{--qol-modal-width:560px}
 @keyframes qolModalIn{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:none}}
-@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.qol-switch-ui,.qol-switch-ui::after{transition:none}.qol-toggle-label>input[type="checkbox"]{}:is(.st-dialog-overlay>.st-dialog,.editor>.editor-card,.editor>.card,.rule-modal>.rule-modal-card,.test-modal>.test-card,.receipt>.receipt-card,.profile-crop-modal>.profile-crop-dialog){animation:none!important}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.qol-switch-ui,.qol-switch-ui::after{transition:none}.qol-toggle-label>input[type="checkbox"]{}:is(.st-dialog-overlay>.st-dialog,.editor>.editor-card,.editor>.card,.rule-modal>.rule-modal-card,.test-modal>.test-card,.receipt>.receipt-card,.profile-crop-modal>.profile-crop-dialog,.profile-crop-modal>.st-dialog){animation:none!important}}
 
 
 /* V91.1.1 — Modal navigation and Full View repair */

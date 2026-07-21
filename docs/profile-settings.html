@@ -3,15 +3,15 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
 <title>
         Collector Profile | Starlight Card Binder
     </title>
-<link href="css/style.css?v=1.0.0" rel="stylesheet"/>
-<link rel="stylesheet" href="css/pages/profile-settings.css?v=1.0">
-<script src="js/firefox-performance.js" defer></script>
-    <link rel="stylesheet" href="css/shared-ui.css?v=1.6.7">
-<link rel="stylesheet" href="css/qol-ui.css?v=94.2.2">
+<link href="css/style.css?v=1.0.1" rel="stylesheet"/>
+<link rel="stylesheet" href="css/pages/profile-settings.css?v=1.1">
+<script src="js/browser-performance.js?v=1.0.0" defer></script>
+    <link rel="stylesheet" href="css/shared-ui.css?v=1.6.8">
+<link rel="stylesheet" href="css/qol-ui.css?v=94.2.3">
 </head>
 <body><script src="js/embed-mode.js" type="module"></script>
 <div class="sky"></div>
@@ -222,8 +222,9 @@
 </main>
 <script src="js/pages/profile-settings-page.js?v=1.0" type="module"></script>
 <script src="js/staff-profile-link.js" type="module"></script>
-<div aria-hidden="true" class="profile-crop-modal hidden" id="profile-crop-modal">
-<section aria-describedby="profile-crop-description" aria-labelledby="profile-crop-heading" aria-modal="true" class="profile-crop-dialog" role="dialog" tabindex="-1">
+<div aria-hidden="true" class="st-dialog-overlay profile-crop-modal hidden" id="profile-crop-modal">
+<section aria-describedby="profile-crop-description" aria-labelledby="profile-crop-heading" aria-modal="true" class="st-dialog profile-crop-dialog" role="dialog" tabindex="-1">
+<button type="button" class="st-dialog-close" data-st-modal-close aria-label="Close">×</button>
 <h2 id="profile-crop-heading">Adjust Your Profile Image</h2>
 <p id="profile-crop-description">Drag the image to reposition it, then use zoom until it looks just right inside the circle.</p>
 <div class="profile-crop-stage">
@@ -234,14 +235,14 @@
 <label for="profile-image-zoom"><span>Zoom</span><span id="profile-image-zoom-value">100%</span></label>
 <input id="profile-image-zoom" max="3" min="1" step="0.01" type="range" value="1"/>
 </div>
-<div class="profile-crop-actions">
-<button class="profile-crop-cancel" id="cancel-profile-image" type="button">Cancel</button>
-<button class="profile-crop-save" id="save-profile-image" type="button">Save Profile Image</button>
+<div class="st-dialog-actions profile-crop-actions">
+<button class="st-dialog-cancel profile-crop-cancel" id="cancel-profile-image" type="button">Cancel</button>
+<button class="st-dialog-confirm profile-crop-save" id="save-profile-image" type="button">Save Profile Image</button>
 </div>
 </section>
 </div>
-<script src="js/profile-extras.js" type="module"></script><script src="js/profile-data-tools.js" type="module"></script>    <script type="module" src="js/profile-twitch.js"></script>
-<script src="js/shared-ui.js?v=1.6.7"></script>
-<script src="js/qol-ui.js?v=94.2.2" defer></script>
+<script src="js/profile-extras.js?v=1.1" type="module"></script><script src="js/profile-data-tools.js" type="module"></script>    <script type="module" src="js/profile-twitch.js"></script>
+<script src="js/shared-ui.js?v=1.6.8"></script>
+<script src="js/qol-ui.js?v=94.2.3" defer></script>
 </body>
 </html>

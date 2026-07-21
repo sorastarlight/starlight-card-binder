@@ -58,7 +58,7 @@ function setViewState(mode,message=''){
   frameWrap?.classList.toggle('is-loading',mode==='loading');
   frameWrap?.classList.toggle('has-error',mode==='error');
   if(label)label.textContent=mode==='error'?'This page did not finish loading':`Loading ${routes[currentRoute]?.title||'view'}…`;
-  if(description)description.textContent=message||(mode==='error'?'Firefox may have restored an incomplete cached page. Try loading it again.':'Please wait while the Starlight Binder prepares this page.');
+  if(description)description.textContent=message||(mode==='error'?'This page did not finish loading. Try again — a cached copy may have been incomplete.':'Please wait while the Starlight Binder prepares this page.');
   if(retry)retry.hidden=mode!=='error';
 }
 

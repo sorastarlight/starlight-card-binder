@@ -1,65 +1,83 @@
-/* ===== V82.8.5 Firefox / low-power performance mode ===== */
+/* ===== V82.8.5+ Cross-browser / low-power performance mode ===== */
 .starlight-performance-lite *,
 .starlight-performance-lite *::before,
 .starlight-performance-lite *::after {
   scroll-behavior: auto !important;
 }
 
-.firefox-performance-mode .panel,
-.firefox-performance-mode .side-card,
-.firefox-performance-mode .topbar,
-.firefox-performance-mode .shell-account-bar,
-.firefox-performance-mode .collector-nav,
-.firefox-performance-mode .daily-panel,
-.firefox-performance-mode .bits-panel {
+:is(.firefox-performance-mode, .starlight-performance-lite) .panel,
+:is(.firefox-performance-mode, .starlight-performance-lite) .side-card,
+:is(.firefox-performance-mode, .starlight-performance-lite) .topbar,
+:is(.firefox-performance-mode, .starlight-performance-lite) .shell-account-bar,
+:is(.firefox-performance-mode, .starlight-performance-lite) .collector-nav,
+:is(.firefox-performance-mode, .starlight-performance-lite) .daily-panel,
+:is(.firefox-performance-mode, .starlight-performance-lite) .bits-panel {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
 
-.firefox-performance-mode .sky,
-.firefox-performance-mode .analyzer-bg,
-.firefox-performance-mode .daily-portal::before,
-.firefox-performance-mode .daily-portal::after {
+:is(.firefox-performance-mode, .starlight-performance-lite) .sky,
+:is(.firefox-performance-mode, .starlight-performance-lite) .analyzer-bg,
+:is(.firefox-performance-mode, .starlight-performance-lite) .daily-portal::before,
+:is(.firefox-performance-mode, .starlight-performance-lite) .daily-portal::after {
   filter: none !important;
 }
 
-.firefox-performance-mode .collection-card,
-.firefox-performance-mode .v61-card-slot,
-.firefox-performance-mode .fav-spot,
-.firefox-performance-mode .reward-card,
-.firefox-performance-mode .duplicate-card {
+:is(.firefox-performance-mode, .starlight-performance-lite) .collection-card,
+:is(.firefox-performance-mode, .starlight-performance-lite) .v61-card-slot,
+:is(.firefox-performance-mode, .starlight-performance-lite) .fav-spot,
+:is(.firefox-performance-mode, .starlight-performance-lite) .reward-card,
+:is(.firefox-performance-mode, .starlight-performance-lite) .duplicate-card,
+:is(.firefox-performance-mode, .starlight-performance-lite) .pack-card {
   contain: layout paint style;
 }
 
-.firefox-performance-mode .grid-page,
-.firefox-performance-mode .v61-grid,
-.firefox-performance-mode .favorite-carousel,
-.firefox-performance-mode .duplicate-grid,
-.firefox-performance-mode .reward-grid {
+:is(.firefox-performance-mode, .starlight-performance-lite) .grid-page,
+:is(.firefox-performance-mode, .starlight-performance-lite) .v61-grid,
+:is(.firefox-performance-mode, .starlight-performance-lite) .favorite-carousel,
+:is(.firefox-performance-mode, .starlight-performance-lite) .duplicate-grid,
+:is(.firefox-performance-mode, .starlight-performance-lite) .reward-grid,
+:is(.firefox-performance-mode, .starlight-performance-lite) .pack-grid {
   content-visibility: auto;
   contain-intrinsic-size: 600px;
 }
 
-.firefox-performance-mode .starlight-offscreen,
+:is(.firefox-performance-mode, .starlight-performance-lite) .starlight-offscreen,
 .starlight-page-hidden * {
   animation-play-state: paused !important;
 }
 
-.firefox-performance-mode .v61-card-slot,
-.firefox-performance-mode .collection-card,
-.firefox-performance-mode .fav-spot {
+:is(.firefox-performance-mode, .starlight-performance-lite) .v61-card-slot,
+:is(.firefox-performance-mode, .starlight-performance-lite) .collection-card,
+:is(.firefox-performance-mode, .starlight-performance-lite) .fav-spot {
   animation: none !important;
   transition-duration: .14s !important;
 }
 
-.firefox-performance-mode .v61-card-slot:hover,
-.firefox-performance-mode .collection-card:hover,
-.firefox-performance-mode .fav-spot:hover {
+:is(.firefox-performance-mode, .starlight-performance-lite) .v61-card-slot:hover,
+:is(.firefox-performance-mode, .starlight-performance-lite) .collection-card:hover,
+:is(.firefox-performance-mode, .starlight-performance-lite) .fav-spot:hover {
   transform: translateY(-3px) !important;
 }
 
-.firefox-performance-mode img {
+:is(.firefox-performance-mode, .starlight-performance-lite) img {
   image-rendering: auto;
+}
+
+/* Chromium / Opera GX keep fuller desktop visuals; only trim when lite/mobile. */
+.starlight-engine-chromium:not(.starlight-performance-lite):not(.starlight-mobile) .shell-view-frame iframe,
+.starlight-engine-opera:not(.starlight-performance-lite):not(.starlight-mobile) .shell-view-frame iframe {
+  content-visibility: auto;
+}
+
+.starlight-mobile {
+  -webkit-tap-highlight-color: rgba(255, 130, 200, 0.18);
+}
+
+.starlight-mobile img,
+.starlight-mobile video {
+  max-width: 100%;
+  height: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {
