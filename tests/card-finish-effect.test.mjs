@@ -18,11 +18,12 @@ test('holographic finish uses one shared animated and accessible presentation', 
   assert.match(ui, /holoSparkMarkup/);
   assert.match(css, /\.card-finish-holographic::before/);
   assert.match(css, /repeating-linear-gradient/);
-  assert.match(css, /mix-blend-mode:color-dodge/);
+  assert.match(css, /mix-blend-mode:overlay/);
   assert.match(css, /\.st-holo-spark/);
   assert.match(css, /@keyframes stHoloRainbowSweep/);
   assert.match(css, /--st-holo-period/);
   assert.match(css, /repeating-linear-gradient/);
+  assert.match(css, /translate3d\(111px,45px,0\)/);
   assert.match(css, /@keyframes stHoloGlare/);
   assert.match(css, /@keyframes stHoloSparkle/);
   assert.match(css, /prefers-reduced-motion:reduce[^}]*card-finish-holographic/s);
