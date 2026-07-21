@@ -30,11 +30,12 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
   --st-holo-x:52%;
   --st-holo-y:38%;
   --st-holo-angle:125deg;
+  --st-holo-period:96px;
   position:relative;
   display:block;
   overflow:hidden;
   isolation:isolate;
-  filter:saturate(1.18) contrast(1.06) brightness(1.04);
+  filter:saturate(1.08) contrast(1.02);
 }
 .face.card-finish-holographic,
 .st-r3-card-front.card-finish-holographic{position:absolute;inset:0}
@@ -56,45 +57,45 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
   background-image:
     repeating-linear-gradient(
       var(--st-holo-angle),
-      rgba(255,55,170,.0) 0 2%,
-      rgba(255,55,170,.72) 5%,
-      rgba(255,210,55,.78) 9%,
-      rgba(70,255,150,.68) 13%,
-      rgba(55,190,255,.78) 17%,
-      rgba(170,80,255,.72) 21%,
-      rgba(255,55,170,.0) 25%
+      rgba(255,70,180,0) 0,
+      rgba(255,70,180,.28) 14px,
+      rgba(255,205,70,.32) 28px,
+      rgba(70,230,160,.26) 42px,
+      rgba(70,185,255,.32) 56px,
+      rgba(170,90,255,.28) 70px,
+      rgba(255,70,180,0) var(--st-holo-period)
     ),
-    radial-gradient(circle at 18% 22%,rgba(255,255,255,.55) 0 .9px,transparent 1.6px),
-    radial-gradient(circle at 62% 48%,rgba(255,255,255,.45) 0 .7px,transparent 1.4px),
-    radial-gradient(circle at 84% 16%,rgba(255,255,255,.5) 0 1px,transparent 1.8px),
-    radial-gradient(circle at 34% 78%,rgba(255,255,255,.4) 0 .8px,transparent 1.5px),
-    radial-gradient(circle at 8% 64%,rgba(255,255,255,.35) 0 .6px,transparent 1.2px);
-  background-size:220% 220%,14px 14px,17px 17px,11px 11px,19px 19px,13px 13px;
+    radial-gradient(circle at 18% 22%,rgba(255,255,255,.35) 0 .9px,transparent 1.6px),
+    radial-gradient(circle at 62% 48%,rgba(255,255,255,.28) 0 .7px,transparent 1.4px),
+    radial-gradient(circle at 84% 16%,rgba(255,255,255,.32) 0 1px,transparent 1.8px),
+    radial-gradient(circle at 34% 78%,rgba(255,255,255,.26) 0 .8px,transparent 1.5px),
+    radial-gradient(circle at 8% 64%,rgba(255,255,255,.22) 0 .6px,transparent 1.2px);
+  background-size:auto,14px 14px,17px 17px,11px 11px,19px 19px,13px 13px;
   background-position:
-    calc(var(--st-holo-x) * .35) calc(var(--st-holo-y) * .25),
+    0 0,
     0 0,4px 7px,9px 2px,2px 11px,6px 3px;
-  mix-blend-mode:color-dodge;
-  opacity:.88;
-  animation:stHoloRainbowSweep 2.8s linear infinite;
+  mix-blend-mode:overlay;
+  opacity:.72;
+  animation:stHoloRainbowSweep 7.5s linear infinite;
 }
 /* Specular sheet glare that tracks pointer / drifts across the card */
 .card-finish-holographic::after{
   z-index:3;
   background-image:
-    radial-gradient(circle at var(--st-holo-x) var(--st-holo-y),rgba(255,255,255,.95) 0 4%,rgba(255,255,255,.45) 12%,rgba(255,240,180,.18) 22%,transparent 42%),
+    radial-gradient(circle at var(--st-holo-x) var(--st-holo-y),rgba(255,255,255,.7) 0 3%,rgba(255,255,255,.28) 11%,rgba(255,240,180,.12) 20%,transparent 40%),
     linear-gradient(
       calc(var(--st-holo-angle) - 8deg),
-      transparent 28%,
-      rgba(255,255,255,.15) 40%,
-      rgba(255,255,255,.85) 49%,
-      rgba(180,240,255,.45) 55%,
-      transparent 68%
+      transparent 30%,
+      rgba(255,255,255,.1) 42%,
+      rgba(255,255,255,.48) 50%,
+      rgba(180,240,255,.22) 58%,
+      transparent 70%
     );
   background-size:140% 140%,260% 260%;
   background-position:center,calc(var(--st-holo-x) - 40%) calc(var(--st-holo-y) - 20%);
   mix-blend-mode:soft-light;
-  opacity:1;
-  animation:stHoloGlare 2.1s ease-in-out infinite;
+  opacity:.85;
+  animation:stHoloGlare 3.4s ease-in-out infinite;
 }
 /* Hard sparkle bursts — dedicated child layer for extra “secret rare” flash */
 .card-finish-holographic>.st-holo-spark{
@@ -154,12 +155,12 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
   opacity:.85;
 }
 @keyframes stHoloRainbowSweep{
-  0%{background-position:0% 35%,0 0,4px 7px,9px 2px,2px 11px,6px 3px}
-  100%{background-position:100% 65%,0 0,4px 7px,9px 2px,2px 11px,6px 3px}
+  from{background-position:0 0,0 0,4px 7px,9px 2px,2px 11px,6px 3px}
+  to{background-position:var(--st-holo-period) var(--st-holo-period),0 0,4px 7px,9px 2px,2px 11px,6px 3px}
 }
 @keyframes stHoloGlare{
-  0%,100%{opacity:.72;filter:brightness(1)}
-  50%{opacity:1;filter:brightness(1.18)}
+  0%,100%{opacity:.7}
+  50%{opacity:.9}
 }
 @keyframes stHoloSparkle{
   0%,49%{opacity:.35;transform:scale(1)}
@@ -181,4 +182,4 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
 .st-view-state{display:grid;place-items:center;min-height:220px;padding:28px;text-align:center;color:var(--st-ui-muted)}.st-view-state strong{display:block;color:#405fa1;font-size:1.25rem;margin-bottom:7px}.st-view-state button{margin-top:15px;padding:10px 18px;border:0;border-radius:999px;background:linear-gradient(135deg,var(--st-ui-blue),var(--st-ui-pink));color:#fff;font-weight:900;cursor:pointer}.st-spinner{width:38px;height:38px;margin:0 auto 14px;border:4px solid rgba(107,198,248,.2);border-top-color:var(--st-ui-pink);border-radius:50%;animation:stSpin .8s linear infinite}@keyframes stSpin{to{transform:rotate(360deg)}}
 :focus-visible{outline:3px solid rgba(255,130,200,.75)!important;outline-offset:3px!important}
 .status:empty,.page-status:empty,[role="status"]:empty{display:none!important}
-@media(prefers-reduced-motion:reduce){.st-toast,.st-spinner,.card-finish-holographic::before,.card-finish-holographic::after,.card-finish-holographic>.st-holo-spark,.card-finish-holographic>.st-holo-spark::before,.card-finish-holographic>.st-holo-spark::after{animation:none!important}.card-finish-holographic{filter:saturate(1.12) contrast(1.04)}.card-finish-holographic::before{background-position:42% 50%,0 0,4px 7px,9px 2px,2px 11px,6px 3px;opacity:.7}.card-finish-holographic::after{opacity:.75}.card-finish-holographic>.st-holo-spark{opacity:.55}.st-dialog-overlay{backdrop-filter:none}.st-dialog-overlay,.st-dialog,.st-button{transition:none!important}}
+@media(prefers-reduced-motion:reduce){.st-toast,.st-spinner,.card-finish-holographic::before,.card-finish-holographic::after,.card-finish-holographic>.st-holo-spark,.card-finish-holographic>.st-holo-spark::before,.card-finish-holographic>.st-holo-spark::after{animation:none!important}.card-finish-holographic{filter:saturate(1.06) contrast(1.02)}.card-finish-holographic::before{background-position:24px 24px,0 0,4px 7px,9px 2px,2px 11px,6px 3px;opacity:.62}.card-finish-holographic::after{opacity:.7}.card-finish-holographic>.st-holo-spark{opacity:.45}.st-dialog-overlay{backdrop-filter:none}.st-dialog-overlay,.st-dialog,.st-button{transition:none!important}}
