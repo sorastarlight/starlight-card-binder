@@ -350,22 +350,23 @@ function startFavoriteMonitor() {
 /**
  * Loads the original Binder application after cloud sync.
  */
-function loadBinderApplication() {
+async function loadBinderApplication() {
+    const existingScript =
+        document.querySelector(
+            'script[data-starlight-app="true"]'
+        );
+
+    if (existingScript) {
+        return;
+    }
+
+    window.StarlightCardFilters = await import('./card-filter-utils.js?v=1.0.0');
+
     return new Promise((resolve, reject) => {
-        const existingScript =
-            document.querySelector(
-                'script[data-starlight-app="true"]'
-            );
-
-        if (existingScript) {
-            resolve();
-            return;
-        }
-
         const script =
             document.createElement("script");
 
-        script.src = "./js/app.js?v=1.4.3";
+        script.src = "./js/app.js?v=1.5.1";
         script.async = false;
         script.dataset.starlightApp = "true";
 

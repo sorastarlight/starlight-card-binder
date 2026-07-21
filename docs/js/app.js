@@ -432,9 +432,26 @@ function activeFilters() {
   };
 }
 
+function filterOptions() {
+  return {
+    respectOwnership: true,
+    isCollected,
+    sortCards
+  };
+}
+
 function filterCardList(source, filters = activeFilters(), { respectOwnership = true } = {}) {
+  const api = window.StarlightCardFilters;
+  if (api?.filterCardList) {
+    return api.filterCardList(source, filters, {
+      respectOwnership,
+      isCollected,
+      sortCards
+    });
+  }
+  // Compatibility fallback if utils failed to load.
   const list = source.filter(card => {
-    const haystack = `${card.number} ${card.name} ${card.series} ${card.rarity} ${card.cardDescription} ${card.artist}`.toLowerCase();
+    const haystack = `${card.number} ${card.collectorNumber || ''} ${card.name} ${card.series} ${card.rarity} ${card.cardDescription} ${card.artist}`.toLowerCase();
     const seriesMatches = filters.series === 'All Series' || card.series === filters.series;
     const rarityMatches = filters.rarity === 'All Rarities' || String(card.rarity || '').trim().toLowerCase() === String(filters.rarity || '').trim().toLowerCase();
     const searchMatches = !filters.q || haystack.includes(filters.q);
@@ -445,11 +462,33 @@ function filterCardList(source, filters = activeFilters(), { respectOwnership = 
   return list;
 }
 
+function resolveBinderBrowse() {
+  const api = window.StarlightCardFilters;
+  const filters = activeFilters();
+  if (api?.resolveBinderBrowseList) {
+    return api.resolveBinderBrowseList(cards, filters, filterOptions());
+  }
+  const searching = Boolean(filters.q);
+  if (!searching && filters.series === 'All Series') {
+    return { showLanding: true, list: [], poolSize: cards.length, heading: 'All Series', summary: '' };
+  }
+  const pool = filters.series === 'All Series' ? cards : cards.filter(c => c.series === filters.series);
+  const list = filterCardList(pool, { ...filters, series: 'All Series' });
+  return {
+    showLanding: false,
+    list,
+    poolSize: pool.length,
+    heading: filters.series === 'All Series' ? 'Search results' : filters.series,
+    summary: `Showing ${list.length} of ${pool.length} cards`
+  };
+}
+
 function applyFilters() {
-  const f = activeFilters();
-  filtered = filterCardList(cards, f);
+  const browse = resolveBinderBrowse();
+  filtered = browse.showLanding ? [] : browse.list.slice();
   const max = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
   if (page > max) page = max;
+  return browse;
 }
 
 function getVisibleImage(card) { return isCollected(card.id) ? card.imageUrl : CARD_BACK_URL; }
@@ -790,12 +829,23 @@ document.addEventListener('click', e => {
     startPackOpen(pack.dataset.packSeries);
     return;
   }
-  if (e.target.closest('#backToSeries')) { document.body.classList.add('series-select'); const select = $('[data-series]'); if (select) select.value = 'All Series'; page = 1; renderAll(); return; }
+  if (e.target.closest('#backToSeries')) {
+    document.body.classList.add('series-select');
+    const select = $('[data-series]');
+    if (select) select.value = 'All Series';
+    if ($('#globalSearch')) $('#globalSearch').value = '';
+    page = 1;
+    renderAll();
+    return;
+  }
   const tile = e.target.closest('.card-tile');
   if (tile) { selected = cards.find(c => c.id === tile.dataset.id) || selected; selectedIndex = cards.findIndex(c => c.id === tile.dataset.id); previewFlipped = false; renderDetail(); playSfx('sparkle'); }
 });
 function applyCardFilterChange() {
   page = 1;
+  const filters = activeFilters();
+  if (filters.q) document.body.classList.remove('series-select');
+  else if (filters.series === 'All Series') document.body.classList.add('series-select');
   renderAll();
   updateRaritySelectClass();
   window.dispatchEvent(new CustomEvent('starlight-card-filters-changed'));
@@ -811,6 +861,7 @@ document.addEventListener('click', e => {
   $('#sortSelect') && ($('#sortSelect').value = 'numberAsc');
   const allCards = $('[name="viewFilter"][value="all"]');
   if (allCards) allCards.checked = true;
+  if (pageName === 'binder') document.body.classList.add('series-select');
   applyCardFilterChange();
 });
 document.addEventListener('keydown', e => { if ($('#cardOverlay')?.classList.contains('open')) { if (e.key === 'ArrowLeft') stepFullView(-1); if (e.key === 'ArrowRight') stepFullView(1); } });
@@ -872,12 +923,21 @@ function attachFullViewTilt() {
 /* ===== V61: Booster splash + magical grid binder replacement ===== */
 function renderBinder() {
   renderSeriesHero();
-  const inSeriesSelect = document.body.classList.contains('series-select');
+  const browse = applyFilters();
+  const searching = Boolean(activeFilters().q);
+  const inSeriesSelect = document.body.classList.contains('series-select') && browse.showLanding && !searching;
+  if (searching) document.body.classList.remove('series-select');
+  else if (browse.showLanding) document.body.classList.add('series-select');
+  if (browse.showLanding && browse.summary) {
+    $$('[data-filter-summary]').forEach(element => {
+      element.textContent = browse.summary;
+    });
+  }
   const landing = $('#seriesLanding');
   const grid = $('#seriesGridStage');
   if (landing) landing.innerHTML = inSeriesSelect ? renderV61SeriesLandingHtml() : '';
-  if (grid) grid.innerHTML = inSeriesSelect ? '' : renderV61CardGridHtml();
-  renderV62Showcase(inSeriesSelect);
+  if (grid) grid.innerHTML = inSeriesSelect ? '' : renderV61CardGridHtml(browse);
+  renderV62Showcase(inSeriesSelect, browse);
   attachV61HoverSfx();
 }
 function renderV61SeriesLandingHtml() {
@@ -896,19 +956,19 @@ function renderV61SeriesLandingHtml() {
     }).join('')}</div>
   </div>`;
 }
-function renderV61CardGridHtml() {
+function renderV61CardGridHtml(browse = resolveBinderBrowse()) {
   const f = activeFilters();
-  const series = f.series === 'All Series' ? ([...new Set(cards.map(c => c.series))][0] || '') : f.series;
-  const seriesCards = cards.filter(c => c.series === series);
-  const list = filterCardList(seriesCards, { ...f, series });
-  const gotCount = list.filter(c => isCollected(c.id)).length;
+  const list = browse.list || [];
+  const poolSize = browse.poolSize || list.length;
+  const heading = browse.heading || f.series;
   $$('[data-filter-summary]').forEach(element => {
-    element.textContent = `Showing ${list.length} of ${seriesCards.length} cards in ${series}`;
+    element.textContent = browse.summary || `Showing ${list.length} of ${poolSize} cards`;
   });
+  const gotCount = list.filter(c => isCollected(c.id)).length;
   return `<div class="v61-grid-shell">
     <div class="v61-grid-head">
       <button id="backToSeries" class="v61-back-btn" type="button">← Back to Series</button>
-      <div><h2>${esc(series)}</h2><p>Browse the set and see which Starlight cards you have earned.</p></div>
+      <div><h2>${esc(heading)}</h2><p>${f.q ? 'Search matches across your selected filters.' : 'Browse the set and see which Starlight cards you have earned.'}</p></div>
       <span class="v61-count-pill">Collected: ${gotCount} / ${list.length} ✨</span>
     </div>
     <div class="v61-grid">${list.length ? list.map((card,i)=>renderV61Card(card,i)).join('') : '<div class="empty-state"><h2>No cards match these filters</h2><p>Reset one or more filters to browse this series again.</p><button class="btn primary" type="button" data-reset-card-filters>Reset Filters</button></div>'}</div>
@@ -930,12 +990,12 @@ function renderV61Card(card, i) {
   </article>`;
 }
 
-function renderV62Showcase(inSeriesSelect = false) {
+function renderV62Showcase(inSeriesSelect = false, browse = resolveBinderBrowse()) {
   const panel = $('#v62Showcase');
   if (!panel) return;
   if (inSeriesSelect) { panel.innerHTML = ''; return; }
-  applyFilters();
-  const list = filtered;
+  const list = browse.list || [];
+  filtered = list.slice();
   if (!list.length) {
     selected = null;
     panel.innerHTML = `<div class="v62-empty-showcase"><p class="eyebrow">Selected Card</p><h2>No matching card</h2><p>Adjust or reset the Binder filters to choose a card.</p><button class="btn primary" type="button" data-reset-card-filters>Reset Filters</button></div>`;

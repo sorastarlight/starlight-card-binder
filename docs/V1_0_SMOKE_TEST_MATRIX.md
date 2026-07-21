@@ -32,11 +32,13 @@ These do **not** replace the matrix above, but must stay green:
 - `npm run check` — JS/CSS structure, foundation inventory, migrations, boosters, tests
 - `npm run validate:boosters` — booster configuration schema
 
-## Browser notes
+## V1.0 wrap status (2026-07-21)
 
-- Prefer real devices or DevTools device mode for rows 4–9 on mobile.
-- Opera GX is Chromium-based; confirm `document.documentElement.dataset.starlightEngine` is `opera` or `opera-gx`.
-- After hard-refresh, confirm cache-busted assets (`browser-performance.js`, `shared-ui`, `app-shell`, `qol-ui`) load.
+V1.0 foundation systems are in place (shared modals, reveal engine, design tokens, smoke matrix, anon RPC revokes). Remaining optional smoke: Firefox/Opera GX live pass, redeem with a real code, signed-in mobile re-run. Sign-out was exercised in earlier Chromium work.
+
+## V1.1 — Collector Features (active slice)
+
+First slice: **binder search correctness** — catalog-aware All Series search, collector-number matches, grid/showcase share one list, shell search visible on series landing, reset restores landing.
 
 ## Fixes found during this walk
 

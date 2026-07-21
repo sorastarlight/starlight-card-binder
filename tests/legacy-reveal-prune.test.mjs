@@ -41,5 +41,5 @@ test('legacy reveal layers keep live binder analyzer/pack styles and drop proven
 
   assert.match(appJs, /analyzer-full-stage/);
   assert.match(appJs, /v61-pack v78-pack/);
-  assert.match(binderHtml, /css\/style\.css\?v=1\.0\.2/);
+  assert.match(binderHtml, /css\/style\.css\?v=1\.0\.3/);
 });
