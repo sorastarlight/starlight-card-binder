@@ -80,7 +80,9 @@ function cardFinishClass(card) {
 }
 
 function attachHoloSpark(element, card) {
-  window.StarlightUI?.ensureHoloSparkLayer?.(element, Boolean(cardFinishClass(card)));
+  const enabled = Boolean(cardFinishClass(card));
+  window.StarlightUI?.ensureHoloSparkLayer?.(element, enabled);
+  if (enabled) window.StarlightUI?.attachHoloPointer?.(element, element);
 }
 
 export function normalizeRevealOptions(options = {}) {

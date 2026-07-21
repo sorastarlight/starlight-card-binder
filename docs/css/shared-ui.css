@@ -23,19 +23,16 @@
 input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
 .collection-card,.link-card,.st-card{border-radius:var(--st-radius-md)}
 /*
- * Holographic finish — rainbow-rare foil (reveal + full-view only).
- * Rainbow sheet translates by one exact tile (seamless); grain/glare stay put.
+ * Holographic finish — Pokémon TCG–style rainbow foil (reveal + full-view only).
+ * No looping CSS animations. Shine is pointer/tilt-driven via --st-holo-x/y.
  */
 .card-finish-holographic{
-  --st-holo-x:52%;
-  --st-holo-y:38%;
-  --st-holo-angle:112deg;
-  --st-holo-period:120px;
+  --st-holo-x:48%;
+  --st-holo-y:42%;
   position:relative;
   display:block;
   overflow:hidden;
   isolation:isolate;
-  filter:saturate(1.18) contrast(1.04);
 }
 .face.card-finish-holographic,
 .st-r3-card-front.card-finish-holographic{position:absolute;inset:0}
@@ -46,148 +43,99 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
 .card-finish-holographic>.st-holo-spark{
   content:"";
   position:absolute;
+  inset:0;
   z-index:2;
   border-radius:inherit;
   pointer-events:none;
 }
-/* Rainbow-only foil sheet — oversized so translate never exposes edges. */
+/* Spectral rainbow foil — position tracks pointer like physical card stock */
 .card-finish-holographic::before{
   z-index:2;
-  inset:auto;
-  top:-50%;
-  left:-50%;
-  width:200%;
-  height:200%;
-  background-image:repeating-linear-gradient(
-    var(--st-holo-angle),
-    #ff4fa8 0,
-    #ff7a3d 20px,
-    #ffd84a 40px,
-    #5dff9a 60px,
-    #4ab8ff 80px,
-    #9b6bff 100px,
-    #ff4fa8 120px
-  );
-  mix-blend-mode:overlay;
-  opacity:.46;
-  will-change:transform;
-  animation:stHoloRainbowSweep 7.2s linear infinite;
-}
-/* Static etch + colored specular (does not travel — avoids loop jump) */
-.card-finish-holographic::after{
-  z-index:3;
-  inset:0;
   background-image:
-    radial-gradient(
-      circle at var(--st-holo-x) var(--st-holo-y),
-      rgba(255,255,255,.72) 0 2%,
-      rgba(255,120,200,.3) 8%,
-      rgba(90,200,255,.18) 16%,
-      transparent 34%
-    ),
     linear-gradient(
-      calc(var(--st-holo-angle) - 4deg),
-      transparent 18%,
-      rgba(255,80,170,.24) 32%,
-      rgba(255,255,255,.4) 42%,
-      rgba(80,220,255,.3) 50%,
-      rgba(160,100,255,.24) 58%,
-      rgba(255,200,70,.2) 66%,
-      transparent 78%
+      110deg,
+      transparent 15%,
+      #ff4d9a 28%,
+      #ff8a3d 36%,
+      #ffe566 44%,
+      #5dff9a 52%,
+      #4ab8ff 60%,
+      #b06bff 68%,
+      transparent 82%
     ),
     repeating-linear-gradient(
-      calc(var(--st-holo-angle) + 90deg),
-      rgba(255,255,255,.2) 0 1px,
-      transparent 1px 3px
+      125deg,
+      rgba(255,255,255,.14) 0 1px,
+      transparent 1px 4px
+    );
+  background-size:280% 280%, 6px 6px;
+  background-position:
+    var(--st-holo-x) var(--st-holo-y),
+    center;
+  mix-blend-mode:color-dodge;
+  filter:brightness(.82) contrast(1.35) saturate(1.05);
+  opacity:.42;
+  transition:opacity 120ms ease;
+}
+.card-finish-holographic.is-holo-lit::before,
+.tilting .card-finish-holographic::before{opacity:.58}
+/* Specular hotspot + soft glare bar */
+.card-finish-holographic::after{
+  z-index:3;
+  background-image:
+    radial-gradient(
+      farthest-corner circle at var(--st-holo-x) var(--st-holo-y),
+      rgba(255,255,255,.85) 0%,
+      rgba(255,180,220,.35) 12%,
+      rgba(140,210,255,.18) 22%,
+      transparent 45%
     ),
-    radial-gradient(circle at 18% 22%,rgba(255,255,255,.45) 0 .7px,transparent 1.4px),
-    radial-gradient(circle at 62% 48%,rgba(255,255,255,.32) 0 .6px,transparent 1.2px),
-    radial-gradient(circle at 84% 16%,rgba(255,255,255,.4) 0 .8px,transparent 1.5px),
-    radial-gradient(circle at 34% 78%,rgba(255,255,255,.28) 0 .6px,transparent 1.2px);
-  background-size:
-    160% 160%,
-    240% 240%,
-    auto,
-    15px 15px,18px 18px,12px 12px,20px 20px;
+    linear-gradient(
+      115deg,
+      transparent 30%,
+      rgba(255,255,255,.35) 48%,
+      rgba(180,240,255,.22) 52%,
+      transparent 70%
+    );
+  background-size:100% 100%, 200% 200%;
   background-position:
     center,
-    calc(var(--st-holo-x) - 30%) calc(var(--st-holo-y) - 15%),
-    0 0,
-    0 0,4px 7px,9px 2px,2px 11px;
+    var(--st-holo-x) var(--st-holo-y);
   mix-blend-mode:soft-light;
-  opacity:.9;
-  animation:stHoloGlare 4.5s ease-in-out infinite;
+  opacity:.55;
+  transition:opacity 120ms ease;
 }
-/* Soft starburst sparkles — ease only, no stepped flash */
+.card-finish-holographic.is-holo-lit::after,
+.tilting .card-finish-holographic::after{opacity:.78}
+/* Static foil sparkles (no animation — they catch light via blend only) */
 .card-finish-holographic>.st-holo-spark{
   z-index:4;
-  inset:0;
   content:none;
   background-image:
-    radial-gradient(circle at 12% 18%,#fff 0 1px,transparent 1.7px),
-    radial-gradient(circle at 28% 62%,#fff 0 .8px,transparent 1.5px),
-    radial-gradient(circle at 46% 28%,#fff 0 1.2px,transparent 2px),
-    radial-gradient(circle at 63% 74%,#fff 0 .9px,transparent 1.6px),
-    radial-gradient(circle at 78% 22%,#fff 0 1.3px,transparent 2.1px),
-    radial-gradient(circle at 88% 58%,#fff 0 .7px,transparent 1.4px),
-    radial-gradient(circle at 18% 84%,#fff 0 .9px,transparent 1.6px),
-    radial-gradient(circle at 52% 48%,#fff 0 1.1px,transparent 1.9px),
-    linear-gradient(0deg,transparent 47%,rgba(255,255,255,.9) 50%,transparent 53%),
-    linear-gradient(90deg,transparent 47%,rgba(255,255,255,.9) 50%,transparent 53%),
-    linear-gradient(0deg,transparent 47%,rgba(255,255,255,.75) 50%,transparent 53%),
-    linear-gradient(90deg,transparent 47%,rgba(255,255,255,.75) 50%,transparent 53%);
+    radial-gradient(circle at 14% 20%,#fff 0 .9px,transparent 1.6px),
+    radial-gradient(circle at 32% 68%,#fff 0 .7px,transparent 1.4px),
+    radial-gradient(circle at 48% 30%,#fff 0 1.1px,transparent 1.9px),
+    radial-gradient(circle at 66% 72%,#fff 0 .8px,transparent 1.5px),
+    radial-gradient(circle at 78% 24%,#fff 0 1.2px,transparent 2px),
+    radial-gradient(circle at 86% 56%,#fff 0 .7px,transparent 1.3px),
+    radial-gradient(circle at 22% 82%,#fff 0 .8px,transparent 1.5px),
+    linear-gradient(0deg,transparent 47%,rgba(255,255,255,.95) 50%,transparent 53%),
+    linear-gradient(90deg,transparent 47%,rgba(255,255,255,.95) 50%,transparent 53%),
+    linear-gradient(0deg,transparent 47%,rgba(255,255,255,.8) 50%,transparent 53%),
+    linear-gradient(90deg,transparent 47%,rgba(255,255,255,.8) 50%,transparent 53%);
   background-size:
-    100% 100%,100% 100%,100% 100%,100% 100%,
-    100% 100%,100% 100%,100% 100%,100% 100%,
-    16px 16px,16px 16px,14px 14px,14px 14px;
+    100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,100% 100%,
+    14px 14px,14px 14px,18px 18px,18px 18px;
   background-position:
-    0 0,0 0,0 0,0 0,0 0,0 0,0 0,0 0,
-    12% 18%,12% 18%,78% 22%,78% 22%;
+    0 0,0 0,0 0,0 0,0 0,0 0,0 0,
+    14% 20%,14% 20%,78% 24%,78% 24%;
   background-repeat:no-repeat;
   mix-blend-mode:screen;
-  opacity:.42;
-  animation:stHoloSparkle 2.8s ease-in-out infinite;
+  opacity:.28;
+  transition:opacity 120ms ease;
 }
-.card-finish-holographic>.st-holo-spark::before,
-.card-finish-holographic>.st-holo-spark::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius:inherit;
-  background-image:
-    linear-gradient(0deg,transparent 47%,rgba(255,255,255,.85) 50%,transparent 53%),
-    linear-gradient(90deg,transparent 47%,rgba(255,255,255,.85) 50%,transparent 53%),
-    linear-gradient(0deg,transparent 47%,rgba(255,220,255,.7) 50%,transparent 53%),
-    linear-gradient(90deg,transparent 47%,rgba(200,255,255,.7) 50%,transparent 53%);
-  background-size:18px 18px,18px 18px,22px 22px,22px 22px;
-  background-position:46% 28%,46% 28%,63% 74%,63% 74%;
-  background-repeat:no-repeat;
-  mix-blend-mode:screen;
-  animation:stHoloSparkleShift 3.2s ease-in-out infinite alternate;
-}
-.card-finish-holographic>.st-holo-spark::after{
-  background-position:18% 84%,18% 84%,88% 58%,88% 58%;
-  animation-duration:2.6s;
-  animation-direction:alternate-reverse;
-  opacity:.75;
-}
-/* 120px along 112deg ≈ (sin 112° · 120, −cos 112° · 120) ≈ (111px, 45px). */
-@keyframes stHoloRainbowSweep{
-  from{transform:translate3d(0,0,0)}
-  to{transform:translate3d(111px,45px,0)}
-}
-@keyframes stHoloGlare{
-  0%,100%{opacity:.82}
-  50%{opacity:.94}
-}
-@keyframes stHoloSparkle{
-  0%,100%{opacity:.28}
-  50%{opacity:.55}
-}
-@keyframes stHoloSparkleShift{
-  0%{opacity:.35;transform:translate3d(-.6%,.6%,0)}
-  100%{opacity:.75;transform:translate3d(.8%,-.8%,0)}
-}
+.card-finish-holographic.is-holo-lit>.st-holo-spark,
+.tilting .card-finish-holographic>.st-holo-spark{opacity:.48}
 .st-toast-region{position:fixed;right:18px;bottom:18px;z-index:30000;display:grid;gap:10px;width:min(380px,calc(100vw - 28px));pointer-events:none}
 .st-toast{pointer-events:auto;padding:13px 16px;border:1px solid rgba(107,198,248,.48);border-radius:16px;background:rgba(255,255,255,.97);box-shadow:0 15px 38px rgba(45,62,105,.22);color:var(--st-ui-ink);font-weight:800;line-height:1.45;animation:stToastIn .22s ease-out}
 .st-toast.success{border-color:rgba(70,176,127,.5)}.st-toast.error{border-color:rgba(180,35,63,.5);color:var(--st-ui-danger)}.st-toast.info{border-color:rgba(255,130,200,.5)}
@@ -200,4 +148,4 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
 .st-view-state{display:grid;place-items:center;min-height:220px;padding:28px;text-align:center;color:var(--st-ui-muted)}.st-view-state strong{display:block;color:#405fa1;font-size:1.25rem;margin-bottom:7px}.st-view-state button{margin-top:15px;padding:10px 18px;border:0;border-radius:999px;background:linear-gradient(135deg,var(--st-ui-blue),var(--st-ui-pink));color:#fff;font-weight:900;cursor:pointer}.st-spinner{width:38px;height:38px;margin:0 auto 14px;border:4px solid rgba(107,198,248,.2);border-top-color:var(--st-ui-pink);border-radius:50%;animation:stSpin .8s linear infinite}@keyframes stSpin{to{transform:rotate(360deg)}}
 :focus-visible{outline:3px solid rgba(255,130,200,.75)!important;outline-offset:3px!important}
 .status:empty,.page-status:empty,[role="status"]:empty{display:none!important}
-@media(prefers-reduced-motion:reduce){.st-toast,.st-spinner,.card-finish-holographic::before,.card-finish-holographic::after,.card-finish-holographic>.st-holo-spark,.card-finish-holographic>.st-holo-spark::before,.card-finish-holographic>.st-holo-spark::after{animation:none!important}.card-finish-holographic{filter:saturate(1.12) contrast(1.03)}.card-finish-holographic::before{transform:translate3d(44px,18px,0);opacity:.4}.card-finish-holographic::after{opacity:.84}.card-finish-holographic>.st-holo-spark{opacity:.36}.st-dialog-overlay{backdrop-filter:none}.st-dialog-overlay,.st-dialog,.st-button{transition:none!important}}
+@media(prefers-reduced-motion:reduce){.st-toast,.st-spinner{animation:none!important}.card-finish-holographic::before,.card-finish-holographic::after,.card-finish-holographic>.st-holo-spark{transition:none!important}.card-finish-holographic::before{opacity:.36;filter:brightness(.88) contrast(1.2) saturate(.95)}.card-finish-holographic::after{opacity:.45}.card-finish-holographic>.st-holo-spark{opacity:.22}.st-dialog-overlay{backdrop-filter:none}.st-dialog-overlay,.st-dialog,.st-button{transition:none!important}}

@@ -73,6 +73,7 @@ function ensureHoloSparkLayer(element, enabled = true) {
   let spark = element.querySelector(':scope > .st-holo-spark');
   if (!enabled) {
     spark?.remove();
+    element.classList.remove('is-holo-lit');
     return null;
   }
   if (!spark) {
@@ -82,6 +83,37 @@ function ensureHoloSparkLayer(element, enabled = true) {
     element.append(spark);
   }
   return spark;
+}
+
+/** Pointer/tilt-driven foil shine — no looping animation, so no visible restart. */
+function setHoloPointer(foil, x, y) {
+  if (!foil) return;
+  const px = Math.min(1, Math.max(0, Number(x) || 0));
+  const py = Math.min(1, Math.max(0, Number(y) || 0));
+  foil.style.setProperty('--st-holo-x', `${(px * 100).toFixed(1)}%`);
+  foil.style.setProperty('--st-holo-y', `${(py * 100).toFixed(1)}%`);
+  foil.classList.add('is-holo-lit');
+}
+
+function clearHoloPointer(foil) {
+  if (!foil) return;
+  foil.classList.remove('is-holo-lit');
+  foil.style.removeProperty('--st-holo-x');
+  foil.style.removeProperty('--st-holo-y');
+}
+
+function attachHoloPointer(surface, foil = surface) {
+  if (!surface || !foil || surface.dataset.holoPointerBound === '1') return foil;
+  surface.dataset.holoPointerBound = '1';
+  surface.addEventListener('pointermove', event => {
+    if (!foil.classList.contains('card-finish-holographic')) return;
+    const rect = surface.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / Math.max(1, rect.width);
+    const y = (event.clientY - rect.top) / Math.max(1, rect.height);
+    setHoloPointer(foil, x, y);
+  });
+  surface.addEventListener('pointerleave', () => clearHoloPointer(foil));
+  return foil;
 }
 
 function focusableElements(root) {
@@ -351,6 +383,9 @@ window.StarlightUI = {
   cardFinishClass,
   holoSparkMarkup,
   ensureHoloSparkLayer,
+  attachHoloPointer,
+  setHoloPointer,
+  clearHoloPointer,
   stateMarkup,
   escapeHtml,
   cleanupLegacyStorage

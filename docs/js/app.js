@@ -869,9 +869,7 @@ function attachFullViewTilt() {
     card.style.setProperty('--tiltX', `${tiltX.toFixed(2)}deg`);
     card.style.setProperty('--tiltY', `${tiltY.toFixed(2)}deg`);
     if (frontFace?.classList.contains('card-finish-holographic')) {
-      frontFace.style.setProperty('--st-holo-x', `${(x * 100).toFixed(1)}%`);
-      frontFace.style.setProperty('--st-holo-y', `${(y * 100).toFixed(1)}%`);
-      frontFace.style.setProperty('--st-holo-angle', `${(112 + (x - 0.5) * 28).toFixed(1)}deg`);
+      window.StarlightUI?.setHoloPointer?.(frontFace, x, y);
     }
     card.classList.add('tilting');
   });
@@ -879,9 +877,7 @@ function attachFullViewTilt() {
     card.classList.remove('tilting');
     card.style.removeProperty('--tiltX');
     card.style.removeProperty('--tiltY');
-    frontFace?.style.removeProperty('--st-holo-x');
-    frontFace?.style.removeProperty('--st-holo-y');
-    frontFace?.style.removeProperty('--st-holo-angle');
+    window.StarlightUI?.clearHoloPointer?.(frontFace);
   });
 }
 
