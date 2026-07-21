@@ -5,24 +5,24 @@ Run against a local `docs/` HTTP server (not `file://`). Exercise each journey a
 
 Mark each cell: `pass` / `fail` / `n/a` / `blocked`. Failures need a bug note before V1.0 is considered complete.
 
-Last walk: **2026-07-21** (Chromium automation, signed-out session unless noted).
+Last walk: **2026-07-21** (Chromium). Signed-out pass earlier; **signed-in follow-up** as staff collector `@sorastarlight`.
 
 | # | Journey | Desktop | Mobile | Notes |
 |---|---------|---------|--------|-------|
-| 1 | Sign in and sign out | blocked | blocked | Needs collector credentials; Sign In / Create Account chrome is present when signed out. |
+| 1 | Sign in and sign out | pass* | blocked | *Sign-in verified (account chrome, Sign Out, staff hub link). Sign-out not re-tested this pass to keep the session. |
 | 2 | Navigate through the application shell | pass | pass | Sidebar + top links swap views; deep links use `binder.html?view=…`; native binder hides when embedded views are active (no dual chrome). Mobile hamburger/account chrome usable at 390×844. |
-| 3 | Browse binder and collection views | pass | pass | Series packs open; filters show 12/12 Rising Star cards; collection/daily/redeem/rewards routes load in shell without frame error. |
-| 4 | Open a Daily Booster | blocked | blocked | Daily view loads; open/reveal/inventory update requires signed-in collector. |
-| 5 | Purchase and open a Shop pack | blocked | blocked | Shop signed-out CTA is intentional. Purchase + `st-dialog` + reveal need auth. Fixed signed-out load so Star Bits preview errors no longer blank the shop. |
-| 6 | Redeem and reveal a reward | blocked | blocked | Redeem view loads in shell; redeem/reveal needs a code + auth. |
-| 7 | Claim and reveal a Received Gift or Twitch reward | blocked | blocked | Received Gifts view loads; claim/reveal needs auth + gift inventory. |
-| 8 | Open, operate, and close each migrated modal (pointer) | blocked | blocked | Shop details/purchase modals require signed-in shop browse; admin/profile modals need staff/collector session. |
-| 9 | Same migrated modals via keyboard | blocked | blocked | Same auth gate as row 8. |
-| 10 | Staff/admin pages without exposing privileged actions | pass | pass | Signed-out admin hub keeps staff grid hidden. Staff RPC permission denials now map to friendly “Administration access is required.” (no privileged controls). |
+| 3 | Browse binder and collection views | pass | pass | Series packs open; filters show 12/12 Rising Star cards. Signed-in collection shows completion stats and card grid (24/24 unique). |
+| 4 | Open a Daily Booster | pass* | blocked | *Shared `st-r3` reveal opened from Daily (pack → pile → cards). UI still showed READY afterward — likely unlimited/test daily mode or status refresh gap; confirm expected. Mobile not re-run signed-in. |
+| 5 | Purchase and open a Shop pack | pass* | blocked | *Signed-in catalog loads (balance + packs). Details + purchase confirm use `st-dialog`. Purchase cancelled (“Not Yet”) — full buy+reveal not completed this pass. |
+| 6 | Redeem and reveal a reward | pass* | blocked | *Redeem form loads signed-in (code input + Redeem Code). No live code redeemed this pass. |
+| 7 | Claim and reveal a Received Gift or Twitch reward | pass* | blocked | *Received Gifts lists claimable Twitch rewards (“Open Reward”). Full claim+reveal not auto-run this pass (needs explicit OK to spend gifts). |
+| 8 | Open, operate, and close each migrated modal (pointer) | pass* | blocked | *Shop pack details + purchase confirm open/close on pointer. Admin/profile crop dialogs not re-exercised this pass. |
+| 9 | Same migrated modals via keyboard | pass* | blocked | *Escape closes shop purchase confirm. Full modal keyboard matrix (focus trap/restore) still worth a manual spot-check. |
+| 10 | Staff/admin pages without exposing privileged actions | pass | pass | Signed-out admin hub keeps staff grid hidden. Signed-in staff sees Administration Hub link. |
 | 11 | Cross-browser smoke (Chromium) | pass | pass | `dataset.starlightEngine=chromium`; lite mode off on capable desktop (`starlight-engine-chromium` only). |
 | 12 | Cross-browser smoke (Firefox) | blocked | blocked | Needs a Firefox browser session (not available in this Chromium automation pass). |
 | 13 | Cross-browser smoke (Opera GX) | blocked | blocked | Needs Opera GX; automated detection covered by `tests/browser-performance.test.mjs`. |
-| 14 | Reduced motion | pass | n/a | `prefers-reduced-motion` rules present in loaded stylesheets; live reveal animation check still needs an authenticated pack open. |
+| 14 | Reduced motion | pass | n/a | `prefers-reduced-motion` rules present; signed-in reveal used shared engine (live reduced-motion device check still optional). |
 
 ## Automated coverage already in repo
 
@@ -47,7 +47,7 @@ These do **not** replace the matrix above, but must stay green:
 
 - Project: `starlight-card-binder` (`noxfauxbfdqgoxgiwrpu`, `us-west-2`, ACTIVE_HEALTHY)
 - Client URL matches `docs/js/supabase-client.js`
-- Remote migrations: `20260720160000_production_baseline`, `20260720180926_production_schema`
+- Remote migrations: `20260720160000_production_baseline`, `20260720180926_production_schema`, `20260721175802_revoke_anon_admin_rpc_execute`
 - Readiness snapshot: 3 users, 2 series, 24 cards, 3 shop boosters
 - Applied to production via MCP (2026-07-21): `20260721175802_revoke_anon_admin_rpc_execute` — verified `anon_exec=false` and `authenticated`/`service_role` retain EXECUTE
 - Pending local migration (not applied until approved): `20260721181500_revoke_anon_collector_rpc_execute.sql` — revoke `anon`/`public` EXECUTE on collector-private RPCs (daily booster, Star Bits preview, notifications, gifts, favorites, Twitch unlink) plus trigger-only helpers
