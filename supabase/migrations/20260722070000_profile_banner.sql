@@ -78,7 +78,7 @@ begin
     raise exception 'You must be signed in.';
   end if;
 
-  if requested_title_id is not null and not exists (
+  if nullif(trim(requested_title_id), '') is not null and not exists (
     select 1
     from public.user_titles
     where user_id = uid
