@@ -8,7 +8,7 @@
         Collector Profile | Starlight Card Binder
     </title>
 <link href="css/style.css?v=1.0.2" rel="stylesheet"/>
-<link rel="stylesheet" href="css/pages/collector.css?v=1.12.0">
+<link rel="stylesheet" href="css/pages/collector.css?v=1.13.0">
 <script src="js/browser-performance.js?v=1.0.0" defer></script>
     <link rel="stylesheet" href="css/shared-ui.css?v=1.6.15">
 <link rel="stylesheet" href="css/qol-ui.css?v=94.2.8">
@@ -97,15 +97,18 @@
 <a class="collector-twitch-badge" id="collector-twitch-badge" href="#" target="_blank" rel="noopener" hidden></a>
 </div>
 <div class="collector-identity">
+<div class="collector-identity-panel">
+<div class="collector-nameplate">
 <h1 id="collector-display-name">
                         Collector
                     </h1>
 <p class="collector-username" id="collector-username"></p>
+</div>
 <div class="collector-flair" id="collector-flair" hidden>
 <span class="collector-title" id="collector-title" hidden></span>
 <p class="collector-role" id="collector-bio" hidden></p>
 </div>
-<div class="collector-meta-row">
+<div class="collector-meta-row" id="collector-meta-row">
 <p class="collector-member" id="collector-member"></p>
 <p class="collector-follow-meta" id="collector-follow-meta" hidden></p>
 </div>
@@ -115,6 +118,7 @@
 <span class="collector-follow-label" data-content="collector.followCta">Follow</span>
 </button>
 <button type="button" class="collector-button primary" id="gift-button" data-content="collector.giftCta">Send Gift</button>
+</div>
 </div>
 </div>
 <span hidden data-content-source data-content="collector.defaultBio" id="collector-default-bio">A Starlight Card collector.</span>
@@ -243,10 +247,10 @@
 </dialog>
 </main>
 <script type="module" src="js/pages/website-content-hydrate-page.js?v=1.4"></script>
-<script src="js/pages/collector-page.js?v=1.6.1" type="module"></script>
-<script src="js/public-profile-extras.js?v=1.4.0" type="module"></script>
+<script src="js/pages/collector-page.js?v=1.6.2" type="module"></script>
+<script src="js/public-profile-extras.js?v=1.4.1" type="module"></script>
 <script src="js/public-trade-showcase.js?v=1.1" type="module"></script>
-<script type="module" src="js/public-twitch-profile.js?v=1.2.0"></script>
+<script type="module" src="js/public-twitch-profile.js?v=1.2.1"></script>
 <script src="js/shared-ui.js?v=1.6.15"></script>
 <script src="js/qol-ui.js?v=94.2.8" defer></script>
 </body>

@@ -567,6 +567,14 @@ import {
             </article>`;
         }
 
+        function syncCollectorMetaRow() {
+            const metaRow = document.getElementById("collector-meta-row");
+            if (!metaRow) return;
+            const hasMember = Boolean(memberElement?.textContent?.trim());
+            const hasFollow = Boolean(followMeta && !followMeta.hidden && followMeta.textContent?.trim());
+            metaRow.hidden = !(hasMember || hasFollow);
+        }
+
         function getFollowCtas() {
             const followLabel = followButton?.querySelector(".collector-follow-label");
             const followingSource = document.getElementById("collector-following-cta");
@@ -611,6 +619,7 @@ import {
             if (!social || social.private || !social.found) {
                 if (followMeta) followMeta.hidden = true;
                 if (socialActions) socialActions.hidden = true;
+                syncCollectorMetaRow();
                 return;
             }
 
@@ -622,6 +631,7 @@ import {
                 followMeta.hidden = false;
                 followMeta.textContent = `${followers} follower${followers === 1 ? "" : "s"} · ${following} following`;
             }
+            syncCollectorMetaRow();
             if (socialActions) {
                 socialActions.hidden = Boolean(social.isSelf);
             }
@@ -750,6 +760,8 @@ import {
                 memberDate
                     ? `Joined ${memberDate}`
                     : "";
+
+            syncCollectorMetaRow();
 
             if (
                 avatarElement.classList.contains('has-photo') ||
