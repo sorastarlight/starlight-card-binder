@@ -10,6 +10,8 @@ if(cancel){
   cancel.href=reported
     ?`binder.html?view=collector&username=${encodeURIComponent(reported)}`
     :'binder.html?view=home';
+  cancel.setAttribute('target','_top');
+  cancel.setAttribute('data-shell-view', reported ? 'collector' : 'home');
 }
 document.getElementById('form').addEventListener('submit',async e=>{
   e.preventDefault();

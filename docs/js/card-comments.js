@@ -47,7 +47,7 @@ export async function mountCardComments(host, cardId) {
   const { data: auth } = await supabase.auth.getUser();
   const signedIn = Boolean(auth?.user);
   if (!signedIn) {
-    form.innerHTML = `<p class="card-comments-signin"><a href="login.html?mode=signin">Sign in</a> to join the conversation.</p>`;
+    form.innerHTML = `<p class="card-comments-signin"><a href="login.html?mode=signin" target="_top" data-shell-view="login">Sign in</a> to join the conversation.</p>`;
   }
 
   async function refresh() {
@@ -63,10 +63,13 @@ export async function mountCardComments(host, cardId) {
           const name = author.displayName || author.username || 'Collector';
           const profile = author.username
             ? `binder.html?view=collector&username=${encodeURIComponent(author.username)}`
-            : '#';
+            : '';
+          const authorMarkup = profile
+            ? `<a href="${esc(profile)}" target="_top" data-shell-view="collector"><strong>${esc(name)}</strong></a>`
+            : `<strong>${esc(name)}</strong>`;
           return `<article class="card-comment" data-comment-id="${esc(comment.id)}">
             <div class="card-comment-head">
-              <a href="${profile}"><strong>${esc(name)}</strong></a>
+              ${authorMarkup}
               <span>${esc(relativeTime(comment.createdAt))}</span>
               ${comment.isOwn ? `<button type="button" class="card-comment-delete" data-delete-comment="${esc(comment.id)}">Delete</button>` : ''}
             </div>

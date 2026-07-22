@@ -55,7 +55,7 @@ function tradeHref(username) {
 function avatarMarkup(entry) {
   const initial = (entry.displayName || entry.username || '?').trim().charAt(0).toUpperCase() || '✦';
   if (entry.avatarUrl) {
-    return `<span class="rankings-avatar has-photo" style="background-image:url('${esc(entry.avatarUrl)}')" role="img" aria-label=""></span>`;
+    return `<span class="rankings-avatar has-photo" style="background-image:url('${esc(entry.avatarUrl)}')" aria-hidden="true"></span>`;
   }
   return `<span class="rankings-avatar" aria-hidden="true">${esc(initial)}</span>`;
 }

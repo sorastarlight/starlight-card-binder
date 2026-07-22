@@ -35,7 +35,9 @@ test('binder filter panel exposes search on series landing', async () => {
 
   assert.match(app, /const showSearch = true/);
   assert.match(app, /id="globalSearch"/);
+  assert.match(app, /role="status" aria-live="polite"/);
   assert.match(app, /if \(filters\.q\) document\.body\.classList\.remove\('series-select'\)/);
+  assert.match(app, /e\.preventDefault\(\);\s*stepFullView/s);
   assert.match(css, /Keep binder filters \(including search\) available on the series landing/);
   assert.match(css, /series-select \.card-filter-panel \{\s*display: block;/);
   assert.doesNotMatch(
@@ -43,5 +45,19 @@ test('binder filter panel exposes search on series landing', async () => {
     /series-select \.card-filter-panel,\s*body\[data-page="binder"\]\.series-select \.binder-browser-layout \{\s*display: none;/
   );
   assert.match(binder, /binder\.css\?v=1\.4\.0/);
-  assert.match(binder, /cloud-collection\.js\?v=1\.1\.8/);
+  assert.match(binder, /cloud-collection\.js\?v=1\.1\.9/);
+});
+
+test('shell-safe profile links avoid binder-in-binder nesting', async () => {
+  const [offers, comments, report, rankings] = await Promise.all([
+    read('docs/js/pages/trade-offers-page.js'),
+    read('docs/js/card-comments.js'),
+    read('docs/js/pages/report-profile-page.js'),
+    read('docs/js/pages/user-rankings-page.js')
+  ]);
+  assert.match(offers, /target="_top" data-shell-view="collector"/);
+  assert.match(comments, /target="_top" data-shell-view="collector"/);
+  assert.match(comments, /target="_top" data-shell-view="login"/);
+  assert.match(report, /setAttribute\('target','_top'\)/);
+  assert.match(rankings, /rankings-avatar has-photo[\s\S]*aria-hidden="true"/);
 });

@@ -44,6 +44,8 @@ test('trade offer composer keeps selections outside the pick grid DOM', async ()
   assert.match(offersPage, /initialOfferTab/);
   assert.match(offersPage, /Decline this trade\?/);
   assert.match(offersPage, /view=collector&username=/);
+  assert.match(offersPage, /target="_top"/);
+  assert.match(offersPage, /data-shell-view="collector"/);
 });
 
 test('wishlist empty state can open the All Cards tab', async () => {

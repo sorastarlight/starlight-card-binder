@@ -180,7 +180,7 @@ function collectorLink(displayName, handle) {
   const href = profileHref(handle);
   const label = displayName || handle || 'Collector';
   if (!href) return esc(label);
-  return `<a class="collector-link" href="${esc(href)}">${esc(label)}</a>`;
+  return `<a class="collector-link" href="${esc(href)}" target="_top" data-shell-view="collector">${esc(label)}</a>`;
 }
 
 function setResultsOpen(open) {

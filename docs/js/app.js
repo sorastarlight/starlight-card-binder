@@ -457,7 +457,7 @@ function renderFilterControls() {
   const showView = !isCollection;
   host.innerHTML = `<div class="card-filter-heading">
       <div><p class="eyebrow">${esc(eyebrow)}</p><h2>${esc(title)}</h2></div>
-      <p data-filter-summary>Preparing cards…</p>
+      <p data-filter-summary role="status" aria-live="polite">Preparing cards…</p>
     </div>
     <div class="card-filter-fields">
       ${showSearch ? `<label class="card-filter-search"><span>Search</span><input id="globalSearch" type="search" placeholder="Search names, numbers, artists…" autocomplete="off"></label>` : ''}
@@ -887,7 +887,7 @@ function renderFullView() {
   attachFullViewTilt();
   const commentsHost = overlay.querySelector('[data-card-comments-host]');
   if (commentsHost && selected?.id) {
-    import('./card-comments.js')
+    import('./card-comments.js?v=1.1.0')
       .then((mod) => mod.mountCardComments(commentsHost, selected.id))
       .catch((error) => {
         commentsHost.innerHTML = `<p class="card-comments-status">Comments unavailable.</p>`;
@@ -1148,8 +1148,14 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('keydown', e => {
   if ($('#cardOverlay')?.classList.contains('open')) {
-    if (e.key === 'ArrowLeft') stepFullView(-1);
-    if (e.key === 'ArrowRight') stepFullView(1);
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      stepFullView(-1);
+    }
+    if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      stepFullView(1);
+    }
     return;
   }
   if ((e.key === 'Enter' || e.key === ' ') && pageName === 'collection') {
