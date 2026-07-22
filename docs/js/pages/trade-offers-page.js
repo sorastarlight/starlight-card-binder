@@ -1,5 +1,9 @@
 import { getTradeOfferContext, createTradeOffer, getMyTradeOffers, respondToTradeOffer, searchTradeCollectors } from '../trade-offer-service.js';
 import { buildTradeSearchHaystack } from '../card-filter-utils.js';
+import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
+
+const siteCopy = await loadAndHydrateWebsiteContent();
+const offersCopy = siteCopy?.offers || {};
 
 const params = new URLSearchParams(location.search);
 let username = params.get('username') || '';
@@ -339,15 +343,18 @@ function pendingIncomingCount() {
 function renderOffers() {
   const pending = pendingIncomingCount();
   const incomingTab = document.querySelector('[data-tab="incoming"]');
+  const incomingLabel = offersCopy.tabIncoming || 'Incoming';
   if (incomingTab) {
-    incomingTab.textContent = pending ? `Incoming (${pending})` : 'Incoming';
+    incomingTab.textContent = pending ? `${incomingLabel} (${pending})` : incomingLabel;
   }
+  const emptyIncoming = esc(offersCopy.emptyIncoming || 'No incoming offers.');
+  const emptyOutgoing = esc(offersCopy.emptyOutgoing || 'No sent offers.');
   document.querySelector('#incomingList').innerHTML = offers.incoming.length
     ? offers.incoming.map(offer => offerHtml(offer, true)).join('')
-    : '<div class="empty">No incoming offers.</div>';
+    : `<div class="empty">${emptyIncoming}</div>`;
   document.querySelector('#outgoingList').innerHTML = offers.outgoing.length
     ? offers.outgoing.map(offer => offerHtml(offer, false)).join('')
-    : '<div class="empty">No sent offers.</div>';
+    : `<div class="empty">${emptyOutgoing}</div>`;
 }
 
 async function loadOffers() {

@@ -18,13 +18,13 @@
 <main class="profile-settings-page">
 <section class="profile-settings-panel">
 <header class="profile-settings-header">
-<p class="eyebrow">
+<p class="eyebrow" data-content="profile.eyebrow">
                     Collector Profile
                 </p>
-<h1>
+<h1 data-content="profile.title">
                     Edit Profile
                 </h1>
-<p>
+<p data-content="profile.lead">
                     Manage your public identity, profile visibility, and collection preferences.
                 </p>
 </header>
@@ -189,22 +189,22 @@
 <p class="profile-help">Manage the social side of your collection from one place.</p>
 <div class="profile-activity-grid">
 <a class="profile-activity-card" href="binder.html?view=trades" data-shell-view="trades">
-<strong>💫 Wishlist &amp; Trade List</strong>
-<span>Choose cards you are seeking and duplicates you are offering.</span>
+<strong data-content="profile.wishlistCardTitle">💫 Wishlist &amp; Trade List</strong>
+<span data-content="profile.wishlistCardLead">Choose cards you are seeking and duplicates you are offering.</span>
 </a>
 <a class="profile-activity-card" href="binder.html?view=offers" data-shell-view="offers">
-<strong>🤝 Trade Offers</strong>
-<span>Review incoming offers, sent offers, and create a new exchange.</span>
+<strong data-content="profile.offersCardTitle">🤝 Trade Offers</strong>
+<span data-content="profile.offersCardLead">Review incoming offers, sent offers, and create a new exchange.</span>
 </a>
 <a class="profile-activity-card" href="binder.html?view=collector" id="view-public-profile-card" data-shell-view="collector">
-<strong>🌟 Public Collector Profile</strong>
-<span>See how your profile, showcase, achievements, and trade lists appear.</span>
+<strong data-content="profile.publicCardTitle">🌟 Public Collector Profile</strong>
+<span data-content="profile.publicCardLead">See how your profile, showcase, achievements, and trade lists appear.</span>
 </a>
 </div>
 </section>
 <section class="profile-section account-data-section">
 <h2>Account &amp; Data</h2>
-<p class="profile-section-intro">Manage your local backup and collection data. Cloud ownership remains protected by your account.</p>
+<p class="profile-section-intro" data-content="profile.accountIntro">Manage your local backup and collection data. Cloud ownership remains protected by your account.</p>
 <div class="account-data-actions">
 <button class="profile-link secondary" id="profileExportData" type="button">Download Collection Backup</button>
 <button class="profile-link secondary" id="profileImportData" type="button">Import Collection Backup</button>
@@ -226,6 +226,7 @@
 </form>
 </section>
 </main>
+<script type="module" src="js/pages/website-content-hydrate-page.js?v=1.1"></script>
 <script src="js/pages/profile-settings-page.js?v=1.2" type="module"></script>
 <script src="js/staff-profile-link.js" type="module"></script>
 <div aria-hidden="true" class="st-dialog-overlay profile-crop-modal hidden" id="profile-crop-modal">

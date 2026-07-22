@@ -19,11 +19,11 @@
 <header class="daily-header">
   <div class="daily-header-icon" aria-hidden="true">✦</div>
   <div class="daily-header-copy">
-    <p class="eyebrow">Daily Collector Reward</p>
-    <h1>Daily Free Booster Pack</h1>
-    <p>Open today’s free pack, reveal four cards one at a time, and grow your Starlight collection. Your next free pack becomes available at midnight Eastern Time.</p>
+    <p class="eyebrow" data-content="daily.eyebrow">Daily Collector Reward</p>
+    <h1 data-content="daily.title">Daily Free Booster Pack</h1>
+    <p data-content="daily.lead">Open today’s free pack, reveal four cards one at a time, and grow your Starlight collection. Your next free pack becomes available at midnight Eastern Time.</p>
   </div>
-  <div class="daily-header-badge">FREE • DAILY</div>
+  <div class="daily-header-badge" data-content="daily.badge">FREE • DAILY</div>
 </header>
 <section aria-label="Free Daily Booster portal" class="portal-zone" id="portal-zone">
 <div aria-hidden="true" class="portal-ring"></div><div aria-hidden="true" class="portal-ribbons"><i></i><i></i><i></i></div>
@@ -36,22 +36,23 @@
 <section class="more-packs-card" aria-labelledby="more-packs-title">
   <div class="more-packs-icon" aria-hidden="true">✦</div>
   <div>
-    <p class="eyebrow">Keep the magic going</p>
-    <h2 id="more-packs-title">Want to open more packs?</h2>
-    <p>Extra cards are never wasted. Convert duplicate cards into <strong>Star Bits</strong>, then spend them in the <strong>Starlight Booster Shop</strong> for more chances to pull Rare, Epic, and Legendary cards.</p>
+    <p class="eyebrow" data-content="daily.morePacksEyebrow">Keep the magic going</p>
+    <h2 id="more-packs-title" data-content="daily.morePacksTitle">Want to open more packs?</h2>
+    <p data-content="daily.morePacksLead">Extra cards are never wasted. Convert duplicate cards into <strong>Star Bits</strong>, then spend them in the <strong>Starlight Booster Shop</strong> for more chances to pull Rare, Epic, and Legendary cards.</p>
     <div class="more-packs-loop"><span>Open packs</span><b>→</b><span>Collect extras</span><b>→</b><span>Earn Star Bits</span><b>→</b><span>Open more packs</span></div>
   </div>
   <div class="more-packs-actions">
-    <a class="daily-link secondary" href="binder.html?view=star-bits" data-shell-view="star-bits">Convert Extras</a>
-    <a class="daily-link primary" href="binder.html?view=shop" data-shell-view="shop">Visit Booster Shop</a>
+    <a class="daily-link secondary" href="binder.html?view=star-bits" data-shell-view="star-bits" data-content="daily.convertCta">Convert Extras</a>
+    <a class="daily-link primary" href="binder.html?view=shop" data-shell-view="shop" data-content="daily.shopCta">Visit Booster Shop</a>
   </div>
 </section>
 
-<div class="daily-actions"><a class="daily-link primary hidden" href="login.html" id="sign-in-link">Sign In</a></div>
+<div class="daily-actions"><a class="daily-link primary hidden" href="login.html" id="sign-in-link" data-content="daily.signInCta">Sign In to Open</a></div>
 
-<section class="reward-section hidden" id="reward-section"><h2 id="reward-title">Your Pulls</h2><div class="reward-grid" id="reward-grid"></div></section>
+<section class="reward-section hidden" id="reward-section"><h2 id="reward-title" data-content="daily.pullsTitle">Your Pulls</h2><div class="reward-grid" id="reward-grid"></div></section>
 <p aria-live="polite" class="page-status" id="page-status" role="status"></p>
 </section></main>
+<script type="module" src="js/pages/website-content-hydrate-page.js?v=1.1"></script>
 <script type="module" src="js/pages/daily-booster-page.js?v=1.5.11"></script>
     <script src="js/shared-ui.js?v=1.6.7"></script>
 <script src="js/qol-ui.js?v=94.2.4" defer></script>

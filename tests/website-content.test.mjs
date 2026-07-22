@@ -3,7 +3,8 @@ import test from 'node:test';
 import { readFile } from 'node:fs/promises';
 import {
   cloneDefaultWebsiteContent,
-  HOME_QUICK_LINK_IDS
+  HOME_QUICK_LINK_IDS,
+  WEBSITE_EDITOR_TABS
 } from '../docs/js/website-content-defaults.js';
 import {
   mergeWebsiteContent,
@@ -14,16 +15,55 @@ const read = (relativePath) => readFile(new URL(`../${relativePath}`, import.met
 
 test('default website content includes editable page groups', () => {
   const content = cloneDefaultWebsiteContent();
-  assert.equal(content.version, 1);
+  assert.equal(content.version, 2);
   assert.ok(content.home.title);
+  assert.ok(content.home.primaryCta);
+  assert.ok(content.home.newsLoading);
   assert.ok(content.about.lead);
+  assert.ok(content.about.seriesLoading);
   assert.ok(content.socials.links.length >= 1);
   assert.equal(content.login.brandTitle, 'Starlight Card Binder');
   assert.ok(content.binderLanding.title);
+  assert.ok(content.daily.title);
+  assert.ok(content.daily.signInCta);
+  assert.ok(content.shop.emptyCategory);
+  assert.ok(content.events.emptyTitle);
+  assert.ok(content.redeem.submitCta);
+  assert.ok(content.collection.duplicatesCta);
+  assert.ok(content.starBits.exchangeCta);
+  assert.ok(content.checklist.exchangeTitle);
+  assert.ok(content.trades.emptyWishlist);
+  assert.ok(content.offers.emptyIncoming);
+  assert.ok(content.notifications.emptyTitle);
+  assert.ok(content.rewards.emptyLead);
+  assert.ok(content.profile.accountIntro);
   assert.ok(content.shared.infoStripCopyright);
   assert.deepEqual(
     content.home.quickLinks.map((link) => link.id),
     [...HOME_QUICK_LINK_IDS]
+  );
+  assert.deepEqual(
+    WEBSITE_EDITOR_TABS.map((tab) => tab.id),
+    [
+      'home',
+      'binderLanding',
+      'daily',
+      'shop',
+      'events',
+      'redeem',
+      'collection',
+      'starBits',
+      'checklist',
+      'trades',
+      'offers',
+      'notifications',
+      'rewards',
+      'profile',
+      'about',
+      'socials',
+      'login',
+      'shared'
+    ]
   );
 });
 
@@ -45,6 +85,7 @@ test('sanitizeWebsiteContent keeps quick-link ids and rejects bad social urls', 
     }
   });
 
+  assert.equal(sanitized.version, 2);
   assert.equal(sanitized.home.title, 'Fresh Home Title');
   assert.deepEqual(
     sanitized.home.quickLinks.map((link) => link.id),
@@ -62,6 +103,8 @@ test('mergeWebsiteContent falls back to defaults for empty remote', () => {
   const merged = mergeWebsiteContent({});
   assert.equal(merged.about.title, cloneDefaultWebsiteContent().about.title);
   assert.equal(merged.binderLanding.eyebrow, 'Starlight Cards');
+  assert.equal(merged.daily.badge, 'FREE • DAILY');
+  assert.equal(merged.version, 2);
 });
 
 test('website editor admin page and public hooks are wired', async () => {
@@ -78,7 +121,23 @@ test('website editor admin page and public hooks are wired', async () => {
     socials,
     login,
     binder,
+    daily,
+    shop,
+    events,
+    redeem,
+    collection,
+    starBits,
+    checklist,
+    trades,
+    offers,
+    notifications,
+    rewards,
+    profile,
     loginPage,
+    tradeListsPage,
+    tradeOffersPage,
+    boosterShopPage,
+    eventsPage,
     app,
     migration
   ] = await Promise.all([
@@ -94,18 +153,35 @@ test('website editor admin page and public hooks are wired', async () => {
     read('docs/socials.html'),
     read('docs/login.html'),
     read('docs/binder.html'),
+    read('docs/daily-booster.html'),
+    read('docs/booster-shop.html'),
+    read('docs/events.html'),
+    read('docs/redeem.html'),
+    read('docs/collection.html'),
+    read('docs/star-bits.html'),
+    read('docs/checklist.html'),
+    read('docs/trade-lists.html'),
+    read('docs/trade-offers.html'),
+    read('docs/notifications.html'),
+    read('docs/received-rewards.html'),
+    read('docs/profile-settings.html'),
     read('docs/js/pages/login-page.js'),
+    read('docs/js/pages/trade-lists-page.js'),
+    read('docs/js/pages/trade-offers-page.js'),
+    read('docs/js/pages/booster-shop-page.js'),
+    read('docs/js/pages/events-page.js'),
     read('docs/js/app.js'),
     read('supabase/migrations/20260722060000_website_content_settings.sql')
   ]);
 
   assert.match(html, /Website Editor/);
-  assert.match(html, /Home \| About \| Socials \| Login \| Binder \| Shared|data-tab="home"/);
-  assert.match(html, /data-tab="shared"/);
+  assert.match(html, /id="tablist"/);
   assert.match(page, /canEditWebsite|canManageRoles/);
   assert.match(page, /saveWebsiteContent/);
   assert.match(page, /resetWebsiteContent/);
-  assert.match(page, /data-action="add-social"/);
+  assert.match(page, /id="addSocialLink"|addSocialLink/);
+  assert.match(page, /WEBSITE_EDITOR_TABS/);
+  assert.match(page, /data-tab=/);
   assert.match(hydrate, /export function hydrateWebsiteContent/);
   assert.match(hydrate, /export async function loadAndHydrateWebsiteContent/);
   assert.match(hydrate, /\.social-links/);
@@ -115,15 +191,41 @@ test('website editor admin page and public hooks are wired', async () => {
   assert.match(shell, /'admin-website':\{title:'Website Editor'/);
   assert.match(routes, /'admin-website'/);
   assert.match(home, /data-content="home\.title"/);
-  assert.match(home, /website-content-hydrate-page\.js/);
+  assert.match(home, /data-content="home\.primaryCta"/);
+  assert.match(home, /data-content="home\.newsLoading"/);
+  assert.match(home, /website-content-hydrate-page\.js\?v=1\.1/);
   assert.match(about, /data-content="about\.lead"/);
+  assert.match(about, /data-content="about\.seriesLoading"/);
   assert.match(about, /shared\.infoStripCollection/);
+  assert.match(about, /website-content-hydrate-page\.js\?v=1\.1/);
   assert.match(socials, /id="socialLinks"/);
   assert.match(socials, /class="[^"]*social-links/);
   assert.match(login, /data-content="login\.brandTitle"/);
   assert.match(loginPage, /loginCopy/);
   assert.match(loginPage, /loadAndHydrateWebsiteContent/);
   assert.match(binder, /data-content="binder\.title"/);
+  assert.match(daily, /data-content="daily\.title"/);
+  assert.match(daily, /data-content="daily\.signInCta"/);
+  assert.match(daily, /website-content-hydrate-page\.js\?v=1\.1/);
+  assert.match(shop, /data-content="shop\.title"/);
+  assert.match(shop, /data-content="shop\.footerCta"/);
+  assert.match(events, /data-content="events\.emptyTitle"|data-content="events\.loading"/);
+  assert.match(redeem, /data-content="redeem\.submitCta"/);
+  assert.match(collection, /data-content="collection\.title"/);
+  assert.match(collection, /shared\.infoStripCollection/);
+  assert.match(starBits, /data-content="starBits\.title"/);
+  assert.match(checklist, /data-content="checklist\.title"/);
+  assert.match(checklist, /shared\.infoStripCopyright/);
+  assert.match(trades, /data-content="trades\.title"/);
+  assert.match(offers, /data-content="offers\.composeEmpty"/);
+  assert.match(notifications, /data-content="notifications\.preferencesTitle"/);
+  assert.match(rewards, /data-content="rewards\.tabPending"/);
+  assert.match(profile, /data-content="profile\.accountIntro"/);
+  assert.match(tradeListsPage, /loadAndHydrateWebsiteContent/);
+  assert.match(tradeListsPage, /emptyWishlist/);
+  assert.match(tradeOffersPage, /emptyIncoming/);
+  assert.match(boosterShopPage, /signedOutTitle/);
+  assert.match(eventsPage, /emptyTitle/);
   assert.match(app, /ensureWebsiteBinderLanding|getWebsiteContent/);
   assert.match(app, /binderLanding/);
   assert.match(migration, /get_website_content|admin_save_website_content/);

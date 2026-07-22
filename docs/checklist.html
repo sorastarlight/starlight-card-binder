@@ -63,26 +63,26 @@
 </aside>
 <main class="main">
 <section class="page-head panel">
-<p class="eyebrow">
+<p class="eyebrow" data-content="checklist.eyebrow">
                     Checklist
                 </p>
-<h1>
+<h1 data-content="checklist.title">
                     My Checklist
                 </h1>
-<p>
+<p data-content="checklist.lead">
                     Track every card by set, rarity, collection
                     status, and favorites.
                 </p>
 <div class="checklist-star-bits">
 <div>
-<h2>
+<h2 data-content="checklist.exchangeTitle">
                             ✦ Duplicate Card Exchange
                         </h2>
-<p>
+<p data-content="checklist.exchangeLead">
                             Review duplicate pulls and convert them into Star Bits without removing your final copy.
                         </p>
 </div>
-<a class="btn primary" href="binder.html?view=star-bits" data-shell-view="star-bits">Review Duplicates</a>
+<a class="btn primary" href="binder.html?view=star-bits" data-shell-view="star-bits" data-content="checklist.exchangeCta">Review Duplicates</a>
 </div>
 </section>
 <section class="card-filter-panel panel" data-card-filter-context="checklist" aria-label="Filter checklist cards"></section>
@@ -107,9 +107,9 @@
 <section class="info-strip">
 <p>
 <b>Collection:</b>
-                    Cards are earned through Daily Boosters, reward codes, and special events.
+                    <span data-content="shared.infoStripCollection">Cards are earned through Daily Boosters, reward codes, and special events.</span>
                 </p>
-<p>
+<p data-content="shared.infoStripCopyright">
                     © 2026 Sora Starlight
                 </p>
 </section>
@@ -119,6 +119,7 @@
 <!--
         Cloud synchronization finishes before app.js starts.
     -->
+<script type="module" src="js/pages/website-content-hydrate-page.js?v=1.1"></script>
 <script src="js/cloud-collection.js?v=1.1.4" type="module"></script>
 <script src="js/site-dashboard.js" type="module"></script>
 <script src="js/pages/checklist-page.js?v=1.0"></script>

@@ -1,5 +1,9 @@
 import { getMyTradeLists, setCardTradePreference, setTradeListVisibility } from '../trade-list-service.js';
 import { buildTradeSearchHaystack } from '../card-filter-utils.js';
+import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
+
+const siteCopy = await loadAndHydrateWebsiteContent();
+const tradesCopy = siteCopy?.trades || {};
 
 const grid = document.querySelector('#tradeGrid');
 const search = document.querySelector('#tradeSearch');
@@ -38,24 +42,27 @@ function filtered() {
 
 function emptyCopy(listLength) {
   if (query && !listLength) return 'No cards matched your search.';
-  if (tab === 'wishlist') return 'Browse All Cards and add the ones you are searching for.';
-  if (tab === 'trade') return 'Only duplicate copies can be offered for trade.';
+  if (tab === 'wishlist') {
+    return tradesCopy.emptyWishlist || 'Browse All Cards and add the ones you are searching for.';
+  }
+  if (tab === 'trade') {
+    return tradesCopy.emptyTrade || 'Only duplicate copies can be offered for trade.';
+  }
   return 'No cards matched your search.';
 }
 
 function emptyActions() {
   if (query) return '';
-  if (tab === 'wishlist') {
-    return '<p><button type="button" class="trade-empty-action" data-open-tab="all">Browse All Cards</button></p>';
-  }
-  if (tab === 'trade') {
-    return '<p><button type="button" class="trade-empty-action" data-open-tab="all">Browse All Cards</button></p>';
+  const actionLabel = esc(tradesCopy.emptyAction || 'Browse All Cards');
+  if (tab === 'wishlist' || tab === 'trade') {
+    return `<p><button type="button" class="trade-empty-action" data-open-tab="all">${actionLabel}</button></p>`;
   }
   return '';
 }
 
 function render() {
   const list = filtered();
+  const emptyTitle = esc(tradesCopy.emptyTitle || 'Nothing here yet');
   grid.innerHTML = list.length
     ? list.map(card => `<article class="trade-card">
         <img src="${esc(card.thumbnailUrl || card.imageUrl)}" alt="${esc(card.name)} card artwork">
@@ -67,7 +74,7 @@ function render() {
           <label>For Trade <select data-trade="${esc(card.id)}" aria-label="Trade quantity for ${esc(card.name)}">${Array.from({ length: card.duplicateQuantity + 1 }, (_, index) => `<option value="${index}" ${index === card.tradeQuantity ? 'selected' : ''}>${index}</option>`).join('')}</select></label>
         </div>
       </article>`).join('')
-    : `<div class="trade-empty"><h2>Nothing here yet</h2><p>${emptyCopy(list.length)}</p>${emptyActions()}</div>`;
+    : `<div class="trade-empty"><h2>${emptyTitle}</h2><p>${esc(emptyCopy(list.length))}</p>${emptyActions()}</div>`;
 }
 
 function setActiveTab(nextTab) {

@@ -2,6 +2,10 @@ import { supabase } from '../supabase-client.js';
 import { getStarBitsExchangePreview } from '../star-bits-service.js';
 import { openStarBitsBoosterById } from '../daily-booster-service.js';
 import { revealRewardSequence } from '../reward-reveal.js?v=1.5.11';
+import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
+
+const siteCopy = await loadAndHydrateWebsiteContent();
+const shopCopy = siteCopy?.shop || {};
 
 const packsEl = document.getElementById('packs');
 const balanceEl = document.getElementById('balance');
@@ -85,13 +89,16 @@ function sortedBoosters(){
 }
 function render(){
   if(!currentUser){
-    packsEl.innerHTML='<div class="signed-out"><h2>Sign in to visit the shop ✨</h2><p>Your purchases and new cards need a Starlight account so they can be saved safely.</p><a class="gallery-link" href="login.html" target="_top">Log In or Create Account</a></div>';
+    const title=escapeHTML(shopCopy.signedOutTitle||'Sign in to visit the shop ✨');
+    const lead=escapeHTML(shopCopy.signedOutLead||'Your purchases and new cards need a Starlight account so they can be saved safely.');
+    const cta=escapeHTML(shopCopy.signedOutCta||'Log In or Create Account');
+    packsEl.innerHTML=`<div class="signed-out"><h2>${title}</h2><p>${lead}</p><a class="gallery-link" href="login.html" target="_top">${cta}</a></div>`;
     return;
   }
   const list=sortedBoosters();
   if(!list.length){
     featuredStage.innerHTML='';
-    packsEl.innerHTML='<div class="empty">No booster packs are currently available in this category.</div>';
+    packsEl.innerHTML=`<div class="empty">${escapeHTML(shopCopy.emptyCategory||'No booster packs are currently available in this category.')}</div>`;
     return;
   }
   const featured=list[0];

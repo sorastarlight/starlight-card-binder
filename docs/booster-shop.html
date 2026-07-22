@@ -17,20 +17,20 @@
   <section class="shop-shell">
     <header class="shop-hero">
       <div class="hero-copy">
-        <p class="shop-kicker">Magical Booster Marketplace</p>
-        <h1 class="shop-title" aria-label="Starlight Card Shop">
+        <p class="shop-kicker" data-content="shop.eyebrow">Magical Booster Marketplace</p>
+        <h1 class="shop-title" aria-label="Starlight Card Shop" data-content="shop.title">
           <span class="title-top">Starlight</span>
           <span class="title-bottom">Card Shop</span>
         </h1>
         <div class="hero-message">
-          <p>Crack open wonder, chase your favorite cards, and turn every duplicate into fuel for your next magical pull.</p>
-          <strong>Exchange your Star Bits for booster packs and more!</strong>
+          <p data-content="shop.lead">Crack open wonder, chase your favorite cards, and turn every duplicate into fuel for your next magical pull.</p>
+          <strong data-content="shop.tagline">Exchange your Star Bits for booster packs and more!</strong>
         </div>
       </div>
       <aside class="wallet-card" aria-label="Star Bits wallet">
-        <small>Your Star Bits</small>
+        <small data-content="shop.walletLabel">Your Star Bits</small>
         <div class="wallet-amount"><span class="star">★</span><b id="balance">0</b></div>
-        <span id="wallet-note">Available to spend</span>
+        <span id="wallet-note" data-content="shop.walletNote">Available to spend</span>
         
       </aside>
     </header>
@@ -38,13 +38,13 @@
     <section class="shop-main">
       <section id="featured-stage" class="featured-stage" aria-live="polite"></section>
       <div class="shop-tabs" role="tablist" aria-label="Shop categories">
-        <button class="active" type="button" data-shop-tab="all">All Packs</button>
-        <button type="button" data-shop-tab="slots">Standard Packs</button>
-        <button type="button" data-shop-tab="series">Series Packs</button>
-        <button type="button" data-shop-tab="special">Special Packs</button>
+        <button class="active" type="button" data-shop-tab="all" data-content="shop.tabAll">All Packs</button>
+        <button type="button" data-shop-tab="slots" data-content="shop.tabStandard">Standard Packs</button>
+        <button type="button" data-shop-tab="series" data-content="shop.tabSeries">Series Packs</button>
+        <button type="button" data-shop-tab="special" data-content="shop.tabSpecial">Special Packs</button>
       </div>
       <div class="shop-toolbar">
-        <h2 class="section-title">✨ Booster Collection</h2>
+        <h2 class="section-title" data-content="shop.sectionTitle">✨ Booster Collection</h2>
         <label class="shop-filter">Sort
           <select id="sort-packs">
             <option value="featured">Featured</option>
@@ -57,8 +57,8 @@
       <div id="packs" class="pack-grid" aria-live="polite"></div>
       <p id="status" class="shop-status" role="status" aria-live="polite"></p>
       <footer class="shop-footer">
-        <div><strong>Turn duplicates into more pulls!</strong><span>Trade in extra cards for Star Bits and keep your collection growing.</span></div>
-        <a class="gallery-link" href="binder.html?view=star-bits" data-shell-view="star-bits">★ Go To My Star Bits</a>
+        <div><strong data-content="shop.footerTitle">Turn duplicates into more pulls!</strong><span data-content="shop.footerLead">Trade in extra cards for Star Bits and keep your collection growing.</span></div>
+        <a class="gallery-link" href="binder.html?view=star-bits" data-shell-view="star-bits" data-content="shop.footerCta">★ Go To My Star Bits</a>
       </footer>
     </section>
   </section>
@@ -92,6 +92,7 @@
   </section>
 </div>
 
+<script type="module" src="js/pages/website-content-hydrate-page.js?v=1.1"></script>
 <script src="js/pages/booster-shop-page.js?v=1.6.1" type="module"></script>
     <script src="js/shared-ui.js?v=1.6.7"></script>
 <script src="js/qol-ui.js?v=94.2.4" defer></script>

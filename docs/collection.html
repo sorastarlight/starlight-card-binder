@@ -29,9 +29,9 @@
 <main class="main">
 <section class="collection-dashboard panel">
 <div class="collection-dashboard-copy">
-<p class="eyebrow">My Stuff</p>
-<h1>My Card Collection &amp; Favorites</h1>
-<p>Celebrate your collection, revisit favorite cards, and understand your progress at a glance.</p>
+<p class="eyebrow" data-content="collection.eyebrow">My Stuff</p>
+<h1 data-content="collection.title">My Card Collection &amp; Favorites</h1>
+<p data-content="collection.lead">Celebrate your collection, revisit favorite cards, and understand your progress at a glance.</p>
 </div>
 <div aria-label="Collection summary" class="collection-summary-grid">
 <div><strong data-collected="">0</strong><span>Unique Cards</span></div>
@@ -52,24 +52,24 @@
 </div>
 </section>
 <section aria-label="Collection views" class="collection-tabs panel">
-<button class="collection-tab active" data-collection-tab="all" type="button">All Cards</button>
-<button class="collection-tab" data-collection-tab="favorites" type="button">Favorites</button>
-<button class="collection-tab" data-collection-tab="duplicates" type="button">Duplicates</button>
+<button class="collection-tab active" data-collection-tab="all" type="button" data-content="collection.tabAll">All Cards</button>
+<button class="collection-tab" data-collection-tab="favorites" type="button" data-content="collection.tabFavorites">Favorites</button>
+<button class="collection-tab" data-collection-tab="duplicates" type="button" data-content="collection.tabDuplicates">Duplicates</button>
 </section>
 <section class="card-filter-panel panel" data-card-filter-context="collection" aria-label="Filter collection cards"></section>
 <section class="collection-tab-panel active" data-collection-panel="all">
-<div class="collection-section-heading"><div><p class="eyebrow">Owned Cards</p><h2>All Cards</h2></div><p>Your complete cloud-synced collection.</p></div>
+<div class="collection-section-heading"><div><p class="eyebrow" data-content="collection.allEyebrow">Owned Cards</p><h2 data-content="collection.allTitle">All Cards</h2></div><p data-content="collection.allLead">Your complete cloud-synced collection.</p></div>
 <section class="grid-page" id="collectionGrid"></section>
 </section>
 <section class="collection-tab-panel" data-collection-panel="favorites" hidden="">
-<div class="collection-section-heading"><div><p class="eyebrow">Personal Picks</p><h2>Favorites</h2></div><p>The cards you have starred for quick access.</p></div>
+<div class="collection-section-heading"><div><p class="eyebrow" data-content="collection.favoritesEyebrow">Personal Picks</p><h2 data-content="collection.favoritesTitle">Favorites</h2></div><p data-content="collection.favoritesLead">The cards you have starred for quick access.</p></div>
 <section class="favorite-showcase panel" id="favoriteShowcase"></section>
 <section class="grid-page favorite-grid-list" id="favoriteGrid" aria-label="Favorite cards list"></section>
 </section>
 <section class="collection-tab-panel" data-collection-panel="duplicates" hidden="">
 <div class="collection-duplicates-card panel">
-<div><p class="eyebrow">Extra Copies</p><h2>Duplicate Cards</h2><p>You currently have <strong data-duplicates="">0</strong> extra copies. Your final copy of every card is always protected.</p></div>
-<a class="btn primary" data-shell-view="star-bits" href="binder.html?view=star-bits">✦ Open Star Bits Exchange</a>
+<div><p class="eyebrow" data-content="collection.duplicatesEyebrow">Extra Copies</p><h2 data-content="collection.duplicatesTitle">Duplicate Cards</h2><p data-content="collection.duplicatesLead">You currently have <strong data-duplicates="">0</strong> extra copies. Your final copy of every card is always protected.</p></div>
+<a class="btn primary" data-shell-view="star-bits" href="binder.html?view=star-bits" data-content="collection.duplicatesCta">✦ Open Star Bits Exchange</a>
 </div>
 <div class="grid-page" id="collectionDuplicateGrid"></div>
 </section>
@@ -82,9 +82,9 @@
 <section class="info-strip">
 <p>
 <b>Collection:</b>
-                    Cards are earned through Daily Boosters, reward codes, and special events.
+                    <span data-content="shared.infoStripCollection">Cards are earned through Daily Boosters, reward codes, and special events.</span>
                 </p>
-<p>
+<p data-content="shared.infoStripCopyright">
                     © 2026 Sora Starlight
                 </p>
 </section>
@@ -94,6 +94,7 @@
 <!--
         Cloud synchronization finishes before app.js starts.
     -->
+<script type="module" src="js/pages/website-content-hydrate-page.js?v=1.1"></script>
 <script src="js/cloud-collection.js?v=1.1.4" type="module"></script>
 <script src="js/site-dashboard.js" type="module"></script>
 <script src="js/pages/collection-page.js?v=1.0"></script>

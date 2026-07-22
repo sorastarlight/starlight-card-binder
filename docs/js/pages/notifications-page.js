@@ -12,6 +12,10 @@ import {
   resolveNotificationRoute,
   shellNotificationUrl
 } from '../shell-route-utils.js';
+import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
+
+const siteCopy = await loadAndHydrateWebsiteContent();
+const notificationsCopy = siteCopy?.notifications || {};
 
 const list = document.getElementById('list');
 const summary = document.getElementById('summary');
@@ -46,7 +50,9 @@ function render(data) {
   summary.textContent = `${data.unreadCount || 0} unread • ${state.length} recent${historyMode ? ' • history' : ''}`;
   list.replaceChildren();
   if (!visible.length) {
-    list.innerHTML = '<div class="notice-empty"><h2>All caught up ✨</h2><p>New collector activity will appear here.</p></div>';
+    const emptyTitle = esc(notificationsCopy.emptyTitle || 'All caught up ✨');
+    const emptyLead = esc(notificationsCopy.emptyLead || 'New collector activity will appear here.');
+    list.innerHTML = `<div class="notice-empty"><h2>${emptyTitle}</h2><p>${emptyLead}</p></div>`;
     return;
   }
   for (const n of visible) {

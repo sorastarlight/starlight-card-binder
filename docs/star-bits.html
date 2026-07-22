@@ -18,13 +18,13 @@
 <main class="bits-page">
 <section class="bits-panel">
 <header class="bits-header">
-<p class="eyebrow">
+<p class="eyebrow" data-content="starBits.eyebrow">
                     Duplicate Card Exchange
                 </p>
-<h1>
+<h1 data-content="starBits.title">
                     ✦ Star Bits Exchange
                 </h1>
-<p>
+<p data-content="starBits.lead">
                     Extra copies can be converted into Star Bits.
                     Your final copy of every card will always stay
                     safely in your collection.
@@ -65,7 +65,7 @@
 </div>
 </section>
 <section class="rate-section hidden" id="rate-section">
-<h2>
+<h2 data-content="starBits.ratesTitle">
                     Exchange Values
                 </h2>
 <div class="rate-grid" id="rate-grid"></div>
@@ -73,9 +73,9 @@
 <section class="duplicate-section hidden qol-duplicate-section" id="duplicate-section">
 <div class="duplicate-heading">
   <div>
-    <p class="eyebrow">Your Extra Copies</p>
-    <h2>Choose What to Exchange</h2>
-    <p>One permanent copy of every card is automatically protected.</p>
+    <p class="eyebrow" data-content="starBits.chooseTitle">Your Extra Copies</p>
+    <h2 data-content="starBits.chooseLead">Choose What to Exchange</h2>
+    <p data-content="starBits.chooseNote">One permanent copy of every card is automatically protected.</p>
   </div>
   <label class="qol-bulk-toggle">
     <input id="select-all-toggle" class="qol-no-enhance" type="checkbox">
@@ -92,23 +92,23 @@
 <div class="duplicate-grid" id="duplicate-grid"></div>
 </section>
 <section class="empty-state hidden" id="empty-state">
-<h2>
+<h2 data-content="starBits.emptyTitle">
                     No Duplicates Available
                 </h2>
-<p>
+<p data-content="starBits.emptyLead">
                     Your extra copies will appear here after
                     opening Daily Boosters and reward packs.
                 </p>
 </section>
 <section class="exchange-box hidden" id="exchange-box">
-<h2>
+<h2 data-content="starBits.exchangeTitle">
                     Conversion Available
                 </h2>
 <p id="exchange-description"></p>
-<button class="exchange-button" id="exchange-button" type="button">
+<button class="exchange-button" id="exchange-button" type="button" data-content="starBits.exchangeCta">
                     Convert All Selected
                 </button>
-<p>
+<p data-content="starBits.exchangeNote">
                     One permanent copy of every card is protected.
                 </p>
 </section>
@@ -117,6 +117,7 @@
             </p>
 </section>
 </main>
+<script type="module" src="js/pages/website-content-hydrate-page.js?v=1.1"></script>
 <script src="js/pages/star-bits-page.js?v=1.1" type="module"></script>
     <script src="js/shared-ui.js?v=1.6.7"></script>
 <script src="js/qol-ui.js?v=94.2.4" defer></script>

@@ -1,8 +1,9 @@
 import { cloneDefaultWebsiteContent, HOME_QUICK_LINK_IDS } from './website-content-defaults.js';
 
 const QUICK_LINK_SET = new Set(HOME_QUICK_LINK_IDS);
+const MAX_STRING = 500;
 
-function text(value, fallback = '', max = 240) {
+function text(value, fallback = '', max = MAX_STRING) {
   const next = String(value ?? '').trim();
   if (!next) return fallback;
   return next.slice(0, max);
@@ -20,96 +21,120 @@ function safeHttpUrl(value, fallback = '') {
   }
 }
 
+function normalizeLegacyHome(home = {}, defaults) {
+  const primary = typeof home.primaryCta === 'object'
+    ? home.primaryCta?.label
+    : home.primaryCta;
+  const secondary = typeof home.secondaryCta === 'object'
+    ? home.secondaryCta?.label
+    : home.secondaryCta;
+  const newsEyebrow = home.newsEyebrow ?? home.newsHeading?.eyebrow;
+  const newsTitle = home.newsTitle ?? home.newsHeading?.title;
+  return {
+    ...home,
+    primaryCta: primary,
+    secondaryCta: secondary,
+    newsEyebrow,
+    newsTitle
+  };
+}
+
+function sanitizeStringMap(source = {}, defaults = {}, max = MAX_STRING) {
+  const out = { ...defaults };
+  for (const [key, fallback] of Object.entries(defaults)) {
+    if (typeof fallback === 'string') {
+      out[key] = text(source[key], fallback, max);
+    }
+  }
+  // Inclusive: keep extra string fields staff already saved (future-proof).
+  for (const [key, value] of Object.entries(source)) {
+    if (key in out) continue;
+    if (typeof value === 'string') out[key] = text(value, '', max);
+  }
+  return out;
+}
+
+function sanitizeSocialLinks(links, defaults) {
+  const rows = Array.isArray(links) ? links : defaults;
+  const sanitized = rows.slice(0, 12).map((link, index) => {
+    const fallback = defaults[index] || defaults[0] || {
+      id: `link-${index}`, icon: '✦', label: 'Link', handle: '', url: 'https://example.com'
+    };
+    return {
+      id: text(link?.id, fallback.id, 32) || `link-${index}`,
+      icon: text(link?.icon, fallback.icon, 8),
+      label: text(link?.label, fallback.label, 40),
+      handle: text(link?.handle, fallback.handle, 60),
+      url: safeHttpUrl(link?.url, fallback.url)
+    };
+  });
+  if (!sanitized.length) throw new Error('At least one social link is required.');
+  return sanitized;
+}
+
+function sanitizeQuickLinks(links, defaults) {
+  const rows = Array.isArray(links) ? links : defaults;
+  const mapped = rows
+    .map((link, index) => {
+      const id = String(link?.id || HOME_QUICK_LINK_IDS[index] || '').trim();
+      if (!QUICK_LINK_SET.has(id)) return null;
+      const fallback = defaults.find(entry => entry.id === id) || defaults[index];
+      return { id, label: text(link?.label, fallback?.label || id, 40) };
+    })
+    .filter(Boolean);
+  return HOME_QUICK_LINK_IDS.map(id => (
+    mapped.find(link => link.id === id)
+    || defaults.find(link => link.id === id)
+  )).filter(Boolean);
+}
+
 export function sanitizeWebsiteContent(input) {
   const defaults = cloneDefaultWebsiteContent();
   const source = input && typeof input === 'object' ? input : {};
+  const homeSource = normalizeLegacyHome(source.home || {}, defaults.home);
 
-  const homeSource = source.home && typeof source.home === 'object' ? source.home : {};
-  const aboutSource = source.about && typeof source.about === 'object' ? source.about : {};
-  const socialsSource = source.socials && typeof source.socials === 'object' ? source.socials : {};
-  const loginSource = source.login && typeof source.login === 'object' ? source.login : {};
-  const binderSource = source.binderLanding && typeof source.binderLanding === 'object' ? source.binderLanding : {};
-  const sharedSource = source.shared && typeof source.shared === 'object' ? source.shared : {};
-
-  const quickLinks = Array.isArray(homeSource.quickLinks)
-    ? homeSource.quickLinks
-      .map((link, index) => {
-        const id = String(link?.id || HOME_QUICK_LINK_IDS[index] || '').trim();
-        if (!QUICK_LINK_SET.has(id)) return null;
-        const fallback = defaults.home.quickLinks.find(entry => entry.id === id) || defaults.home.quickLinks[index];
-        return {
-          id,
-          label: text(link?.label, fallback?.label || id, 40)
-        };
-      })
-      .filter(Boolean)
-      .slice(0, 4)
-    : defaults.home.quickLinks;
-
-  const orderedQuickLinks = HOME_QUICK_LINK_IDS.map(id => (
-    quickLinks.find(link => link.id === id)
-    || defaults.home.quickLinks.find(link => link.id === id)
-  )).filter(Boolean);
-
-  const socialLinks = Array.isArray(socialsSource.links)
-    ? socialsSource.links.slice(0, 8).map((link, index) => {
-      const fallback = defaults.socials.links[index] || defaults.socials.links[0];
-      return {
-        id: text(link?.id, fallback.id, 32) || `link-${index}`,
-        icon: text(link?.icon, fallback.icon, 8),
-        label: text(link?.label, fallback.label, 40),
-        handle: text(link?.handle, fallback.handle, 60),
-        url: safeHttpUrl(link?.url, fallback.url)
-      };
-    })
-    : defaults.socials.links;
-
-  if (!socialLinks.length) throw new Error('At least one social link is required.');
-
-  return {
-    version: 1,
+  const result = {
+    version: 2,
     home: {
-      eyebrow: text(homeSource.eyebrow, defaults.home.eyebrow, 80),
-      title: text(homeSource.title, defaults.home.title, 120),
-      lead: text(homeSource.lead, defaults.home.lead, 400),
-      primaryCta: {
-        label: text(homeSource.primaryCta?.label, defaults.home.primaryCta.label, 48)
-      },
-      secondaryCta: {
-        label: text(homeSource.secondaryCta?.label, defaults.home.secondaryCta.label, 48)
-      },
-      quickLinks: orderedQuickLinks,
-      newsHeading: {
-        eyebrow: text(homeSource.newsHeading?.eyebrow, defaults.home.newsHeading.eyebrow, 80),
-        title: text(homeSource.newsHeading?.title, defaults.home.newsHeading.title, 80)
-      }
+      ...sanitizeStringMap(homeSource, {
+        eyebrow: defaults.home.eyebrow,
+        title: defaults.home.title,
+        lead: defaults.home.lead,
+        primaryCta: defaults.home.primaryCta,
+        secondaryCta: defaults.home.secondaryCta,
+        newsEyebrow: defaults.home.newsEyebrow,
+        newsTitle: defaults.home.newsTitle,
+        newsLoading: defaults.home.newsLoading
+      }),
+      quickLinks: sanitizeQuickLinks(homeSource.quickLinks, defaults.home.quickLinks)
     },
-    about: {
-      eyebrow: text(aboutSource.eyebrow, defaults.about.eyebrow, 40),
-      title: text(aboutSource.title, defaults.about.title, 120),
-      lead: text(aboutSource.lead, defaults.about.lead, 400)
-    },
+    binderLanding: sanitizeStringMap(source.binderLanding || {}, defaults.binderLanding),
+    daily: sanitizeStringMap(source.daily || {}, defaults.daily),
+    shop: sanitizeStringMap(source.shop || {}, defaults.shop),
+    events: sanitizeStringMap(source.events || {}, defaults.events),
+    redeem: sanitizeStringMap(source.redeem || {}, defaults.redeem),
+    collection: sanitizeStringMap(source.collection || {}, defaults.collection),
+    starBits: sanitizeStringMap(source.starBits || {}, defaults.starBits),
+    checklist: sanitizeStringMap(source.checklist || {}, defaults.checklist),
+    trades: sanitizeStringMap(source.trades || {}, defaults.trades),
+    offers: sanitizeStringMap(source.offers || {}, defaults.offers),
+    notifications: sanitizeStringMap(source.notifications || {}, defaults.notifications),
+    rewards: sanitizeStringMap(source.rewards || {}, defaults.rewards),
+    profile: sanitizeStringMap(source.profile || {}, defaults.profile),
+    about: sanitizeStringMap(source.about || {}, defaults.about),
     socials: {
-      eyebrow: text(socialsSource.eyebrow, defaults.socials.eyebrow, 40),
-      title: text(socialsSource.title, defaults.socials.title, 120),
-      lead: text(socialsSource.lead, defaults.socials.lead, 400),
-      links: socialLinks
+      ...sanitizeStringMap(source.socials || {}, {
+        eyebrow: defaults.socials.eyebrow,
+        title: defaults.socials.title,
+        lead: defaults.socials.lead
+      }),
+      links: sanitizeSocialLinks(source.socials?.links, defaults.socials.links)
     },
-    login: {
-      brandTitle: text(loginSource.brandTitle, defaults.login.brandTitle, 60),
-      signInDescription: text(loginSource.signInDescription, defaults.login.signInDescription, 220),
-      signUpDescription: text(loginSource.signUpDescription, defaults.login.signUpDescription, 220)
-    },
-    binderLanding: {
-      eyebrow: text(binderSource.eyebrow, defaults.binderLanding.eyebrow, 60),
-      title: text(binderSource.title, defaults.binderLanding.title, 120),
-      lead: text(binderSource.lead, defaults.binderLanding.lead, 240)
-    },
-    shared: {
-      infoStripCollection: text(sharedSource.infoStripCollection, defaults.shared.infoStripCollection, 220),
-      infoStripCopyright: text(sharedSource.infoStripCopyright, defaults.shared.infoStripCopyright, 80)
-    }
+    login: sanitizeStringMap(source.login || {}, defaults.login),
+    shared: sanitizeStringMap(source.shared || {}, defaults.shared)
   };
+
+  return result;
 }
 
 export function mergeWebsiteContent(remote) {
@@ -118,4 +143,12 @@ export function mergeWebsiteContent(remote) {
   } catch {
     return cloneDefaultWebsiteContent();
   }
+}
+
+/** Humanize a camelCase / dotted field key for admin labels. */
+export function labelForFieldKey(key) {
+  return String(key || '')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/[._]/g, ' ')
+    .replace(/\b\w/g, char => char.toUpperCase());
 }
