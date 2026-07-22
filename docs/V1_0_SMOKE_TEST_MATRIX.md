@@ -46,11 +46,11 @@ Third slice: **checklist + collection filter parity** — checklist uses shared 
 
 Fourth slice: **binder browse chrome + trade search** — honest owned/not-collected count pill, collector-number badges, mobile filter head stack, trade wishlist search haystack includes collector numbers.
 
-Fifth slice: **profiles + trading polish** — shell-safe public profile links, report CTA, self-trade guard, wishlist/offers a11y + pick search; migration `20260722020000_trade_lists_collector_number` pending production apply.
+Fifth slice: **profiles + trading polish** — shell-safe public profile links, report CTA, self-trade guard, wishlist/offers a11y + pick search; migration `20260722020000_trade_lists_collector_number` applied to production 2026-07-21.
 
 Sixth slice: **trade offer composer integrity** — selections survive search via qty maps, sticky offer summary, match-first pick sort, send → Sent tab, inbox profile links + deep-link tab, decline/cancel confirms, wishlist empty Browse All CTA.
 
-Seventh slice: **collector recipient typeahead** — search by username, display name, or exact email (`search_trade_collectors`); emails never returned to the client; migration `20260722030000_search_trade_collectors` pending production apply.
+Seventh slice: **collector recipient typeahead** — search by username, display name, or exact email (`search_trade_collectors`); emails never returned to the client; migration `20260722030000_search_trade_collectors` applied to production 2026-07-21.
 
 ## Fixes found during this walk
 
@@ -65,3 +65,5 @@ Seventh slice: **collector recipient typeahead** — search by username, display
 - Readiness snapshot: 3 users, 2 series, 24 cards, 3 shop boosters
 - Applied to production via MCP (2026-07-21): `20260721175802_revoke_anon_admin_rpc_execute` — verified `anon_exec=false` and `authenticated`/`service_role` retain EXECUTE
 - Applied to production via MCP (2026-07-21): `20260721191343_revoke_anon_collector_rpc_execute` — verified collector-private RPCs (`open_daily_booster`, Star Bits preview, notifications, gifts, favorites, etc.) have `anon_exec=false`
+- Applied to production via MCP (2026-07-22): `trade_lists_collector_number` — `get_my_trade_lists` / `get_public_trade_lists` / `get_trade_offer_context` expose `collectorNumber`; anon cannot execute private trade RPCs
+- Applied to production via MCP (2026-07-22): `search_trade_collectors` — authenticated typeahead for username/display name/exact email; anon cannot execute
