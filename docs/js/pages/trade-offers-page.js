@@ -1,10 +1,11 @@
-import { getTradeOfferContext, createTradeOffer, getMyTradeOffers, respondToTradeOffer } from '../trade-offer-service.js';
+import { getTradeOfferContext, createTradeOffer, getMyTradeOffers, respondToTradeOffer, searchTradeCollectors } from '../trade-offer-service.js';
 import { buildTradeSearchHaystack } from '../card-filter-utils.js';
 
 const params = new URLSearchParams(location.search);
 let username = params.get('username') || '';
 const status = document.querySelector('#tradeStatus');
 const recipientInput = document.querySelector('#recipientUsername');
+const recipientResults = document.querySelector('#recipientResults');
 const mySearch = document.querySelector('#myCardsSearch');
 const theirSearch = document.querySelector('#theirCardsSearch');
 const sendButton = document.querySelector('#sendOffer');
@@ -19,6 +20,12 @@ const offeredQty = new Map();
 /** @type {Map<string, number>} */
 const requestedQty = new Map();
 let sending = false;
+let searchTimer = 0;
+let searchRequestId = 0;
+/** @type {Array<{username:string,displayName?:string,avatarUrl?:string,matchedByEmail?:boolean}>} */
+let searchHits = [];
+let activeSearchIndex = -1;
+let searchAvailable = true;
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
   '&': '&amp;',
@@ -172,9 +179,109 @@ function collectorLink(displayName, handle) {
   return `<a class="collector-link" href="${esc(href)}">${esc(label)}</a>`;
 }
 
-async function initCompose() {
+function setResultsOpen(open) {
+  if (!recipientResults || !recipientInput) return;
+  recipientResults.hidden = !open;
+  recipientInput.setAttribute('aria-expanded', String(Boolean(open)));
+}
+
+function hideRecipientResults() {
+  searchHits = [];
+  activeSearchIndex = -1;
+  if (recipientResults) recipientResults.innerHTML = '';
+  setResultsOpen(false);
+}
+
+function renderRecipientResults(message = '') {
+  if (!recipientResults) return;
+  if (message) {
+    recipientResults.innerHTML = `<div class="recipient-results-status">${esc(message)}</div>`;
+    setResultsOpen(true);
+    return;
+  }
+  if (!searchHits.length) {
+    recipientResults.innerHTML = '<div class="recipient-results-empty">No collectors matched.</div>';
+    setResultsOpen(true);
+    return;
+  }
+  recipientResults.innerHTML = searchHits.map((hit, index) => {
+    const label = hit.displayName || hit.username;
+    const meta = hit.matchedByEmail ? `@${hit.username} • matched by email` : `@${hit.username}`;
+    return `<button type="button" class="recipient-option" role="option" id="recipient-option-${index}" data-username="${esc(hit.username)}" aria-selected="${index === activeSearchIndex}">
+      ${hit.avatarUrl ? `<img src="${esc(hit.avatarUrl)}" alt="">` : '<span class="recipient-option-avatar" aria-hidden="true"></span>'}
+      <span class="recipient-option-copy"><b>${esc(label)}</b><small>${esc(meta)}</small></span>
+    </button>`;
+  }).join('');
+  setResultsOpen(true);
+}
+
+async function runCollectorSearch(rawQuery) {
+  const query = String(rawQuery || '').trim();
+  if (query.length < 2) {
+    hideRecipientResults();
+    return;
+  }
+  if (!searchAvailable) {
+    renderRecipientResults('Live search is unavailable. Enter an exact username, then Create Offer.');
+    return;
+  }
+  const requestId = ++searchRequestId;
+  renderRecipientResults('Searching…');
+  try {
+    const payload = await searchTradeCollectors(query);
+    if (requestId !== searchRequestId) return;
+    searchHits = payload.results || [];
+    activeSearchIndex = searchHits.length ? 0 : -1;
+    renderRecipientResults();
+  } catch (error) {
+    if (requestId !== searchRequestId) return;
+    const message = String(error?.message || error || '');
+    if (/search_trade_collectors|Could not find the function|schema cache/i.test(message)) {
+      searchAvailable = false;
+      renderRecipientResults('Live search needs a database update. Enter an exact username for now.');
+      return;
+    }
+    renderRecipientResults(message || 'Could not search collectors.');
+  }
+}
+
+function scheduleCollectorSearch() {
+  window.clearTimeout(searchTimer);
+  const query = recipientInput?.value || '';
+  if (String(query).trim().length < 2) {
+    hideRecipientResults();
+    return;
+  }
+  searchTimer = window.setTimeout(() => {
+    runCollectorSearch(query);
+  }, 220);
+}
+
+function selectSearchHit(index) {
+  const hit = searchHits[index];
+  if (!hit?.username) return;
+  if (recipientInput) recipientInput.value = hit.username;
+  hideRecipientResults();
+  loadRecipient(hit.username);
+}
+
+function showRecipientLookup() {
+  document.querySelector('#composeForm').hidden = true;
+  document.querySelector('#composeMissing').hidden = false;
+  context = null;
+  resetComposerSelections();
+  renderOfferSummary();
+  if (recipientInput) {
+    recipientInput.focus();
+    if (username) recipientInput.value = username;
+  }
+}
+
+async function initCompose(requestedUsername = username) {
+  username = String(requestedUsername || '').trim().replace(/^@/, '');
   if (!username) return;
   if (recipientInput) recipientInput.value = username;
+  hideRecipientResults();
   try {
     context = await getTradeOfferContext(username);
     context.myAvailableCards = (context.myAvailableCards || []).map(normalizeCard);
@@ -184,24 +291,26 @@ async function initCompose() {
     document.querySelector('#composeForm').hidden = false;
     const recipient = context.recipient;
     const avatarAlt = recipient.displayName || recipient.username || 'Collector';
-    document.querySelector('#recipientHead').innerHTML = `<div class="collector-head">${recipient.avatarUrl ? `<img src="${esc(recipient.avatarUrl)}" alt="${esc(avatarAlt)} avatar">` : ''}<div><b>Trading with ${collectorLink(recipient.displayName || recipient.username, recipient.username)}</b><div>@${esc(recipient.username)}</div></div></div>`;
+    document.querySelector('#recipientHead').innerHTML = `<div class="collector-head">${recipient.avatarUrl ? `<img src="${esc(recipient.avatarUrl)}" alt="${esc(avatarAlt)} avatar">` : ''}<div><b>Trading with ${collectorLink(recipient.displayName || recipient.username, recipient.username)}</b><div>@${esc(recipient.username)}</div><button type="button" class="change-recipient" data-action="change-recipient">Change collector</button></div></div>`;
     renderPickGrids();
     status.textContent = `Ready to trade with @${recipient.username}.`;
   } catch (error) {
     status.textContent = error.message;
+    showRecipientLookup();
   }
 }
 
-async function loadRecipient() {
-  username = (recipientInput?.value || '').trim().replace(/^@/, '');
+async function loadRecipient(forcedUsername) {
+  username = String(forcedUsername ?? recipientInput?.value ?? '').trim().replace(/^@/, '');
   if (!username) {
-    status.textContent = 'Enter a collector username.';
+    status.textContent = 'Search for a collector, or enter a username.';
     return;
   }
   const next = new URLSearchParams(params);
   next.set('username', username);
   history.replaceState({}, '', `${location.pathname}?${next.toString()}`);
-  await initCompose();
+  setActiveOfferTab('compose');
+  await initCompose(username);
 }
 
 function mini(items) {
@@ -277,13 +386,51 @@ function focusHighlightedOffer() {
   target?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 
-document.querySelector('#loadRecipient')?.addEventListener('click', loadRecipient);
+document.querySelector('#loadRecipient')?.addEventListener('click', () => loadRecipient());
+recipientInput?.addEventListener('input', scheduleCollectorSearch);
+recipientInput?.addEventListener('focus', () => {
+  if (searchHits.length || (recipientInput.value || '').trim().length >= 2) {
+    if (searchHits.length) renderRecipientResults();
+    else scheduleCollectorSearch();
+  }
+});
 recipientInput?.addEventListener('keydown', event => {
+  if (event.key === 'ArrowDown' && searchHits.length) {
+    event.preventDefault();
+    activeSearchIndex = (activeSearchIndex + 1) % searchHits.length;
+    renderRecipientResults();
+    return;
+  }
+  if (event.key === 'ArrowUp' && searchHits.length) {
+    event.preventDefault();
+    activeSearchIndex = (activeSearchIndex - 1 + searchHits.length) % searchHits.length;
+    renderRecipientResults();
+    return;
+  }
+  if (event.key === 'Escape') {
+    hideRecipientResults();
+    return;
+  }
   if (event.key === 'Enter') {
     event.preventDefault();
+    if (activeSearchIndex >= 0 && searchHits[activeSearchIndex]) {
+      selectSearchHit(activeSearchIndex);
+      return;
+    }
     loadRecipient();
   }
 });
+recipientResults?.addEventListener('mousedown', event => {
+  const option = event.target.closest('[data-username]');
+  if (!option) return;
+  event.preventDefault();
+  loadRecipient(option.dataset.username);
+});
+document.addEventListener('click', event => {
+  if (event.target.closest('.recipient-search')) return;
+  hideRecipientResults();
+});
+
 mySearch?.addEventListener('input', () => {
   myQuery = mySearch.value.trim().toLowerCase();
   renderPickGrids();
@@ -334,6 +481,13 @@ if (sendButton) {
 }
 
 document.addEventListener('click', async event => {
+  const changeButton = event.target.closest('[data-action="change-recipient"]');
+  if (changeButton) {
+    showRecipientLookup();
+    status.textContent = 'Search for another collector.';
+    return;
+  }
+
   const clearButton = event.target.closest('[data-action="clear-selections"]');
   if (clearButton) {
     clearSelections();
