@@ -19,7 +19,10 @@ test('V1.0 smoke-test matrix covers the critical foundation journeys', async () 
     'Chromium',
     'Firefox',
     'Opera GX',
-    'Reduced motion'
+    'Reduced motion',
+    'Shell overlay viewport contract',
+    'visible viewport',
+    'Done returns a clickable page'
   ]) {
     assert.match(matrix, new RegExp(journey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'));
   }

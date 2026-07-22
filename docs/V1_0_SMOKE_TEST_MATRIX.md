@@ -24,6 +24,18 @@ Last walk: **2026-07-21** (Chromium). Signed-out + signed-in staff collector `@s
 | 13 | Cross-browser smoke (Opera GX) | blocked | blocked | Needs Opera GX; automated detection covered by `tests/browser-performance.test.mjs`. |
 | 14 | Reduced motion | pass | n/a | `prefers-reduced-motion` rules present; signed-in reveal used shared engine (live reduced-motion device check still optional). |
 
+## Shell overlay viewport contract (regression)
+
+Shared contract: `StarlightUI.anchorOverlayToVisibleViewport` / `clearOverlayViewportAnchor` + `.is-embed-anchored` CSS. Overlays must pin to the **visible** shell iframe slice, never the middle of a tall iframe document. Parent shell scroll must not be left locked after close.
+
+| # | Check | Desktop | Mobile | Notes |
+|---|-------|---------|--------|-------|
+| O1 | Profile crop/banner dialog opens centered in the visible viewport | | | Choose image while scrolled mid-page inside Profile Settings embed |
+| O2 | Confirm dialogs (Star Bits convert, shop purchase) open in front of the user | | | No scroll hunting for the dialog |
+| O3 | Daily/Shop reveal Done returns a clickable page without refresh | | | Open pack → complete → Done → open another / navigate |
+| O4 | Reveal pack UI is visible without scrolling the shell to find it | | | Start reveal while mid-page on a tall shop/daily view |
+| O5 | After modal/reveal close, shell sidebar + page clicks still work | | | No frozen iframe / dead clicks |
+
 ## Automated coverage already in repo
 
 These do **not** replace the matrix above, but must stay green:

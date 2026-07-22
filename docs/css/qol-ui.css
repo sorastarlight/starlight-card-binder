@@ -175,9 +175,10 @@ html{scroll-padding-top:110px}
 .profile-crop-modal[data-crop-mode="banner"]>.profile-crop-dialog,
 .profile-crop-modal[data-crop-mode="banner"]>.st-dialog{--qol-modal-width:720px}
 /* Tall shell iframes: pin the overlay to the visible slice.
-   Specificity must beat the :not(.hidden):not([hidden]) fixed/100dvh rule. */
-:is(.st-dialog-overlay,.editor,.rule-modal,.test-modal,.receipt,.profile-crop-modal).is-embed-anchored:not(.hidden):not([hidden]),
-:is(.st-dialog-overlay,.editor,.rule-modal,.test-modal,.receipt,.profile-crop-modal).is-embed-anchored.is-open{
+   Specificity must beat the :not(.hidden):not([hidden]) fixed/100dvh rule.
+   Keep in sync with docs/css/shared-ui.css shell iframe contract. */
+:is(.st-dialog-overlay,.st-r3-overlay,.editor,.rule-modal,.test-modal,.receipt,.profile-crop-modal).is-embed-anchored:not(.hidden):not([hidden]),
+:is(.st-dialog-overlay,.st-r3-overlay,.editor,.rule-modal,.test-modal,.receipt,.profile-crop-modal).is-embed-anchored.is-open{
   --st-embed-overlay-top:0px;
   --st-embed-overlay-height:100dvh;
   position:absolute!important;
@@ -191,8 +192,8 @@ html{scroll-padding-top:110px}
   height:var(--st-embed-overlay-height)!important;
   max-height:var(--st-embed-overlay-height)!important;
 }
-:is(.st-dialog-overlay,.editor,.rule-modal,.test-modal,.receipt,.profile-crop-modal).is-embed-anchored:not(.hidden):not([hidden])>:is(.st-dialog,.editor-card,.card,.rule-modal-card,.test-card,.receipt-card,.profile-crop-dialog),
-:is(.st-dialog-overlay,.editor,.rule-modal,.test-modal,.receipt,.profile-crop-modal).is-embed-anchored.is-open>:is(.st-dialog,.editor-card,.card,.rule-modal-card,.test-card,.receipt-card,.profile-crop-dialog){
+:is(.st-dialog-overlay,.st-r3-overlay,.editor,.rule-modal,.test-modal,.receipt,.profile-crop-modal).is-embed-anchored:not(.hidden):not([hidden])>:is(.st-dialog,.st-r3-dialog,.editor-card,.card,.rule-modal-card,.test-card,.receipt-card,.profile-crop-dialog),
+:is(.st-dialog-overlay,.st-r3-overlay,.editor,.rule-modal,.test-modal,.receipt,.profile-crop-modal).is-embed-anchored.is-open>:is(.st-dialog,.st-r3-dialog,.editor-card,.card,.rule-modal-card,.test-card,.receipt-card,.profile-crop-dialog){
   max-height:min(92%, calc(var(--st-embed-overlay-height) - 24px))!important;
 }
 @keyframes qolModalIn{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:none}}

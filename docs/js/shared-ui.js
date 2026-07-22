@@ -402,7 +402,7 @@ function adoptModal(element, options = {}) {
       syncOverlayEmbedAnchor(element, ownerDocument.defaultView);
       options.onOpen?.(controller);
       element.dispatchEvent(new ownerDocument.defaultView.CustomEvent('starlight:modal-open', { detail: { controller } }));
-      // Keep the overlay's own scroll at top. Avoid scrollIntoView — in tall
+      // Keep the overlay's own scroll at top. Avoid auto-scrolling the host — in tall
       // shell iframes it scrolls the parent shell and leaves clicks missing the UI.
       element.scrollTop = 0;
       ownerDocument.defaultView.requestAnimationFrame(() => {
@@ -565,6 +565,11 @@ window.StarlightUI = {
   alert: alertDialog,
   createModal,
   adoptModal,
+  /** Pin an overlay to the visible shell-iframe slice (tall embeds). */
+  anchorOverlayToVisibleViewport: syncOverlayEmbedAnchor,
+  /** Clear embed viewport pin styles after close/cleanup. */
+  clearOverlayViewportAnchor: clearOverlayEmbedAnchor,
+  getEmbedVisibleFrame,
   isHolographicCard,
   cardFinishClass,
   finishEffectLabel,

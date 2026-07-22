@@ -1,5 +1,5 @@
 /*
- * Approved reveal presentation baseline: v1.5.12.
+ * Approved reveal presentation baseline: v1.5.13.
  * Keep its motion contract intact unless this version and its regression test
  * are intentionally advanced together.
  */
@@ -47,8 +47,10 @@
   backdrop-filter: blur(14px) saturate(1.08);
   isolation: isolate;
 }
-/* Tall shell iframes: pin the reveal to the visible viewport slice. */
-.st-r3-overlay.is-embed-anchored {
+/* Tall shell iframes: pin the reveal to the visible viewport slice.
+   Keep in sync with docs/css/shared-ui.css shell iframe contract. */
+.st-r3-overlay.is-embed-anchored:not(.hidden):not([hidden]),
+.st-r3-overlay.is-embed-anchored.is-open {
   --st-embed-overlay-top: 0px;
   --st-embed-overlay-height: 100%;
   position: absolute !important;
@@ -61,7 +63,8 @@
   height: var(--st-embed-overlay-height) !important;
   max-height: var(--st-embed-overlay-height) !important;
 }
-.st-r3-overlay.is-embed-anchored .st-r3-dialog {
+.st-r3-overlay.is-embed-anchored:not(.hidden):not([hidden]) .st-r3-dialog,
+.st-r3-overlay.is-embed-anchored.is-open .st-r3-dialog {
   position: absolute !important;
   inset: 0 !important;
   width: 100% !important;

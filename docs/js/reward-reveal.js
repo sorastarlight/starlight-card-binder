@@ -223,7 +223,7 @@ function acquireRevealViewportLock(doc) {
   };
 }
 
-export const REVEAL_PRESENTATION_VERSION = '1.5.12';
+export const REVEAL_PRESENTATION_VERSION = '1.5.13';
 
 const REVEAL_STYLESHEET_ID = `starlight-reveal-v${REVEAL_PRESENTATION_VERSION.replace(/\./g, '')}`;
 const REVEAL_STYLESHEET_URL = new URL(
@@ -600,9 +600,17 @@ export async function revealRewardSequence(cards = [], options = {}) {
     };
 
     const clearOverlayClass = () => {
-      overlay.classList.remove('is-embed-anchored', 'is-open');
-      overlay.style.removeProperty('--st-embed-overlay-top');
-      overlay.style.removeProperty('--st-embed-overlay-height');
+      const api = win.StarlightUI || window.StarlightUI;
+      if (api?.clearOverlayViewportAnchor) {
+        api.clearOverlayViewportAnchor(overlay);
+      } else {
+        overlay.classList.remove('is-embed-anchored');
+        overlay.style.removeProperty('--st-embed-overlay-top');
+        overlay.style.removeProperty('--st-embed-overlay-height');
+        ['position', 'inset', 'top', 'left', 'right', 'bottom', 'width', 'height', 'max-height', 'max-width']
+          .forEach(property => overlay.style.removeProperty(property));
+      }
+      overlay.classList.remove('is-open');
     };
 
     const finish = () => {
@@ -866,9 +874,11 @@ export async function revealRewardSequence(cards = [], options = {}) {
       };
       overlay.hidden = false;
       overlay.classList.remove('hidden');
+      modalApi?.anchorOverlayToVisibleViewport?.(overlay);
       doc.addEventListener('keydown', onKeydown);
       fallbackCleanup = () => {
         doc.removeEventListener('keydown', onKeydown);
+        modalApi?.clearOverlayViewportAnchor?.(overlay);
         previousFocus?.focus?.({ preventScroll: true });
       };
       focusControl(packButton);
