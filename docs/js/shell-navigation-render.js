@@ -43,10 +43,10 @@ function renderAccountMenuItem(item) {
     return `<button role="menuitem" type="button" class="shell-signout-button" data-shell-signout>${esc(item.label || 'Sign Out')}</button>`;
   }
   if (features.includes('signIn')) {
-    return `<a role="menuitem" href="login.html?mode=signin">${esc(item.label || 'Sign In')}</a>`;
+    return `<a role="menuitem" data-shell-auth="signin" href="login.html?mode=signin">${esc(item.label || 'Sign In')}</a>`;
   }
   if (features.includes('signUp')) {
-    return `<a role="menuitem" href="login.html?mode=signup">${esc(item.label || 'Register')}</a>`;
+    return `<a role="menuitem" data-shell-auth="signup" href="login.html?mode=signup">${esc(item.label || 'Register')}</a>`;
   }
   if (features.includes('profileLink')) {
     return `<a role="menuitem" class="shell-profile-link" data-shell-profile-link="" href="binder.html?view=profile">${esc(item.label || 'View My Profile')}${itemBadge(features)}</a>`;

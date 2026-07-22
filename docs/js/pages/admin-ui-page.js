@@ -88,7 +88,7 @@ function destinationOptions(selected = '', { allowEmpty = false } = {}) {
 
 function emojiPickerHtml(selectedEmoji, dataAttrs) {
   return `<div class="emoji-picker" ${dataAttrs}>${COMMON_NAV_EMOJIS.map((emoji) => `
-    <button type="button" class="emoji-btn ${selectedEmoji === emoji ? 'active' : ''}" data-emoji="${esc(emoji)}" title="${esc(emoji)}">${esc(emoji)}</button>
+    <button type="button" class="emoji-btn ${selectedEmoji === emoji ? 'active' : ''}" data-emoji="${esc(emoji)}" ${dataAttrs} title="${esc(emoji)}">${esc(emoji)}</button>
   `).join('')}</div>`;
 }
 
@@ -594,10 +594,11 @@ async function onEditorClick(event) {
   if (!btn) return;
 
   if (btn.classList.contains('emoji-btn')) {
-    const emoji = btn.dataset.emoji || '';
-    const sIndex = Number(btn.dataset.section);
-    const iIndex = btn.dataset.item != null ? Number(btn.dataset.item) : null;
-    const target = btn.dataset.target === 'item' ? getItem(sIndex, iIndex) : getSection(sIndex);
+    const scope = btn.closest('.emoji-picker') || btn;
+    const emoji = btn.dataset.emoji || btn.textContent.trim() || '';
+    const sIndex = Number(scope.dataset.section);
+    const iIndex = scope.dataset.item != null ? Number(scope.dataset.item) : null;
+    const target = scope.dataset.target === 'item' ? getItem(sIndex, iIndex) : getSection(sIndex);
     if (target) {
       setIconEmoji(target, emoji);
       renderAll();

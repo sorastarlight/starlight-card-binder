@@ -425,7 +425,28 @@ accountMenuButton?.addEventListener('click',e=>{
   e.stopPropagation();
   setAccountMenuOpen(Boolean(accountMenu?.hidden));
 });
-accountMenu?.addEventListener('click',e=>{
+accountMenu?.addEventListener('click',async e=>{
+  const signOutBtn=e.target.closest('[data-shell-signout]');
+  if(signOutBtn){
+    e.preventDefault();
+    e.stopPropagation();
+    closeAccountMenu();
+    try{
+      await supabase.auth.signOut();
+    }catch(err){
+      console.warn('[Starlight] Sign out failed',err);
+    }
+    location.href='binder.html?view=home';
+    return;
+  }
+  const authLink=e.target.closest('[data-shell-auth]');
+  if(authLink){
+    e.preventDefault();
+    closeAccountMenu();
+    const mode=authLink.dataset.shellAuth==='signup'?'signup':'signin';
+    location.href=`login.html?mode=${mode}`;
+    return;
+  }
   const profileLink=e.target.closest('[data-shell-profile-link]');
   if(profileLink){
     e.preventDefault();
@@ -436,7 +457,6 @@ accountMenu?.addEventListener('click',e=>{
   }
   const item=e.target.closest('[role="menuitem"]');
   if(!item)return;
-  if(item.matches('[data-shell-signout]'))return;
   closeAccountMenu();
 });
 document.addEventListener('click',e=>{
@@ -496,9 +516,3 @@ initLiveFeedWidget({
 if (isStudioPreview()) {
   document.getElementById('shellLiveFeed')?.setAttribute('hidden', '');
 }
-
-document.querySelector('[data-shell-signout]')?.addEventListener('click',async()=>{
-  closeAccountMenu();
-  await supabase.auth.signOut();
-  location.href='binder.html?view=home';
-});
