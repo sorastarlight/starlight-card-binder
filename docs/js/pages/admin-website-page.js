@@ -393,10 +393,10 @@ function renderEditor() {
 
   let html = `
     <div class="editor-toolbar">
-      <div class="preview-mode" role="group" aria-label="Preview depth">
-        <button type="button" class="btn small ${previewMode === 'hero' ? 'primary' : ''}" data-preview-mode="hero">Hero</button>
-        <button type="button" class="btn small ${previewMode === 'full' ? 'primary' : ''}" data-preview-mode="full">Full</button>
-        <button type="button" class="btn small ${previewMode === 'empty' ? 'primary' : ''}" data-preview-mode="empty">Empty states</button>
+      <div class="preview-mode" role="group" aria-label="Preview what to show">
+        <button type="button" class="btn small ${previewMode === 'hero' ? 'primary' : ''}" data-preview-mode="hero">Page header only</button>
+        <button type="button" class="btn small ${previewMode === 'full' ? 'primary' : ''}" data-preview-mode="full">Full page preview</button>
+        <button type="button" class="btn small ${previewMode === 'empty' ? 'primary' : ''}" data-preview-mode="empty">Empty / signed-out messages</button>
       </div>
       <p class="editor-note">${modifiedCount(activeTab)} field${modifiedCount(activeTab) === 1 ? '' : 's'} differ from defaults on this page.</p>
     </div>
