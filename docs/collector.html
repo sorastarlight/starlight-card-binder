@@ -8,7 +8,7 @@
         Collector Profile | Starlight Card Binder
     </title>
 <link href="css/style.css?v=1.0.2" rel="stylesheet"/>
-<link rel="stylesheet" href="css/pages/collector.css?v=1.9.0">
+<link rel="stylesheet" href="css/pages/collector.css?v=1.11.0">
 <script src="js/browser-performance.js?v=1.0.0" defer></script>
     <link rel="stylesheet" href="css/shared-ui.css?v=1.6.15">
 <link rel="stylesheet" href="css/qol-ui.css?v=94.2.8">
@@ -38,51 +38,51 @@
 </div>
 </nav>
 <section class="collector-shell collector-state" id="loading-state">
-<h1>
+<h1 data-content="collector.loadingTitle">
                 Loading Collector Profile…
             </h1>
-<p>
+<p data-content="collector.loadingLead">
                 Gathering cards, favorites, and a tasteful
                 quantity of sparkles.
             </p>
 </section>
 <section class="collector-shell collector-state hidden" id="missing-state">
-<h1>
+<h1 data-content="collector.missingTitle">
                 Collector Not Found
             </h1>
-<p>
+<p data-content="collector.missingLead">
                 This collector profile does not exist or has
                 not completed setup yet.
             </p>
 <div class="collector-actions">
-<a class="collector-button primary" href="./binder.html">
+<a class="collector-button primary" href="./binder.html" data-content="collector.openBinderCta">
                     Open the Binder
                 </a>
 </div>
 </section>
 <section class="collector-shell collector-state hidden" id="private-state">
-<h1>
+<h1 data-content="collector.privateTitle">
                 Private Collector Profile
             </h1>
-<p>
+<p data-content="collector.privateLead">
                 This collector has chosen to keep their
                 Starlight profile private.
             </p>
 <div class="collector-actions">
-<a class="collector-button primary" href="./binder.html">
+<a class="collector-button primary" href="./binder.html" data-content="collector.openBinderCta">
                     Open the Binder
                 </a>
 </div>
 </section>
 <section class="collector-shell collector-state error hidden" id="error-state">
-<h1>
+<h1 data-content="collector.errorTitle">
                 Profile Could Not Be Loaded
             </h1>
-<p id="error-message">
+<p id="error-message" data-content="collector.errorLead">
                 Something went wrong while loading this profile.
             </p>
 <div class="collector-actions">
-<button class="collector-button primary" id="retry-button" type="button">
+<button class="collector-button primary" id="retry-button" type="button" data-content="collector.retryCta">
                     Try Again
                 </button>
 </div>
@@ -90,80 +90,67 @@
 <article class="collector-shell hidden" id="profile-content">
 <div class="collector-banner" id="collector-banner"></div>
 <header class="collector-header">
+<div class="collector-avatar-wrap">
 <div aria-hidden="true" class="collector-avatar" id="collector-avatar">
                     ✦
                 </div>
+<a class="collector-twitch-badge" id="collector-twitch-badge" href="#" target="_blank" rel="noopener" hidden></a>
+</div>
 <div class="collector-identity">
 <h1 id="collector-display-name">
                         Collector
                     </h1>
 <p class="collector-username" id="collector-username"></p>
 <p class="collector-bio" id="collector-bio"></p>
+<span hidden id="collector-default-bio" data-content="collector.defaultBio">A Starlight Card collector.</span>
+<span hidden id="collector-following-cta" data-content="collector.followingCta">Following</span>
 <p class="collector-member" id="collector-member"></p>
 <p class="collector-follow-meta" id="collector-follow-meta" hidden></p>
 <div class="collector-social-actions" id="collector-social-actions" hidden>
 <button type="button" class="collector-button collector-follow-button" id="follow-button" aria-pressed="false">
 <span class="collector-follow-icon" aria-hidden="true">♡</span>
-<span class="collector-follow-label">Follow</span>
+<span class="collector-follow-label" data-content="collector.followCta">Follow</span>
 </button>
-<button type="button" class="collector-button primary" id="gift-button">Send Gift</button>
+<button type="button" class="collector-button primary" id="gift-button" data-content="collector.giftCta">Send Gift</button>
 </div>
 </div>
 </header>
 <div class="collector-content">
-<section class="collector-section hidden" id="stats-section">
-<h2>
+<section class="collector-section collector-dashboard hidden" id="stats-section">
+<h2 data-content="collector.statsTitle">
                         ✨ Collection Overview
                     </h2>
-<div class="stat-grid">
-<div class="stat-card">
-<strong id="unique-card-count">
-                                0
-                            </strong>
-<span>
-                                Unique Cards
-                            </span>
+<div aria-label="Collection summary" class="collection-summary-grid" id="collector-summary-grid">
+<div><strong id="unique-card-count">0</strong><span>Unique Cards</span></div>
+<div><strong id="total-copy-count">0</strong><span>Total Copies</span></div>
+<div><strong id="favorite-card-count">0</strong><span>Favorites</span></div>
+<div><strong id="extra-copy-count">0</strong><span>Extra Copies</span></div>
+<div><strong id="catalog-total">0</strong><span>Available Cards</span></div>
 </div>
-<div class="stat-card">
-<strong id="total-copy-count">
-                                0
-                            </strong>
-<span>
-                                Total Copies
-                            </span>
+<div class="collection-level-card" id="collector-level-card">
+<div><span>Collector Level</span><strong>Lv. <span id="collector-level">1</span></strong></div>
+<div class="collector-progress"><span id="collector-level-progress" data-level-progress=""></span></div>
+<small><span id="collector-points">0</span> / <span id="collector-next-points">25</span> points</small>
 </div>
-<div class="stat-card">
-<strong id="catalog-total">
-                                0
-                            </strong>
-<span>
-                                Available Cards
-                            </span>
+<div class="collection-progress-suite" id="collector-progress-suite">
+<article class="collection-progress-card">
+<div><span>Collection Completion</span><strong><span id="unique-card-count-inline">0</span> / <span id="catalog-total-inline">0</span></strong></div>
+<div class="collector-progress"><span id="collector-completion-progress"></span></div>
+<small><span id="completion-percent">0%</span> complete</small>
+</article>
+<article class="collection-progress-card collection-highlight-card">
+<div><span>Collection Spotlight</span><strong id="collector-highlight">Building their showcase…</strong></div>
+<small id="collector-insight">Collection highlights appear when stats are public.</small>
+<div class="collection-rarity-breakdown" id="collector-rarity-breakdown"></div>
+</article>
+<article class="collection-progress-card collection-series-progress">
+<div><span>Series Progress</span><strong>Their sets</strong></div>
+<div class="mini-series" id="collector-mini-series"></div>
+</article>
 </div>
-<div class="stat-card">
-<strong id="completion-percent">
-                                0%
-                            </strong>
-<span>
-                                Complete
-                            </span>
-</div>
-</div>
-</section>
-<section class="collector-section hidden" id="rarity-section">
-<h2>
-                        💎 Rarity Collection
-                    </h2>
-<div class="rarity-grid" id="rarity-grid"></div>
-</section>
-<section class="collector-section hidden" id="series-section">
-<h2>
-                        📚 Series Progress
-                    </h2>
-<div class="series-list" id="series-list"></div>
 </section>
 <section class="collector-section hidden" id="showcase-section">
-<h2>
+<h2 data-content="collector.showcaseTitle">
                         🌟 Favorite Card Showcase
                     </h2>
 <div class="showcase-layout showcase-layout-hero">
@@ -180,15 +167,15 @@
 </div>
 </section>
 <section class="collector-section hidden" id="highlights-section">
-<h2>✨ Collector Highlights</h2>
+<h2 data-content="collector.highlightsTitle">✨ Collector Highlights</h2>
 <div class="highlight-grid" id="highlight-grid"></div>
 </section>
 
 <section class="collector-section hidden" id="public-trades-section">
 <div class="trade-showcase-heading">
-<h2>💫 Wishlist &amp; Trades</h2>
+<h2 data-content="collector.tradesTitle">💫 Wishlist &amp; Trades</h2>
 <div class="collector-trade-actions">
-<a class="trade-propose-button" href="binder.html?view=offers" id="propose-trade-button">🤝 Propose Trade</a>
+<a class="trade-propose-button" href="binder.html?view=offers" id="propose-trade-button" data-content="collector.proposeTradeCta">🤝 Propose Trade</a>
 <a class="trade-report-button" href="binder.html?view=report" id="report-profile-button" hidden>⚑ Report Profile</a>
 </div>
 </div>
@@ -201,8 +188,8 @@
 <div class="trade-showcase-grid" id="public-trade-grid"></div>
 </section>
 <section class="collector-section hidden" id="favorites-section">
-<h2>
-                        💖 Favorite Cards
+<h2 data-content="collector.favoritesTitle">
+                        ♡ Favorite Cards
                     </h2>
 <div class="favorite-grid" id="favorite-grid"></div>
 </section>
@@ -250,9 +237,11 @@
 </form>
 </dialog>
 </main>
-<script src="js/pages/collector-page.js?v=1.5.0" type="module"></script>
+<script type="module" src="js/pages/website-content-hydrate-page.js?v=1.3"></script>
+<script src="js/pages/collector-page.js?v=1.6.0" type="module"></script>
 <script src="js/public-profile-extras.js?v=1.3.1" type="module"></script>
-<script src="js/public-trade-showcase.js?v=1.1" type="module"></script>    <script type="module" src="js/public-twitch-profile.js?v=1.0"></script>
+<script src="js/public-trade-showcase.js?v=1.1" type="module"></script>
+<script type="module" src="js/public-twitch-profile.js?v=1.1.1"></script>
 <script src="js/shared-ui.js?v=1.6.15"></script>
 <script src="js/qol-ui.js?v=94.2.8" defer></script>
 </body>

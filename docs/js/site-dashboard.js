@@ -1,5 +1,6 @@
 
 import { supabase } from "./supabase-client.js";
+import { levelFromPoints } from "./collector-level.js";
 
 let countdownTimer = null;
 
@@ -27,14 +28,6 @@ function startCountdown(dateValue) {
   };
   tick();
   countdownTimer = setInterval(tick, 1000);
-}
-function levelFromPoints(points) {
-  const thresholds = [0,25,75,150,250,400,600,850,1150,1500];
-  let level = 1;
-  for (let i=1;i<thresholds.length;i++) if (points >= thresholds[i]) level=i+1;
-  const floor = thresholds[Math.min(level-1, thresholds.length-1)] || 0;
-  const next = thresholds[level] ?? (floor + 500);
-  return { level, floor, next, percent: Math.max(0,Math.min(100,Math.round(((points-floor)/(next-floor))*100))) };
 }
 async function loadEconomy() {
   const { data: authData } = await supabase.auth.getUser();

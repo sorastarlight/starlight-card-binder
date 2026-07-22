@@ -728,6 +728,106 @@ export const WEBSITE_PAGE_META = Object.freeze({
       }
     ]
   },
+  collector: {
+    description: 'Public collector profile page: loading/private states, section titles, and social CTAs.',
+    previewUrl: 'collector.html',
+    groups: [
+      {
+        id: 'states',
+        label: 'Loading & status screens',
+        open: true,
+        fields: [
+          { key: 'loadingTitle', preview: 'title' },
+          { key: 'loadingLead', multiline: true, preview: 'lead' },
+          { key: 'missingTitle', preview: 'empty-title' },
+          { key: 'missingLead', multiline: true, preview: 'empty-lead' },
+          { key: 'privateTitle', preview: 'empty-title' },
+          { key: 'privateLead', multiline: true, preview: 'empty-lead' },
+          { key: 'errorTitle', preview: 'empty-title' },
+          { key: 'errorLead', multiline: true, preview: 'empty-lead' },
+          { key: 'retryCta', preview: 'cta-primary' },
+          { key: 'openBinderCta', preview: 'cta' }
+        ]
+      },
+      {
+        id: 'identity',
+        label: 'Identity & actions',
+        open: true,
+        fields: [
+          { key: 'defaultBio', multiline: true, hint: 'Fallback bio when a collector has not written one yet.' },
+          { key: 'followCta', preview: 'cta' },
+          { key: 'followingCta', preview: 'cta-primary' },
+          { key: 'giftCta', preview: 'cta-primary' }
+        ]
+      },
+      {
+        id: 'sections',
+        label: 'Section headings',
+        fields: [
+          { key: 'statsTitle', preview: 'title' },
+          { key: 'rarityTitle', preview: 'title' },
+          { key: 'seriesTitle', preview: 'title' },
+          { key: 'showcaseTitle', preview: 'title' },
+          { key: 'highlightsTitle', preview: 'title' },
+          { key: 'tradesTitle', preview: 'title' },
+          { key: 'proposeTradeCta', preview: 'cta' },
+          { key: 'favoritesTitle', preview: 'title' }
+        ]
+      }
+    ]
+  },
+  rankings: {
+    description: 'Community User Rankings list: hero copy, search/sort labels, empty states, and row actions.',
+    previewUrl: 'user-rankings.html',
+    groups: [
+      {
+        id: 'hero',
+        label: 'Hero',
+        open: true,
+        fields: [
+          { key: 'eyebrow', preview: 'eyebrow' },
+          { key: 'title', preview: 'title' },
+          { key: 'lead', multiline: true, preview: 'lead' }
+        ]
+      },
+      {
+        id: 'toolbar',
+        label: 'Search & sort',
+        open: true,
+        fields: [
+          { key: 'searchLabel' },
+          { key: 'searchPlaceholder', hint: 'Placeholder text inside the search field.' },
+          { key: 'sortLabel' },
+          { key: 'sortLevel' },
+          { key: 'sortCollection' },
+          { key: 'sortUnique' },
+          { key: 'sortName' }
+        ]
+      },
+      {
+        id: 'states',
+        label: 'Loading & empty states',
+        fields: [
+          { key: 'loadingTitle', preview: 'title' },
+          { key: 'loadingLead', multiline: true, preview: 'lead' },
+          { key: 'emptyTitle', preview: 'empty-title' },
+          { key: 'emptyLead', multiline: true, preview: 'empty-lead' },
+          { key: 'emptySearchLead', multiline: true }
+        ]
+      },
+      {
+        id: 'actions',
+        label: 'Row actions',
+        fields: [
+          { key: 'wishlistCta', preview: 'cta' },
+          { key: 'proposeTradeCta', preview: 'cta-primary' },
+          { key: 'viewProfileCta', preview: 'cta' },
+          { key: 'prevCta' },
+          { key: 'nextCta' }
+        ]
+      }
+    ]
+  },
   about: {
     description: 'About page hero and series list loading text.',
     previewUrl: 'about.html',

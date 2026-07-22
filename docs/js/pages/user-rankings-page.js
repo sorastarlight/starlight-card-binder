@@ -1,6 +1,7 @@
 import { listPublicCollectorRankings } from '../collector-rankings-service.js';
 import { levelFromPoints } from '../collector-level.js';
 import { getPublicTradeLists } from '../trade-list-service.js';
+import { getCachedWebsiteContent } from '../website-content-hydrate.js';
 
 const PAGE_SIZE = 40;
 const root = document.querySelector('#rankingsList');
@@ -24,6 +25,15 @@ let offset = 0;
 let searchQuery = '';
 let requestToken = 0;
 let debounceTimer = 0;
+
+function rankingsCopy() {
+  return getCachedWebsiteContent()?.rankings || {};
+}
+
+function copy(key, fallback) {
+  const value = rankingsCopy()[key];
+  return typeof value === 'string' && value.trim() ? value : fallback;
+}
 
 function setLive(message) {
   if (liveRegion) liveRegion.textContent = message;
@@ -136,9 +146,9 @@ function renderRow(entry) {
       </div>
     </div>
     <div class="rankings-actions">
-      <button type="button" class="st-button" data-wishlist-toggle aria-expanded="false">Cards they want</button>
-      <a class="st-button primary" href="${esc(tradeHref(entry.username))}" target="_top" data-shell-view="offers">Propose trade</a>
-      <a class="st-button" href="${esc(profileHref(entry.username))}" target="_top" data-shell-view="collector">View profile</a>
+      <button type="button" class="st-button" data-wishlist-toggle aria-expanded="false">${esc(copy('wishlistCta', 'Cards they want'))}</button>
+      <a class="st-button primary" href="${esc(tradeHref(entry.username))}" target="_top" data-shell-view="offers">${esc(copy('proposeTradeCta', 'Propose trade'))}</a>
+      <a class="st-button" href="${esc(profileHref(entry.username))}" target="_top" data-shell-view="collector">${esc(copy('viewProfileCta', 'View profile'))}</a>
     </div>
     <div class="rankings-wishlist" hidden>
       <div class="rankings-wishlist-status">Loading wishlist…</div>
@@ -157,8 +167,8 @@ function renderPager(total) {
   }
   pager.hidden = false;
   pager.innerHTML = `
-    <button type="button" class="st-button" data-page="prev" ${canPrev ? '' : 'disabled'}>Previous</button>
-    <button type="button" class="st-button" data-page="next" ${canNext ? '' : 'disabled'}>Next</button>
+    <button type="button" class="st-button" data-page="prev" ${canPrev ? '' : 'disabled'}>${esc(copy('prevCta', 'Previous'))}</button>
+    <button type="button" class="st-button" data-page="next" ${canNext ? '' : 'disabled'}>${esc(copy('nextCta', 'Next'))}</button>
   `;
 }
 
@@ -222,7 +232,7 @@ async function loadRankings({ resetOffset = false } = {}) {
 
   if (status) {
     status.hidden = false;
-    status.innerHTML = '<h2>Loading rankings…</h2><p>Gathering public collectors.</p>';
+    status.innerHTML = `<h2>${esc(copy('loadingTitle', 'Loading rankings…'))}</h2><p>${esc(copy('loadingLead', 'Gathering public collectors.'))}</p>`;
   }
   if (root) root.innerHTML = '';
   if (meta) meta.textContent = '';
@@ -240,10 +250,10 @@ async function loadRankings({ resetOffset = false } = {}) {
 
     if (!sorted.length) {
       if (root) {
-        root.innerHTML = `<li class="rankings-empty"><h2>No collectors found</h2><p>${
-          searchQuery
-            ? 'Try another display name or username.'
-            : 'Public collector profiles will appear here once they are available.'
+        root.innerHTML = `<li class="rankings-empty"><h2>${esc(copy('emptyTitle', 'No collectors found'))}</h2><p>${
+          esc(searchQuery
+            ? copy('emptySearchLead', 'Try another display name or username.')
+            : copy('emptyLead', 'Public collector profiles will appear here once they are available.'))
         }</p></li>`;
       }
       if (meta) meta.textContent = '0 collectors';
@@ -302,3 +312,8 @@ pager?.addEventListener('click', event => {
 });
 
 loadRankings({ resetOffset: true });
+window.addEventListener('starlight-website-content-hydrated', () => {
+  if (root?.querySelector('.rankings-item, .rankings-empty')) {
+    loadRankings({ resetOffset: false });
+  }
+});

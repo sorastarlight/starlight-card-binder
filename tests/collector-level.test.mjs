@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { readFile } from 'node:fs/promises';
 import { levelFromPoints } from '../docs/js/collector-level.js';
 
 test('levelFromPoints uses early thresholds', () => {
@@ -18,4 +19,10 @@ test('levelFromPoints continues past level 10', () => {
   assert.equal(eleven.level, 11);
   assert.equal(eleven.floor, 2000);
   assert.equal(eleven.next, 2500);
+});
+
+test('site dashboard uses the shared collector-level module', async () => {
+  const source = await readFile(new URL('../docs/js/site-dashboard.js', import.meta.url), 'utf8');
+  assert.match(source, /from ["']\.\/collector-level\.js["']/);
+  assert.doesNotMatch(source, /function levelFromPoints\s*\(/);
 });

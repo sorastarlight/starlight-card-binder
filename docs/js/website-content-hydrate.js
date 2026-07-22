@@ -105,6 +105,12 @@ export function hydrateWebsiteContent(content) {
     el.textContent = value;
   });
 
+  document.querySelectorAll('[data-content-placeholder]').forEach((el) => {
+    const path = el.getAttribute('data-content-placeholder');
+    const value = resolveContentValue(payload, path);
+    if (typeof value === 'string') el.setAttribute('placeholder', value);
+  });
+
   rebuildSocialLinks(payload);
   try {
     window.dispatchEvent(new CustomEvent('starlight-website-content-hydrated', { detail: payload }));

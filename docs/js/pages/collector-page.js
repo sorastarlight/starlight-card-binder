@@ -9,6 +9,7 @@ import {
             sendPeerGift,
             unfollowCollector
         } from "../social-service.js";
+        import { levelFromPoints } from "../collector-level.js";
         import { supabase } from "../supabase-client.js";
 
         const loadingState =
@@ -81,16 +82,6 @@ import {
                 "showcase-section"
             );
 
-        const raritySection =
-            document.getElementById(
-                "rarity-section"
-            );
-
-        const seriesSection =
-            document.getElementById(
-                "series-section"
-            );
-
         const favoritesSection =
             document.getElementById(
                 "favorites-section"
@@ -106,14 +97,89 @@ import {
                 "total-copy-count"
             );
 
+        const favoriteCardCount =
+            document.getElementById(
+                "favorite-card-count"
+            );
+
+        const extraCopyCount =
+            document.getElementById(
+                "extra-copy-count"
+            );
+
         const catalogTotal =
             document.getElementById(
                 "catalog-total"
             );
 
+        const uniqueCardCountInline =
+            document.getElementById(
+                "unique-card-count-inline"
+            );
+
+        const catalogTotalInline =
+            document.getElementById(
+                "catalog-total-inline"
+            );
+
         const completionPercent =
             document.getElementById(
                 "completion-percent"
+            );
+
+        const completionProgress =
+            document.getElementById(
+                "collector-completion-progress"
+            );
+
+        const collectorLevel =
+            document.getElementById(
+                "collector-level"
+            );
+
+        const collectorPoints =
+            document.getElementById(
+                "collector-points"
+            );
+
+        const collectorNextPoints =
+            document.getElementById(
+                "collector-next-points"
+            );
+
+        const collectorLevelProgress =
+            document.getElementById(
+                "collector-level-progress"
+            );
+
+        const collectorHighlight =
+            document.getElementById(
+                "collector-highlight"
+            );
+
+        const collectorInsight =
+            document.getElementById(
+                "collector-insight"
+            );
+
+        const collectorRarityBreakdown =
+            document.getElementById(
+                "collector-rarity-breakdown"
+            );
+
+        const collectorMiniSeries =
+            document.getElementById(
+                "collector-mini-series"
+            );
+
+        const progressSuite =
+            document.getElementById(
+                "collector-progress-suite"
+            );
+
+        const summaryGrid =
+            document.getElementById(
+                "collector-summary-grid"
             );
 
         const showcaseCardImage =
@@ -139,16 +205,6 @@ import {
         const showcaseCardArtist =
             document.getElementById(
                 "showcase-card-artist"
-            );
-
-        const rarityGrid =
-            document.getElementById(
-                "rarity-grid"
-            );
-
-        const seriesList =
-            document.getElementById(
-                "series-list"
             );
 
         const favoriteGrid =
@@ -378,9 +434,16 @@ import {
             return firstCharacter || "✦";
         }
 
-        function renderRarityCounts(
-            rarityCounts
-        ) {
+        function renderCollectorLevel(collectorXp) {
+            const level = levelFromPoints(collectorXp);
+            if (collectorLevel) collectorLevel.textContent = String(level.level);
+            if (collectorPoints) collectorPoints.textContent = String(level.xp);
+            if (collectorNextPoints) collectorNextPoints.textContent = String(level.next);
+            if (collectorLevelProgress) collectorLevelProgress.style.width = `${level.percent}%`;
+            return level;
+        }
+
+        function renderRaritySpotlight(rarityCounts, collection) {
             const rarityOrder = [
                 "Common",
                 "Uncommon",
@@ -388,133 +451,51 @@ import {
                 "Epic",
                 "Legendary"
             ];
+            const counts = rarityOrder.map((rarity) => ({
+                rarity,
+                count: Number(rarityCounts?.[rarity] ?? 0)
+            }));
+            const highest = [...counts].reverse().find((item) => item.count > 0);
+            const unique = Number(collection?.uniqueCards ?? 0);
+            const percent = Number(collection?.completionPercent ?? 0);
+            const favorites = Number(collection?.favoriteCount ?? 0);
 
-            rarityGrid.replaceChildren();
-
-            for (const rarity of rarityOrder) {
-                const item =
-                    document.createElement(
-                        "div"
-                    );
-
-                item.className =
-                    `rarity-count rarity-${rarity.toLowerCase()}`;
-
-                const label =
-                    document.createElement(
-                        "span"
-                    );
-
-                label.textContent =
-                    rarity;
-
-                const count =
-                    document.createElement(
-                        "strong"
-                    );
-
-                count.textContent =
-                    String(
-                        rarityCounts?.[rarity] ??
-                        0
-                    );
-
-                item.append(
-                    label,
-                    count
-                );
-
-                rarityGrid.append(item);
+            if (collectorHighlight) {
+                collectorHighlight.textContent = highest
+                    ? `${highest.count} ${highest.rarity} owned`
+                    : "Their first card awaits";
+            }
+            if (collectorInsight) {
+                collectorInsight.textContent = unique
+                    ? `${favorites} favorite${favorites === 1 ? "" : "s"} selected · ${percent}% of the full catalog collected.`
+                    : "This collector has not published owned cards yet.";
+            }
+            if (collectorRarityBreakdown) {
+                collectorRarityBreakdown.innerHTML = counts
+                    .map((item) => `<span class="rarity-${item.rarity.toLowerCase()}"><b>${item.count}</b> ${item.rarity}</span>`)
+                    .join("");
             }
         }
 
-        function renderSeriesProgress(
-            seriesProgress
-        ) {
-            seriesList.replaceChildren();
-
-            for (
-                const series of
-                seriesProgress || []
-            ) {
-                const owned =
-                    Number(series.owned || 0);
-
-                const total =
-                    Number(series.total || 0);
-
-                const percent =
-                    total > 0
-                        ? Math.round(
-                            (
-                                owned /
-                                total
-                            ) * 100
-                        )
-                        : 0;
-
-                const row =
-                    document.createElement(
-                        "div"
-                    );
-
-                row.className =
-                    "series-row";
-
-                const header =
-                    document.createElement(
-                        "div"
-                    );
-
-                header.className =
-                    "series-row-header";
-
-                const name =
-                    document.createElement(
-                        "span"
-                    );
-
-                name.textContent =
-                    `Series ${series.seriesId}: ${series.seriesName}`;
-
-                const count =
-                    document.createElement(
-                        "span"
-                    );
-
-                count.textContent =
-                    `${owned} / ${total}`;
-
-                header.append(
-                    name,
-                    count
-                );
-
-                const bar =
-                    document.createElement(
-                        "div"
-                    );
-
-                bar.className =
-                    "series-bar";
-
-                const fill =
-                    document.createElement(
-                        "span"
-                    );
-
-                fill.style.width =
-                    `${percent}%`;
-
-                bar.append(fill);
-
-                row.append(
-                    header,
-                    bar
-                );
-
-                seriesList.append(row);
+        function renderSeriesMini(seriesProgress) {
+            if (!collectorMiniSeries) return;
+            const rows = (seriesProgress || [])
+                .filter((series) => Number(series.total || 0) > 0)
+                .slice(0, 8);
+            if (!rows.length) {
+                collectorMiniSeries.innerHTML = '<p class="collector-series-empty">No series progress to show yet.</p>';
+                return;
             }
+            collectorMiniSeries.innerHTML = rows.map((series) => {
+                const owned = Number(series.owned || 0);
+                const total = Number(series.total || 0);
+                const percent = total > 0 ? Math.round((owned / total) * 100) : 0;
+                const name = String(series.seriesName || series.seriesId || "Series")
+                    .replaceAll("<", "&lt;")
+                    .replaceAll(">", "&gt;")
+                    .replaceAll('"', "&quot;");
+                return `<div class="mini-row"><b><span>${name}</span><span>${owned} / ${total}</span></b><div class="bar"><span style="width:${percent}%"></span></div></div>`;
+            }).join("");
         }
 
         function renderFavoriteCards(
@@ -586,13 +567,33 @@ import {
             </article>`;
         }
 
+        function getFollowCtas() {
+            const followLabel = followButton?.querySelector(".collector-follow-label");
+            const followingSource = document.getElementById("collector-following-cta");
+            if (followLabel && !followButton.classList.contains("is-following") && followLabel.textContent.trim()) {
+                followLabel.dataset.followCta = followLabel.textContent.trim();
+            }
+            return {
+                follow: followLabel?.dataset?.followCta || "Follow",
+                following: followingSource?.textContent?.trim() || "Following"
+            };
+        }
+
         function setFollowButtonState(following, { burst = false } = {}) {
             if (!followButton) return;
             const label = followButton.querySelector(".collector-follow-label") || followButton;
             const icon = followButton.querySelector(".collector-follow-icon");
+            if (
+                label?.classList?.contains("collector-follow-label") &&
+                !followButton.classList.contains("is-following") &&
+                label.textContent.trim()
+            ) {
+                label.dataset.followCta = label.textContent.trim();
+            }
+            const ctas = getFollowCtas();
             followButton.setAttribute("aria-pressed", following ? "true" : "false");
             followButton.classList.toggle("is-following", following);
-            label.textContent = following ? "Following" : "Follow";
+            label.textContent = following ? ctas.following : ctas.follow;
             if (icon) icon.textContent = following ? "♥" : "♡";
             if (burst) {
                 followButton.classList.remove("is-burst");
@@ -721,6 +722,7 @@ import {
 
             bioElement.textContent =
                 profile.bio ||
+                document.getElementById("collector-default-bio")?.textContent?.trim() ||
                 "A Starlight Card collector.";
 
             const memberDate =
@@ -745,50 +747,43 @@ import {
 
             renderSocialHighlights(result.social || null);
 
+            const levelCard = document.getElementById("collector-level-card");
+            const hasXp = result.collectorXp != null && result.collectorXp !== "";
+            if (hasXp) {
+                renderCollectorLevel(result.collectorXp);
+                levelCard?.removeAttribute("hidden");
+                statsSection?.classList.remove("hidden");
+            } else {
+                levelCard?.setAttribute("hidden", "");
+            }
+
             if (
                 profile.showCollectionStats &&
                 collection
             ) {
-                uniqueCardCount.textContent =
-                    String(
-                        collection.uniqueCards ??
-                        0
-                    );
+                const unique = Number(collection.uniqueCards ?? 0);
+                const catalog = Number(collection.catalogTotal ?? 0);
+                const percent = Number(collection.completionPercent ?? 0);
 
-                totalCopyCount.textContent =
-                    String(
-                        collection.totalCopies ??
-                        0
-                    );
+                if (uniqueCardCount) uniqueCardCount.textContent = String(unique);
+                if (totalCopyCount) totalCopyCount.textContent = String(collection.totalCopies ?? 0);
+                if (favoriteCardCount) favoriteCardCount.textContent = String(collection.favoriteCount ?? 0);
+                if (extraCopyCount) extraCopyCount.textContent = String(collection.extraCopies ?? 0);
+                if (catalogTotal) catalogTotal.textContent = String(catalog);
+                if (uniqueCardCountInline) uniqueCardCountInline.textContent = String(unique);
+                if (catalogTotalInline) catalogTotalInline.textContent = String(catalog);
+                if (completionPercent) completionPercent.textContent = `${percent}%`;
+                if (completionProgress) completionProgress.style.width = `${Math.max(0, Math.min(100, percent))}%`;
 
-                catalogTotal.textContent =
-                    String(
-                        collection.catalogTotal ??
-                        0
-                    );
+                renderRaritySpotlight(collection.rarityCounts, collection);
+                renderSeriesMini(collection.seriesProgress);
 
-                completionPercent.textContent =
-                    `${collection.completionPercent ?? 0}%`;
-
-                renderRarityCounts(
-                    collection.rarityCounts
-                );
-
-                renderSeriesProgress(
-                    collection.seriesProgress
-                );
-
-                statsSection.classList.remove(
-                    "hidden"
-                );
-
-                raritySection.classList.remove(
-                    "hidden"
-                );
-
-                seriesSection.classList.remove(
-                    "hidden"
-                );
+                summaryGrid?.removeAttribute("hidden");
+                progressSuite?.removeAttribute("hidden");
+                statsSection?.classList.remove("hidden");
+            } else {
+                summaryGrid?.setAttribute("hidden", "");
+                progressSuite?.setAttribute("hidden", "");
             }
 
             if (

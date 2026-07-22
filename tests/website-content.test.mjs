@@ -49,6 +49,10 @@ test('default website content includes editable page groups', () => {
   assert.ok(content.rewards.emptyLead);
   assert.ok(content.profile.accountIntro);
   assert.ok(content.profile.imageSectionTitle);
+  assert.ok(content.collector.statsTitle);
+  assert.ok(content.collector.followCta);
+  assert.ok(content.rankings.title);
+  assert.ok(content.rankings.sortLevel);
   assert.ok(content.shared.infoStripCopyright);
   assert.deepEqual(
     content.home.quickLinks.map((link) => link.id),
@@ -74,6 +78,8 @@ test('default website content includes editable page groups', () => {
       'notifications',
       'rewards',
       'profile',
+      'collector',
+      'rankings',
       'about',
       'socials',
       'login',
@@ -133,11 +139,19 @@ test('website editor field meta covers binder splash and admin visual chrome', a
   assert.ok(WEBSITE_PAGE_META.binderFullView);
   assert.ok(listedFieldKeys('binderFullView').includes('scanEyebrow'));
   assert.ok(listedFieldKeys('daily').includes('readyTitle'));
+  assert.ok(WEBSITE_PAGE_META.collector);
+  assert.equal(WEBSITE_PAGE_META.collector.previewUrl, 'collector.html');
+  assert.ok(listedFieldKeys('collector').includes('statsTitle'));
+  assert.ok(listedFieldKeys('collector').includes('followCta'));
+  assert.ok(WEBSITE_PAGE_META.rankings);
+  assert.equal(WEBSITE_PAGE_META.rankings.previewUrl, 'user-rankings.html');
+  assert.ok(listedFieldKeys('rankings').includes('title'));
+  assert.ok(listedFieldKeys('rankings').includes('wishlistCta'));
   const html = await read('docs/admin-website.html');
   const page = await read('docs/js/pages/admin-website-page.js');
   assert.match(html, /fieldSearch/);
   assert.match(html, /resetPageBtn/);
-  assert.match(html, /admin-website-page\.js\?v=2\.0/);
+  assert.match(html, /admin-website-page\.js\?v=2\.2/);
   assert.match(html, /previewFrame|Live preview/);
   assert.match(page, /WEBSITE_PAGE_META|getPageMeta/);
   assert.match(page, /renderGroupedFields|field-group/);
@@ -192,6 +206,8 @@ test('website editor admin page and public hooks are wired', async () => {
     notifications,
     rewards,
     profile,
+    collector,
+    rankingsPage,
     loginPage,
     tradeListsPage,
     tradeOffersPage,
@@ -224,6 +240,8 @@ test('website editor admin page and public hooks are wired', async () => {
     read('docs/notifications.html'),
     read('docs/received-rewards.html'),
     read('docs/profile-settings.html'),
+    read('docs/collector.html'),
+    read('docs/user-rankings.html'),
     read('docs/js/pages/login-page.js'),
     read('docs/js/pages/trade-lists-page.js'),
     read('docs/js/pages/trade-offers-page.js'),
@@ -284,6 +302,16 @@ test('website editor admin page and public hooks are wired', async () => {
   assert.match(rewards, /data-content="rewards\.tabPending"/);
   assert.match(profile, /data-content="profile\.accountIntro"/);
   assert.match(profile, /data-content="profile\.imageSectionTitle"/);
+  assert.match(collector, /data-content="collector\.statsTitle"/);
+  assert.match(collector, /data-content="collector\.followCta"/);
+  assert.match(collector, /data-content="collector\.defaultBio"/);
+  assert.match(collector, /website-content-hydrate-page\.js\?v=1\.3/);
+  assert.match(collector, /collector-twitch-badge/);
+  assert.match(collector, /public-twitch-profile\.js/);
+  assert.match(collector, /collection-level-card|collector-level/);
+  assert.match(rankingsPage, /data-content="rankings\.title"/);
+  assert.match(rankingsPage, /data-content="rankings\.lead"/);
+  assert.match(rankingsPage, /website-content-hydrate-page\.js\?v=1\.3/);
   assert.match(tradeListsPage, /loadAndHydrateWebsiteContent/);
   assert.match(tradeListsPage, /emptyWishlist/);
   assert.match(tradeOffersPage, /emptyIncoming/);

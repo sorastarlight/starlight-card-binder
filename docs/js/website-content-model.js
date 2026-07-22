@@ -128,6 +128,8 @@ export function sanitizeWebsiteContent(input) {
     notifications: sanitizeStringMap(source.notifications || {}, defaults.notifications),
     rewards: sanitizeStringMap(source.rewards || {}, defaults.rewards),
     profile: sanitizeStringMap(source.profile || {}, defaults.profile),
+    collector: sanitizeStringMap(source.collector || {}, defaults.collector),
+    rankings: sanitizeStringMap(source.rankings || {}, defaults.rankings),
     about: sanitizeStringMap(source.about || {}, defaults.about),
     socials: {
       ...sanitizeStringMap(source.socials || {}, {

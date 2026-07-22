@@ -8,7 +8,7 @@
         Collector Profile | Starlight Card Binder
     </title>
 <link href="css/style.css?v=1.0.2" rel="stylesheet"/>
-<link rel="stylesheet" href="css/pages/profile-settings.css?v=1.6">
+<link rel="stylesheet" href="css/pages/profile-settings.css?v=1.7">
 <script src="js/browser-performance.js?v=1.0.0" defer></script>
     <link rel="stylesheet" href="css/shared-ui.css?v=1.6.15">
 <link rel="stylesheet" href="css/qol-ui.css?v=94.2.8">
@@ -27,6 +27,11 @@
 <p data-content="profile.lead">
                     Manage your public identity, profile visibility, and collection preferences.
                 </p>
+<div class="collection-level-card profile-level-card" aria-label="Your collector level">
+<div><span>Collector Level</span><strong>Lv. <span data-collector-level="">1</span></strong></div>
+<div class="collector-progress"><span data-level-progress=""></span></div>
+<small><span data-collector-points="">0</span> / <span data-next-level-points="">25</span> points</small>
+</div>
 </header>
 <form id="profile-form"><section class="profile-section profile-image-section">
 <h2 data-content="profile.imageSectionTitle">Profile Image &amp; Collector Flair</h2>
@@ -261,7 +266,8 @@
 </form>
 </section>
 </main>
-<script type="module" src="js/pages/website-content-hydrate-page.js?v=1.2"></script>
+<script type="module" src="js/pages/website-content-hydrate-page.js?v=1.3"></script>
+<script src="js/site-dashboard.js?v=1.1" type="module"></script>
 <script src="js/pages/profile-settings-page.js?v=1.3" type="module"></script>
 <script src="js/staff-profile-link.js" type="module"></script>
 <div aria-hidden="true" class="st-dialog-overlay profile-crop-modal hidden" id="profile-crop-modal" data-crop-mode="avatar">

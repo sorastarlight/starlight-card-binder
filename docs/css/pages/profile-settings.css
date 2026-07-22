@@ -632,3 +632,37 @@
 .twitch-linked-icon{display:block;flex:0 0 auto;color:#9146ff}
 #username.is-locked,#username[readonly]{background:#f4f6fb;color:#5a617a;cursor:not-allowed}
 
+.profile-level-card{
+  margin-top:18px;
+  max-width:420px;
+  padding:16px 18px;
+  border-radius:16px;
+  background:linear-gradient(135deg,rgba(107,198,248,.14),rgba(255,130,200,.13));
+  border:1px solid rgba(255,130,200,.24);
+}
+.profile-level-card>div:first-child{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  color:#405fa1;
+  font-weight:900;
+}
+.profile-level-card .collector-progress{
+  height:12px;
+  margin:11px 0 8px;
+  border-radius:999px;
+  background:#eaf2f8;
+  overflow:hidden;
+}
+.profile-level-card .collector-progress>span{
+  display:block;
+  height:100%;
+  width:0;
+  background:linear-gradient(90deg,#6bc6f8,#ff82c8);
+}
+.profile-level-card small{
+  display:block;
+  color:#6b7089;
+  text-align:right;
+}
+
