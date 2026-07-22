@@ -44,7 +44,8 @@ test('normalizes snake_case reward cards into the canonical reveal shape', () =>
     subcategory_id: 'summer-2026',
     finish_id: 'holographic',
     finish_name: 'Holographic',
-    is_duplicate: 1
+    is_duplicate: 1,
+    quantity: 12
   });
 
   assert.equal(card.id, 42);
@@ -56,6 +57,8 @@ test('normalizes snake_case reward cards into the canonical reveal shape', () =>
   assert.equal(card.finishId, 'holographic');
   assert.equal(card.finishName, 'Holographic');
   assert.equal(card.isDuplicate, true);
+  assert.equal(card.quantity, 12);
+  assert.equal(card.prestigeTier, 'silver');
 });
 
 test('fills missing finish metadata from the cached card catalog when available', () => {

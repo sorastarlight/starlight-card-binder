@@ -1,7 +1,11 @@
 /* Prestige frames from duplicate quantity thresholds (copies are not burned). */
 .prestige-frame,
 .collection-card.prestige-frame,
-.v61-card-slot.prestige-frame {
+.v61-card-slot.prestige-frame,
+.full-card-wrap.prestige-frame,
+.st-r3-card-actor.prestige-frame,
+.st-r3-result-art.prestige-frame,
+.st-r3-result-card.prestige-frame {
   position: relative;
 }
 
@@ -16,7 +20,10 @@
 }
 
 .collection-card.prestige-frame,
-.v61-card-slot.prestige-frame {
+.v61-card-slot.prestige-frame,
+.full-card-wrap.prestige-frame,
+.st-r3-card-actor.prestige-frame,
+.st-r3-result-art.prestige-frame {
   border-radius: 18px;
 }
 

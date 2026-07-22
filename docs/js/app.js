@@ -869,6 +869,7 @@ function renderFullView() {
   const visibleRarity = getVisibleRarity(selected);
   const full = websiteSection('binderFullView');
   const qty = getCardQuantity(selected.id);
+  const prestigeClass = got ? prestigeFrameClass(qty) : '';
   overlay.innerHTML = `<div class="full-card-stage analyzer-full-stage ${rarityClass(selected)}" role="dialog" aria-modal="true" aria-labelledby="fullViewCardTitle" tabindex="-1">
     <div class="analyzer-bg" aria-hidden="true"><span></span><span></span><span></span></div>
     <button class="overlay-close analyzer-close" type="button" aria-label="Close">×</button>
@@ -880,7 +881,7 @@ function renderFullView() {
       </div>
       <div class="analyzer-card-zone">
         <div class="analyzer-reticle" aria-hidden="true"></div>
-        <div class="full-card-wrap flip-card simple-flip ${overlayFlipped?'show-back showing-card-back':''} ${rarityClass(selected)}" id="fullCard3d" aria-label="${esc(overlayFlipped ? 'Card back' : visibleName)}" data-holographic="${got && isHolographicCard(selected)}" data-finish-class="${esc(got ? cardFinishClass(selected, true) : '')}">
+        <div class="full-card-wrap flip-card simple-flip ${overlayFlipped?'show-back showing-card-back':''} ${rarityClass(selected)} ${prestigeClass}" id="fullCard3d" aria-label="${esc(overlayFlipped ? 'Card back' : visibleName)}" data-holographic="${got && isHolographicCard(selected)}" data-finish-class="${esc(got ? cardFinishClass(selected, true) : '')}">
           <span class="full-inner">
             <span class="face front ${cardFinishClass(selected, got && !overlayFlipped)}"><img class="${hidden && !overlayFlipped?'obscured':''}" src="${esc(overlayFlipped ? CARD_BACK_URL : getVisibleImage(selected))}" alt="${esc(overlayFlipped ? 'Card back' : visibleName)}" onerror="this.src='${CARD_BACK_URL}'" draggable="false">${holoSparkMarkup(selected, got && !overlayFlipped)}</span>
             <span class="face back"><img src="${CARD_BACK_URL}" alt="Card back" draggable="false"></span>
@@ -891,6 +892,7 @@ function renderFullView() {
         <div class="analyzer-title-row"><div><p class="eyebrow">${esc(full.scanEyebrow || 'Card Scan Complete')}</p><h2 id="fullViewCardTitle">${esc(visibleName)}</h2><p class="db2-collector-line">${esc(selected.collectorNumber || selected.number || '???')} · ${esc(selected.series || 'Unknown Series')}</p></div></div>
         <div class="card-meta-chips">${cardIdentityChips(selected, { full: true, hidden })}</div>
         <div class="analyzer-data-grid"><span><b>${esc(full.seriesLabel || 'Series')}</b>${esc(selected.series || 'Unknown')}</span><span><b>${esc(full.collectorNumberLabel || 'Collector #')}</b>${esc(selected.collectorNumber || selected.number || '???')}</span>${got && selected.artist ? `<span><b>${esc(full.illustratorLabel || 'Illustrator')}</b>${esc(selected.artist)}</span>` : ''}${got ? `<span><b>${esc(full.ownedLabel || 'Owned')}</b>×${qty}</span>` : ''}</div>
+        ${got ? prestigeBadgeHtml(qty) : ''}
         ${got ? `<div class="db2-full-story"><b>${esc(full.storyLabel || 'Card Story')}</b><p>${esc(selected.cardDescription || 'No card story has been added yet.')}</p></div><details class="db2-more"><summary>${esc(full.additionalLabel || 'Additional Information')}</summary><div class="detail-list clean-detail-list">${cardExpandedDetails(selected)}</div></details>` : ''}
         <p class="analyzer-description">${esc(getVisibleDescription(selected))}</p>
         <div data-card-comments-host></div>

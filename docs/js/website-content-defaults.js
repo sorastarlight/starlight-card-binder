@@ -13,6 +13,8 @@ export const WEBSITE_EDITOR_TABS = Object.freeze([
   { id: 'collection', label: 'Collection' },
   { id: 'starBits', label: 'Star Bits' },
   { id: 'checklist', label: 'Checklist' },
+  { id: 'quests', label: 'Collection Quests' },
+  { id: 'seasonPass', label: 'Season Pass' },
   { id: 'trades', label: 'Wishlist & Trades' },
   { id: 'offers', label: 'Trade Offers' },
   { id: 'notifications', label: 'Notifications' },
@@ -252,6 +254,29 @@ export function createDefaultWebsiteContent() {
       exchangeCta: 'Review Duplicates',
       filtersEyebrow: 'Find your cards',
       filtersTitle: 'Checklist Filters'
+    },
+    quests: {
+      eyebrow: 'My Stuff',
+      title: 'Collection Quests',
+      lead: 'Complete collector goals to earn Star Bits and titles. Progress syncs from your collection, trades, gifts, and booster opens.',
+      refreshCta: 'Refresh',
+      emptyTitle: 'No quests yet',
+      emptyLead: 'Check back soon for new collector goals.',
+      signInTitle: 'Sign in required',
+      claimCta: 'Claim',
+      claimedLabel: 'Claimed',
+      inProgressLabel: 'In progress'
+    },
+    seasonPass: {
+      eyebrow: 'My Stuff',
+      title: 'Seasonal Collection Pass',
+      lead: 'A free seasonal track. Earn points from boosters, trades, gifts, favorites, and visits — then claim Star Bits and titles.',
+      emptyTitle: 'No active season',
+      emptyLead: 'Check back when the next Collection Pass begins.',
+      claimCta: 'Claim',
+      claimedLabel: 'Claimed',
+      lockedLabel: 'Locked',
+      loadingLead: 'Loading season progress…'
     },
     trades: {
       eyebrow: 'Collector Connections',

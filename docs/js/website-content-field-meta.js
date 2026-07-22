@@ -562,6 +562,63 @@ export const WEBSITE_PAGE_META = Object.freeze({
       }
     ]
   },
+  quests: {
+    description: 'Collection Quests hero and claim states.',
+    previewUrl: 'collection-quests.html',
+    groups: [
+      {
+        id: 'hero',
+        label: 'Hero',
+        open: true,
+        fields: [
+          { key: 'eyebrow', preview: 'eyebrow' },
+          { key: 'title', preview: 'title' },
+          { key: 'lead', multiline: true, preview: 'lead' }
+        ]
+      },
+      {
+        id: 'actions',
+        label: 'Actions and empty states',
+        fields: [
+          { key: 'refreshCta', preview: 'cta-secondary' },
+          { key: 'claimCta', preview: 'cta-primary' },
+          { key: 'claimedLabel' },
+          { key: 'inProgressLabel' },
+          { key: 'emptyTitle' },
+          { key: 'emptyLead', multiline: true },
+          { key: 'signInTitle' }
+        ]
+      }
+    ]
+  },
+  seasonPass: {
+    description: 'Seasonal Collection Pass hero and tier states.',
+    previewUrl: 'season-pass.html',
+    groups: [
+      {
+        id: 'hero',
+        label: 'Hero',
+        open: true,
+        fields: [
+          { key: 'eyebrow', preview: 'eyebrow' },
+          { key: 'title', preview: 'title' },
+          { key: 'lead', multiline: true, preview: 'lead' }
+        ]
+      },
+      {
+        id: 'states',
+        label: 'States and actions',
+        fields: [
+          { key: 'loadingLead', multiline: true },
+          { key: 'claimCta', preview: 'cta-primary' },
+          { key: 'claimedLabel' },
+          { key: 'lockedLabel' },
+          { key: 'emptyTitle' },
+          { key: 'emptyLead', multiline: true }
+        ]
+      }
+    ]
+  },
   trades: {
     description: 'Wishlist & trade list tabs and empty states.',
     previewUrl: 'trade-lists.html',

@@ -42,6 +42,8 @@ test('default website content includes editable page groups', () => {
   assert.ok(content.collection.emptyAllTitle);
   assert.ok(content.starBits.exchangeCta);
   assert.ok(content.checklist.exchangeTitle);
+  assert.ok(content.quests.title);
+  assert.ok(content.seasonPass.title);
   assert.ok(content.trades.emptyWishlist);
   assert.ok(content.offers.emptyIncoming);
   assert.ok(content.notifications.emptyTitle);
@@ -73,6 +75,8 @@ test('default website content includes editable page groups', () => {
       'collection',
       'starBits',
       'checklist',
+      'quests',
+      'seasonPass',
       'trades',
       'offers',
       'notifications',
@@ -147,6 +151,12 @@ test('website editor field meta covers binder splash and admin visual chrome', a
   assert.equal(WEBSITE_PAGE_META.rankings.previewUrl, 'user-rankings.html');
   assert.ok(listedFieldKeys('rankings').includes('title'));
   assert.ok(listedFieldKeys('rankings').includes('wishlistCta'));
+  assert.ok(WEBSITE_PAGE_META.quests);
+  assert.equal(WEBSITE_PAGE_META.quests.previewUrl, 'collection-quests.html');
+  assert.ok(listedFieldKeys('quests').includes('claimCta'));
+  assert.ok(WEBSITE_PAGE_META.seasonPass);
+  assert.equal(WEBSITE_PAGE_META.seasonPass.previewUrl, 'season-pass.html');
+  assert.ok(listedFieldKeys('seasonPass').includes('lockedLabel'));
   const html = await read('docs/admin-website.html');
   const page = await read('docs/js/pages/admin-website-page.js');
   assert.match(html, /fieldSearch/);

@@ -2,6 +2,10 @@ import {
   claimSeasonPassTier,
   getMySeasonPass
 } from '../season-pass-service.js';
+import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
+
+const siteCopy = await loadAndHydrateWebsiteContent();
+const seasonCopy = siteCopy?.seasonPass || {};
 
 const titleEl = document.getElementById('season-title');
 const leadEl = document.getElementById('season-lead');
@@ -53,16 +57,16 @@ function renderBreakdown(breakdown = {}) {
 
 function render(data) {
   if (!data?.found) {
-    titleEl.textContent = 'Seasonal Collection Pass';
-    leadEl.textContent = 'No active season is configured yet.';
-    summaryEl.innerHTML = '<p>Check back when the next Collection Pass begins.</p>';
+    titleEl.textContent = seasonCopy.title || 'Seasonal Collection Pass';
+    leadEl.textContent = seasonCopy.emptyLead || seasonCopy.lead || 'No active season is configured yet.';
+    summaryEl.innerHTML = `<p>${esc(seasonCopy.emptyTitle || 'No active season')}</p>`;
     trackEl.replaceChildren();
     return;
   }
 
   const season = data.season || {};
-  titleEl.textContent = season.name || 'Seasonal Collection Pass';
-  leadEl.textContent = season.description || '';
+  titleEl.textContent = season.name || seasonCopy.title || 'Seasonal Collection Pass';
+  leadEl.textContent = season.description || seasonCopy.lead || '';
   const points = Number(data.points) || 0;
   const tiers = Array.isArray(data.tiers) ? data.tiers : [];
   const maxPoints = Math.max(...tiers.map((t) => Number(t.pointsRequired) || 0), 1);
@@ -99,13 +103,13 @@ function render(data) {
     if (tier.claimed) {
       const done = document.createElement('span');
       done.className = 'season-status';
-      done.textContent = 'Claimed';
+      done.textContent = seasonCopy.claimedLabel || 'Claimed';
       actions.append(done);
     } else if (tier.unlocked) {
       const btn = document.createElement('button');
       btn.className = 'btn primary';
       btn.type = 'button';
-      btn.textContent = 'Claim';
+      btn.textContent = seasonCopy.claimCta || 'Claim';
       btn.addEventListener('click', async () => {
         btn.disabled = true;
         try {
@@ -122,7 +126,7 @@ function render(data) {
     } else {
       const status = document.createElement('span');
       status.className = 'season-status muted';
-      status.textContent = 'Locked';
+      status.textContent = seasonCopy.lockedLabel || 'Locked';
       actions.append(status);
     }
     trackEl.append(article);
@@ -131,7 +135,7 @@ function render(data) {
 
 async function load() {
   try {
-    summaryEl.innerHTML = '<p>Loading season progress…</p>';
+    summaryEl.innerHTML = `<p>${esc(seasonCopy.loadingLead || 'Loading season progress…')}</p>`;
     render(await getMySeasonPass());
   } catch (error) {
     summaryEl.innerHTML = `<p>Unable to load the season pass. ${esc(error.message || 'Sign in required.')}</p>`;

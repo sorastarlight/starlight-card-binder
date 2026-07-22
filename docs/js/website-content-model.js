@@ -123,6 +123,8 @@ export function sanitizeWebsiteContent(input) {
     collection: sanitizeStringMap(source.collection || {}, defaults.collection),
     starBits: sanitizeStringMap(source.starBits || {}, defaults.starBits),
     checklist: sanitizeStringMap(source.checklist || {}, defaults.checklist),
+    quests: sanitizeStringMap(source.quests || {}, defaults.quests),
+    seasonPass: sanitizeStringMap(source.seasonPass || {}, defaults.seasonPass),
     trades: sanitizeStringMap(source.trades || {}, defaults.trades),
     offers: sanitizeStringMap(source.offers || {}, defaults.offers),
     notifications: sanitizeStringMap(source.notifications || {}, defaults.notifications),

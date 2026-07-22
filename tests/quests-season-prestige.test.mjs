@@ -54,15 +54,34 @@ test('quests and season pass pages wire services and claim UI', async () => {
 });
 
 test('binder and collection load prestige frame styles and helpers', async () => {
-  const [app, binder, collection, css] = await Promise.all([
+  const [app, binder, collection, css, reveal] = await Promise.all([
     read('docs/js/app.js'),
     read('docs/binder.html'),
     read('docs/collection.html'),
-    read('docs/css/prestige-frames.css')
+    read('docs/css/prestige-frames.css'),
+    read('docs/js/reward-reveal.js')
   ]);
   assert.match(app, /function prestigeTierFromQuantity/);
   assert.match(app, /prestigeFrameClass/);
+  assert.match(app, /full-card-wrap[\s\S]*\$\{prestigeClass\}/);
   assert.match(binder, /prestige-frames\.css/);
   assert.match(collection, /prestige-frames\.css/);
   assert.match(css, /\.prestige-celestial/);
+  assert.match(css, /\.st-r3-card-actor\.prestige-frame/);
+  assert.match(reveal, /prestigeRevealBadge/);
+  assert.match(reveal, /ensurePrestigeStyles/);
+  assert.match(reveal, /prestigeTier/);
+});
+
+test('quests and season pass pages wire website content hooks', async () => {
+  const [questsHtml, seasonHtml, questsPage, seasonPage] = await Promise.all([
+    read('docs/collection-quests.html'),
+    read('docs/season-pass.html'),
+    read('docs/js/pages/collection-quests-page.js'),
+    read('docs/js/pages/season-pass-page.js')
+  ]);
+  assert.match(questsHtml, /data-content="quests\.title"/);
+  assert.match(seasonHtml, /data-content="seasonPass\.title"/);
+  assert.match(questsPage, /loadAndHydrateWebsiteContent/);
+  assert.match(seasonPage, /loadAndHydrateWebsiteContent/);
 });

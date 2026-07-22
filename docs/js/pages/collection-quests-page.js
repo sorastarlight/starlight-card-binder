@@ -2,6 +2,10 @@ import {
   claimCollectionQuest,
   getMyCollectionQuests
 } from '../collection-quests-service.js';
+import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
+
+const siteCopy = await loadAndHydrateWebsiteContent();
+const questsCopy = siteCopy?.quests || {};
 
 const list = document.getElementById('quests-list');
 const summary = document.getElementById('quests-summary');
@@ -40,7 +44,7 @@ function render(quests) {
     : 'No active quests right now.';
 
   if (!rows.length) {
-    list.innerHTML = `<div class="quests-empty"><h2>No quests yet</h2><p>Check back soon for new collector goals.</p></div>`;
+    list.innerHTML = `<div class="quests-empty"><h2>${esc(questsCopy.emptyTitle || 'No quests yet')}</h2><p>${esc(questsCopy.emptyLead || 'Check back soon for new collector goals.')}</p></div>`;
     return;
   }
 
@@ -69,13 +73,13 @@ function render(quests) {
     if (quest.claimed) {
       const done = document.createElement('span');
       done.className = 'quest-status';
-      done.textContent = 'Claimed';
+      done.textContent = questsCopy.claimedLabel || 'Claimed';
       actions.append(done);
     } else if (quest.completed) {
       const btn = document.createElement('button');
       btn.className = 'btn primary';
       btn.type = 'button';
-      btn.textContent = 'Claim';
+      btn.textContent = questsCopy.claimCta || 'Claim';
       btn.addEventListener('click', async () => {
         btn.disabled = true;
         try {
@@ -92,7 +96,7 @@ function render(quests) {
     } else {
       const status = document.createElement('span');
       status.className = 'quest-status muted';
-      status.textContent = 'In progress';
+      status.textContent = questsCopy.inProgressLabel || 'In progress';
       actions.append(status);
     }
 
@@ -107,7 +111,7 @@ async function load() {
     render(data.quests || []);
   } catch (error) {
     summary.textContent = 'Quests could not be loaded.';
-    list.innerHTML = `<div class="quests-empty"><h2>Sign in required</h2><p>${esc(error.message || 'Unable to load quests.')}</p></div>`;
+    list.innerHTML = `<div class="quests-empty"><h2>${esc(questsCopy.signInTitle || 'Sign in required')}</h2><p>${esc(error.message || 'Unable to load quests.')}</p></div>`;
   }
 }
 
