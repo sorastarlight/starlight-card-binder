@@ -67,3 +67,5 @@ Seventh slice: **collector recipient typeahead** — search by username, display
 - Applied to production via MCP (2026-07-21): `20260721191343_revoke_anon_collector_rpc_execute` — verified collector-private RPCs (`open_daily_booster`, Star Bits preview, notifications, gifts, favorites, etc.) have `anon_exec=false`
 - Applied to production via MCP (2026-07-22): `trade_lists_collector_number` — `get_my_trade_lists` / `get_public_trade_lists` / `get_trade_offer_context` expose `collectorNumber`; anon cannot execute private trade RPCs
 - Applied to production via MCP (2026-07-22): `search_trade_collectors` — authenticated typeahead for username/display name/exact email; anon cannot execute
+- Applied to production via MCP (2026-07-22): `shell_navigation_settings` — `get_shell_navigation` (anon+auth), admin save/reset owner/admin only
+- Applied to production via MCP (2026-07-22): `collector_identity_onboarding` — `username_locked`/`username_source`, Twitch claim + identity RPCs; anon cannot execute
