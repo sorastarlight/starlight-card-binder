@@ -311,19 +311,26 @@ body.unified-shell{padding-left:env(safe-area-inset-left);padding-right:env(safe
 .shell-account-menu-button .shell-account-main strong{font-size:.92rem;line-height:1.15}
 .shell-account-menu-button .shell-account-main>span{display:block;font-size:.74rem;line-height:1.2}
 .shell-account-caret{flex:none;color:#7a89ad;font-size:.78rem;margin-right:2px}
-.shell-account-notify-badge{position:absolute;top:-5px;right:-4px;min-width:20px;height:20px;padding:0 5px;display:grid;place-items:center;border-radius:999px;background:#ff5eaa;color:#fff;font-size:.68rem;border:2px solid #fff;box-shadow:0 4px 12px rgba(255,94,170,.36)}
-.shell-account-notify-badge[hidden]{display:none!important}
+.shell-notify-bell{position:relative;display:inline-grid;place-items:center;width:42px;height:42px;border-radius:14px;text-decoration:none;background:linear-gradient(135deg,#edf8ff,#ffeafa);border:1px solid rgba(107,198,248,.45);box-shadow:0 7px 18px rgba(61,83,132,.1);color:#4a6498}
+.shell-notify-bell:hover,.shell-notify-bell:focus-visible{border-color:rgba(255,130,200,.5);color:#9c4677;box-shadow:0 10px 22px rgba(61,83,132,.14)}
+.shell-notify-bell[hidden]{display:none!important}
+.shell-notify-bell-icon{display:block}
+.shell-notify-bell-dot{position:absolute;top:6px;right:7px;width:9px;height:9px;border-radius:50%;background:#ff5eaa;border:2px solid #fff;box-shadow:0 2px 8px rgba(255,94,170,.4)}
+.shell-notify-bell-dot[hidden]{display:none!important}
 .shell-avatar{overflow:hidden;flex:none}
 .shell-avatar.is-placeholder{background:linear-gradient(145deg,#d7e7f7,#e8eef8);color:#7a8aaa;box-shadow:inset 0 0 0 1px rgba(107,198,248,.28),0 4px 12px rgba(61,83,132,.08)}
 .shell-avatar.has-photo{background-size:cover;background-position:center;color:transparent}
 .shell-avatar-silhouette{display:block}
 .shell-account-menu{position:absolute;right:0;top:calc(100% + 8px);z-index:1200;min-width:230px;padding:8px;border:1px solid rgba(107,198,248,.35);border-radius:15px;background:#fff;box-shadow:0 18px 40px rgba(45,60,105,.2)}
 .shell-account-menu[hidden]{display:none!important}
-.shell-account-menu a,.shell-account-menu button{display:block;width:100%;padding:10px 12px;border:0;border-radius:10px;background:transparent;color:#405fa1;text-align:left;font:inherit;font-weight:800;text-decoration:none;cursor:pointer}
+.shell-account-menu a,.shell-account-menu button{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:10px 12px;border:0;border-radius:10px;background:transparent;color:#405fa1;text-align:left;font:inherit;font-weight:800;text-decoration:none;cursor:pointer}
 .shell-account-menu a:hover,.shell-account-menu button:hover{background:rgba(107,198,248,.13)}
+.shell-account-menu .shell-nav-badge{margin-left:auto;flex:none}
 .shell-account-menu-sep{margin:6px 8px;border:0;border-top:1px solid rgba(107,198,248,.28)}
-.shell-account-menu .shell-signout-button{color:#9c4677;font-weight:900}
+.shell-account-menu .shell-signout-button{color:#9c4677;font-weight:900;display:block}
 .shell-account-menu .shell-signout-button:hover{background:rgba(255,130,200,.12)}
+.shell-nav-badge{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:linear-gradient(135deg,#fed334,#ff82c8);color:#fff;font-size:.74rem;font-weight:900;box-shadow:0 0 14px rgba(255,130,200,.4)}
+.shell-nav-badge[hidden]{display:none!important}
 @media(max-width:900px){.shell-signed-in-actions .shell-account-stats,.shell-signed-in-actions .daily-booster-cta{display:none}.shell-auth-button{padding:7px 10px;font-size:.8rem}}
 /* V84.1 account-state cleanup */
 .shell-signed-out-actions[hidden],.shell-signed-in-actions[hidden],.shell-account-menu-signed-in[hidden],.shell-account-menu-signed-out[hidden]{display:none!important}

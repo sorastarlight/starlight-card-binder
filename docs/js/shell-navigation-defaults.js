@@ -13,7 +13,7 @@ export const PUBLIC_SHELL_DESTINATIONS = Object.freeze([
   { value: 'trades', label: 'Wishlist & Trades' },
   { value: 'offers', label: 'Trade Offers' },
   { value: 'rankings', label: 'User Rankings' },
-  { value: 'feed', label: 'Pull Feed' },
+  { value: 'feed', label: 'LIVE Feed' },
   { value: 'notifications', label: 'Notifications' },
   { value: 'rewards', label: 'Received Gifts' },
   { value: 'profile', label: 'Profile & Settings' },
@@ -44,7 +44,7 @@ export function createDefaultShellNavigation() {
       trades: 'Wishlist & Trades',
       offers: 'Trade Offers',
       rankings: 'User Rankings',
-      feed: 'Pull Feed',
+      feed: 'LIVE Feed',
       notifications: 'Notifications',
       rewards: 'Received Gifts',
       profile: 'Profile Settings',
@@ -81,7 +81,7 @@ export function createDefaultShellNavigation() {
             { id: 'trades', label: 'Wishlist & Trades', icon: { type: 'emoji', value: '💫' }, destination: 'trades', enabled: true, features: [] },
             { id: 'offers', label: 'Trade Offers', icon: { type: 'emoji', value: '🤝' }, destination: 'offers', enabled: true, features: ['tradeOfferBadge'] },
             { id: 'rankings', label: 'User Rankings', icon: { type: 'emoji', value: '👤' }, destination: 'rankings', enabled: true, features: [] },
-            { id: 'feed', label: 'Pull Feed', icon: { type: 'emoji', value: '🎉' }, destination: 'feed', enabled: true, features: [] }
+            { id: 'feed', label: 'LIVE Feed', icon: { type: 'emoji', value: '📡' }, destination: 'feed', enabled: true, features: [] }
           ]
         },
         {
@@ -112,6 +112,22 @@ export function createDefaultShellNavigation() {
         { id: 'top-binder', label: 'Starlight Card Binder', destination: 'binder', enabled: true },
         { id: 'top-collection', label: 'My Card Collection', destination: 'collection', enabled: true },
         { id: 'top-shop', label: 'Card Shop', destination: 'shop', enabled: true }
+      ]
+    },
+    accountMenu: {
+      signedIn: [
+        { id: 'view-profile', label: 'View My Profile', destination: 'collector', enabled: true, features: ['profileLink'] },
+        { id: 'profile-settings', label: 'Profile & Settings', destination: 'profile', enabled: true, features: [] },
+        { id: 'notifications', label: 'View My Notifications', destination: 'notifications', enabled: true, features: ['notificationBadge'] },
+        { id: 'rewards', label: 'Received Gifts', destination: 'rewards', enabled: true, features: ['receivedGiftBadge'] },
+        { id: 'offers', label: 'Trade Offers', destination: 'offers', enabled: true, features: ['tradeOfferBadge'] },
+        { id: 'redeem', label: 'Redeem A Code', destination: 'redeem', enabled: true, features: [] },
+        { id: 'sep-1', label: '', destination: '', enabled: true, features: ['separator'] },
+        { id: 'sign-out', label: 'Sign Out', destination: '', enabled: true, features: ['signOut'] }
+      ],
+      signedOut: [
+        { id: 'sign-in', label: 'Sign In', destination: '', enabled: true, features: ['signIn'] },
+        { id: 'register', label: 'Register', destination: '', enabled: true, features: ['signUp'] }
       ]
     }
   };

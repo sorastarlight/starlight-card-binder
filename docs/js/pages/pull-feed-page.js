@@ -76,7 +76,7 @@ async function loadFeed({ append = false } = {}) {
   try {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth?.user) {
-      statusEl.textContent = 'Sign in to browse the Pull Feed.';
+      statusEl.textContent = 'Sign in to browse the LIVE Feed.';
       listEl.innerHTML = `<div class="pull-feed-empty"><a href="login.html?mode=signin">Sign in</a> to see Everyone, Following, or Just You.</div>`;
       moreBtn.hidden = true;
       return;

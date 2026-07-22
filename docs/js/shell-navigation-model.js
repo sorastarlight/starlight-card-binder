@@ -20,19 +20,35 @@ function sanitizeItem(item = {}, index = 0) {
     ? item.features.map(String).filter(Boolean).slice(0, 8)
     : [];
   const isLabel = features.includes('sectionLabel');
-  const destination = isLabel ? '' : String(item.destination || '').trim();
-  if (!isLabel && destination && !ALLOWED_DESTINATIONS.has(destination) && !isKnownShellRoute(destination)) {
+  const isSeparator = features.includes('separator');
+  const isAuthAction = features.some((feature) =>
+    ['signOut', 'signIn', 'signUp', 'profileLink'].includes(feature)
+  );
+  const destination = isLabel || isSeparator ? '' : String(item.destination || '').trim();
+  if (
+    !isLabel &&
+    !isSeparator &&
+    !isAuthAction &&
+    destination &&
+    !ALLOWED_DESTINATIONS.has(destination) &&
+    !isKnownShellRoute(destination)
+  ) {
     throw new Error(`Unsupported navigation destination: ${destination}`);
   }
   return {
     id: String(item.id || `item-${index}`).slice(0, 64),
-    label: String(item.label || 'Untitled').trim().slice(0, 80) || 'Untitled',
+    label: String(item.label || (isSeparator ? '' : 'Untitled')).trim().slice(0, 80) || (isSeparator ? '' : 'Untitled'),
     icon: asIcon(item.icon),
     destination,
     enabled: item.enabled !== false,
     features,
     className: String(item.className || '').trim().slice(0, 80)
   };
+}
+
+function sanitizeAccountMenuItems(items, fallback) {
+  const source = Array.isArray(items) ? items : fallback;
+  return source.map(sanitizeItem).slice(0, 16);
 }
 
 function sanitizeSection(section = {}, index = 0) {
@@ -78,12 +94,41 @@ export function sanitizeShellNavigation(input) {
 
   if (!sections.length) throw new Error('At least one sidebar section is required.');
 
+  // Keep LIVE Feed naming in sync when older saves still say "Pull Feed".
+  for (const section of sections) {
+    for (const item of section.items || []) {
+      if (item.destination === 'feed' && /^pull feed$/i.test(String(item.label || '').trim())) {
+        item.label = 'LIVE Feed';
+      }
+    }
+  }
+  if (/^pull feed$/i.test(String(pageTitles.feed || '').trim())) {
+    pageTitles.feed = 'LIVE Feed';
+  }
+
+  const accountMenuSource = source.accountMenu && typeof source.accountMenu === 'object'
+    ? source.accountMenu
+    : defaults.accountMenu;
+
+  const accountMenu = {
+    signedIn: sanitizeAccountMenuItems(accountMenuSource.signedIn, defaults.accountMenu.signedIn),
+    signedOut: sanitizeAccountMenuItems(accountMenuSource.signedOut, defaults.accountMenu.signedOut)
+  };
+  for (const list of [accountMenu.signedIn, accountMenu.signedOut]) {
+    for (const item of list) {
+      if (item.destination === 'feed' && /^pull feed$/i.test(String(item.label || '').trim())) {
+        item.label = 'LIVE Feed';
+      }
+    }
+  }
+
   return {
     version: 1,
     brandRibbon: String(source.brandRibbon ?? defaults.brandRibbon).trim().slice(0, 40) || defaults.brandRibbon,
     pageTitles,
     sidebar: { sections },
-    topBar: { quickLinks }
+    topBar: { quickLinks },
+    accountMenu
   };
 }
 

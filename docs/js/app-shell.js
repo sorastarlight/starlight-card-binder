@@ -26,7 +26,7 @@ const routes = {
   'star-bits':{title:'Star Bits Exchange',src:'star-bits.html'}, checklist:{title:'My Checklist',src:'checklist.html'},
   trades:{title:'Wishlist & Trades',src:'trade-lists.html'}, offers:{title:'Trade Offers',src:'trade-offers.html'},
   rankings:{title:'User Rankings',src:'user-rankings.html'},
-  feed:{title:'Pull Feed',src:'pull-feed.html'},
+  feed:{title:'LIVE Feed',src:'pull-feed.html'},
   notifications:{title:'Notifications',src:'notifications.html'}, rewards:{title:'Received Gifts',src:'received-rewards.html'}, profile:{title:'Profile Settings',src:'profile-settings.html'}, collector:{title:'Collector Profile',src:'collector.html'},
   report:{title:'Report Profile',src:'report-profile.html'}, about:{title:'About',src:'about.html'}, socials:{title:'Socials',src:'socials.html'},
   admin:{title:'Administration Hub',src:'admin-hub.html'}, 'admin-codes':{title:'Reward Code Console',src:'admin-codes.html'},
@@ -282,9 +282,11 @@ function ensureNotificationPopover(){
 
 async function hydrateNotificationBadge(){
   document.querySelectorAll('[data-notification-badge]').forEach(b=>b.hidden=true);
+  document.querySelectorAll('[data-notification-dot]').forEach(b=>b.hidden=true);
   try{
     const data=await getMyNotifications(20);const count=Number(data?.unreadCount||0);
     document.querySelectorAll('[data-notification-badge]').forEach(b=>{b.textContent=String(count);b.hidden=count===0});
+    document.querySelectorAll('[data-notification-dot]').forEach(b=>{b.hidden=count===0});
   }catch(e){console.warn('[Starlight] Notification badge failed',e)}
 }
 
@@ -298,13 +300,19 @@ async function hydrateActiveEventBanner(){
   try{const events=await getActiveEvents();const event=events?.[0];if(!event){banner.hidden=true;return}banner.hidden=false;banner.style.setProperty('--event-accent',event.accentColor||'#ff82c8');banner.querySelector('[data-shell-event-name]').textContent=event.name||'Starlight Event';const end=new Date(event.endAt);const hours=Math.max(0,Math.ceil((end-Date.now())/36e5));banner.querySelector('[data-shell-event-time]').textContent=hours>48?`${Math.ceil(hours/24)} days remaining`:`${hours} hours remaining`;if(event.bannerImageUrl)banner.style.setProperty('--event-image',`url("${String(event.bannerImageUrl).replaceAll('"','%22')}")`)}catch(e){banner.hidden=true;console.warn('[Starlight] Event banner failed',e)}
 }
 async function hydrateTradeOfferBadge(){
-  const badge=document.querySelector('[data-trade-offer-badge]');
-  if(!badge)return;
+  const badges=document.querySelectorAll('[data-trade-offer-badge]');
+  badges.forEach(b=>b.hidden=true);
   try{
     const offers=await getMyTradeOffers();
     const count=(offers?.incoming||[]).filter(o=>o.status==='pending').length;
-    badge.textContent=String(count);badge.hidden=count===0;
-  }catch(e){badge.hidden=true;console.warn('[Starlight] Trade offer badge failed',e)}
+    badges.forEach(b=>{b.textContent=String(count);b.hidden=count===0});
+  }catch(e){badges.forEach(b=>b.hidden=true);console.warn('[Starlight] Trade offer badge failed',e)}
+}
+
+function refreshShellBadges(){
+  hydrateTradeOfferBadge();
+  hydrateNotificationBadge();
+  hydrateReceivedGiftBadge();
 }
 
 async function hydrateAccount(){
@@ -318,6 +326,13 @@ async function hydrateAccount(){
     signedOutNodes.forEach(node=>node.setAttribute('hidden',''));
     signedInNodes.forEach(node=>node.removeAttribute('hidden'));
   };
+  const applyProfileLink=()=>{
+    const link=document.querySelector('[data-shell-profile-link]');
+    if(!link)return;
+    link.href=profileUsername
+      ? `binder.html?view=collector&username=${encodeURIComponent(profileUsername)}`
+      : 'binder.html?view=profile';
+  };
   let access = null;
   try{
     const {data}=await supabase.auth.getUser();const user=data?.user;
@@ -326,8 +341,7 @@ async function hydrateAccount(){
       setShellAvatar('');
       document.querySelector('[data-shell-account-name]').textContent='Welcome to Starlight Cards';
       document.querySelector('[data-shell-account-sub]').textContent='Sign in or register to collect cards';
-      const link=document.querySelector('[data-shell-profile-link]');
-      if(link)link.href='binder.html?view=profile';
+      profileUsername='';
     } else {
       showSignedIn();
       const {data:profile}=await supabase.from('profiles').select('username,display_name,onboarding_complete,username_locked,username_source,avatar_url,selected_title_id').eq('id',user.id).maybeSingle();
@@ -336,10 +350,6 @@ async function hydrateAccount(){
       document.querySelector('[data-shell-account-name]').textContent=name;
       document.querySelector('[data-shell-account-sub]').textContent=profile?.username?`@${profile.username}`:user.email;
       setShellAvatar(profile?.avatar_url||'');
-      const link=document.querySelector('[data-shell-profile-link]');
-      if(link)link.href=profileUsername
-        ? `binder.html?view=collector&username=${encodeURIComponent(profileUsername)}`
-        : 'binder.html?view=profile';
       access=await getMyStaffAccess();
       if(profile && profile.onboarding_complete===false){
         try{
@@ -355,6 +365,7 @@ async function hydrateAccount(){
     console.warn('[Starlight] Shell account hydration failed',e);
     showSignedOut();
     setShellAvatar('');
+    profileUsername='';
   }
 
   try{
@@ -364,6 +375,8 @@ async function hydrateAccount(){
     }
     applyShellPageTitles(routes, navigation);
     applyShellNavigationToDom(navigation, { isStaff: Boolean(access?.isStaff) || isStudioPreview() });
+    applyProfileLink();
+    refreshShellBadges();
     if(currentRoute !== 'binder' && routes[currentRoute]?.title){
       document.title = `${routes[currentRoute].title} | Starlight Card Binder`;
     }
@@ -378,6 +391,8 @@ async function hydrateAccount(){
           window.__starlightShellNavigationDraft = data.navigation || null;
           applyShellPageTitles(routes, data.navigation || {});
           applyShellNavigationToDom(data.navigation || null, { isStaff: true });
+          applyProfileLink();
+          refreshShellBadges();
           setActive(currentRoute);
         });
       }
@@ -388,6 +403,8 @@ async function hydrateAccount(){
   }catch(e){
     console.warn('[Starlight] Shell navigation config failed', e);
     applyShellNavigationToDom(null, { isStaff: Boolean(access?.isStaff) });
+    applyProfileLink();
+    refreshShellBadges();
   }
 
   if(access?.isStaff)document.querySelector('.unified-nav')?.classList.add('has-staff-access');

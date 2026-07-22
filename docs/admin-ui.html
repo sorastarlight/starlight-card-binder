@@ -19,7 +19,7 @@
       <div class="toolbar">
         <div>
           <h1>Website User Interface</h1>
-          <p class="lead">Edit the sidebar, top-bar quick links, brand ribbon, and page titles against a live shell preview. Save publishes for all collectors.</p>
+          <p class="lead">Edit the sidebar, top-bar quick links, account menu, brand ribbon, and page titles against a live shell preview. Save publishes for all collectors.</p>
         </div>
         <div class="actions">
           <button id="saveBtn" class="btn primary" type="button" hidden>Save Changes</button>
@@ -37,6 +37,7 @@
         <div class="tabs" role="tablist" aria-label="Website UI editors">
           <button type="button" class="tab active" role="tab" aria-selected="true" data-tab="sidebar" id="tab-sidebar" aria-controls="panel-sidebar">Sidebar</button>
           <button type="button" class="tab" role="tab" aria-selected="false" data-tab="topbar" id="tab-topbar" aria-controls="panel-topbar">Top Bar</button>
+          <button type="button" class="tab" role="tab" aria-selected="false" data-tab="account" id="tab-account" aria-controls="panel-account">Account Menu</button>
           <button type="button" class="tab" role="tab" aria-selected="false" data-tab="titles" id="tab-titles" aria-controls="panel-titles">Page Titles</button>
         </div>
 
@@ -44,6 +45,7 @@
           <div class="editor-main">
             <section id="panel-sidebar" class="tab-panel" role="tabpanel" aria-labelledby="tab-sidebar" data-panel="sidebar"></section>
             <section id="panel-topbar" class="tab-panel hidden" role="tabpanel" aria-labelledby="tab-topbar" data-panel="topbar" hidden></section>
+            <section id="panel-account" class="tab-panel hidden" role="tabpanel" aria-labelledby="tab-account" data-panel="account" hidden></section>
             <section id="panel-titles" class="tab-panel hidden" role="tabpanel" aria-labelledby="tab-titles" data-panel="titles" hidden></section>
           </div>
           <aside class="preview-panel" aria-label="Live shell preview">
@@ -67,7 +69,7 @@
   </main>
 
   <script src="js/shared-ui.js?v=1.6.13"></script>
-  <script type="module" src="js/pages/admin-ui-page.js?v=2.0"></script>
+  <script type="module" src="js/pages/admin-ui-page.js?v=2.1"></script>
   <script src="js/qol-ui.js?v=94.2.8" defer></script>
 </body>
 </html>

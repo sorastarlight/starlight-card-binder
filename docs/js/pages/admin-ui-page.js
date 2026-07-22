@@ -25,11 +25,25 @@ const FEATURES = [
   { id: 'sectionLabel', label: 'Section label (no destination)' }
 ];
 
+const ACCOUNT_FEATURES = [
+  { id: 'notificationBadge', label: 'Notification count badge' },
+  { id: 'receivedGiftBadge', label: 'Received gifts count badge' },
+  { id: 'tradeOfferBadge', label: 'Trade offers count badge' },
+  { id: 'profileLink', label: 'My public profile link' },
+  { id: 'separator', label: 'Separator line' },
+  { id: 'signOut', label: 'Sign out action' },
+  { id: 'signIn', label: 'Sign in action' },
+  { id: 'signUp', label: 'Register action' }
+];
+
+const ACCOUNT_SPECIAL = new Set(['separator', 'signOut', 'signIn', 'signUp', 'profileLink']);
+
 const statusEl = byId('status');
 const appEl = byId('app');
 const brandInput = byId('brandRibbon');
 const sidebarPanel = byId('panel-sidebar');
 const topbarPanel = byId('panel-topbar');
+const accountPanel = byId('panel-account');
 const titlesPanel = byId('panel-titles');
 const previewEl = byId('livePreview');
 const shellPreviewFrame = byId('shellPreviewFrame');
@@ -209,6 +223,80 @@ function renderTopBar() {
   `;
 }
 
+function ensureAccountMenu() {
+  if (!navigation.accountMenu || typeof navigation.accountMenu !== 'object') {
+    navigation.accountMenu = { signedIn: [], signedOut: [] };
+  }
+  if (!Array.isArray(navigation.accountMenu.signedIn)) navigation.accountMenu.signedIn = [];
+  if (!Array.isArray(navigation.accountMenu.signedOut)) navigation.accountMenu.signedOut = [];
+  return navigation.accountMenu;
+}
+
+function renderAccountMenuList(listKey, title, hint) {
+  ensureAccountMenu();
+  const items = navigation.accountMenu[listKey] || [];
+  return `
+    <article class="section-card account-menu-card">
+      <header>
+        <div class="section-meta">
+          <strong>${esc(title)}</strong>
+          <p class="lead">${esc(hint)}</p>
+        </div>
+      </header>
+      <div class="items">
+        ${items.map((item, index) => {
+          const features = new Set(item.features || []);
+          const isSpecial = [...ACCOUNT_SPECIAL].some((feature) => features.has(feature));
+          const needsDestination = !isSpecial || features.has('profileLink');
+          return `
+            <div class="item-row" data-account-list="${listKey}" data-account-item="${index}">
+              <div class="item-fields">
+                <label>Item label
+                  <input type="text" maxlength="80" value="${esc(item.label || '')}" data-field="accountLabel" data-account-list="${listKey}" data-account-item="${index}" ${features.has('separator') ? 'disabled' : ''}>
+                </label>
+                <label>Destination
+                  <select data-field="accountDestination" data-account-list="${listKey}" data-account-item="${index}" ${needsDestination ? '' : 'disabled'}>
+                    ${destinationOptions(item.destination || '', { allowEmpty: !needsDestination || features.has('profileLink') })}
+                  </select>
+                </label>
+                <div class="checks">
+                  <label><input type="checkbox" data-field="accountEnabled" data-account-list="${listKey}" data-account-item="${index}" ${item.enabled !== false ? 'checked' : ''}> Enabled</label>
+                </div>
+              </div>
+              <div class="checks">
+                ${ACCOUNT_FEATURES.map((feature) => `
+                  <label>
+                    <input type="checkbox" data-field="accountFeature" data-feature="${feature.id}" data-account-list="${listKey}" data-account-item="${index}" ${features.has(feature.id) ? 'checked' : ''}>
+                    ${esc(feature.label)}
+                  </label>
+                `).join('')}
+              </div>
+              <div class="row-tools">
+                <button type="button" class="btn small" data-action="move-account-item" data-account-list="${listKey}" data-account-item="${index}" data-delta="-1" ${index === 0 ? 'disabled' : ''}>↑</button>
+                <button type="button" class="btn small" data-action="move-account-item" data-account-list="${listKey}" data-account-item="${index}" data-delta="1" ${index === items.length - 1 ? 'disabled' : ''}>↓</button>
+                <button type="button" class="btn small danger" data-action="remove-account-item" data-account-list="${listKey}" data-account-item="${index}">Remove</button>
+              </div>
+            </div>
+          `;
+        }).join('') || '<p class="lead">No menu items yet.</p>'}
+      </div>
+      <div class="panel-actions">
+        <button type="button" class="btn small" data-action="add-account-item" data-account-list="${listKey}">＋ Add menu item</button>
+      </div>
+    </article>
+  `;
+}
+
+function renderAccountMenu() {
+  if (!accountPanel) return;
+  accountPanel.innerHTML = `
+    <div class="section-list">
+      ${renderAccountMenuList('signedIn', 'Signed-in menu', 'Shown when a collector is signed in. Use count badges for notifications, gifts, and trades.')}
+      ${renderAccountMenuList('signedOut', 'Signed-out menu', 'Shown on the profile button when nobody is signed in.')}
+    </div>
+  `;
+}
+
 function renderTitles() {
   const titles = navigation?.pageTitles || {};
   const keys = Object.keys(titles);
@@ -261,6 +349,14 @@ function renderPreview() {
           <span class="preview-chip ${link.enabled === false ? 'disabled' : ''}">${esc(link.label || link.destination)}</span>
         `).join('') || '<span class="lead">No quick links</span>'}
       </div>
+      <div class="preview-top">
+        <strong>Account ↓</strong>
+        ${(navigation.accountMenu?.signedIn || []).filter((item) => item.enabled !== false).map((item) => {
+          const features = item.features || [];
+          if (features.includes('separator')) return '<span class="preview-chip">—</span>';
+          return `<span class="preview-chip">${esc(item.label || item.destination || 'Item')}</span>`;
+        }).join('') || '<span class="lead">No signed-in items</span>'}
+      </div>
     `;
   }
   pushShellPreviewDraft();
@@ -295,8 +391,10 @@ function loadShellPreview({ force = false } = {}) {
 
 function renderAll() {
   if (brandInput && navigation) brandInput.value = navigation.brandRibbon || '';
+  ensureAccountMenu();
   renderSidebar();
   renderTopBar();
+  renderAccountMenu();
   renderTitles();
   renderPreview();
   loadShellPreview();
@@ -310,7 +408,8 @@ function showTab(name) {
     btn.classList.toggle('active', selected);
     btn.setAttribute('aria-selected', selected ? 'true' : 'false');
   });
-  [sidebarPanel, topbarPanel, titlesPanel].forEach((panel) => {
+  [sidebarPanel, topbarPanel, accountPanel, titlesPanel].forEach((panel) => {
+    if (!panel) return;
     const match = panel.dataset.panel === name;
     panel.classList.toggle('hidden', !match);
     panel.hidden = !match;
@@ -323,6 +422,11 @@ function getSection(index) {
 
 function getItem(sectionIndex, itemIndex) {
   return getSection(sectionIndex)?.items?.[itemIndex];
+}
+
+function getAccountItem(listKey, itemIndex) {
+  ensureAccountMenu();
+  return navigation.accountMenu?.[listKey]?.[itemIndex];
 }
 
 function setIconEmoji(target, emoji) {
@@ -442,6 +546,46 @@ function onEditorInput(event) {
     const key = el.dataset.key;
     if (key) navigation.pageTitles[key] = el.value;
   }
+  if (field === 'accountLabel') {
+    const item = getAccountItem(el.dataset.accountList, Number(el.dataset.accountItem));
+    if (item) item.label = el.value;
+    renderPreview();
+    return;
+  }
+  if (field === 'accountDestination') {
+    const item = getAccountItem(el.dataset.accountList, Number(el.dataset.accountItem));
+    if (item) item.destination = el.value;
+    return;
+  }
+  if (field === 'accountEnabled') {
+    const item = getAccountItem(el.dataset.accountList, Number(el.dataset.accountItem));
+    if (item) item.enabled = el.checked;
+    renderPreview();
+    return;
+  }
+  if (field === 'accountFeature') {
+    const item = getAccountItem(el.dataset.accountList, Number(el.dataset.accountItem));
+    if (!item) return;
+    const feature = el.dataset.feature;
+    const set = new Set(item.features || []);
+    if (el.checked) {
+      if (ACCOUNT_SPECIAL.has(feature)) {
+        for (const special of ACCOUNT_SPECIAL) set.delete(special);
+      }
+      set.add(feature);
+      if (feature === 'separator') {
+        item.label = '';
+        item.destination = '';
+      }
+      if (feature === 'signOut' || feature === 'signIn' || feature === 'signUp') {
+        item.destination = '';
+      }
+    } else {
+      set.delete(feature);
+    }
+    item.features = [...set];
+    renderAll();
+  }
 }
 
 async function onEditorClick(event) {
@@ -540,6 +684,36 @@ async function onEditorClick(event) {
     moveItem(navigation.topBar.quickLinks, lIndex, delta);
     renderAll();
   }
+  if (action === 'add-account-item') {
+    const listKey = btn.dataset.accountList;
+    ensureAccountMenu();
+    if (!navigation.accountMenu[listKey]) return;
+    navigation.accountMenu[listKey].push({
+      id: uid('account'),
+      label: listKey === 'signedOut' ? 'Sign In' : 'Menu item',
+      destination: listKey === 'signedOut' ? '' : 'profile',
+      enabled: true,
+      features: listKey === 'signedOut' ? ['signIn'] : []
+    });
+    renderAll();
+    return;
+  }
+  if (action === 'remove-account-item') {
+    const listKey = btn.dataset.accountList;
+    const aIndex = Number(btn.dataset.accountItem);
+    ensureAccountMenu();
+    navigation.accountMenu[listKey]?.splice(aIndex, 1);
+    renderAll();
+    return;
+  }
+  if (action === 'move-account-item') {
+    const listKey = btn.dataset.accountList;
+    const aIndex = Number(btn.dataset.accountItem);
+    ensureAccountMenu();
+    const list = navigation.accountMenu[listKey];
+    if (list) moveItem(list, aIndex, delta);
+    renderAll();
+  }
 }
 
 async function onEditorChange(event) {
@@ -584,7 +758,7 @@ resetBtn.addEventListener('click', async () => {
   if (busy) return;
   const ok = await window.StarlightUI.confirm({
     title: 'Reset website UI?',
-    message: 'This restores the default sidebar, top bar, brand ribbon, and page titles. Unsaved edits will be lost.',
+    message: 'This restores the default sidebar, top bar, account menu, brand ribbon, and page titles. Unsaved edits will be lost.',
     confirmText: 'Reset to Defaults',
     danger: true
   });

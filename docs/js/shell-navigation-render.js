@@ -33,6 +33,28 @@ function itemBadge(features = []) {
   return '';
 }
 
+function renderAccountMenuItem(item) {
+  if (item.enabled === false) return '';
+  const features = item.features || [];
+  if (features.includes('separator')) {
+    return '<hr class="shell-account-menu-sep" aria-hidden="true"/>';
+  }
+  if (features.includes('signOut')) {
+    return `<button role="menuitem" type="button" class="shell-signout-button" data-shell-signout>${esc(item.label || 'Sign Out')}</button>`;
+  }
+  if (features.includes('signIn')) {
+    return `<a role="menuitem" href="login.html?mode=signin">${esc(item.label || 'Sign In')}</a>`;
+  }
+  if (features.includes('signUp')) {
+    return `<a role="menuitem" href="login.html?mode=signup">${esc(item.label || 'Register')}</a>`;
+  }
+  if (features.includes('profileLink')) {
+    return `<a role="menuitem" class="shell-profile-link" data-shell-profile-link="" href="binder.html?view=profile">${esc(item.label || 'View My Profile')}${itemBadge(features)}</a>`;
+  }
+  const destination = item.destination || 'home';
+  return `<a role="menuitem" data-shell-view="${esc(destination)}" href="binder.html?view=${esc(destination)}">${esc(item.label || destination)}${itemBadge(features)}</a>`;
+}
+
 function renderSidebarItem(item) {
   if (item.enabled === false) return '';
   const features = item.features || [];
@@ -66,6 +88,19 @@ export function applyShellNavigationToDom(navigation, { isStaff = false } = {}) 
     top.innerHTML = (config.topBar.quickLinks || [])
       .filter(link => link.enabled !== false)
       .map(link => `<a data-shell-view="${esc(link.destination)}" href="binder.html?view=${esc(link.destination)}">${esc(link.label)}</a>`)
+      .join('');
+  }
+
+  const signedInMenu = document.querySelector('.shell-account-menu-signed-in');
+  if (signedInMenu) {
+    signedInMenu.innerHTML = (config.accountMenu?.signedIn || [])
+      .map(renderAccountMenuItem)
+      .join('');
+  }
+  const signedOutMenu = document.querySelector('.shell-account-menu-signed-out');
+  if (signedOutMenu) {
+    signedOutMenu.innerHTML = (config.accountMenu?.signedOut || [])
+      .map(renderAccountMenuItem)
       .join('');
   }
 
