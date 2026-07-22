@@ -222,8 +222,10 @@ function setShellAvatar(photoUrl){
   const avatar=document.querySelector('[data-shell-avatar]');
   if(!avatar)return;
   if(photoUrl){
-    avatar.innerHTML='';
-    avatar.style.backgroundImage=`url(${photoUrl})`;
+    avatar.replaceChildren();
+    avatar.style.backgroundImage=`url(${JSON.stringify(String(photoUrl))})`;
+    avatar.style.backgroundSize='cover';
+    avatar.style.backgroundPosition='center';
     avatar.classList.add('has-photo');
     avatar.classList.remove('is-placeholder');
     return;

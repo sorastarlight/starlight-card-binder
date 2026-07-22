@@ -578,12 +578,29 @@ import {
         function cardTile(card, eyebrow) {
             if (!card) return "";
             const image = card.thumbnailUrl || card.imageUrl || "";
-            return `<article class="highlight-card">
+            return `<article class="highlight-card${image ? " has-art" : " is-meta"}">
               <p class="eyebrow">${eyebrow}</p>
-              ${image ? `<img src="${image.replaceAll('"','&quot;')}" alt="">` : '<div class="highlight-fallback">✦</div>'}
+              ${image ? `<img src="${image.replaceAll('"','&quot;')}" alt="" loading="lazy">` : ''}
               <strong>${String(card.name || "").replaceAll("<","&lt;")}</strong>
               <span>${String(card.rarity || "")}${card.seriesName ? ` · ${card.seriesName}` : ""}</span>
             </article>`;
+        }
+
+        function setFollowButtonState(following, { burst = false } = {}) {
+            if (!followButton) return;
+            const label = followButton.querySelector(".collector-follow-label") || followButton;
+            const icon = followButton.querySelector(".collector-follow-icon");
+            followButton.setAttribute("aria-pressed", following ? "true" : "false");
+            followButton.classList.toggle("is-following", following);
+            label.textContent = following ? "Following" : "Follow";
+            if (icon) icon.textContent = following ? "♥" : "♡";
+            if (burst) {
+                followButton.classList.remove("is-burst");
+                // Retrigger CSS animation.
+                void followButton.offsetWidth;
+                followButton.classList.add("is-burst");
+                window.setTimeout(() => followButton.classList.remove("is-burst"), 700);
+            }
         }
 
         function renderSocialHighlights(social) {
@@ -607,28 +624,25 @@ import {
             if (socialActions) {
                 socialActions.hidden = Boolean(social.isSelf);
             }
-            if (followButton) {
-                followButton.textContent = followState ? "Following" : "Follow";
-                followButton.setAttribute("aria-pressed", followState ? "true" : "false");
-            }
+            setFollowButtonState(followState);
 
             const parts = [];
             if (social.favoriteSeries?.name) {
-                parts.push(`<article class="highlight-card"><p class="eyebrow">Favorite Series</p><strong>${String(social.favoriteSeries.name).replaceAll("<","&lt;")}</strong><span>Chosen showcase series</span></article>`);
+                parts.push(`<article class="highlight-card is-meta"><p class="eyebrow">Favorite Series</p><strong>${String(social.favoriteSeries.name).replaceAll("<","&lt;")}</strong><span>Chosen showcase series</span></article>`);
             }
             if (social.favoriteCharacter) {
-                parts.push(`<article class="highlight-card"><p class="eyebrow">Favorite Character</p><strong>${String(social.favoriteCharacter).replaceAll("<","&lt;")}</strong><span>Collector favorite</span></article>`);
+                parts.push(`<article class="highlight-card is-meta"><p class="eyebrow">Favorite Character</p><strong>${String(social.favoriteCharacter).replaceAll("<","&lt;")}</strong><span>Collector favorite</span></article>`);
             }
             if (social.mostRarePull) parts.push(cardTile(social.mostRarePull, "Most Rare Pull"));
             if (social.newestPull) parts.push(cardTile(social.newestPull, "Newest Pull"));
             const streak = Number(social.pullStreakDays || 0);
             if (streak > 0) {
-                parts.push(`<article class="highlight-card"><p class="eyebrow">Pull Streak</p><strong>Opened packs ${streak} day${streak === 1 ? "" : "s"} in a row</strong><span>Daily Booster streak</span></article>`);
+                parts.push(`<article class="highlight-card is-meta"><p class="eyebrow">Pull Streak</p><strong>${streak} day${streak === 1 ? "" : "s"}</strong><span>Daily Booster streak</span></article>`);
             }
             if (social.profile?.memberSince) {
                 const joined = formatMemberDate(social.profile.memberSince);
                 if (joined) {
-                    parts.push(`<article class="highlight-card"><p class="eyebrow">Joined</p><strong>${joined}</strong><span>Member since</span></article>`);
+                    parts.push(`<article class="highlight-card is-meta"><p class="eyebrow">Joined</p><strong>${joined}</strong><span>Member since</span></article>`);
                 }
             }
 
@@ -912,8 +926,12 @@ import {
         }
 
         followButton?.addEventListener("click", async () => {
-            if (!activeUsername) return;
+            if (!activeUsername || followButton.disabled) return;
+            const nextFollow = !followState;
             followButton.disabled = true;
+            followButton.classList.add("is-busy");
+            const label = followButton.querySelector(".collector-follow-label") || followButton;
+            label.textContent = nextFollow ? "Following…" : "Unfollowing…";
             try {
                 if (followState) {
                     await unfollowCollector(activeUsername);
@@ -922,13 +940,20 @@ import {
                     await followCollector(activeUsername);
                     followState = true;
                 }
-                followButton.textContent = followState ? "Following" : "Follow";
-                followButton.setAttribute("aria-pressed", followState ? "true" : "false");
+                setFollowButtonState(followState, { burst: true });
+                window.StarlightUI?.toast?.(
+                    followState ? `You're now following @${activeUsername}.` : `Unfollowed @${activeUsername}.`,
+                    "success"
+                );
                 const social = await getPublicCollectorSocial(activeUsername);
                 renderSocialHighlights(social);
+                setFollowButtonState(followState);
             } catch (error) {
-                alert(error.message || "Could not update follow.");
+                setFollowButtonState(followState);
+                window.StarlightUI?.toast?.(error.message || "Could not update follow.", "error")
+                    || alert(error.message || "Could not update follow.");
             } finally {
+                followButton.classList.remove("is-busy");
                 followButton.disabled = false;
             }
         });
