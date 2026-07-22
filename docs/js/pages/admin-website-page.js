@@ -4,7 +4,7 @@ import {
   HOME_QUICK_LINK_IDS,
   WEBSITE_EDITOR_TABS
 } from '../website-content-defaults.js';
-import { getPageMeta, listedFieldKeys } from '../website-content-field-meta.js';
+import { getPageMeta, listedFieldKeys, isHideableField } from '../website-content-field-meta.js';
 import {
   getWebsiteContent,
   saveWebsiteContent,
@@ -33,10 +33,27 @@ const openPreviewBtn = byId('openPreviewBtn');
 
 let content = null;
 const defaults = cloneDefaultWebsiteContent();
+/** Remembers last non-empty value when a field is hidden, keyed as section.key */
+const fieldMemory = Object.create(null);
 let activeTab = WEBSITE_EDITOR_TABS[0].id;
 let busy = false;
 let fieldQuery = '';
 let previewMode = 'full';
+
+function memoryKey(sectionKey, key) {
+  return `${sectionKey}.${key}`;
+}
+
+function rememberField(sectionKey, key, value) {
+  const trimmed = String(value || '').trim();
+  if (trimmed) fieldMemory[memoryKey(sectionKey, key)] = trimmed;
+}
+
+function restoreField(sectionKey, key) {
+  return fieldMemory[memoryKey(sectionKey, key)]
+    || defaults?.[sectionKey]?.[key]
+    || '';
+}
 
 function setStatus(message, type = '') {
   statusEl.textContent = message || '';
@@ -78,20 +95,39 @@ function matchesQuery(label, key, value) {
   return [label, key, value].some((part) => String(part || '').toLowerCase().includes(q));
 }
 
-function field(label, attrs, value, { multiline = false, hint = '', modified = false, key = '' } = {}) {
+function field(label, attrs, value, {
+  multiline = false,
+  hint = '',
+  modified = false,
+  key = '',
+  hideable = false,
+  sectionKey = '',
+  visible = true
+} = {}) {
   const control = multiline
-    ? `<textarea ${attrs}>${esc(value || '')}</textarea>`
-    : `<input type="text" value="${esc(value || '')}" ${attrs}>`;
+    ? `<textarea ${attrs} ${visible ? '' : 'disabled'}>${esc(value || '')}</textarea>`
+    : `<input type="text" value="${esc(value || '')}" ${attrs} ${visible ? '' : 'disabled'}>`;
+  const visibility = hideable ? `
+    <label class="field-visibility">
+      <input type="checkbox" data-visibility-path="${esc(sectionKey)}.${esc(key)}" ${visible ? 'checked' : ''}>
+      <span>Show on page</span>
+    </label>
+  ` : '';
   return `
-    <div class="field ${modified ? 'is-modified' : ''}" data-field-key="${esc(key)}">
-      <label>
-        <span class="field-label-row">
-          <span>${esc(label)}</span>
+    <div class="field ${modified ? 'is-modified' : ''} ${hideable && !visible ? 'is-hidden-field' : ''}" data-field-key="${esc(key)}">
+      <div class="field-label-row">
+        <span class="field-label">${esc(label)}</span>
+        <span class="field-label-tools">
           ${modified ? '<span class="field-badge">Edited</span>' : ''}
+          ${!visible ? '<span class="field-badge hidden-badge">Hidden</span>' : ''}
+          ${visibility}
         </span>
+      </div>
+      <label class="field-control">
         ${control}
       </label>
       ${hint ? `<p class="field-hint">${esc(hint)}</p>` : ''}
+      ${hideable && !visible ? '<p class="field-hint">Hidden on the live page. Turn on “Show on page” to restore it.</p>' : ''}
     </div>
   `;
 }
@@ -115,11 +151,22 @@ function renderStringField(sectionKey, fieldMeta, value) {
   if (!matchesQuery(label, key, value)) return '';
   const longDefault = new Set(['lead', 'signInLead', 'morePacksLead', 'emptyLead', 'emptyWishlist', 'emptyTrade', 'composeEmpty', 'accountIntro', 'signedOutLead', 'duplicatesLead', 'chooseNote', 'exchangeNote', 'exchangeLead', 'wishlistCardLead', 'offersCardLead', 'publicCardLead', 'footerLead', 'tagline', 'splashTitle', 'gridBrowseLead', 'gridSearchLead', 'readyLead', 'claimedLead', 'disabledLead', 'resultsTitle', 'favoritesShowcaseEmptyLead', 'emptyAllLead', 'emptyFavoritesLead', 'emptyFiltersLead', 'showcaseEmptyLead', 'showcasePickLead', 'signInDescription', 'signUpDescription', 'infoStripCollection', 'loadError']);
   const multiline = Boolean(fieldMeta.multiline || longDefault.has(key) || String(value || '').length > 90);
+  const hideable = isHideableField(fieldMeta);
+  const visible = String(value ?? '').trim().length > 0;
+  if (visible) rememberField(sectionKey, key, value);
   return field(
     label,
     `maxlength="500" data-path="${esc(sectionKey)}.${esc(key)}"`,
     value,
-    { multiline, hint: fieldMeta.hint || '', modified: isModified(sectionKey, key), key }
+    {
+      multiline,
+      hint: fieldMeta.hint || (hideable ? 'Uncheck “Show on page” to remove this from the live page.' : ''),
+      modified: isModified(sectionKey, key),
+      key,
+      hideable,
+      sectionKey,
+      visible: hideable ? visible : true
+    }
   );
 }
 
@@ -236,10 +283,11 @@ function valuesByPreview(section, role) {
 function renderPreview() {
   const section = content[activeTab] || {};
   const meta = getPageMeta(activeTab);
-  const eyebrow = valuesByPreview(section, 'eyebrow')[0] || section.eyebrow || '';
-  const title = valuesByPreview(section, 'title')[0] || section.title || section.brandTitle || labelForFieldKey(activeTab);
-  const lead = valuesByPreview(section, 'lead')[0] || section.lead || section.signInDescription || '';
-  const splash = valuesByPreview(section, 'splash')[0] || section.splashTitle || '';
+  const eyebrow = valuesByPreview(section, 'eyebrow')[0] ?? section.eyebrow ?? '';
+  const titleRaw = valuesByPreview(section, 'title')[0] ?? section.title ?? section.brandTitle ?? '';
+  const title = titleRaw || (previewMode === 'empty' ? '' : labelForFieldKey(activeTab));
+  const lead = valuesByPreview(section, 'lead')[0] ?? section.lead ?? section.signInDescription ?? '';
+  const splash = valuesByPreview(section, 'splash')[0] ?? section.splashTitle ?? '';
   const primaryCtas = valuesByPreview(section, 'cta-primary');
   const ctas = [...primaryCtas, ...valuesByPreview(section, 'cta')];
   const chips = valuesByPreview(section, 'chip');
@@ -247,6 +295,7 @@ function renderPreview() {
   const emptyLead = valuesByPreview(section, 'empty-lead')[0] || '';
   const edited = modifiedCount(activeTab);
   const stringCount = Object.keys(section).filter((key) => typeof section[key] === 'string').length;
+  const hiddenCount = Object.keys(section).filter((key) => typeof section[key] === 'string' && !String(section[key]).trim()).length;
   const showHero = previewMode !== 'empty';
   const showSplash = Boolean(splash) && previewMode !== 'hero';
   const showChips = chips.length > 0 && previewMode === 'full';
@@ -260,7 +309,7 @@ function renderPreview() {
   const heroBlock = showHero ? `
     <div class="preview-block preview-hero">
       ${eyebrow ? `<p class="eyebrow">${esc(eyebrow)}</p>` : ''}
-      <h3>${esc(title)}</h3>
+      ${titleRaw ? `<h3>${esc(titleRaw)}</h3>` : '<p class="preview-hidden-note">Title hidden</p>'}
       ${lead ? `<p>${esc(lead)}</p>` : ''}
       ${ctas.length ? `<div class="preview-actions">${ctas.map((label, index) => `<span class="preview-chip ${index === 0 && primaryCtas.includes(label) ? 'primary' : ''}">${esc(label)}</span>`).join('')}</div>` : ''}
     </div>
@@ -311,7 +360,7 @@ function renderPreview() {
     ${chipsBlock}
     ${emptyBlock}
     ${socialBlock}
-    <p class="preview-meta">${stringCount} text fields · ${edited} edited vs defaults · preview: ${esc(previewMode)}</p>
+    <p class="preview-meta">${stringCount} text fields · ${edited} edited · ${hiddenCount} hidden · preview: ${esc(previewMode)}</p>
   `;
 }
 
@@ -362,10 +411,12 @@ function renderEditor() {
 
 function syncFromDom() {
   editorPanel.querySelectorAll('[data-path]').forEach((input) => {
+    if (input.disabled) return;
     const path = input.getAttribute('data-path');
     const [section, key] = path.split('.');
     if (!content[section] || !key) return;
     content[section][key] = input.value;
+    rememberField(section, key, input.value);
   });
 
   editorPanel.querySelectorAll('[data-quick-link]').forEach((input) => {
@@ -430,6 +481,22 @@ editorPanel.addEventListener('input', () => {
     const count = modifiedCount(activeTab);
     note.textContent = `${count} field${count === 1 ? '' : 's'} differ from defaults on this page.`;
   }
+});
+
+editorPanel.addEventListener('change', (event) => {
+  const toggle = event.target.closest('[data-visibility-path]');
+  if (!toggle) return;
+  const path = toggle.getAttribute('data-visibility-path');
+  const [section, key] = path.split('.');
+  if (!content[section] || !key) return;
+  syncFromDom();
+  if (toggle.checked) {
+    content[section][key] = restoreField(section, key);
+  } else {
+    rememberField(section, key, content[section][key]);
+    content[section][key] = '';
+  }
+  renderAll();
 });
 
 editorPanel.addEventListener('click', (event) => {

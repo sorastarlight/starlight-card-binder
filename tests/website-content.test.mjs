@@ -122,10 +122,31 @@ test('website editor field meta covers binder splash and admin visual chrome', a
   const page = await read('docs/js/pages/admin-website-page.js');
   assert.match(html, /fieldSearch/);
   assert.match(html, /resetPageBtn/);
-  assert.match(html, /admin-website-page\.js\?v=1\.2/);
+  assert.match(html, /admin-website-page\.js\?v=1\.3/);
   assert.match(page, /WEBSITE_PAGE_META|getPageMeta/);
   assert.match(page, /renderGroupedFields|field-group/);
   assert.match(page, /preview-splash|splashTitle/);
+  assert.match(page, /data-visibility-path|Show on page/);
+});
+
+test('sanitizeWebsiteContent preserves intentionally blank hideable fields', () => {
+  const sanitized = sanitizeWebsiteContent({
+    binderLanding: {
+      eyebrow: '',
+      title: 'Custom Binder',
+      splashTitle: ''
+    },
+    home: {
+      eyebrow: '',
+      title: 'Still here'
+    }
+  });
+  assert.equal(sanitized.binderLanding.eyebrow, '');
+  assert.equal(sanitized.binderLanding.splashTitle, '');
+  assert.equal(sanitized.binderLanding.title, 'Custom Binder');
+  assert.equal(sanitized.home.eyebrow, '');
+  assert.equal(sanitized.home.title, 'Still here');
+  assert.ok(sanitized.home.lead);
 });
 
 test('website editor admin page and public hooks are wired', async () => {
@@ -214,11 +235,11 @@ test('website editor admin page and public hooks are wired', async () => {
   assert.match(home, /data-content="home\.title"/);
   assert.match(home, /data-content="home\.primaryCta"/);
   assert.match(home, /data-content="home\.newsLoading"/);
-  assert.match(home, /website-content-hydrate-page\.js\?v=1\.1/);
+  assert.match(home, /website-content-hydrate-page\.js\?v=1\.2/);
   assert.match(about, /data-content="about\.lead"/);
   assert.match(about, /data-content="about\.seriesLoading"/);
   assert.match(about, /shared\.infoStripCollection/);
-  assert.match(about, /website-content-hydrate-page\.js\?v=1\.1/);
+  assert.match(about, /website-content-hydrate-page\.js\?v=1\.2/);
   assert.match(socials, /id="socialLinks"/);
   assert.match(socials, /class="[^"]*social-links/);
   assert.match(login, /data-content="login\.brandTitle"/);
@@ -229,7 +250,7 @@ test('website editor admin page and public hooks are wired', async () => {
   assert.match(daily, /data-content="daily\.title"/);
   assert.match(daily, /data-content="daily\.signInCta"/);
   assert.match(daily, /data-content="daily\.loopStep1"/);
-  assert.match(daily, /website-content-hydrate-page\.js\?v=1\.1/);
+  assert.match(daily, /website-content-hydrate-page\.js\?v=1\.2/);
   assert.match(shop, /data-content="shop\.title"/);
   assert.match(shop, /data-content="shop\.footerCta"/);
   assert.match(events, /data-content="events\.emptyTitle"|data-content="events\.loading"/);

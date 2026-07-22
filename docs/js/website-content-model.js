@@ -42,14 +42,18 @@ function normalizeLegacyHome(home = {}, defaults) {
 function sanitizeStringMap(source = {}, defaults = {}, max = MAX_STRING) {
   const out = { ...defaults };
   for (const [key, fallback] of Object.entries(defaults)) {
-    if (typeof fallback === 'string') {
-      out[key] = text(source[key], fallback, max);
+    if (typeof fallback !== 'string') continue;
+    // Present empty string is intentional (hide this copy on the live page).
+    if (Object.prototype.hasOwnProperty.call(source, key) && typeof source[key] === 'string') {
+      out[key] = String(source[key]).trim().slice(0, max);
+    } else {
+      out[key] = fallback;
     }
   }
   // Inclusive: keep extra string fields staff already saved (future-proof).
   for (const [key, value] of Object.entries(source)) {
     if (key in out) continue;
-    if (typeof value === 'string') out[key] = text(value, '', max);
+    if (typeof value === 'string') out[key] = String(value).trim().slice(0, max);
   }
   return out;
 }

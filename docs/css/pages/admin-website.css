@@ -33,6 +33,18 @@ h1,h2,h3{color:#405fa1;margin:0 0 .35em}
 .field{margin:0 0 14px}
 .field label,.title-grid label,.link-card label{display:block;margin-bottom:5px;color:#405fa1;font-weight:850}
 .field-label-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px}
+.field-label{color:#405fa1;font-weight:850}
+.field-label-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.field-control{display:block}
+.field-visibility{
+  display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;
+  background:#eef6fb;color:#405fa1;font-size:.78rem;font-weight:850;cursor:pointer;user-select:none
+}
+.field-visibility input{margin:0}
+.field.is-hidden-field{opacity:.78}
+.field.is-hidden-field .field-control{pointer-events:none}
+.field-badge.hidden-badge{background:rgba(109,118,146,.14);color:#6d7692}
+.preview-hidden-note{margin:0;color:#6d7692;font-style:italic;font-weight:700}
 .field input,.field select,.field textarea,.title-grid input,.link-card input,.link-card textarea{
   width:100%;padding:10px 12px;border:2px solid rgba(107,198,248,.28);border-radius:11px;font:inherit
 }

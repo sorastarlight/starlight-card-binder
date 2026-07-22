@@ -40,6 +40,26 @@ function websiteSection(sectionKey) {
   return window.__starlightWebsiteContent?.[sectionKey] || {};
 }
 
+function hasWebsiteCopy(value) {
+  return value != null && String(value).trim() !== '';
+}
+
+function applyOptionalText(el, value, fallback = '') {
+  if (!el) return;
+  if (value == null) {
+    el.textContent = fallback;
+    el.hidden = !fallback;
+    el.classList.toggle('is-content-hidden', !fallback);
+    return;
+  }
+  const next = String(value);
+  el.textContent = next;
+  el.hidden = !next.trim();
+  el.classList.toggle('is-content-hidden', !next.trim());
+  if (next.trim()) el.removeAttribute('aria-hidden');
+  else el.setAttribute('aria-hidden', 'true');
+}
+
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
 const pageName = document.body.dataset.page || "binder";
@@ -653,11 +673,17 @@ function renderSeriesHero() {
   const got = list.filter(c => isCollected(c.id)).length;
   const landing = websiteBinderLanding || window.__starlightWebsiteContent?.binderLanding || websiteSection('binderLanding');
   if (inSeriesSelect || f.series === 'All Series') {
-    title.textContent = landing?.title || 'Starlight Card Series Binder 📦';
-    desc.textContent = landing?.lead || 'Choose a booster pack to enter that series binder.';
-    if (eyebrow) eyebrow.textContent = landing?.eyebrow || 'Starlight Cards';
+    applyOptionalText(title, landing?.title, 'Starlight Card Series Binder 📦');
+    applyOptionalText(desc, landing?.lead, 'Choose a booster pack to enter that series binder.');
+    if (eyebrow) applyOptionalText(eyebrow, landing?.eyebrow, 'Starlight Cards');
   } else {
+    title.hidden = false;
+    title.classList.remove('is-content-hidden');
+    title.removeAttribute('aria-hidden');
     title.textContent = `${f.series} ⭐`;
+    desc.hidden = false;
+    desc.classList.remove('is-content-hidden');
+    desc.removeAttribute('aria-hidden');
     desc.textContent = list.find(c => c.seriesDescription)?.seriesDescription || '';
   }
   if (stats) {
@@ -1138,10 +1164,15 @@ function renderBinder() {
 function renderV61SeriesLandingHtml() {
   const groups = getSeriesGroups();
   const copy = websiteBinderLanding || websiteSection('binderLanding');
-  const splashTitle = copy.splashTitle || 'Choose A Series Booster Pack Below And Start Collecting!';
+  const splashTitle = Object.prototype.hasOwnProperty.call(copy, 'splashTitle')
+    ? copy.splashTitle
+    : 'Choose A Series Booster Pack Below And Start Collecting!';
   const collectedTemplate = copy.packCollectedLabel || '{owned} / {total} Collected';
+  const splashHeading = hasWebsiteCopy(splashTitle)
+    ? `<div class="v61-splash-title"><h2>${esc(splashTitle)}</h2></div>`
+    : '';
   return `<div class="v61-splash-inner v78-splash-inner">
-    <div class="v61-splash-title"><h2>${esc(splashTitle)}</h2></div>
+    ${splashHeading}
     <div class="v61-pack-row v78-pack-grid">${groups.map((group,i)=>{
       const list = group.cards;
       const got = list.filter(c => isCollected(c.id)).length;
@@ -1172,15 +1203,16 @@ function renderV61CardGridHtml(browse = resolveBinderBrowse()) {
       ? `Showing ${list.length} not collected`
       : `Collected: ${gotCount} / ${list.length}`);
   const browseLead = f.q
-    ? (copy.gridSearchLead || 'Search matches across your selected filters.')
-    : (copy.gridBrowseLead || 'Browse the set and see which Starlight cards you have earned.');
+    ? (Object.prototype.hasOwnProperty.call(copy, 'gridSearchLead') ? copy.gridSearchLead : 'Search matches across your selected filters.')
+    : (Object.prototype.hasOwnProperty.call(copy, 'gridBrowseLead') ? copy.gridBrowseLead : 'Browse the set and see which Starlight cards you have earned.');
   const emptyTitle = copy.emptyFiltersTitle || 'No cards match these filters';
   const emptyLead = copy.emptyFiltersLead || 'Reset one or more filters to browse this series again.';
   const emptyCta = copy.emptyFiltersCta || copy.filtersResetCta || 'Reset Filters';
+  const leadHtml = hasWebsiteCopy(browseLead) ? `<p>${esc(browseLead)}</p>` : '';
   return `<div class="v61-grid-shell">
     <div class="v61-grid-head">
       <button id="backToSeries" class="v61-back-btn" type="button">${esc(copy.backToSeriesCta || '← Back to Series')}</button>
-      <div><h2>${esc(heading)}</h2><p>${esc(browseLead)}</p></div>
+      <div><h2>${esc(heading)}</h2>${leadHtml}</div>
       <span class="v61-count-pill">${esc(countPill)}</span>
     </div>
     <div class="v61-grid">${list.length ? list.map((card,i)=>renderV61Card(card,i)).join('') : `<div class="empty-state"><h2>${esc(emptyTitle)}</h2><p>${esc(emptyLead)}</p><button class="btn primary" type="button" data-reset-card-filters>${esc(emptyCta)}</button></div>`}</div>

@@ -684,3 +684,16 @@ export function listedFieldKeys(sectionKey) {
   if (!meta) return [];
   return meta.groups.flatMap((group) => group.fields.map((field) => field.key));
 }
+
+/** Fields that can be blanked to hide them on the live page. */
+export function isHideableField(fieldMeta = {}) {
+  if (fieldMeta.hideable === false) return false;
+  if (fieldMeta.hideable === true) return true;
+  const key = String(fieldMeta.key || '');
+  const preview = String(fieldMeta.preview || '');
+  if (['eyebrow', 'title', 'lead', 'splash', 'cta', 'cta-primary', 'chip'].includes(preview)) return true;
+  if (/^(eyebrow|title|lead|splashTitle|badge|brandTitle|tagline|primaryCta|secondaryCta|newsEyebrow|newsTitle)$/.test(key)) {
+    return true;
+  }
+  return /(Eyebrow|SectionTitle)$/.test(key);
+}

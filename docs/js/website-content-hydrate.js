@@ -50,6 +50,14 @@ function resolveContentValue(content, path) {
   return null;
 }
 
+function setContentVisibility(el, visible) {
+  if (!el) return;
+  el.hidden = !visible;
+  if (visible) el.removeAttribute('aria-hidden');
+  else el.setAttribute('aria-hidden', 'true');
+  el.classList.toggle('is-content-hidden', !visible);
+}
+
 function rebuildSocialLinks(content) {
   const roots = document.querySelectorAll('[data-content-socials], .social-links');
   if (!roots.length) return;
@@ -69,6 +77,7 @@ function rebuildSocialLinks(content) {
 /**
  * Apply sanitized website content to elements marked with data-content.
  * Paths use dot notation, e.g. daily.title, shop.emptyCategory, shared.infoStripCopyright.
+ * Empty strings hide the element (staff can remove eyebrows/titles in the Website Editor).
  */
 export function hydrateWebsiteContent(content) {
   const payload = mergeWebsiteContent(content);
@@ -77,7 +86,17 @@ export function hydrateWebsiteContent(content) {
   document.querySelectorAll('[data-content]').forEach((el) => {
     const path = el.getAttribute('data-content');
     const value = resolveContentValue(payload, path);
-    if (value == null || value === '') return;
+    if (value == null) return;
+    if (value === '') {
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+        el.value = '';
+      } else {
+        el.textContent = '';
+      }
+      setContentVisibility(el, false);
+      return;
+    }
+    setContentVisibility(el, true);
     if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
       el.value = value;
       return;
