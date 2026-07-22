@@ -53,7 +53,7 @@ export async function uploadProfileImage(blob) {
 export async function uploadProfileBanner(blob) {
   return uploadProfileAsset(blob, {
     pathSuffix: 'banner.webp',
-    maxBytes: 1572864,
+    maxBytes: 2097152,
     setUrl: async (publicUrl) => {
       await setMyProfileExtras({ bannerUrl: publicUrl });
     }

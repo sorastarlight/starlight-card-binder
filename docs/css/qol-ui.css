@@ -124,9 +124,12 @@ html{scroll-padding-top:110px}
   inset:0!important;
   z-index:90000!important;
   display:flex!important;
+  align-items:center!important;
   align-items:safe center!important;
+  justify-content:center!important;
   justify-content:safe center!important;
-  width:100vw!important;
+  width:100%!important;
+  max-width:100%!important;
   height:100dvh!important;
   max-height:100dvh!important;
   padding:clamp(12px,3vw,28px)!important;
@@ -147,7 +150,7 @@ html{scroll-padding-top:110px}
   position:relative!important;
   inset:auto!important;
   flex:0 0 auto!important;
-  width:min(var(--qol-modal-width,920px),calc(100vw - clamp(24px,6vw,56px)))!important;
+  width:min(var(--qol-modal-width,920px),calc(100% - clamp(24px,6vw,56px)))!important;
   max-width:100%!important;
   margin:auto!important;
   max-height:min(88dvh, calc(100dvh - clamp(24px,6vw,56px)))!important;
@@ -171,13 +174,22 @@ html{scroll-padding-top:110px}
 .profile-crop-modal>.profile-crop-dialog,.profile-crop-modal>.st-dialog{--qol-modal-width:560px}
 .profile-crop-modal[data-crop-mode="banner"]>.profile-crop-dialog,
 .profile-crop-modal[data-crop-mode="banner"]>.st-dialog{--qol-modal-width:720px}
+/* Tall shell iframes: pin the overlay to the visible slice via CSS variables set by shared-ui.js */
 :is(.st-dialog-overlay,.editor,.rule-modal,.test-modal,.receipt,.profile-crop-modal).is-embed-anchored{
+  --st-embed-overlay-top:0px;
+  --st-embed-overlay-height:100dvh;
   position:absolute!important;
   inset:auto!important;
+  top:var(--st-embed-overlay-top)!important;
   left:0!important;
   right:0!important;
-  width:100%!important;
   bottom:auto!important;
+  width:100%!important;
+  height:var(--st-embed-overlay-height)!important;
+  max-height:var(--st-embed-overlay-height)!important;
+}
+:is(.st-dialog-overlay,.editor,.rule-modal,.test-modal,.receipt,.profile-crop-modal).is-embed-anchored>:is(.st-dialog,.editor-card,.card,.rule-modal-card,.test-card,.receipt-card,.profile-crop-dialog){
+  max-height:min(92%, calc(var(--st-embed-overlay-height) - 24px))!important;
 }
 @keyframes qolModalIn{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}.qol-switch-ui,.qol-switch-ui::after{transition:none}.qol-toggle-label>input[type="checkbox"]{}:is(.st-dialog-overlay>.st-dialog,.editor>.editor-card,.editor>.card,.rule-modal>.rule-modal-card,.test-modal>.test-card,.receipt>.receipt-card,.profile-crop-modal>.profile-crop-dialog,.profile-crop-modal>.st-dialog){animation:none!important}}

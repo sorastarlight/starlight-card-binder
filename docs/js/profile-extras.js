@@ -68,8 +68,13 @@ let lastY = 0;
 let objectUrl = '';
 let clearFileOnClose = true;
 let activeFileInput = null;
+let cropModalController = null;
 
-const ctx = canvas?.getContext('2d');
+const ctx = canvas?.getContext('2d', { alpha: false });
+
+function cssUrl(url) {
+    return `url(${JSON.stringify(String(url))})`;
+}
 
 function status(message, type = '') {
     if (!extrasStatus) return;
@@ -81,15 +86,17 @@ function setAvatarPreview(url) {
     const avatarUrl = url || '';
 
     if (avatarUrl) {
-        preview.src = avatarUrl;
-        preview.classList.remove('hidden');
+        if (preview) {
+            preview.src = avatarUrl;
+            preview.classList.remove('hidden');
+        }
         placeholder?.classList.add('hidden');
         if (avatarPreviewWrap) {
-            avatarPreviewWrap.style.backgroundImage = `url(${JSON.stringify(avatarUrl).slice(1, -1)})`;
+            avatarPreviewWrap.style.backgroundImage = cssUrl(avatarUrl);
         }
     } else {
-        preview.removeAttribute('src');
-        preview.classList.add('hidden');
+        preview?.removeAttribute('src');
+        preview?.classList.add('hidden');
         placeholder?.classList.remove('hidden');
         if (avatarPreviewWrap) {
             avatarPreviewWrap.style.backgroundImage = '';
@@ -101,12 +108,14 @@ function setBannerPreview(url) {
     const bannerUrl = url || '';
 
     if (bannerUrl) {
-        bannerPreview.src = bannerUrl;
-        bannerPreview.classList.remove('hidden');
+        if (bannerPreview) {
+            bannerPreview.src = bannerUrl;
+            bannerPreview.classList.remove('hidden');
+        }
         bannerPlaceholder?.classList.add('hidden');
         bannerPreviewWrap?.classList.add('has-photo');
         if (bannerPreviewWrap) {
-            bannerPreviewWrap.style.backgroundImage = `url(${JSON.stringify(bannerUrl).slice(1, -1)})`;
+            bannerPreviewWrap.style.backgroundImage = cssUrl(bannerUrl);
         }
         removeBanner?.classList.remove('hidden');
     } else {
@@ -144,26 +153,40 @@ function applyCropMode(mode) {
     if (saveImage) saveImage.textContent = config.saveLabel;
 }
 
-function draw() {
-    if (!ctx || !image || !canvas) return;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    const baseScale = Math.max(
-        canvas.width / image.width,
-        canvas.height / image.height
-    );
-
+function coverMetrics() {
+    if (!image || !canvas) return null;
+    const baseScale = Math.max(canvas.width / image.width, canvas.height / image.height);
     const finalScale = baseScale * scale;
     const width = image.width * finalScale;
     const height = image.height * finalScale;
+    return { width, height, finalScale };
+}
+
+function clampOffsets() {
+    const metrics = coverMetrics();
+    if (!metrics || !canvas) return;
+    const maxX = Math.max(0, (metrics.width - canvas.width) / 2);
+    const maxY = Math.max(0, (metrics.height - canvas.height) / 2);
+    offsetX = Math.min(maxX, Math.max(-maxX, offsetX));
+    offsetY = Math.min(maxY, Math.max(-maxY, offsetY));
+}
+
+function draw() {
+    if (!ctx || !image || !canvas) return;
+
+    clampOffsets();
+    ctx.fillStyle = '#0f1a33';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const metrics = coverMetrics();
+    if (!metrics) return;
 
     ctx.drawImage(
         image,
-        (canvas.width - width) / 2 + offsetX,
-        (canvas.height - height) / 2 + offsetY,
-        width,
-        height
+        (canvas.width - metrics.width) / 2 + offsetX,
+        (canvas.height - metrics.height) / 2 + offsetY,
+        metrics.width,
+        metrics.height
     );
 }
 
@@ -199,27 +222,73 @@ function resetCropState(clearFile = true) {
     activeFileInput = null;
 }
 
-const cropModalController = cropModal ? window.StarlightUI.adoptModal(cropModal, {
-    dialog: cropModal.querySelector('.st-dialog'),
-    labelledBy: 'profile-crop-heading',
-    describedBy: 'profile-crop-description',
-    initialFocus: saveImage,
-    onClose: ({ reason }) => {
-        const cancelled = modeConfig().cancelled;
-        resetCropState(clearFileOnClose);
-        clearFileOnClose = true;
-        if (reason === 'escape' || reason === 'backdrop') status(cancelled);
-        applyCropMode('avatar');
+function whenStarlightUI(callback) {
+    if (window.StarlightUI?.adoptModal) {
+        callback(window.StarlightUI);
+        return;
     }
-}) : null;
+
+    const started = Date.now();
+    const timer = window.setInterval(() => {
+        if (window.StarlightUI?.adoptModal) {
+            window.clearInterval(timer);
+            callback(window.StarlightUI);
+            return;
+        }
+        if (Date.now() - started > 8000) {
+            window.clearInterval(timer);
+            status('Profile image tools failed to load. Refresh the page and try again.', 'error');
+        }
+    }, 25);
+}
 
 function openCropModal() {
-    cropModalController?.open({ initialFocus: saveImage });
+    if (!cropModalController) {
+        status('Profile image editor is still loading…', 'error');
+        return;
+    }
+    cropModalController.open({ initialFocus: saveImage });
+    // Re-draw after layout so the canvas bitmap is visible in the opened dialog.
+    window.requestAnimationFrame(() => {
+        draw();
+        window.requestAnimationFrame(draw);
+    });
 }
 
 function closeCropModal({ clearFile = true } = {}) {
     clearFileOnClose = clearFile;
     cropModalController?.close(undefined, 'page');
+}
+
+function canvasToBlob(quality) {
+    return new Promise((resolve, reject) => {
+        if (!canvas) {
+            reject(new Error('Crop canvas is missing.'));
+            return;
+        }
+        canvas.toBlob(blob => {
+            if (!blob) {
+                reject(new Error('Could not prepare the image.'));
+                return;
+            }
+            resolve(blob);
+        }, 'image/webp', quality);
+    });
+}
+
+async function exportCroppedBlob() {
+    const qualities = [0.86, 0.74, 0.62, 0.5];
+    const maxBytes = cropMode === 'banner' ? 2097152 : 1048576;
+    let lastBlob = null;
+
+    for (const quality of qualities) {
+        lastBlob = await canvasToBlob(quality);
+        if (lastBlob.size <= maxBytes) return lastBlob;
+    }
+
+    throw new Error(
+        `The finished image is still too large (${Math.ceil((lastBlob?.size || 0) / 1024)} KB). Try a simpler photo or zoom out slightly.`
+    );
 }
 
 function handleFileSelection(fileInput, mode) {
@@ -269,10 +338,32 @@ function handleFileSelection(fileInput, mode) {
     selectedImage.onerror = () => {
         status('That image could not be opened.', 'error');
         closeCropModal();
+        resetCropState(true);
     };
 
     selectedImage.src = objectUrl;
 }
+
+whenStarlightUI(ui => {
+    if (!cropModal) return;
+
+    cropModalController = ui.adoptModal(cropModal, {
+        dialog: cropModal.querySelector('.st-dialog'),
+        labelledBy: 'profile-crop-heading',
+        describedBy: 'profile-crop-description',
+        initialFocus: saveImage,
+        onOpen: () => {
+            draw();
+        },
+        onClose: ({ reason }) => {
+            const cancelled = modeConfig().cancelled;
+            resetCropState(clearFileOnClose);
+            clearFileOnClose = true;
+            if (reason === 'escape' || reason === 'backdrop') status(cancelled);
+            applyCropMode('avatar');
+        }
+    });
+});
 
 avatarFileInput?.addEventListener('change', () => {
     handleFileSelection(avatarFileInput, 'avatar');
@@ -301,7 +392,7 @@ cropStage?.addEventListener('wheel', event => {
 
 canvas?.addEventListener('pointerdown', event => {
     if (!image) return;
-
+    event.preventDefault();
     dragging = true;
     lastX = event.clientX;
     lastY = event.clientY;
@@ -333,6 +424,9 @@ function endDrag(event) {
 
 canvas?.addEventListener('pointerup', endDrag);
 canvas?.addEventListener('pointercancel', endDrag);
+canvas?.addEventListener('pointerleave', event => {
+    if (dragging) endDrag(event);
+});
 
 cancelImage?.addEventListener('click', () => {
     const cancelled = modeConfig().cancelled;
@@ -349,27 +443,23 @@ saveImage?.addEventListener('click', async () => {
     saveImage.textContent = 'Saving…';
     status(config.uploading);
 
-    canvas.toBlob(async blob => {
-        try {
-            if (!blob) {
-                throw new Error('Could not prepare the image.');
-            }
-
-            const url = await config.upload(blob);
-            if (cropMode === 'banner') {
-                setBannerPreview(url);
-            } else {
-                setAvatarPreview(url);
-            }
-            closeCropModal({ clearFile: true });
-            status(config.saved, 'success');
-        } catch (error) {
-            status(error.message || 'Upload failed.', 'error');
-        } finally {
-            saveImage.disabled = false;
-            saveImage.textContent = config.saveLabel;
+    try {
+        draw();
+        const blob = await exportCroppedBlob();
+        const url = await config.upload(blob);
+        if (cropMode === 'banner') {
+            setBannerPreview(url);
+        } else {
+            setAvatarPreview(url);
         }
-    }, 'image/webp', 0.86);
+        closeCropModal({ clearFile: true });
+        status(config.saved, 'success');
+    } catch (error) {
+        status(error.message || 'Upload failed.', 'error');
+    } finally {
+        saveImage.disabled = false;
+        saveImage.textContent = config.saveLabel;
+    }
 });
 
 removeBanner?.addEventListener('click', async () => {
@@ -409,27 +499,31 @@ setBannerPreview('');
         setAvatarPreview(data.avatarUrl || '');
         setBannerPreview(data.bannerUrl || '');
 
-        titleSelect.innerHTML =
-            '<option value="">No collector title</option>' +
-            data.titles
-                .map(title => `<option value="${title.id}">${title.name}</option>`)
-                .join('');
+        if (titleSelect) {
+            titleSelect.innerHTML =
+                '<option value="">No collector title</option>' +
+                (data.titles || [])
+                    .map(title => `<option value="${title.id}">${title.name}</option>`)
+                    .join('');
 
-        titleSelect.value = data.selectedTitleId || '';
+            titleSelect.value = data.selectedTitleId || '';
+        }
 
-        achievementGrid.innerHTML = data.achievements.length
-            ? data.achievements
-                .map(achievement => `
-                    <article class="achievement-badge">
-                        <span>${achievement.icon}</span>
-                        <div>
-                            <strong>${achievement.name}</strong>
-                            <small>${achievement.description}</small>
-                        </div>
-                    </article>
-                `)
-                .join('')
-            : '<p class="profile-help">Open packs and grow your collection to unlock achievements.</p>';
+        if (achievementGrid) {
+            achievementGrid.innerHTML = data.achievements?.length
+                ? data.achievements
+                    .map(achievement => `
+                        <article class="achievement-badge">
+                            <span>${achievement.icon}</span>
+                            <div>
+                                <strong>${achievement.name}</strong>
+                                <small>${achievement.description}</small>
+                            </div>
+                        </article>
+                    `)
+                    .join('')
+                : '<p class="profile-help">Open packs and grow your collection to unlock achievements.</p>';
+        }
     } catch (error) {
         status(error.message || 'Could not load profile extras.', 'error');
     }

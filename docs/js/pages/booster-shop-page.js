@@ -1,7 +1,7 @@
 import { supabase } from '../supabase-client.js';
 import { getStarBitsExchangePreview } from '../star-bits-service.js';
 import { openStarBitsBoosterById } from '../daily-booster-service.js';
-import { revealRewardSequence } from '../reward-reveal.js?v=1.5.11';
+import { revealRewardSequence } from '../reward-reveal.js?v=1.5.12';
 import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
 
 const siteCopy = await loadAndHydrateWebsiteContent();

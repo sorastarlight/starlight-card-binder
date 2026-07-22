@@ -223,7 +223,7 @@ function acquireRevealViewportLock(doc) {
   };
 }
 
-export const REVEAL_PRESENTATION_VERSION = '1.5.11';
+export const REVEAL_PRESENTATION_VERSION = '1.5.12';
 
 const REVEAL_STYLESHEET_ID = `starlight-reveal-v${REVEAL_PRESENTATION_VERSION.replace(/\./g, '')}`;
 const REVEAL_STYLESHEET_URL = new URL(
@@ -599,14 +599,42 @@ export async function revealRewardSequence(cards = [], options = {}) {
       activeAudio.clear();
     };
 
+    const clearOverlayClass = () => {
+      overlay.classList.remove('is-embed-anchored', 'is-open');
+      overlay.style.removeProperty('--st-embed-overlay-top');
+      overlay.style.removeProperty('--st-embed-overlay-height');
+    };
+
     const finish = () => {
       if (settled) return;
       settled = true;
       stopAudio();
       fallbackCleanup?.();
-      overlay.remove();
+      try {
+        clearOverlayClass();
+        overlay.remove();
+      } catch {}
       releaseViewportLock();
+      // Ensure embedded shell documents are interactive again after reveal.
+      try {
+        doc.documentElement.classList.remove('st-r3-reveal-open');
+        doc.documentElement.style.removeProperty('overflow');
+        doc.documentElement.style.removeProperty('overflow-x');
+        doc.documentElement.style.removeProperty('overflow-y');
+        doc.body?.style.removeProperty('overflow');
+        doc.body?.style.removeProperty('overflow-x');
+        doc.body?.style.removeProperty('overflow-y');
+      } catch {}
       if (returnFocus?.isConnected) returnFocus.focus?.({ preventScroll: true });
+      try {
+        win.parent?.postMessage?.({
+          type: 'starlight-view-height',
+          height: Math.max(
+            doc.documentElement?.scrollHeight || 0,
+            doc.body?.scrollHeight || 0
+          )
+        }, win.location.origin);
+      } catch {}
       resolve();
     };
 

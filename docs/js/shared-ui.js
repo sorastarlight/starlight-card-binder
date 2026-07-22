@@ -197,13 +197,11 @@ function getEmbedVisibleFrame(view) {
     if (!frameEl) return null;
     const parentWin = view.parent;
     const parentDoc = parentWin.document;
-    const main = parentDoc.querySelector('.main') || parentDoc.scrollingElement || parentDoc.documentElement;
+    const main = parentDoc.querySelector('.main');
     const frameRect = frameEl.getBoundingClientRect();
-    const mainRect = main.getBoundingClientRect();
-    const viewportTop = Math.max(0, mainRect.top);
-    const viewportBottom = Math.min(parentWin.innerHeight || parentDoc.documentElement.clientHeight, mainRect.bottom);
-    const intersectTop = Math.max(frameRect.top, viewportTop);
-    const intersectBottom = Math.min(frameRect.bottom, viewportBottom);
+    const viewportHeight = parentWin.innerHeight || parentDoc.documentElement.clientHeight || 0;
+    const intersectTop = Math.max(frameRect.top, 0);
+    const intersectBottom = Math.min(frameRect.bottom, viewportHeight);
     const visibleHeight = Math.max(240, intersectBottom - intersectTop);
     const topWithinIframe = Math.max(0, intersectTop - frameRect.top);
     return {
@@ -220,14 +218,8 @@ function getEmbedVisibleFrame(view) {
 function clearOverlayEmbedAnchor(overlay) {
   if (!overlay) return;
   overlay.classList.remove('is-embed-anchored');
-  overlay.style.top = '';
-  overlay.style.height = '';
-  overlay.style.left = '';
-  overlay.style.right = '';
-  overlay.style.width = '';
-  overlay.style.bottom = '';
-  overlay.style.position = '';
-  overlay.style.inset = '';
+  overlay.style.removeProperty('--st-embed-overlay-top');
+  overlay.style.removeProperty('--st-embed-overlay-height');
 }
 
 function syncOverlayEmbedAnchor(overlay, view = overlay?.ownerDocument?.defaultView) {
@@ -237,14 +229,8 @@ function syncOverlayEmbedAnchor(overlay, view = overlay?.ownerDocument?.defaultV
     return null;
   }
   overlay.classList.add('is-embed-anchored');
-  overlay.style.position = 'absolute';
-  overlay.style.inset = 'auto';
-  overlay.style.left = '0';
-  overlay.style.right = '0';
-  overlay.style.width = '100%';
-  overlay.style.bottom = 'auto';
-  overlay.style.top = `${Math.round(frame.top)}px`;
-  overlay.style.height = `${Math.round(frame.height)}px`;
+  overlay.style.setProperty('--st-embed-overlay-top', `${Math.round(frame.top)}px`);
+  overlay.style.setProperty('--st-embed-overlay-height', `${Math.round(frame.height)}px`);
   overlay.scrollTop = 0;
   return frame;
 }
@@ -260,28 +246,25 @@ function syncOpenOverlayAnchors(ownerDocument) {
 function lockScroll(ownerDocument) {
   if (!scrollSnapshots.has(ownerDocument)) {
     const view = ownerDocument.defaultView;
-    const main = ownerDocument.querySelector('.main, main.page, .bits-page, .profile-page');
     const embed = getEmbedVisibleFrame(view);
     scrollSnapshots.set(ownerDocument, {
       body: ownerDocument.body.style.overflow,
       html: ownerDocument.documentElement.style.overflow,
-      mainOverflow: main?.style.overflow || '',
-      main: main || null,
-      parentMain: embed?.parentMain || null,
-      parentMainOverflow: embed?.parentMain?.style.overflow || '',
       parentWin: embed?.parentWin || null,
+      parentMain: embed?.parentMain || null,
       onParentScroll: null,
       scrollY: view?.scrollY || 0
     });
+    // Only lock the embedded document itself. Never touch the parent shell —
+    // leftover parent overflow locks make the iframe look "dead" after reveal.
     ownerDocument.body.style.overflow = 'hidden';
     ownerDocument.documentElement.style.overflow = 'hidden';
-    if (main) main.style.overflow = 'hidden';
-    if (embed?.parentMain) embed.parentMain.style.overflow = 'hidden';
 
     const snapshot = scrollSnapshots.get(ownerDocument);
     const refresh = () => syncOpenOverlayAnchors(ownerDocument);
     snapshot.onParentScroll = refresh;
     embed?.parentMain?.addEventListener('scroll', refresh, { passive: true });
+    embed?.parentWin?.addEventListener('scroll', refresh, { passive: true });
     embed?.parentWin?.addEventListener('resize', refresh);
     view?.addEventListener('resize', refresh);
   }
@@ -297,16 +280,19 @@ function unlockScroll(ownerDocument) {
   if (!snapshot) return;
   ownerDocument.body.style.overflow = snapshot.body;
   ownerDocument.documentElement.style.overflow = snapshot.html;
-  if (snapshot.main) snapshot.main.style.overflow = snapshot.mainOverflow;
-  if (snapshot.parentMain) snapshot.parentMain.style.overflow = snapshot.parentMainOverflow;
   if (snapshot.onParentScroll) {
     snapshot.parentMain?.removeEventListener('scroll', snapshot.onParentScroll);
+    snapshot.parentWin?.removeEventListener('scroll', snapshot.onParentScroll);
     snapshot.parentWin?.removeEventListener('resize', snapshot.onParentScroll);
     ownerDocument.defaultView?.removeEventListener('resize', snapshot.onParentScroll);
   }
-  modalControllers.forEach(controller => {
+  modalStack.forEach(controller => {
     if (controller.element.ownerDocument === ownerDocument) clearOverlayEmbedAnchor(controller.element);
   });
+  // Also clear anchors on any closed-but-tracked overlays in this document.
+  try {
+    ownerDocument.querySelectorAll('.is-embed-anchored').forEach(clearOverlayEmbedAnchor);
+  } catch {}
   scrollSnapshots.delete(ownerDocument);
 }
 
@@ -387,13 +373,13 @@ function adoptModal(element, options = {}) {
       syncOverlayEmbedAnchor(element, ownerDocument.defaultView);
       options.onOpen?.(controller);
       element.dispatchEvent(new ownerDocument.defaultView.CustomEvent('starlight:modal-open', { detail: { controller } }));
-      // Keep dialogs in the visible viewport even if the page was scrolled.
+      // Keep the overlay's own scroll at top. Avoid scrollIntoView — in tall
+      // shell iframes it scrolls the parent shell and leaves clicks missing the UI.
       element.scrollTop = 0;
       ownerDocument.defaultView.requestAnimationFrame(() => {
         element.classList.add('is-open');
         syncOverlayEmbedAnchor(element, ownerDocument.defaultView);
         element.scrollTop = 0;
-        dialog?.scrollIntoView?.({ block: 'nearest', inline: 'nearest', behavior: 'auto' });
         const target = typeof initialFocus === 'string' ? dialog.querySelector(initialFocus) : initialFocus;
         (target || focusableElements(dialog)[0] || dialog).focus?.({ preventScroll: true });
       });

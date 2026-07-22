@@ -1,6 +1,6 @@
 import { supabase } from "../supabase-client.js";
 import { getDailyBoosterStatus, openDailyBooster } from "../daily-booster-service.js";
-import { revealRewardSequence } from "../reward-reveal.js?v=1.5.11";
+import { revealRewardSequence } from "../reward-reveal.js?v=1.5.12";
 import { getPublicBoosterConfig } from "../booster-config-service.js";
 import { loadAndHydrateWebsiteContent } from "../website-content-hydrate.js";
 
