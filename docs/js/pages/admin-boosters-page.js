@@ -14,8 +14,8 @@ import {
   getAdminEvents,
   saveEvent,
   deleteEvent,
-} from "../content-studio-service.js?v=1.4";
-import { createAdminBoosterEditors } from "./admin-boosters-editors.js?v=1.4";
+} from "../content-studio-service.js?v=1.5";
+import { createAdminBoosterEditors } from "./admin-boosters-editors.js?v=1.5";
 const $ = (s) => document.querySelector(s),
   status = $("#status"),
   app = $("#app"),
@@ -477,7 +477,8 @@ const {
 } = createAdminBoosterEditors({
   $, body, data, esc, openEditor, options, taxonomyOptions, subcategoryOptions,
   toggleControl, selectedValues, chipPicker, wireChipPicker, categoryName,
-  subcategoryName, variantName, finishName, distributionName, say, reload, close
+  subcategoryName, variantName, finishName, distributionName, say, reload, close,
+  copyBoosterDialog, friendlyRewardMode
 });
 
 function downloadJson(name, value) {

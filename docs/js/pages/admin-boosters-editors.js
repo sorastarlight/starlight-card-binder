@@ -14,15 +14,27 @@ import {
   storagePathFromUrl,
   saveBoosterSlot,
   simulateBoosterV91
-} from "../content-studio-service.js?v=1.4";
+} from "../content-studio-service.js?v=1.5";
 import { validateBooster } from "../booster-config-validator.js?v=1.0.2";
 
 export function createAdminBoosterEditors(context) {
   const {
     $, body, data, esc, openEditor, options, taxonomyOptions, subcategoryOptions,
     toggleControl, selectedValues, chipPicker, wireChipPicker, categoryName,
-    subcategoryName, variantName, finishName, distributionName, say, reload, close
+    subcategoryName, variantName, finishName, distributionName, say, reload, close,
+    copyBoosterDialog, friendlyRewardMode: friendlyRewardModeFromPage
   } = context;
+
+  const friendlyRewardMode = friendlyRewardModeFromPage || ((mode) => (
+    {
+      slots: "Rarity Slots",
+      series: "Single-Series Pack",
+      exact: "Exact Cards",
+      weighted_pool: "Weighted Card Pool",
+      single: "Single Card",
+      mixed: "Cards + Star Bits",
+    }[mode] || mode || "Custom"
+  ));
 
   function imageBlock(prefix, url, folder, label, filename = "") {
     const path = storagePathFromUrl(url),
@@ -481,7 +493,11 @@ export function createAdminBoosterEditors(context) {
       $("#oddsPreset").value = "custom";
       updatePreview();
     });
-    updatePreview();
+    try {
+      updatePreview();
+    } catch (error) {
+      console.error("[Starlight] Booster preview failed during editor open:", error);
+    }
     $("#addReward").onclick = () =>
       $("#rewardRows").insertAdjacentHTML("beforeend", rewardRow({}, Date.now()));
     body.onclick = async (e) => {
@@ -641,13 +657,8 @@ export function createAdminBoosterEditors(context) {
         console.error("[Starlight] Booster save failed:", err);
         const message = formatSaveError(err);
         editorSay(message, "error");
-        try {
-          await window.StarlightUI?.alert?.({
-            title: "Could not save booster",
-            message,
-            buttonText: "OK",
-          });
-        } catch (_) {}
+        // Do not await a nested alert while the editor overlay is open — it can
+        // sit behind the editor and leave Save stuck on "Saving…".
       } finally {
         if (saveButton?.isConnected) {
           saveButton.disabled = false;
