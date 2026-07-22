@@ -27,6 +27,8 @@ let previewFlipped = false;
 let overlayFlipped = false;
 let fullViewList = [];
 let fullViewListMode = 'all';
+let websiteContentPromise = null;
+let websiteBinderLanding = null;
 
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
@@ -592,18 +594,47 @@ function renderShell() {
   $('#sfxToggle')?.classList.toggle('on', sfxOn);
 }
 
+function ensureWebsiteBinderLanding() {
+  if (websiteBinderLanding) return Promise.resolve(websiteBinderLanding);
+  if (window.__starlightWebsiteContent?.binderLanding) {
+    websiteBinderLanding = window.__starlightWebsiteContent.binderLanding;
+    return Promise.resolve(websiteBinderLanding);
+  }
+  if (!websiteContentPromise) {
+    websiteContentPromise = import('./website-content-service.js')
+      .then(({ getWebsiteContent }) => getWebsiteContent())
+      .then((content) => {
+        window.__starlightWebsiteContent = content;
+        websiteBinderLanding = content?.binderLanding || null;
+        return websiteBinderLanding;
+      })
+      .catch(() => {
+        websiteBinderLanding = {
+          eyebrow: 'Starlight Cards',
+          title: 'Starlight Card Series Binder 📦',
+          lead: 'Choose a booster pack to enter that series binder.'
+        };
+        return websiteBinderLanding;
+      });
+  }
+  return websiteContentPromise;
+}
+
 function renderSeriesHero() {
   const f = activeFilters();
   const title = $('#seriesHeroTitle');
   const desc = $('#seriesHeroDescription');
+  const eyebrow = $('.series-hero .eyebrow');
   const stats = $('#seriesHeroStats');
   if (!title || !desc) return;
   const inSeriesSelect = document.body.classList.contains('series-select');
   const list = f.series === 'All Series' ? cards : cards.filter(c => c.series === f.series);
   const got = list.filter(c => isCollected(c.id)).length;
   if (inSeriesSelect || f.series === 'All Series') {
-    title.textContent = 'Starlight Card Series Binder 📦';
-    desc.textContent = 'Choose a booster pack to enter that series binder.';
+    const landing = websiteBinderLanding || window.__starlightWebsiteContent?.binderLanding;
+    title.textContent = landing?.title || 'Starlight Card Series Binder 📦';
+    desc.textContent = landing?.lead || 'Choose a booster pack to enter that series binder.';
+    if (eyebrow) eyebrow.textContent = landing?.eyebrow || 'Starlight Cards';
   } else {
     title.textContent = `${f.series} ⭐`;
     desc.textContent = list.find(c => c.seriesDescription)?.seriesDescription || '';
@@ -980,6 +1011,9 @@ document.addEventListener('keydown', e => { if ($('#cardOverlay')?.classList.con
 document.addEventListener('DOMContentLoaded', () => {
   renderFilterControls();
   if (pageName === 'binder') document.body.classList.add('series-select');
+  if (pageName === 'binder') {
+    ensureWebsiteBinderLanding().then(() => renderSeriesHero());
+  }
   loadCards();
   $('#prevPage')?.addEventListener('click', () => { page = Math.max(1, page - 1); renderAll(); playSfx('page'); });
   $('#nextPage')?.addEventListener('click', () => { page += 1; renderAll(); playSfx('page'); });

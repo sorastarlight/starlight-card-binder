@@ -6,6 +6,9 @@ import { supabase } from "../supabase-client.js";
             signInWithTwitch
         } from "../auth.js";
 
+        import { loadAndHydrateWebsiteContent } from "../website-content-hydrate.js";
+        import { cloneDefaultWebsiteContent } from "../website-content-defaults.js";
+
         const form =
             document.getElementById("auth-form");
 
@@ -72,6 +75,14 @@ import { supabase } from "../supabase-client.js";
             );
 
         let currentMode = "signin";
+        const defaultLogin = cloneDefaultWebsiteContent().login;
+        let loginCopy = {
+            brandTitle: defaultLogin.brandTitle,
+            signInDescription: defaultLogin.signInDescription,
+            signUpDescription: defaultLogin.signUpDescription
+        };
+        const brandTitleEl = document.querySelector('[data-content="login.brandTitle"]');
+
         twitchAuthButton.addEventListener("click", async () => {
             try {
                 twitchAuthButton.disabled = true;
@@ -169,10 +180,13 @@ import { supabase } from "../supabase-client.js";
                     ? "new-password"
                     : "current-password";
 
-            pageDescription.textContent =
-                isSignUp
-                    ? "Create an account to protect your collection and synchronize it between devices."
-                    : "Sign in to save your collection and keep it synchronized between devices.";
+            if (brandTitleEl) {
+                brandTitleEl.textContent = loginCopy.brandTitle;
+            }
+
+            pageDescription.textContent = isSignUp
+                ? loginCopy.signUpDescription
+                : loginCopy.signInDescription;
 
             submitButton.textContent =
                 isSignUp
@@ -332,7 +346,22 @@ import { supabase } from "../supabase-client.js";
         });
 
         const requestedMode = new URLSearchParams(window.location.search).get("mode");
-        setMode(requestedMode === "signup" ? "signup" : "signin");
+
+        (async () => {
+            try {
+                const content = await loadAndHydrateWebsiteContent();
+                if (content?.login) {
+                    loginCopy = {
+                        brandTitle: content.login.brandTitle || loginCopy.brandTitle,
+                        signInDescription: content.login.signInDescription || loginCopy.signInDescription,
+                        signUpDescription: content.login.signUpDescription || loginCopy.signUpDescription
+                    };
+                }
+            } catch {
+                // Keep defaults when remote content is unavailable.
+            }
+            setMode(requestedMode === "signup" ? "signup" : "signin");
+        })();
 
         form.addEventListener(
             "submit",

@@ -5,7 +5,7 @@ const routes = {
   'trade-lists.html':'trades','trade-offers.html':'offers','collector.html':'collector','report-profile.html':'report',
   'about.html':'about','socials.html':'socials','admin-hub.html':'admin','admin-codes.html':'admin-codes',
   'admin-staff.html':'admin-staff','admin-audit.html':'admin-audit','admin-moderation.html':'admin-moderation',
-  'admin-boosters.html':'admin-boosters','admin-twitch.html':'admin-twitch','admin-gifts.html':'admin-gifts','admin-news.html':'admin-news','admin-notifications.html':'admin-notifications','admin-ui.html':'admin-ui','admin-users.html':'admin-users','admin-health.html':'admin-health'
+  'admin-boosters.html':'admin-boosters','admin-twitch.html':'admin-twitch','admin-gifts.html':'admin-gifts','admin-news.html':'admin-news','admin-notifications.html':'admin-notifications','admin-ui.html':'admin-ui','admin-website.html':'admin-website','admin-users.html':'admin-users','admin-health.html':'admin-health'
 };
 const SHELL_PARAM_SKIP = new Set(['embed','view','shellBuild','shellLoad','shellRetry']);
 

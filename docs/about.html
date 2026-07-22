@@ -15,9 +15,9 @@
   <div class="site static-info-site">
     <main class="main">
       <section class="page-head panel">
-        <p class="eyebrow">About</p>
-        <h1>About the Starlight Card Binder</h1>
-        <p>A cute interactive collection binder for Sora Starlight cards. Reveal cards, track sets, favorite your pulls, and keep the sparkle goblin economy alive.</p>
+        <p class="eyebrow" data-content="about.eyebrow">About</p>
+        <h1 data-content="about.title">About the Starlight Card Binder</h1>
+        <p data-content="about.lead">A cute interactive collection binder for Sora Starlight cards. Reveal cards, track sets, favorite your pulls, and keep the sparkle goblin economy alive.</p>
       </section>
 
       <section id="seriesAbout" class="grid-page" aria-label="Card series">
@@ -25,12 +25,13 @@
       </section>
 
       <section class="info-strip">
-        <p><b>Collection:</b> Cards are earned through Daily Boosters, reward codes, and special events.</p>
-        <p>© 2026 Sora Starlight</p>
+        <p><b>Collection:</b> <span data-content="shared.infoStripCollection">Cards are earned through Daily Boosters, reward codes, and special events.</span></p>
+        <p data-content="shared.infoStripCopyright">© 2026 Sora Starlight</p>
       </section>
     </main>
   </div>
   <script src="js/shared-ui.js?v=1.6.7"></script>
   <script src="js/pages/about-page.js?v=1.0" type="module"></script>
+  <script type="module" src="js/pages/website-content-hydrate-page.js?v=1.0"></script>
 </body>
 </html>

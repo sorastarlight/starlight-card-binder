@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Website Editor | Starlight Card Binder</title>
+  <link rel="stylesheet" href="css/style.css?v=1.0.2">
+  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.8">
+  <link rel="stylesheet" href="css/pages/admin-website.css?v=1.0">
+  <link rel="stylesheet" href="css/qol-ui.css?v=94.2.4">
+  <script src="js/browser-performance.js?v=1.0.0" defer></script>
+</head>
+<body>
+  <script src="js/embed-mode.js" type="module"></script>
+  <div class="sky"></div>
+  <main class="page">
+    <section class="panel">
+      <p class="eyebrow">Administration Hub</p>
+      <div class="toolbar">
+        <div>
+          <h1>Website Editor</h1>
+          <p class="lead">Edit Home, About, Socials, Login, Binder landing, and shared footer copy.</p>
+        </div>
+        <div class="actions">
+          <button id="saveBtn" class="btn primary" type="button" hidden>Save Changes</button>
+          <button id="resetBtn" class="btn danger" type="button" hidden>Reset to Defaults</button>
+        </div>
+      </div>
+      <p id="status" class="status" role="status">Checking staff access…</p>
+
+      <div id="app" class="hidden" hidden>
+        <div class="tabs" role="tablist" aria-label="Website content editors">
+          <button type="button" class="tab active" role="tab" aria-selected="true" data-tab="home" id="tab-home" aria-controls="panel-home">Home</button>
+          <button type="button" class="tab" role="tab" aria-selected="false" data-tab="about" id="tab-about" aria-controls="panel-about">About</button>
+          <button type="button" class="tab" role="tab" aria-selected="false" data-tab="socials" id="tab-socials" aria-controls="panel-socials">Socials</button>
+          <button type="button" class="tab" role="tab" aria-selected="false" data-tab="login" id="tab-login" aria-controls="panel-login">Login</button>
+          <button type="button" class="tab" role="tab" aria-selected="false" data-tab="binder" id="tab-binder" aria-controls="panel-binder">Binder</button>
+          <button type="button" class="tab" role="tab" aria-selected="false" data-tab="shared" id="tab-shared" aria-controls="panel-shared">Shared</button>
+        </div>
+
+        <div class="editor-layout">
+          <div class="editor-main">
+            <section id="panel-home" class="tab-panel" role="tabpanel" aria-labelledby="tab-home" data-panel="home"></section>
+            <section id="panel-about" class="tab-panel hidden" role="tabpanel" aria-labelledby="tab-about" data-panel="about" hidden></section>
+            <section id="panel-socials" class="tab-panel hidden" role="tabpanel" aria-labelledby="tab-socials" data-panel="socials" hidden></section>
+            <section id="panel-login" class="tab-panel hidden" role="tabpanel" aria-labelledby="tab-login" data-panel="login" hidden></section>
+            <section id="panel-binder" class="tab-panel hidden" role="tabpanel" aria-labelledby="tab-binder" data-panel="binder" hidden></section>
+            <section id="panel-shared" class="tab-panel hidden" role="tabpanel" aria-labelledby="tab-shared" data-panel="shared" hidden></section>
+          </div>
+          <aside class="preview-panel" aria-label="Live preview">
+            <h2>Live preview</h2>
+            <p class="preview-hint">Updates as you edit. Save to publish for all collectors.</p>
+            <div id="livePreview" class="live-preview"></div>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/shared-ui.js?v=1.6.7"></script>
+  <script type="module" src="js/pages/admin-website-page.js?v=1.0"></script>
+  <script src="js/qol-ui.js?v=94.2.4" defer></script>
+</body>
+</html>

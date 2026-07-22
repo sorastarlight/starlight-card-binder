@@ -31,7 +31,8 @@ export const SHELL_ROUTE_KEYS = Object.freeze([
   'admin-users',
   'admin-health',
   'admin-notifications',
-  'admin-ui'
+  'admin-ui',
+  'admin-website'
 ]);
 
 const SHELL_ROUTE_SET = new Set(SHELL_ROUTE_KEYS);
@@ -87,7 +88,9 @@ const ROUTE_ALIASES = Object.freeze({
   'admin-hub': 'admin',
   'admin-hub.html': 'admin',
   'admin-ui': 'admin-ui',
-  'admin-ui.html': 'admin-ui'
+  'admin-ui.html': 'admin-ui',
+  'admin-website': 'admin-website',
+  'admin-website.html': 'admin-website'
 });
 
 export function isKnownShellRoute(route) {
