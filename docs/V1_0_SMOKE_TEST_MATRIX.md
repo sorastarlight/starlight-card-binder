@@ -46,6 +46,8 @@ Third slice: **checklist + collection filter parity** — checklist uses shared 
 
 Fourth slice: **binder browse chrome + trade search** — honest owned/not-collected count pill, collector-number badges, mobile filter head stack, trade wishlist search haystack includes collector numbers.
 
+Fifth slice: **profiles + trading polish** — shell-safe public profile links, report CTA, self-trade guard, wishlist/offers a11y + pick search; migration `20260722020000_trade_lists_collector_number` pending production apply.
+
 ## Fixes found during this walk
 
 1. **Shop signed-out load** — `booster-shop-page.js` no longer throws away the pack catalog when Star Bits preview fails for anonymous users (shows signed-out CTA instead of “shop could not be loaded”).
