@@ -238,6 +238,7 @@ export async function loadCloudCollection() {
             card_id,
             quantity,
             is_favorite,
+            prestige_tier,
             first_obtained_at,
             last_obtained_at,
             cards (

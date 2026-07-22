@@ -1,0 +1,82 @@
+/* Prestige frames from duplicate quantity thresholds (copies are not burned). */
+.prestige-frame,
+.collection-card.prestige-frame,
+.v61-card-slot.prestige-frame {
+  position: relative;
+}
+
+.prestige-frame::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  border: 2px solid transparent;
+  z-index: 2;
+}
+
+.collection-card.prestige-frame,
+.v61-card-slot.prestige-frame {
+  border-radius: 18px;
+}
+
+.prestige-silver::after {
+  border-color: rgba(168, 184, 206, 0.95);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.55), 0 8px 18px rgba(120, 138, 168, 0.22);
+}
+
+.prestige-gold::after {
+  border-color: rgba(214, 170, 72, 0.95);
+  box-shadow: 0 0 0 1px rgba(255, 244, 210, 0.7), 0 10px 22px rgba(184, 136, 36, 0.24);
+}
+
+.prestige-prismatic::after {
+  border-image: linear-gradient(135deg, #7fd0ff, #ff9ad5, #b8f0a8, #ffd57a) 1;
+  box-shadow: 0 0 18px rgba(127, 208, 255, 0.35), 0 10px 24px rgba(255, 154, 213, 0.2);
+}
+
+.prestige-celestial::after {
+  border-color: rgba(120, 168, 255, 0.95);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.75),
+    0 0 22px rgba(120, 168, 255, 0.45),
+    0 12px 28px rgba(90, 120, 210, 0.28);
+}
+
+.prestige-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.02em;
+  background: #eef4fa;
+  color: #405fa1;
+}
+
+.prestige-badge.prestige-silver { background: #eef2f7; color: #5b6b84; }
+.prestige-badge.prestige-gold { background: #fff5df; color: #8a650f; }
+.prestige-badge.prestige-prismatic { background: linear-gradient(135deg, #e9f8ff, #ffe8f5); color: #5a4f8a; }
+.prestige-badge.prestige-celestial { background: #eaf0ff; color: #3550a0; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .prestige-prismatic::after,
+  .prestige-celestial::after {
+    animation: prestige-shimmer 4.5s ease-in-out infinite;
+  }
+}
+
+@keyframes prestige-shimmer {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prestige-prismatic::after,
+  .prestige-celestial::after {
+    animation: none;
+  }
+}

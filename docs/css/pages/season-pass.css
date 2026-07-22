@@ -1,0 +1,20 @@
+.season-pass-page{width:min(100%,980px);margin:auto;padding:18px 16px 56px}
+.season-pass-hero{padding:24px 26px;border:2px solid rgba(107,198,248,.48);border-radius:26px;background:linear-gradient(135deg,rgba(255,255,255,.98),rgba(244,250,255,.96) 48%,rgba(255,242,250,.96));box-shadow:0 18px 45px rgba(61,83,132,.14)}
+.season-pass-hero h1{margin:.2rem 0;color:#405fa1}
+.season-pass-summary{margin:18px 0;padding:18px;border:1px solid rgba(107,198,248,.35);border-radius:18px;background:rgba(255,255,255,.94);display:grid;gap:16px}
+.season-points span{display:block;color:#626a82;font-weight:700}
+.season-points strong{font-size:1.8rem;color:#405fa1}
+.season-progress{margin:10px 0;height:12px;border-radius:999px;background:#e8f2fb;overflow:hidden}
+.season-progress span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#6bc6f8,#ff82c8)}
+.season-breakdown{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.season-breakdown li{display:flex;justify-content:space-between;gap:8px;padding:10px 12px;border-radius:12px;background:#f6fbff;color:#405fa1;font-weight:700}
+.season-pass-track{display:grid;gap:12px}
+.season-tier{display:grid;grid-template-columns:52px 1fr auto;gap:14px;align-items:center;padding:17px;border:1px solid rgba(107,198,248,.35);border-radius:18px;background:rgba(255,255,255,.96);box-shadow:0 8px 22px rgba(61,83,132,.09)}
+.season-tier.season-ready{border-color:rgba(255,130,200,.62);background:linear-gradient(135deg,#fff,#fff5fb)}
+.season-tier.season-locked{opacity:.8}
+.season-tier-index{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#eaf7ff,#ffe8f5);color:#405fa1;font-weight:900}
+.season-tier-copy h2{margin:0 0 4px;color:#405fa1;font-size:1.04rem}
+.season-tier-copy p{margin:0;color:#626a82}
+.season-status{font-weight:850;color:#405fa1}
+.season-status.muted{color:#8990a4}
+@media(max-width:620px){.season-tier{grid-template-columns:42px 1fr}.season-tier-actions{grid-column:1/-1}}

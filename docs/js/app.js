@@ -70,6 +70,24 @@ function writeStore(key, value) { localStorage.setItem(key, JSON.stringify(value
 function isCollected(id) { return !!readStore(STORAGE_KEY)[id]; }
 function isFavorite(id) { return !!readStore(FAVORITES_KEY)[id]; }
 function getCardQuantity(id) { return Math.max(isCollected(id) ? 1 : 0, Number(readStore(QUANTITIES_KEY)[id] || 0)); }
+function prestigeTierFromQuantity(quantity) {
+  const qty = Math.max(0, Math.floor(Number(quantity) || 0));
+  if (qty >= 500) return 'celestial';
+  if (qty >= 100) return 'prismatic';
+  if (qty >= 25) return 'gold';
+  if (qty >= 10) return 'silver';
+  return 'standard';
+}
+function prestigeFrameClass(quantity) {
+  const tier = prestigeTierFromQuantity(quantity);
+  return tier === 'standard' ? '' : `prestige-frame prestige-${tier}`;
+}
+function prestigeBadgeHtml(quantity) {
+  const tier = prestigeTierFromQuantity(quantity);
+  if (tier === 'standard') return '';
+  const labels = { silver: 'Silver', gold: 'Gold', prismatic: 'Prismatic', celestial: 'Celestial' };
+  return `<span class="prestige-badge prestige-${tier}">${labels[tier] || 'Prestige'} Prestige</span>`;
+}
 function binderRarityBadgeHtml(card) { const label=String(card?.rarity || 'Common'); return `<span class="binder-rarity-badge ${rarityClass(card)}">${esc(label)}</span>`; }
 function percent(part, total) { return total ? Math.round((part / total) * 100) : 0; }
 function padNumber(value, fallback) { return String(value || fallback).padStart(3, "0"); }
@@ -939,7 +957,7 @@ function renderGridPage(target, mode) {
     const got = isCollected(c.id); const hidden = !got;
     const quantity = getCardQuantity(c.id);
     const favorited = isFavorite(c.id);
-    return `<article class="collection-card ${rarityClass(c)}" data-id="${esc(c.id)}" data-open-collection-card="${esc(c.id)}" role="button" tabindex="0" aria-label="Open ${esc(getVisibleName(c))} full view"><div class="collection-image"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"></div><h3>${esc(getVisibleName(c))}</h3><p class="collection-card-number">${esc(c.collectorNumber || c.number)} • ${esc(c.series)}</p><div class="card-meta-chips compact">${cardIdentityChips(c,{hidden})}</div>${mode === 'duplicates' ? `<p class="duplicate-copy-summary"><strong>${quantity}</strong> total copies · <strong>${quantity - 1}</strong> exchangeable</p>` : ''}<div class="card-buttons"><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${quantity}` : 'Not Collected'}</span>${got ? `<button class="icon-btn" type="button" data-toggle-favorite="${esc(c.id)}" aria-label="${favorited ? 'Remove from favorites' : 'Add to favorites'}" aria-pressed="${favorited ? 'true' : 'false'}">${favorited ? '★' : '☆'}</button>` : ''}</div></article>`;
+    return `<article class="collection-card ${rarityClass(c)} ${got ? prestigeFrameClass(quantity) : ''}" data-id="${esc(c.id)}" data-open-collection-card="${esc(c.id)}" role="button" tabindex="0" aria-label="Open ${esc(getVisibleName(c))} full view"><div class="collection-image"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"></div><h3>${esc(getVisibleName(c))}</h3><p class="collection-card-number">${esc(c.collectorNumber || c.number)} • ${esc(c.series)}</p><div class="card-meta-chips compact">${cardIdentityChips(c,{hidden})}</div>${got ? prestigeBadgeHtml(quantity) : ''}${mode === 'duplicates' ? `<p class="duplicate-copy-summary"><strong>${quantity}</strong> total copies · <strong>${quantity - 1}</strong> exchangeable</p>` : ''}<div class="card-buttons"><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${quantity}` : 'Not Collected'}</span>${got ? `<button class="icon-btn" type="button" data-toggle-favorite="${esc(c.id)}" aria-label="${favorited ? 'Remove from favorites' : 'Add to favorites'}" aria-pressed="${favorited ? 'true' : 'false'}">${favorited ? '★' : '☆'}</button>` : ''}</div></article>`;
   }).join('') : `<div class="empty-state"><h2>${esc(emptyTitle)}</h2><p>${esc(emptyLead)}</p>${emptyAction}</div>`;
   attachTileTilts();
   attachBinderHoverSfx();
@@ -1305,16 +1323,19 @@ function renderV61Card(card, i) {
   const hidden = !got;
   const img = getVisibleImage(card);
   const numberLabel = window.StarlightCardFilters?.cardDisplayNumber?.(card) || String(card.collectorNumber || card.number || '');
-  return `<article class="v61-card-slot ${rarityClass(card)} ${got ? 'is-collected' : 'is-hidden'}" style="--i:${i}">
+  const qty = getCardQuantity(card.id);
+  const prestigeClass = got ? prestigeFrameClass(qty) : '';
+  return `<article class="v61-card-slot ${rarityClass(card)} ${got ? 'is-collected' : 'is-hidden'} ${prestigeClass}" style="--i:${i}">
     <button class="v61-card-btn" type="button" data-v61-card="${esc(card.id)}" aria-label="View ${esc(getVisibleName(card))}">
       <span class="v61-card-art"><img class="${hidden?'obscured':''}" src="${esc(img)}" alt="${esc(getVisibleName(card))}" loading="lazy" onerror="this.src='${CARD_BACK_URL}'"></span>
       <span class="badge">${esc(numberLabel)}</span>
     </button>
     <span class="v61-ownership ${got ? 'owned' : 'locked'}">
       <span>${esc(got
-        ? fillWebsiteTokens((websiteBinderLanding || websiteSection('binderLanding')).ownedLabel || 'Owned ×{qty}', { qty: getCardQuantity(card.id) })
+        ? fillWebsiteTokens((websiteBinderLanding || websiteSection('binderLanding')).ownedLabel || 'Owned ×{qty}', { qty })
         : ((websiteBinderLanding || websiteSection('binderLanding')).notCollectedLabel || 'Not Collected'))}</span>
       ${binderRarityBadgeHtml(card)}
+      ${got ? prestigeBadgeHtml(qty) : ''}
     </span>
   </article>`;
 }
