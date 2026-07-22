@@ -3,7 +3,6 @@ import {
   convertSelectedDuplicatesToStarBits,
   getStarBitsExchangePreview
 } from '../star-bits-service.js';
-import { playStarBitsConvertReveal } from '../star-bits-convert-reveal.js';
 import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
 
 await loadAndHydrateWebsiteContent();
@@ -296,15 +295,10 @@ async function runConversion(payload, revealCards, confirmOptions) {
     const result = await convertSelectedDuplicatesToStarBits(payload);
     const converted = Number(result.convertedDuplicateCopies ?? copies);
     const earned = Number(result.starBitsEarned ?? bits);
-    await playStarBitsConvertReveal({
-      cards: revealCards || selectedCardsForReveal(),
-      convertedCopies: converted,
-      starBitsEarned: earned,
-      title: 'Duplicates Converted!'
-    });
     await loadPreview(
       `Converted ${converted} duplicate ${converted === 1 ? 'copy' : 'copies'} into ${earned} Star Bits.`
     );
+    toast(`Converted ${converted} ${converted === 1 ? 'copy' : 'copies'} into ${earned} Star Bits.`, 'success');
   } catch (error) {
     console.error('Star Bits conversion failed:', error);
     displayStatus(error.message || 'The selected duplicate cards could not be converted.', 'error');

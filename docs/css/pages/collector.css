@@ -78,7 +78,8 @@
         }
 
         .collector-banner {
-            min-height: 170px;
+            width: 100%;
+            aspect-ratio: 3 / 1;
 
             background:
                 radial-gradient(
@@ -115,7 +116,7 @@
 
             color: rgba(255, 255, 255, 0.76);
 
-            font-size: clamp(2rem, 8vw, 5.4rem);
+            font-size: clamp(1.6rem, 6vw, 4.4rem);
             letter-spacing: 0.18em;
         }
 
@@ -133,10 +134,10 @@
         }
 
         .collector-avatar {
-            width: 150px;
+            width: clamp(112px, 18vw, 168px);
             aspect-ratio: 1;
 
-            margin-top: -70px;
+            margin-top: clamp(-56px, -9vw, -84px);
 
             display: grid;
             place-items: center;
@@ -151,9 +152,12 @@
                     var(--collector-pink)
                 );
 
+            background-size: cover;
+            background-position: center;
+
             color: #ffffff;
 
-            font-size: 3rem;
+            font-size: clamp(2.2rem, 5vw, 3.2rem);
             font-weight: 900;
 
             box-shadow:
@@ -637,8 +641,8 @@
             }
 
             .collector-avatar {
-                width: 120px;
-                margin: -60px auto 0;
+                width: clamp(104px, 28vw, 132px);
+                margin: clamp(-48px, -14vw, -66px) auto 0;
             }
 
             .collector-content {

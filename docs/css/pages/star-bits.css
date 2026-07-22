@@ -538,6 +538,20 @@
 .exchange-box-actions{display:grid;gap:8px;justify-items:end}
 .exchange-box-actions .selection-toolbar-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
 .exchange-button{min-width:220px!important}
+.exchange-button.secondary{
+  min-width:0!important;
+  margin-top:0;
+  border:2px solid rgba(107,198,248,.55)!important;
+  background:linear-gradient(145deg,#ffffff,#f3f9ff)!important;
+  color:#405fa1!important;
+  box-shadow:0 8px 18px rgba(61,83,132,.12)!important;
+}
+.exchange-button.secondary:hover,
+.exchange-button.secondary:focus-visible{
+  border-color:rgba(255,130,200,.55)!important;
+  background:linear-gradient(145deg,#fff,#ffeef7)!important;
+}
+.exchange-box-actions .exchange-button{margin-top:0}
 .card-convert-now{
   margin-top:4px;border:1px solid rgba(107,198,248,.45);border-radius:999px;padding:8px 12px;
   background:#fff;color:#405fa1;font:inherit;font-weight:850;cursor:pointer

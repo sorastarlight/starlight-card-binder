@@ -8,10 +8,10 @@
         Collector Profile | Starlight Card Binder
     </title>
 <link href="css/style.css?v=1.0.2" rel="stylesheet"/>
-<link rel="stylesheet" href="css/pages/profile-settings.css?v=1.4">
+<link rel="stylesheet" href="css/pages/profile-settings.css?v=1.5">
 <script src="js/browser-performance.js?v=1.0.0" defer></script>
-    <link rel="stylesheet" href="css/shared-ui.css?v=1.6.8">
-<link rel="stylesheet" href="css/qol-ui.css?v=94.2.4">
+    <link rel="stylesheet" href="css/shared-ui.css?v=1.6.10">
+<link rel="stylesheet" href="css/qol-ui.css?v=94.2.5">
 </head>
 <body><script src="js/embed-mode.js" type="module"></script>
 <div class="sky"></div>
@@ -31,14 +31,31 @@
 <form id="profile-form"><section class="profile-section profile-image-section">
 <h2 data-content="profile.imageSectionTitle">Profile Image &amp; Collector Flair</h2>
 <div class="profile-extras-layout">
-<div class="profile-image-editor">
-<div class="profile-image-preview-wrap">
+<div class="profile-media-editor">
+<div class="profile-public-preview" aria-label="Public profile media preview">
+<div class="profile-preview-banner" id="profile-banner-preview-wrap">
+<span aria-hidden="true" class="profile-banner-placeholder" id="profile-banner-placeholder">✦ ⋆ ✧ ⋆ ✦</span>
+<img alt="" class="profile-banner-preview hidden" id="profile-banner-preview"/>
+</div>
+<div class="profile-preview-header">
+<div class="profile-preview-avatar" id="profile-image-preview-wrap">
 <span aria-hidden="true" class="profile-image-placeholder" id="profile-image-placeholder">✦</span>
 <img alt="Current profile image" class="profile-image-preview hidden" id="profile-image-preview"/>
 </div>
+<div class="profile-preview-identity">
+<p class="profile-preview-kicker">Public profile preview</p>
+<p class="profile-preview-hint">Banner and photo are shown exactly as they appear on your public collector page. Position them here before saving.</p>
+</div>
+</div>
+</div>
+<div class="profile-media-actions">
 <label class="profile-upload-button" for="profile-image-file">Choose Profile Image</label>
 <input accept="image/png,image/jpeg,image/webp" hidden="" id="profile-image-file" type="file"/>
-<small class="profile-help">PNG, JPG, or WebP. Maximum source upload: 1 MB.</small>
+<label class="profile-upload-button" for="profile-banner-file">Choose Profile Banner</label>
+<input accept="image/png,image/jpeg,image/webp" hidden="" id="profile-banner-file" type="file"/>
+<button class="profile-link secondary hidden" id="remove-profile-banner" type="button">Remove Banner</button>
+</div>
+<small class="profile-help">Avatar: square crop, up to 1 MB source. Banner: 3:1 crop matching the public banner (1500 × 500), up to 2 MB source. PNG, JPG, or WebP. Saved as WebP.</small>
 </div>
 <div class="profile-flair">
 <label for="collector-title-select"><strong>Collector Title</strong></label>
@@ -46,16 +63,6 @@
 <h3>Achievements</h3>
 <div class="achievement-grid" id="achievement-grid"></div>
 </div>
-</div>
-<div class="profile-banner-editor">
-<div class="profile-banner-preview-wrap" id="profile-banner-preview-wrap">
-<span aria-hidden="true" class="profile-banner-placeholder" id="profile-banner-placeholder">✦</span>
-<img alt="Current profile banner" class="profile-banner-preview hidden" id="profile-banner-preview"/>
-</div>
-<label class="profile-upload-button" for="profile-banner-file">Choose Profile Banner</label>
-<input accept="image/png,image/jpeg,image/webp" hidden="" id="profile-banner-file" type="file"/>
-<small class="profile-help">Recommended display size: 1500 × 500 px (3:1). Crop canvas: 1200 × 400. PNG, JPG, or WebP. Maximum source upload: 2 MB. Saved as WebP.</small>
-<button class="profile-link secondary hidden" id="remove-profile-banner" type="button">Remove Banner</button>
 </div>
 <p aria-live="polite" class="profile-extras-status" id="profile-extras-status" role="status"></p>
 </section>
@@ -258,8 +265,8 @@
 </div>
 </section>
 </div>
-<script src="js/profile-extras.js?v=1.2" type="module"></script><script src="js/profile-data-tools.js" type="module"></script>    <script type="module" src="js/profile-twitch.js"></script>
-<script src="js/shared-ui.js?v=1.6.8"></script>
-<script src="js/qol-ui.js?v=94.2.4" defer></script>
+<script src="js/profile-extras.js?v=1.3" type="module"></script><script src="js/profile-data-tools.js" type="module"></script>    <script type="module" src="js/profile-twitch.js"></script>
+<script src="js/shared-ui.js?v=1.6.10"></script>
+<script src="js/qol-ui.js?v=94.2.5" defer></script>
 </body>
 </html>

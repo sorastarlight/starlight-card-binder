@@ -18,8 +18,10 @@ const saveImage = document.getElementById('save-profile-image');
 const cancelImage = document.getElementById('cancel-profile-image');
 const preview = document.getElementById('profile-image-preview');
 const placeholder = document.getElementById('profile-image-placeholder');
+const avatarPreviewWrap = document.getElementById('profile-image-preview-wrap');
 const bannerPreview = document.getElementById('profile-banner-preview');
 const bannerPlaceholder = document.getElementById('profile-banner-placeholder');
+const bannerPreviewWrap = document.getElementById('profile-banner-preview-wrap');
 const removeBanner = document.getElementById('remove-profile-banner');
 const cropModal = document.getElementById('profile-crop-modal');
 const titleSelect = document.getElementById('collector-title-select');
@@ -41,11 +43,11 @@ const CROP_MODES = {
         upload: uploadProfileImage
     },
     banner: {
-        canvasWidth: 1200,
-        canvasHeight: 400,
+        canvasWidth: 1500,
+        canvasHeight: 500,
         maxSourceBytes: 2097152,
         heading: 'Adjust Your Profile Banner',
-        description: 'Drag the image to reposition it, then use zoom until it looks just right inside the banner frame.',
+        description: 'Drag and zoom until the image fills this 3:1 banner frame — the same shape used on your public profile.',
         canvasLabel: 'Profile banner crop editor',
         saveLabel: 'Save Profile Banner',
         uploading: 'Uploading your profile banner…',
@@ -82,10 +84,16 @@ function setAvatarPreview(url) {
         preview.src = avatarUrl;
         preview.classList.remove('hidden');
         placeholder?.classList.add('hidden');
+        if (avatarPreviewWrap) {
+            avatarPreviewWrap.style.backgroundImage = `url(${JSON.stringify(avatarUrl).slice(1, -1)})`;
+        }
     } else {
         preview.removeAttribute('src');
         preview.classList.add('hidden');
         placeholder?.classList.remove('hidden');
+        if (avatarPreviewWrap) {
+            avatarPreviewWrap.style.backgroundImage = '';
+        }
     }
 }
 
@@ -96,11 +104,19 @@ function setBannerPreview(url) {
         bannerPreview.src = bannerUrl;
         bannerPreview.classList.remove('hidden');
         bannerPlaceholder?.classList.add('hidden');
+        bannerPreviewWrap?.classList.add('has-photo');
+        if (bannerPreviewWrap) {
+            bannerPreviewWrap.style.backgroundImage = `url(${JSON.stringify(bannerUrl).slice(1, -1)})`;
+        }
         removeBanner?.classList.remove('hidden');
     } else {
         bannerPreview?.removeAttribute('src');
         bannerPreview?.classList.add('hidden');
         bannerPlaceholder?.classList.remove('hidden');
+        bannerPreviewWrap?.classList.remove('has-photo');
+        if (bannerPreviewWrap) {
+            bannerPreviewWrap.style.backgroundImage = '';
+        }
         removeBanner?.classList.add('hidden');
     }
 }
@@ -271,6 +287,17 @@ zoom?.addEventListener('input', () => {
     updateZoomLabel();
     draw();
 });
+
+cropStage?.addEventListener('wheel', event => {
+    if (!image || !zoom) return;
+    event.preventDefault();
+    const delta = event.deltaY > 0 ? -0.05 : 0.05;
+    const next = Math.min(3, Math.max(1, scale + delta));
+    scale = Number(next.toFixed(2));
+    zoom.value = String(scale);
+    updateZoomLabel();
+    draw();
+}, { passive: false });
 
 canvas?.addEventListener('pointerdown', event => {
     if (!image) return;
