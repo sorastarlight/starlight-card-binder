@@ -1,4 +1,5 @@
 import {
+            loadOwnProfile,
             loadPublicCollectorProfile
         } from "../profile-service.js";
 
@@ -436,19 +437,48 @@ import {
                 `@${profile.username}`;
 
             const proposeTradeButton = document.getElementById('propose-trade-button');
+            const reportProfileButton = document.getElementById('report-profile-button');
+            const tradeSelfNote = document.getElementById('trade-self-note');
+            const isSelf = Boolean(result.isSelf);
             if (proposeTradeButton && profile.username) {
-                const tradeUrl = `binder.html?view=offers&username=${encodeURIComponent(profile.username)}`;
-                proposeTradeButton.href = tradeUrl;
-                proposeTradeButton.onclick = event => {
-                    if (window.parent !== window) {
-                        event.preventDefault();
-                        window.parent.postMessage({
-                            type: 'starlight-navigate',
-                            view: 'offers',
-                            params: { username: profile.username }
-                        }, window.location.origin);
-                    }
-                };
+                if (isSelf) {
+                    proposeTradeButton.hidden = true;
+                    proposeTradeButton.removeAttribute('href');
+                } else {
+                    proposeTradeButton.hidden = false;
+                    const tradeUrl = `binder.html?view=offers&username=${encodeURIComponent(profile.username)}`;
+                    proposeTradeButton.href = tradeUrl;
+                    proposeTradeButton.onclick = event => {
+                        if (window.parent !== window) {
+                            event.preventDefault();
+                            window.parent.postMessage({
+                                type: 'starlight-navigate',
+                                view: 'offers',
+                                params: { username: profile.username }
+                            }, window.location.origin);
+                        }
+                    };
+                }
+            }
+            if (tradeSelfNote) tradeSelfNote.classList.toggle('hidden', !isSelf);
+            if (reportProfileButton && profile.username) {
+                if (isSelf) {
+                    reportProfileButton.hidden = true;
+                } else {
+                    reportProfileButton.hidden = false;
+                    const reportUrl = `binder.html?view=report&username=${encodeURIComponent(profile.username)}`;
+                    reportProfileButton.href = reportUrl;
+                    reportProfileButton.onclick = event => {
+                        if (window.parent !== window) {
+                            event.preventDefault();
+                            window.parent.postMessage({
+                                type: 'starlight-navigate',
+                                view: 'report',
+                                params: { username: profile.username }
+                            }, window.location.origin);
+                        }
+                    };
+                }
             }
 
             bioElement.textContent =
@@ -592,6 +622,15 @@ import {
                     username
                 );
 
+            let isSelf = false;
+            try {
+                const own = await loadOwnProfile();
+                const ownUsername = String(own?.profile?.username || '').trim().toLowerCase();
+                isSelf = Boolean(ownUsername && ownUsername === String(username).trim().toLowerCase());
+            } catch {
+                isSelf = false;
+            }
+
             hideAllStates();
 
             if (error) {
@@ -605,6 +644,8 @@ import {
 
                 return;
             }
+
+            if (result) result.isSelf = isSelf;
 
             if (
                 !result ||

@@ -168,7 +168,7 @@ function normalizeNotificationRoute(value,notice={}){
   const raw=String(value||'binder').trim();
   const withoutShell=raw.replace(/^https?:\/\/[^/]+\/?/i,'').replace(/^\/?binder\.html\?view=/i,'').replace(/^\/?/,'');
   const key=withoutShell.split(/[?&#]/)[0].toLowerCase();
-  const aliases={daily:'daily','daily-booster':'daily','daily-booster.html':'daily','free-daily-booster':'daily',notifications:'notifications','notifications.html':'notifications',collection:'collection','collection.html':'collection',offers:'offers','trade-offers':'offers','trade-offers.html':'offers',trades:'trades','trade-lists':'trades','trade-lists.html':'trades',events:'events','events.html':'events',shop:'shop','booster-shop':'shop','booster-shop.html':'shop',profile:'profile','profile-settings':'profile','profile-settings.html':'profile',rewards:'rewards','received-rewards':'rewards','received-rewards.html':'rewards'};
+  const aliases={daily:'daily','daily-booster':'daily','daily-booster.html':'daily','free-daily-booster':'daily',notifications:'notifications','notifications.html':'notifications',collection:'collection','collection.html':'collection',offers:'offers','trade-offers':'offers','trade-offers.html':'offers',trades:'trades','trade-lists':'trades','trade-lists.html':'trades',events:'events','events.html':'events',shop:'shop','booster-shop':'shop','booster-shop.html':'shop',profile:'profile','profile-settings':'profile','profile-settings.html':'profile',rewards:'rewards','received-rewards':'rewards','received-rewards.html':'rewards',collector:'collector','collector.html':'collector',report:'report','report-profile':'report','report-profile.html':'report'};
   return aliases[key]||key||'binder';
 }
 

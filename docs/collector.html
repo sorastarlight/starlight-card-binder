@@ -8,7 +8,7 @@
         Collector Profile | Starlight Card Binder
     </title>
 <link href="css/style.css?v=1.0.2" rel="stylesheet"/>
-<link rel="stylesheet" href="css/pages/collector.css?v=1.1">
+<link rel="stylesheet" href="css/pages/collector.css?v=1.2">
 <script src="js/browser-performance.js?v=1.0.0" defer></script>
     <link rel="stylesheet" href="css/shared-ui.css?v=1.6.8">
 <link rel="stylesheet" href="css/qol-ui.css?v=94.2.4">
@@ -18,21 +18,21 @@
 <main class="collector-page">
 <nav class="collector-nav">
 <div class="collector-nav-links">
-<a href="./binder.html">
+<a href="binder.html?view=binder" data-shell-view="binder">
                     🗂️ Binder
                 </a>
-<a href="./collection.html">
+<a href="binder.html?view=collection" data-shell-view="collection">
                     ♡ My Collection
                 </a>
-<a href="./checklist.html">
+<a href="binder.html?view=checklist" data-shell-view="checklist">
                     ☑ Checklist
                 </a>
 </div>
 <div class="collector-nav-links">
-<a href="./profile-settings.html">
+<a href="binder.html?view=profile" data-shell-view="profile">
                     ⚙ My Profile
                 </a>
-<a href="./login.html">
+<a href="login.html">
                     Sign In
                 </a>
 </div>
@@ -175,9 +175,14 @@
 <section class="collector-section hidden" id="public-trades-section">
 <div class="trade-showcase-heading">
 <h2>💫 Wishlist &amp; Trades</h2>
+<div class="collector-trade-actions">
 <a class="trade-propose-button" href="binder.html?view=offers" id="propose-trade-button">🤝 Propose Trade</a>
+<a class="trade-report-button" href="binder.html?view=report" id="report-profile-button" hidden>⚑ Report Profile</a>
 </div>
+</div>
+<p id="trade-self-note" class="trade-showcase-empty hidden">This is your public profile. Use Wishlist &amp; Trade Offers from your account menu to manage listings.</p>
 <div id="trade-match-summary" class="trade-showcase-empty hidden"></div>
+<div id="trade-lists-error" class="trade-showcase-empty hidden" role="status"></div>
 <h3>Looking For</h3>
 <div class="trade-showcase-grid" id="public-wishlist-grid"></div>
 <h3 class="trade-showcase-title">Available For Trade</h3>
@@ -192,9 +197,9 @@
 </div>
 </article>
 </main>
-<script src="js/pages/collector-page.js?v=1.0" type="module"></script>
-<script src="js/public-profile-extras.js" type="module"></script>
-<script src="js/public-trade-showcase.js" type="module"></script>    <script type="module" src="js/public-twitch-profile.js"></script>
+<script src="js/pages/collector-page.js?v=1.1" type="module"></script>
+<script src="js/public-profile-extras.js?v=1.1" type="module"></script>
+<script src="js/public-trade-showcase.js?v=1.1" type="module"></script>    <script type="module" src="js/public-twitch-profile.js?v=1.0"></script>
 <script src="js/shared-ui.js?v=1.6.7"></script>
 <script src="js/qol-ui.js?v=94.2.4" defer></script>
 </body>

@@ -80,6 +80,11 @@ import {
                 "view-profile-link"
             );
 
+        const viewPublicProfileCard =
+            document.getElementById(
+                "view-public-profile-card"
+            );
+
         const statusElement =
             document.getElementById(
                 "profile-status"
@@ -87,6 +92,27 @@ import {
 
         let ownedCards = [];
         let existingProfile = null;
+
+        function escapeHtml(value) {
+            return String(value ?? "").replace(
+                /[&<>"']/g,
+                char =>
+                    ({
+                        "&": "&amp;",
+                        "<": "&lt;",
+                        ">": "&gt;",
+                        '"': "&quot;",
+                        "'": "&#039;"
+                    })[char]
+            );
+        }
+
+        function shellCollectorHref(username) {
+            const params = new URLSearchParams();
+            params.set("view", "collector");
+            if (username) params.set("username", username);
+            return `binder.html?${params.toString()}`;
+        }
 
         function displayStatus(
             message,
@@ -138,6 +164,21 @@ import {
         function updateProfileLink(
             username
         ) {
+            const href = shellCollectorHref(username);
+
+            if (viewPublicProfileCard) {
+                viewPublicProfileCard.href = username
+                    ? href
+                    : "binder.html?view=profile";
+                if (username) {
+                    viewPublicProfileCard.dataset.shellView = "collector";
+                } else {
+                    viewPublicProfileCard.removeAttribute("data-shell-view");
+                }
+            }
+
+            if (!viewProfileLink) return;
+
             if (!username) {
                 viewProfileLink.classList.add(
                     "hidden"
@@ -146,11 +187,8 @@ import {
                 return;
             }
 
-            viewProfileLink.href =
-                `./collector.html?username=${encodeURIComponent(
-                    username
-                )}`;
-
+            viewProfileLink.href = href;
+            viewProfileLink.dataset.shellView = "collector";
             viewProfileLink.classList.remove(
                 "hidden"
             );
@@ -191,7 +229,7 @@ import {
                 `#${selectedCard.card_number} ${selectedCard.name}`;
 
             favoriteCardDetails.textContent =
-                `${selectedCard.rarity} • Series ${selectedCard.series_id}`;
+                `${selectedCard.rarity} • ${selectedCard.series_name || selectedCard.seriesName || selectedCard.series || ("Series " + (selectedCard.series_id || ""))}`;
 
             favoriteCardPreview.classList.remove(
                 "hidden"
@@ -299,10 +337,10 @@ import {
                 ownedCards
                     .map(card => {
                         return `
-                            <option value="${card.id}">
-                                #${card.card_number}
-                                ${card.name}
-                                — ${card.rarity}
+                            <option value="${escapeHtml(card.id)}">
+                                #${escapeHtml(card.card_number)}
+                                ${escapeHtml(card.name)}
+                                — ${escapeHtml(card.rarity)}
                             </option>
                         `;
                     })

@@ -1,10 +1,134 @@
-import {getMyTradeLists,setCardTradePreference,setTradeListVisibility} from '../trade-list-service.js';
+import { getMyTradeLists, setCardTradePreference, setTradeListVisibility } from '../trade-list-service.js';
 import { buildTradeSearchHaystack } from '../card-filter-utils.js';
-const grid=document.querySelector('#tradeGrid'),search=document.querySelector('#tradeSearch'),status=document.querySelector('#tradeStatus'),publicToggle=document.querySelector('#publicLists');let data=[],tab='wishlist';
-const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-function filtered(){const q=search.value.trim().toLowerCase();return data.filter(c=>{const match=!q||buildTradeSearchHaystack(c).includes(q);if(!match)return false;if(tab==='wishlist')return c.wishlisted;if(tab==='trade')return c.tradeQuantity>0;return true})}
-function render(){const list=filtered();grid.innerHTML=list.length?list.map(c=>`<article class="trade-card"><img src="${esc(c.thumbnailUrl||c.imageUrl)}" alt="${esc(c.name)}"><h3>#${esc(c.cardNumber)} ${esc(c.name)}</h3><p>${esc(c.rarity)} • ${esc(c.seriesName)}</p><p>Owned: ${c.ownedQuantity} • Extras: ${c.duplicateQuantity}</p><div class="trade-actions"><label><input type="checkbox" data-wish="${esc(c.id)}" ${c.wishlisted?'checked':''}> Add to Wishlist</label><label>For Trade <select data-trade="${esc(c.id)}">${Array.from({length:c.duplicateQuantity+1},(_,i)=>`<option value="${i}" ${i===c.tradeQuantity?'selected':''}>${i}</option>`).join('')}</select></label></div></article>`).join(''):`<div class="trade-empty"><h2>Nothing here yet</h2><p>${tab==='wishlist'?'Browse All Cards and add the ones you are searching for.':tab==='trade'?'Only duplicate copies can be offered for trade.':'No cards matched your search.'}</p></div>`}
-async function save(id){const c=data.find(x=>x.id===id);if(!c)return;status.textContent='Saving…';try{const result=await setCardTradePreference(id,c.wishlisted,c.tradeQuantity);c.tradeQuantity=result.tradeQuantity;status.textContent='Trade lists saved ✨';render()}catch(e){status.textContent=e.message||'Could not save.'}}
-document.addEventListener('change',e=>{if(e.target.matches('[data-wish]')){const c=data.find(x=>x.id===e.target.dataset.wish);c.wishlisted=e.target.checked;save(c.id)}if(e.target.matches('[data-trade]')){const c=data.find(x=>x.id===e.target.dataset.trade);c.tradeQuantity=Number(e.target.value);save(c.id)}});document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));render()});search.oninput=render;publicToggle.onchange=async()=>{try{await setTradeListVisibility(publicToggle.checked);status.textContent='Profile visibility updated.'}catch(e){status.textContent=e.message}};
-try{const result=await getMyTradeLists();data=result.cards||[];publicToggle.checked=result.publicLists!==false;render();status.textContent='Wishlist and trade binder loaded.'}catch(e){status.textContent=e.message||'Please sign in.'}
 
+const grid = document.querySelector('#tradeGrid');
+const search = document.querySelector('#tradeSearch');
+const status = document.querySelector('#tradeStatus');
+const publicToggle = document.querySelector('#publicLists');
+const tabs = [...document.querySelectorAll('[data-tab]')];
+
+let data = [];
+let tab = 'wishlist';
+let query = '';
+
+const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#039;'
+}[char]));
+
+function normalizeCard(card = {}) {
+  return {
+    ...card,
+    collectorNumber: card.collectorNumber || card.cardNumber || ''
+  };
+}
+
+function filtered() {
+  return data.filter(card => {
+    const match = !query || buildTradeSearchHaystack(card).includes(query);
+    if (!match) return false;
+    if (tab === 'wishlist') return card.wishlisted;
+    if (tab === 'trade') return card.tradeQuantity > 0;
+    return true;
+  });
+}
+
+function emptyCopy(listLength) {
+  if (query && !listLength) return 'No cards matched your search.';
+  if (tab === 'wishlist') return 'Browse All Cards and add the ones you are searching for.';
+  if (tab === 'trade') return 'Only duplicate copies can be offered for trade.';
+  return 'No cards matched your search.';
+}
+
+function render() {
+  const list = filtered();
+  grid.innerHTML = list.length
+    ? list.map(card => `<article class="trade-card">
+        <img src="${esc(card.thumbnailUrl || card.imageUrl)}" alt="${esc(card.name)} card artwork">
+        <h3>#${esc(card.collectorNumber || card.cardNumber)} ${esc(card.name)}</h3>
+        <p>${esc(card.rarity)} • ${esc(card.seriesName)}</p>
+        <p>Owned: ${card.ownedQuantity} • Extras: ${card.duplicateQuantity}</p>
+        <div class="trade-actions">
+          <label><input type="checkbox" data-wish="${esc(card.id)}" ${card.wishlisted ? 'checked' : ''}> Add to Wishlist</label>
+          <label>For Trade <select data-trade="${esc(card.id)}" aria-label="Trade quantity for ${esc(card.name)}">${Array.from({ length: card.duplicateQuantity + 1 }, (_, index) => `<option value="${index}" ${index === card.tradeQuantity ? 'selected' : ''}>${index}</option>`).join('')}</select></label>
+        </div>
+      </article>`).join('')
+    : `<div class="trade-empty"><h2>Nothing here yet</h2><p>${emptyCopy(list.length)}</p></div>`;
+}
+
+function setActiveTab(nextTab) {
+  tab = nextTab;
+  tabs.forEach(button => {
+    const active = button.dataset.tab === tab;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-selected', String(active));
+  });
+  render();
+}
+
+async function save(id) {
+  const card = data.find(entry => entry.id === id);
+  if (!card) return;
+  status.textContent = 'Saving…';
+  try {
+    const result = await setCardTradePreference(id, card.wishlisted, card.tradeQuantity);
+    card.tradeQuantity = result.tradeQuantity;
+    status.textContent = 'Trade lists saved ✨';
+    render();
+  } catch (error) {
+    status.textContent = error.message || 'Could not save.';
+  }
+}
+
+document.addEventListener('change', event => {
+  if (event.target.matches('[data-wish]')) {
+    const card = data.find(entry => entry.id === event.target.dataset.wish);
+    if (!card) return;
+    card.wishlisted = event.target.checked;
+    save(card.id);
+  }
+  if (event.target.matches('[data-trade]')) {
+    const card = data.find(entry => entry.id === event.target.dataset.trade);
+    if (!card) return;
+    card.tradeQuantity = Number(event.target.value);
+    save(card.id);
+  }
+});
+
+tabs.forEach(button => {
+  button.setAttribute('role', 'tab');
+  button.addEventListener('click', () => setActiveTab(button.dataset.tab));
+});
+
+search?.addEventListener('input', () => {
+  query = search.value.trim().toLowerCase();
+  render();
+});
+
+publicToggle?.addEventListener('change', async () => {
+  const previous = !publicToggle.checked;
+  try {
+    await setTradeListVisibility(publicToggle.checked);
+    status.textContent = 'Profile visibility updated.';
+  } catch (error) {
+    publicToggle.checked = previous;
+    status.textContent = error.message || 'Could not update visibility.';
+  }
+});
+
+grid.innerHTML = '<div class="trade-empty"><h2>Loading trade lists…</h2><p>Gathering your wishlist and trade binder.</p></div>';
+status.textContent = 'Loading…';
+
+try {
+  const result = await getMyTradeLists();
+  data = (result.cards || []).map(normalizeCard);
+  if (publicToggle) publicToggle.checked = result.publicLists !== false;
+  setActiveTab('wishlist');
+  status.textContent = 'Wishlist and trade binder loaded.';
+} catch (error) {
+  grid.innerHTML = `<div class="trade-empty"><h2>Could not load trade lists</h2><p>${esc(error.message || 'Please sign in.')}</p></div>`;
+  status.textContent = error.message || 'Please sign in.';
+}

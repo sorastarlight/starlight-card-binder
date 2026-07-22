@@ -1,16 +1,197 @@
-import{getTradeOfferContext,createTradeOffer,getMyTradeOffers,respondToTradeOffer}from'../trade-offer-service.js';
-const q=new URLSearchParams(location.search);let username=q.get('username')||'';const status=document.querySelector('#tradeStatus');let context=null,offers={incoming:[],outgoing:[]};
-const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-function pickHtml(c,side){return `<article class="pick-card"><img src="${esc(c.thumbnailUrl||c.imageUrl)}" alt="${esc(c.name)}"><h3>#${esc(c.cardNumber)} ${esc(c.name)}</h3><p>${c.wantedByOther||c.onMyWishlist?'✨ Match • ':''}${esc(c.rarity)}</p><select data-pick="${side}" data-card="${esc(c.id)}">${Array.from({length:Number(c.available)+1},(_,i)=>`<option value="${i}">${i===0?'Not selected':`×${i}`}</option>`).join('')}</select></article>`}
-async function initCompose(){if(!username)return;try{context=await getTradeOfferContext(username);document.querySelector('#composeMissing').hidden=true;document.querySelector('#composeForm').hidden=false;const r=context.recipient;document.querySelector('#recipientHead').innerHTML=`<div class="collector-head">${r.avatarUrl?`<img src="${esc(r.avatarUrl)}" alt="">`:''}<div><b>Trading with ${esc(r.displayName||r.username)}</b><div>@${esc(r.username)}</div></div></div>`;document.querySelector('#myCards').innerHTML=(context.myAvailableCards||[]).map(c=>pickHtml(c,'offered')).join('')||'<div class="empty">You have no duplicate cards listed for trade.</div>';document.querySelector('#theirCards').innerHTML=(context.theirAvailableCards||[]).map(c=>pickHtml(c,'requested')).join('')||'<div class="empty">This collector has no duplicate cards listed.</div>'}catch(e){status.textContent=e.message}}
-document.querySelector('#loadRecipient')?.addEventListener('click',async()=>{username=document.querySelector('#recipientUsername').value.trim().replace(/^@/,'');if(!username){status.textContent='Enter a collector username.';return}history.replaceState({},'',`${location.pathname}?${new URLSearchParams({...Object.fromEntries(q),username}).toString()}`);await initCompose()});
-function chosen(side){return [...document.querySelectorAll(`[data-pick="${side}"]`)].map(s=>({cardId:s.dataset.card,quantity:Number(s.value)})).filter(x=>x.quantity>0)}
-document.querySelector('#sendOffer').onclick=async()=>{const offered=chosen('offered'),requested=chosen('requested');if(!offered.length||!requested.length){status.textContent='Choose at least one card from each side.';return}status.textContent='Sending offer…';try{await createTradeOffer(username,offered,requested,document.querySelector('#tradeNote').value);status.textContent='Trade offer sent ✨';document.querySelectorAll('[data-pick]').forEach(s=>s.value='0');await loadOffers()}catch(e){status.textContent=e.message}};
-function mini(items){return `<div class="offer-items">${(items||[]).map(c=>`<div class="mini-card"><img src="${esc(c.thumbnailUrl||c.imageUrl)}"><div>×${c.quantity} ${esc(c.name)}</div></div>`).join('')}</div>`}
-function offerHtml(o,incoming){return `<article class="offer-card"><div class="offer-top"><b>${incoming?`From ${esc(o.proposer_name||o.proposer_username)}`:`To ${esc(o.recipient_name||o.recipient_username)}`}</b><span class="status-pill ${esc(o.status)}">${esc(o.status)}</span></div><div class="offer-sides"><div><b>Sender gives</b>${mini(o.proposer_items)}</div><div class="offer-arrow">⇄</div><div><b>Recipient gives</b>${mini(o.recipient_items)}</div></div>${o.note?`<p>“${esc(o.note)}”</p>`:''}${o.status==='pending'?`<div class="actions">${incoming?`<button class="accept" data-action="accept" data-id="${o.id}">Accept</button><button class="decline" data-action="decline" data-id="${o.id}">Decline</button>`:`<button class="cancel" data-action="cancel" data-id="${o.id}">Cancel Offer</button>`}</div>`:''}</article>`}
-function renderOffers(){document.querySelector('#incomingList').innerHTML=offers.incoming.length?offers.incoming.map(o=>offerHtml(o,true)).join(''):'<div class="empty">No incoming offers.</div>';document.querySelector('#outgoingList').innerHTML=offers.outgoing.length?offers.outgoing.map(o=>offerHtml(o,false)).join(''):'<div class="empty">No sent offers.</div>'}
-async function loadOffers(){try{offers=await getMyTradeOffers();renderOffers()}catch(e){status.textContent=e.message}}
-document.addEventListener('click',async e=>{const b=e.target.closest('[data-action]');if(!b)return;const action=b.dataset.action;if(action==='accept'&&!(await StarlightUI.confirm({title:'Accept this trade?',message:'The listed duplicate cards will be exchanged immediately.',confirmText:'Accept Trade'})))return;status.textContent='Updating trade…';try{await respondToTradeOffer(b.dataset.id,action);status.textContent=`Trade ${action==='accept'?'completed':action+'d'}.`;await loadOffers()}catch(err){status.textContent=err.message}});
-document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));['compose','incoming','outgoing'].forEach(t=>document.querySelector(`#${t}View`).hidden=t!==b.dataset.tab)});
-await Promise.all([initCompose(),loadOffers()]);
+import { getTradeOfferContext, createTradeOffer, getMyTradeOffers, respondToTradeOffer } from '../trade-offer-service.js';
+import { buildTradeSearchHaystack } from '../card-filter-utils.js';
 
+const params = new URLSearchParams(location.search);
+let username = params.get('username') || '';
+const status = document.querySelector('#tradeStatus');
+const recipientInput = document.querySelector('#recipientUsername');
+const mySearch = document.querySelector('#myCardsSearch');
+const theirSearch = document.querySelector('#theirCardsSearch');
+
+let context = null;
+let offers = { incoming: [], outgoing: [] };
+let myQuery = '';
+let theirQuery = '';
+
+const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#039;'
+}[char]));
+
+function normalizeCard(card = {}) {
+  return {
+    ...card,
+    collectorNumber: card.collectorNumber || card.cardNumber || ''
+  };
+}
+
+function pickHtml(card, side) {
+  const number = card.collectorNumber || card.cardNumber;
+  return `<article class="pick-card">
+    <img src="${esc(card.thumbnailUrl || card.imageUrl)}" alt="${esc(card.name)} card artwork">
+    <h3>#${esc(number)} ${esc(card.name)}</h3>
+    <p>${card.wantedByOther || card.onMyWishlist ? '✨ Match • ' : ''}${esc(card.rarity)}</p>
+    <label class="pick-qty">
+      <span class="visually-hidden">Quantity for ${esc(card.name)}</span>
+      <select data-pick="${side}" data-card="${esc(card.id)}" aria-label="Quantity for ${esc(card.name)}">
+        ${Array.from({ length: Number(card.available) + 1 }, (_, index) => `<option value="${index}">${index === 0 ? 'Not selected' : `×${index}`}</option>`).join('')}
+      </select>
+    </label>
+  </article>`;
+}
+
+function renderPickGrids() {
+  if (!context) return;
+  const myCards = (context.myAvailableCards || []).filter(card => !myQuery || buildTradeSearchHaystack(card).includes(myQuery));
+  const theirCards = (context.theirAvailableCards || []).filter(card => !theirQuery || buildTradeSearchHaystack(card).includes(theirQuery));
+  document.querySelector('#myCards').innerHTML = myCards.map(card => pickHtml(card, 'offered')).join('')
+    || `<div class="empty">${myQuery ? 'No offered cards matched your search.' : 'You have no duplicate cards listed for trade.'}</div>`;
+  document.querySelector('#theirCards').innerHTML = theirCards.map(card => pickHtml(card, 'requested')).join('')
+    || `<div class="empty">${theirQuery ? 'No requested cards matched your search.' : 'This collector has no duplicate cards listed.'}</div>`;
+}
+
+async function initCompose() {
+  if (!username) return;
+  if (recipientInput) recipientInput.value = username;
+  try {
+    context = await getTradeOfferContext(username);
+    context.myAvailableCards = (context.myAvailableCards || []).map(normalizeCard);
+    context.theirAvailableCards = (context.theirAvailableCards || []).map(normalizeCard);
+    document.querySelector('#composeMissing').hidden = true;
+    document.querySelector('#composeForm').hidden = false;
+    const recipient = context.recipient;
+    document.querySelector('#recipientHead').innerHTML = `<div class="collector-head">${recipient.avatarUrl ? `<img src="${esc(recipient.avatarUrl)}" alt="">` : ''}<div><b>Trading with ${esc(recipient.displayName || recipient.username)}</b><div>@${esc(recipient.username)}</div></div></div>`;
+    renderPickGrids();
+    status.textContent = `Ready to trade with @${recipient.username}.`;
+  } catch (error) {
+    status.textContent = error.message;
+  }
+}
+
+async function loadRecipient() {
+  username = (recipientInput?.value || '').trim().replace(/^@/, '');
+  if (!username) {
+    status.textContent = 'Enter a collector username.';
+    return;
+  }
+  const next = new URLSearchParams(params);
+  next.set('username', username);
+  history.replaceState({}, '', `${location.pathname}?${next.toString()}`);
+  await initCompose();
+}
+
+function chosen(side) {
+  return [...document.querySelectorAll(`[data-pick="${side}"]`)]
+    .map(select => ({ cardId: select.dataset.card, quantity: Number(select.value) }))
+    .filter(entry => entry.quantity > 0);
+}
+
+function mini(items) {
+  return `<div class="offer-items">${(items || []).map(card => `<div class="mini-card"><img src="${esc(card.thumbnailUrl || card.imageUrl)}" alt="${esc(card.name)} card artwork"><div>×${card.quantity} ${esc(card.name)}</div></div>`).join('')}</div>`;
+}
+
+function offerHtml(offer, incoming) {
+  return `<article class="offer-card">
+    <div class="offer-top"><b>${incoming ? `From ${esc(offer.proposer_name || offer.proposer_username)}` : `To ${esc(offer.recipient_name || offer.recipient_username)}`}</b><span class="status-pill ${esc(offer.status)}">${esc(offer.status)}</span></div>
+    <div class="offer-sides"><div><b>Sender gives</b>${mini(offer.proposer_items)}</div><div class="offer-arrow">⇄</div><div><b>Recipient gives</b>${mini(offer.recipient_items)}</div></div>
+    ${offer.note ? `<p>“${esc(offer.note)}”</p>` : ''}
+    ${offer.status === 'pending' ? `<div class="actions">${incoming
+      ? `<button class="accept" data-action="accept" data-id="${offer.id}">Accept</button><button class="decline" data-action="decline" data-id="${offer.id}">Decline</button>`
+      : `<button class="cancel" data-action="cancel" data-id="${offer.id}">Cancel Offer</button>`}</div>` : ''}
+  </article>`;
+}
+
+function renderOffers() {
+  document.querySelector('#incomingList').innerHTML = offers.incoming.length
+    ? offers.incoming.map(offer => offerHtml(offer, true)).join('')
+    : '<div class="empty">No incoming offers.</div>';
+  document.querySelector('#outgoingList').innerHTML = offers.outgoing.length
+    ? offers.outgoing.map(offer => offerHtml(offer, false)).join('')
+    : '<div class="empty">No sent offers.</div>';
+}
+
+async function loadOffers() {
+  try {
+    offers = await getMyTradeOffers();
+    renderOffers();
+  } catch (error) {
+    status.textContent = error.message;
+  }
+}
+
+function setActiveOfferTab(name) {
+  document.querySelectorAll('[data-tab]').forEach(button => {
+    const active = button.dataset.tab === name;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-selected', String(active));
+  });
+  ['compose', 'incoming', 'outgoing'].forEach(tabName => {
+    const view = document.querySelector(`#${tabName}View`);
+    if (view) view.hidden = tabName !== name;
+  });
+}
+
+document.querySelector('#loadRecipient')?.addEventListener('click', loadRecipient);
+recipientInput?.addEventListener('keydown', event => {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    loadRecipient();
+  }
+});
+mySearch?.addEventListener('input', () => {
+  myQuery = mySearch.value.trim().toLowerCase();
+  renderPickGrids();
+});
+theirSearch?.addEventListener('input', () => {
+  theirQuery = theirSearch.value.trim().toLowerCase();
+  renderPickGrids();
+});
+
+document.querySelector('#sendOffer').onclick = async () => {
+  const offered = chosen('offered');
+  const requested = chosen('requested');
+  if (!offered.length || !requested.length) {
+    status.textContent = 'Choose at least one card from each side.';
+    return;
+  }
+  status.textContent = 'Sending offer…';
+  try {
+    await createTradeOffer(username, offered, requested, document.querySelector('#tradeNote').value);
+    status.textContent = 'Trade offer sent ✨';
+    document.querySelectorAll('[data-pick]').forEach(select => { select.value = '0'; });
+    await loadOffers();
+  } catch (error) {
+    status.textContent = error.message;
+  }
+};
+
+document.addEventListener('click', async event => {
+  const button = event.target.closest('[data-action]');
+  if (!button) return;
+  const action = button.dataset.action;
+  if (action === 'accept' && !(await StarlightUI.confirm({
+    title: 'Accept this trade?',
+    message: 'The listed duplicate cards will be exchanged immediately.',
+    confirmText: 'Accept Trade'
+  }))) return;
+  status.textContent = 'Updating trade…';
+  try {
+    await respondToTradeOffer(button.dataset.id, action);
+    status.textContent = `Trade ${action === 'accept' ? 'completed' : `${action}d`}.`;
+    await loadOffers();
+  } catch (error) {
+    status.textContent = error.message;
+  }
+});
+
+document.querySelectorAll('[data-tab]').forEach(button => {
+  button.setAttribute('role', 'tab');
+  button.addEventListener('click', () => setActiveOfferTab(button.dataset.tab));
+});
+
+if (recipientInput && username) recipientInput.value = username;
+setActiveOfferTab('compose');
+await Promise.all([initCompose(), loadOffers()]);

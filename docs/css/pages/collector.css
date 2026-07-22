@@ -553,7 +553,14 @@
             margin-bottom: 16px;
         }
         .trade-showcase-heading h2 { margin: 0; }
-        .trade-propose-button {
+        .collector-trade-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        .trade-propose-button,
+        .trade-report-button {
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -561,11 +568,18 @@
             padding: 10px 17px;
             border: 0;
             border-radius: 999px;
-            background: linear-gradient(135deg, var(--collector-blue), var(--collector-pink));
-            color: white;
             font-weight: 900;
             text-decoration: none;
+        }
+        .trade-propose-button {
+            background: linear-gradient(135deg, var(--collector-blue), var(--collector-pink));
+            color: white;
             box-shadow: 0 8px 20px rgba(255,130,200,.22);
+        }
+        .trade-report-button {
+            background: rgba(255, 255, 255, .9);
+            border: 1px solid var(--collector-border);
+            color: var(--collector-muted);
         }
         .trade-propose-button[aria-disabled="true"] {
             opacity: .62;
