@@ -50,13 +50,13 @@ V1.0 foundation systems are in place (shared modals, reveal engine, design token
 
 ## V1.1 — Collector Features (active slice)
 
-First slice: **binder search correctness** — catalog-aware All Series search, collector-number matches, grid/showcase share one list, shell search visible on series landing, reset restores landing.
+First slice: **binder search correctness** — restored in-panel binder search (including series landing); catalog-aware All Series search via `resolveBinderBrowseList`; collector-number matches; grid/showcase share one list. Shell banner search intentionally removed.
 
-Second slice: **favorites polish** — favorite/unfavorite in full view, showcase star remove, visible favorites grid synced with showcase, filter summary per collection tab.
+Second slice: **favorites polish** — done: favorite/unfavorite in full view, showcase star remove, visible favorites grid synced with showcase, filter summary per collection tab; hardening exposes `window.renderAll` and toasts on sync failure.
 
-Third slice: **checklist + collection filter parity** — checklist uses shared search/filters; duplicates tab updates filter summary; Back to Series resets all binder filters.
+Third slice: **checklist + collection filter parity** — done: checklist uses shared search/filters; duplicates tab updates filter summary; Back to Series resets all binder filters.
 
-Fourth slice: **binder browse chrome + trade search** — honest owned/not-collected count pill, collector-number badges, mobile filter head stack, trade wishlist search haystack includes collector numbers.
+Fourth slice: **binder browse chrome + trade search** — done: honest owned/not-collected count pill, collector-number badges, mobile filter head stack, trade wishlist search haystack includes collector numbers.
 
 Fifth slice: **profiles + trading polish** — shell-safe public profile links, report CTA, self-trade guard, wishlist/offers a11y + pick search; migration `20260722020000_trade_lists_collector_number` applied to production 2026-07-21.
 

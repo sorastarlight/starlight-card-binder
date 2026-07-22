@@ -4,9 +4,13 @@ body[data-page="binder"] .binder-browser-layout {
   min-width: 0;
 }
 
-body[data-page="binder"].series-select .card-filter-panel,
 body[data-page="binder"].series-select .binder-browser-layout {
   display: none;
+}
+
+/* Keep binder filters (including search) available on the series landing. */
+body[data-page="binder"].series-select .card-filter-panel {
+  display: block;
 }
 
 .binder-browser-layout {

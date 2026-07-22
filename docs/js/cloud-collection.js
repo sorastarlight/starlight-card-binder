@@ -240,6 +240,11 @@ async function saveFavoriteToCloud(
             window.renderAll();
         }
 
+        window.StarlightUI?.toast?.(
+            "Favorite could not sync. Your change was undone.",
+            "error"
+        );
+
         return;
     }
 
@@ -367,7 +372,7 @@ async function loadBinderApplication() {
         const script =
             document.createElement("script");
 
-        script.src = "./js/app.js?v=1.5.11";
+        script.src = "./js/app.js?v=1.5.12";
         script.async = false;
         script.dataset.starlightApp = "true";
 

@@ -453,7 +453,7 @@ function renderFilterControls() {
       ? (checklistCopy.filtersTitle || 'Checklist Filters')
       : (binderCopy.filtersTitle || 'Binder Filters'));
   const resetLabel = binderCopy.filtersResetCta || 'Reset Filters';
-  const showSearch = isCollection || isChecklist;
+  const showSearch = true;
   const showView = !isCollection;
   host.innerHTML = `<div class="card-filter-heading">
       <div><p class="eyebrow">${esc(eyebrow)}</p><h2>${esc(title)}</h2></div>
@@ -1044,6 +1044,7 @@ function renderAbout() {
   about.innerHTML = groups.map(series => { const list = cards.filter(c => c.series === series); const legendary = list.filter(c=>c.rarity==='Legendary').length; return `<div class="collection-card text-card"><h3>${esc(series)}</h3><p>${esc(list.find(c=>c.seriesDescription)?.seriesDescription || 'A Starlight card series.')}</p><p><b>${list.length}</b> cards • <b>${legendary}</b> Legendary</p></div>`; }).join('');
 }
 function renderAll() { document.body.classList.toggle('sfx-on', sfxOn); renderShell(); if (pageName === 'binder') renderBinder(); renderGridPage('#collectionGrid', 'collection'); renderGridPage('#favoriteGrid', 'favorites'); renderGridPage('#collectionDuplicateGrid', 'duplicates'); renderFavoritesShowcase(); renderChecklist(); renderAbout(); updateRaritySelectClass(); }
+window.renderAll = renderAll;
 
 
 function startPackOpen(series) {
