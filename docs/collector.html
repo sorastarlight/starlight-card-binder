@@ -8,7 +8,7 @@
         Collector Profile | Starlight Card Binder
     </title>
 <link href="css/style.css?v=1.0.2" rel="stylesheet"/>
-<link rel="stylesheet" href="css/pages/collector.css?v=1.5">
+<link rel="stylesheet" href="css/pages/collector.css?v=1.6">
 <script src="js/browser-performance.js?v=1.0.0" defer></script>
     <link rel="stylesheet" href="css/shared-ui.css?v=1.6.13">
 <link rel="stylesheet" href="css/qol-ui.css?v=94.2.8">
@@ -208,34 +208,46 @@
 <dialog class="collector-gift-dialog" id="gift-dialog">
 <form method="dialog" class="collector-gift-panel" id="gift-form">
 <h2>Send a Gift</h2>
-<p class="collector-gift-lead">Send Star Bits or a duplicate card. Gifts appear in their Received Gifts mailbox.</p>
+<p class="collector-gift-lead">Send Star Bits or a duplicate card to <strong id="gift-recipient-label">this collector</strong>. They’ll find it in Received Gifts.</p>
 <label>Gift type
 <select id="gift-type">
 <option value="star_bits">Star Bits</option>
 <option value="card">Duplicate Card</option>
 </select>
 </label>
-<label id="gift-amount-wrap">Amount
+<div id="gift-amount-wrap" class="collector-gift-block">
+<label for="gift-amount">Amount</label>
 <input id="gift-amount" type="number" min="1" max="50000" value="100"/>
-</label>
-<label id="gift-card-wrap" hidden>Card ID
-<input id="gift-card-id" type="text" placeholder="card id you own as a duplicate"/>
-</label>
+<p class="collector-gift-hint" id="gift-balance-hint">Loading your Star Bits balance…</p>
+<div class="collector-gift-presets" id="gift-presets" role="group" aria-label="Quick amounts">
+<button type="button" class="collector-button" data-gift-preset="50">50</button>
+<button type="button" class="collector-button" data-gift-preset="100">100</button>
+<button type="button" class="collector-button" data-gift-preset="250">250</button>
+<button type="button" class="collector-button" data-gift-preset="500">500</button>
+</div>
+</div>
+<div id="gift-card-wrap" class="collector-gift-block" hidden>
+<label for="gift-card-id">Choose a duplicate</label>
+<select id="gift-card-id">
+<option value="">Loading duplicates…</option>
+</select>
+<p class="collector-gift-hint" id="gift-card-hint">Only cards with extras (quantity 2+) can be gifted.</p>
+</div>
 <label>Message <span>(optional)</span>
 <input id="gift-message" type="text" maxlength="160" placeholder="Enjoy this sparkle ✦"/>
 </label>
 <p class="collector-gift-status" id="gift-status" role="status"></p>
 <div class="collector-gift-actions">
-<button type="submit" class="collector-button primary" value="send">Send Gift</button>
+<button type="submit" class="collector-button primary" id="gift-send-button" value="send">Send Gift</button>
 <button type="submit" class="collector-button" value="cancel">Cancel</button>
 </div>
 </form>
 </dialog>
 </main>
-<script src="js/pages/collector-page.js?v=1.2" type="module"></script>
+<script src="js/pages/collector-page.js?v=1.3" type="module"></script>
 <script src="js/public-profile-extras.js?v=1.2" type="module"></script>
 <script src="js/public-trade-showcase.js?v=1.1" type="module"></script>    <script type="module" src="js/public-twitch-profile.js?v=1.0"></script>
-<script src="js/shared-ui.js?v=1.6.13"></script>
+<script src="js/shared-ui.js?v=1.6.14"></script>
 <script src="js/qol-ui.js?v=94.2.8" defer></script>
 </body>
 </html>

@@ -1,5 +1,6 @@
 import {
             loadOwnProfile,
+            loadOwnedProfileCards,
             loadPublicCollectorProfile
         } from "../profile-service.js";
         import {
@@ -8,6 +9,7 @@ import {
             sendPeerGift,
             unfollowCollector
         } from "../social-service.js";
+        import { supabase } from "../supabase-client.js";
 
         const loadingState =
             document.getElementById(
@@ -178,9 +180,113 @@ import {
             document.getElementById("gift-card-wrap");
         const giftStatus =
             document.getElementById("gift-status");
+        const giftCardSelect =
+            document.getElementById("gift-card-id");
+        const giftAmountInput =
+            document.getElementById("gift-amount");
+        const giftBalanceHint =
+            document.getElementById("gift-balance-hint");
+        const giftCardHint =
+            document.getElementById("gift-card-hint");
+        const giftRecipientLabel =
+            document.getElementById("gift-recipient-label");
+        const giftSendButton =
+            document.getElementById("gift-send-button");
+        const giftPresets =
+            document.getElementById("gift-presets");
 
         let activeUsername = "";
         let followState = false;
+        let starBitsBalance = 0;
+
+        function escapeHtml(value) {
+            return String(value ?? "")
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;");
+        }
+
+        function syncGiftTypeUi() {
+            const isCard = giftType?.value === "card";
+            if (giftAmountWrap) giftAmountWrap.hidden = isCard;
+            if (giftCardWrap) giftCardWrap.hidden = !isCard;
+        }
+
+        async function prepareGiftDialog() {
+            if (giftRecipientLabel) {
+                giftRecipientLabel.textContent = activeUsername
+                    ? `@${activeUsername}`
+                    : "this collector";
+            }
+            if (giftStatus) giftStatus.textContent = "";
+            if (giftBalanceHint) giftBalanceHint.textContent = "Loading your Star Bits balance…";
+            if (giftCardSelect) {
+                giftCardSelect.innerHTML = `<option value="">Loading duplicates…</option>`;
+                giftCardSelect.disabled = true;
+            }
+            if (giftSendButton) giftSendButton.disabled = true;
+            syncGiftTypeUi();
+
+            const [{ data: auth }, cardsResult] = await Promise.all([
+                supabase.auth.getUser(),
+                loadOwnedProfileCards()
+            ]);
+
+            if (!auth?.user) {
+                if (giftStatus) giftStatus.textContent = "Sign in to send a gift.";
+                if (giftBalanceHint) giftBalanceHint.textContent = "Sign in required.";
+                if (giftCardSelect) {
+                    giftCardSelect.innerHTML = `<option value="">Sign in to gift cards</option>`;
+                }
+                return;
+            }
+
+            const { data: wallet } = await supabase
+                .from("user_wallets")
+                .select("star_bits")
+                .eq("user_id", auth.user.id)
+                .maybeSingle();
+
+            starBitsBalance = Number(wallet?.star_bits || 0);
+            if (giftBalanceHint) {
+                giftBalanceHint.textContent = `You have ${starBitsBalance.toLocaleString()} Star Bits available.`;
+            }
+            if (giftAmountInput) {
+                const current = Number(giftAmountInput.value || 100);
+                giftAmountInput.max = String(Math.max(1, starBitsBalance || 1));
+                if (current > starBitsBalance && starBitsBalance > 0) {
+                    giftAmountInput.value = String(Math.min(100, starBitsBalance));
+                }
+            }
+
+            const duplicates = (cardsResult.cards || [])
+                .filter((card) => Number(card.quantity || 0) > 1)
+                .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
+
+            if (giftCardSelect) {
+                if (!duplicates.length) {
+                    giftCardSelect.innerHTML = `<option value="">No duplicate cards available</option>`;
+                    giftCardSelect.disabled = true;
+                    if (giftCardHint) {
+                        giftCardHint.textContent = "Open packs to build extras you can gift.";
+                    }
+                } else {
+                    giftCardSelect.innerHTML =
+                        `<option value="">Select a duplicate…</option>` +
+                        duplicates.map((card) => {
+                            const extras = Math.max(0, Number(card.quantity || 0) - 1);
+                            return `<option value="${escapeHtml(card.id)}">#${escapeHtml(card.card_number)} ${escapeHtml(card.name)} — ${escapeHtml(card.rarity)} (×${extras} extra${extras === 1 ? "" : "s"})</option>`;
+                        }).join("");
+                    giftCardSelect.disabled = false;
+                    if (giftCardHint) {
+                        giftCardHint.textContent = `${duplicates.length} duplicate card${duplicates.length === 1 ? "" : "s"} ready to gift.`;
+                    }
+                }
+            }
+
+            if (giftSendButton) giftSendButton.disabled = false;
+        }
 
         const username =
             new URLSearchParams(
@@ -798,16 +904,26 @@ import {
             }
         });
 
-        giftButton?.addEventListener("click", () => {
+        giftButton?.addEventListener("click", async () => {
             if (!giftDialog) return;
-            if (giftStatus) giftStatus.textContent = "";
             giftDialog.showModal();
+            try {
+                await prepareGiftDialog();
+            } catch (error) {
+                if (giftStatus) giftStatus.textContent = error.message || "Could not prepare gift form.";
+            }
         });
 
-        giftType?.addEventListener("change", () => {
-            const isCard = giftType.value === "card";
-            if (giftAmountWrap) giftAmountWrap.hidden = isCard;
-            if (giftCardWrap) giftCardWrap.hidden = !isCard;
+        giftType?.addEventListener("change", syncGiftTypeUi);
+
+        giftPresets?.addEventListener("click", (event) => {
+            const button = event.target.closest("[data-gift-preset]");
+            if (!button || !giftAmountInput) return;
+            const amount = Number(button.dataset.giftPreset || 0);
+            if (!amount) return;
+            giftAmountInput.value = String(
+                starBitsBalance > 0 ? Math.min(amount, starBitsBalance) : amount
+            );
         });
 
         giftForm?.addEventListener("submit", async (event) => {
@@ -815,19 +931,40 @@ import {
             if (submitter?.value === "cancel") return;
             event.preventDefault();
             if (!activeUsername) return;
+            const type = giftType?.value || "star_bits";
+            const amount = Number(giftAmountInput?.value || 0);
+            const cardId = giftCardSelect?.value || null;
+
+            if (type === "star_bits") {
+                if (!amount || amount < 1) {
+                    if (giftStatus) giftStatus.textContent = "Enter a Star Bits amount.";
+                    return;
+                }
+                if (amount > starBitsBalance) {
+                    if (giftStatus) giftStatus.textContent = "That amount is higher than your balance.";
+                    return;
+                }
+            }
+            if (type === "card" && !cardId) {
+                if (giftStatus) giftStatus.textContent = "Choose a duplicate card to gift.";
+                return;
+            }
+
             if (giftStatus) giftStatus.textContent = "Sending gift…";
+            if (giftSendButton) giftSendButton.disabled = true;
             try {
                 await sendPeerGift({
                     username: activeUsername,
-                    giftType: giftType?.value || "star_bits",
-                    amount: Number(document.getElementById("gift-amount")?.value || 0),
-                    cardId: document.getElementById("gift-card-id")?.value || null,
+                    giftType: type,
+                    amount,
+                    cardId,
                     message: document.getElementById("gift-message")?.value || null
                 });
                 if (giftStatus) giftStatus.textContent = "Gift sent! It will appear in their Received Gifts.";
                 setTimeout(() => giftDialog?.close(), 900);
             } catch (error) {
                 if (giftStatus) giftStatus.textContent = error.message || "Could not send gift.";
+                if (giftSendButton) giftSendButton.disabled = false;
             }
         });
 
