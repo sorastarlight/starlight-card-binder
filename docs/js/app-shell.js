@@ -301,8 +301,8 @@ async function hydrateAccount(){
       document.querySelector('[data-shell-account-name]').textContent=name;
       document.querySelector('[data-shell-account-sub]').textContent=profile?.username?`@${profile.username}`:user.email;
       const avatar=document.querySelector('[data-shell-avatar]');
-      if(profile?.avatar_url){avatar.textContent='';avatar.style.backgroundImage=`url(${profile.avatar_url})`;avatar.style.backgroundSize='cover';avatar.style.backgroundPosition='center'}
-      else{avatar.textContent=String(name).trim().charAt(0).toUpperCase()||'✦';}
+      if(profile?.avatar_url){avatar.textContent='';avatar.style.backgroundImage=`url(${profile.avatar_url})`;avatar.style.backgroundSize='cover';avatar.style.backgroundPosition='center';avatar.classList.add('has-photo')}
+      else{avatar.textContent='✦';avatar.style.backgroundImage='';avatar.classList.remove('has-photo')}
       const link=document.querySelector('[data-shell-profile-link]');if(link&&profileUsername)link.href=`binder.html?view=collector&username=${encodeURIComponent(profileUsername)}`;
       access=await getMyStaffAccess();
       if(profile && profile.onboarding_complete===false){

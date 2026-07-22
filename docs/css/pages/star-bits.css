@@ -530,15 +530,26 @@
 .qol-card-toggle:has(input:checked):after{background:linear-gradient(135deg,#ff82c8,#6bc6f8)}
 .qol-card-toggle:has(input:checked):before{transform:translateX(20px)}
 .duplicate-quantity-control{justify-content:flex-start!important}
-.exchange-box{position:sticky!important;bottom:12px!important;z-index:30!important;display:grid!important;grid-template-columns:1fr auto!important;align-items:center!important;gap:12px!important;padding:15px 18px!important;background:rgba(255,255,255,.96)!important;backdrop-filter:blur(12px);box-shadow:0 15px 42px rgba(61,83,132,.18)!important}
-.exchange-box h2,.exchange-box>p:last-child{display:none!important}
+.exchange-box{position:sticky!important;top:10px!important;bottom:auto!important;z-index:30!important;display:grid!important;grid-template-columns:1fr auto!important;align-items:center!important;gap:12px!important;padding:15px 18px!important;margin:0 0 16px!important;background:rgba(255,255,255,.96)!important;backdrop-filter:blur(12px);box-shadow:0 15px 42px rgba(61,83,132,.18)!important;border:1px solid rgba(107,198,248,.35)!important;border-radius:18px!important}
+.exchange-box-top{display:grid!important}
+.exchange-box h2{display:block!important;margin:0 0 4px!important;color:#405fa1!important;font-size:1.05rem!important}
+.exchange-box .exchange-note{display:block!important;margin:6px 0 0!important;color:#6d7692!important;font-size:.88rem!important}
 .exchange-box #exchange-description{margin:0!important}
-.exchange-button{min-width:245px!important}
+.exchange-box-actions{display:grid;gap:8px;justify-items:end}
+.exchange-box-actions .selection-toolbar-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.exchange-button{min-width:220px!important}
+.card-convert-now{
+  margin-top:4px;border:1px solid rgba(107,198,248,.45);border-radius:999px;padding:8px 12px;
+  background:#fff;color:#405fa1;font:inherit;font-weight:850;cursor:pointer
+}
+.card-convert-now:disabled{opacity:.45;cursor:not-allowed}
+.duplicate-quantity-control button{min-width:34px}
 @media(max-width:720px){
  .duplicate-heading{align-items:stretch;flex-direction:column}
  .qol-bulk-toggle{min-width:0}
  .duplicate-grid{grid-template-columns:1fr!important}
  .exchange-box{grid-template-columns:1fr!important}
+ .exchange-box-actions,.exchange-box-actions .selection-toolbar-actions{justify-items:stretch;justify-content:stretch}
  .exchange-button{width:100%;min-width:0!important}
 }
 

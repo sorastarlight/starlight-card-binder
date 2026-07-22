@@ -1,18 +1,61 @@
-import { getMyProfileExtras, setMyProfileExtras, uploadProfileImage } from './profile-extras-service.js';
+import {
+    getMyProfileExtras,
+    setMyProfileExtras,
+    uploadProfileImage,
+    uploadProfileBanner
+} from './profile-extras-service.js';
 
-const fileInput = document.getElementById('profile-image-file');
+const avatarFileInput = document.getElementById('profile-image-file');
+const bannerFileInput = document.getElementById('profile-banner-file');
 const canvas = document.getElementById('profile-image-canvas');
+const cropStage = document.getElementById('profile-crop-stage');
+const cropMask = document.getElementById('profile-crop-mask');
+const cropHeading = document.getElementById('profile-crop-heading');
+const cropDescription = document.getElementById('profile-crop-description');
 const zoom = document.getElementById('profile-image-zoom');
 const zoomValue = document.getElementById('profile-image-zoom-value');
 const saveImage = document.getElementById('save-profile-image');
 const cancelImage = document.getElementById('cancel-profile-image');
 const preview = document.getElementById('profile-image-preview');
 const placeholder = document.getElementById('profile-image-placeholder');
+const bannerPreview = document.getElementById('profile-banner-preview');
+const bannerPlaceholder = document.getElementById('profile-banner-placeholder');
+const removeBanner = document.getElementById('remove-profile-banner');
 const cropModal = document.getElementById('profile-crop-modal');
 const titleSelect = document.getElementById('collector-title-select');
 const achievementGrid = document.getElementById('achievement-grid');
 const extrasStatus = document.getElementById('profile-extras-status');
 
+const CROP_MODES = {
+    avatar: {
+        canvasWidth: 480,
+        canvasHeight: 480,
+        maxSourceBytes: 1048576,
+        heading: 'Adjust Your Profile Image',
+        description: 'Drag the image to reposition it, then use zoom until it looks just right inside the circle.',
+        canvasLabel: 'Profile image crop editor',
+        saveLabel: 'Save Profile Image',
+        uploading: 'Uploading your profile image…',
+        saved: 'Profile image saved!',
+        cancelled: 'Profile image change cancelled.',
+        upload: uploadProfileImage
+    },
+    banner: {
+        canvasWidth: 1200,
+        canvasHeight: 400,
+        maxSourceBytes: 2097152,
+        heading: 'Adjust Your Profile Banner',
+        description: 'Drag the image to reposition it, then use zoom until it looks just right inside the banner frame.',
+        canvasLabel: 'Profile banner crop editor',
+        saveLabel: 'Save Profile Banner',
+        uploading: 'Uploading your profile banner…',
+        saved: 'Profile banner saved!',
+        cancelled: 'Profile banner change cancelled.',
+        upload: uploadProfileBanner
+    }
+};
+
+let cropMode = 'avatar';
 let image = null;
 let scale = 1;
 let offsetX = 0;
@@ -20,9 +63,9 @@ let offsetY = 0;
 let dragging = false;
 let lastX = 0;
 let lastY = 0;
-let currentAvatar = '';
 let objectUrl = '';
 let clearFileOnClose = true;
+let activeFileInput = null;
 
 const ctx = canvas?.getContext('2d');
 
@@ -32,11 +75,11 @@ function status(message, type = '') {
     extrasStatus.className = `profile-extras-status ${type}`;
 }
 
-function setPreview(url) {
-    currentAvatar = url || '';
+function setAvatarPreview(url) {
+    const avatarUrl = url || '';
 
-    if (currentAvatar) {
-        preview.src = currentAvatar;
+    if (avatarUrl) {
+        preview.src = avatarUrl;
         preview.classList.remove('hidden');
         placeholder?.classList.add('hidden');
     } else {
@@ -44,6 +87,45 @@ function setPreview(url) {
         preview.classList.add('hidden');
         placeholder?.classList.remove('hidden');
     }
+}
+
+function setBannerPreview(url) {
+    const bannerUrl = url || '';
+
+    if (bannerUrl) {
+        bannerPreview.src = bannerUrl;
+        bannerPreview.classList.remove('hidden');
+        bannerPlaceholder?.classList.add('hidden');
+        removeBanner?.classList.remove('hidden');
+    } else {
+        bannerPreview?.removeAttribute('src');
+        bannerPreview?.classList.add('hidden');
+        bannerPlaceholder?.classList.remove('hidden');
+        removeBanner?.classList.add('hidden');
+    }
+}
+
+function modeConfig() {
+    return CROP_MODES[cropMode] || CROP_MODES.avatar;
+}
+
+function applyCropMode(mode) {
+    cropMode = mode === 'banner' ? 'banner' : 'avatar';
+    const config = modeConfig();
+
+    if (canvas) {
+        canvas.width = config.canvasWidth;
+        canvas.height = config.canvasHeight;
+        canvas.setAttribute('aria-label', config.canvasLabel);
+    }
+
+    cropModal?.setAttribute('data-crop-mode', cropMode);
+    cropStage?.classList.toggle('is-banner', cropMode === 'banner');
+    cropMask?.classList.toggle('is-banner', cropMode === 'banner');
+
+    if (cropHeading) cropHeading.textContent = config.heading;
+    if (cropDescription) cropDescription.textContent = config.description;
+    if (saveImage) saveImage.textContent = config.saveLabel;
 }
 
 function draw() {
@@ -94,9 +176,11 @@ function resetCropState(clearFile = true) {
         objectUrl = '';
     }
 
-    if (clearFile && fileInput) {
-        fileInput.value = '';
+    if (clearFile && activeFileInput) {
+        activeFileInput.value = '';
     }
+
+    activeFileInput = null;
 }
 
 const cropModalController = cropModal ? window.StarlightUI.adoptModal(cropModal, {
@@ -105,9 +189,11 @@ const cropModalController = cropModal ? window.StarlightUI.adoptModal(cropModal,
     describedBy: 'profile-crop-description',
     initialFocus: saveImage,
     onClose: ({ reason }) => {
+        const cancelled = modeConfig().cancelled;
         resetCropState(clearFileOnClose);
         clearFileOnClose = true;
-        if (reason === 'escape' || reason === 'backdrop') status('Profile image change cancelled.');
+        if (reason === 'escape' || reason === 'backdrop') status(cancelled);
+        applyCropMode('avatar');
     }
 }) : null;
 
@@ -120,19 +206,26 @@ function closeCropModal({ clearFile = true } = {}) {
     cropModalController?.close(undefined, 'page');
 }
 
-fileInput?.addEventListener('change', () => {
+function handleFileSelection(fileInput, mode) {
     const file = fileInput.files?.[0];
     if (!file) return;
 
-    if (file.size > 1048576) {
-        status('Please choose an image that is 1 MB or smaller.', 'error');
+    applyCropMode(mode);
+    const config = modeConfig();
+    activeFileInput = fileInput;
+
+    if (file.size > config.maxSourceBytes) {
+        const mb = Math.round(config.maxSourceBytes / 1048576);
+        status(`Please choose an image that is ${mb} MB or smaller.`, 'error');
         fileInput.value = '';
+        activeFileInput = null;
         return;
     }
 
     if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
         status('Please choose a PNG, JPG, or WebP image.', 'error');
         fileInput.value = '';
+        activeFileInput = null;
         return;
     }
 
@@ -163,6 +256,14 @@ fileInput?.addEventListener('change', () => {
     };
 
     selectedImage.src = objectUrl;
+}
+
+avatarFileInput?.addEventListener('change', () => {
+    handleFileSelection(avatarFileInput, 'avatar');
+});
+
+bannerFileInput?.addEventListener('change', () => {
+    handleFileSelection(bannerFileInput, 'banner');
 });
 
 zoom?.addEventListener('input', () => {
@@ -207,16 +308,19 @@ canvas?.addEventListener('pointerup', endDrag);
 canvas?.addEventListener('pointercancel', endDrag);
 
 cancelImage?.addEventListener('click', () => {
+    const cancelled = modeConfig().cancelled;
     closeCropModal();
-    status('Profile image change cancelled.');
+    status(cancelled);
 });
 
 saveImage?.addEventListener('click', async () => {
     if (!image || !canvas) return;
 
+    const config = modeConfig();
+
     saveImage.disabled = true;
     saveImage.textContent = 'Saving…';
-    status('Uploading your profile image…');
+    status(config.uploading);
 
     canvas.toBlob(async blob => {
         try {
@@ -224,24 +328,42 @@ saveImage?.addEventListener('click', async () => {
                 throw new Error('Could not prepare the image.');
             }
 
-            const url = await uploadProfileImage(blob);
-            setPreview(url);
+            const url = await config.upload(blob);
+            if (cropMode === 'banner') {
+                setBannerPreview(url);
+            } else {
+                setAvatarPreview(url);
+            }
             closeCropModal({ clearFile: true });
-            status('Profile image saved!', 'success');
+            status(config.saved, 'success');
         } catch (error) {
             status(error.message || 'Upload failed.', 'error');
         } finally {
             saveImage.disabled = false;
-            saveImage.textContent = 'Save Profile Image';
+            saveImage.textContent = config.saveLabel;
         }
     }, 'image/webp', 0.86);
+});
+
+removeBanner?.addEventListener('click', async () => {
+    removeBanner.disabled = true;
+    status('Removing profile banner…');
+
+    try {
+        await setMyProfileExtras({ bannerUrl: '' });
+        setBannerPreview('');
+        status('Profile banner removed.', 'success');
+    } catch (error) {
+        status(error.message || 'Could not remove banner.', 'error');
+    } finally {
+        removeBanner.disabled = false;
+    }
 });
 
 titleSelect?.addEventListener('change', async () => {
     try {
         await setMyProfileExtras({
-            avatarUrl: currentAvatar || null,
-            titleId: titleSelect.value || null
+            titleId: titleSelect.value || ''
         });
 
         status('Collector title updated.', 'success');
@@ -250,11 +372,15 @@ titleSelect?.addEventListener('change', async () => {
     }
 });
 
+applyCropMode('avatar');
+setBannerPreview('');
+
 (async () => {
     try {
         const data = await getMyProfileExtras();
 
-        setPreview(data.avatarUrl || '');
+        setAvatarPreview(data.avatarUrl || '');
+        setBannerPreview(data.bannerUrl || '');
 
         titleSelect.innerHTML =
             '<option value="">No collector title</option>' +

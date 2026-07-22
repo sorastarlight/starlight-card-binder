@@ -99,6 +99,8 @@
                     var(--collector-pink)
                 );
 
+            background-size: cover;
+            background-position: center;
             position: relative;
         }
 
@@ -115,6 +117,10 @@
 
             font-size: clamp(2rem, 8vw, 5.4rem);
             letter-spacing: 0.18em;
+        }
+
+        .collector-banner.has-photo::after {
+            content: none;
         }
 
         .collector-header {

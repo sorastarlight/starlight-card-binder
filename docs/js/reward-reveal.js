@@ -19,6 +19,23 @@ const prettyMeta = value => String(value || '')
   .replace(/[_-]+/g, ' ')
   .replace(/\b\w/g, character => character.toUpperCase());
 
+const fillRevealTokens = (template, vars = {}) => String(template || '').replace(/\{(\w+)\}/g, (_, key) => (
+  vars[key] == null ? '' : String(vars[key])
+));
+
+async function resolveRevealCopy() {
+  let content = typeof window !== 'undefined' ? window.__starlightWebsiteContent : null;
+  if (!content?.reveal) {
+    try {
+      const mod = await import('./website-content-hydrate.js');
+      content = mod.getCachedWebsiteContent?.() || content;
+    } catch {
+      // Website content is optional for reveal; hard-coded fallbacks remain.
+    }
+  }
+  return content?.reveal || {};
+}
+
 const categoryOf = card => prettyMeta(
   card?.categoryName || card?.category_name || card?.categoryId || card?.category_id || ''
 );
@@ -392,7 +409,15 @@ function playRevealSound(win, name, activeAudio) {
 }
 
 export async function revealRewardSequence(cards = [], options = {}) {
-  const rewards = cards.filter(Boolean).map(normalizeRevealCard);
+  const revealCopy = await resolveRevealCopy();
+  const mysteryName = revealCopy.mysteryName || 'Mystery Card';
+  const fallbackMeta = revealCopy.fallbackMeta || 'Starlight Card';
+  const rewards = cards.filter(Boolean).map((card) => {
+    const normalized = normalizeRevealCard(card);
+    const hasName = Boolean(card?.name ?? card?.cardName ?? card?.card_name);
+    if (!hasName) return { ...normalized, name: mysteryName };
+    return normalized;
+  });
   if (!rewards.length) return;
 
   const sourceDocument = document;
@@ -401,9 +426,21 @@ export async function revealRewardSequence(cards = [], options = {}) {
     : null;
   const { win, doc } = getHost();
   const normalizedOptions = normalizeRevealOptions(options);
-  const revealTitle = normalizedOptions.title || 'Your Booster Pack';
+  const revealTitle = normalizedOptions.title || revealCopy.defaultTitle || 'Your Booster Pack';
   const packArtwork = normalizedOptions.packImageUrl || normalizedOptions.cardBackUrl;
   const summary = summarizeRevealCards(rewards);
+  const cardsReadyText = rewards.length === 1
+    ? (revealCopy.cardsReadyOne || '1 card ready.')
+    : fillRevealTokens(revealCopy.cardsReady || '{count} cards ready.', { count: rewards.length });
+  const resultsSummaryText = summary.duplicates === 1
+    ? fillRevealTokens(
+      revealCopy.resultsSummaryOneDup || '{total} total · {new} new · 1 duplicate',
+      { total: summary.total, new: summary.newCards }
+    )
+    : fillRevealTokens(
+      revealCopy.resultsSummary || '{total} total · {new} new · {duplicates} duplicates',
+      { total: summary.total, new: summary.newCards, duplicates: summary.duplicates }
+    );
   await installStyles(doc);
 
   return new Promise(resolve => {
@@ -421,14 +458,14 @@ export async function revealRewardSequence(cards = [], options = {}) {
     const dialog = createElement(doc, 'section', 'st-r3-dialog');
     const header = createElement(doc, 'header', 'st-r3-header');
     const headerCopy = createElement(doc, 'div', 'st-r3-header-copy');
-    const eyebrow = createElement(doc, 'p', 'st-r3-eyebrow', 'Starlight Booster');
+    const eyebrow = createElement(doc, 'p', 'st-r3-eyebrow', revealCopy.eyebrow || 'Starlight Booster');
     const title = createElement(doc, 'h2', 'st-r3-title', revealTitle);
     const closeButton = createElement(doc, 'button', 'st-r3-close', '×');
     const liveStatus = createElement(
       doc,
       'p',
       'st-r3-live',
-      `${rewards.length} ${rewards.length === 1 ? 'card' : 'cards'} ready.`
+      cardsReadyText
     );
     const progress = createElement(doc, 'p', 'st-r3-progress');
     const stage = createElement(doc, 'div', 'st-r3-stage');
@@ -442,7 +479,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
     const packTop = createImage(doc, packArtwork, '', normalizedOptions.cardBackUrl, 'st-r3-pack-half st-r3-pack-top');
     const packBottom = createImage(doc, packArtwork, '', normalizedOptions.cardBackUrl, 'st-r3-pack-half st-r3-pack-bottom');
     const packCount = createElement(doc, 'span', 'st-r3-pack-count', `${rewards.length} ${rewards.length === 1 ? 'card' : 'cards'}`);
-    const packPrompt = createElement(doc, 'span', 'st-r3-prompt', 'Tap the booster to open');
+    const packPrompt = createElement(doc, 'span', 'st-r3-prompt', revealCopy.packPrompt || 'Tap the booster to open');
     const packEnergy = createElement(doc, 'span', 'st-r3-pack-energy');
     const packCore = createElement(doc, 'i', 'st-r3-pack-core');
     const packRing = createElement(doc, 'i', 'st-r3-pack-ring');
@@ -470,23 +507,23 @@ export async function revealRewardSequence(cards = [], options = {}) {
     const cardName = createElement(doc, 'h3', 'st-r3-card-name');
     const cardMeta = createElement(doc, 'p', 'st-r3-card-meta');
     const cardBadges = createElement(doc, 'div', 'st-r3-card-badges');
-    const continuePrompt = createElement(doc, 'p', 'st-r3-continue', 'Tap the revealed card to continue');
+    const continuePrompt = createElement(doc, 'p', 'st-r3-continue', revealCopy.continuePrompt || 'Tap the revealed card to continue');
 
     const resultsScene = createElement(doc, 'section', 'st-r3-results');
     const resultsHeading = createElement(doc, 'div', 'st-r3-results-heading');
-    const resultsTitle = createElement(doc, 'h3', '', 'Your Cards');
+    const resultsTitle = createElement(doc, 'h3', '', revealCopy.resultsTitle || 'Your Cards');
     const resultsSummary = createElement(
       doc,
       'p',
       '',
-      `${summary.total} total · ${summary.newCards} new · ${summary.duplicates} duplicate${summary.duplicates === 1 ? '' : 's'}`
+      resultsSummaryText
     );
     const resultsGrid = createElement(doc, 'div', 'st-r3-results-grid');
-    const doneButton = createElement(doc, 'button', 'st-r3-done', 'Done');
+    const doneButton = createElement(doc, 'button', 'st-r3-done', revealCopy.doneCta || 'Done');
 
     title.id = `st-r3-title-${win.crypto?.randomUUID?.() || Date.now().toString(36)}`;
     closeButton.type = 'button';
-    closeButton.setAttribute('aria-label', 'Close booster reveal');
+    closeButton.setAttribute('aria-label', revealCopy.closeLabel || 'Close booster reveal');
     closeButton.setAttribute('data-st-modal-close', '');
     liveStatus.setAttribute('role', 'status');
     liveStatus.setAttribute('aria-live', 'polite');
@@ -607,14 +644,16 @@ export async function revealRewardSequence(cards = [], options = {}) {
         const art = createElement(doc, 'span', `st-r3-result-art ${cardFinishClass(card)}`);
         const copy = createElement(doc, 'div', 'st-r3-result-copy');
         const name = createElement(doc, 'h4', '', card.name);
-        const detail = createElement(doc, 'p', '', cardDescription(card) || 'Starlight Card');
+        const detail = createElement(doc, 'p', '', cardDescription(card) || fallbackMeta);
         const badges = createElement(doc, 'div', 'st-r3-result-badges');
         const rarity = createElement(doc, 'span', `st-r3-badge rarity-${card.rarity}`, prettyMeta(card.rarity));
         const status = createElement(
           doc,
           'span',
           `st-r3-result-status ${card.isDuplicate ? 'is-duplicate' : 'is-new'}`,
-          card.isDuplicate ? 'Duplicate' : 'New'
+          card.isDuplicate
+            ? (revealCopy.badgeDuplicate || 'Duplicate')
+            : (revealCopy.badgeNew || 'New')
         );
         const finish = finishEffectBadge(card, doc);
         badges.append(rarity, ...(finish ? [finish] : []), status);
@@ -658,8 +697,13 @@ export async function revealRewardSequence(cards = [], options = {}) {
         layer.style.setProperty('--pile-rotation', `${centeredIndex * 2.2}deg`);
         layer.style.setProperty('--pile-z', String(layerIndex + 1));
       });
-      pileCount.textContent = `${remaining} ${remaining === 1 ? 'card remains' : 'cards remain'}`;
-      pilePrompt.textContent = remaining === 1 ? 'Tap the last card' : 'Tap the pile to reveal a card';
+      const remainText = remaining === 1
+        ? (revealCopy.pileRemainOne || '1 card remains')
+        : fillRevealTokens(revealCopy.pileRemain || '{count} cards remain', { count: remaining });
+      pileCount.textContent = remainText;
+      pilePrompt.textContent = remaining === 1
+        ? (revealCopy.pileTapLast || 'Tap the last card')
+        : (revealCopy.pileTap || 'Tap the pile to reveal a card');
       pileButton.setAttribute('aria-label', `Reveal card ${index + 1} of ${rewards.length} from the pile`);
       pileButton.disabled = false;
       progress.hidden = false;
@@ -671,7 +715,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
       pileScene.classList.toggle('is-arriving', fromPack);
       prepareCurrentCard();
       setPhase('pile');
-      liveStatus.textContent = `${remaining} ${remaining === 1 ? 'card remains' : 'cards remain'}.`;
+      liveStatus.textContent = `${remainText}.`;
       focusControl(pileButton);
       if (fromPack) {
         waitForMotion(pileScene, win).then(() => {
@@ -725,7 +769,7 @@ export async function revealRewardSequence(cards = [], options = {}) {
       actor.disabled = false;
       actor.setAttribute('aria-label', `${card.name}, ${prettyMeta(card.rarity)}. Continue to the pile.`);
       cardName.textContent = card.name;
-      cardMeta.textContent = cardDescription(card) || 'Starlight Card';
+      cardMeta.textContent = cardDescription(card) || fallbackMeta;
       const finishBadge = finishEffectBadge(card, doc);
       cardBadges.replaceChildren(
         createElement(doc, 'span', `st-r3-badge rarity-${card.rarity}`, prettyMeta(card.rarity)),
@@ -734,7 +778,9 @@ export async function revealRewardSequence(cards = [], options = {}) {
           doc,
           'span',
           `st-r3-badge ${card.isDuplicate ? 'is-duplicate' : 'is-new'}`,
-          card.isDuplicate ? 'Duplicate' : 'New Card'
+          card.isDuplicate
+            ? (revealCopy.badgeDuplicate || 'Duplicate')
+            : (revealCopy.badgeNewCard || 'New Card')
         )
       );
       cardDetails.hidden = false;

@@ -98,7 +98,7 @@ export function sanitizeWebsiteContent(input) {
   const homeSource = normalizeLegacyHome(source.home || {}, defaults.home);
 
   const result = {
-    version: 3,
+    version: 4,
     home: {
       ...sanitizeStringMap(homeSource, {
         eyebrow: defaults.home.eyebrow,
@@ -113,6 +113,9 @@ export function sanitizeWebsiteContent(input) {
       quickLinks: sanitizeQuickLinks(homeSource.quickLinks, defaults.home.quickLinks)
     },
     binderLanding: sanitizeStringMap(source.binderLanding || {}, defaults.binderLanding),
+    reveal: sanitizeStringMap(source.reveal || {}, defaults.reveal),
+    binderSidePanel: sanitizeStringMap(source.binderSidePanel || {}, defaults.binderSidePanel),
+    binderFullView: sanitizeStringMap(source.binderFullView || {}, defaults.binderFullView),
     daily: sanitizeStringMap(source.daily || {}, defaults.daily),
     shop: sanitizeStringMap(source.shop || {}, defaults.shop),
     events: sanitizeStringMap(source.events || {}, defaults.events),

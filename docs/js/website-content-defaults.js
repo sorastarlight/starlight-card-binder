@@ -3,6 +3,9 @@
 export const WEBSITE_EDITOR_TABS = Object.freeze([
   { id: 'home', label: 'Home' },
   { id: 'binderLanding', label: 'Binder' },
+  { id: 'reveal', label: 'Card Pull Reveal' },
+  { id: 'binderSidePanel', label: 'Binder Card Panel' },
+  { id: 'binderFullView', label: 'Card Full View' },
   { id: 'daily', label: 'Daily Booster' },
   { id: 'shop', label: 'Card Shop' },
   { id: 'events', label: 'Events' },
@@ -25,7 +28,7 @@ export const HOME_QUICK_LINK_IDS = Object.freeze(['collection', 'shop', 'events'
 
 export function createDefaultWebsiteContent() {
   return {
-    version: 3,
+    version: 4,
     home: {
       eyebrow: 'Welcome, Starlight Collector!',
       title: 'Your magical card adventure starts here.',
@@ -67,6 +70,55 @@ export function createDefaultWebsiteContent() {
       showcaseEmptyCta: 'Reset Filters',
       showcasePickTitle: 'Pick a Card ✨',
       showcasePickLead: 'Select a Starlight card to preview it here.'
+    },
+    reveal: {
+      eyebrow: 'Starlight Booster',
+      defaultTitle: 'Your Booster Pack',
+      cardsReady: '{count} cards ready.',
+      cardsReadyOne: '1 card ready.',
+      packPrompt: 'Tap the booster to open',
+      continuePrompt: 'Tap the revealed card to continue',
+      resultsTitle: 'Your Cards',
+      resultsSummary: '{total} total · {new} new · {duplicates} duplicates',
+      resultsSummaryOneDup: '{total} total · {new} new · 1 duplicate',
+      doneCta: 'Done',
+      closeLabel: 'Close booster reveal',
+      pileRemain: '{count} cards remain',
+      pileRemainOne: '1 card remains',
+      pileTap: 'Tap the pile to reveal a card',
+      pileTapLast: 'Tap the last card',
+      badgeNew: 'New',
+      badgeDuplicate: 'Duplicate',
+      badgeNewCard: 'New Card',
+      mysteryName: 'Mystery Card',
+      fallbackMeta: 'Starlight Card'
+    },
+    binderSidePanel: {
+      flipCta: '↻ Flip',
+      fullViewCta: '⛶ Full View',
+      seriesLabel: 'Series',
+      collectorNumberLabel: 'Collector Number',
+      artistLabel: 'Artist',
+      ownedLabel: 'Owned',
+      notCollectedLabel: 'Not Collected',
+      ownedQtyLabel: 'Owned ×{qty}',
+      descriptionLabel: 'Description',
+      storyLabel: 'Card Story',
+      additionalLabel: 'Additional Information',
+      favoriteCta: '♡ Favorite',
+      favoritedCta: '★ Favorited'
+    },
+    binderFullView: {
+      flipCta: '↻ Flip',
+      favoriteCta: '♡ Favorite',
+      favoritedCta: '★ Favorited',
+      scanEyebrow: 'Card Scan Complete',
+      seriesLabel: 'Series',
+      collectorNumberLabel: 'Collector #',
+      illustratorLabel: 'Illustrator',
+      ownedLabel: 'Owned',
+      storyLabel: 'Card Story',
+      additionalLabel: 'Additional Information'
     },
     daily: {
       eyebrow: 'Daily Collector Reward',

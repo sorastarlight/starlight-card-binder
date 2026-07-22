@@ -495,11 +495,8 @@ import {
                     ? `Collector since ${memberDate}`
                     : "";
 
-            avatarElement.textContent =
-                getInitial(
-                    profile.displayName ||
-                    profile.username
-                );
+            avatarElement.textContent = '✦';
+            avatarElement.classList.remove('has-photo');
 
             if (
                 profile.showCollectionStats &&

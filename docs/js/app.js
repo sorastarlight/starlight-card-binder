@@ -706,10 +706,12 @@ function renderDetail() {
   selectedIndex = Math.max(0, cards.findIndex(c => c.id === selected.id));
   const got = isCollected(selected.id);
   const hidden = !got;
+  const side = websiteSection('binderSidePanel');
+  const qty = getCardQuantity(selected.id);
   detail.innerHTML = `
   <div class="detail-actions top-actions-preview">
-    <button class="btn primary" id="flipPreview" type="button">↻ Flip</button>
-    <button class="btn" id="openFullView" type="button">⛶ Full View</button>
+    <button class="btn primary" id="flipPreview" type="button">${esc(side.flipCta || '↻ Flip')}</button>
+    <button class="btn" id="openFullView" type="button">${esc(side.fullViewCta || '⛶ Full View')}</button>
   </div>
   <button class="preview-card flip-card simple-flip ${previewFlipped ? 'show-back showing-card-back' : ''} ${rarityClass(selected)}" id="previewCard" type="button" aria-label="Open full card view" data-finish-class="${esc(got ? cardFinishClass(selected, true) : '')}" data-holographic="${got && isHolographicCard(selected)}">
     <span class="preview-inner">
@@ -727,13 +729,13 @@ function renderDetail() {
       ${got && !isStandardMeta(finishLabel(selected)) ? `<span class="card-meta-chip finish">${esc(finishLabel(selected))}</span>` : ''}
     </div>
     <div class="detail-list clean-detail-list v91-identity-list">
-      <p><b>Series</b><span>${esc(selected.series)}</span></p>
-      <p><b>Collector Number</b><span>${esc(selected.collectorNumber || selected.number)}</span></p>
-      ${got && selected.artist ? `<p><b>Illustrator</b><span>${esc(selected.artist)}</span></p>` : ''}
-      <p><b>Owned</b><span>${got ? `×${getCardQuantity(selected.id)}` : 'Not Collected'}</span></p>
+      <p><b>${esc(side.seriesLabel || 'Series')}</b><span>${esc(selected.series)}</span></p>
+      <p><b>${esc(side.collectorNumberLabel || 'Collector Number')}</b><span>${esc(selected.collectorNumber || selected.number)}</span></p>
+      ${got && selected.artist ? `<p><b>${esc(side.artistLabel || 'Illustrator')}</b><span>${esc(selected.artist)}</span></p>` : ''}
+      <p><b>${esc(side.ownedLabel || 'Owned')}</b><span>${got ? `×${qty}` : esc(side.notCollectedLabel || 'Not Collected')}</span></p>
     </div>
-    <div class="db2-story"><b>Card Story</b><p>${esc(getVisibleDescription(selected))}</p></div>
-    ${got ? `<details class="db2-more"><summary>Additional Information</summary><div class="detail-list clean-detail-list"><p><b>Variant</b><span>${esc(variantLabel(selected))}</span></p><p><b>Finish</b><span>${esc(finishLabel(selected))}</span></p>${cardExpandedDetails(selected)}</div></details>` : ''}
+    <div class="db2-story"><b>${esc(side.storyLabel || 'Card Story')}</b><p>${esc(getVisibleDescription(selected))}</p></div>
+    ${got ? `<details class="db2-more"><summary>${esc(side.additionalLabel || 'Additional Information')}</summary><div class="detail-list clean-detail-list"><p><b>Variant</b><span>${esc(variantLabel(selected))}</span></p><p><b>Finish</b><span>${esc(finishLabel(selected))}</span></p>${cardExpandedDetails(selected)}</div></details>` : ''}
   </div>`;
   $('#flipPreview')?.addEventListener('click', () => { previewFlipped = !previewFlipped; flipCardImage($('#previewCard'), getVisibleImage(selected), getVisibleName(selected), previewFlipped); playSfx('flip'); });
   $('#openFullView')?.addEventListener('click', () => openFullView('filtered'));
@@ -808,14 +810,16 @@ function renderFullView() {
   const hidden = !got;
   const visibleName = getVisibleName(selected);
   const visibleRarity = getVisibleRarity(selected);
+  const full = websiteSection('binderFullView');
+  const qty = getCardQuantity(selected.id);
   overlay.innerHTML = `<div class="full-card-stage analyzer-full-stage ${rarityClass(selected)}" role="dialog" aria-modal="true" aria-labelledby="fullViewCardTitle" tabindex="-1">
     <div class="analyzer-bg" aria-hidden="true"><span></span><span></span><span></span></div>
     <button class="overlay-close analyzer-close" type="button" aria-label="Close">×</button>
     <button class="overlay-arrow left analyzer-arrow" type="button" aria-label="Previous card">‹</button>
     <section class="analyzer-screen db2-full-layout v9112-full-view">
       <div class="analyzer-actions">
-        <button class="overlay-flip analyzer-flip" type="button">↻ Flip</button>
-        ${got ? `<button class="overlay-favorite analyzer-favorite" type="button" data-toggle-favorite="${esc(selected.id)}" aria-pressed="${isFavorite(selected.id) ? 'true' : 'false'}">${isFavorite(selected.id) ? '★ Favorited' : '♡ Favorite'}</button>` : ''}
+        <button class="overlay-flip analyzer-flip" type="button">${esc(full.flipCta || '↻ Flip')}</button>
+        ${got ? `<button class="overlay-favorite analyzer-favorite" type="button" data-toggle-favorite="${esc(selected.id)}" aria-pressed="${isFavorite(selected.id) ? 'true' : 'false'}">${esc(isFavorite(selected.id) ? (full.favoritedCta || '★ Favorited') : (full.favoriteCta || '♡ Favorite'))}</button>` : ''}
       </div>
       <div class="analyzer-card-zone">
         <div class="analyzer-reticle" aria-hidden="true"></div>
@@ -827,10 +831,10 @@ function renderFullView() {
         </div>
       </div>
       <div class="analyzer-info-card db2-full-info">
-        <div class="analyzer-title-row"><div><p class="eyebrow">Card Scan Complete</p><h2 id="fullViewCardTitle">${esc(visibleName)}</h2><p class="db2-collector-line">${esc(selected.collectorNumber || selected.number || '???')} · ${esc(selected.series || 'Unknown Series')}</p></div></div>
+        <div class="analyzer-title-row"><div><p class="eyebrow">${esc(full.scanEyebrow || 'Card Scan Complete')}</p><h2 id="fullViewCardTitle">${esc(visibleName)}</h2><p class="db2-collector-line">${esc(selected.collectorNumber || selected.number || '???')} · ${esc(selected.series || 'Unknown Series')}</p></div></div>
         <div class="card-meta-chips">${cardIdentityChips(selected, { full: true, hidden })}</div>
-        <div class="analyzer-data-grid"><span><b>Series</b>${esc(selected.series || 'Unknown')}</span><span><b>Collector #</b>${esc(selected.collectorNumber || selected.number || '???')}</span>${got && selected.artist ? `<span><b>Illustrator</b>${esc(selected.artist)}</span>` : ''}${got ? `<span><b>Owned</b>×${getCardQuantity(selected.id)}</span>` : ''}</div>
-        ${got ? `<div class="db2-full-story"><b>Card Story</b><p>${esc(selected.cardDescription || 'No card story has been added yet.')}</p></div><details class="db2-more"><summary>Additional Information</summary><div class="detail-list clean-detail-list">${cardExpandedDetails(selected)}</div></details>` : ''}
+        <div class="analyzer-data-grid"><span><b>${esc(full.seriesLabel || 'Series')}</b>${esc(selected.series || 'Unknown')}</span><span><b>${esc(full.collectorNumberLabel || 'Collector #')}</b>${esc(selected.collectorNumber || selected.number || '???')}</span>${got && selected.artist ? `<span><b>${esc(full.illustratorLabel || 'Illustrator')}</b>${esc(selected.artist)}</span>` : ''}${got ? `<span><b>${esc(full.ownedLabel || 'Owned')}</b>×${qty}</span>` : ''}</div>
+        ${got ? `<div class="db2-full-story"><b>${esc(full.storyLabel || 'Card Story')}</b><p>${esc(selected.cardDescription || 'No card story has been added yet.')}</p></div><details class="db2-more"><summary>${esc(full.additionalLabel || 'Additional Information')}</summary><div class="detail-list clean-detail-list">${cardExpandedDetails(selected)}</div></details>` : ''}
         <p class="analyzer-description">${esc(getVisibleDescription(selected))}</p>
       </div>
     </section>
@@ -1259,15 +1263,18 @@ function renderV62Showcase(inSeriesSelect = false, browse = resolveBinderBrowse(
     panel.innerHTML = `<div class="v62-empty-showcase"><h2>${esc(copy.showcasePickTitle || 'Pick a Card ✨')}</h2><p>${esc(copy.showcasePickLead || 'Select a Starlight card to preview it here.')}</p></div>`;
     return;
   }
+  const side = websiteSection('binderSidePanel');
   const got = isCollected(card.id);
   const hidden = !got;
   const visibleImage = getVisibleImage(card);
   const visibleName = getVisibleName(card);
   const visibleRarity = getVisibleRarity(card);
+  const qty = getCardQuantity(card.id);
+  const ownedQtyText = fillWebsiteTokens(side.ownedQtyLabel || 'Owned ×{qty}', { qty });
   panel.innerHTML = `<div class="v62-panel-inner ${rarityClass(card)} ${got ? 'is-collected' : 'is-hidden'}">
     <div class="v62-panel-actions">
-      <button class="btn primary" id="v62Flip" type="button">↻ Flip</button>
-      <button class="btn" id="v62Full" type="button">⛶ Full View</button>
+      <button class="btn primary" id="v62Flip" type="button">${esc(side.flipCta || '↻ Flip')}</button>
+      <button class="btn" id="v62Full" type="button">${esc(side.fullViewCta || '⛶ Full View')}</button>
     </div>
     <button class="v62-preview-card flip-card simple-flip ${previewFlipped ? 'show-back showing-card-back' : ''}" id="v62PreviewCard" type="button" aria-label="Open full view for ${esc(visibleName)}" data-finish-class="${esc(got ? cardFinishClass(card, true) : '')}" data-holographic="${got && isHolographicCard(card)}">
       <span class="preview-inner">
@@ -1279,16 +1286,16 @@ function renderV62Showcase(inSeriesSelect = false, browse = resolveBinderBrowse(
       <h2>${esc(visibleName)}</h2>
       <span class="pill rarity-pill ${rarityClass(card)}">${esc(visibleRarity)}</span>
       <div class="v62-info-list">
-        <p><b>Series</b><span>${esc(card.series)}</span></p>
-        <p><b>Collector Number</b><span>${esc(card.collectorNumber || card.number)}</span></p>
-        <p><b>Artist</b><span>${esc(card.artist)}</span></p>
-        <p><b>Owned</b><span>×${getCardQuantity(card.id)}</span></p>
+        <p><b>${esc(side.seriesLabel || 'Series')}</b><span>${esc(card.series)}</span></p>
+        <p><b>${esc(side.collectorNumberLabel || 'Collector Number')}</b><span>${esc(card.collectorNumber || card.number)}</span></p>
+        <p><b>${esc(side.artistLabel || 'Artist')}</b><span>${esc(card.artist)}</span></p>
+        <p><b>${esc(side.ownedLabel || 'Owned')}</b><span>×${qty}</span></p>
       </div>
-      <p class="v62-description"><b>Description</b><br>${esc(getVisibleDescription(card))}</p>
+      <p class="v62-description"><b>${esc(side.descriptionLabel || 'Description')}</b><br>${esc(getVisibleDescription(card))}</p>
     </div>
     <div class="v62-panel-buttons">
-      <span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${getCardQuantity(card.id)}` : 'Not Collected'}</span>
-      ${got ? `<button class="btn primary" id="v62Favorite" type="button" data-toggle-favorite="${esc(card.id)}" aria-pressed="${isFavorite(card.id) ? 'true' : 'false'}">${isFavorite(card.id)?'★ Favorited':'♡ Favorite'}</button>` : ''}
+      <span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? esc(ownedQtyText) : esc(side.notCollectedLabel || 'Not Collected')}</span>
+      ${got ? `<button class="btn primary" id="v62Favorite" type="button" data-toggle-favorite="${esc(card.id)}" aria-pressed="${isFavorite(card.id) ? 'true' : 'false'}">${esc(isFavorite(card.id) ? (side.favoritedCta || '★ Favorited') : (side.favoriteCta || '♡ Favorite'))}</button>` : ''}
       
     </div>
   </div>`;

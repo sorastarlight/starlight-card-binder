@@ -23,6 +23,14 @@ const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
       avatar.style.backgroundPosition = 'center';
     }
 
+    const banner = document.getElementById('collector-banner') || document.querySelector('.collector-banner');
+    if (data.bannerUrl && banner) {
+      banner.style.backgroundImage = `url(${JSON.stringify(data.bannerUrl).slice(1, -1)})`;
+      banner.style.backgroundSize = 'cover';
+      banner.style.backgroundPosition = 'center';
+      banner.classList.add('has-photo');
+    }
+
     const identity = document.querySelector('.collector-identity');
     if (data.title?.name && identity) {
       const title = document.createElement('p');

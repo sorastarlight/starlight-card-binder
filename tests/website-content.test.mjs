@@ -15,7 +15,7 @@ const read = (relativePath) => readFile(new URL(`../${relativePath}`, import.met
 
 test('default website content includes editable page groups', () => {
   const content = cloneDefaultWebsiteContent();
-  assert.equal(content.version, 3);
+  assert.equal(content.version, 4);
   assert.ok(content.home.title);
   assert.ok(content.home.primaryCta);
   assert.ok(content.home.newsLoading);
@@ -25,6 +25,12 @@ test('default website content includes editable page groups', () => {
   assert.equal(content.login.brandTitle, 'Starlight Card Binder');
   assert.ok(content.binderLanding.title);
   assert.ok(content.binderLanding.splashTitle);
+  assert.ok(content.reveal.packPrompt);
+  assert.ok(content.reveal.resultsTitle);
+  assert.ok(content.binderSidePanel.flipCta);
+  assert.ok(content.binderSidePanel.ownedQtyLabel);
+  assert.ok(content.binderFullView.scanEyebrow);
+  assert.ok(content.binderFullView.illustratorLabel);
   assert.ok(content.daily.title);
   assert.ok(content.daily.readyTitle);
   assert.ok(content.daily.signInCta);
@@ -53,6 +59,9 @@ test('default website content includes editable page groups', () => {
     [
       'home',
       'binderLanding',
+      'reveal',
+      'binderSidePanel',
+      'binderFullView',
       'daily',
       'shop',
       'events',
@@ -91,7 +100,7 @@ test('sanitizeWebsiteContent keeps quick-link ids and rejects bad social urls', 
     }
   });
 
-  assert.equal(sanitized.version, 3);
+  assert.equal(sanitized.version, 4);
   assert.equal(sanitized.home.title, 'Fresh Home Title');
   assert.deepEqual(
     sanitized.home.quickLinks.map((link) => link.id),
@@ -110,13 +119,19 @@ test('mergeWebsiteContent falls back to defaults for empty remote', () => {
   assert.equal(merged.about.title, cloneDefaultWebsiteContent().about.title);
   assert.equal(merged.binderLanding.eyebrow, 'Starlight Cards');
   assert.equal(merged.daily.badge, 'FREE • DAILY');
-  assert.equal(merged.version, 3);
+  assert.equal(merged.version, 4);
 });
 
 test('website editor field meta covers binder splash and admin visual chrome', async () => {
   const { WEBSITE_PAGE_META, listedFieldKeys } = await import('../docs/js/website-content-field-meta.js');
   assert.ok(WEBSITE_PAGE_META.binderLanding);
   assert.ok(listedFieldKeys('binderLanding').includes('splashTitle'));
+  assert.ok(WEBSITE_PAGE_META.reveal);
+  assert.ok(listedFieldKeys('reveal').includes('packPrompt'));
+  assert.ok(WEBSITE_PAGE_META.binderSidePanel);
+  assert.ok(listedFieldKeys('binderSidePanel').includes('ownedQtyLabel'));
+  assert.ok(WEBSITE_PAGE_META.binderFullView);
+  assert.ok(listedFieldKeys('binderFullView').includes('scanEyebrow'));
   assert.ok(listedFieldKeys('daily').includes('readyTitle'));
   const html = await read('docs/admin-website.html');
   const page = await read('docs/js/pages/admin-website-page.js');
@@ -279,5 +294,7 @@ test('website editor admin page and public hooks are wired', async () => {
   assert.match(app, /ensureWebsiteBinderLanding|getWebsiteContent/);
   assert.match(app, /binderLanding/);
   assert.match(app, /splashTitle/);
+  assert.match(app, /binderSidePanel/);
+  assert.match(app, /binderFullView/);
   assert.match(migration, /get_website_content|admin_save_website_content/);
 });

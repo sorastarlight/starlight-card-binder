@@ -125,6 +125,131 @@ export const WEBSITE_PAGE_META = Object.freeze({
       }
     ]
   },
+  reveal: {
+    description: 'Shared card-pull reveal overlay: pack prompts, pile, results, and badges.',
+    previewUrl: 'binder.html?view=binder',
+    groups: [
+      {
+        id: 'hero',
+        label: 'Hero & prompts',
+        open: true,
+        description: 'Header, pack prompt, and pile continue copy.',
+        fields: [
+          { key: 'eyebrow', preview: 'eyebrow' },
+          { key: 'defaultTitle', preview: 'title' },
+          {
+            key: 'cardsReady',
+            hint: 'Use {count}. Example: {count} cards ready.'
+          },
+          { key: 'cardsReadyOne' },
+          { key: 'packPrompt', preview: 'lead' },
+          { key: 'continuePrompt' },
+          {
+            key: 'pileRemain',
+            hint: 'Use {count}. Example: {count} cards remain'
+          },
+          { key: 'pileRemainOne' },
+          { key: 'pileTap' },
+          { key: 'pileTapLast' },
+          { key: 'closeLabel', hint: 'Close button accessible name.' }
+        ]
+      },
+      {
+        id: 'results',
+        label: 'Results',
+        open: true,
+        fields: [
+          { key: 'resultsTitle', preview: 'title' },
+          {
+            key: 'resultsSummary',
+            hint: 'Use {total}, {new}, and {duplicates}.'
+          },
+          {
+            key: 'resultsSummaryOneDup',
+            hint: 'Use {total} and {new} when there is exactly one duplicate.'
+          },
+          { key: 'doneCta', preview: 'cta-primary' },
+          { key: 'mysteryName' },
+          { key: 'fallbackMeta' }
+        ]
+      },
+      {
+        id: 'badges',
+        label: 'Badges',
+        fields: [
+          { key: 'badgeNew', preview: 'chip' },
+          { key: 'badgeDuplicate', preview: 'chip' },
+          { key: 'badgeNewCard', preview: 'chip' }
+        ]
+      }
+    ]
+  },
+  binderSidePanel: {
+    description: 'Binder right-side card info panel actions and labels.',
+    previewUrl: 'binder.html?view=binder',
+    groups: [
+      {
+        id: 'actions',
+        label: 'Actions',
+        open: true,
+        fields: [
+          { key: 'flipCta', preview: 'cta-primary' },
+          { key: 'fullViewCta', preview: 'cta' },
+          { key: 'favoriteCta', preview: 'cta' },
+          { key: 'favoritedCta', preview: 'cta' }
+        ]
+      },
+      {
+        id: 'labels',
+        label: 'Labels',
+        open: true,
+        fields: [
+          { key: 'seriesLabel' },
+          { key: 'collectorNumberLabel' },
+          { key: 'artistLabel' },
+          { key: 'ownedLabel' },
+          { key: 'notCollectedLabel' },
+          {
+            key: 'ownedQtyLabel',
+            hint: 'Use {qty}. Example: Owned ×{qty}'
+          },
+          { key: 'descriptionLabel' },
+          { key: 'storyLabel' },
+          { key: 'additionalLabel' }
+        ]
+      }
+    ]
+  },
+  binderFullView: {
+    description: 'Card full-view analyzer overlay actions and labels.',
+    previewUrl: 'binder.html?view=binder',
+    groups: [
+      {
+        id: 'actions',
+        label: 'Actions',
+        open: true,
+        fields: [
+          { key: 'flipCta', preview: 'cta' },
+          { key: 'favoriteCta', preview: 'cta' },
+          { key: 'favoritedCta', preview: 'cta' }
+        ]
+      },
+      {
+        id: 'labels',
+        label: 'Labels',
+        open: true,
+        fields: [
+          { key: 'scanEyebrow', preview: 'eyebrow' },
+          { key: 'seriesLabel' },
+          { key: 'collectorNumberLabel' },
+          { key: 'illustratorLabel' },
+          { key: 'ownedLabel' },
+          { key: 'storyLabel' },
+          { key: 'additionalLabel' }
+        ]
+      }
+    ]
+  },
   daily: {
     description: 'Daily Free Booster portal states, CTAs, and more-packs block.',
     previewUrl: 'daily-booster.html',
