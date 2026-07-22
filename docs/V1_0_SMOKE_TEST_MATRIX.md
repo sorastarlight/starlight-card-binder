@@ -48,6 +48,8 @@ Fourth slice: **binder browse chrome + trade search** — honest owned/not-colle
 
 Fifth slice: **profiles + trading polish** — shell-safe public profile links, report CTA, self-trade guard, wishlist/offers a11y + pick search; migration `20260722020000_trade_lists_collector_number` pending production apply.
 
+Sixth slice: **trade offer composer integrity** — selections survive search via qty maps, sticky offer summary, match-first pick sort, send → Sent tab, inbox profile links + deep-link tab, decline/cancel confirms, wishlist empty Browse All CTA.
+
 ## Fixes found during this walk
 
 1. **Shop signed-out load** — `booster-shop-page.js` no longer throws away the pack catalog when Star Bits preview fails for anonymous users (shows signed-out CTA instead of “shop could not be loaded”).

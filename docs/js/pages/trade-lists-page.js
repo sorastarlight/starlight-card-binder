@@ -43,6 +43,17 @@ function emptyCopy(listLength) {
   return 'No cards matched your search.';
 }
 
+function emptyActions() {
+  if (query) return '';
+  if (tab === 'wishlist') {
+    return '<p><button type="button" class="trade-empty-action" data-open-tab="all">Browse All Cards</button></p>';
+  }
+  if (tab === 'trade') {
+    return '<p><button type="button" class="trade-empty-action" data-open-tab="all">Browse All Cards</button></p>';
+  }
+  return '';
+}
+
 function render() {
   const list = filtered();
   grid.innerHTML = list.length
@@ -56,7 +67,7 @@ function render() {
           <label>For Trade <select data-trade="${esc(card.id)}" aria-label="Trade quantity for ${esc(card.name)}">${Array.from({ length: card.duplicateQuantity + 1 }, (_, index) => `<option value="${index}" ${index === card.tradeQuantity ? 'selected' : ''}>${index}</option>`).join('')}</select></label>
         </div>
       </article>`).join('')
-    : `<div class="trade-empty"><h2>Nothing here yet</h2><p>${emptyCopy(list.length)}</p></div>`;
+    : `<div class="trade-empty"><h2>Nothing here yet</h2><p>${emptyCopy(list.length)}</p>${emptyActions()}</div>`;
 }
 
 function setActiveTab(nextTab) {
@@ -101,6 +112,12 @@ document.addEventListener('change', event => {
 tabs.forEach(button => {
   button.setAttribute('role', 'tab');
   button.addEventListener('click', () => setActiveTab(button.dataset.tab));
+});
+
+grid?.addEventListener('click', event => {
+  const button = event.target.closest('[data-open-tab]');
+  if (!button) return;
+  setActiveTab(button.dataset.openTab);
 });
 
 search?.addEventListener('input', () => {

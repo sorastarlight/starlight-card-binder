@@ -30,4 +30,23 @@ test('trade pages wire collector-number search helpers and a11y labels', async (
   assert.match(listsHtml, /aria-label="Search cards"/);
   assert.match(offersHtml, /aria-label="Collector username"/);
   assert.match(offersHtml, /id="myCardsSearch"/);
+  assert.match(offersHtml, /id="offerSummary"/);
+});
+
+test('trade offer composer keeps selections outside the pick grid DOM', async () => {
+  const offersPage = await read('docs/js/pages/trade-offers-page.js');
+  assert.match(offersPage, /const offeredQty = new Map\(\)/);
+  assert.match(offersPage, /const requestedQty = new Map\(\)/);
+  assert.match(offersPage, /function chosen\(side\) \{\s*return \[\.\.\.selectionMap\(side\)\.entries\(\)\]/s);
+  assert.match(offersPage, /function sortPickCards/);
+  assert.match(offersPage, /setActiveOfferTab\('outgoing'\)/);
+  assert.match(offersPage, /initialOfferTab/);
+  assert.match(offersPage, /Decline this trade\?/);
+  assert.match(offersPage, /view=collector&username=/);
+});
+
+test('wishlist empty state can open the All Cards tab', async () => {
+  const listsPage = await read('docs/js/pages/trade-lists-page.js');
+  assert.match(listsPage, /data-open-tab="all"/);
+  assert.match(listsPage, /dataset\.openTab/);
 });
