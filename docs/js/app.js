@@ -27,7 +27,6 @@ let previewFlipped = false;
 let overlayFlipped = false;
 let fullViewList = [];
 let fullViewListMode = 'all';
-let fullViewPhotoMode = false;
 let websiteContentPromise = null;
 let websiteBinderLanding = null;
 
@@ -798,7 +797,6 @@ function openFullView(listMode = 'all') {
   if (!fullViewList.find(c => c.id === selected.id)) fullViewList.unshift(selected);
   selectedIndex = Math.max(0, fullViewList.findIndex(c => c.id === selected.id));
   overlayFlipped = previewFlipped;
-  fullViewPhotoMode = false;
   renderFullView();
   playSfx('analyze');
   const modal = fullViewModal();
@@ -809,7 +807,6 @@ function openFullView(listMode = 'all') {
   }
 }
 function closeFullView() {
-  fullViewPhotoMode = false;
   if (cardOverlayModal?.isOpen) cardOverlayModal.close(undefined, 'page');
   else {
     $('#cardOverlay')?.classList.remove('open');
@@ -823,7 +820,6 @@ function stepFullView(dir) {
   selected = list[selectedIndex];
   previewFlipped = false;
   overlayFlipped = false;
-  fullViewPhotoMode = false;
   renderDetail();
   renderFullView();
   playSfx('page');
@@ -836,42 +832,24 @@ function renderFullView() {
   const visibleRarity = getVisibleRarity(selected);
   const full = websiteSection('binderFullView');
   const qty = getCardQuantity(selected.id);
-  const photoMode = fullViewPhotoMode && got;
-  overlay.classList.toggle('is-photo-mode', photoMode);
-  overlay.innerHTML = `<div class="full-card-stage analyzer-full-stage ${rarityClass(selected)}${photoMode ? ' is-photo-mode' : ''}" role="dialog" aria-modal="true" aria-labelledby="fullViewCardTitle" tabindex="-1">
+  overlay.innerHTML = `<div class="full-card-stage analyzer-full-stage ${rarityClass(selected)}" role="dialog" aria-modal="true" aria-labelledby="fullViewCardTitle" tabindex="-1">
     <div class="analyzer-bg" aria-hidden="true"><span></span><span></span><span></span></div>
-    ${photoMode ? `<div class="photo-sparkle-field" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>` : ''}
-    <button class="overlay-close analyzer-close" type="button" aria-label="${photoMode ? 'Exit photo mode' : 'Close'}">×</button>
-    ${photoMode ? '' : `<button class="overlay-arrow left analyzer-arrow" type="button" aria-label="Previous card">‹</button>`}
+    <button class="overlay-close analyzer-close" type="button" aria-label="Close">×</button>
+    <button class="overlay-arrow left analyzer-arrow" type="button" aria-label="Previous card">‹</button>
     <section class="analyzer-screen db2-full-layout v9112-full-view">
       <div class="analyzer-actions">
-        ${photoMode
-          ? `<button class="overlay-exit-photo analyzer-flip" type="button">Exit Photo Mode</button>`
-          : `<button class="overlay-flip analyzer-flip" type="button">${esc(full.flipCta || '↻ Flip')}</button>
+        <button class="overlay-flip analyzer-flip" type="button">${esc(full.flipCta || '↻ Flip')}</button>
         ${got ? `<button class="overlay-favorite analyzer-favorite" type="button" data-toggle-favorite="${esc(selected.id)}" aria-pressed="${isFavorite(selected.id) ? 'true' : 'false'}">${esc(isFavorite(selected.id) ? (full.favoritedCta || '★ Favorited') : (full.favoriteCta || '♡ Favorite'))}</button>` : ''}
-        ${got ? `<button class="overlay-photo analyzer-favorite" type="button" data-photo-mode>📸 Photo Mode</button>` : ''}
-        ${got ? `<button class="overlay-share analyzer-favorite" type="button" data-share-card>Share</button>` : ''}
-        ${got ? `<button class="overlay-download analyzer-favorite" type="button" data-download-card>Download</button>` : ''}`}
       </div>
       <div class="analyzer-card-zone">
         <div class="analyzer-reticle" aria-hidden="true"></div>
         <div class="full-card-wrap flip-card simple-flip ${overlayFlipped?'show-back showing-card-back':''} ${rarityClass(selected)}" id="fullCard3d" aria-label="${esc(overlayFlipped ? 'Card back' : visibleName)}" data-holographic="${got && isHolographicCard(selected)}" data-finish-class="${esc(got ? cardFinishClass(selected, true) : '')}">
           <span class="full-inner">
-            <span class="face front ${cardFinishClass(selected, got && !overlayFlipped)}"><img class="${hidden && !overlayFlipped?'obscured':''}" src="${esc(overlayFlipped ? CARD_BACK_URL : getVisibleImage(selected))}" alt="${esc(overlayFlipped ? 'Card back' : visibleName)}" onerror="this.src='${CARD_BACK_URL}'">${holoSparkMarkup(selected, got && !overlayFlipped)}</span>
-            <span class="face back"><img src="${CARD_BACK_URL}" alt="Card back"></span>
+            <span class="face front ${cardFinishClass(selected, got && !overlayFlipped)}"><img class="${hidden && !overlayFlipped?'obscured':''}" src="${esc(overlayFlipped ? CARD_BACK_URL : getVisibleImage(selected))}" alt="${esc(overlayFlipped ? 'Card back' : visibleName)}" onerror="this.src='${CARD_BACK_URL}'" draggable="false">${holoSparkMarkup(selected, got && !overlayFlipped)}</span>
+            <span class="face back"><img src="${CARD_BACK_URL}" alt="Card back" draggable="false"></span>
           </span>
         </div>
       </div>
-      ${photoMode ? `
-        <div class="photo-mode-caption">
-          <p class="eyebrow">Show Off Your Pull</p>
-          <h2 id="fullViewCardTitle">${esc(visibleName)}</h2>
-          <p>${esc(selected.series || 'Unknown Series')} · ${esc(visibleRarity)}</p>
-          <div class="photo-mode-actions">
-            <button class="btn" type="button" data-share-card>Share</button>
-            <button class="btn primary" type="button" data-download-card>Download</button>
-          </div>
-        </div>` : `
       <div class="analyzer-info-card db2-full-info">
         <div class="analyzer-title-row"><div><p class="eyebrow">${esc(full.scanEyebrow || 'Card Scan Complete')}</p><h2 id="fullViewCardTitle">${esc(visibleName)}</h2><p class="db2-collector-line">${esc(selected.collectorNumber || selected.number || '???')} · ${esc(selected.series || 'Unknown Series')}</p></div></div>
         <div class="card-meta-chips">${cardIdentityChips(selected, { full: true, hidden })}</div>
@@ -879,44 +857,14 @@ function renderFullView() {
         ${got ? `<div class="db2-full-story"><b>${esc(full.storyLabel || 'Card Story')}</b><p>${esc(selected.cardDescription || 'No card story has been added yet.')}</p></div><details class="db2-more"><summary>${esc(full.additionalLabel || 'Additional Information')}</summary><div class="detail-list clean-detail-list">${cardExpandedDetails(selected)}</div></details>` : ''}
         <p class="analyzer-description">${esc(getVisibleDescription(selected))}</p>
         <div data-card-comments-host></div>
-      </div>`}
+      </div>
     </section>
-    ${photoMode ? '' : `<button class="overlay-arrow right analyzer-arrow" type="button" aria-label="Next card">›</button>`}
+    <button class="overlay-arrow right analyzer-arrow" type="button" aria-label="Next card">›</button>
   </div>`;
-  $('.overlay-close', overlay).addEventListener('click', () => {
-    if (fullViewPhotoMode) {
-      fullViewPhotoMode = false;
-      renderFullView();
-      return;
-    }
-    closeFullView();
-  });
-  $('.overlay-arrow.left', overlay)?.addEventListener('click', () => stepFullView(-1));
-  $('.overlay-arrow.right', overlay)?.addEventListener('click', () => stepFullView(1));
-  $('.overlay-flip', overlay)?.addEventListener('click', () => { overlayFlipped = !overlayFlipped; flipCardImage($('.full-card-wrap', overlay), getVisibleImage(selected), getVisibleName(selected), overlayFlipped); playSfx('flip'); });
-  $('.overlay-exit-photo', overlay)?.addEventListener('click', () => {
-    fullViewPhotoMode = false;
-    renderFullView();
-  });
-  overlay.querySelector('[data-photo-mode]')?.addEventListener('click', () => {
-    fullViewPhotoMode = true;
-    overlayFlipped = false;
-    playSfx('sparkle');
-    renderFullView();
-  });
-  overlay.querySelectorAll('[data-share-card]').forEach((button) => {
-    button.addEventListener('click', async () => {
-      const { shareOwnedCard } = await import('./card-photo-share.js?v=1.0.0');
-      await shareOwnedCard(selected);
-    });
-  });
-  overlay.querySelectorAll('[data-download-card]').forEach((button) => {
-    button.addEventListener('click', async () => {
-      const { downloadOwnedCardImage } = await import('./card-photo-share.js?v=1.0.0');
-      const img = overlay.querySelector('.full-card-wrap .face.front img');
-      await downloadOwnedCardImage(selected, img);
-    });
-  });
+  $('.overlay-close', overlay).addEventListener('click', closeFullView);
+  $('.overlay-arrow.left', overlay).addEventListener('click', () => stepFullView(-1));
+  $('.overlay-arrow.right', overlay).addEventListener('click', () => stepFullView(1));
+  $('.overlay-flip', overlay).addEventListener('click', () => { overlayFlipped = !overlayFlipped; flipCardImage($('.full-card-wrap', overlay), getVisibleImage(selected), getVisibleName(selected), overlayFlipped); playSfx('flip'); });
   attachFullViewTilt();
   const commentsHost = overlay.querySelector('[data-card-comments-host]');
   if (commentsHost && selected?.id) {

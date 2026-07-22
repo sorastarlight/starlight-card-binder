@@ -559,6 +559,25 @@ function watchRoutineStatuses() {
   }
 }
 
+function protectImageAssets(doc = document) {
+  if (!doc || doc.documentElement?.dataset?.stImageProtect === '1') return;
+  if (doc.documentElement) doc.documentElement.dataset.stImageProtect = '1';
+
+  const isProtectedImage = (target) => {
+    if (!(target instanceof Element)) return false;
+    if (target.closest('[data-allow-image-save]')) return false;
+    return Boolean(target.closest('img, picture, svg, canvas, video'));
+  };
+
+  doc.addEventListener('contextmenu', (event) => {
+    if (isProtectedImage(event.target)) event.preventDefault();
+  }, true);
+
+  doc.addEventListener('dragstart', (event) => {
+    if (isProtectedImage(event.target)) event.preventDefault();
+  }, true);
+}
+
 window.StarlightUI = {
   toast,
   confirm: confirmDialog,
@@ -586,7 +605,8 @@ window.StarlightUI = {
   clearHoloPointer,
   stateMarkup,
   escapeHtml,
-  cleanupLegacyStorage
+  cleanupLegacyStorage,
+  protectImageAssets
 };
 
 window.addEventListener('error', event => {
@@ -596,4 +616,8 @@ window.addEventListener('unhandledrejection', event => console.error('[Starlight
 document.addEventListener('DOMContentLoaded', () => {
   cleanupLegacyStorage();
   watchRoutineStatuses();
+  protectImageAssets();
 });
+if (document.readyState !== 'loading') {
+  protectImageAssets();
+}
