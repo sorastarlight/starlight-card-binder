@@ -800,7 +800,11 @@ function openFullView(listMode = 'all') {
   if (!selected) return;
   fullViewListMode = listMode;
   if (listMode === 'favorites') {
-    fullViewList = cards.filter(c => isFavorite(c.id));
+    fullViewList = filterCardList(cards.filter(c => isFavorite(c.id)), activeFilters(), { respectOwnership: false });
+  } else if (listMode === 'collection') {
+    fullViewList = filterCardList(cards.filter(c => isCollected(c.id)), activeFilters(), { respectOwnership: false });
+  } else if (listMode === 'duplicates') {
+    fullViewList = filterCardList(cards.filter(c => getCardQuantity(c.id) > 1), activeFilters(), { respectOwnership: false });
   } else if (listMode === 'filtered') {
     applyFilters();
     fullViewList = filtered.length ? [...filtered] : [...cards];
@@ -935,7 +939,7 @@ function renderGridPage(target, mode) {
     const got = isCollected(c.id); const hidden = !got;
     const quantity = getCardQuantity(c.id);
     const favorited = isFavorite(c.id);
-    return `<article class="collection-card ${rarityClass(c)}"><div class="collection-image"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"></div><h3>${esc(getVisibleName(c))}</h3><p class="collection-card-number">${esc(c.collectorNumber || c.number)} • ${esc(c.series)}</p><div class="card-meta-chips compact">${cardIdentityChips(c,{hidden})}</div>${mode === 'duplicates' ? `<p class="duplicate-copy-summary"><strong>${quantity}</strong> total copies · <strong>${quantity - 1}</strong> exchangeable</p>` : ''}<div class="card-buttons"><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${quantity}` : 'Not Collected'}</span>${got ? `<button class="icon-btn" type="button" data-toggle-favorite="${esc(c.id)}" aria-label="${favorited ? 'Remove from favorites' : 'Add to favorites'}" aria-pressed="${favorited ? 'true' : 'false'}">${favorited ? '★' : '☆'}</button>` : ''}</div></article>`;
+    return `<article class="collection-card ${rarityClass(c)}" data-id="${esc(c.id)}" data-open-collection-card="${esc(c.id)}" role="button" tabindex="0" aria-label="Open ${esc(getVisibleName(c))} full view"><div class="collection-image"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"></div><h3>${esc(getVisibleName(c))}</h3><p class="collection-card-number">${esc(c.collectorNumber || c.number)} • ${esc(c.series)}</p><div class="card-meta-chips compact">${cardIdentityChips(c,{hidden})}</div>${mode === 'duplicates' ? `<p class="duplicate-copy-summary"><strong>${quantity}</strong> total copies · <strong>${quantity - 1}</strong> exchangeable</p>` : ''}<div class="card-buttons"><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${quantity}` : 'Not Collected'}</span>${got ? `<button class="icon-btn" type="button" data-toggle-favorite="${esc(c.id)}" aria-label="${favorited ? 'Remove from favorites' : 'Add to favorites'}" aria-pressed="${favorited ? 'true' : 'false'}">${favorited ? '★' : '☆'}</button>` : ''}</div></article>`;
   }).join('') : `<div class="empty-state"><h2>${esc(emptyTitle)}</h2><p>${esc(emptyLead)}</p>${emptyAction}</div>`;
   attachTileTilts();
   attachBinderHoverSfx();
@@ -1082,6 +1086,16 @@ document.addEventListener('click', e => {
     openFullView('favorites');
     return;
   }
+  const openCollectionCard = e.target.closest('[data-open-collection-card]');
+  if (openCollectionCard && pageName === 'collection') {
+    e.preventDefault();
+    const cardId = openCollectionCard.dataset.openCollectionCard;
+    selected = cards.find(card => card.id === cardId) || selected;
+    const tab = document.querySelector('[data-collection-tab].active')?.dataset.collectionTab || 'all';
+    const mode = tab === 'favorites' ? 'favorites' : tab === 'duplicates' ? 'duplicates' : 'collection';
+    openFullView(mode);
+    return;
+  }
   const pack = e.target.closest('[data-pack-series]');
   if (pack) {
     const select = $('[data-series]'); if (select) select.value = pack.dataset.packSeries;
@@ -1131,7 +1145,19 @@ document.addEventListener('click', e => {
   if (pageName === 'binder') document.body.classList.add('series-select');
   applyCardFilterChange();
 });
-document.addEventListener('keydown', e => { if ($('#cardOverlay')?.classList.contains('open')) { if (e.key === 'ArrowLeft') stepFullView(-1); if (e.key === 'ArrowRight') stepFullView(1); } });
+document.addEventListener('keydown', e => {
+  if ($('#cardOverlay')?.classList.contains('open')) {
+    if (e.key === 'ArrowLeft') stepFullView(-1);
+    if (e.key === 'ArrowRight') stepFullView(1);
+    return;
+  }
+  if ((e.key === 'Enter' || e.key === ' ') && pageName === 'collection') {
+    const cardEl = e.target.closest?.('[data-open-collection-card]');
+    if (!cardEl || e.target.closest('[data-toggle-favorite]')) return;
+    e.preventDefault();
+    cardEl.click();
+  }
+});
 document.addEventListener('DOMContentLoaded', () => {
   renderFilterControls();
   if (pageName === 'binder') document.body.classList.add('series-select');

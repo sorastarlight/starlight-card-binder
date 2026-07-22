@@ -119,8 +119,33 @@ function loadEmbeddedView(route,{force=false,resetRetry=false}={}){
   frame.setAttribute('scrolling','no');
   frame.dataset.route=route;
   const absolute=new URL(src,location.href).href;
-  if(force||frame.src!==absolute){frame.src=absolute;}
+  // Use location.replace so iframe document swaps do not create extra session
+  // history entries that break the browser Back button alongside pushState.
+  if(force||getFrameLocation()!==absolute)setFrameLocation(absolute);
   armReadyTimeout(route,currentLoadToken);
+}
+
+function getFrameLocation(){
+  if(!frame)return '';
+  try{
+    return frame.contentWindow?.location?.href||'';
+  }catch{
+    return '';
+  }
+}
+
+function setFrameLocation(url){
+  if(!frame)return;
+  const absolute=new URL(url,location.href).href;
+  try{
+    if(frame.contentWindow){
+      frame.contentWindow.location.replace(absolute);
+      return;
+    }
+  }catch{
+    /* fall through to src assignment */
+  }
+  frame.src=absolute;
 }
 
 function navigate(route,{push=true,extra={}}={}){
@@ -149,7 +174,7 @@ function navigate(route,{push=true,extra={}}={}){
     clearReadyTimer();
     nativeView?.classList.remove('hidden');
     frameWrap?.classList.remove('active','is-loading','has-error');
-    if(frame)frame.src='about:blank';
+    if(frame)setFrameLocation('about:blank');
     document.title='The Starlight Card Series Binder | Starlight Card Binder';
     return;
   }
@@ -495,7 +520,7 @@ frame?.addEventListener('pointerdown',()=>{closeNotificationPopover();closeAccou
 frame?.addEventListener('load',()=>{
   closeNotificationPopover();
   closeAccountMenu();
-  if(frame.src==='about:blank')return;
+  if(getFrameLocation().includes('about:blank')||frame.getAttribute('src')==='about:blank')return;
   // A successful document load is not enough; the child still must send its ready handshake.
   setViewState('loading');
 });

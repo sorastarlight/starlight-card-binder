@@ -305,9 +305,11 @@ test('website editor admin page and public hooks are wired', async () => {
   assert.match(collector, /data-content="collector\.statsTitle"/);
   assert.match(collector, /data-content="collector\.followCta"/);
   assert.match(collector, /data-content="collector\.defaultBio"/);
-  assert.match(collector, /website-content-hydrate-page\.js\?v=1\.3/);
+  assert.match(collector, /website-content-hydrate-page\.js\?v=1\.4/);
   assert.match(collector, /collector-twitch-badge/);
   assert.match(collector, /public-twitch-profile\.js/);
+  assert.doesNotMatch(collector, /collector-twitch-handle/);
+  assert.match(collector, /collector-role|collector-flair/);
   assert.match(collector, /collection-level-card|collector-level/);
   assert.match(rankingsPage, /data-content="rankings\.title"/);
   assert.match(rankingsPage, /data-content="rankings\.lead"/);

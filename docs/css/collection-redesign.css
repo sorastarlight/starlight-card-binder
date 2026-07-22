@@ -91,7 +91,8 @@
 .collection-series-progress .mini-series { max-height: 142px; overflow: auto; }
 
 body[data-page="collection"] .card-filter-panel { margin-top: 20px; }
-body[data-page="collection"] .collection-card { display: flex; min-width: 0; flex-direction: column; }
+body[data-page="collection"] .collection-card { display: flex; min-width: 0; flex-direction: column; cursor: pointer; }
+body[data-page="collection"] .collection-card:focus-visible { outline: 2px solid rgba(107, 198, 248, .85); outline-offset: 3px; }
 body[data-page="collection"] .collection-card .card-buttons { margin-top: auto; padding-top: 12px; align-items: center; justify-content: space-between; }
 body[data-page="collection"] .collection-image .quantity-badge,
 body[data-page="collection"] .collection-image .duplicate-badge { display: none !important; }

@@ -146,9 +146,9 @@ function renderRow(entry) {
       </div>
     </div>
     <div class="rankings-actions">
+      <a class="st-button" href="${esc(profileHref(entry.username))}" target="_top" data-shell-view="collector">${esc(copy('viewProfileCta', 'View profile'))}</a>
       <button type="button" class="st-button" data-wishlist-toggle aria-expanded="false">${esc(copy('wishlistCta', 'Cards they want'))}</button>
       <a class="st-button primary" href="${esc(tradeHref(entry.username))}" target="_top" data-shell-view="offers">${esc(copy('proposeTradeCta', 'Propose trade'))}</a>
-      <a class="st-button" href="${esc(profileHref(entry.username))}" target="_top" data-shell-view="collector">${esc(copy('viewProfileCta', 'View profile'))}</a>
     </div>
     <div class="rankings-wishlist" hidden>
       <div class="rankings-wishlist-status">Loading wishlist…</div>

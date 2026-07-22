@@ -94,7 +94,12 @@ export function hydrateWebsiteContent(content) {
       } else {
         el.textContent = '';
       }
-      setContentVisibility(el, false);
+      if (!el.hasAttribute('data-content-source')) setContentVisibility(el, false);
+      return;
+    }
+    // Hidden copy sources stay out of the layout; they only feed page scripts.
+    if (el.hasAttribute('data-content-source')) {
+      el.textContent = value;
       return;
     }
     setContentVisibility(el, true);

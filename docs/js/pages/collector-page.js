@@ -720,10 +720,26 @@ import {
                 }
             }
 
-            bioElement.textContent =
-                profile.bio ||
+            const roleText =
+                (profile.bio || "").trim() ||
                 document.getElementById("collector-default-bio")?.textContent?.trim() ||
                 "A Starlight Card collector.";
+            const flair = document.getElementById("collector-flair");
+            const titleEl = document.getElementById("collector-title");
+            if (bioElement) {
+                bioElement.hidden = false;
+                bioElement.textContent = roleText;
+                // Short roles stay as the 3D chip; longer custom bios read as body text.
+                const isLongBio = roleText.length > 90 || roleText.includes("\n");
+                bioElement.classList.toggle("collector-role", !isLongBio);
+                bioElement.classList.toggle("collector-bio", isLongBio);
+                bioElement.classList.toggle("is-long-bio", isLongBio);
+            }
+            if (flair) {
+                const hasTitle = titleEl && !titleEl.hidden && titleEl.textContent.trim();
+                const hasRole = bioElement && !bioElement.hidden && bioElement.textContent.trim();
+                flair.hidden = !(hasTitle || hasRole);
+            }
 
             const memberDate =
                 formatMemberDate(

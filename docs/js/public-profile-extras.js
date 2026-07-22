@@ -32,15 +32,16 @@ const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
       banner.classList.add('has-photo');
     }
 
-    const identity = document.querySelector('.collector-identity');
-    if (data.title?.name && identity) {
-      const title = document.createElement('p');
-      title.className = 'collector-title';
-      if (data.title.id === 'series_complete') {
-        title.classList.add('is-series-complete');
-      }
-      title.textContent = `✦ ${data.title.name}`;
-      identity.insertBefore(title, document.getElementById('collector-bio'));
+    const flair = document.getElementById('collector-flair');
+    const titleEl = document.getElementById('collector-title');
+    if (data.title?.name && titleEl) {
+      titleEl.hidden = false;
+      titleEl.classList.toggle('is-series-complete', data.title.id === 'series_complete');
+      titleEl.textContent = `✦ ${data.title.name}`;
+      if (flair) flair.hidden = false;
+    } else if (titleEl) {
+      titleEl.hidden = true;
+      titleEl.textContent = '';
     }
 
     const content = document.querySelector('.collector-content');
