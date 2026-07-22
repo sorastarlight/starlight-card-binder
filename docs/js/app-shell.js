@@ -4,8 +4,14 @@ import { getMyTradeOffers } from './trade-offer-service.js';
 import { getMyNotifications } from './notification-service.js';
 import { getActiveEvents } from './event-service.js';
 import { getReceivedRewards } from './received-rewards-service.js';
+import {
+  aliasShellRoute,
+  isKnownShellRoute,
+  normalizeNotificationParams,
+  resolveNotificationRoute
+} from './shell-route-utils.js';
 
-const SHELL_BUILD = '94.1.0';
+const SHELL_BUILD = '94.2.0';
 const VIEW_READY_TIMEOUT_MS = 6500;
 const MAX_VIEW_RETRIES = 1;
 
@@ -20,7 +26,8 @@ const routes = {
   admin:{title:'Administration Hub',src:'admin-hub.html'}, 'admin-codes':{title:'Reward Code Console',src:'admin-codes.html'},
   'admin-staff':{title:'Staff Management',src:'admin-staff.html'}, 'admin-audit':{title:'Audit Log',src:'admin-audit.html'},
   'admin-moderation':{title:'Moderation Dashboard',src:'admin-moderation.html'},
-  'admin-boosters':{title:'Starlight Card Management',src:'admin-boosters.html'}, 'admin-twitch':{title:'Twitch Redeems',src:'admin-twitch.html'}, 'admin-gifts':{title:'Send Gifts',src:'admin-gifts.html'}, 'admin-news':{title:'News & Updates Management',src:'admin-news.html'}, 'admin-users':{title:'Registered User Directory',src:'admin-users.html'}, 'admin-health':{title:'Database Health',src:'admin-health.html'}, 'admin-notifications':{title:'Notification Broadcasts',src:'admin-notifications.html'}
+  'admin-boosters':{title:'Starlight Card Management',src:'admin-boosters.html'}, 'admin-twitch':{title:'Twitch Redeems',src:'admin-twitch.html'}, 'admin-gifts':{title:'Send Gifts',src:'admin-gifts.html'}, 'admin-news':{title:'News & Updates Management',src:'admin-news.html'}, 'admin-users':{title:'Registered User Directory',src:'admin-users.html'}, 'admin-health':{title:'Database Health',src:'admin-health.html'}, 'admin-notifications':{title:'Notification Broadcasts',src:'admin-notifications.html'},
+  'admin-ui':{title:'Website User Interface',src:'admin-ui.html'}
 };
 
 const nativeView=document.getElementById('binderNativeView');
@@ -109,7 +116,12 @@ function loadEmbeddedView(route,{force=false,resetRetry=false}={}){
 
 function navigate(route,{push=true,extra={}}={}){
   closeNotificationPopover();
-  if(!routes[route])route='binder';
+  const resolved = aliasShellRoute(route) || (isKnownShellRoute(route) ? route : '');
+  if(!resolved){
+    console.warn('[Starlight] Unknown shell route ignored:', route);
+    return;
+  }
+  route = resolved;
   currentRoute=route;
   retryCount=0;
   const url=new URL(location.href);
@@ -172,6 +184,16 @@ function normalizeNotificationRoute(value,notice={}){
   return aliases[key]||key||'binder';
 }
 
+function escShell(value){
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  }[char]));
+}
+
 function closeNotificationPopover(){
   const pop=document.querySelector('.shell-notification-popover');
   if(pop)pop.hidden=true;
@@ -185,8 +207,41 @@ function ensureNotificationPopover(){
   pop.hidden=true;
   pop.innerHTML='<div class="shell-popover-head"><strong>Notifications</strong><a href="binder.html?view=notifications" data-shell-view="notifications">View all</a></div><div class="shell-popover-list">Loading…</div>';
   button.parentElement?.appendChild(pop);
-  button.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();pop.hidden=!pop.hidden;if(!pop.hidden){try{const data=await getMyNotifications(5);const rows=data?.notifications||[];pop.querySelector('.shell-popover-list').innerHTML=rows.length?rows.map(n=>`<button type="button" data-notice-route="${normalizeNotificationRoute(n.route,n)}" data-notice-params='${JSON.stringify(n.route_params||{}).replaceAll("'",'&#39;')}'><span>${n.icon||'✦'}</span><span><b>${String(n.title||'Notification')}</b><small>${String(n.body||'')}</small></span></button>`).join(''):'<p>All caught up ✨</p>'}catch{pop.querySelector('.shell-popover-list').textContent='Could not load notifications.'}}});
-  pop.addEventListener('click',e=>{const item=e.target.closest('[data-notice-route]');if(!item)return;let params={};try{params=JSON.parse(item.dataset.noticeParams||'{}')}catch{}pop.hidden=true;navigate(normalizeNotificationRoute(item.dataset.noticeRoute),{extra:params})});
+  button.addEventListener('click',async e=>{
+    e.preventDefault();
+    e.stopPropagation();
+    pop.hidden=!pop.hidden;
+    if(pop.hidden)return;
+    try{
+      const data=await getMyNotifications(5);
+      const rows=data?.notifications||[];
+      pop.querySelector('.shell-popover-list').innerHTML = rows.length
+        ? rows.map(n => {
+          const route = resolveNotificationRoute(n.route, n);
+          const params = normalizeNotificationParams(n);
+          return `<button type="button" data-notice-route="${escShell(route)}" data-notice-params='${escShell(JSON.stringify(params))}'>
+            <span>${escShell(n.icon || '✦')}</span>
+            <span><b>${escShell(n.title || 'Notification')}</b><small>${escShell(n.body || '')}</small></span>
+          </button>`;
+        }).join('')
+        : '<p>All caught up ✨</p>';
+    }catch{
+      pop.querySelector('.shell-popover-list').textContent='Could not load notifications.';
+    }
+  });
+  pop.addEventListener('click',e=>{
+    const item=e.target.closest('[data-notice-route]');
+    if(!item)return;
+    let params={};
+    try{params=JSON.parse(item.dataset.noticeParams||'{}')}catch{}
+    pop.hidden=true;
+    const route = aliasShellRoute(item.dataset.noticeRoute) || item.dataset.noticeRoute;
+    if(!isKnownShellRoute(route)){
+      navigate('notifications');
+      return;
+    }
+    navigate(route,{extra:params});
+  });
   document.addEventListener('click',e=>{if(!pop.hidden&&!pop.contains(e.target)&&e.target!==button)pop.hidden=true});
 }
 
@@ -263,7 +318,10 @@ window.addEventListener('message',e=>{
   if(e.origin!==location.origin)return;
   const data=e.data||{};
   if(data.type==='starlight-close-notifications')closeNotificationPopover();
-  if(data.type==='starlight-navigate')navigate(normalizeNotificationRoute(data.view),{extra:data.params||{}});
+  if(data.type==='starlight-navigate'){
+    const route = aliasShellRoute(data.view) || (isKnownShellRoute(data.view) ? data.view : '');
+    if(route) navigate(route,{extra:data.params||{}});
+  }
   if(data.type==='starlight-trades-changed'||data.type==='starlight-view-ready')hydrateTradeOfferBadge();
   if(data.type==='starlight-notifications-changed'||data.type==='starlight-view-ready')hydrateNotificationBadge();
   if(data.type==='starlight-rewards-changed'||data.type==='starlight-view-ready'||data.type==='starlight-content-ready')hydrateReceivedGiftBadge();
@@ -286,7 +344,7 @@ window.addEventListener('pageshow',event=>{
   if(event.persisted && currentRoute!=='binder')loadEmbeddedView(currentRoute,{force:true,resetRetry:true});
 });
 
-const initial=new URLSearchParams(location.search).get('view')||'home';
+const initial=aliasShellRoute(new URLSearchParams(location.search).get('view')||'home')||'home';
 navigate(initial,{push:false});
 hydrateAccount().then(ensureNotificationPopover);
 hydrateTradeOfferBadge();
