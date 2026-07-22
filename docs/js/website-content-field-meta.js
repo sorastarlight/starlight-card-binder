@@ -822,6 +822,8 @@ export const WEBSITE_PAGE_META = Object.freeze({
           { key: 'wishlistCta', preview: 'cta' },
           { key: 'proposeTradeCta', preview: 'cta-primary' },
           { key: 'viewProfileCta', preview: 'cta' },
+          { key: 'followCta', preview: 'cta' },
+          { key: 'followingCta', preview: 'cta' },
           { key: 'prevCta' },
           { key: 'nextCta' }
         ]

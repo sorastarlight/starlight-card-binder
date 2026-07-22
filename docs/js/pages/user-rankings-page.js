@@ -1,5 +1,10 @@
 import { listPublicCollectorRankings } from '../collector-rankings-service.js';
 import { levelFromPoints } from '../collector-level.js';
+import {
+  followCollector,
+  getPublicCollectorSocial,
+  unfollowCollector
+} from '../social-service.js';
 import { getPublicTradeLists } from '../trade-list-service.js';
 import { getCachedWebsiteContent } from '../website-content-hydrate.js';
 
@@ -127,7 +132,7 @@ function renderRow(entry) {
 
   return `<li class="rankings-item" data-username="${esc(entry.username)}">
     <div class="rankings-row${topClass}">
-      <div class="rankings-place" aria-label="Rank ${esc(rank)}"><small>#</small>${esc(rank)}</div>
+      <div class="rankings-place" aria-label="Rank ${esc(rank)}">#${esc(rank)}</div>
       <a class="rankings-avatar-link" href="${esc(profileHref(entry.username))}" target="_top" data-shell-view="collector" aria-label="Open ${esc(entry.displayName || entry.username)} profile">
         ${avatarMarkup(entry)}
       </a>
@@ -147,6 +152,10 @@ function renderRow(entry) {
     </div>
     <div class="rankings-actions">
       <a class="st-button" href="${esc(profileHref(entry.username))}" target="_top" data-shell-view="collector">${esc(copy('viewProfileCta', 'View profile'))}</a>
+      <button type="button" class="st-button rankings-follow" data-follow-toggle aria-pressed="false" hidden>
+        <span class="rankings-follow-icon" aria-hidden="true">♡</span>
+        <span class="rankings-follow-label">${esc(copy('followCta', 'Follow'))}</span>
+      </button>
       <button type="button" class="st-button" data-wishlist-toggle aria-expanded="false">${esc(copy('wishlistCta', 'Cards they want'))}</button>
       <a class="st-button primary" href="${esc(tradeHref(entry.username))}" target="_top" data-shell-view="offers">${esc(copy('proposeTradeCta', 'Propose trade'))}</a>
     </div>
@@ -170,6 +179,96 @@ function renderPager(total) {
     <button type="button" class="st-button" data-page="prev" ${canPrev ? '' : 'disabled'}>${esc(copy('prevCta', 'Previous'))}</button>
     <button type="button" class="st-button" data-page="next" ${canNext ? '' : 'disabled'}>${esc(copy('nextCta', 'Next'))}</button>
   `;
+}
+
+function followCtas() {
+  return {
+    follow: copy('followCta', 'Follow'),
+    following: copy('followingCta', 'Following')
+  };
+}
+
+function setFollowButtonState(button, following) {
+  if (!button) return;
+  const ctas = followCtas();
+  const label = button.querySelector('.rankings-follow-label') || button;
+  const icon = button.querySelector('.rankings-follow-icon');
+  button.hidden = false;
+  button.setAttribute('aria-pressed', following ? 'true' : 'false');
+  button.classList.toggle('is-following', following);
+  button.dataset.following = following ? '1' : '0';
+  label.textContent = following ? ctas.following : ctas.follow;
+  if (icon) icon.textContent = following ? '♥' : '♡';
+}
+
+async function mapPool(items, limit, worker) {
+  let index = 0;
+  const runners = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (index < items.length) {
+      const current = index++;
+      await worker(items[current], current);
+    }
+  });
+  await Promise.all(runners);
+}
+
+async function hydrateFollowButtons(token) {
+  const items = [...(root?.querySelectorAll('.rankings-item[data-username]') || [])];
+  if (!items.length) return;
+
+  await mapPool(items, 6, async item => {
+    if (token !== requestToken) return;
+    const username = item.dataset.username;
+    const button = item.querySelector('[data-follow-toggle]');
+    if (!username || !button) return;
+
+    try {
+      const social = await getPublicCollectorSocial(username);
+      if (token !== requestToken) return;
+      if (!social?.found || social.private || social.isSelf) {
+        button.hidden = true;
+        return;
+      }
+      setFollowButtonState(button, Boolean(social.follow?.following));
+    } catch {
+      if (token !== requestToken) return;
+      setFollowButtonState(button, false);
+    }
+  });
+}
+
+async function toggleFollow(button) {
+  const item = button?.closest('.rankings-item');
+  const username = item?.dataset.username;
+  if (!username || button.disabled) return;
+
+  const nextFollow = button.dataset.following !== '1';
+  const label = button.querySelector('.rankings-follow-label') || button;
+  button.disabled = true;
+  button.classList.add('is-busy');
+  label.textContent = nextFollow ? 'Following…' : 'Unfollowing…';
+
+  try {
+    if (nextFollow) {
+      await followCollector(username);
+      setFollowButtonState(button, true);
+      setLive(`You're now following @${username}.`);
+      window.StarlightUI?.toast?.(`Following @${username}.`, 'success');
+    } else {
+      await unfollowCollector(username);
+      setFollowButtonState(button, false);
+      setLive(`Unfollowed @${username}.`);
+      window.StarlightUI?.toast?.(`Unfollowed @${username}.`, 'success');
+    }
+  } catch (error) {
+    setFollowButtonState(button, !nextFollow);
+    const message = error?.message || 'Could not update follow.';
+    setLive(message);
+    window.StarlightUI?.toast?.(message, 'error') || alert(message);
+  } finally {
+    button.classList.remove('is-busy');
+    button.disabled = false;
+  }
 }
 
 async function loadWishlistPanel(item) {
@@ -272,6 +371,7 @@ async function loadRankings({ resetOffset = false } = {}) {
     }
     setLive(`Loaded ${sorted.length} collectors.`);
     renderPager(data.total);
+    hydrateFollowButtons(token);
   } catch (error) {
     if (token !== requestToken) return;
     if (status) {
@@ -285,6 +385,11 @@ async function loadRankings({ resetOffset = false } = {}) {
 }
 
 root?.addEventListener('click', event => {
+  const followToggle = event.target.closest('[data-follow-toggle]');
+  if (followToggle) {
+    toggleFollow(followToggle);
+    return;
+  }
   const toggle = event.target.closest('[data-wishlist-toggle]');
   if (!toggle) return;
   const item = toggle.closest('.rankings-item');

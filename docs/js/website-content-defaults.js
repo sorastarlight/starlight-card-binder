@@ -364,6 +364,8 @@ export function createDefaultWebsiteContent() {
       wishlistCta: 'Cards they want',
       proposeTradeCta: 'Propose trade',
       viewProfileCta: 'View profile',
+      followCta: 'Follow',
+      followingCta: 'Following',
       prevCta: 'Previous',
       nextCta: 'Next'
     },

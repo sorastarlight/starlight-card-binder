@@ -112,19 +112,18 @@
   background:linear-gradient(145deg,#fffaf6,#f8ebe2);
 }
 .rankings-place{
-  min-width:2.75rem;
+  min-width:3.1rem;
   text-align:center;
   font-weight:900;
-  font-size:1.15rem;
+  font-size:clamp(1.35rem, 2.8vw, 1.7rem);
+  line-height:1;
+  letter-spacing:-.03em;
+  white-space:nowrap;
   color:#405fa1;
 }
-.rankings-place small{
-  display:block;
-  font-size:.68rem;
-  letter-spacing:.04em;
-  color:var(--st-color-muted);
-  text-transform:uppercase;
-}
+.rankings-row.is-top-1 .rankings-place{color:#b8860b}
+.rankings-row.is-top-2 .rankings-place{color:#6b7fa8}
+.rankings-row.is-top-3 .rankings-place{color:#a86b45}
 .rankings-avatar-link{
   display:block;
   text-decoration:none;
@@ -234,10 +233,24 @@
   border-top:1px solid rgba(107,198,248,.18);
 }
 .rankings-actions .st-button{
-  min-height:40px;
-  padding:.45rem .9rem;
-  font-size:.88rem;
+  min-height:30px;
+  padding:.22rem .7rem;
+  font-size:.8rem;
+  line-height:1.15;
+  gap:.3rem;
 }
+.rankings-follow .rankings-follow-icon{
+  font-size:.92em;
+  line-height:1;
+}
+.rankings-follow.is-following,
+.rankings-follow[aria-pressed="true"]{
+  border-color:rgba(255,130,200,.55);
+  background:linear-gradient(135deg,rgba(255,130,200,.14),rgba(107,198,248,.12));
+  color:#b04f92;
+}
+.rankings-follow.is-busy{opacity:.82;cursor:wait}
+.rankings-follow[hidden]{display:none!important}
 .rankings-wishlist{
   margin-top:var(--st-space-3);
   padding:var(--st-space-3);
