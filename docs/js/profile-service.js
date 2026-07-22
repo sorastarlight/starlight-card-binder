@@ -40,6 +40,8 @@ export async function loadOwnProfile() {
             show_featured_cards,
             favorite_card_id,
             onboarding_complete,
+            username_locked,
+            username_source,
             created_at,
             updated_at
         `)
@@ -102,6 +104,52 @@ export async function updateCollectorProfile({
     }
 
     return data;
+}
+
+/**
+ * Claims Twitch login as the locked collector username when eligible.
+ */
+export async function claimTwitchCollectorIdentity() {
+    const {
+        data,
+        error
+    } = await supabase.rpc(
+        "claim_twitch_collector_identity"
+    );
+
+    if (error) {
+        throw error;
+    }
+
+    return data;
+}
+
+/**
+ * Returns the signed-in user's collector identity + Twitch link summary.
+ */
+export async function getMyCollectorIdentity() {
+    const {
+        data,
+        error
+    } = await supabase.rpc(
+        "get_my_collector_identity"
+    );
+
+    if (error) {
+        throw error;
+    }
+
+    return data || {
+        username: null,
+        displayName: null,
+        onboardingComplete: false,
+        usernameLocked: false,
+        usernameSource: "user",
+        twitchLinked: false,
+        twitchLogin: null,
+        twitchDisplayName: null,
+        twitchAvatarUrl: null
+    };
 }
 
 /**

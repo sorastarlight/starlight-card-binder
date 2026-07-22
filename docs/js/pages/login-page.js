@@ -25,6 +25,21 @@ import { supabase } from "../supabase-client.js";
                 "confirm-password-group"
             );
 
+        const signupIdentityGroup =
+            document.getElementById(
+                "signup-identity-group"
+            );
+
+        const signupUsernameInput =
+            document.getElementById(
+                "signup-username"
+            );
+
+        const signupDisplayNameInput =
+            document.getElementById(
+                "signup-display-name"
+            );
+
         const submitButton =
             document.getElementById("submit-button");
 
@@ -133,8 +148,21 @@ import { supabase } from "../supabase-client.js";
                 !isSignUp
             );
 
+            signupIdentityGroup?.classList.toggle(
+                "hidden",
+                !isSignUp
+            );
+
             confirmPasswordInput.required =
                 isSignUp;
+
+            if (signupUsernameInput) {
+                signupUsernameInput.required = isSignUp;
+            }
+
+            if (signupDisplayNameInput) {
+                signupDisplayNameInput.required = isSignUp;
+            }
 
             passwordInput.autocomplete =
                 isSignUp
@@ -181,6 +209,25 @@ import { supabase } from "../supabase-client.js";
             });
         }
 
+        async function claimTwitchIdentityIfNeeded() {
+            try {
+                const { error } = await supabase.rpc(
+                    "claim_twitch_collector_identity"
+                );
+                if (error) {
+                    console.warn(
+                        "Twitch collector identity claim failed:",
+                        error
+                    );
+                }
+            } catch (error) {
+                console.warn(
+                    "Twitch collector identity claim failed:",
+                    error
+                );
+            }
+        }
+
         async function handleAuthenticationReturn() {
             const urlParameters =
                 new URLSearchParams(
@@ -221,6 +268,18 @@ import { supabase } from "../supabase-client.js";
             }
 
             if (data.session) {
+                const isTwitchOAuth =
+                    urlParameters.get("oauth") === "twitch" ||
+                    Boolean(
+                        data.session.user?.identities?.find(
+                            item => item.provider === "twitch"
+                        )
+                    );
+
+                if (isTwitchOAuth) {
+                    await claimTwitchIdentityIfNeeded();
+                }
+
                 const identity = data.session.user?.identities?.find(item => item.provider === 'twitch');
                 const twitchName =
                     identity?.identity_data?.preferred_username ||
@@ -265,6 +324,12 @@ import { supabase } from "../supabase-client.js";
             showConfirmPasswordButton,
             confirmPasswordInput
         );
+
+        signupUsernameInput?.addEventListener("input", () => {
+            signupUsernameInput.value = signupUsernameInput.value
+                .toLowerCase()
+                .replace(/[^a-z0-9_]/g, "");
+        });
 
         const requestedMode = new URLSearchParams(window.location.search).get("mode");
         setMode(requestedMode === "signup" ? "signup" : "signin");
@@ -316,6 +381,42 @@ import { supabase } from "../supabase-client.js";
                     return;
                 }
 
+                let signupUsername = "";
+                let signupDisplayName = "";
+
+                if (currentMode === "signup") {
+                    signupUsername = String(
+                        signupUsernameInput?.value || ""
+                    )
+                        .trim()
+                        .toLowerCase();
+
+                    signupDisplayName = String(
+                        signupDisplayNameInput?.value || ""
+                    ).trim();
+
+                    if (!/^[a-z0-9_]{3,24}$/.test(signupUsername)) {
+                        displayStatus(
+                            "Username must be 3–24 characters using lowercase letters, numbers, or underscores.",
+                            "error"
+                        );
+                        signupUsernameInput?.focus();
+                        return;
+                    }
+
+                    if (
+                        !signupDisplayName ||
+                        signupDisplayName.length > 40
+                    ) {
+                        displayStatus(
+                            "Display name must be between 1 and 40 characters.",
+                            "error"
+                        );
+                        signupDisplayNameInput?.focus();
+                        return;
+                    }
+                }
+
                 setLoading(true);
 
                 try {
@@ -325,7 +426,11 @@ import { supabase } from "../supabase-client.js";
                             error
                         } = await signUp(
                             email,
-                            password
+                            password,
+                            {
+                                username: signupUsername,
+                                displayName: signupDisplayName
+                            }
                         );
 
                         if (error) {
@@ -393,4 +498,3 @@ import { supabase } from "../supabase-client.js";
         );
 
         handleAuthenticationReturn();
-

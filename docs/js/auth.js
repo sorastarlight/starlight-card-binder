@@ -19,13 +19,22 @@ function getAuthRedirectUrl() {
 
 /**
  * Creates a new account.
+ * Optional profile fields are stored in auth user metadata for handle_new_user.
  */
-export async function signUp(email, password) {
+export async function signUp(email, password, profile = {}) {
+    const username = String(profile.username || "").trim().toLowerCase();
+    const displayName = String(profile.displayName || profile.display_name || "").trim();
+    const data = {};
+
+    if (username) data.username = username;
+    if (displayName) data.display_name = displayName;
+
     return await supabase.auth.signUp({
         email,
         password,
         options: {
-            emailRedirectTo: getAuthRedirectUrl()
+            emailRedirectTo: getAuthRedirectUrl(),
+            data
         }
     });
 }

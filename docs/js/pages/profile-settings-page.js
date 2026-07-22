@@ -1,9 +1,11 @@
 import {
+            getMyCollectorIdentity,
             loadOwnProfile,
             loadOwnedProfileCards,
             setProfileFavoriteCard,
             updateCollectorProfile
         } from "../profile-service.js";
+        import { getMyTwitchConnection } from "../twitch-service.js";
 
         const form =
             document.getElementById(
@@ -13,6 +15,16 @@ import {
         const usernameInput =
             document.getElementById(
                 "username"
+            );
+
+        const usernameHelp =
+            document.getElementById(
+                "username-help"
+            );
+
+        const twitchLinkedBadge =
+            document.getElementById(
+                "twitch-linked-badge"
             );
 
         const displayNameInput =
@@ -92,6 +104,40 @@ import {
 
         let ownedCards = [];
         let existingProfile = null;
+        let usernameLocked = false;
+
+        const DEFAULT_USERNAME_HELP =
+            "Lowercase letters, numbers, and underscores only.";
+        const LOCKED_USERNAME_HELP =
+            "Locked to your Twitch login";
+
+        function applyUsernameLockState(locked) {
+            usernameLocked = Boolean(locked);
+            usernameInput.readOnly = usernameLocked;
+            usernameInput.toggleAttribute(
+                "readonly",
+                usernameLocked
+            );
+            usernameInput.classList.toggle(
+                "is-locked",
+                usernameLocked
+            );
+            if (usernameHelp) {
+                usernameHelp.textContent = usernameLocked
+                    ? LOCKED_USERNAME_HELP
+                    : DEFAULT_USERNAME_HELP;
+            }
+        }
+
+        function setTwitchLinkedBadge(linked) {
+            if (!twitchLinkedBadge) return;
+            const isLinked = Boolean(linked);
+            twitchLinkedBadge.hidden = !isLinked;
+            twitchLinkedBadge.classList.toggle(
+                "hidden",
+                !isLinked
+            );
+        }
 
         function escapeHtml(value) {
             return String(value ?? "").replace(
@@ -283,7 +329,41 @@ import {
                     : ""
             );
 
+            applyUsernameLockState(
+                profile.username_locked ||
+                profile.usernameLocked
+            );
+
             renderFavoriteCardPreview();
+        }
+
+        async function refreshTwitchLinkedBadge() {
+            try {
+                const [identity, connection] = await Promise.all([
+                    getMyCollectorIdentity().catch(() => null),
+                    getMyTwitchConnection().catch(() => ({ linked: false }))
+                ]);
+                setTwitchLinkedBadge(
+                    Boolean(
+                        identity?.twitchLinked ||
+                        connection?.linked
+                    )
+                );
+                if (
+                    identity?.usernameLocked != null ||
+                    identity?.username_locked != null
+                ) {
+                    applyUsernameLockState(
+                        identity.usernameLocked ??
+                        identity.username_locked
+                    );
+                }
+            } catch (error) {
+                console.warn(
+                    "Unable to resolve Twitch linked state:",
+                    error
+                );
+            }
         }
 
         async function initializePage() {
@@ -350,6 +430,8 @@ import {
                 existingProfile
             );
 
+            await refreshTwitchLinkedBadge();
+
             displayStatus(
                 existingProfile.onboarding_complete
                     ? "Your profile is ready to edit."
@@ -371,6 +453,13 @@ import {
         usernameInput.addEventListener(
             "input",
             () => {
+                if (usernameLocked) {
+                    usernameInput.value =
+                        existingProfile?.username ||
+                        usernameInput.value;
+                    return;
+                }
+
                 usernameInput.value =
                     usernameInput.value
                         .toLowerCase()
@@ -402,6 +491,7 @@ import {
                         .trim();
 
                 if (
+                    !usernameLocked &&
                     !/^[a-z0-9_]{3,24}$/.test(
                         username
                     )
@@ -468,6 +558,12 @@ import {
 
                     updateProfileLink(
                         result.username
+                    );
+
+                    applyUsernameLockState(
+                        result.usernameLocked ??
+                        result.username_locked ??
+                        usernameLocked
                     );
 
                     displayStatus(

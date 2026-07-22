@@ -10,7 +10,7 @@
 
     <title>Sign In | Starlight Card Binder</title>
 
-    <link rel="stylesheet" href="css/pages/login.css?v=1.1">
+    <link rel="stylesheet" href="css/pages/login.css?v=1.2">
 <script src="js/browser-performance.js?v=1.0.0" defer></script>
     <link rel="stylesheet" href="css/shared-ui.css?v=1.6.8">
 <link rel="stylesheet" href="css/qol-ui.css?v=94.2.4">
@@ -64,6 +64,46 @@
                     inputmode="email"
                     required
                 >
+            </div>
+
+            <div
+                id="signup-identity-group"
+                class="form-group signup-identity-group hidden"
+            >
+                <label for="signup-username">
+                    Username
+                </label>
+
+                <input
+                    id="signup-username"
+                    name="username"
+                    type="text"
+                    autocomplete="username"
+                    maxlength="24"
+                    minlength="3"
+                    pattern="[a-z0-9_]{3,24}"
+                    spellcheck="false"
+                >
+
+                <small class="field-help">
+                    3–24 characters. Lowercase letters, numbers, and underscores only.
+                </small>
+
+                <label for="signup-display-name" class="stacked-label">
+                    Display Name
+                </label>
+
+                <input
+                    id="signup-display-name"
+                    name="displayName"
+                    type="text"
+                    autocomplete="nickname"
+                    maxlength="40"
+                >
+
+                <small class="field-help">
+                    Friendly name shown on your collector profile.
+                </small>
             </div>
 
             <div class="form-group">
@@ -146,7 +186,7 @@
         </a>
     </main>
 
-    <script type="module" src="js/pages/login-page.js?v=1.0"></script>
+    <script type="module" src="js/pages/login-page.js?v=1.1"></script>
     <script src="js/shared-ui.js?v=1.6.7"></script>
 <script src="js/qol-ui.js?v=94.2.4" defer></script>
 </body>

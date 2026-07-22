@@ -13,7 +13,7 @@ import {
 import { getShellNavigation } from './shell-navigation-service.js';
 import { applyShellNavigationToDom, applyShellPageTitles } from './shell-navigation-render.js';
 
-const SHELL_BUILD = '94.3.0';
+const SHELL_BUILD = '94.3.1';
 const VIEW_READY_TIMEOUT_MS = 6500;
 const MAX_VIEW_RETRIES = 1;
 
@@ -294,7 +294,7 @@ async function hydrateAccount(){
       document.querySelector('[data-shell-account-sub]').textContent='Log in or create an account to collect cards';
     } else {
       showSignedIn();
-      const {data:profile}=await supabase.from('profiles').select('username,display_name,onboarding_complete,avatar_url,selected_title_id').eq('id',user.id).maybeSingle();
+      const {data:profile}=await supabase.from('profiles').select('username,display_name,onboarding_complete,username_locked,username_source,avatar_url,selected_title_id').eq('id',user.id).maybeSingle();
       profileUsername=profile?.username||'';
       const name=profile?.display_name||profile?.username||user.email||'Collector';
       document.querySelector('[data-shell-account-name]').textContent=name;
@@ -304,6 +304,15 @@ async function hydrateAccount(){
       else{avatar.textContent=String(name).trim().charAt(0).toUpperCase()||'✦';}
       const link=document.querySelector('[data-shell-profile-link]');if(link&&profileUsername)link.href=`binder.html?view=collector&username=${encodeURIComponent(profileUsername)}`;
       access=await getMyStaffAccess();
+      if(profile && profile.onboarding_complete===false){
+        try{
+          const nudged=sessionStorage.getItem('starlight-onboarding-nudge');
+          if(!nudged){
+            sessionStorage.setItem('starlight-onboarding-nudge','1');
+            if(currentRoute!=='profile')navigate('profile');
+          }
+        }catch(_e){/* sessionStorage may be unavailable */}
+      }
     }
   }catch(e){
     console.warn('[Starlight] Shell account hydration failed',e);
