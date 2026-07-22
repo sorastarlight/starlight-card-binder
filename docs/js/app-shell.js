@@ -12,8 +12,9 @@ import {
 } from './shell-route-utils.js';
 import { getShellNavigation } from './shell-navigation-service.js';
 import { applyShellNavigationToDom, applyShellPageTitles } from './shell-navigation-render.js';
+import { isStudioPreview, STUDIO_MSG } from './studio-preview.js';
 
-const SHELL_BUILD = '94.3.3';
+const SHELL_BUILD = '94.3.4';
 const VIEW_READY_TIMEOUT_MS = 6500;
 const MAX_VIEW_RETRIES = 1;
 
@@ -320,11 +321,32 @@ async function hydrateAccount(){
   }
 
   try{
-    const navigation = await getShellNavigation();
+    let navigation = await getShellNavigation();
+    if(isStudioPreview() && window.__starlightShellNavigationDraft){
+      navigation = window.__starlightShellNavigationDraft;
+    }
     applyShellPageTitles(routes, navigation);
-    applyShellNavigationToDom(navigation, { isStaff: Boolean(access?.isStaff) });
+    applyShellNavigationToDom(navigation, { isStaff: Boolean(access?.isStaff) || isStudioPreview() });
     if(currentRoute !== 'binder' && routes[currentRoute]?.title){
       document.title = `${routes[currentRoute].title} | Starlight Card Binder`;
+    }
+    if(isStudioPreview()){
+      document.documentElement.classList.add('starlight-studio-preview');
+      if(!window.__starlightStudioNavPreviewInstalled){
+        window.__starlightStudioNavPreviewInstalled = true;
+        window.addEventListener('message', event => {
+          if(event.origin !== location.origin) return;
+          const data = event.data || {};
+          if(data.type !== STUDIO_MSG.NAV_DRAFT) return;
+          window.__starlightShellNavigationDraft = data.navigation || null;
+          applyShellPageTitles(routes, data.navigation || {});
+          applyShellNavigationToDom(data.navigation || null, { isStaff: true });
+          setActive(currentRoute);
+        });
+      }
+      try{
+        parent.postMessage({ type: STUDIO_MSG.READY, kind: 'shell' }, location.origin);
+      }catch(_e){/* ignore */}
     }
   }catch(e){
     console.warn('[Starlight] Shell navigation config failed', e);

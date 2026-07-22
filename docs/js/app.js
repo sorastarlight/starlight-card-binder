@@ -641,25 +641,45 @@ function ensureWebsiteBinderLanding() {
     return Promise.resolve(websiteBinderLanding);
   }
   if (!websiteContentPromise) {
-    websiteContentPromise = import('./website-content-service.js')
-      .then(({ getWebsiteContent }) => getWebsiteContent())
-      .then((content) => {
-        window.__starlightWebsiteContent = content;
-        websiteBinderLanding = content?.binderLanding || null;
-        return websiteBinderLanding;
-      })
-      .catch(() => {
-        websiteBinderLanding = {
-          eyebrow: 'Starlight Cards',
-          title: 'Starlight Card Series Binder 📦',
-          lead: 'Choose a booster pack to enter that series binder.',
-          splashTitle: 'Choose A Series Booster Pack Below And Start Collecting!'
-        };
-        return websiteBinderLanding;
-      });
+    const studioPreview = new URLSearchParams(location.search).get('studioPreview') === '1';
+    if (studioPreview) {
+      websiteContentPromise = import('./website-content-hydrate.js')
+        .then(({ loadAndHydrateWebsiteContent }) => loadAndHydrateWebsiteContent())
+        .then((content) => {
+          websiteBinderLanding = content?.binderLanding || null;
+          return websiteBinderLanding;
+        })
+        .catch(() => null);
+    } else {
+      websiteContentPromise = import('./website-content-service.js')
+        .then(({ getWebsiteContent }) => getWebsiteContent())
+        .then((content) => {
+          window.__starlightWebsiteContent = content;
+          websiteBinderLanding = content?.binderLanding || null;
+          return websiteBinderLanding;
+        })
+        .catch(() => {
+          websiteBinderLanding = {
+            eyebrow: 'Starlight Cards',
+            title: 'Starlight Card Series Binder 📦',
+            lead: 'Choose a booster pack to enter that series binder.',
+            splashTitle: 'Choose A Series Booster Pack Below And Start Collecting!'
+          };
+          return websiteBinderLanding;
+        });
+    }
   }
   return websiteContentPromise;
 }
+
+window.addEventListener('starlight-website-content-hydrated', (event) => {
+  websiteBinderLanding = event.detail?.binderLanding || websiteBinderLanding;
+  try {
+    renderSeriesHero();
+  } catch (_error) {
+    /* binder may not be ready yet */
+  }
+});
 
 function renderSeriesHero() {
   const f = activeFilters();

@@ -37,6 +37,7 @@ test('website UI admin page and migration are wired', async () => {
   assert.match(html, /Website User Interface/);
   assert.match(html, /64[\u00d7x]64/i);
   assert.match(page, /uploadStudioAsset\(file, 'nav-icons'\)/);
+  assert.match(page, /shellPreviewFrame|NAV_DRAFT|buildShellStudioPreviewUrl/);
   assert.match(hub, /admin-ui\.html/);
   assert.match(migration, /admin_save_shell_navigation/);
   assert.match(embed, /'admin-ui\.html':'admin-ui'/);

@@ -11,6 +11,7 @@ import {
   resetWebsiteContent
 } from '../website-content-service.js';
 import { labelForFieldKey, sanitizeWebsiteContent } from '../website-content-model.js';
+import { buildContentStudioPreviewUrl, STUDIO_MSG } from '../studio-preview.js';
 
 const byId = (id) => document.getElementById(id);
 const esc = (value) =>
@@ -27,6 +28,10 @@ const fieldSearchEl = byId('fieldSearch');
 const saveBtn = byId('saveBtn');
 const resetBtn = byId('resetBtn');
 const resetPageBtn = byId('resetPageBtn');
+const previewFrame = byId('previewFrame');
+const previewWrap = previewFrame?.parentElement;
+const openLivePage = byId('openLivePage');
+const reloadPreviewBtn = byId('reloadPreviewBtn');
 
 let content = null;
 const defaults = cloneDefaultWebsiteContent();
@@ -35,6 +40,9 @@ const fieldMemory = Object.create(null);
 let activeTab = WEBSITE_EDITOR_TABS[0].id;
 let busy = false;
 let fieldQuery = '';
+let previewReady = false;
+let previewTimer = 0;
+let loadedPreviewKey = '';
 
 function memoryKey(sectionKey, key) {
   return `${sectionKey}.${key}`;
@@ -269,13 +277,14 @@ function renderSocialLinks() {
 function updatePageChrome() {
   const tabMeta = WEBSITE_EDITOR_TABS.find((tab) => tab.id === activeTab);
   const pageMeta = getPageMeta(activeTab);
+  const liveUrl = pageMeta?.previewUrl || 'home.html';
   if (pageMetaEl) {
     pageMetaEl.innerHTML = `
       <strong>${esc(tabMeta?.label || activeTab)}</strong>
       <span>${esc(pageMeta?.description || 'Edit every string on this page.')}</span>
-      ${pageMeta?.previewUrl ? `<a class="page-link" href="${esc(pageMeta.previewUrl)}" target="_blank" rel="noopener">Open live page</a>` : ''}
     `;
   }
+  if (openLivePage) openLivePage.href = liveUrl;
 }
 
 function renderEditor() {
@@ -323,9 +332,45 @@ function syncFromDom() {
   });
 }
 
+function pushPreviewDraft() {
+  if (!previewFrame?.contentWindow || !content || !previewReady) return;
+  try {
+    previewFrame.contentWindow.postMessage({
+      type: STUDIO_MSG.CONTENT_DRAFT,
+      content: sanitizeWebsiteContent(content)
+    }, window.location.origin);
+  } catch (_error) {
+    /* ignore cross-frame failures while loading */
+  }
+}
+
+function schedulePreviewDraft() {
+  window.clearTimeout(previewTimer);
+  previewTimer = window.setTimeout(pushPreviewDraft, 120);
+}
+
+function loadPreviewFrame({ force = false } = {}) {
+  const pageMeta = getPageMeta(activeTab);
+  const previewUrl = buildContentStudioPreviewUrl(pageMeta?.previewUrl || 'home.html');
+  if (!previewFrame) return;
+  if (!force && loadedPreviewKey === previewUrl && previewReady) {
+    pushPreviewDraft();
+    return;
+  }
+  previewReady = false;
+  loadedPreviewKey = previewUrl;
+  previewWrap?.classList.add('is-loading');
+  previewFrame.src = previewUrl;
+}
+
+function renderPreview() {
+  loadPreviewFrame();
+}
+
 function renderAll() {
   renderTabs();
   renderEditor();
+  renderPreview();
 }
 
 async function boot() {
@@ -341,12 +386,27 @@ async function boot() {
     saveBtn.hidden = false;
     resetBtn.hidden = false;
     if (resetPageBtn) resetPageBtn.hidden = false;
-    setStatus('Website Editor ready. Edit any left-nav page, then Save.');
+    setStatus('Website Editor ready. Edit a page and watch the live preview, then Save.');
     renderAll();
   } catch (error) {
     setStatus(error.message || 'Could not load website content.', 'error');
   }
 }
+
+window.addEventListener('message', (event) => {
+  if (event.origin !== window.location.origin) return;
+  const data = event.data || {};
+  if (data.type === STUDIO_MSG.READY && data.kind === 'website') {
+    previewReady = true;
+    previewWrap?.classList.remove('is-loading');
+    pushPreviewDraft();
+  }
+});
+
+reloadPreviewBtn?.addEventListener('click', () => {
+  syncFromDom();
+  loadPreviewFrame({ force: true });
+});
 
 tablist.addEventListener('click', (event) => {
   const button = event.target.closest('[data-tab]');
@@ -365,6 +425,7 @@ fieldSearchEl?.addEventListener('input', () => {
 editorPanel.addEventListener('input', () => {
   syncFromDom();
   renderTabs();
+  schedulePreviewDraft();
   const note = editorPanel.querySelector('.editor-note');
   if (note) {
     const count = modifiedCount(activeTab);
@@ -386,6 +447,7 @@ editorPanel.addEventListener('change', (event) => {
     content[section][key] = '';
   }
   renderAll();
+  schedulePreviewDraft();
 });
 
 editorPanel.addEventListener('click', (event) => {
@@ -400,6 +462,7 @@ editorPanel.addEventListener('click', (event) => {
       url: 'https://example.com'
     });
     renderEditor();
+    schedulePreviewDraft();
     return;
   }
 
@@ -409,6 +472,7 @@ editorPanel.addEventListener('click', (event) => {
     const index = Number(remove.getAttribute('data-link-remove'));
     content.socials.links.splice(index, 1);
     renderEditor();
+    schedulePreviewDraft();
     return;
   }
 
@@ -419,6 +483,7 @@ editorPanel.addEventListener('click', (event) => {
     const delta = Number(move.getAttribute('data-delta'));
     moveItem(content.socials.links, index, delta);
     renderEditor();
+    schedulePreviewDraft();
   }
 });
 

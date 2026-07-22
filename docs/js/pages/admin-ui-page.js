@@ -9,6 +9,7 @@ import {
   COMMON_NAV_EMOJIS
 } from '../shell-navigation-defaults.js';
 import { uploadStudioAsset } from '../content-studio-service.js';
+import { buildShellStudioPreviewUrl, STUDIO_MSG } from '../studio-preview.js';
 
 const byId = (id) => document.getElementById(id);
 const esc = (value) =>
@@ -31,12 +32,17 @@ const sidebarPanel = byId('panel-sidebar');
 const topbarPanel = byId('panel-topbar');
 const titlesPanel = byId('panel-titles');
 const previewEl = byId('livePreview');
+const shellPreviewFrame = byId('shellPreviewFrame');
+const shellPreviewWrap = shellPreviewFrame?.parentElement;
+const reloadShellPreviewBtn = byId('reloadShellPreview');
 const saveBtn = byId('saveBtn');
 const resetBtn = byId('resetBtn');
 
 let navigation = null;
 let activeTab = 'sidebar';
 let busy = false;
+let shellPreviewReady = false;
+let shellPreviewTimer = 0;
 
 function setStatus(message, type = '') {
   statusEl.textContent = message || '';
@@ -226,34 +232,65 @@ function previewIcon(icon) {
 
 function renderPreview() {
   if (!navigation) {
-    previewEl.innerHTML = '';
+    if (previewEl) previewEl.innerHTML = '';
     return;
   }
-  const sections = navigation.sidebar?.sections || [];
-  const links = (navigation.topBar?.quickLinks || []).filter(Boolean);
-  previewEl.innerHTML = `
-    <div class="preview-ribbon">${esc(navigation.brandRibbon || 'Card Binder')}</div>
-    ${sections.map((section) => `
-      <div class="preview-section">
-        <strong>${previewIcon(section.icon)} ${esc(section.label || 'Section')}${section.staffOnly ? ' <small>(staff)</small>' : ''}</strong>
-        <ul>
-          ${(section.items || []).map((item) => {
-            const isLabel = (item.features || []).includes('sectionLabel');
-            const classes = [
-              item.enabled === false ? 'disabled' : '',
-              isLabel ? 'label' : ''
-            ].filter(Boolean).join(' ');
-            return `<li class="${classes}">${previewIcon(item.icon)} <span>${esc(item.label || 'Item')}</span></li>`;
-          }).join('')}
-        </ul>
+  // Keep a compact schematic as an accessibility/fallback snapshot under the live iframe.
+  if (previewEl) {
+    const sections = navigation.sidebar?.sections || [];
+    const links = (navigation.topBar?.quickLinks || []).filter(Boolean);
+    previewEl.innerHTML = `
+      <div class="preview-ribbon">${esc(navigation.brandRibbon || 'Card Binder')}</div>
+      ${sections.map((section) => `
+        <div class="preview-section">
+          <strong>${previewIcon(section.icon)} ${esc(section.label || 'Section')}${section.staffOnly ? ' <small>(staff)</small>' : ''}</strong>
+          <ul>
+            ${(section.items || []).map((item) => {
+              const isLabel = (item.features || []).includes('sectionLabel');
+              const classes = [
+                item.enabled === false ? 'disabled' : '',
+                isLabel ? 'label' : ''
+              ].filter(Boolean).join(' ');
+              return `<li class="${classes}">${previewIcon(item.icon)} <span>${esc(item.label || 'Item')}</span></li>`;
+            }).join('')}
+          </ul>
+        </div>
+      `).join('')}
+      <div class="preview-top">
+        ${links.map((link) => `
+          <span class="preview-chip ${link.enabled === false ? 'disabled' : ''}">${esc(link.label || link.destination)}</span>
+        `).join('') || '<span class="lead">No quick links</span>'}
       </div>
-    `).join('')}
-    <div class="preview-top">
-      ${links.map((link) => `
-        <span class="preview-chip ${link.enabled === false ? 'disabled' : ''}">${esc(link.label || link.destination)}</span>
-      `).join('') || '<span class="lead">No quick links</span>'}
-    </div>
-  `;
+    `;
+  }
+  pushShellPreviewDraft();
+}
+
+function pushShellPreviewDraft() {
+  window.clearTimeout(shellPreviewTimer);
+  shellPreviewTimer = window.setTimeout(() => {
+    if (!shellPreviewFrame?.contentWindow || !navigation || !shellPreviewReady) return;
+    try {
+      shellPreviewFrame.contentWindow.postMessage({
+        type: STUDIO_MSG.NAV_DRAFT,
+        navigation
+      }, window.location.origin);
+    } catch (_error) {
+      /* ignore while loading */
+    }
+  }, 100);
+}
+
+function loadShellPreview({ force = false } = {}) {
+  if (!shellPreviewFrame) return;
+  if (!force && shellPreviewFrame.dataset.loaded === '1' && shellPreviewReady) {
+    pushShellPreviewDraft();
+    return;
+  }
+  shellPreviewReady = false;
+  shellPreviewWrap?.classList.add('is-loading');
+  shellPreviewFrame.dataset.loaded = '1';
+  shellPreviewFrame.src = buildShellStudioPreviewUrl('home');
 }
 
 function renderAll() {
@@ -262,6 +299,7 @@ function renderAll() {
   renderTopBar();
   renderTitles();
   renderPreview();
+  loadShellPreview();
   showTab(activeTab);
 }
 
@@ -581,10 +619,24 @@ async function boot() {
     saveBtn.hidden = false;
     resetBtn.hidden = false;
     renderAll();
-    setStatus('Ready to edit. Changes publish when you save.', 'success');
+    setStatus('Ready to edit. Live shell preview updates as you type; Save publishes.', 'success');
   } catch (error) {
     setStatus(error.message || 'Unable to load website UI settings.', 'error');
   }
 }
+
+window.addEventListener('message', (event) => {
+  if (event.origin !== window.location.origin) return;
+  const data = event.data || {};
+  if (data.type === STUDIO_MSG.READY && data.kind === 'shell') {
+    shellPreviewReady = true;
+    shellPreviewWrap?.classList.remove('is-loading');
+    pushShellPreviewDraft();
+  }
+});
+
+reloadShellPreviewBtn?.addEventListener('click', () => {
+  loadShellPreview({ force: true });
+});
 
 boot();

@@ -5,21 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Website Editor | Starlight Card Binder</title>
   <link rel="stylesheet" href="css/style.css?v=1.0.2">
-  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.8">
-  <link rel="stylesheet" href="css/pages/admin-website.css?v=1.4">
-  <link rel="stylesheet" href="css/qol-ui.css?v=94.2.4">
+  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.13">
+  <link rel="stylesheet" href="css/pages/admin-website.css?v=2.0">
+  <link rel="stylesheet" href="css/qol-ui.css?v=94.2.8">
   <script src="js/browser-performance.js?v=1.0.0" defer></script>
 </head>
 <body>
   <script src="js/embed-mode.js" type="module"></script>
   <div class="sky"></div>
   <main class="page">
-    <section class="panel">
+    <section class="panel studio-panel">
       <p class="eyebrow">Administration Hub</p>
       <div class="toolbar">
         <div>
           <h1>Website Editor</h1>
-          <p class="lead">Edit marketing copy for every public left-nav page — heroes, splash headlines, portal states, CTAs, tabs, and empty states. Changes publish site-wide after Save.</p>
+          <p class="lead">Pick a page, edit its copy, and watch the live preview update instantly. Save publishes site-wide.</p>
         </div>
         <div class="actions">
           <button id="resetPageBtn" class="btn" type="button" hidden>Reset This Page</button>
@@ -29,22 +29,41 @@
       </div>
       <p id="status" class="status" role="status">Checking staff access…</p>
 
-      <div id="app" class="hidden" hidden>
-        <div class="editor-chrome">
+      <div id="app" class="hidden studio-app" hidden>
+        <aside class="page-picker" aria-label="Website pages">
           <label class="field-search">
             <span class="sr-only">Search fields</span>
-            <input id="fieldSearch" type="search" placeholder="Search fields on this page…" autocomplete="off">
+            <input id="fieldSearch" type="search" placeholder="Search fields…" autocomplete="off">
           </label>
+          <div id="tablist" class="page-list" role="tablist" aria-label="Website pages"></div>
+        </aside>
+
+        <section class="studio-editor">
           <div id="pageMeta" class="page-meta"></div>
-        </div>
-        <div id="tablist" class="tabs" role="tablist" aria-label="Website pages"></div>
-        <section id="editorPanel" class="tab-panel" role="tabpanel"></section>
+          <section id="editorPanel" class="tab-panel editor-scroll" role="tabpanel"></section>
+        </section>
+
+        <aside class="studio-preview" aria-label="Live page preview">
+          <div class="preview-toolbar">
+            <div>
+              <h2>Live preview</h2>
+              <p class="preview-hint">Draft changes appear here before Save.</p>
+            </div>
+            <div class="preview-actions">
+              <button type="button" class="btn small" id="reloadPreviewBtn">Reload</button>
+              <a class="btn small" id="openLivePage" href="home.html" target="_blank" rel="noopener">Open live</a>
+            </div>
+          </div>
+          <div class="preview-frame-wrap">
+            <iframe id="previewFrame" title="Website content preview" loading="lazy"></iframe>
+          </div>
+        </aside>
       </div>
     </section>
   </main>
 
-  <script src="js/shared-ui.js?v=1.6.7"></script>
-  <script type="module" src="js/pages/admin-website-page.js?v=1.5"></script>
-  <script src="js/qol-ui.js?v=94.2.4" defer></script>
+  <script src="js/shared-ui.js?v=1.6.13"></script>
+  <script type="module" src="js/pages/admin-website-page.js?v=2.0"></script>
+  <script src="js/qol-ui.js?v=94.2.8" defer></script>
 </body>
 </html>

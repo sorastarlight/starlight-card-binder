@@ -1,5 +1,6 @@
 import { getWebsiteContent } from './website-content-service.js';
 import { mergeWebsiteContent } from './website-content-model.js';
+import { isStudioPreview, STUDIO_MSG } from './studio-preview.js';
 
 const esc = (value) =>
   (typeof window !== 'undefined' && window.StarlightUI?.escapeHtml
@@ -105,10 +106,44 @@ export function hydrateWebsiteContent(content) {
   });
 
   rebuildSocialLinks(payload);
+  try {
+    window.dispatchEvent(new CustomEvent('starlight-website-content-hydrated', { detail: payload }));
+  } catch (_error) {
+    /* ignore */
+  }
   return payload;
 }
 
+function announceStudioPreviewReady() {
+  if (window.parent === window) return;
+  try {
+    window.parent.postMessage({ type: STUDIO_MSG.READY, kind: 'website' }, window.location.origin);
+  } catch (_error) {
+    /* ignore */
+  }
+}
+
+function installStudioPreviewListener() {
+  if (window.__starlightStudioContentPreviewInstalled) return;
+  window.__starlightStudioContentPreviewInstalled = true;
+  window.addEventListener('message', (event) => {
+    if (event.origin !== window.location.origin) return;
+    const data = event.data || {};
+    if (data.type !== STUDIO_MSG.CONTENT_DRAFT) return;
+    hydrateWebsiteContent(data.content || null);
+  });
+}
+
 export async function loadAndHydrateWebsiteContent() {
+  if (isStudioPreview()) {
+    installStudioPreviewListener();
+    document.documentElement.classList.add('starlight-studio-preview');
+    const draft = window.__starlightWebsiteContentDraft || null;
+    const payload = hydrateWebsiteContent(draft);
+    announceStudioPreviewReady();
+    return payload;
+  }
+
   try {
     const content = await getWebsiteContent();
     return hydrateWebsiteContent(content);
