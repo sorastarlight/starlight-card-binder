@@ -14,8 +14,8 @@ import {
   getAdminEvents,
   saveEvent,
   deleteEvent,
-} from "../content-studio-service.js";
-import { createAdminBoosterEditors } from "./admin-boosters-editors.js";
+} from "../content-studio-service.js?v=1.4";
+import { createAdminBoosterEditors } from "./admin-boosters-editors.js?v=1.4";
 const $ = (s) => document.querySelector(s),
   status = $("#status"),
   app = $("#app"),

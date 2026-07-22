@@ -196,7 +196,7 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
 .st-r3-reveal-scene.is-revealed .st-r3-card-actor.st-card-drag-tilt.is-dragging{
   transition:none;
 }
-.st-toast-region{position:fixed;right:18px;bottom:18px;z-index:30000;display:grid;gap:10px;width:min(380px,calc(100vw - 28px));pointer-events:none}
+.st-toast-region{position:fixed;right:18px;bottom:18px;z-index:100001;display:grid;gap:10px;width:min(380px,calc(100vw - 28px));pointer-events:none}
 .st-toast{pointer-events:auto;padding:13px 16px;border:1px solid rgba(107,198,248,.48);border-radius:16px;background:rgba(255,255,255,.97);box-shadow:0 15px 38px rgba(45,62,105,.22);color:var(--st-ui-ink);font-weight:800;line-height:1.45;animation:stToastIn .22s ease-out}
 .st-toast.success{border-color:rgba(70,176,127,.5)}.st-toast.error{border-color:rgba(180,35,63,.5);color:var(--st-ui-danger)}.st-toast.info{border-color:rgba(255,130,200,.5)}
 @keyframes stToastIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}

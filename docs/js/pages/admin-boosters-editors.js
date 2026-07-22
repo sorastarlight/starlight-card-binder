@@ -14,8 +14,8 @@ import {
   storagePathFromUrl,
   saveBoosterSlot,
   simulateBoosterV91
-} from "../content-studio-service.js";
-import { validateBooster } from "../booster-config-validator.js";
+} from "../content-studio-service.js?v=1.4";
+import { validateBooster } from "../booster-config-validator.js?v=1.0.2";
 
 export function createAdminBoosterEditors(context) {
   const {
@@ -331,7 +331,7 @@ export function createAdminBoosterEditors(context) {
   ) {
     openEditor(
       b.id ? "Configure Booster Pack" : "Create Booster Pack",
-      `<div class="booster-builder-head"><div><span class="taxonomy-chip">Booster Builder</span><h3>Build a reliable pack without guesswork</h3><p>Choose a pack structure, set the Rare-or-Better odds, then validate or simulate it before activation.</p></div><div class="toggle-card"><div><strong>Advanced Mode</strong><small>Show raw slot percentages.</small></div><label class="toggle-switch"><input id="advancedBuilder" type="checkbox" ${b.builderMode === "advanced" ? "checked" : ""}><span></span></label></div></div><div class="form-grid"><div class="field"><label>Booster ID</label><input id="eBoosterId" value="${esc(b.id || "")}" ${b.id ? "readonly" : ""}></div><div class="field"><label>Name</label><input id="eBoosterName" value="${esc(b.name || "")}"></div><div class="field full"><label>Description</label><textarea id="eBoosterDescription">${esc(b.description || "")}</textarea></div><div class="field"><label>What does this pack award?</label><select id="eRewardMode"><option value="slots">Cards using rarity odds</option><option value="series">Random cards from one series</option><option value="exact">Exact selected cards</option><option value="weighted_pool">Custom selected card pool</option><option value="single">One exact card</option><option value="mixed">Cards + Star Bits</option></select></div><div class="field"><label>Restrict to Series</label><select id="eBoosterSeries"><option value="">All series</option>${options(data.series, b.seriesId)}</select></div><div class="field"><label>Cards Per Pack</label><input id="eBoosterCount" type="number" min="1" max="50" value="${b.cardCount || 4}"></div><div class="field"><label>Default Pull-Rate Preset</label><select id="oddsPreset"><option value="standard">Standard — Rare 80%, Epic 18%, Legendary 2%</option><option value="generous">Generous — Rare 72%, Epic 23%, Legendary 5%</option><option value="premium">Premium — Rare 60%, Epic 30%, Legendary 10%</option><option value="custom">Custom / Keep Current</option></select></div><div class="field full"><label>Optional Category Filters</label>${chipPicker("boosterCategories", data.categories || [], b.categoryIds || [])}<small>Leave everything cleared to allow every category.</small></div><div class="field full"><label>Optional Finish Filters</label>${chipPicker("boosterFinishes", data.finishes || [], b.finishIds || [])}<small>Leave everything cleared to allow every finish.</small></div><div class="field"><label>Bonus Star Bits</label><input id="eBoosterBits" type="number" min="0" value="${b.bonusStarBits || 0}"></div><div class="field"><label>Star Bits Cost</label><input id="eBoosterCost" type="number" min="0" value="${b.starBitsCost || 0}"></div><div class="field"><label>Sort Order</label><input id="eBoosterSort" type="number" value="${b.sortOrder || 0}"></div><div class="toggle-grid full">${toggleControl("excludePromos","Exclude promotional cards",b.excludePromos !== false,"Promo cards will not appear in this pack.")}${toggleControl("allowDuplicates","Allow duplicates in one pack",b.allowDuplicates !== false,"The same card may be pulled more than once.")}${toggleControl("eBoosterActive","Active / Visible",b.isActive,"Collectors can see and use this booster where eligible.")}${toggleControl("eBoosterArchived","Archived",b.archived,"Keep the record but hide it from normal use.")}</div><div>${imageBlock("ePackImage", b.packImageUrl, "booster-packs", "Pack Artwork")}</div><div>${imageBlock("eBackImage", b.cardBackUrl, "card-backs", "Card Back")}</div></div><div id="guidedOdds" class="reward-builder"><h3>Rare-or-Better Preset</h3><p class="lead">A normal four-card pack uses 2 Common, 1 Uncommon, and 1 Rare-or-Better. Standard keeps Legendary pulls genuinely special.</p><div class="preset-cards"><button type="button" class="template-choice" data-easy-preset="standard"><strong>Standard</strong><span>Rare 80 · Epic 18 · Legendary 2</span></button><button type="button" class="template-choice" data-easy-preset="generous"><strong>Generous</strong><span>Rare 72 · Epic 23 · Legendary 5</span></button><button type="button" class="template-choice" data-easy-preset="premium"><strong>Premium</strong><span>Rare 60 · Epic 30 · Legendary 10</span></button></div></div><details id="slotBuilder" class="reward-builder v91-odds-details" ${b.builderMode === "advanced" ? "open" : ""}><summary><span><strong>Edit Exact Pull Rates</strong><small>Optional. Every slot must total exactly 100%.</small></span></summary><div class="toolbar"><button id="balanceSlots" class="btn" type="button">Balance Current Slots</button></div>${slotsHtml(b)}</details><div class="reward-builder"><h3>Pack Preview</h3><pre id="boosterPreview" class="odds-summary plain-preview"></pre></div><div id="rewardBuilder" class="reward-builder"><div class="toolbar"><div><h3>Exact Cards / Custom Pool</h3></div><button id="addReward" class="btn">＋ Add Card</button></div><div id="rewardRows">${rewardRows(b)}</div></div><section class="reward-builder v91-validation-panel"><div><h3>Validate Before Going Live</h3><p class="lead">Save your changes, then simulate openings to confirm the results look right.</p></div><div class="v91-sim-controls"><select id="simulationCount"><option value="100">100 openings</option><option value="1000" selected>1,000 openings</option><option value="10000">10,000 openings</option></select><button id="simulateBooster" class="btn" type="button" ${b.id ? "" : "disabled"}>Simulate Pack</button></div><div id="simulationResults" class="v91-simulation-results">Simulation does not award cards or spend Star Bits.</div></section><div class="editor-actions"><button id="saveBooster" class="btn primary">Save Booster Pack</button>${b.id ? '<button id="copyThisBooster" class="btn">Copy Booster</button><button id="inspectBooster" class="btn">Inspect References</button><button id="renameBooster" class="btn">Rename Booster ID</button><button id="detachBooster" class="btn archive">Detach From Card Shop</button><button id="archiveBooster" class="btn archive">Archive Booster</button><button id="deleteBooster" class="btn danger">Delete Booster Safely</button>' : ""}</div>`,
+      `<div class="booster-builder-head"><div><span class="taxonomy-chip">Booster Builder</span><h3>Build a reliable pack without guesswork</h3><p>Choose a pack structure, set the Rare-or-Better odds, then validate or simulate it before activation.</p></div><div class="toggle-card"><div><strong>Advanced Mode</strong><small>Show raw slot percentages.</small></div><label class="toggle-switch"><input id="advancedBuilder" type="checkbox" ${b.builderMode === "advanced" ? "checked" : ""}><span></span></label></div></div><div class="form-grid"><div class="field"><label>Booster ID</label><input id="eBoosterId" value="${esc(b.id || "")}" ${b.id ? "readonly" : ""}></div><div class="field"><label>Name</label><input id="eBoosterName" value="${esc(b.name || "")}"></div><div class="field full"><label>Description</label><textarea id="eBoosterDescription">${esc(b.description || "")}</textarea></div><div class="field"><label>What does this pack award?</label><select id="eRewardMode"><option value="slots">Cards using rarity odds</option><option value="series">Random cards from one series</option><option value="exact">Exact selected cards</option><option value="weighted_pool">Custom selected card pool</option><option value="single">One exact card</option><option value="mixed">Cards + Star Bits</option></select></div><div class="field"><label>Restrict to Series</label><select id="eBoosterSeries"><option value="">All series</option>${options(data.series, b.seriesId)}</select></div><div class="field"><label>Cards Per Pack</label><input id="eBoosterCount" type="number" min="1" max="50" value="${b.cardCount || 4}"></div><div class="field"><label>Default Pull-Rate Preset</label><select id="oddsPreset"><option value="standard">Standard — Rare 80%, Epic 18%, Legendary 2%</option><option value="generous">Generous — Rare 72%, Epic 23%, Legendary 5%</option><option value="premium">Premium — Rare 60%, Epic 30%, Legendary 10%</option><option value="custom">Custom / Keep Current</option></select></div><div class="field full"><label>Optional Category Filters</label>${chipPicker("boosterCategories", data.categories || [], b.categoryIds || [])}<small>Leave everything cleared to allow every category.</small></div><div class="field full"><label>Optional Finish Filters</label>${chipPicker("boosterFinishes", data.finishes || [], b.finishIds || [])}<small>Leave everything cleared to allow every finish.</small></div><div class="field"><label>Bonus Star Bits</label><input id="eBoosterBits" type="number" min="0" value="${b.bonusStarBits || 0}"></div><div class="field"><label>Star Bits Cost</label><input id="eBoosterCost" type="number" min="0" value="${b.starBitsCost || 0}"></div><div class="field"><label>Sort Order</label><input id="eBoosterSort" type="number" value="${b.sortOrder || 0}"></div><div class="toggle-grid full">${toggleControl("excludePromos","Exclude promotional cards",b.excludePromos !== false,"Promo cards will not appear in this pack.")}${toggleControl("allowDuplicates","Allow duplicates in one pack",b.allowDuplicates !== false,"The same card may be pulled more than once.")}${toggleControl("eBoosterActive","Active / Visible",b.isActive,"Collectors can see and use this booster where eligible.")}${toggleControl("eBoosterArchived","Archived",b.archived,"Keep the record but hide it from normal use.")}</div><div>${imageBlock("ePackImage", b.packImageUrl, "booster-packs", "Pack Artwork")}</div><div>${imageBlock("eBackImage", b.cardBackUrl, "card-backs", "Card Back")}</div></div><div id="guidedOdds" class="reward-builder"><h3>Rare-or-Better Preset</h3><p class="lead">A normal four-card pack uses 2 Common, 1 Uncommon, and 1 Rare-or-Better. Standard keeps Legendary pulls genuinely special.</p><div class="preset-cards"><button type="button" class="template-choice" data-easy-preset="standard"><strong>Standard</strong><span>Rare 80 · Epic 18 · Legendary 2</span></button><button type="button" class="template-choice" data-easy-preset="generous"><strong>Generous</strong><span>Rare 72 · Epic 23 · Legendary 5</span></button><button type="button" class="template-choice" data-easy-preset="premium"><strong>Premium</strong><span>Rare 60 · Epic 30 · Legendary 10</span></button></div></div><details id="slotBuilder" class="reward-builder v91-odds-details" ${b.builderMode === "advanced" ? "open" : ""}><summary><span><strong>Edit Exact Pull Rates</strong><small>Optional. Every slot must total exactly 100%.</small></span></summary><div class="toolbar"><button id="balanceSlots" class="btn" type="button">Balance Current Slots</button></div>${slotsHtml(b)}</details><div class="reward-builder"><h3>Pack Preview</h3><pre id="boosterPreview" class="odds-summary plain-preview"></pre></div><div id="rewardBuilder" class="reward-builder"><div class="toolbar"><div><h3>Exact Cards / Custom Pool</h3></div><button id="addReward" class="btn">＋ Add Card</button></div><div id="rewardRows">${rewardRows(b)}</div></div><section class="reward-builder v91-validation-panel"><div><h3>Validate Before Going Live</h3><p class="lead">Save your changes, then simulate openings to confirm the results look right.</p></div><div class="v91-sim-controls"><select id="simulationCount"><option value="100">100 openings</option><option value="1000" selected>1,000 openings</option><option value="10000">10,000 openings</option></select><button id="simulateBooster" class="btn" type="button" ${b.id ? "" : "disabled"}>Simulate Pack</button></div><div id="simulationResults" class="v91-simulation-results">Simulation does not award cards or spend Star Bits.</div></section><div class="editor-actions sticky-save"><button id="saveBooster" class="btn primary" type="button" data-action="save-booster">Save Booster Pack</button><p id="editorStatus" class="status" role="status"></p>${b.id ? '<button id="copyThisBooster" class="btn" type="button">Copy Booster</button><button id="inspectBooster" class="btn" type="button">Inspect References</button><button id="renameBooster" class="btn" type="button">Rename Booster ID</button><button id="detachBooster" class="btn archive" type="button">Detach From Card Shop</button><button id="archiveBooster" class="btn archive" type="button">Archive Booster</button><button id="deleteBooster" class="btn danger" type="button">Delete Booster Safely</button>' : ""}</div>`,
     );
     $("#eRewardMode").value = b.rewardMode || "slots";
     $("#oddsPreset").value = b.oddsPreset || "standard";
@@ -531,26 +531,32 @@ export function createAdminBoosterEditors(context) {
       }
     });
   
+    const field = (id) => body.querySelector(`#${id}`) || $(`#${id}`);
     const formatSaveError = (err) => {
       if (!err) return "Unable to save booster.";
       if (typeof err === "string") return err;
       return err.message || err.details || err.hint || String(err);
     };
     const editorSay = (message, type = "") => {
-      let el = $("#editorStatus");
+      const el = field("editorStatus") || (() => {
+        const created = document.createElement("p");
+        created.id = "editorStatus";
+        created.setAttribute("role", "status");
+        body.querySelector(".sticky-save")?.prepend(created);
+        return created;
+      })();
       if (!el) {
-        el = document.createElement("p");
-        el.id = "editorStatus";
-        el.setAttribute("role", "status");
-        body.prepend(el);
+        say(message, type);
+        return;
       }
-      el.textContent = message;
+      el.textContent = message || "";
       el.className = `status ${type}`.trim();
       say(message, type);
       if (type === "error") window.StarlightUI?.toast?.(message, "error");
+      if (type === "success") window.StarlightUI?.toast?.(message, "success");
     };
-    $("#saveBooster").onclick = async () => {
-      const saveButton = $("#saveBooster");
+    const runBoosterSave = async () => {
+      const saveButton = field("saveBooster");
       try {
         const rewardCards = [...body.querySelectorAll("[data-reward-row]")].map(
           (row, i) => ({
@@ -570,7 +576,7 @@ export function createAdminBoosterEditors(context) {
               ) - 100,
             ) > 0.001,
         );
-        if ($("#eRewardMode").value === "slots" && invalid)
+        if ((field("eRewardMode")?.value || "slots") === "slots" && invalid)
           throw new Error("Every rarity slot must total 100%.");
         const slots = [...body.querySelectorAll("[data-slot]")].map((row,index) => {
           const rates = {};
@@ -591,37 +597,57 @@ export function createAdminBoosterEditors(context) {
           saveButton.textContent = "Saving…";
         }
         editorSay("Saving booster pack…");
+        const categoriesEl = field("boosterCategories");
+        const finishesEl = field("boosterFinishes");
         const payload = {
-          id: $("#eBoosterId").value,
-          name: $("#eBoosterName").value,
-          description: $("#eBoosterDescription").value,
-          rewardMode: $("#eRewardMode").value,
-          seriesId: $("#eBoosterSeries").value || null,
-          cardCount: Number($("#eBoosterCount").value) || 1,
-          bonusStarBits: Number($("#eBoosterBits").value) || 0,
-          starBitsCost: Number($("#eBoosterCost").value) || 0,
-          sortOrder: Number($("#eBoosterSort").value) || 0,
-          isActive: $("#eBoosterActive").checked,
-          archived: $("#eBoosterArchived").checked,
-          packImageUrl: $("#ePackImageUrl").value,
-          cardBackUrl: $("#eBackImageUrl").value,
+          id: field("eBoosterId")?.value || "",
+          name: field("eBoosterName")?.value || "",
+          description: field("eBoosterDescription")?.value || "",
+          rewardMode: field("eRewardMode")?.value || "slots",
+          seriesId: field("eBoosterSeries")?.value || null,
+          cardCount: Number(field("eBoosterCount")?.value) || 1,
+          bonusStarBits: Number(field("eBoosterBits")?.value) || 0,
+          starBitsCost: Number(field("eBoosterCost")?.value) || 0,
+          sortOrder: Number(field("eBoosterSort")?.value) || 0,
+          isActive: Boolean(field("eBoosterActive")?.checked),
+          archived: Boolean(field("eBoosterArchived")?.checked),
+          packImageUrl: field("ePackImageUrl")?.value || "",
+          cardBackUrl: field("eBackImageUrl")?.value || "",
           rewardCards,
-          builderMode: $("#advancedBuilder").checked ? "advanced" : "guided",
-          oddsPreset: $("#oddsPreset").value,
-          categoryIds: selectedValues($("#boosterCategories")),
-          finishIds: selectedValues($("#boosterFinishes")),
-          excludePromos: $("#excludePromos").checked,
-          allowDuplicates: $("#allowDuplicates").checked,
+          builderMode: field("advancedBuilder")?.checked ? "advanced" : "guided",
+          oddsPreset: field("oddsPreset")?.value || "standard",
+          categoryIds: categoriesEl ? selectedValues(categoriesEl) : [],
+          finishIds: finishesEl ? selectedValues(finishesEl) : [],
+          excludePromos: Boolean(field("excludePromos")?.checked),
+          allowDuplicates: Boolean(field("allowDuplicates")?.checked),
           slots,
         };
-        const validation = validateBooster(payload, { cards: data.cards });
-        if (!validation.valid) throw new Error(validation.errors.map(error => error.message).join(" "));
+        const validation = validateBooster(payload, { cards: data.cards || [] });
+        // Empty rarity pools are advisory while editing; odds/id/mode errors still block save.
+        const blocking = validation.errors.filter(
+          (error) => error.code !== "slot.pool.empty" && error.code !== "booster.series.empty",
+        );
+        if (blocking.length) throw new Error(blocking.map((error) => error.message).join(" "));
+        const poolWarnings = validation.errors
+          .filter((error) => error.code === "slot.pool.empty" || error.code === "booster.series.empty")
+          .map((error) => error.message);
         await saveBooster(payload, slots);
-        await reload("Booster pack saved successfully.");
-        window.StarlightUI?.toast?.("Booster pack saved successfully.", "success");
+        const successMessage = poolWarnings.length
+          ? `Booster pack saved successfully. Warning: ${poolWarnings.join(" ")}`
+          : "Booster pack saved successfully.";
+        await reload(successMessage);
+        window.StarlightUI?.toast?.(successMessage, poolWarnings.length ? "info" : "success");
       } catch (err) {
         console.error("[Starlight] Booster save failed:", err);
-        editorSay(formatSaveError(err), "error");
+        const message = formatSaveError(err);
+        editorSay(message, "error");
+        try {
+          await window.StarlightUI?.alert?.({
+            title: "Could not save booster",
+            message,
+            buttonText: "OK",
+          });
+        } catch (_) {}
       } finally {
         if (saveButton?.isConnected) {
           saveButton.disabled = false;
@@ -629,6 +655,16 @@ export function createAdminBoosterEditors(context) {
         }
       }
     };
+    const saveBtn = field("saveBooster");
+    if (saveBtn) {
+      saveBtn.onclick = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        runBoosterSave();
+      };
+    } else {
+      console.error("[Starlight] Save Booster Pack button was not found in the editor.");
+    }
     if (b.id) {
       $("#copyThisBooster").onclick = () => copyBoosterDialog(b.id);
       $("#inspectBooster").onclick = async () => {
