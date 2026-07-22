@@ -3,6 +3,7 @@ import { getStarBitsExchangePreview } from '../star-bits-service.js';
 import { openStarBitsBoosterById } from '../daily-booster-service.js';
 import { revealRewardSequence } from '../reward-reveal.js?v=1.5.14';
 import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
+import { maybeCelebrateSeriesCompletions } from '../series-complete-celebration.js?v=1.0.0';
 
 const siteCopy = await loadAndHydrateWebsiteContent();
 const shopCopy = siteCopy?.shop || {};
@@ -323,7 +324,9 @@ async function confirmPurchase(){
   try{
     purchaseModalController.close(undefined,'purchase');
     const result=await openStarBitsBoosterById(booster.id);
-    await revealRewardSequence(result.cards||[],{title:booster.name,packImageUrl:booster.pack_image_url||FALLBACK_PACK,cardBackUrl:booster.card_back_url||button.dataset.back||undefined,autoOpen:true});
+    const awardedCards = result.cards || [];
+    await revealRewardSequence(awardedCards,{title:booster.name,packImageUrl:booster.pack_image_url||FALLBACK_PACK,cardBackUrl:booster.card_back_url||button.dataset.back||undefined,autoOpen:true});
+    await maybeCelebrateSeriesCompletions(awardedCards);
     pendingPurchase=null;
     await load();
   }catch(error){

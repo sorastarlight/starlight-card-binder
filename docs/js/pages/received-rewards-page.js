@@ -1,6 +1,7 @@
 import { getReceivedRewards, claimReceivedReward, dismissReceivedReward } from '../received-rewards-service.js';
 import { revealRewardSequence } from '../reward-reveal.js?v=1.5.14';
 import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
+import { maybeCelebrateSeriesCompletions } from '../series-complete-celebration.js?v=1.0.0';
 
 const siteCopy = await loadAndHydrateWebsiteContent();
 const rewardsCopy = siteCopy?.rewards || {};
@@ -64,6 +65,7 @@ async function claim(id) {
         packImageUrl: payload.packImageUrl || payload.pack_image_url || snapshot.packImageUrl || snapshot.pack_image_url || '',
         cardBackUrl: payload.cardBackUrl || payload.card_back_url || snapshot.cardBackUrl || snapshot.card_back_url || undefined
       });
+      await maybeCelebrateSeriesCompletions(cards);
     }
     status.textContent = 'Reward claimed successfully!';
     await load();

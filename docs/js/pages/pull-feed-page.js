@@ -52,15 +52,21 @@ function renderItems() {
     const profileHref = actor.username
       ? `binder.html?view=collector&username=${encodeURIComponent(actor.username)}`
       : '#';
-    return `<article class="pull-feed-item">
+    const isSeriesComplete = item.type === 'series_complete';
+    const seriesName = item.payload?.seriesName || '';
+    const thumb = highlight?.thumbnailUrl || highlight?.imageUrl || '';
+    const badge = isSeriesComplete
+      ? `<span class="pull-feed-badge" aria-hidden="true">🏆</span>`
+      : (thumb
+        ? `<img class="pull-feed-thumb" src="${esc(thumb)}" alt="">`
+        : '');
+    return `<article class="pull-feed-item${isSeriesComplete ? ' is-series-complete' : ''}">
       <a class="pull-feed-avatar" href="${profileHref}" data-shell-view="collector" ${avatarStyle(actor)} aria-label="${esc(name)}">${actor.avatarUrl ? '' : '✦'}</a>
       <div class="pull-feed-copy">
         <strong>${esc(item.summary || '')}</strong>
-        <span><a href="${profileHref}">@${esc(actor.username || 'collector')}</a> · ${esc(relativeTime(item.createdAt))}</span>
+        <span><a href="${profileHref}">@${esc(actor.username || 'collector')}</a> · ${esc(relativeTime(item.createdAt))}${isSeriesComplete && seriesName ? ` · ${esc(seriesName)}` : ''}</span>
       </div>
-      ${highlight?.thumbnailUrl || highlight?.imageUrl
-        ? `<img class="pull-feed-thumb" src="${esc(highlight.thumbnailUrl || highlight.imageUrl)}" alt="">`
-        : ''}
+      ${badge}
     </article>`;
   }).join('');
 

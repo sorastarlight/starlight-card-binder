@@ -85,8 +85,14 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
       const highlight = item.payload?.highlight || null;
       const thumb = highlight?.thumbnailUrl || highlight?.imageUrl || '';
       const isNew = item.__isNew;
-      return `<article class="shell-live-feed-item${isNew ? ' is-new' : ''}" style="--i:${index}">
-        ${thumb ? `<img class="shell-live-feed-thumb" src="${esc(thumb)}" alt="">` : `<span class="shell-live-feed-dot" aria-hidden="true"></span>`}
+      const isSeriesComplete = item.type === 'series_complete';
+      const media = isSeriesComplete
+        ? `<span class="shell-live-feed-badge" aria-hidden="true">🏆</span>`
+        : (thumb
+          ? `<img class="shell-live-feed-thumb" src="${esc(thumb)}" alt="">`
+          : `<span class="shell-live-feed-dot" aria-hidden="true"></span>`);
+      return `<article class="shell-live-feed-item${isNew ? ' is-new' : ''}${isSeriesComplete ? ' is-series-complete' : ''}" style="--i:${index}">
+        ${media}
         <div class="shell-live-feed-copy">
           <strong>${esc(item.summary || '')}</strong>
           <span>${esc(relativeTime(item.createdAt))}${actor.username ? ` · @${esc(actor.username)}` : ''}</span>

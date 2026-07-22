@@ -681,6 +681,19 @@
         }
     
 .collector-title{display:inline-block;margin:8px 0 0;padding:7px 12px;border-radius:999px;background:linear-gradient(135deg,rgba(254,211,52,.22),rgba(255,130,200,.18));color:#8a5a70;font-weight:900}
+.collector-title.is-series-complete{
+  background:linear-gradient(135deg,#fed334,#ff9ad0);
+  color:#5a3a18;
+  box-shadow:0 0 0 2px rgba(255,255,255,.65),0 8px 18px rgba(180,120,40,.22);
+  animation:collectorTitleShine 2.8s ease-in-out infinite;
+}
+@keyframes collectorTitleShine{
+  0%,100%{filter:saturate(1)}
+  50%{filter:saturate(1.25) brightness(1.05)}
+}
+@media (prefers-reduced-motion:reduce){
+  .collector-title.is-series-complete{animation:none}
+}
 .public-achievement-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}.public-achievement-grid article{display:flex;gap:12px;align-items:center;padding:14px;border-radius:15px;background:#fff;border:1px solid rgba(255,130,200,.28)}.public-achievement-grid article>span{font-size:2rem}.public-achievement-grid strong,.public-achievement-grid small{display:block}.public-achievement-grid small{margin-top:4px;color:#6b7089}
 .trade-showcase-title{margin-top:24px}
 

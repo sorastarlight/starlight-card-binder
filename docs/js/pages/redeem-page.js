@@ -1,6 +1,7 @@
 import { supabase } from '../supabase-client.js';
 import { redeemRewardCode } from '../redemption-service.js';
 import { revealRewardSequence } from '../reward-reveal.js?v=1.5.14';
+import { maybeCelebrateSeriesCompletions } from '../series-complete-celebration.js?v=1.0.0';
 
 const GENERIC_PACK = 'site_assets/series01_rising_star_booster.png';
 const CARD_BACK = 'site_assets/StarlightCard_Back_NewLogo.png';
@@ -57,6 +58,7 @@ form.addEventListener('submit', async event => {
         packImageUrl: GENERIC_PACK,
         cardBackUrl: CARD_BACK
       });
+      await maybeCelebrateSeriesCompletions(cards);
       showReward(
         label,
         `${cards.length} ${cards.length === 1 ? 'card was' : 'cards were'} added directly to your collection.`

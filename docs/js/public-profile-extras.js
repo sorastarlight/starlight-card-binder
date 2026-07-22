@@ -35,6 +35,9 @@ const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
     if (data.title?.name && identity) {
       const title = document.createElement('p');
       title.className = 'collector-title';
+      if (data.title.id === 'series_complete') {
+        title.classList.add('is-series-complete');
+      }
       title.textContent = `✦ ${data.title.name}`;
       identity.insertBefore(title, document.getElementById('collector-bio'));
     }
