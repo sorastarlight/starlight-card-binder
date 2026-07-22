@@ -18,6 +18,7 @@ const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
     const avatar = document.getElementById('collector-avatar');
     if (data.avatarUrl && avatar) {
       avatar.textContent = '';
+      avatar.classList.add('has-photo');
       avatar.style.backgroundImage = `url(${JSON.stringify(data.avatarUrl).slice(1, -1)})`;
       avatar.style.backgroundSize = 'cover';
       avatar.style.backgroundPosition = 'center';

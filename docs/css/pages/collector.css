@@ -168,6 +168,10 @@
             z-index: 1;
         }
 
+        .collector-avatar.has-photo {
+            color: transparent;
+        }
+
         .collector-identity {
             padding-top: 18px;
         }

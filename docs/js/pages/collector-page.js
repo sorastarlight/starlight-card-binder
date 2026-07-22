@@ -719,8 +719,15 @@ import {
                     ? `Joined ${memberDate}`
                     : "";
 
-            avatarElement.textContent = '✦';
-            avatarElement.classList.remove('has-photo');
+            if (
+                avatarElement.classList.contains('has-photo') ||
+                avatarElement.style.backgroundImage
+            ) {
+                avatarElement.textContent = '';
+            } else {
+                avatarElement.textContent = getInitial(profile.displayName);
+                avatarElement.classList.remove('has-photo');
+            }
 
             renderSocialHighlights(result.social || null);
 
