@@ -11,6 +11,8 @@ test('default shell navigation includes core destinations and staff section', ()
   assert.equal(nav.sidebar.sections[0].label, 'Explore The Starlight Card Series');
   assert.ok(nav.sidebar.sections.some(section => section.staffOnly));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'offers'));
+  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'rankings'));
+  assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'rankings'));
   assert.equal(nav.topBar.quickLinks.length, 5);
 });
 

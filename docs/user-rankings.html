@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>User Rankings | Starlight Card Binder</title>
+  <link rel="stylesheet" href="css/style.css?v=1.0.2">
+  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.13">
+  <link rel="stylesheet" href="css/pages/user-rankings.css?v=1.0.0">
+  <link rel="stylesheet" href="css/qol-ui.css?v=94.2.8">
+  <script src="js/browser-performance.js?v=1.0.0" defer></script>
+</head>
+<body>
+  <script type="module" src="js/embed-mode.js"></script>
+  <main class="rankings-page">
+    <header class="rankings-header">
+      <p class="eyebrow">Community</p>
+      <h1>User Rankings</h1>
+      <p>Browse public collectors by display name, see profile photos, levels, and collection progress. Ranked by highest collector level.</p>
+    </header>
+
+    <section class="rankings-toolbar" aria-label="Rankings filters">
+      <div class="rankings-toolbar-row">
+        <label class="rankings-search" for="rankingsSearch">
+          Search collectors
+          <input id="rankingsSearch" type="search" placeholder="Display name or username…" autocomplete="off" aria-controls="rankingsList">
+        </label>
+        <label class="rankings-sort" for="rankingsSort">
+          Sort
+          <select id="rankingsSort">
+            <option value="level" selected>Highest level</option>
+            <option value="collection">Collection %</option>
+            <option value="unique">Most unique cards</option>
+            <option value="name">Display name A–Z</option>
+          </select>
+        </label>
+      </div>
+      <p id="rankingsMeta" class="rankings-meta" aria-live="polite"></p>
+    </section>
+
+    <div id="rankingsStatus" class="rankings-status" role="status">
+      <h2>Loading rankings…</h2>
+      <p>Gathering public collectors.</p>
+    </div>
+
+    <ol id="rankingsList" class="rankings-list" aria-label="Collector rankings"></ol>
+    <div id="rankingsPager" class="rankings-pager" hidden></div>
+    <div id="rankingsLive" class="visually-hidden" aria-live="polite"></div>
+  </main>
+  <script type="module" src="js/pages/user-rankings-page.js?v=1.0.0"></script>
+  <script src="js/shared-ui.js?v=1.6.13"></script>
+  <script src="js/qol-ui.js?v=94.2.8" defer></script>
+</body>
+</html>

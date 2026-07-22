@@ -11,6 +11,8 @@ import {
 test('aliasShellRoute trusts known keys and path-prefixed binder links', () => {
   assert.equal(aliasShellRoute('daily'), 'daily');
   assert.equal(aliasShellRoute('received-gifts'), 'rewards');
+  assert.equal(aliasShellRoute('user-rankings'), 'rankings');
+  assert.equal(aliasShellRoute('binder.html?view=rankings'), 'rankings');
   assert.equal(aliasShellRoute('binder.html?view=offers'), 'offers');
   assert.equal(aliasShellRoute('starlight-card-binder/binder.html?view=rewards'), 'rewards');
   assert.equal(aliasShellRoute('https://example.com/binder.html?view=shop'), 'shop');

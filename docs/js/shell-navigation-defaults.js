@@ -12,6 +12,7 @@ export const PUBLIC_SHELL_DESTINATIONS = Object.freeze([
   { value: 'checklist', label: 'My Checklist' },
   { value: 'trades', label: 'Wishlist & Trades' },
   { value: 'offers', label: 'Trade Offers' },
+  { value: 'rankings', label: 'User Rankings' },
   { value: 'notifications', label: 'Notifications' },
   { value: 'rewards', label: 'Received Gifts' },
   { value: 'profile', label: 'Profile & Settings' },
@@ -41,6 +42,7 @@ export function createDefaultShellNavigation() {
       checklist: 'My Checklist',
       trades: 'Wishlist & Trades',
       offers: 'Trade Offers',
+      rankings: 'User Rankings',
       notifications: 'Notifications',
       rewards: 'Received Gifts',
       profile: 'Profile Settings',
@@ -73,9 +75,10 @@ export function createDefaultShellNavigation() {
             { id: 'collection', label: 'My Card Collection & Favorites', icon: { type: 'emoji', value: '♡' }, destination: 'collection', enabled: true, features: [] },
             { id: 'star-bits', label: 'My Star Bits', icon: { type: 'emoji', value: '✦' }, destination: 'star-bits', enabled: true, features: [] },
             { id: 'checklist', label: 'My Checklist', icon: { type: 'emoji', value: '☑' }, destination: 'checklist', enabled: true, features: [] },
-            { id: 'trading-label', label: 'Trading', icon: { type: 'emoji', value: '🤝' }, destination: '', enabled: true, features: ['sectionLabel'] },
+            { id: 'trading-label', label: 'Community', icon: { type: 'emoji', value: '🤝' }, destination: '', enabled: true, features: ['sectionLabel'] },
             { id: 'trades', label: 'Wishlist & Trades', icon: { type: 'emoji', value: '💫' }, destination: 'trades', enabled: true, features: [] },
-            { id: 'offers', label: 'Trade Offers', icon: { type: 'emoji', value: '🤝' }, destination: 'offers', enabled: true, features: ['tradeOfferBadge'] }
+            { id: 'offers', label: 'Trade Offers', icon: { type: 'emoji', value: '🤝' }, destination: 'offers', enabled: true, features: ['tradeOfferBadge'] },
+            { id: 'rankings', label: 'User Rankings', icon: { type: 'emoji', value: '👤' }, destination: 'rankings', enabled: true, features: [] }
           ]
         },
         {

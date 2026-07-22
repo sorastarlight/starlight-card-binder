@@ -2,7 +2,7 @@ const params = new URLSearchParams(location.search);
 const routes = {
   'binder.html':'binder','index.html':'binder','home.html':'home','collection.html':'collection','checklist.html':'checklist','daily-booster.html':'daily',
   'booster-shop.html':'shop','events.html':'events','star-bits.html':'star-bits','redeem.html':'redeem','notifications.html':'notifications','received-rewards.html':'rewards','profile-settings.html':'profile',
-  'trade-lists.html':'trades','trade-offers.html':'offers','collector.html':'collector','report-profile.html':'report',
+  'trade-lists.html':'trades','trade-offers.html':'offers','user-rankings.html':'rankings','collector.html':'collector','report-profile.html':'report',
   'about.html':'about','socials.html':'socials','admin-hub.html':'admin','admin-codes.html':'admin-codes',
   'admin-staff.html':'admin-staff','admin-audit.html':'admin-audit','admin-moderation.html':'admin-moderation',
   'admin-boosters.html':'admin-boosters','admin-twitch.html':'admin-twitch','admin-gifts.html':'admin-gifts','admin-news.html':'admin-news','admin-notifications.html':'admin-notifications','admin-ui.html':'admin-ui','admin-website.html':'admin-website','admin-users.html':'admin-users','admin-health.html':'admin-health'
