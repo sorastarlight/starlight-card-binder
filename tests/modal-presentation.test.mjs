@@ -12,8 +12,9 @@ test('keeps modal overlays centered without turning dialog cards into overlays',
   assert.match(css, /display:flex!important/);
   assert.match(css, /align-items:safe center!important/);
   assert.match(css, /justify-content:safe center!important/);
-  assert.match(css, /\.is-embed-anchored\{/);
+  assert.match(css, /\.is-embed-anchored:not\(\.hidden\):not\(\[hidden\]\)/);
   assert.match(css, /--st-embed-overlay-height/);
+  assert.match(css, /position:absolute!important/);
   assert.match(css, /\.editor>\.editor-card(?:,\.editor>\.st-dialog)?\{--qol-modal-width:1100px\}/);
   assert.match(css, /\.rule-modal>\.rule-modal-card(?:,\.rule-modal>\.st-dialog)?\{--qol-modal-width:1080px\}/);
   assert.match(css, /background:linear-gradient\(145deg,rgba\(255,255,255,\.99\)/);

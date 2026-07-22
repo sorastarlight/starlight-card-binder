@@ -32,7 +32,7 @@ const CROP_MODES = {
     avatar: {
         canvasWidth: 480,
         canvasHeight: 480,
-        maxSourceBytes: 1048576,
+        maxSourceBytes: 8388608,
         heading: 'Adjust Your Profile Image',
         description: 'Drag the image to reposition it, then use zoom until it looks just right inside the circle.',
         canvasLabel: 'Profile image crop editor',
@@ -45,7 +45,7 @@ const CROP_MODES = {
     banner: {
         canvasWidth: 1500,
         canvasHeight: 500,
-        maxSourceBytes: 2097152,
+        maxSourceBytes: 12582912,
         heading: 'Adjust Your Profile Banner',
         description: 'Drag and zoom until the image fills this 3:1 banner frame — the same shape used on your public profile.',
         canvasLabel: 'Profile banner crop editor',
@@ -247,7 +247,7 @@ function openCropModal() {
         status('Profile image editor is still loading…', 'error');
         return;
     }
-    cropModalController.open({ initialFocus: saveImage });
+    cropModalController.open({ initialFocus: zoom || saveImage });
     // Re-draw after layout so the canvas bitmap is visible in the opened dialog.
     window.requestAnimationFrame(() => {
         draw();

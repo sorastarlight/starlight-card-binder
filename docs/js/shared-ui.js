@@ -215,11 +215,25 @@ function getEmbedVisibleFrame(view) {
   }
 }
 
+const EMBED_OVERLAY_STYLE_PROPS = [
+  'position',
+  'inset',
+  'top',
+  'left',
+  'right',
+  'bottom',
+  'width',
+  'height',
+  'max-height',
+  'max-width'
+];
+
 function clearOverlayEmbedAnchor(overlay) {
   if (!overlay) return;
   overlay.classList.remove('is-embed-anchored');
   overlay.style.removeProperty('--st-embed-overlay-top');
   overlay.style.removeProperty('--st-embed-overlay-height');
+  EMBED_OVERLAY_STYLE_PROPS.forEach(property => overlay.style.removeProperty(property));
 }
 
 function syncOverlayEmbedAnchor(overlay, view = overlay?.ownerDocument?.defaultView) {
@@ -228,9 +242,24 @@ function syncOverlayEmbedAnchor(overlay, view = overlay?.ownerDocument?.defaultV
     clearOverlayEmbedAnchor(overlay);
     return null;
   }
+
+  // Inline !important beats the base overlay rule (fixed + 100dvh), which otherwise
+  // centers dialogs in the middle of tall shell iframes — off-screen for the user.
+  const top = `${Math.round(frame.top)}px`;
+  const height = `${Math.round(frame.height)}px`;
   overlay.classList.add('is-embed-anchored');
-  overlay.style.setProperty('--st-embed-overlay-top', `${Math.round(frame.top)}px`);
-  overlay.style.setProperty('--st-embed-overlay-height', `${Math.round(frame.height)}px`);
+  overlay.style.setProperty('--st-embed-overlay-top', top);
+  overlay.style.setProperty('--st-embed-overlay-height', height);
+  overlay.style.setProperty('position', 'absolute', 'important');
+  overlay.style.setProperty('inset', 'auto', 'important');
+  overlay.style.setProperty('top', top, 'important');
+  overlay.style.setProperty('left', '0', 'important');
+  overlay.style.setProperty('right', '0', 'important');
+  overlay.style.setProperty('bottom', 'auto', 'important');
+  overlay.style.setProperty('width', '100%', 'important');
+  overlay.style.setProperty('max-width', '100%', 'important');
+  overlay.style.setProperty('height', height, 'important');
+  overlay.style.setProperty('max-height', height, 'important');
   overlay.scrollTop = 0;
   return frame;
 }
