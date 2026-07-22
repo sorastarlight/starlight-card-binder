@@ -194,10 +194,13 @@ import {
             document.getElementById("gift-send-button");
         const giftPresets =
             document.getElementById("gift-presets");
+        const giftCardPreview =
+            document.getElementById("gift-card-preview");
 
         let activeUsername = "";
         let followState = false;
         let starBitsBalance = 0;
+        let giftDuplicateCards = [];
 
         function escapeHtml(value) {
             return String(value ?? "")
@@ -207,10 +210,26 @@ import {
                 .replaceAll('"', "&quot;");
         }
 
+        function updateGiftCardPreview() {
+            if (!giftCardPreview) return;
+            const selected = giftDuplicateCards.find((card) => card.id === giftCardSelect?.value);
+            const src = selected?.thumbnail_url || selected?.image_url || selected?.thumbnailUrl || selected?.imageUrl || "";
+            if (!src) {
+                giftCardPreview.hidden = true;
+                giftCardPreview.removeAttribute("src");
+                return;
+            }
+            giftCardPreview.src = src;
+            giftCardPreview.alt = selected?.name || "Selected card";
+            giftCardPreview.hidden = false;
+        }
+
         function syncGiftTypeUi() {
             const isCard = giftType?.value === "card";
             if (giftAmountWrap) giftAmountWrap.hidden = isCard;
             if (giftCardWrap) giftCardWrap.hidden = !isCard;
+            if (!isCard && giftCardPreview) giftCardPreview.hidden = true;
+            if (isCard) updateGiftCardPreview();
         }
 
         async function prepareGiftDialog() {
@@ -263,6 +282,7 @@ import {
             const duplicates = (cardsResult.cards || [])
                 .filter((card) => Number(card.quantity || 0) > 1)
                 .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
+            giftDuplicateCards = duplicates;
 
             if (giftCardSelect) {
                 if (!duplicates.length) {
@@ -271,6 +291,7 @@ import {
                     if (giftCardHint) {
                         giftCardHint.textContent = "Open packs to build extras you can gift.";
                     }
+                    updateGiftCardPreview();
                 } else {
                     giftCardSelect.innerHTML =
                         `<option value="">Select a duplicate…</option>` +
@@ -282,6 +303,7 @@ import {
                     if (giftCardHint) {
                         giftCardHint.textContent = `${duplicates.length} duplicate card${duplicates.length === 1 ? "" : "s"} ready to gift.`;
                     }
+                    updateGiftCardPreview();
                 }
             }
 
@@ -915,6 +937,7 @@ import {
         });
 
         giftType?.addEventListener("change", syncGiftTypeUi);
+        giftCardSelect?.addEventListener("change", updateGiftCardPreview);
 
         giftPresets?.addEventListener("click", (event) => {
             const button = event.target.closest("[data-gift-preset]");

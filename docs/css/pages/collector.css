@@ -703,6 +703,8 @@
 .collector-gift-block{display:grid;gap:6px}
 .collector-gift-panel label{display:grid;gap:6px;color:#405fa1;font-weight:800}
 .collector-gift-panel input,.collector-gift-panel select{min-height:40px;padding:8px 10px;border:1px solid rgba(107,198,248,.35);border-radius:12px;font:inherit}
-.collector-gift-presets{display:flex;flex-wrap:wrap;gap:7px}
+.collector-gift-card-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
+.collector-gift-preview{width:48px;height:66px;object-fit:cover;border-radius:10px;box-shadow:0 6px 14px rgba(61,83,132,.18)}
+.collector-gift-preview[hidden]{display:none!important}
 .collector-gift-presets .collector-button{min-height:34px;padding:6px 12px;font-size:.86rem}
 .collector-gift-actions{display:flex;gap:8px;justify-content:flex-end}

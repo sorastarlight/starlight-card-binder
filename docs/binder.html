@@ -9,7 +9,7 @@
     </title>
 <link href="css/style.css?v=1.0.3" rel="stylesheet"/>
 <link href="css/v80-8-ui.css" rel="stylesheet"/>
-<link href="css/app-shell.css?v=1.3.5" rel="stylesheet"/>
+<link href="css/app-shell.css?v=1.3.7" rel="stylesheet"/>
 <link href="css/card-filters.css?v=1.0" rel="stylesheet"/>
 <link href="css/pages/binder.css?v=1.1" rel="stylesheet"/><script src="js/browser-performance.js?v=1.0.0" defer></script>
     <link rel="stylesheet" href="css/shared-ui.css?v=1.6.14">
@@ -73,6 +73,22 @@
 </div>
 </section><section class="card-filter-panel panel" data-card-filter-context="binder" aria-label="Filter binder cards"></section><section aria-label="Choose a series booster pack" class="v61-series-stage" id="seriesLanding"></section><div class="binder-browser-layout"><section aria-label="Selected card series" class="v61-card-stage" id="seriesGridStage"></section><aside aria-label="Selected card showcase" class="v62-showcase" id="v62Showcase"></aside></div></div><section aria-live="polite" class="shell-view-frame" id="shellViewFrame"><iframe id="shellViewIframe" title="Starlight Binder view"></iframe></section></main>
 </div>
+<aside class="shell-live-feed" id="shellLiveFeed" aria-label="Live collector activity feed">
+  <div class="shell-live-feed-head">
+    <div class="shell-live-feed-title">
+      <span class="shell-live-feed-pulse" aria-hidden="true"></span>
+      <strong>LIVE FEED</strong>
+      <span class="shell-live-feed-state" data-live-feed-status>Connecting</span>
+    </div>
+    <div class="shell-live-feed-controls">
+      <a class="shell-live-feed-open" href="binder.html?view=feed" data-live-feed-open>Open</a>
+      <button type="button" class="shell-live-feed-toggle" data-live-feed-toggle aria-expanded="true" aria-label="Collapse live feed">▾</button>
+    </div>
+  </div>
+  <div class="shell-live-feed-body" data-live-feed-body>
+    <div class="shell-live-feed-list" data-live-feed-list aria-live="polite"></div>
+  </div>
+</aside>
 <div aria-hidden="true" aria-live="polite" id="cardOverlay" hidden></div>
 <!--
         cloud-collection.js now loads app.js only after the
@@ -81,7 +97,7 @@
 <script src="js/cloud-collection.js?v=1.1.4" type="module"></script>
 <script src="js/site-dashboard.js" type="module"></script>
 <script src="js/pages/binder-page.js?v=1.0"></script>
-<script src="js/app-shell.js?v=1.3.6" type="module"></script>    <script src="js/shared-ui.js?v=1.6.14"></script>
+<script src="js/app-shell.js?v=1.3.7" type="module"></script>    <script src="js/shared-ui.js?v=1.6.14"></script>
 <script src="js/qol-ui.js?v=94.2.8" defer></script>
 </body>
 </html>

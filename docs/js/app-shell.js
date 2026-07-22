@@ -13,6 +13,7 @@ import {
 import { getShellNavigation } from './shell-navigation-service.js';
 import { applyShellNavigationToDom, applyShellPageTitles } from './shell-navigation-render.js';
 import { isStudioPreview, STUDIO_MSG } from './studio-preview.js';
+import { initLiveFeedWidget } from './live-feed-widget.js';
 
 const SHELL_BUILD = '94.3.4';
 const VIEW_READY_TIMEOUT_MS = 6500;
@@ -468,6 +469,16 @@ hydrateTradeOfferBadge();
 hydrateNotificationBadge();
 hydrateReceivedGiftBadge();
 hydrateActiveEventBanner();
+
+initLiveFeedWidget({
+  onOpenFullFeed() {
+    navigate('feed');
+  }
+});
+
+if (isStudioPreview()) {
+  document.getElementById('shellLiveFeed')?.setAttribute('hidden', '');
+}
 
 document.querySelector('[data-shell-signout]')?.addEventListener('click',async()=>{
   closeAccountMenu();
