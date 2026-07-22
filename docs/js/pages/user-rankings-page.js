@@ -1,5 +1,6 @@
 import { listPublicCollectorRankings } from '../collector-rankings-service.js';
 import { levelFromPoints } from '../collector-level.js';
+import { getPublicTradeLists } from '../trade-list-service.js';
 
 const PAGE_SIZE = 40;
 const root = document.querySelector('#rankingsList');
@@ -18,6 +19,7 @@ const esc = v => String(v ?? '').replace(/[&<>"']/g, m => ({
   "'": '&#39;'
 }[m]));
 
+const wishlistCache = new Map();
 let offset = 0;
 let searchQuery = '';
 let requestToken = 0;
@@ -29,6 +31,10 @@ function setLive(message) {
 
 function profileHref(username) {
   return `binder.html?view=collector&username=${encodeURIComponent(username)}`;
+}
+
+function tradeHref(username) {
+  return `binder.html?view=offers&username=${encodeURIComponent(username)}`;
 }
 
 function avatarMarkup(entry) {
@@ -72,6 +78,24 @@ function sortEntries(entries, mode) {
   }
 }
 
+function renderWishlistCards(cards) {
+  if (!cards.length) {
+    return '<p class="rankings-wishlist-empty">This collector is not publicly searching for any cards right now.</p>';
+  }
+  return `<div class="rankings-wishlist-grid">${cards.map(card => {
+    const owned = card.viewerOwnsThis ? '<span class="rankings-match-pill">You own this</span>' : '';
+    const art = card.thumbnailUrl || card.imageUrl || '';
+    return `<article class="rankings-wish-card">
+      ${art ? `<img src="${esc(art)}" alt="" loading="lazy">` : '<div class="rankings-wish-fallback" aria-hidden="true">✦</div>'}
+      <div>
+        <strong>#${esc(card.collectorNumber || card.cardNumber)} ${esc(card.name)}</strong>
+        <span>${esc(card.rarity)} · ${esc(card.seriesName || 'Series')}</span>
+        ${owned}
+      </div>
+    </article>`;
+  }).join('')}</div>`;
+}
+
 function renderRow(entry) {
   const level = levelFromPoints(entry.collectorXp);
   const rank = Number(entry.rank || 0);
@@ -80,6 +104,9 @@ function renderRow(entry) {
   const completion = showStats ? Number(entry.completionPercent || 0) : null;
   const unique = showStats ? Number(entry.uniqueCards || 0) : null;
   const catalog = Number(entry.catalogTotal || 0);
+  const title = entry.selectedTitle
+    ? `<em class="rankings-title">${esc(entry.selectedTitle)}</em>`
+    : '';
 
   const collectionStat = showStats
     ? `<div class="rankings-stat"><b>${esc(unique)}${catalog ? `/${esc(catalog)}` : ''}</b><span>Cards</span></div>
@@ -88,12 +115,17 @@ function renderRow(entry) {
        </div>`
     : `<div class="rankings-stat"><b>—</b><span>Collection private</span></div>`;
 
-  return `<li>
-    <a class="rankings-row${topClass}" href="${esc(profileHref(entry.username))}" target="_top" data-shell-view="collector">
+  return `<li class="rankings-item" data-username="${esc(entry.username)}">
+    <div class="rankings-row${topClass}">
       <div class="rankings-place" aria-label="Rank ${esc(rank)}"><small>#</small>${esc(rank)}</div>
-      ${avatarMarkup(entry)}
+      <a class="rankings-avatar-link" href="${esc(profileHref(entry.username))}" target="_top" data-shell-view="collector" aria-label="Open ${esc(entry.displayName || entry.username)} profile">
+        ${avatarMarkup(entry)}
+      </a>
       <div class="rankings-identity">
-        <strong>${esc(entry.displayName || entry.username || 'Collector')}</strong>
+        <a href="${esc(profileHref(entry.username))}" target="_top" data-shell-view="collector">
+          <strong>${esc(entry.displayName || entry.username || 'Collector')}</strong>
+        </a>
+        ${title}
         <span>@${esc(entry.username)}</span>
       </div>
       <div class="rankings-stats">
@@ -102,7 +134,15 @@ function renderRow(entry) {
         </div>
         ${collectionStat}
       </div>
-    </a>
+    </div>
+    <div class="rankings-actions">
+      <button type="button" class="st-button" data-wishlist-toggle aria-expanded="false">Cards they want</button>
+      <a class="st-button primary" href="${esc(tradeHref(entry.username))}" target="_top" data-shell-view="offers">Propose trade</a>
+      <a class="st-button" href="${esc(profileHref(entry.username))}" target="_top" data-shell-view="collector">View profile</a>
+    </div>
+    <div class="rankings-wishlist" hidden>
+      <div class="rankings-wishlist-status">Loading wishlist…</div>
+    </div>
   </li>`;
 }
 
@@ -120,6 +160,60 @@ function renderPager(total) {
     <button type="button" class="st-button" data-page="prev" ${canPrev ? '' : 'disabled'}>Previous</button>
     <button type="button" class="st-button" data-page="next" ${canNext ? '' : 'disabled'}>Next</button>
   `;
+}
+
+async function loadWishlistPanel(item) {
+  const username = item?.dataset.username;
+  const panel = item?.querySelector('.rankings-wishlist');
+  const toggle = item?.querySelector('[data-wishlist-toggle]');
+  if (!username || !panel || !toggle) return;
+
+  const open = panel.hasAttribute('hidden');
+  document.querySelectorAll('.rankings-item.is-open').forEach(other => {
+    if (other === item) return;
+    other.classList.remove('is-open');
+    other.querySelector('.rankings-wishlist')?.setAttribute('hidden', '');
+    other.querySelector('[data-wishlist-toggle]')?.setAttribute('aria-expanded', 'false');
+  });
+
+  if (!open) {
+    item.classList.remove('is-open');
+    panel.setAttribute('hidden', '');
+    toggle.setAttribute('aria-expanded', 'false');
+    return;
+  }
+
+  item.classList.add('is-open');
+  panel.removeAttribute('hidden');
+  toggle.setAttribute('aria-expanded', 'true');
+
+  if (wishlistCache.has(username)) {
+    panel.innerHTML = wishlistCache.get(username);
+    return;
+  }
+
+  panel.innerHTML = '<div class="rankings-wishlist-status">Loading wishlist…</div>';
+  try {
+    const result = await getPublicTradeLists(username);
+    let html = '';
+    if (!result?.found) {
+      html = '<p class="rankings-wishlist-empty">Trade lists are not available for this collector.</p>';
+    } else if (!result.publicLists) {
+      html = '<p class="rankings-wishlist-empty">This collector keeps their wishlist private.</p>';
+    } else {
+      const wishlist = Array.isArray(result.wishlist) ? result.wishlist : [];
+      const owned = wishlist.filter(card => card.viewerOwnsThis).length;
+      html = `<div class="rankings-wishlist-head">
+        <strong>Searching for ${wishlist.length} card${wishlist.length === 1 ? '' : 's'}</strong>
+        ${owned ? `<span>You own ${owned} of them</span>` : ''}
+      </div>${renderWishlistCards(wishlist)}`;
+    }
+    wishlistCache.set(username, html);
+    panel.innerHTML = html;
+    setLive(`Loaded wishlist for @${username}.`);
+  } catch (error) {
+    panel.innerHTML = `<p class="rankings-wishlist-empty">${esc(error?.message || 'Wishlist could not load.')}</p>`;
+  }
 }
 
 async function loadRankings({ resetOffset = false } = {}) {
@@ -180,6 +274,13 @@ async function loadRankings({ resetOffset = false } = {}) {
   }
 }
 
+root?.addEventListener('click', event => {
+  const toggle = event.target.closest('[data-wishlist-toggle]');
+  if (!toggle) return;
+  const item = toggle.closest('.rankings-item');
+  loadWishlistPanel(item);
+});
+
 searchInput?.addEventListener('input', () => {
   window.clearTimeout(debounceTimer);
   debounceTimer = window.setTimeout(() => {
@@ -189,7 +290,6 @@ searchInput?.addEventListener('input', () => {
 });
 
 sortSelect?.addEventListener('change', () => {
-  // Re-sort the current page without refetch when possible.
   loadRankings({ resetOffset: false });
 });
 

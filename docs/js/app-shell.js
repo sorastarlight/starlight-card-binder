@@ -13,7 +13,7 @@ import {
 import { getShellNavigation } from './shell-navigation-service.js';
 import { applyShellNavigationToDom, applyShellPageTitles } from './shell-navigation-render.js';
 
-const SHELL_BUILD = '94.3.2';
+const SHELL_BUILD = '94.3.3';
 const VIEW_READY_TIMEOUT_MS = 6500;
 const MAX_VIEW_RETRIES = 1;
 
@@ -37,7 +37,6 @@ const routes = {
 const nativeView=document.getElementById('binderNativeView');
 const frameWrap=document.getElementById('shellViewFrame');
 const frame=document.getElementById('shellViewIframe');
-const heading=document.getElementById('shellViewTitle');
 const menuButton=document.getElementById('shellMenuButton');
 const mainContent=document.querySelector('.main');
 let profileUsername='';
@@ -149,7 +148,6 @@ function navigate(route,{push=true,extra={}}={}){
   }
   nativeView?.classList.add('hidden');
   frameWrap?.classList.add('active');
-  if(heading)heading.textContent=routes[route].title;
   document.title=`${routes[route].title} | Starlight Card Binder`;
   loadEmbeddedView(route,{force:true,resetRetry:true});
   window.scrollTo({top:0,left:0,behavior:'auto'});
@@ -325,7 +323,6 @@ async function hydrateAccount(){
     const navigation = await getShellNavigation();
     applyShellPageTitles(routes, navigation);
     applyShellNavigationToDom(navigation, { isStaff: Boolean(access?.isStaff) });
-    if(heading && routes[currentRoute]?.title) heading.textContent = routes[currentRoute].title;
     if(currentRoute !== 'binder' && routes[currentRoute]?.title){
       document.title = `${routes[currentRoute].title} | Starlight Card Binder`;
     }

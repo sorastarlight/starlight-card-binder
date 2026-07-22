@@ -13,7 +13,7 @@ test('default shell navigation includes core destinations and staff section', ()
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'offers'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'rankings'));
   assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'rankings'));
-  assert.equal(nav.topBar.quickLinks.length, 5);
+  assert.equal(nav.topBar.quickLinks.length, 4);
 });
 
 test('sanitizeShellNavigation rejects unknown destinations and merges empty remote', () => {

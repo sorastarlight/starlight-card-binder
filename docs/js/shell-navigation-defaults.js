@@ -105,11 +105,10 @@ export function createDefaultShellNavigation() {
     },
     topBar: {
       quickLinks: [
-        { id: 'top-home', label: 'Home', destination: 'home', enabled: true },
-        { id: 'top-binder', label: 'Binder', destination: 'binder', enabled: true },
-        { id: 'top-collection', label: 'My Cards', destination: 'collection', enabled: true },
-        { id: 'top-shop', label: 'Card Shop', destination: 'shop', enabled: true },
-        { id: 'top-trades', label: 'Wishlist', destination: 'trades', enabled: true }
+        { id: 'top-home', label: 'News & Updates', destination: 'home', enabled: true },
+        { id: 'top-binder', label: 'Starlight Card Binder', destination: 'binder', enabled: true },
+        { id: 'top-collection', label: 'My Card Collection', destination: 'collection', enabled: true },
+        { id: 'top-shop', label: 'Card Shop', destination: 'shop', enabled: true }
       ]
     }
   };
