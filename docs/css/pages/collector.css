@@ -126,31 +126,31 @@
 
         .collector-header {
             display: grid;
-            grid-template-columns: clamp(120px, 18vw, 168px) minmax(0, 1fr);
-            gap: clamp(18px, 3vw, 28px);
-            align-items: end;
+            grid-template-columns: clamp(148px, 24vw, 220px) minmax(0, 1fr);
+            gap: clamp(20px, 3.2vw, 36px);
+            align-items: center;
 
-            padding: 0 28px 30px;
+            padding: 0 28px 28px;
         }
 
         .collector-avatar-wrap {
             position: relative;
             width: 100%;
-            margin-top: clamp(-56px, -9vw, -84px);
+            margin-top: clamp(-72px, -11vw, -108px);
             z-index: 1;
         }
 
         .collector-avatar-wrap::before {
             content: "";
             position: absolute;
-            inset: -10px;
+            inset: -16px;
             border-radius: 50%;
             background:
                 radial-gradient(
                     circle,
-                    rgba(255, 130, 200, 0.28),
-                    rgba(107, 198, 248, 0.12) 48%,
-                    transparent 70%
+                    rgba(255, 130, 200, 0.36),
+                    rgba(107, 198, 248, 0.16) 42%,
+                    transparent 72%
                 );
             pointer-events: none;
             z-index: 0;
@@ -165,7 +165,7 @@
             display: grid;
             place-items: center;
 
-            border: 6px solid #ffffff;
+            border: 7px solid #ffffff;
             border-radius: 50%;
 
             background:
@@ -180,12 +180,12 @@
 
             color: #ffffff;
 
-            font-size: clamp(2.2rem, 5vw, 3.2rem);
+            font-size: clamp(2.4rem, 5.5vw, 3.6rem);
             font-weight: 900;
 
             box-shadow:
-                0 0 0 1px rgba(107, 198, 248, 0.22),
-                0 16px 34px rgba(61, 83, 132, 0.22);
+                0 0 0 2px rgba(107, 198, 248, 0.28),
+                0 20px 44px rgba(61, 83, 132, 0.26);
         }
 
         .collector-avatar.has-photo {
@@ -194,15 +194,15 @@
 
         .collector-twitch-badge {
             position: absolute;
-            right: 2px;
-            bottom: 10px;
+            right: 4px;
+            bottom: 12px;
             z-index: 2;
 
             display: inline-grid;
             place-items: center;
 
-            width: 38px;
-            height: 38px;
+            width: 42px;
+            height: 42px;
             padding: 0;
 
             border-radius: 50%;
@@ -244,47 +244,15 @@
         }
 
         .collector-identity {
-            min-width: 0;
-            padding-top: 8px;
-        }
-
-        .collector-identity-panel {
-            position: relative;
             display: grid;
-            gap: 16px;
+            gap: 12px;
             min-width: 0;
-            padding: 18px 20px 20px;
-
-            border: 1px solid rgba(107, 198, 248, 0.28);
-            border-radius: 24px;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(255, 255, 255, 0.96),
-                    rgba(239, 249, 255, 0.9) 55%,
-                    rgba(255, 244, 251, 0.92)
-                );
-            box-shadow:
-                0 1px 0 rgba(255, 255, 255, 0.8) inset,
-                0 16px 36px rgba(61, 83, 132, 0.1);
-            overflow: hidden;
-        }
-
-        .collector-identity-panel::before {
-            content: "✦";
-            position: absolute;
-            right: 16px;
-            top: 6px;
-            font-size: 3.4rem;
-            line-height: 1;
-            color: rgba(255, 130, 200, 0.12);
-            pointer-events: none;
+            padding: 4px 0 0;
         }
 
         .collector-nameplate {
             display: grid;
-            gap: 4px;
+            gap: 2px;
             min-width: 0;
         }
 
@@ -295,12 +263,12 @@
 
             font-size:
                 clamp(
-                    1.9rem,
-                    4.8vw,
-                    2.85rem
+                    2rem,
+                    5vw,
+                    3.05rem
                 );
-            line-height: 1.08;
-            letter-spacing: -0.02em;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
         }
 
         .collector-username {
@@ -308,7 +276,7 @@
 
             color: var(--collector-pink);
             font-weight: 900;
-            font-size: 1rem;
+            font-size: 1.05rem;
             letter-spacing: 0.01em;
         }
 
@@ -316,7 +284,7 @@
             display: flex;
             flex-wrap: wrap;
             align-items: stretch;
-            gap: 10px;
+            gap: 8px;
             margin: 0;
         }
 
@@ -329,13 +297,13 @@
             display: inline-flex;
             align-items: center;
             gap: 7px;
-            min-height: 38px;
+            min-height: 34px;
             max-width: 100%;
             margin: 0;
-            padding: 8px 15px;
+            padding: 7px 13px;
 
             border-radius: 999px;
-            font-size: 0.84rem;
+            font-size: 0.8rem;
             font-weight: 900;
             line-height: 1.2;
             letter-spacing: 0.01em;
@@ -353,7 +321,7 @@
             border: 1px solid rgba(254, 211, 52, 0.45);
             box-shadow:
                 0 1px 0 rgba(255, 255, 255, 0.7) inset,
-                0 6px 14px rgba(180, 120, 40, 0.12);
+                0 4px 10px rgba(180, 120, 40, 0.1);
         }
 
         .collector-title[hidden] {
@@ -373,8 +341,8 @@
             border: 1px solid rgba(255, 255, 255, 0.35);
             box-shadow:
                 0 1px 0 rgba(255, 255, 255, 0.55) inset,
-                0 4px 0 #d45b9c,
-                0 10px 18px rgba(61, 83, 132, 0.18);
+                0 3px 0 #d45b9c,
+                0 8px 14px rgba(61, 83, 132, 0.16);
             transform: translateY(-1px);
         }
 
@@ -389,20 +357,20 @@
         .collector-role.is-long-bio {
             display: block;
             width: 100%;
-            max-width: 62ch;
+            max-width: 54ch;
             min-height: 0;
             margin: 0;
-            padding: 12px 14px;
-            border-radius: 16px;
-            border: 1px solid rgba(107, 198, 248, 0.22);
+            padding: 0;
+            border-radius: 0;
+            border: none;
             color: var(--collector-dark);
             font-size: 0.98rem;
             font-weight: 650;
             letter-spacing: normal;
-            line-height: 1.6;
+            line-height: 1.55;
             text-align: left;
             text-shadow: none;
-            background: rgba(255, 255, 255, 0.72);
+            background: transparent;
             box-shadow: none;
             transform: none;
             white-space: pre-wrap;
@@ -418,10 +386,10 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 8px;
+            gap: 4px 0;
             margin: 0;
-            padding-top: 2px;
-            border-top: 1px solid rgba(107, 198, 248, 0.18);
+            padding: 0;
+            border: none;
         }
 
         .collector-meta-row[hidden] {
@@ -431,16 +399,23 @@
         .collector-member,
         .collector-follow-meta {
             margin: 0;
-            padding: 7px 12px;
+            padding: 0;
 
-            border-radius: 999px;
-            border: 1px solid rgba(107, 198, 248, 0.22);
-            background: rgba(255, 255, 255, 0.72);
+            border: none;
+            border-radius: 0;
+            background: transparent;
 
             color: var(--collector-muted);
-            font-size: 0.86rem;
-            font-weight: 750;
-            line-height: 1.2;
+            font-size: 0.9rem;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+
+        .collector-member:not(:empty) + .collector-follow-meta:not(:empty):not([hidden])::before {
+            content: "·";
+            margin: 0 0.7em;
+            color: rgba(107, 198, 248, 0.9);
+            font-weight: 900;
         }
 
         .collector-member:empty,
@@ -453,7 +428,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            margin: 2px 0 0;
+            margin: 4px 0 0;
         }
 
         .collector-content {
@@ -881,20 +856,21 @@
 
             .collector-header {
                 grid-template-columns: 1fr;
-                gap: 14px;
+                gap: 16px;
+                justify-items: center;
 
                 padding: 0 16px 24px;
                 text-align: center;
             }
 
             .collector-avatar-wrap {
-                width: clamp(112px, 34vw, 140px);
-                margin: clamp(-48px, -14vw, -66px) auto 0;
+                width: clamp(132px, 40vw, 176px);
+                margin: clamp(-56px, -16vw, -80px) auto 0;
             }
 
-            .collector-identity-panel {
-                padding: 16px 16px 18px;
-                text-align: left;
+            .collector-identity {
+                width: 100%;
+                justify-items: center;
             }
 
             .collector-nameplate {
@@ -903,6 +879,11 @@
 
             .collector-flair {
                 justify-content: center;
+            }
+
+            .collector-bio,
+            .collector-role.is-long-bio {
+                text-align: center;
             }
 
             .collector-meta-row {
@@ -914,10 +895,10 @@
             }
 
             .collector-twitch-badge {
-                right: 4px;
-                bottom: 8px;
-                width: 36px;
-                height: 36px;
+                right: 6px;
+                bottom: 10px;
+                width: 38px;
+                height: 38px;
             }
 
             .collector-content {
