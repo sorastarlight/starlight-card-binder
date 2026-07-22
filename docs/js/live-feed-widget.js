@@ -27,9 +27,12 @@ function relativeTime(value) {
 
 function readCollapsed() {
   try {
-    return localStorage.getItem(STORAGE_KEY) === '1';
+    const raw = localStorage.getItem(STORAGE_KEY);
+    // Default collapsed so the chip does not cover binder showcase copy.
+    if (raw === null) return true;
+    return raw === '1';
   } catch {
-    return false;
+    return true;
   }
 }
 
@@ -171,6 +174,12 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
 
   return {
     refresh,
+    setSuppressed(hidden) {
+      root.hidden = Boolean(hidden);
+      root.classList.toggle('is-suppressed', Boolean(hidden));
+      if (hidden) window.clearInterval(timer);
+      else start();
+    },
     destroy() {
       window.clearInterval(timer);
     }

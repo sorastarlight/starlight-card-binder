@@ -762,6 +762,17 @@ function renderDetail() {
   $('#previewCard')?.addEventListener('click', (e) => { if (!e.target.closest('#flipPreview')) openFullView('filtered'); });
 }
 
+function notifyShellChrome({ hideLiveFeed = false } = {}) {
+  try {
+    window.parent?.postMessage?.(
+      { type: 'starlight-shell-chrome', hideLiveFeed: Boolean(hideLiveFeed) },
+      window.location.origin
+    );
+  } catch {
+    /* ignore */
+  }
+}
+
 let cardOverlayModal = null;
 function fullViewModal() {
   const overlay = $('#cardOverlay');
@@ -773,10 +784,12 @@ function fullViewModal() {
       onOpen: () => {
         overlay.classList.add('open');
         document.body.classList.add('modal-open');
+        notifyShellChrome({ hideLiveFeed: true });
       },
       onClose: () => {
         overlay.classList.remove('open');
         document.body.classList.remove('modal-open');
+        notifyShellChrome({ hideLiveFeed: false });
       }
     });
   }
@@ -804,6 +817,7 @@ function openFullView(listMode = 'all') {
   else {
     $('#cardOverlay')?.classList.add('open');
     document.body.classList.add('modal-open');
+    notifyShellChrome({ hideLiveFeed: true });
   }
 }
 function closeFullView() {
@@ -811,6 +825,7 @@ function closeFullView() {
   else {
     $('#cardOverlay')?.classList.remove('open');
     document.body.classList.remove('modal-open');
+    notifyShellChrome({ hideLiveFeed: false });
   }
 }
 function stepFullView(dir) {

@@ -484,6 +484,9 @@ window.addEventListener('message',e=>{
     window.dispatchEvent(new CustomEvent('starlight-dashboard-refresh',{detail:data}));
   }
   if(data.type==='starlight-view-height')resizeEmbeddedView(Number(data.height));
+  if(data.type==='starlight-shell-chrome'){
+    liveFeedWidget?.setSuppressed?.(Boolean(data.hideLiveFeed));
+  }
 });
 
 frame?.addEventListener('pointerdown',()=>{closeNotificationPopover();closeAccountMenu();});
@@ -507,7 +510,7 @@ hydrateNotificationBadge();
 hydrateReceivedGiftBadge();
 hydrateActiveEventBanner();
 
-initLiveFeedWidget({
+const liveFeedWidget = initLiveFeedWidget({
   onOpenFullFeed() {
     navigate('feed');
   }
@@ -515,4 +518,5 @@ initLiveFeedWidget({
 
 if (isStudioPreview()) {
   document.getElementById('shellLiveFeed')?.setAttribute('hidden', '');
+  liveFeedWidget?.setSuppressed?.(true);
 }
