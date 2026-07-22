@@ -12,6 +12,8 @@
 .unified-nav a:hover,.unified-nav a:focus-visible{background:rgba(107,198,248,.15);transform:translateX(2px)}
 .unified-nav a.active{background:linear-gradient(135deg,rgba(107,198,248,.25),rgba(255,130,200,.22));box-shadow:inset 0 0 0 1px rgba(255,130,200,.25);color:#334f8d}
 .unified-nav .staff-link{display:none}.unified-nav .staff-link.visible{display:flex}
+.shell-nav-icon-img{width:20px;height:20px;object-fit:contain;flex:none;border-radius:4px;vertical-align:middle}
+.shell-nav-label .shell-nav-icon-img{width:16px;height:16px}
 .shell-account-bar{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:14px;padding:13px 17px;border:1px solid rgba(107,198,248,.36);border-radius:17px;background:rgba(255,255,255,.93);box-shadow:0 9px 24px rgba(61,83,132,.09)}
 .shell-account-main{min-width:0}.shell-account-main strong{display:block;color:#405fa1;font-size:1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.shell-account-main span{color:var(--shell-muted);font-size:.86rem}
 .shell-account-stats{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}.shell-stat{display:inline-flex;gap:5px;align-items:center;padding:7px 10px;border-radius:999px;background:linear-gradient(135deg,rgba(254,211,52,.18),rgba(255,130,200,.14));color:#765600;font-weight:850;font-size:.86rem}.shell-avatar{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--shell-blue),var(--shell-pink));color:#fff;font-weight:950;box-shadow:0 7px 18px rgba(255,130,200,.25)}

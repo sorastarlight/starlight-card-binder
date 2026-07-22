@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Website User Interface | Starlight Card Binder</title>
+  <link rel="stylesheet" href="css/style.css?v=1.0.2">
+  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.8">
+  <link rel="stylesheet" href="css/pages/admin-ui.css?v=1.0">
+  <link rel="stylesheet" href="css/qol-ui.css?v=94.2.4">
+  <script src="js/browser-performance.js?v=1.0.0" defer></script>
+</head>
+<body>
+  <script src="js/embed-mode.js" type="module"></script>
+  <div class="sky"></div>
+  <main class="page">
+    <section class="panel">
+      <p class="eyebrow">Administration Hub</p>
+      <div class="toolbar">
+        <div>
+          <h1>Website User Interface</h1>
+          <p class="lead">Edit the shell sidebar, top-bar quick links, brand ribbon, and page titles used across Starlight Card Binder.</p>
+        </div>
+        <div class="actions">
+          <button id="saveBtn" class="btn primary" type="button" hidden>Save Changes</button>
+          <button id="resetBtn" class="btn danger" type="button" hidden>Reset to Defaults</button>
+        </div>
+      </div>
+      <p id="status" class="status" role="status">Checking staff access…</p>
+
+      <div id="app" class="hidden" hidden>
+        <div class="field brand-field">
+          <label for="brandRibbon">Brand ribbon text</label>
+          <input id="brandRibbon" maxlength="40" placeholder="Card Binder">
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="Website UI editors">
+          <button type="button" class="tab active" role="tab" aria-selected="true" data-tab="sidebar" id="tab-sidebar" aria-controls="panel-sidebar">Sidebar</button>
+          <button type="button" class="tab" role="tab" aria-selected="false" data-tab="topbar" id="tab-topbar" aria-controls="panel-topbar">Top Bar</button>
+          <button type="button" class="tab" role="tab" aria-selected="false" data-tab="titles" id="tab-titles" aria-controls="panel-titles">Page Titles</button>
+        </div>
+
+        <div class="editor-layout">
+          <div class="editor-main">
+            <section id="panel-sidebar" class="tab-panel" role="tabpanel" aria-labelledby="tab-sidebar" data-panel="sidebar"></section>
+            <section id="panel-topbar" class="tab-panel hidden" role="tabpanel" aria-labelledby="tab-topbar" data-panel="topbar" hidden></section>
+            <section id="panel-titles" class="tab-panel hidden" role="tabpanel" aria-labelledby="tab-titles" data-panel="titles" hidden></section>
+          </div>
+          <aside class="preview-panel" aria-label="Live preview">
+            <h2>Live preview</h2>
+            <p class="preview-hint">Updates as you edit. Save to publish for all collectors.</p>
+            <div id="livePreview" class="live-preview"></div>
+          </aside>
+        </div>
+
+        <p class="upload-guide">Icon uploads: Use a square PNG or WebP, 64×64 recommended (48–96px). Max 5 MB. Transparent background preferred.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/shared-ui.js?v=1.6.7"></script>
+  <script type="module" src="js/pages/admin-ui-page.js?v=1.0"></script>
+  <script src="js/qol-ui.js?v=94.2.4" defer></script>
+</body>
+</html>

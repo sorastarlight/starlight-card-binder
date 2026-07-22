@@ -10,8 +10,10 @@ import {
   normalizeNotificationParams,
   resolveNotificationRoute
 } from './shell-route-utils.js';
+import { getShellNavigation } from './shell-navigation-service.js';
+import { applyShellNavigationToDom, applyShellPageTitles } from './shell-navigation-render.js';
 
-const SHELL_BUILD = '94.2.0';
+const SHELL_BUILD = '94.3.0';
 const VIEW_READY_TIMEOUT_MS = 6500;
 const MAX_VIEW_RETRIES = 1;
 
@@ -283,32 +285,47 @@ async function hydrateAccount(){
     signedOutNodes.forEach(node=>node.setAttribute('hidden',''));
     signedInNodes.forEach(node=>node.removeAttribute('hidden'));
   };
+  let access = null;
   try{
     const {data}=await supabase.auth.getUser();const user=data?.user;
     if(!user){
       showSignedOut();
       document.querySelector('[data-shell-account-name]').textContent='Welcome to Starlight Cards';
       document.querySelector('[data-shell-account-sub]').textContent='Log in or create an account to collect cards';
-      return;
+    } else {
+      showSignedIn();
+      const {data:profile}=await supabase.from('profiles').select('username,display_name,onboarding_complete,avatar_url,selected_title_id').eq('id',user.id).maybeSingle();
+      profileUsername=profile?.username||'';
+      const name=profile?.display_name||profile?.username||user.email||'Collector';
+      document.querySelector('[data-shell-account-name]').textContent=name;
+      document.querySelector('[data-shell-account-sub]').textContent=profile?.username?`@${profile.username}`:user.email;
+      const avatar=document.querySelector('[data-shell-avatar]');
+      if(profile?.avatar_url){avatar.textContent='';avatar.style.backgroundImage=`url(${profile.avatar_url})`;avatar.style.backgroundSize='cover';avatar.style.backgroundPosition='center'}
+      else{avatar.textContent=String(name).trim().charAt(0).toUpperCase()||'✦';}
+      const link=document.querySelector('[data-shell-profile-link]');if(link&&profileUsername)link.href=`binder.html?view=collector&username=${encodeURIComponent(profileUsername)}`;
+      access=await getMyStaffAccess();
     }
-    showSignedIn();
-    const {data:profile}=await supabase.from('profiles').select('username,display_name,onboarding_complete,avatar_url,selected_title_id').eq('id',user.id).maybeSingle();
-    profileUsername=profile?.username||'';
-    const name=profile?.display_name||profile?.username||user.email||'Collector';
-    document.querySelector('[data-shell-account-name]').textContent=name;
-    document.querySelector('[data-shell-account-sub]').textContent=profile?.username?`@${profile.username}`:user.email;
-    const avatar=document.querySelector('[data-shell-avatar]');
-    if(profile?.avatar_url){avatar.textContent='';avatar.style.backgroundImage=`url(${profile.avatar_url})`;avatar.style.backgroundSize='cover';avatar.style.backgroundPosition='center'}
-    else{avatar.textContent=String(name).trim().charAt(0).toUpperCase()||'✦';}
-    const link=document.querySelector('[data-shell-profile-link]');if(link&&profileUsername)link.href=`binder.html?view=collector&username=${encodeURIComponent(profileUsername)}`;
-    const access=await getMyStaffAccess();
-    if(access?.isStaff)document.querySelector('.unified-nav')?.classList.add('has-staff-access');
-    document.querySelectorAll('.staff-link').forEach(el=>el.classList.toggle('visible',Boolean(access?.isStaff)));
-    document.querySelector('.staff-only-menu')?.toggleAttribute('hidden',!access?.isStaff);
   }catch(e){
     console.warn('[Starlight] Shell account hydration failed',e);
     showSignedOut();
   }
+
+  try{
+    const navigation = await getShellNavigation();
+    applyShellPageTitles(routes, navigation);
+    applyShellNavigationToDom(navigation, { isStaff: Boolean(access?.isStaff) });
+    if(heading && routes[currentRoute]?.title) heading.textContent = routes[currentRoute].title;
+    if(currentRoute !== 'binder' && routes[currentRoute]?.title){
+      document.title = `${routes[currentRoute].title} | Starlight Card Binder`;
+    }
+  }catch(e){
+    console.warn('[Starlight] Shell navigation config failed', e);
+    applyShellNavigationToDom(null, { isStaff: Boolean(access?.isStaff) });
+  }
+
+  if(access?.isStaff)document.querySelector('.unified-nav')?.classList.add('has-staff-access');
+  document.querySelectorAll('.staff-link').forEach(el=>el.classList.toggle('visible',Boolean(access?.isStaff)));
+  document.querySelector('.staff-only-menu')?.toggleAttribute('hidden',!access?.isStaff);
 }
 
 document.addEventListener('click',e=>{const a=e.target.closest('[data-shell-view]');if(a){e.preventDefault();navigate(a.dataset.shellView);}});
