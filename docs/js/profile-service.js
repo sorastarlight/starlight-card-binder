@@ -39,6 +39,8 @@ export async function loadOwnProfile() {
             show_favorites,
             show_featured_cards,
             favorite_card_id,
+            favorite_series_id,
+            favorite_character,
             onboarding_complete,
             username_locked,
             username_source,

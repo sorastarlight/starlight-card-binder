@@ -5,7 +5,9 @@ import {
             setProfileFavoriteCard,
             updateCollectorProfile
         } from "../profile-service.js";
+        import { setProfileShowcase } from "../social-service.js";
         import { getMyTwitchConnection } from "../twitch-service.js";
+        import { supabase } from "../supabase-client.js";
 
         const form =
             document.getElementById(
@@ -61,6 +63,10 @@ import {
             document.getElementById(
                 "favorite-card"
             );
+        const favoriteSeriesSelect =
+            document.getElementById("favorite-series");
+        const favoriteCharacterInput =
+            document.getElementById("favorite-character");
 
         const favoriteCardPreview =
             document.getElementById(
@@ -322,6 +328,15 @@ import {
                 profile.favorite_card_id ||
                 "";
 
+            if (favoriteSeriesSelect) {
+                favoriteSeriesSelect.value =
+                    profile.favorite_series_id || "";
+            }
+            if (favoriteCharacterInput) {
+                favoriteCharacterInput.value =
+                    profile.favorite_character || "";
+            }
+
             updateBioCount();
             updateProfileLink(
                 profile.onboarding_complete
@@ -425,6 +440,23 @@ import {
                         `;
                     })
                     .join("");
+
+            try {
+                const { data: seriesRows } = await supabase
+                    .from("card_series")
+                    .select("id,name,sort_order")
+                    .eq("is_visible", true)
+                    .order("sort_order", { ascending: true });
+                if (favoriteSeriesSelect) {
+                    favoriteSeriesSelect.innerHTML =
+                        `<option value="">No favorite series selected</option>` +
+                        (seriesRows || []).map((series) =>
+                            `<option value="${escapeHtml(series.id)}">${escapeHtml(series.name)}</option>`
+                        ).join("");
+                }
+            } catch (seriesError) {
+                console.warn("Unable to load series list", seriesError);
+            }
 
             fillProfileForm(
                 existingProfile
@@ -555,6 +587,15 @@ import {
                         favoriteCardSelect.value ||
                         null
                     );
+
+                    await setProfileShowcase({
+                        favoriteCardId: favoriteCardSelect.value || null,
+                        favoriteSeriesId: favoriteSeriesSelect?.value || null,
+                        favoriteCharacter: favoriteCharacterInput?.value || null,
+                        clearFavoriteCard: !favoriteCardSelect.value,
+                        clearFavoriteSeries: !favoriteSeriesSelect?.value,
+                        clearFavoriteCharacter: !(favoriteCharacterInput?.value || "").trim()
+                    });
 
                     updateProfileLink(
                         result.username

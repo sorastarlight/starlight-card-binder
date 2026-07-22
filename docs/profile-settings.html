@@ -201,6 +201,20 @@
 </div>
 </div>
 </section>
+<section class="profile-section">
+<h2>Favorite Series &amp; Character</h2>
+<div class="profile-field">
+<label for="favorite-series">Favorite Series</label>
+<select id="favorite-series">
+<option value="">No favorite series selected</option>
+</select>
+</div>
+<div class="profile-field">
+<label for="favorite-character">Favorite Character</label>
+<input id="favorite-character" type="text" maxlength="64" placeholder="e.g. Sora"/>
+</div>
+<p class="profile-help">These appear on your public collector profile alongside your showcase card.</p>
+</section>
 <section aria-labelledby="collector-hub-heading" class="profile-section profile-collector-hub">
 <h2 id="collector-hub-heading" data-content="profile.activitySectionTitle">Collector Activity</h2>
 <p class="profile-help">Manage the social side of your collection from one place.</p>
@@ -212,6 +226,10 @@
 <a class="profile-activity-card" href="binder.html?view=offers" data-shell-view="offers">
 <strong data-content="profile.offersCardTitle">🤝 Trade Offers</strong>
 <span data-content="profile.offersCardLead">Review incoming offers, sent offers, and create a new exchange.</span>
+</a>
+<a class="profile-activity-card" href="binder.html?view=feed" data-shell-view="feed">
+<strong>🎉 Pull Feed</strong>
+<span>Follow collectors and watch live pulls, gifts, and community moments.</span>
 </a>
 <a class="profile-activity-card" href="binder.html?view=collector" id="view-public-profile-card" data-shell-view="collector">
 <strong data-content="profile.publicCardTitle">🌟 Public Collector Profile</strong>
@@ -244,7 +262,7 @@
 </section>
 </main>
 <script type="module" src="js/pages/website-content-hydrate-page.js?v=1.2"></script>
-<script src="js/pages/profile-settings-page.js?v=1.2" type="module"></script>
+<script src="js/pages/profile-settings-page.js?v=1.3" type="module"></script>
 <script src="js/staff-profile-link.js" type="module"></script>
 <div aria-hidden="true" class="st-dialog-overlay profile-crop-modal hidden" id="profile-crop-modal" data-crop-mode="avatar">
 <section aria-describedby="profile-crop-description" aria-labelledby="profile-crop-heading" aria-modal="true" class="st-dialog profile-crop-dialog" role="dialog" tabindex="-1">

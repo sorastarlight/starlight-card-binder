@@ -25,6 +25,7 @@ const routes = {
   'star-bits':{title:'Star Bits Exchange',src:'star-bits.html'}, checklist:{title:'My Checklist',src:'checklist.html'},
   trades:{title:'Wishlist & Trades',src:'trade-lists.html'}, offers:{title:'Trade Offers',src:'trade-offers.html'},
   rankings:{title:'User Rankings',src:'user-rankings.html'},
+  feed:{title:'Pull Feed',src:'pull-feed.html'},
   notifications:{title:'Notifications',src:'notifications.html'}, rewards:{title:'Received Gifts',src:'received-rewards.html'}, profile:{title:'Profile Settings',src:'profile-settings.html'}, collector:{title:'Collector Profile',src:'collector.html'},
   report:{title:'Report Profile',src:'report-profile.html'}, about:{title:'About',src:'about.html'}, socials:{title:'Socials',src:'socials.html'},
   admin:{title:'Administration Hub',src:'admin-hub.html'}, 'admin-codes':{title:'Reward Code Console',src:'admin-codes.html'},

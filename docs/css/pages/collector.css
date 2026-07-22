@@ -683,3 +683,22 @@
 .collector-title{display:inline-block;margin:8px 0 0;padding:7px 12px;border-radius:999px;background:linear-gradient(135deg,rgba(254,211,52,.22),rgba(255,130,200,.18));color:#8a5a70;font-weight:900}
 .public-achievement-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}.public-achievement-grid article{display:flex;gap:12px;align-items:center;padding:14px;border-radius:15px;background:#fff;border:1px solid rgba(255,130,200,.28)}.public-achievement-grid article>span{font-size:2rem}.public-achievement-grid strong,.public-achievement-grid small{display:block}.public-achievement-grid small{margin-top:4px;color:#6b7089}
 .trade-showcase-title{margin-top:24px}
+
+.collector-follow-meta{margin:8px 0 0;color:var(--collector-muted);font-size:.9rem;font-weight:750}
+.collector-social-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.showcase-layout-hero{grid-template-columns:minmax(240px,380px) minmax(0,1fr)}
+.highlight-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.highlight-card{display:grid;gap:8px;padding:14px;border:1px solid rgba(107,198,248,.28);border-radius:16px;background:rgba(255,255,255,.92)}
+.highlight-card .eyebrow{margin:0;color:#7a89ad;font-size:.7rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.highlight-card img,.highlight-fallback{width:100%;aspect-ratio:5/7;object-fit:cover;border-radius:12px;background:linear-gradient(145deg,#e8f4ff,#ffeaf5)}
+.highlight-fallback{display:grid;place-items:center;color:#9aa8c7;font-size:1.6rem}
+.highlight-card strong{color:#405fa1}
+.highlight-card span{color:#67708b;font-size:.86rem}
+.collector-gift-dialog{border:0;padding:0;border-radius:18px;background:transparent;max-width:min(420px,92vw)}
+.collector-gift-dialog::backdrop{background:rgba(40,48,78,.45)}
+.collector-gift-panel{display:grid;gap:12px;padding:20px;border:1px solid rgba(107,198,248,.35);border-radius:18px;background:#fff;box-shadow:0 20px 50px rgba(45,60,105,.25)}
+.collector-gift-panel h2{margin:0;color:#405fa1}
+.collector-gift-lead,.collector-gift-status{margin:0;color:#67708b}
+.collector-gift-panel label{display:grid;gap:6px;color:#405fa1;font-weight:800}
+.collector-gift-panel input,.collector-gift-panel select{min-height:40px;padding:8px 10px;border:1px solid rgba(107,198,248,.35);border-radius:12px;font:inherit}
+.collector-gift-actions{display:flex;gap:8px;justify-content:flex-end}

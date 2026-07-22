@@ -13,6 +13,7 @@ export const PUBLIC_SHELL_DESTINATIONS = Object.freeze([
   { value: 'trades', label: 'Wishlist & Trades' },
   { value: 'offers', label: 'Trade Offers' },
   { value: 'rankings', label: 'User Rankings' },
+  { value: 'feed', label: 'Pull Feed' },
   { value: 'notifications', label: 'Notifications' },
   { value: 'rewards', label: 'Received Gifts' },
   { value: 'profile', label: 'Profile & Settings' },
@@ -43,6 +44,7 @@ export function createDefaultShellNavigation() {
       trades: 'Wishlist & Trades',
       offers: 'Trade Offers',
       rankings: 'User Rankings',
+      feed: 'Pull Feed',
       notifications: 'Notifications',
       rewards: 'Received Gifts',
       profile: 'Profile Settings',
@@ -78,7 +80,8 @@ export function createDefaultShellNavigation() {
             { id: 'trading-label', label: 'Community', icon: { type: 'emoji', value: '🤝' }, destination: '', enabled: true, features: ['sectionLabel'] },
             { id: 'trades', label: 'Wishlist & Trades', icon: { type: 'emoji', value: '💫' }, destination: 'trades', enabled: true, features: [] },
             { id: 'offers', label: 'Trade Offers', icon: { type: 'emoji', value: '🤝' }, destination: 'offers', enabled: true, features: ['tradeOfferBadge'] },
-            { id: 'rankings', label: 'User Rankings', icon: { type: 'emoji', value: '👤' }, destination: 'rankings', enabled: true, features: [] }
+            { id: 'rankings', label: 'User Rankings', icon: { type: 'emoji', value: '👤' }, destination: 'rankings', enabled: true, features: [] },
+            { id: 'feed', label: 'Pull Feed', icon: { type: 'emoji', value: '🎉' }, destination: 'feed', enabled: true, features: [] }
           ]
         },
         {

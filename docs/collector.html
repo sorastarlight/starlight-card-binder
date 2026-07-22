@@ -8,7 +8,7 @@
         Collector Profile | Starlight Card Binder
     </title>
 <link href="css/style.css?v=1.0.2" rel="stylesheet"/>
-<link rel="stylesheet" href="css/pages/collector.css?v=1.4">
+<link rel="stylesheet" href="css/pages/collector.css?v=1.5">
 <script src="js/browser-performance.js?v=1.0.0" defer></script>
     <link rel="stylesheet" href="css/shared-ui.css?v=1.6.13">
 <link rel="stylesheet" href="css/qol-ui.css?v=94.2.8">
@@ -100,6 +100,11 @@
 <p class="collector-username" id="collector-username"></p>
 <p class="collector-bio" id="collector-bio"></p>
 <p class="collector-member" id="collector-member"></p>
+<p class="collector-follow-meta" id="collector-follow-meta" hidden></p>
+<div class="collector-social-actions" id="collector-social-actions" hidden>
+<button type="button" class="collector-button" id="follow-button">Follow</button>
+<button type="button" class="collector-button primary" id="gift-button">Send Gift</button>
+</div>
 </div>
 </header>
 <div class="collector-content">
@@ -144,9 +149,9 @@
 </section>
 <section class="collector-section hidden" id="showcase-section">
 <h2>
-                        🌟 Main Showcase Card
+                        🌟 Favorite Card Showcase
                     </h2>
-<div class="showcase-layout">
+<div class="showcase-layout showcase-layout-hero">
 <img alt="" class="showcase-card-image" id="showcase-card-image" src=""/>
 <div class="showcase-copy">
 <p class="eyebrow">
@@ -158,6 +163,10 @@
 <p id="showcase-card-artist"></p>
 </div>
 </div>
+</section>
+<section class="collector-section hidden" id="highlights-section">
+<h2>✨ Collector Highlights</h2>
+<div class="highlight-grid" id="highlight-grid"></div>
 </section>
 <section class="collector-section hidden" id="rarity-section">
 <h2>
@@ -196,8 +205,34 @@
 </section>
 </div>
 </article>
+<dialog class="collector-gift-dialog" id="gift-dialog">
+<form method="dialog" class="collector-gift-panel" id="gift-form">
+<h2>Send a Gift</h2>
+<p class="collector-gift-lead">Send Star Bits or a duplicate card. Gifts appear in their Received Gifts mailbox.</p>
+<label>Gift type
+<select id="gift-type">
+<option value="star_bits">Star Bits</option>
+<option value="card">Duplicate Card</option>
+</select>
+</label>
+<label id="gift-amount-wrap">Amount
+<input id="gift-amount" type="number" min="1" max="50000" value="100"/>
+</label>
+<label id="gift-card-wrap" hidden>Card ID
+<input id="gift-card-id" type="text" placeholder="card id you own as a duplicate"/>
+</label>
+<label>Message <span>(optional)</span>
+<input id="gift-message" type="text" maxlength="160" placeholder="Enjoy this sparkle ✦"/>
+</label>
+<p class="collector-gift-status" id="gift-status" role="status"></p>
+<div class="collector-gift-actions">
+<button type="submit" class="collector-button primary" value="send">Send Gift</button>
+<button type="submit" class="collector-button" value="cancel">Cancel</button>
+</div>
+</form>
+</dialog>
 </main>
-<script src="js/pages/collector-page.js?v=1.1" type="module"></script>
+<script src="js/pages/collector-page.js?v=1.2" type="module"></script>
 <script src="js/public-profile-extras.js?v=1.2" type="module"></script>
 <script src="js/public-trade-showcase.js?v=1.1" type="module"></script>    <script type="module" src="js/public-twitch-profile.js?v=1.0"></script>
 <script src="js/shared-ui.js?v=1.6.13"></script>

@@ -2,6 +2,12 @@ import {
             loadOwnProfile,
             loadPublicCollectorProfile
         } from "../profile-service.js";
+        import {
+            followCollector,
+            getPublicCollectorSocial,
+            sendPeerGift,
+            unfollowCollector
+        } from "../social-service.js";
 
         const loadingState =
             document.getElementById(
@@ -147,6 +153,34 @@ import {
             document.getElementById(
                 "favorite-grid"
             );
+
+        const highlightsSection =
+            document.getElementById("highlights-section");
+        const highlightGrid =
+            document.getElementById("highlight-grid");
+        const followMeta =
+            document.getElementById("collector-follow-meta");
+        const socialActions =
+            document.getElementById("collector-social-actions");
+        const followButton =
+            document.getElementById("follow-button");
+        const giftButton =
+            document.getElementById("gift-button");
+        const giftDialog =
+            document.getElementById("gift-dialog");
+        const giftForm =
+            document.getElementById("gift-form");
+        const giftType =
+            document.getElementById("gift-type");
+        const giftAmountWrap =
+            document.getElementById("gift-amount-wrap");
+        const giftCardWrap =
+            document.getElementById("gift-card-wrap");
+        const giftStatus =
+            document.getElementById("gift-status");
+
+        let activeUsername = "";
+        let followState = false;
 
         const username =
             new URLSearchParams(
@@ -413,6 +447,68 @@ import {
             }
         }
 
+        function cardTile(card, eyebrow) {
+            if (!card) return "";
+            const image = card.thumbnailUrl || card.imageUrl || "";
+            return `<article class="highlight-card">
+              <p class="eyebrow">${eyebrow}</p>
+              ${image ? `<img src="${image.replaceAll('"','&quot;')}" alt="">` : '<div class="highlight-fallback">✦</div>'}
+              <strong>${String(card.name || "").replaceAll("<","&lt;")}</strong>
+              <span>${String(card.rarity || "")}${card.seriesName ? ` · ${card.seriesName}` : ""}</span>
+            </article>`;
+        }
+
+        function renderSocialHighlights(social) {
+            if (!highlightsSection || !highlightGrid) return;
+            highlightGrid.replaceChildren();
+            highlightsSection.classList.add("hidden");
+            if (!social || social.private || !social.found) {
+                if (followMeta) followMeta.hidden = true;
+                if (socialActions) socialActions.hidden = true;
+                return;
+            }
+
+            activeUsername = social.profile?.username || username;
+            followState = Boolean(social.follow?.following);
+            const followers = Number(social.follow?.followerCount || 0);
+            const following = Number(social.follow?.followingCount || 0);
+            if (followMeta) {
+                followMeta.hidden = false;
+                followMeta.textContent = `${followers} follower${followers === 1 ? "" : "s"} · ${following} following`;
+            }
+            if (socialActions) {
+                socialActions.hidden = Boolean(social.isSelf);
+            }
+            if (followButton) {
+                followButton.textContent = followState ? "Following" : "Follow";
+                followButton.setAttribute("aria-pressed", followState ? "true" : "false");
+            }
+
+            const parts = [];
+            if (social.favoriteSeries?.name) {
+                parts.push(`<article class="highlight-card"><p class="eyebrow">Favorite Series</p><strong>${String(social.favoriteSeries.name).replaceAll("<","&lt;")}</strong><span>Chosen showcase series</span></article>`);
+            }
+            if (social.favoriteCharacter) {
+                parts.push(`<article class="highlight-card"><p class="eyebrow">Favorite Character</p><strong>${String(social.favoriteCharacter).replaceAll("<","&lt;")}</strong><span>Collector favorite</span></article>`);
+            }
+            if (social.mostRarePull) parts.push(cardTile(social.mostRarePull, "Most Rare Pull"));
+            if (social.newestPull) parts.push(cardTile(social.newestPull, "Newest Pull"));
+            const streak = Number(social.pullStreakDays || 0);
+            if (streak > 0) {
+                parts.push(`<article class="highlight-card"><p class="eyebrow">Pull Streak</p><strong>Opened packs ${streak} day${streak === 1 ? "" : "s"} in a row</strong><span>Daily Booster streak</span></article>`);
+            }
+            if (social.profile?.memberSince) {
+                const joined = formatMemberDate(social.profile.memberSince);
+                if (joined) {
+                    parts.push(`<article class="highlight-card"><p class="eyebrow">Joined</p><strong>${joined}</strong><span>Member since</span></article>`);
+                }
+            }
+
+            if (!parts.length) return;
+            highlightGrid.innerHTML = parts.join("");
+            highlightsSection.classList.remove("hidden");
+        }
+
         function renderProfile(result) {
             const profile =
                 result.profile;
@@ -492,11 +588,13 @@ import {
 
             memberElement.textContent =
                 memberDate
-                    ? `Collector since ${memberDate}`
+                    ? `Joined ${memberDate}`
                     : "";
 
             avatarElement.textContent = '✦';
             avatarElement.classList.remove('has-photo');
+
+            renderSocialHighlights(result.social || null);
 
             if (
                 profile.showCollectionStats &&
@@ -619,13 +717,22 @@ import {
                     username
                 );
 
-            let isSelf = false;
+            let social = null;
             try {
-                const own = await loadOwnProfile();
-                const ownUsername = String(own?.profile?.username || '').trim().toLowerCase();
-                isSelf = Boolean(ownUsername && ownUsername === String(username).trim().toLowerCase());
-            } catch {
-                isSelf = false;
+                social = await getPublicCollectorSocial(username);
+            } catch (socialError) {
+                console.warn("[Starlight] Social profile unavailable", socialError);
+            }
+
+            let isSelf = Boolean(social?.isSelf);
+            if (!isSelf) {
+                try {
+                    const own = await loadOwnProfile();
+                    const ownUsername = String(own?.profile?.username || '').trim().toLowerCase();
+                    isSelf = Boolean(ownUsername && ownUsername === String(username).trim().toLowerCase());
+                } catch {
+                    isSelf = false;
+                }
             }
 
             hideAllStates();
@@ -642,7 +749,10 @@ import {
                 return;
             }
 
-            if (result) result.isSelf = isSelf;
+            if (result) {
+                result.isSelf = isSelf;
+                result.social = social;
+            }
 
             if (
                 !result ||
@@ -665,6 +775,61 @@ import {
 
             renderProfile(result);
         }
+
+        followButton?.addEventListener("click", async () => {
+            if (!activeUsername) return;
+            followButton.disabled = true;
+            try {
+                if (followState) {
+                    await unfollowCollector(activeUsername);
+                    followState = false;
+                } else {
+                    await followCollector(activeUsername);
+                    followState = true;
+                }
+                followButton.textContent = followState ? "Following" : "Follow";
+                followButton.setAttribute("aria-pressed", followState ? "true" : "false");
+                const social = await getPublicCollectorSocial(activeUsername);
+                renderSocialHighlights(social);
+            } catch (error) {
+                alert(error.message || "Could not update follow.");
+            } finally {
+                followButton.disabled = false;
+            }
+        });
+
+        giftButton?.addEventListener("click", () => {
+            if (!giftDialog) return;
+            if (giftStatus) giftStatus.textContent = "";
+            giftDialog.showModal();
+        });
+
+        giftType?.addEventListener("change", () => {
+            const isCard = giftType.value === "card";
+            if (giftAmountWrap) giftAmountWrap.hidden = isCard;
+            if (giftCardWrap) giftCardWrap.hidden = !isCard;
+        });
+
+        giftForm?.addEventListener("submit", async (event) => {
+            const submitter = event.submitter;
+            if (submitter?.value === "cancel") return;
+            event.preventDefault();
+            if (!activeUsername) return;
+            if (giftStatus) giftStatus.textContent = "Sending gift…";
+            try {
+                await sendPeerGift({
+                    username: activeUsername,
+                    giftType: giftType?.value || "star_bits",
+                    amount: Number(document.getElementById("gift-amount")?.value || 0),
+                    cardId: document.getElementById("gift-card-id")?.value || null,
+                    message: document.getElementById("gift-message")?.value || null
+                });
+                if (giftStatus) giftStatus.textContent = "Gift sent! It will appear in their Received Gifts.";
+                setTimeout(() => giftDialog?.close(), 900);
+            } catch (error) {
+                if (giftStatus) giftStatus.textContent = error.message || "Could not send gift.";
+            }
+        });
 
         retryButton.addEventListener(
             "click",

@@ -856,6 +856,7 @@ function renderFullView() {
         <div class="analyzer-data-grid"><span><b>${esc(full.seriesLabel || 'Series')}</b>${esc(selected.series || 'Unknown')}</span><span><b>${esc(full.collectorNumberLabel || 'Collector #')}</b>${esc(selected.collectorNumber || selected.number || '???')}</span>${got && selected.artist ? `<span><b>${esc(full.illustratorLabel || 'Illustrator')}</b>${esc(selected.artist)}</span>` : ''}${got ? `<span><b>${esc(full.ownedLabel || 'Owned')}</b>×${qty}</span>` : ''}</div>
         ${got ? `<div class="db2-full-story"><b>${esc(full.storyLabel || 'Card Story')}</b><p>${esc(selected.cardDescription || 'No card story has been added yet.')}</p></div><details class="db2-more"><summary>${esc(full.additionalLabel || 'Additional Information')}</summary><div class="detail-list clean-detail-list">${cardExpandedDetails(selected)}</div></details>` : ''}
         <p class="analyzer-description">${esc(getVisibleDescription(selected))}</p>
+        <div data-card-comments-host></div>
       </div>
     </section>
     <button class="overlay-arrow right analyzer-arrow" type="button" aria-label="Next card">›</button>
@@ -865,6 +866,15 @@ function renderFullView() {
   $('.overlay-arrow.right', overlay).addEventListener('click', () => stepFullView(1));
   $('.overlay-flip', overlay).addEventListener('click', () => { overlayFlipped = !overlayFlipped; flipCardImage($('.full-card-wrap', overlay), getVisibleImage(selected), getVisibleName(selected), overlayFlipped); playSfx('flip'); });
   attachFullViewTilt();
+  const commentsHost = overlay.querySelector('[data-card-comments-host]');
+  if (commentsHost && selected?.id) {
+    import('./card-comments.js')
+      .then((mod) => mod.mountCardComments(commentsHost, selected.id))
+      .catch((error) => {
+        commentsHost.innerHTML = `<p class="card-comments-status">Comments unavailable.</p>`;
+        console.warn('[Starlight] Card comments failed to load', error);
+      });
+  }
 }
 
 function renderGridPage(target, mode) {

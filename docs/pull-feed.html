@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
+<title>Pull Feed | Starlight Card Binder</title>
+<link href="css/style.css?v=1.0.3" rel="stylesheet"/>
+<link rel="stylesheet" href="css/pages/pull-feed.css?v=1.0">
+<script src="js/browser-performance.js?v=1.0.0" defer></script>
+<link rel="stylesheet" href="css/shared-ui.css?v=1.6.13">
+<link rel="stylesheet" href="css/qol-ui.css?v=94.2.8">
+</head>
+<body><script src="js/embed-mode.js" type="module"></script>
+<main class="pull-feed-page">
+  <header class="pull-feed-header">
+    <p class="eyebrow">Community</p>
+    <h1>🎉 Pull Feed</h1>
+    <p class="lead">Live collector moments — pulls, gifts, follows, and more.</p>
+  </header>
+
+  <div class="pull-feed-filters" role="tablist" aria-label="Feed filter">
+    <button type="button" class="pull-feed-filter active" data-feed-filter="everyone" role="tab" aria-selected="true">Everyone</button>
+    <button type="button" class="pull-feed-filter" data-feed-filter="friends" role="tab" aria-selected="false">Following</button>
+    <button type="button" class="pull-feed-filter" data-feed-filter="you" role="tab" aria-selected="false">Just You</button>
+  </div>
+
+  <p class="pull-feed-status" id="pull-feed-status" role="status">Loading feed…</p>
+  <section class="pull-feed-list" id="pull-feed-list" aria-live="polite"></section>
+  <div class="pull-feed-actions">
+    <button type="button" class="btn" id="pull-feed-more" hidden>Load more</button>
+  </div>
+</main>
+<script src="js/pages/pull-feed-page.js?v=1.0" type="module"></script>
+<script src="js/shared-ui.js?v=1.6.13"></script>
+<script src="js/qol-ui.js?v=94.2.8" defer></script>
+</body>
+</html>

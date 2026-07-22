@@ -1,0 +1,91 @@
+.pull-feed-page{
+  max-width:780px;
+  margin:0 auto;
+  padding:22px 16px 48px;
+}
+.pull-feed-header{margin-bottom:18px}
+.pull-feed-header .eyebrow{
+  margin:0 0 6px;
+  color:#7a89ad;
+  font-size:.72rem;
+  font-weight:900;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+.pull-feed-header h1{
+  margin:0 0 8px;
+  color:#405fa1;
+  font-size:clamp(1.6rem,3vw,2.1rem);
+}
+.pull-feed-header .lead{
+  margin:0;
+  color:#67708b;
+  line-height:1.45;
+}
+.pull-feed-filters{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:16px;
+}
+.pull-feed-filter{
+  min-height:40px;
+  padding:8px 14px;
+  border:1px solid rgba(107,198,248,.35);
+  border-radius:999px;
+  background:rgba(255,255,255,.9);
+  color:#405fa1;
+  font:inherit;
+  font-weight:850;
+  cursor:pointer;
+}
+.pull-feed-filter.active,
+.pull-feed-filter[aria-selected="true"]{
+  border-color:transparent;
+  background:linear-gradient(135deg,#6bc6f8,#ff82c8);
+  color:#fff;
+}
+.pull-feed-status{
+  margin:0 0 12px;
+  color:#67708b;
+  font-weight:750;
+}
+.pull-feed-list{display:grid;gap:10px}
+.pull-feed-item{
+  display:grid;
+  grid-template-columns:44px 1fr auto;
+  gap:12px;
+  align-items:center;
+  padding:12px 14px;
+  border:1px solid rgba(107,198,248,.3);
+  border-radius:16px;
+  background:rgba(255,255,255,.94);
+  box-shadow:0 8px 20px rgba(61,83,132,.07);
+}
+.pull-feed-avatar{
+  width:44px;height:44px;border-radius:50%;
+  display:grid;place-items:center;
+  background:linear-gradient(135deg,#d7e7f7,#ffe8f4);
+  color:#7a8aaa;font-weight:950;overflow:hidden;
+  background-size:cover;background-position:center;
+}
+.pull-feed-copy{min-width:0}
+.pull-feed-copy strong{display:block;color:#405fa1;font-size:.98rem;line-height:1.3}
+.pull-feed-copy span{display:block;color:#7a89ad;font-size:.78rem;margin-top:3px}
+.pull-feed-thumb{
+  width:42px;height:58px;object-fit:cover;border-radius:8px;
+  box-shadow:0 6px 14px rgba(61,83,132,.16);
+}
+.pull-feed-empty{
+  padding:28px 18px;
+  border:1px dashed rgba(107,198,248,.4);
+  border-radius:16px;
+  text-align:center;
+  color:#67708b;
+  background:rgba(255,255,255,.7);
+}
+.pull-feed-actions{display:flex;justify-content:center;margin-top:16px}
+@media(max-width:560px){
+  .pull-feed-item{grid-template-columns:40px 1fr}
+  .pull-feed-thumb{grid-column:2;justify-self:start}
+}
