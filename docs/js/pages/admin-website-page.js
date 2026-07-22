@@ -22,14 +22,11 @@ const statusEl = byId('status');
 const appEl = byId('app');
 const tablist = byId('tablist');
 const editorPanel = byId('editorPanel');
-const previewEl = byId('livePreview');
-const previewHintEl = byId('previewHint');
 const pageMetaEl = byId('pageMeta');
 const fieldSearchEl = byId('fieldSearch');
 const saveBtn = byId('saveBtn');
 const resetBtn = byId('resetBtn');
 const resetPageBtn = byId('resetPageBtn');
-const openPreviewBtn = byId('openPreviewBtn');
 
 let content = null;
 const defaults = cloneDefaultWebsiteContent();
@@ -38,7 +35,6 @@ const fieldMemory = Object.create(null);
 let activeTab = WEBSITE_EDITOR_TABS[0].id;
 let busy = false;
 let fieldQuery = '';
-let previewMode = 'full';
 
 function memoryKey(sectionKey, key) {
   return `${sectionKey}.${key}`;
@@ -270,100 +266,6 @@ function renderSocialLinks() {
   `;
 }
 
-function valuesByPreview(section, role) {
-  const meta = getPageMeta(activeTab);
-  if (!meta) return [];
-  return meta.groups
-    .flatMap((group) => group.fields)
-    .filter((fieldMeta) => fieldMeta.preview === role)
-    .map((fieldMeta) => section[fieldMeta.key])
-    .filter(Boolean);
-}
-
-function renderPreview() {
-  const section = content[activeTab] || {};
-  const meta = getPageMeta(activeTab);
-  const eyebrow = valuesByPreview(section, 'eyebrow')[0] ?? section.eyebrow ?? '';
-  const titleRaw = valuesByPreview(section, 'title')[0] ?? section.title ?? section.brandTitle ?? '';
-  const title = titleRaw || (previewMode === 'empty' ? '' : labelForFieldKey(activeTab));
-  const lead = valuesByPreview(section, 'lead')[0] ?? section.lead ?? section.signInDescription ?? '';
-  const splash = valuesByPreview(section, 'splash')[0] ?? section.splashTitle ?? '';
-  const primaryCtas = valuesByPreview(section, 'cta-primary');
-  const ctas = [...primaryCtas, ...valuesByPreview(section, 'cta')];
-  const chips = valuesByPreview(section, 'chip');
-  const emptyTitle = valuesByPreview(section, 'empty-title')[0] || '';
-  const emptyLead = valuesByPreview(section, 'empty-lead')[0] || '';
-  const edited = modifiedCount(activeTab);
-  const stringCount = Object.keys(section).filter((key) => typeof section[key] === 'string').length;
-  const hiddenCount = Object.keys(section).filter((key) => typeof section[key] === 'string' && !String(section[key]).trim()).length;
-  const showHero = previewMode !== 'empty';
-  const showSplash = Boolean(splash) && previewMode !== 'hero';
-  const showChips = chips.length > 0 && previewMode === 'full';
-  const showEmpty = (emptyTitle || emptyLead) && previewMode !== 'hero';
-
-  if (previewHintEl) {
-    previewHintEl.textContent = meta?.description
-      || 'Live composition of the selected page’s marketing blocks. Save to publish.';
-  }
-
-  const heroBlock = showHero ? `
-    <div class="preview-block preview-hero">
-      ${eyebrow ? `<p class="eyebrow">${esc(eyebrow)}</p>` : ''}
-      ${titleRaw ? `<h3>${esc(titleRaw)}</h3>` : '<p class="preview-hidden-note">Title hidden</p>'}
-      ${lead ? `<p>${esc(lead)}</p>` : ''}
-      ${ctas.length ? `<div class="preview-actions">${ctas.map((label, index) => `<span class="preview-chip ${index === 0 && primaryCtas.includes(label) ? 'primary' : ''}">${esc(label)}</span>`).join('')}</div>` : ''}
-    </div>
-  ` : '';
-
-  const splashBlock = showSplash ? `
-    <div class="preview-block preview-splash">
-      <p class="eyebrow">Series splash</p>
-      <h3>${esc(splash)}</h3>
-      <div class="preview-pack-row" aria-hidden="true">
-        <span class="preview-pack"></span><span class="preview-pack"></span><span class="preview-pack"></span>
-      </div>
-    </div>
-  ` : '';
-
-  const chipsBlock = showChips ? `
-    <div class="preview-block">
-      <p class="eyebrow">Labels & tabs</p>
-      <div class="preview-actions">${chips.slice(0, 8).map((label) => `<span class="preview-chip">${esc(label)}</span>`).join('')}</div>
-    </div>
-  ` : '';
-
-  const emptyBlock = showEmpty ? `
-    <div class="preview-block preview-empty">
-      <p class="eyebrow">Empty / signed-out state</p>
-      ${emptyTitle ? `<h3>${esc(emptyTitle)}</h3>` : '<h3>Empty state</h3>'}
-      ${emptyLead ? `<p>${esc(emptyLead)}</p>` : '<p>No empty-state copy on this page yet.</p>'}
-    </div>
-  ` : '';
-
-  const socialBlock = activeTab === 'socials' && Array.isArray(section.links) && previewMode === 'full' ? `
-    <div class="preview-block">
-      <p class="eyebrow">Social links</p>
-      <div class="preview-social">
-        ${section.links.slice(0, 4).map((link) => `
-          <div class="preview-social-row">
-            <span>${esc(link.icon || '✦')}</span>
-            <div><strong>${esc(link.label || 'Link')}</strong><small>${esc(link.handle || link.url || '')}</small></div>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-  ` : '';
-
-  previewEl.innerHTML = `
-    ${heroBlock}
-    ${splashBlock}
-    ${chipsBlock}
-    ${emptyBlock}
-    ${socialBlock}
-    <p class="preview-meta">${stringCount} text fields · ${edited} edited · ${hiddenCount} hidden · preview: ${esc(previewMode)}</p>
-  `;
-}
-
 function updatePageChrome() {
   const tabMeta = WEBSITE_EDITOR_TABS.find((tab) => tab.id === activeTab);
   const pageMeta = getPageMeta(activeTab);
@@ -373,12 +275,6 @@ function updatePageChrome() {
       <span>${esc(pageMeta?.description || 'Edit every string on this page.')}</span>
       ${pageMeta?.previewUrl ? `<a class="page-link" href="${esc(pageMeta.previewUrl)}" target="_blank" rel="noopener">Open live page</a>` : ''}
     `;
-  }
-  if (openPreviewBtn && pageMeta?.previewUrl) {
-    openPreviewBtn.hidden = false;
-    openPreviewBtn.dataset.href = pageMeta.previewUrl;
-  } else if (openPreviewBtn) {
-    openPreviewBtn.hidden = true;
   }
 }
 
@@ -393,11 +289,6 @@ function renderEditor() {
 
   let html = `
     <div class="editor-toolbar">
-      <div class="preview-mode" role="group" aria-label="Preview what to show">
-        <button type="button" class="btn small ${previewMode === 'hero' ? 'primary' : ''}" data-preview-mode="hero">Page header only</button>
-        <button type="button" class="btn small ${previewMode === 'full' ? 'primary' : ''}" data-preview-mode="full">Full page preview</button>
-        <button type="button" class="btn small ${previewMode === 'empty' ? 'primary' : ''}" data-preview-mode="empty">Empty / signed-out messages</button>
-      </div>
       <p class="editor-note">${modifiedCount(activeTab)} field${modifiedCount(activeTab) === 1 ? '' : 's'} differ from defaults on this page.</p>
     </div>
   `;
@@ -406,7 +297,6 @@ function renderEditor() {
   if (activeTab === 'socials') html += renderSocialLinks();
 
   editorPanel.innerHTML = html || '<p class="lead">No fields match your search.</p>';
-  renderPreview();
 }
 
 function syncFromDom() {
@@ -451,7 +341,7 @@ async function boot() {
     saveBtn.hidden = false;
     resetBtn.hidden = false;
     if (resetPageBtn) resetPageBtn.hidden = false;
-    setStatus('Visual Website Editor ready. Edit any left-nav page group, preview live, then Save.');
+    setStatus('Website Editor ready. Edit any left-nav page, then Save.');
     renderAll();
   } catch (error) {
     setStatus(error.message || 'Could not load website content.', 'error');
@@ -475,7 +365,6 @@ fieldSearchEl?.addEventListener('input', () => {
 editorPanel.addEventListener('input', () => {
   syncFromDom();
   renderTabs();
-  renderPreview();
   const note = editorPanel.querySelector('.editor-note');
   if (note) {
     const count = modifiedCount(activeTab);
@@ -500,16 +389,6 @@ editorPanel.addEventListener('change', (event) => {
 });
 
 editorPanel.addEventListener('click', (event) => {
-  const modeBtn = event.target.closest('[data-preview-mode]');
-  if (modeBtn) {
-    previewMode = modeBtn.getAttribute('data-preview-mode') || 'full';
-    editorPanel.querySelectorAll('[data-preview-mode]').forEach((btn) => {
-      btn.classList.toggle('primary', btn.getAttribute('data-preview-mode') === previewMode);
-    });
-    renderPreview();
-    return;
-  }
-
   const add = event.target.closest('#addSocialLink');
   if (add) {
     syncFromDom();
@@ -541,11 +420,6 @@ editorPanel.addEventListener('click', (event) => {
     moveItem(content.socials.links, index, delta);
     renderEditor();
   }
-});
-
-openPreviewBtn?.addEventListener('click', () => {
-  const href = openPreviewBtn.dataset.href;
-  if (href) window.open(href, '_blank', 'noopener');
 });
 
 resetPageBtn?.addEventListener('click', async () => {

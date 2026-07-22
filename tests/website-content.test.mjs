@@ -122,11 +122,13 @@ test('website editor field meta covers binder splash and admin visual chrome', a
   const page = await read('docs/js/pages/admin-website-page.js');
   assert.match(html, /fieldSearch/);
   assert.match(html, /resetPageBtn/);
-  assert.match(html, /admin-website-page\.js\?v=1\.4/);
+  assert.match(html, /admin-website-page\.js\?v=1\.5/);
   assert.match(page, /WEBSITE_PAGE_META|getPageMeta/);
   assert.match(page, /renderGroupedFields|field-group/);
-  assert.match(page, /preview-splash|splashTitle/);
+  assert.match(page, /splashTitle/);
   assert.match(page, /data-visibility-path|Show on page/);
+  assert.doesNotMatch(html, /livePreview|Live preview/);
+  assert.doesNotMatch(page, /renderPreview|data-preview-mode/);
 });
 
 test('sanitizeWebsiteContent preserves intentionally blank hideable fields', () => {
