@@ -11,7 +11,16 @@ export async function saveCard(payload){const {data,error}=await supabase.rpc('a
 
 export async function saveCardSubcategory(payload){const {data,error}=await supabase.rpc('admin_save_card_subcategory_v9021',{payload});if(error)throw error;notifyCardCatalogChanged('subcategory-saved');return data;}
 export async function deleteCardSubcategory(id){const {data,error}=await supabase.rpc('admin_delete_card_subcategory_v9021',{requested_id:id});if(error)throw error;notifyCardCatalogChanged('subcategory-deleted');return data;}
-export async function saveBooster(payload,slots=[]){const completePayload={...payload,slots:Array.isArray(slots)?slots:[]};const {data,error}=await supabase.rpc('admin_save_booster_v9011',{payload:completePayload});if(error)throw error;return data;}
+export async function saveBooster(payload, slots = []) {
+  const requestedSlots = Array.isArray(slots) ? slots : [];
+  const { slots: _ignoredSlots, ...boosterPayload } = payload || {};
+  const { data, error } = await supabase.rpc('admin_save_booster_complete_v9013', {
+    payload: boosterPayload,
+    requested_slots: requestedSlots
+  });
+  if (error) throw error;
+  return data;
+}
 export async function cloneBooster(sourceId,newId,newName){const {data,error}=await supabase.rpc('admin_clone_booster_v897',{requested_source_id:sourceId,requested_new_id:newId,requested_new_name:newName});if(error)throw error;return data;}
 export async function createBoosterFromTemplate(templateId,newId,newName){const {data,error}=await supabase.rpc('admin_create_booster_from_template_v897',{requested_template_id:templateId,requested_new_id:newId,requested_new_name:newName});if(error)throw error;return data;}
 export async function deleteSeries(id){const {data,error}=await supabase.rpc('admin_delete_series_v841',{requested_id:id});if(error)throw error;notifyCardCatalogChanged('series-deleted');return data;}
@@ -62,15 +71,39 @@ export async function uploadCardArtworkPair(file,baseFilename,{upsert=false}={})
     throw error;
   }
 }
-export async function listStudioAssets(){
-  const folders=['booster-packs','card-backs','card-fronts','thumbnails','series','events','uploads'];
-  const out=[];
-  for(const folder of folders){
-    const {data,error}=await supabase.storage.from('site-assets').list(folder,{limit:300,sortBy:{column:'created_at',order:'desc'}});
-    if(error)continue;
-    for(const item of data||[]){if(!item.id)continue;const path=`${folder}/${item.name}`;out.push({path,name:item.name,folder,url:supabase.storage.from('site-assets').getPublicUrl(path).data.publicUrl,createdAt:item.created_at});}
-  }
-  return out;
+function listFolderWithTimeout(folder, ms = 10000) {
+  return Promise.race([
+    supabase.storage.from('site-assets').list(folder, {
+      limit: 300,
+      sortBy: { column: 'created_at', order: 'desc' }
+    }),
+    new Promise((resolve) =>
+      setTimeout(() => resolve({ data: null, error: { message: `Storage list timed out for ${folder}` } }), ms)
+    )
+  ]);
+}
+
+export async function listStudioAssets() {
+  const folders = ['booster-packs', 'card-backs', 'card-fronts', 'thumbnails', 'series', 'events', 'uploads'];
+  const nested = await Promise.all(folders.map(async (folder) => {
+    try {
+      const { data, error } = await listFolderWithTimeout(folder);
+      if (error || !data) return [];
+      return data.filter((item) => item.id).map((item) => {
+        const path = `${folder}/${item.name}`;
+        return {
+          path,
+          name: item.name,
+          folder,
+          url: supabase.storage.from('site-assets').getPublicUrl(path).data.publicUrl,
+          createdAt: item.created_at
+        };
+      });
+    } catch {
+      return [];
+    }
+  }));
+  return nested.flat();
 }
 export async function deleteStudioAsset(path){if(!path)throw new Error('This is a bundled site asset and cannot be deleted from Supabase. Upload a replacement instead.');const {error}=await supabase.storage.from('site-assets').remove([path]);if(error)throw error;try{await supabase.rpc('admin_unregister_site_asset_v87',{asset_path:path});}catch(_){}}
 export async function saveBoosterSlot(slotId,quantity,rates){const {data,error}=await supabase.rpc('admin_update_booster_slot',{requested_slot_id:Number(slotId),requested_quantity:Number(quantity),requested_rates:rates});if(error)throw error;return data;}

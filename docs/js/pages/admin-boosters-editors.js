@@ -531,13 +531,32 @@ export function createAdminBoosterEditors(context) {
       }
     });
   
+    const formatSaveError = (err) => {
+      if (!err) return "Unable to save booster.";
+      if (typeof err === "string") return err;
+      return err.message || err.details || err.hint || String(err);
+    };
+    const editorSay = (message, type = "") => {
+      let el = $("#editorStatus");
+      if (!el) {
+        el = document.createElement("p");
+        el.id = "editorStatus";
+        el.setAttribute("role", "status");
+        body.prepend(el);
+      }
+      el.textContent = message;
+      el.className = `status ${type}`.trim();
+      say(message, type);
+      if (type === "error") window.StarlightUI?.toast?.(message, "error");
+    };
     $("#saveBooster").onclick = async () => {
+      const saveButton = $("#saveBooster");
       try {
         const rewardCards = [...body.querySelectorAll("[data-reward-row]")].map(
           (row, i) => ({
-            cardId: row.querySelector("[data-card]").value,
-            quantity: Number(row.querySelector("[data-qty]").value) || 1,
-            weight: Number(row.querySelector("[data-weight]").value) || 0,
+            cardId: row.querySelector("[data-card]")?.value || "",
+            quantity: Number(row.querySelector("[data-qty]")?.value) || 1,
+            weight: Number(row.querySelector("[data-weight]")?.value) || 0,
             guaranteed: true,
             sortOrder: i,
           }),
@@ -567,9 +586,11 @@ export function createAdminBoosterEditors(context) {
             rates
           };
         });
-        const saveButton = $("#saveBooster");
-        saveButton.disabled = true;
-        saveButton.textContent = "Saving…";
+        if (saveButton) {
+          saveButton.disabled = true;
+          saveButton.textContent = "Saving…";
+        }
+        editorSay("Saving booster pack…");
         const payload = {
           id: $("#eBoosterId").value,
           name: $("#eBoosterName").value,
@@ -597,11 +618,15 @@ export function createAdminBoosterEditors(context) {
         if (!validation.valid) throw new Error(validation.errors.map(error => error.message).join(" "));
         await saveBooster(payload, slots);
         await reload("Booster pack saved successfully.");
+        window.StarlightUI?.toast?.("Booster pack saved successfully.", "success");
       } catch (err) {
         console.error("[Starlight] Booster save failed:", err);
-        say(err.message || "Unable to save booster.", "error");
-        const saveButton = $("#saveBooster");
-        if (saveButton) { saveButton.disabled = false; saveButton.textContent = "Save Booster Pack"; }
+        editorSay(formatSaveError(err), "error");
+      } finally {
+        if (saveButton?.isConnected) {
+          saveButton.disabled = false;
+          saveButton.textContent = "Save Booster Pack";
+        }
       }
     };
     if (b.id) {

@@ -829,21 +829,46 @@ async function reload(message = "") {
   close();
   say("Loading Starlight Card Management…");
   try {
-    {
-      const [content, assetRows, eventRows] = await Promise.all([
-        loadContentStudio(),
-        listStudioAssets(),
-        getAdminEvents(),
-      ]);
-      Object.keys(data).forEach((key) => delete data[key]);
-      Object.assign(data, { ...content, events: eventRows });
-      assets.splice(0, assets.length, ...assetRows);
-    }
+    // Catalog/events first — never block booster/card saves on Storage asset listing.
+    const [content, eventRows] = await Promise.all([
+      loadContentStudio(),
+      getAdminEvents().catch((error) => {
+        console.warn("[Starlight] Events refresh failed:", error);
+        return data.events || [];
+      }),
+    ]);
+    Object.keys(data).forEach((key) => delete data[key]);
+    Object.assign(data, { ...content, events: eventRows });
     render();
     app.classList.remove("hidden");
     say(message, message ? "success" : "");
   } catch (e) {
-    say(e.message, "error");
+    const text = e?.message || String(e) || "Unable to refresh Starlight Card Management.";
+    say(text, "error");
+    window.StarlightUI?.toast?.(text, "error");
+    return;
   }
+
+  listStudioAssets()
+    .then((assetRows) => {
+      assets.splice(0, assets.length, ...assetRows);
+      if ($("#assetResults")) {
+        const folderSelect = $("#assetFolder");
+        if (folderSelect) {
+          const current = folderSelect.value;
+          const folders = [...new Set(assets.map((a) => a.folder))].sort();
+          folderSelect.innerHTML = `<option value="">All folders</option>${folders
+            .map((f) => `<option value="${esc(f)}">${esc(f)}</option>`)
+            .join("")}`;
+          if ([...folderSelect.options].some((o) => o.value === current)) {
+            folderSelect.value = current;
+          }
+        }
+        renderAssetLibrary();
+      }
+    })
+    .catch((error) => {
+      console.warn("[Starlight] Asset library refresh failed:", error);
+    });
 }
 reload();
