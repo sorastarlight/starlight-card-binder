@@ -1,7 +1,7 @@
 import { supabase } from '../supabase-client.js';
 import { getStarBitsExchangePreview } from '../star-bits-service.js';
 import { openStarBitsBoosterById } from '../daily-booster-service.js';
-import { revealRewardSequence } from '../reward-reveal.js?v=1.5.13';
+import { revealRewardSequence } from '../reward-reveal.js?v=1.5.14';
 import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
 
 const siteCopy = await loadAndHydrateWebsiteContent();
@@ -323,7 +323,7 @@ async function confirmPurchase(){
   try{
     purchaseModalController.close(undefined,'purchase');
     const result=await openStarBitsBoosterById(booster.id);
-    await revealRewardSequence(result.cards||[],{title:booster.name,packImageUrl:booster.pack_image_url||FALLBACK_PACK,cardBackUrl:booster.card_back_url||button.dataset.back||undefined});
+    await revealRewardSequence(result.cards||[],{title:booster.name,packImageUrl:booster.pack_image_url||FALLBACK_PACK,cardBackUrl:booster.card_back_url||button.dataset.back||undefined,autoOpen:true});
     pendingPurchase=null;
     await load();
   }catch(error){

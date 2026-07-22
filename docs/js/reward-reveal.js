@@ -124,7 +124,8 @@ export function normalizeRevealOptions(options = {}) {
   return {
     title: options.title || options.boosterName || options.booster_name || '',
     packImageUrl: options.packImageUrl || options.pack_image_url || '',
-    cardBackUrl: options.cardBackUrl || options.card_back_url || DEFAULT_BACK
+    cardBackUrl: options.cardBackUrl || options.card_back_url || DEFAULT_BACK,
+    autoOpen: Boolean(options.autoOpen ?? options.auto_open)
   };
 }
 
@@ -223,7 +224,7 @@ function acquireRevealViewportLock(doc) {
   };
 }
 
-export const REVEAL_PRESENTATION_VERSION = '1.5.13';
+export const REVEAL_PRESENTATION_VERSION = '1.5.14';
 
 const REVEAL_STYLESHEET_ID = `starlight-reveal-v${REVEAL_PRESENTATION_VERSION.replace(/\./g, '')}`;
 const REVEAL_STYLESHEET_URL = new URL(
@@ -882,6 +883,12 @@ export async function revealRewardSequence(cards = [], options = {}) {
         previousFocus?.focus?.({ preventScroll: true });
       };
       focusControl(packButton);
+    }
+
+    if (normalizedOptions.autoOpen) {
+      win.requestAnimationFrame(() => {
+        openPack().catch(() => {});
+      });
     }
   });
 }

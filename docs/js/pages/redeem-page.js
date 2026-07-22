@@ -1,6 +1,6 @@
 import { supabase } from '../supabase-client.js';
 import { redeemRewardCode } from '../redemption-service.js';
-import { revealRewardSequence } from '../reward-reveal.js?v=1.5.13';
+import { revealRewardSequence } from '../reward-reveal.js?v=1.5.14';
 
 const GENERIC_PACK = 'site_assets/series01_rising_star_booster.png';
 const CARD_BACK = 'site_assets/StarlightCard_Back_NewLogo.png';

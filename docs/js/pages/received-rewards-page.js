@@ -1,5 +1,5 @@
 import { getReceivedRewards, claimReceivedReward, dismissReceivedReward } from '../received-rewards-service.js';
-import { revealRewardSequence } from '../reward-reveal.js?v=1.5.13';
+import { revealRewardSequence } from '../reward-reveal.js?v=1.5.14';
 import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
 
 const siteCopy = await loadAndHydrateWebsiteContent();
