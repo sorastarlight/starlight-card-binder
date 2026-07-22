@@ -68,7 +68,7 @@ test('login signup collects username and display name fields', async () => {
   assert.match(loginHtml, /id="signup-username"/);
   assert.match(loginHtml, /id="signup-display-name"/);
   assert.match(loginHtml, /login\.css\?v=1\.2/);
-  assert.match(loginHtml, /login-page\.js\?v=1\.2/);
+  assert.match(loginHtml, /login-page\.js\?v=1\.3/);
 
   assert.match(loginPage, /signupIdentityGroup/);
   assert.match(loginPage, /\^\[a-z0-9_\]\{3,24\}\$/);

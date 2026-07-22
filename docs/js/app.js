@@ -30,6 +30,16 @@ let fullViewListMode = 'all';
 let websiteContentPromise = null;
 let websiteBinderLanding = null;
 
+function fillWebsiteTokens(template, vars = {}) {
+  return String(template || '').replace(/\{(\w+)\}/g, (_, key) => (
+    vars[key] == null ? '' : String(vars[key])
+  ));
+}
+
+function websiteSection(sectionKey) {
+  return window.__starlightWebsiteContent?.[sectionKey] || {};
+}
+
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
 const pageName = document.body.dataset.page || "binder";
@@ -412,11 +422,21 @@ function renderFilterControls() {
   const context = host.dataset.cardFilterContext || 'binder';
   const isCollection = context === 'collection';
   const isChecklist = context === 'checklist';
-  const title = isCollection ? 'Collection Filters' : (isChecklist ? 'Checklist Filters' : 'Binder Filters');
+  const binderCopy = websiteBinderLanding || websiteSection('binderLanding');
+  const checklistCopy = websiteSection('checklist');
+  const eyebrow = isChecklist
+    ? (checklistCopy.filtersEyebrow || 'Find your cards')
+    : (binderCopy.filtersEyebrow || 'Find your cards');
+  const title = isCollection
+    ? 'Collection Filters'
+    : (isChecklist
+      ? (checklistCopy.filtersTitle || 'Checklist Filters')
+      : (binderCopy.filtersTitle || 'Binder Filters'));
+  const resetLabel = binderCopy.filtersResetCta || 'Reset Filters';
   const showSearch = isCollection || isChecklist;
   const showView = !isCollection;
   host.innerHTML = `<div class="card-filter-heading">
-      <div><p class="eyebrow">Find your cards</p><h2>${title}</h2></div>
+      <div><p class="eyebrow">${esc(eyebrow)}</p><h2>${esc(title)}</h2></div>
       <p data-filter-summary>Preparing cards…</p>
     </div>
     <div class="card-filter-fields">
@@ -425,7 +445,7 @@ function renderFilterControls() {
       <label><span>Rarity</span><select data-rarity aria-label="Filter by rarity"><option>All Rarities</option><option>Common</option><option>Uncommon</option><option>Rare</option><option>Epic</option><option>Legendary</option></select></label>
       <label><span>Sort By</span><select id="sortSelect" aria-label="Sort cards"><option value="numberAsc">Number (Low to High)</option><option value="numberDesc">Number (High to Low)</option><option value="nameAsc">Name (A to Z)</option><option value="rarityDesc">Rarity (Best First)</option></select></label>
       ${showView ? `<fieldset class="card-filter-view"><legend>Collection Status</legend><label><input checked name="viewFilter" type="radio" value="all"> All Cards</label><label><input name="viewFilter" type="radio" value="collected"> Collected</label><label><input name="viewFilter" type="radio" value="missing"> Not Collected</label></fieldset>` : ''}
-      <button class="card-filter-reset" type="button" data-reset-card-filters>Reset Filters</button>
+      <button class="card-filter-reset" type="button" data-reset-card-filters>${esc(resetLabel)}</button>
     </div>`;
   host.dataset.filterControlsReady = '1';
 }
@@ -612,7 +632,8 @@ function ensureWebsiteBinderLanding() {
         websiteBinderLanding = {
           eyebrow: 'Starlight Cards',
           title: 'Starlight Card Series Binder 📦',
-          lead: 'Choose a booster pack to enter that series binder.'
+          lead: 'Choose a booster pack to enter that series binder.',
+          splashTitle: 'Choose A Series Booster Pack Below And Start Collecting!'
         };
         return websiteBinderLanding;
       });
@@ -630,8 +651,8 @@ function renderSeriesHero() {
   const inSeriesSelect = document.body.classList.contains('series-select');
   const list = f.series === 'All Series' ? cards : cards.filter(c => c.series === f.series);
   const got = list.filter(c => isCollected(c.id)).length;
+  const landing = websiteBinderLanding || window.__starlightWebsiteContent?.binderLanding || websiteSection('binderLanding');
   if (inSeriesSelect || f.series === 'All Series') {
-    const landing = websiteBinderLanding || window.__starlightWebsiteContent?.binderLanding;
     title.textContent = landing?.title || 'Starlight Card Series Binder 📦';
     desc.textContent = landing?.lead || 'Choose a booster pack to enter that series binder.';
     if (eyebrow) eyebrow.textContent = landing?.eyebrow || 'Starlight Cards';
@@ -644,7 +665,11 @@ function renderSeriesHero() {
       const n = list.filter(c => c.rarity === r).length;
       return n ? `<span class="hero-pill rarity-pill rarity-${r.toLowerCase()}">${r}: ${n}</span>` : '';
     }).join('');
-    stats.innerHTML = inSeriesSelect ? `<span class="hero-pill progress">${cards.length} total cards</span>` : `<span class="hero-pill progress">${got} / ${list.length} collected</span>${rarityBits}`;
+    const totalPill = fillWebsiteTokens(landing.totalCardsPill || '{count} total cards', { count: cards.length });
+    const collectedPill = fillWebsiteTokens(landing.collectedPill || '{owned} / {total} collected', { owned: got, total: list.length });
+    stats.innerHTML = inSeriesSelect
+      ? `<span class="hero-pill progress">${esc(totalPill)}</span>`
+      : `<span class="hero-pill progress">${esc(collectedPill)}</span>${rarityBits}`;
   }
 }
 
@@ -817,12 +842,26 @@ function renderGridPage(target, mode) {
     }
   }
   wrap.classList.toggle('empty-grid', !list.length);
+  const collectionCopy = websiteSection('collection');
+  const emptyTitle = baseList.length
+    ? (collectionCopy.emptyFiltersTitle || 'No cards match these filters')
+    : (mode === 'favorites'
+      ? (collectionCopy.emptyFavoritesTitle || 'No favorites yet')
+      : (collectionCopy.emptyAllTitle || 'No cards here yet'));
+  const emptyLead = baseList.length
+    ? (collectionCopy.emptyFiltersLead || 'Try resetting one or more filters to see additional cards.')
+    : (mode === 'favorites'
+      ? (collectionCopy.emptyFavoritesLead || 'Tap the star on your favorite cards and this showcase will sparkle to life.')
+      : (collectionCopy.emptyAllLead || 'Earn cards from Daily Boosters, redemption codes, and special rewards to fill this collection.'));
+  const emptyAction = baseList.length
+    ? `<button class="btn primary" type="button" data-reset-card-filters>${esc(collectionCopy.emptyFiltersCta || 'Reset Filters')}</button>`
+    : `<a class="btn primary" href="binder.html">${esc(mode === 'favorites' ? (collectionCopy.emptyFavoritesCta || 'Open Binder') : (collectionCopy.emptyAllCta || 'Open Binder'))}</a>`;
   wrap.innerHTML = list.length ? list.map(c => {
     const got = isCollected(c.id); const hidden = !got;
     const quantity = getCardQuantity(c.id);
     const favorited = isFavorite(c.id);
     return `<article class="collection-card ${rarityClass(c)}"><div class="collection-image"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"></div><h3>${esc(getVisibleName(c))}</h3><p class="collection-card-number">${esc(c.collectorNumber || c.number)} • ${esc(c.series)}</p><div class="card-meta-chips compact">${cardIdentityChips(c,{hidden})}</div>${mode === 'duplicates' ? `<p class="duplicate-copy-summary"><strong>${quantity}</strong> total copies · <strong>${quantity - 1}</strong> exchangeable</p>` : ''}<div class="card-buttons"><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${quantity}` : 'Not Collected'}</span>${got ? `<button class="icon-btn" type="button" data-toggle-favorite="${esc(c.id)}" aria-label="${favorited ? 'Remove from favorites' : 'Add to favorites'}" aria-pressed="${favorited ? 'true' : 'false'}">${favorited ? '★' : '☆'}</button>` : ''}</div></article>`;
-  }).join('') : `<div class="empty-state"><h2>${baseList.length ? 'No cards match these filters' : (mode === 'favorites' ? 'No favorites yet' : 'No cards here yet')}</h2><p>${baseList.length ? 'Try resetting one or more filters to see additional cards.' : (mode === 'favorites' ? 'Tap the star on your favorite cards and this showcase will sparkle to life.' : 'Earn cards from Daily Boosters, redemption codes, and special rewards to fill this collection.')}</p>${baseList.length ? '<button class="btn primary" type="button" data-reset-card-filters>Reset Filters</button>' : '<a class="btn primary" href="binder.html">Open Binder</a>'}</div>`;
+  }).join('') : `<div class="empty-state"><h2>${esc(emptyTitle)}</h2><p>${esc(emptyLead)}</p>${emptyAction}</div>`;
   attachTileTilts();
   attachBinderHoverSfx();
 }
@@ -831,11 +870,21 @@ function renderFavoritesShowcase() {
   const showcase = $('#favoriteShowcase'); if (!showcase) return;
   const allFavorites = cards.filter(c => isFavorite(c.id));
   const favs = filterCardList(allFavorites, activeFilters(), { respectOwnership: false });
+  const collectionCopy = websiteSection('collection');
   if (!favs.length) {
-    showcase.innerHTML = `<div class="empty-state trophy-empty"><h2>${allFavorites.length ? 'No favorites match these filters' : 'Favorite Showcase'}</h2><p>${allFavorites.length ? 'Reset the filters to bring the rest of your favorite cards back into view.' : 'Star a card to put it on the Starlight stage. Your favorites will scroll here like a tiny idol parade.'}</p>${allFavorites.length ? '<button class="btn primary" type="button" data-reset-card-filters>Reset Filters</button>' : '<a class="btn primary" href="binder.html">Find Favorites</a>'}</div>`;
+    const title = allFavorites.length
+      ? (collectionCopy.emptyFiltersTitle || 'No favorites match these filters')
+      : (collectionCopy.favoritesShowcaseTitle || 'Favorite Showcase');
+    const lead = allFavorites.length
+      ? (collectionCopy.emptyFiltersLead || 'Reset the filters to bring the rest of your favorite cards back into view.')
+      : (collectionCopy.favoritesShowcaseEmptyLead || 'Star a card to put it on the Starlight stage. Your favorites will scroll here like a tiny idol parade.');
+    const action = allFavorites.length
+      ? `<button class="btn primary" type="button" data-reset-card-filters>${esc(collectionCopy.emptyFiltersCta || 'Reset Filters')}</button>`
+      : `<a class="btn primary" href="binder.html">${esc(collectionCopy.favoritesShowcaseCta || 'Find Favorites')}</a>`;
+    showcase.innerHTML = `<div class="empty-state trophy-empty"><h2>${esc(title)}</h2><p>${esc(lead)}</p>${action}</div>`;
     return;
   }
-  showcase.innerHTML = `<div class="favorite-carousel-head"><h2>Favorite Showcase</h2><p>${favs.length} favorite card${favs.length === 1 ? '' : 's'} · same list as the grid below</p></div><div class="favorite-carousel">${favs.map((c, i) => {
+  showcase.innerHTML = `<div class="favorite-carousel-head"><h2>${esc(collectionCopy.favoritesShowcaseTitle || 'Favorite Showcase')}</h2><p>${favs.length} favorite card${favs.length === 1 ? '' : 's'} · same list as the grid below</p></div><div class="favorite-carousel">${favs.map((c, i) => {
     const got = isCollected(c.id);
     const hidden = !got;
     return `<div class="fav-spot ${rarityClass(c)}" style="--i:${i}">
@@ -1088,16 +1137,20 @@ function renderBinder() {
 }
 function renderV61SeriesLandingHtml() {
   const groups = getSeriesGroups();
+  const copy = websiteBinderLanding || websiteSection('binderLanding');
+  const splashTitle = copy.splashTitle || 'Choose A Series Booster Pack Below And Start Collecting!';
+  const collectedTemplate = copy.packCollectedLabel || '{owned} / {total} Collected';
   return `<div class="v61-splash-inner v78-splash-inner">
-    <div class="v61-splash-title"><h2>Choose A Series Booster Pack Below And Start Collecting!</h2></div>
+    <div class="v61-splash-title"><h2>${esc(splashTitle)}</h2></div>
     <div class="v61-pack-row v78-pack-grid">${groups.map((group,i)=>{
       const list = group.cards;
       const got = list.filter(c => isCollected(c.id)).length;
       const label = group.seriesName || group.series;
       const seriesIdLabel = group.seriesId ? `Series ${String(group.seriesId).padStart(2, "0")}` : 'Series Booster';
+      const collectedLabel = fillWebsiteTokens(collectedTemplate, { owned: got, total: list.length });
       return `<button class="v61-pack v78-pack" style="--i:${i}" type="button" data-v61-pack="${esc(group.series)}" aria-label="Open ${esc(group.series)}">
         <img src="${esc(group.boosterImageUrl || BOOSTER_PACK_URL)}" alt="${esc(group.series)} booster pack" loading="eager" onerror="this.src='${BOOSTER_PACK_URL}'">
-        <span class="v61-pack-label"><small class="v79-pack-title-line">${esc(seriesIdLabel)} — ${esc(label)}</small><small>${got} / ${list.length} Collected</small></span>
+        <span class="v61-pack-label"><small class="v79-pack-title-line">${esc(seriesIdLabel)} — ${esc(label)}</small><small>${esc(collectedLabel)}</small></span>
       </button>`;
     }).join('')}</div>
   </div>`;
@@ -1112,18 +1165,25 @@ function renderV61CardGridHtml(browse = resolveBinderBrowse()) {
   });
   const gotCount = list.filter(c => isCollected(c.id)).length;
   const api = window.StarlightCardFilters;
+  const copy = websiteBinderLanding || websiteSection('binderLanding');
   const countPill = api?.formatBinderOwnedPill
     ? api.formatBinderOwnedPill({ shown: list.length, owned: gotCount, view: f.view })
     : (f.view === 'missing'
       ? `Showing ${list.length} not collected`
       : `Collected: ${gotCount} / ${list.length}`);
+  const browseLead = f.q
+    ? (copy.gridSearchLead || 'Search matches across your selected filters.')
+    : (copy.gridBrowseLead || 'Browse the set and see which Starlight cards you have earned.');
+  const emptyTitle = copy.emptyFiltersTitle || 'No cards match these filters';
+  const emptyLead = copy.emptyFiltersLead || 'Reset one or more filters to browse this series again.';
+  const emptyCta = copy.emptyFiltersCta || copy.filtersResetCta || 'Reset Filters';
   return `<div class="v61-grid-shell">
     <div class="v61-grid-head">
-      <button id="backToSeries" class="v61-back-btn" type="button">← Back to Series</button>
-      <div><h2>${esc(heading)}</h2><p>${f.q ? 'Search matches across your selected filters.' : 'Browse the set and see which Starlight cards you have earned.'}</p></div>
+      <button id="backToSeries" class="v61-back-btn" type="button">${esc(copy.backToSeriesCta || '← Back to Series')}</button>
+      <div><h2>${esc(heading)}</h2><p>${esc(browseLead)}</p></div>
       <span class="v61-count-pill">${esc(countPill)}</span>
     </div>
-    <div class="v61-grid">${list.length ? list.map((card,i)=>renderV61Card(card,i)).join('') : '<div class="empty-state"><h2>No cards match these filters</h2><p>Reset one or more filters to browse this series again.</p><button class="btn primary" type="button" data-reset-card-filters>Reset Filters</button></div>'}</div>
+    <div class="v61-grid">${list.length ? list.map((card,i)=>renderV61Card(card,i)).join('') : `<div class="empty-state"><h2>${esc(emptyTitle)}</h2><p>${esc(emptyLead)}</p><button class="btn primary" type="button" data-reset-card-filters>${esc(emptyCta)}</button></div>`}</div>
   </div>`;
 }
 function renderV61Card(card, i) {
@@ -1137,7 +1197,9 @@ function renderV61Card(card, i) {
       <span class="badge">${esc(numberLabel)}</span>
     </button>
     <span class="v61-ownership ${got ? 'owned' : 'locked'}">
-      <span>${got ? `Owned ×${getCardQuantity(card.id)}` : 'Not Collected'}</span>
+      <span>${esc(got
+        ? fillWebsiteTokens((websiteBinderLanding || websiteSection('binderLanding')).ownedLabel || 'Owned ×{qty}', { qty: getCardQuantity(card.id) })
+        : ((websiteBinderLanding || websiteSection('binderLanding')).notCollectedLabel || 'Not Collected'))}</span>
       ${binderRarityBadgeHtml(card)}
     </span>
   </article>`;
@@ -1149,9 +1211,10 @@ function renderV62Showcase(inSeriesSelect = false, browse = resolveBinderBrowse(
   if (inSeriesSelect) { panel.innerHTML = ''; return; }
   const list = browse.list || [];
   filtered = list.slice();
+  const copy = websiteBinderLanding || websiteSection('binderLanding');
   if (!list.length) {
     selected = null;
-    panel.innerHTML = `<div class="v62-empty-showcase"><p class="eyebrow">Selected Card</p><h2>No matching card</h2><p>Adjust or reset the Binder filters to choose a card.</p><button class="btn primary" type="button" data-reset-card-filters>Reset Filters</button></div>`;
+    panel.innerHTML = `<div class="v62-empty-showcase"><p class="eyebrow">${esc(copy.showcaseEmptyEyebrow || 'Selected Card')}</p><h2>${esc(copy.showcaseEmptyTitle || 'No matching card')}</h2><p>${esc(copy.showcaseEmptyLead || 'Adjust or reset the Binder filters to choose a card.')}</p><button class="btn primary" type="button" data-reset-card-filters>${esc(copy.showcaseEmptyCta || copy.filtersResetCta || 'Reset Filters')}</button></div>`;
     return;
   }
   if (!selected || !list.some(c => c.id === selected.id)) {
@@ -1161,7 +1224,7 @@ function renderV62Showcase(inSeriesSelect = false, browse = resolveBinderBrowse(
   }
   const card = selected;
   if (!card) {
-    panel.innerHTML = `<div class="v62-empty-showcase"><h2>Pick a Card ✨</h2><p>Select a Starlight card to preview it here.</p></div>`;
+    panel.innerHTML = `<div class="v62-empty-showcase"><h2>${esc(copy.showcasePickTitle || 'Pick a Card ✨')}</h2><p>${esc(copy.showcasePickLead || 'Select a Starlight card to preview it here.')}</p></div>`;
     return;
   }
   const got = isCollected(card.id);

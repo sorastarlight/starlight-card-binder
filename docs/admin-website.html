@@ -6,7 +6,7 @@
   <title>Website Editor | Starlight Card Binder</title>
   <link rel="stylesheet" href="css/style.css?v=1.0.2">
   <link rel="stylesheet" href="css/shared-ui.css?v=1.6.8">
-  <link rel="stylesheet" href="css/pages/admin-website.css?v=1.1">
+  <link rel="stylesheet" href="css/pages/admin-website.css?v=1.2">
   <link rel="stylesheet" href="css/qol-ui.css?v=94.2.4">
   <script src="js/browser-performance.js?v=1.0.0" defer></script>
 </head>
@@ -19,16 +19,25 @@
       <div class="toolbar">
         <div>
           <h1>Website Editor</h1>
-          <p class="lead">Edit marketing copy for every public left-nav page, plus About, Socials, Login, and shared footer text. Changes publish site-wide after Save.</p>
+          <p class="lead">Visual editor for every public left-nav page — heroes, splash headlines, portal states, CTAs, tabs, and empty states. Changes publish site-wide after Save.</p>
         </div>
         <div class="actions">
+          <button id="openPreviewBtn" class="btn" type="button" hidden>Open Live Page</button>
+          <button id="resetPageBtn" class="btn" type="button" hidden>Reset This Page</button>
           <button id="saveBtn" class="btn primary" type="button" hidden>Save Changes</button>
-          <button id="resetBtn" class="btn danger" type="button" hidden>Reset to Defaults</button>
+          <button id="resetBtn" class="btn danger" type="button" hidden>Reset Everything</button>
         </div>
       </div>
       <p id="status" class="status" role="status">Checking staff access…</p>
 
       <div id="app" class="hidden" hidden>
+        <div class="editor-chrome">
+          <label class="field-search">
+            <span class="sr-only">Search fields</span>
+            <input id="fieldSearch" type="search" placeholder="Search fields on this page…" autocomplete="off">
+          </label>
+          <div id="pageMeta" class="page-meta"></div>
+        </div>
         <div id="tablist" class="tabs" role="tablist" aria-label="Website pages"></div>
         <div class="editor-layout">
           <div class="editor-main">
@@ -36,7 +45,7 @@
           </div>
           <aside class="preview-panel" aria-label="Live preview">
             <h2>Live preview</h2>
-            <p class="preview-hint">Shows the active page’s eyebrow, title, and lead. Save to publish for collectors.</p>
+            <p id="previewHint" class="preview-hint">Composition updates as you type. Save to publish for collectors.</p>
             <div id="livePreview" class="live-preview"></div>
           </aside>
         </div>
@@ -45,7 +54,7 @@
   </main>
 
   <script src="js/shared-ui.js?v=1.6.7"></script>
-  <script type="module" src="js/pages/admin-website-page.js?v=1.1"></script>
+  <script type="module" src="js/pages/admin-website-page.js?v=1.2"></script>
   <script src="js/qol-ui.js?v=94.2.4" defer></script>
 </body>
 </html>

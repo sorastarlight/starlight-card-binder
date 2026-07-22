@@ -94,7 +94,7 @@ export function sanitizeWebsiteContent(input) {
   const homeSource = normalizeLegacyHome(source.home || {}, defaults.home);
 
   const result = {
-    version: 2,
+    version: 3,
     home: {
       ...sanitizeStringMap(homeSource, {
         eyebrow: defaults.home.eyebrow,

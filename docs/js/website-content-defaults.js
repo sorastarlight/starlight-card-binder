@@ -25,7 +25,7 @@ export const HOME_QUICK_LINK_IDS = Object.freeze(['collection', 'shop', 'events'
 
 export function createDefaultWebsiteContent() {
   return {
-    version: 2,
+    version: 3,
     home: {
       eyebrow: 'Welcome, Starlight Collector!',
       title: 'Your magical card adventure starts here.',
@@ -45,7 +45,28 @@ export function createDefaultWebsiteContent() {
     binderLanding: {
       eyebrow: 'Starlight Cards',
       title: 'Starlight Card Series Binder 📦',
-      lead: 'Choose a booster pack to enter that series binder.'
+      lead: 'Choose a booster pack to enter that series binder.',
+      splashTitle: 'Choose A Series Booster Pack Below And Start Collecting!',
+      packCollectedLabel: '{owned} / {total} Collected',
+      totalCardsPill: '{count} total cards',
+      collectedPill: '{owned} / {total} collected',
+      backToSeriesCta: '← Back to Series',
+      gridBrowseLead: 'Browse the set and see which Starlight cards you have earned.',
+      gridSearchLead: 'Search matches across your selected filters.',
+      ownedLabel: 'Owned ×{qty}',
+      notCollectedLabel: 'Not Collected',
+      filtersEyebrow: 'Find your cards',
+      filtersTitle: 'Binder Filters',
+      filtersResetCta: 'Reset Filters',
+      emptyFiltersTitle: 'No cards match these filters',
+      emptyFiltersLead: 'Reset one or more filters to browse this series again.',
+      emptyFiltersCta: 'Reset Filters',
+      showcaseEmptyEyebrow: 'Selected Card',
+      showcaseEmptyTitle: 'No matching card',
+      showcaseEmptyLead: 'Adjust or reset the Binder filters to choose a card.',
+      showcaseEmptyCta: 'Reset Filters',
+      showcasePickTitle: 'Pick a Card ✨',
+      showcasePickLead: 'Select a Starlight card to preview it here.'
     },
     daily: {
       eyebrow: 'Daily Collector Reward',
@@ -60,7 +81,24 @@ export function createDefaultWebsiteContent() {
       morePacksTitle: 'Want to open more packs?',
       morePacksLead: 'Extra cards are never wasted. Convert duplicate cards into Star Bits, then spend them in the Starlight Booster Shop for more chances to pull Rare, Epic, and Legendary cards.',
       convertCta: 'Convert Extras',
-      shopCta: 'Visit Booster Shop'
+      shopCta: 'Visit Booster Shop',
+      readyPackLabel: 'READY TO OPEN - CLICK THE PACK',
+      readyTitle: 'Your Free Booster Is Ready!',
+      readyLead: "Click the pack to view today's cards.",
+      claimedPackLabel: 'Free Booster Claimed',
+      claimedTitle: 'Your Next Free Booster Is Charging',
+      claimedLead: 'The portal will awaken again at midnight Eastern Time.',
+      disabledPackLabel: 'Free Booster Unavailable',
+      disabledTitle: 'Free Daily Booster Is Currently Disabled',
+      disabledLead: 'The Free Daily Booster has been paused by the site administrator.',
+      resultsTitle: "Here Are Today’s Daily Free Booster Pack Results",
+      checkingPackLabel: 'Checking the stars…',
+      choosingPackLabel: 'The stars are choosing…',
+      openingPackLabel: 'Your cards are ready.',
+      loopStep1: 'Open packs',
+      loopStep2: 'Collect extras',
+      loopStep3: 'Earn Star Bits',
+      loopStep4: 'Open more packs'
     },
     shop: {
       eyebrow: 'Magical Booster Marketplace',
@@ -80,7 +118,13 @@ export function createDefaultWebsiteContent() {
       signedOutTitle: 'Sign in to visit the shop ✨',
       signedOutLead: 'Your purchases and new cards need a Starlight account so they can be saved safely.',
       signedOutCta: 'Log In or Create Account',
-      emptyCategory: 'No booster packs are currently available in this category.'
+      emptyCategory: 'No booster packs are currently available in this category.',
+      featuredKicker: 'Featured Booster',
+      openFeaturedCta: 'Open Featured Pack',
+      openPackCta: 'Open Pack',
+      needBitsCta: 'Need More Star Bits',
+      previewContentsCta: 'Preview Contents',
+      whatsInsideCta: 'What’s Inside?'
     },
     events: {
       eyebrow: 'Seasonal Collections',
@@ -88,7 +132,11 @@ export function createDefaultWebsiteContent() {
       lead: 'Limited-time cards, boosters, achievements, and titles live here.',
       loading: 'Loading active events…',
       emptyTitle: 'No active events right now',
-      emptyLead: 'Check back soon for the next Starlight celebration.'
+      emptyLead: 'Check back soon for the next Starlight celebration.',
+      boostersHeading: 'Event Booster Packs',
+      achievementsHeading: 'Event Achievements',
+      shopCta: 'Visit Card Shop',
+      loadError: 'Events could not load'
     },
     redeem: {
       eyebrow: 'Special Rewards',
@@ -113,7 +161,19 @@ export function createDefaultWebsiteContent() {
       duplicatesEyebrow: 'Extra Copies',
       duplicatesTitle: 'Duplicate Cards',
       duplicatesLead: 'Extra copies can be converted into Star Bits. Your final copy of every card is always protected.',
-      duplicatesCta: '✦ Open Star Bits Exchange'
+      duplicatesCta: '✦ Open Star Bits Exchange',
+      emptyAllTitle: 'No cards here yet',
+      emptyAllLead: 'Earn cards from Daily Boosters, redemption codes, and special rewards to fill this collection.',
+      emptyAllCta: 'Open Binder',
+      emptyFavoritesTitle: 'No favorites yet',
+      emptyFavoritesLead: 'Tap the star on your favorite cards and this showcase will sparkle to life.',
+      emptyFavoritesCta: 'Open Binder',
+      emptyFiltersTitle: 'No cards match these filters',
+      emptyFiltersLead: 'Try resetting one or more filters to see additional cards.',
+      emptyFiltersCta: 'Reset Filters',
+      favoritesShowcaseTitle: 'Favorite Showcase',
+      favoritesShowcaseEmptyLead: 'Star a card to put it on the Starlight stage. Your favorites will scroll here like a tiny idol parade.',
+      favoritesShowcaseCta: 'Find Favorites'
     },
     starBits: {
       eyebrow: 'Duplicate Card Exchange',
@@ -135,7 +195,9 @@ export function createDefaultWebsiteContent() {
       lead: 'Track every card by set, rarity, collection status, and favorites.',
       exchangeTitle: '✦ Duplicate Card Exchange',
       exchangeLead: 'Review duplicate pulls and convert them into Star Bits without removing your final copy.',
-      exchangeCta: 'Review Duplicates'
+      exchangeCta: 'Review Duplicates',
+      filtersEyebrow: 'Find your cards',
+      filtersTitle: 'Checklist Filters'
     },
     trades: {
       eyebrow: 'Collector Connections',
@@ -170,7 +232,11 @@ export function createDefaultWebsiteContent() {
       lead: 'Trade updates, event announcements, achievements, rewards, and other Starlight news all live here.',
       preferencesTitle: 'Notification Preferences',
       emptyTitle: 'All caught up ✨',
-      emptyLead: 'New collector activity will appear here.'
+      emptyLead: 'New collector activity will appear here.',
+      markAllReadCta: 'Mark All Read',
+      historyTitle: 'Notification History',
+      deleteReadCta: 'Delete All Read',
+      savePreferencesCta: 'Save Preferences'
     },
     rewards: {
       eyebrow: 'Your Starlight Mailbox',
@@ -186,6 +252,13 @@ export function createDefaultWebsiteContent() {
       eyebrow: 'Collector Profile',
       title: 'Edit Profile',
       lead: 'Manage your public identity, profile visibility, and collection preferences.',
+      imageSectionTitle: 'Profile Image & Collector Flair',
+      detailsSectionTitle: 'Profile Details',
+      privacySectionTitle: 'Privacy',
+      contentSectionTitle: 'Public Profile Content',
+      featuredSectionTitle: 'Featured Card',
+      activitySectionTitle: 'Collector Activity',
+      accountSectionTitle: 'Account & Data',
       wishlistCardTitle: '💫 Wishlist & Trade List',
       wishlistCardLead: 'Choose cards you are seeking and duplicates you are offering.',
       offersCardTitle: '🤝 Trade Offers',
@@ -215,7 +288,12 @@ export function createDefaultWebsiteContent() {
       brandTitle: 'Starlight Card Binder',
       signInDescription: 'Sign in to save your collection and keep it synchronized between devices.',
       signUpDescription: 'Create an account to protect your collection and synchronize it between devices.',
-      returnCta: 'Return to the Binder'
+      returnCta: 'Return to the Binder',
+      signInModeLabel: 'Sign In',
+      signUpModeLabel: 'Create Account',
+      twitchCta: 'Continue with Twitch',
+      submitSignIn: 'Sign In',
+      submitSignUp: 'Create Account'
     },
     shared: {
       infoStripCollection: 'Cards are earned through Daily Boosters, reward codes, and special events.',

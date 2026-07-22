@@ -15,7 +15,7 @@ const read = (relativePath) => readFile(new URL(`../${relativePath}`, import.met
 
 test('default website content includes editable page groups', () => {
   const content = cloneDefaultWebsiteContent();
-  assert.equal(content.version, 2);
+  assert.equal(content.version, 3);
   assert.ok(content.home.title);
   assert.ok(content.home.primaryCta);
   assert.ok(content.home.newsLoading);
@@ -24,19 +24,25 @@ test('default website content includes editable page groups', () => {
   assert.ok(content.socials.links.length >= 1);
   assert.equal(content.login.brandTitle, 'Starlight Card Binder');
   assert.ok(content.binderLanding.title);
+  assert.ok(content.binderLanding.splashTitle);
   assert.ok(content.daily.title);
+  assert.ok(content.daily.readyTitle);
   assert.ok(content.daily.signInCta);
   assert.ok(content.shop.emptyCategory);
+  assert.ok(content.shop.featuredKicker);
   assert.ok(content.events.emptyTitle);
   assert.ok(content.redeem.submitCta);
   assert.ok(content.collection.duplicatesCta);
+  assert.ok(content.collection.emptyAllTitle);
   assert.ok(content.starBits.exchangeCta);
   assert.ok(content.checklist.exchangeTitle);
   assert.ok(content.trades.emptyWishlist);
   assert.ok(content.offers.emptyIncoming);
   assert.ok(content.notifications.emptyTitle);
+  assert.ok(content.notifications.markAllReadCta);
   assert.ok(content.rewards.emptyLead);
   assert.ok(content.profile.accountIntro);
+  assert.ok(content.profile.imageSectionTitle);
   assert.ok(content.shared.infoStripCopyright);
   assert.deepEqual(
     content.home.quickLinks.map((link) => link.id),
@@ -85,7 +91,7 @@ test('sanitizeWebsiteContent keeps quick-link ids and rejects bad social urls', 
     }
   });
 
-  assert.equal(sanitized.version, 2);
+  assert.equal(sanitized.version, 3);
   assert.equal(sanitized.home.title, 'Fresh Home Title');
   assert.deepEqual(
     sanitized.home.quickLinks.map((link) => link.id),
@@ -104,7 +110,22 @@ test('mergeWebsiteContent falls back to defaults for empty remote', () => {
   assert.equal(merged.about.title, cloneDefaultWebsiteContent().about.title);
   assert.equal(merged.binderLanding.eyebrow, 'Starlight Cards');
   assert.equal(merged.daily.badge, 'FREE • DAILY');
-  assert.equal(merged.version, 2);
+  assert.equal(merged.version, 3);
+});
+
+test('website editor field meta covers binder splash and admin visual chrome', async () => {
+  const { WEBSITE_PAGE_META, listedFieldKeys } = await import('../docs/js/website-content-field-meta.js');
+  assert.ok(WEBSITE_PAGE_META.binderLanding);
+  assert.ok(listedFieldKeys('binderLanding').includes('splashTitle'));
+  assert.ok(listedFieldKeys('daily').includes('readyTitle'));
+  const html = await read('docs/admin-website.html');
+  const page = await read('docs/js/pages/admin-website-page.js');
+  assert.match(html, /fieldSearch/);
+  assert.match(html, /resetPageBtn/);
+  assert.match(html, /admin-website-page\.js\?v=1\.2/);
+  assert.match(page, /WEBSITE_PAGE_META|getPageMeta/);
+  assert.match(page, /renderGroupedFields|field-group/);
+  assert.match(page, /preview-splash|splashTitle/);
 });
 
 test('website editor admin page and public hooks are wired', async () => {
@@ -201,11 +222,13 @@ test('website editor admin page and public hooks are wired', async () => {
   assert.match(socials, /id="socialLinks"/);
   assert.match(socials, /class="[^"]*social-links/);
   assert.match(login, /data-content="login\.brandTitle"/);
+  assert.match(login, /data-content="login\.returnCta"/);
   assert.match(loginPage, /loginCopy/);
   assert.match(loginPage, /loadAndHydrateWebsiteContent/);
   assert.match(binder, /data-content="binder\.title"/);
   assert.match(daily, /data-content="daily\.title"/);
   assert.match(daily, /data-content="daily\.signInCta"/);
+  assert.match(daily, /data-content="daily\.loopStep1"/);
   assert.match(daily, /website-content-hydrate-page\.js\?v=1\.1/);
   assert.match(shop, /data-content="shop\.title"/);
   assert.match(shop, /data-content="shop\.footerCta"/);
@@ -219,14 +242,19 @@ test('website editor admin page and public hooks are wired', async () => {
   assert.match(trades, /data-content="trades\.title"/);
   assert.match(offers, /data-content="offers\.composeEmpty"/);
   assert.match(notifications, /data-content="notifications\.preferencesTitle"/);
+  assert.match(notifications, /data-content="notifications\.markAllReadCta"/);
   assert.match(rewards, /data-content="rewards\.tabPending"/);
   assert.match(profile, /data-content="profile\.accountIntro"/);
+  assert.match(profile, /data-content="profile\.imageSectionTitle"/);
   assert.match(tradeListsPage, /loadAndHydrateWebsiteContent/);
   assert.match(tradeListsPage, /emptyWishlist/);
   assert.match(tradeOffersPage, /emptyIncoming/);
   assert.match(boosterShopPage, /signedOutTitle/);
+  assert.match(boosterShopPage, /featuredKicker/);
   assert.match(eventsPage, /emptyTitle/);
+  assert.match(eventsPage, /boostersHeading/);
   assert.match(app, /ensureWebsiteBinderLanding|getWebsiteContent/);
   assert.match(app, /binderLanding/);
+  assert.match(app, /splashTitle/);
   assert.match(migration, /get_website_content|admin_save_website_content/);
 });

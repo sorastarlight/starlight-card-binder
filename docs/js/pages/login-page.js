@@ -76,12 +76,9 @@ import { supabase } from "../supabase-client.js";
 
         let currentMode = "signin";
         const defaultLogin = cloneDefaultWebsiteContent().login;
-        let loginCopy = {
-            brandTitle: defaultLogin.brandTitle,
-            signInDescription: defaultLogin.signInDescription,
-            signUpDescription: defaultLogin.signUpDescription
-        };
+        let loginCopy = { ...defaultLogin };
         const brandTitleEl = document.querySelector('[data-content="login.brandTitle"]');
+        const returnCtaEl = document.querySelector('[data-content="login.returnCta"]');
 
         twitchAuthButton.addEventListener("click", async () => {
             try {
@@ -92,7 +89,7 @@ import { supabase } from "../supabase-client.js";
             } catch (error) {
                 displayStatus(error.message || "Unable to continue with Twitch.", "error");
                 twitchAuthButton.disabled = false;
-                twitchAuthButton.textContent = "💜 Continue with Twitch";
+                twitchAuthButton.textContent = loginCopy.twitchCta || "💜 Continue with Twitch";
             }
         });
 
@@ -124,8 +121,8 @@ import { supabase } from "../supabase-client.js";
 
             submitButton.textContent =
                 currentMode === "signin"
-                    ? "Sign In"
-                    : "Create Account";
+                    ? (loginCopy.submitSignIn || "Sign In")
+                    : (loginCopy.submitSignUp || "Create Account");
         }
 
         function setMode(mode) {
@@ -143,6 +140,13 @@ import { supabase } from "../supabase-client.js";
                 "active",
                 isSignUp
             );
+
+            signInModeButton.textContent = loginCopy.signInModeLabel || "Sign In";
+            signUpModeButton.textContent = loginCopy.signUpModeLabel || "Create Account";
+            twitchAuthButton.textContent = loginCopy.twitchCta || "💜 Continue with Twitch";
+            if (returnCtaEl) {
+                returnCtaEl.textContent = loginCopy.returnCta || "Return to the Binder";
+            }
 
             signInModeButton.setAttribute(
                 "aria-pressed",
@@ -352,9 +356,8 @@ import { supabase } from "../supabase-client.js";
                 const content = await loadAndHydrateWebsiteContent();
                 if (content?.login) {
                     loginCopy = {
-                        brandTitle: content.login.brandTitle || loginCopy.brandTitle,
-                        signInDescription: content.login.signInDescription || loginCopy.signInDescription,
-                        signUpDescription: content.login.signUpDescription || loginCopy.signUpDescription
+                        ...loginCopy,
+                        ...content.login
                     };
                 }
             } catch {

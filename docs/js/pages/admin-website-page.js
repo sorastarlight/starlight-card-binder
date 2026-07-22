@@ -1,5 +1,10 @@
 import { getMyStaffAccess } from '../staff-service.js';
-import { HOME_QUICK_LINK_IDS, WEBSITE_EDITOR_TABS } from '../website-content-defaults.js';
+import {
+  cloneDefaultWebsiteContent,
+  HOME_QUICK_LINK_IDS,
+  WEBSITE_EDITOR_TABS
+} from '../website-content-defaults.js';
+import { getPageMeta, listedFieldKeys } from '../website-content-field-meta.js';
 import {
   getWebsiteContent,
   saveWebsiteContent,
@@ -18,12 +23,20 @@ const appEl = byId('app');
 const tablist = byId('tablist');
 const editorPanel = byId('editorPanel');
 const previewEl = byId('livePreview');
+const previewHintEl = byId('previewHint');
+const pageMetaEl = byId('pageMeta');
+const fieldSearchEl = byId('fieldSearch');
 const saveBtn = byId('saveBtn');
 const resetBtn = byId('resetBtn');
+const resetPageBtn = byId('resetPageBtn');
+const openPreviewBtn = byId('openPreviewBtn');
 
 let content = null;
+const defaults = cloneDefaultWebsiteContent();
 let activeTab = WEBSITE_EDITOR_TABS[0].id;
 let busy = false;
+let fieldQuery = '';
+let previewMode = 'full';
 
 function setStatus(message, type = '') {
   statusEl.textContent = message || '';
@@ -47,13 +60,35 @@ function moveItem(list, index, delta) {
   list.splice(next, 0, row);
 }
 
-function field(label, attrs, value, { multiline = false, hint = '' } = {}) {
+function isModified(sectionKey, key) {
+  const current = content?.[sectionKey]?.[key];
+  const fallback = defaults?.[sectionKey]?.[key];
+  if (typeof current !== 'string') return false;
+  return String(current) !== String(fallback ?? '');
+}
+
+function modifiedCount(sectionKey) {
+  const section = content?.[sectionKey] || {};
+  return Object.keys(section).filter((key) => typeof section[key] === 'string' && isModified(sectionKey, key)).length;
+}
+
+function matchesQuery(label, key, value) {
+  const q = fieldQuery.trim().toLowerCase();
+  if (!q) return true;
+  return [label, key, value].some((part) => String(part || '').toLowerCase().includes(q));
+}
+
+function field(label, attrs, value, { multiline = false, hint = '', modified = false, key = '' } = {}) {
   const control = multiline
     ? `<textarea ${attrs}>${esc(value || '')}</textarea>`
     : `<input type="text" value="${esc(value || '')}" ${attrs}>`;
   return `
-    <div class="field">
-      <label>${esc(label)}
+    <div class="field ${modified ? 'is-modified' : ''}" data-field-key="${esc(key)}">
+      <label>
+        <span class="field-label-row">
+          <span>${esc(label)}</span>
+          ${modified ? '<span class="field-badge">Edited</span>' : ''}
+        </span>
         ${control}
       </label>
       ${hint ? `<p class="field-hint">${esc(hint)}</p>` : ''}
@@ -62,73 +97,240 @@ function field(label, attrs, value, { multiline = false, hint = '' } = {}) {
 }
 
 function renderTabs() {
-  tablist.innerHTML = WEBSITE_EDITOR_TABS.map((tab) => `
-    <button type="button" class="tab ${tab.id === activeTab ? 'active' : ''}" role="tab"
-      aria-selected="${tab.id === activeTab}" data-tab="${esc(tab.id)}">${esc(tab.label)}</button>
-  `).join('');
+  tablist.innerHTML = WEBSITE_EDITOR_TABS.map((tab) => {
+    const count = content ? modifiedCount(tab.id) : 0;
+    return `
+      <button type="button" class="tab ${tab.id === activeTab ? 'active' : ''}" role="tab"
+        aria-selected="${tab.id === activeTab}" data-tab="${esc(tab.id)}">
+        ${esc(tab.label)}
+        ${count ? `<span class="tab-count" title="${count} edited field${count === 1 ? '' : 's'}">${count}</span>` : ''}
+      </button>
+    `;
+  }).join('');
 }
 
-function renderStringFields(sectionKey, section) {
-  const keys = Object.keys(section).filter((key) => typeof section[key] === 'string');
-  if (!keys.length) return '<p class="lead">No text fields on this page.</p>';
-  const longKeys = new Set(['lead', 'signInLead', 'morePacksLead', 'emptyLead', 'emptyWishlist', 'emptyTrade', 'composeEmpty', 'accountIntro', 'signedOutLead', 'duplicatesLead', 'chooseNote', 'exchangeNote', 'exchangeLead', 'wishlistCardLead', 'offersCardLead', 'publicCardLead', 'footerLead', 'tagline']);
-  return `
-    <div class="field-grid wide">
-      ${keys.map((key) => field(
-        labelForFieldKey(key),
-        `maxlength="500" data-path="${esc(sectionKey)}.${esc(key)}"`,
-        section[key],
-        { multiline: longKeys.has(key) || section[key].length > 90 }
-      )).join('')}
-    </div>
-  `;
+function renderStringField(sectionKey, fieldMeta, value) {
+  const key = fieldMeta.key;
+  const label = fieldMeta.label || labelForFieldKey(key);
+  if (!matchesQuery(label, key, value)) return '';
+  const longDefault = new Set(['lead', 'signInLead', 'morePacksLead', 'emptyLead', 'emptyWishlist', 'emptyTrade', 'composeEmpty', 'accountIntro', 'signedOutLead', 'duplicatesLead', 'chooseNote', 'exchangeNote', 'exchangeLead', 'wishlistCardLead', 'offersCardLead', 'publicCardLead', 'footerLead', 'tagline', 'splashTitle', 'gridBrowseLead', 'gridSearchLead', 'readyLead', 'claimedLead', 'disabledLead', 'resultsTitle', 'favoritesShowcaseEmptyLead', 'emptyAllLead', 'emptyFavoritesLead', 'emptyFiltersLead', 'showcaseEmptyLead', 'showcasePickLead', 'signInDescription', 'signUpDescription', 'infoStripCollection', 'loadError']);
+  const multiline = Boolean(fieldMeta.multiline || longDefault.has(key) || String(value || '').length > 90);
+  return field(
+    label,
+    `maxlength="500" data-path="${esc(sectionKey)}.${esc(key)}"`,
+    value,
+    { multiline, hint: fieldMeta.hint || '', modified: isModified(sectionKey, key), key }
+  );
+}
+
+function renderGroupedFields(sectionKey, section) {
+  const meta = getPageMeta(sectionKey);
+  if (!meta) {
+    const keys = Object.keys(section).filter((key) => typeof section[key] === 'string');
+    return `<div class="field-grid wide">${keys.map((key) => renderStringField(sectionKey, { key }, section[key])).join('')}</div>`;
+  }
+
+  const listed = new Set(listedFieldKeys(sectionKey));
+  const groupsHtml = meta.groups.map((group) => {
+    const fieldsHtml = group.fields
+      .map((fieldMeta) => renderStringField(sectionKey, fieldMeta, section[fieldMeta.key] ?? ''))
+      .join('');
+    if (!fieldsHtml && fieldQuery) return '';
+    return `
+      <details class="field-group" ${group.open || fieldQuery ? 'open' : ''}>
+        <summary>
+          <span>${esc(group.label)}</span>
+          <span class="group-count">${group.fields.length}</span>
+        </summary>
+        ${group.description ? `<p class="group-desc">${esc(group.description)}</p>` : ''}
+        <div class="field-grid wide">${fieldsHtml || '<p class="lead">No fields match this search.</p>'}</div>
+      </details>
+    `;
+  }).join('');
+
+  const extras = Object.keys(section)
+    .filter((key) => typeof section[key] === 'string' && !listed.has(key))
+    .filter((key) => matchesQuery(labelForFieldKey(key), key, section[key]));
+
+  const extrasHtml = extras.length ? `
+    <details class="field-group" ${fieldQuery ? 'open' : ''}>
+      <summary>
+        <span>Extra saved fields</span>
+        <span class="group-count">${extras.length}</span>
+      </summary>
+      <p class="group-desc">Custom string keys already stored for this page. Kept for forward compatibility.</p>
+      <div class="field-grid wide">
+        ${extras.map((key) => renderStringField(sectionKey, { key }, section[key])).join('')}
+      </div>
+    </details>
+  ` : '';
+
+  return groupsHtml + extrasHtml;
 }
 
 function renderHomeExtras() {
   const home = content.home;
+  const rows = HOME_QUICK_LINK_IDS.map((id) => {
+    const link = home.quickLinks.find((entry) => entry.id === id) || { id, label: id };
+    if (!matchesQuery('Quick link', id, link.label)) return '';
+    return `
+      <div class="field ${isModified('home', 'quickLinks') ? '' : ''}">
+        <span class="quick-link-id">${esc(id)}</span>
+        <label>Label
+          <input type="text" maxlength="40" value="${esc(link.label || '')}" data-quick-link="${esc(id)}">
+        </label>
+      </div>
+    `;
+  }).join('');
+  if (!rows && fieldQuery) return '';
   return `
-    <h3>Quick links</h3>
-    <p class="lead">Destinations stay fixed to left-nav routes. Edit labels only.</p>
-    <div class="field-grid">
-      ${HOME_QUICK_LINK_IDS.map((id) => {
-        const link = home.quickLinks.find((entry) => entry.id === id) || { id, label: id };
-        return `
-          <div class="field">
-            <span class="quick-link-id">${esc(id)}</span>
-            <label>Label
-              <input type="text" maxlength="40" value="${esc(link.label || '')}" data-quick-link="${esc(id)}">
-            </label>
-          </div>
-        `;
-      }).join('')}
-    </div>
+    <details class="field-group" open>
+      <summary><span>Quick links</span><span class="group-count">${HOME_QUICK_LINK_IDS.length}</span></summary>
+      <p class="group-desc">Destinations stay fixed to left-nav routes. Edit labels only.</p>
+      <div class="field-grid">${rows}</div>
+    </details>
   `;
 }
 
 function renderSocialLinks() {
+  if (fieldQuery && !['social', 'link', 'url', 'handle', 'icon'].some((token) => fieldQuery.includes(token))) {
+    return '';
+  }
   const links = content.socials.links || [];
   return `
-    <h3>Social links</h3>
-    <p class="lead">Add, reorder, or remove public social destinations.</p>
-    <div class="link-list">
-      ${links.map((link, index) => `
-        <article class="link-card-editor" data-link-index="${index}">
-          <div class="field-grid">
-            ${field('Icon', `maxlength="8" data-link-field="icon" data-link-index="${index}"`, link.icon)}
-            ${field('Label', `maxlength="40" data-link-field="label" data-link-index="${index}"`, link.label)}
-            ${field('Handle', `maxlength="60" data-link-field="handle" data-link-index="${index}"`, link.handle)}
-            ${field('URL', `maxlength="240" data-link-field="url" data-link-index="${index}"`, link.url)}
-          </div>
-          <div class="row-actions">
-            <button type="button" class="btn" data-link-move="${index}" data-delta="-1">Up</button>
-            <button type="button" class="btn" data-link-move="${index}" data-delta="1">Down</button>
-            <button type="button" class="btn danger" data-link-remove="${index}">Remove</button>
-          </div>
-        </article>
-      `).join('')}
-    </div>
-    <button type="button" class="btn" id="addSocialLink">Add social link</button>
+    <details class="field-group" open>
+      <summary><span>Social links</span><span class="group-count">${links.length}</span></summary>
+      <p class="group-desc">Add, reorder, or remove public social destinations.</p>
+      <div class="link-list">
+        ${links.map((link, index) => `
+          <article class="link-card-editor" data-link-index="${index}">
+            <div class="field-grid">
+              ${field('Icon', `maxlength="8" data-link-field="icon" data-link-index="${index}"`, link.icon)}
+              ${field('Label', `maxlength="40" data-link-field="label" data-link-index="${index}"`, link.label)}
+              ${field('Handle', `maxlength="60" data-link-field="handle" data-link-index="${index}"`, link.handle)}
+              ${field('URL', `maxlength="240" data-link-field="url" data-link-index="${index}"`, link.url)}
+            </div>
+            <div class="row-actions">
+              <button type="button" class="btn" data-link-move="${index}" data-delta="-1">Up</button>
+              <button type="button" class="btn" data-link-move="${index}" data-delta="1">Down</button>
+              <button type="button" class="btn danger" data-link-remove="${index}">Remove</button>
+            </div>
+          </article>
+        `).join('')}
+      </div>
+      <button type="button" class="btn" id="addSocialLink">Add social link</button>
+    </details>
   `;
+}
+
+function valuesByPreview(section, role) {
+  const meta = getPageMeta(activeTab);
+  if (!meta) return [];
+  return meta.groups
+    .flatMap((group) => group.fields)
+    .filter((fieldMeta) => fieldMeta.preview === role)
+    .map((fieldMeta) => section[fieldMeta.key])
+    .filter(Boolean);
+}
+
+function renderPreview() {
+  const section = content[activeTab] || {};
+  const meta = getPageMeta(activeTab);
+  const eyebrow = valuesByPreview(section, 'eyebrow')[0] || section.eyebrow || '';
+  const title = valuesByPreview(section, 'title')[0] || section.title || section.brandTitle || labelForFieldKey(activeTab);
+  const lead = valuesByPreview(section, 'lead')[0] || section.lead || section.signInDescription || '';
+  const splash = valuesByPreview(section, 'splash')[0] || section.splashTitle || '';
+  const primaryCtas = valuesByPreview(section, 'cta-primary');
+  const ctas = [...primaryCtas, ...valuesByPreview(section, 'cta')];
+  const chips = valuesByPreview(section, 'chip');
+  const emptyTitle = valuesByPreview(section, 'empty-title')[0] || '';
+  const emptyLead = valuesByPreview(section, 'empty-lead')[0] || '';
+  const edited = modifiedCount(activeTab);
+  const stringCount = Object.keys(section).filter((key) => typeof section[key] === 'string').length;
+  const showHero = previewMode !== 'empty';
+  const showSplash = Boolean(splash) && previewMode !== 'hero';
+  const showChips = chips.length > 0 && previewMode === 'full';
+  const showEmpty = (emptyTitle || emptyLead) && previewMode !== 'hero';
+
+  if (previewHintEl) {
+    previewHintEl.textContent = meta?.description
+      || 'Live composition of the selected page’s marketing blocks. Save to publish.';
+  }
+
+  const heroBlock = showHero ? `
+    <div class="preview-block preview-hero">
+      ${eyebrow ? `<p class="eyebrow">${esc(eyebrow)}</p>` : ''}
+      <h3>${esc(title)}</h3>
+      ${lead ? `<p>${esc(lead)}</p>` : ''}
+      ${ctas.length ? `<div class="preview-actions">${ctas.map((label, index) => `<span class="preview-chip ${index === 0 && primaryCtas.includes(label) ? 'primary' : ''}">${esc(label)}</span>`).join('')}</div>` : ''}
+    </div>
+  ` : '';
+
+  const splashBlock = showSplash ? `
+    <div class="preview-block preview-splash">
+      <p class="eyebrow">Series splash</p>
+      <h3>${esc(splash)}</h3>
+      <div class="preview-pack-row" aria-hidden="true">
+        <span class="preview-pack"></span><span class="preview-pack"></span><span class="preview-pack"></span>
+      </div>
+    </div>
+  ` : '';
+
+  const chipsBlock = showChips ? `
+    <div class="preview-block">
+      <p class="eyebrow">Labels & tabs</p>
+      <div class="preview-actions">${chips.slice(0, 8).map((label) => `<span class="preview-chip">${esc(label)}</span>`).join('')}</div>
+    </div>
+  ` : '';
+
+  const emptyBlock = showEmpty ? `
+    <div class="preview-block preview-empty">
+      <p class="eyebrow">Empty / signed-out state</p>
+      ${emptyTitle ? `<h3>${esc(emptyTitle)}</h3>` : '<h3>Empty state</h3>'}
+      ${emptyLead ? `<p>${esc(emptyLead)}</p>` : '<p>No empty-state copy on this page yet.</p>'}
+    </div>
+  ` : '';
+
+  const socialBlock = activeTab === 'socials' && Array.isArray(section.links) && previewMode === 'full' ? `
+    <div class="preview-block">
+      <p class="eyebrow">Social links</p>
+      <div class="preview-social">
+        ${section.links.slice(0, 4).map((link) => `
+          <div class="preview-social-row">
+            <span>${esc(link.icon || '✦')}</span>
+            <div><strong>${esc(link.label || 'Link')}</strong><small>${esc(link.handle || link.url || '')}</small></div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  ` : '';
+
+  previewEl.innerHTML = `
+    ${heroBlock}
+    ${splashBlock}
+    ${chipsBlock}
+    ${emptyBlock}
+    ${socialBlock}
+    <p class="preview-meta">${stringCount} text fields · ${edited} edited vs defaults · preview: ${esc(previewMode)}</p>
+  `;
+}
+
+function updatePageChrome() {
+  const tabMeta = WEBSITE_EDITOR_TABS.find((tab) => tab.id === activeTab);
+  const pageMeta = getPageMeta(activeTab);
+  if (pageMetaEl) {
+    pageMetaEl.innerHTML = `
+      <strong>${esc(tabMeta?.label || activeTab)}</strong>
+      <span>${esc(pageMeta?.description || 'Edit every string on this page.')}</span>
+      ${pageMeta?.previewUrl ? `<a class="page-link" href="${esc(pageMeta.previewUrl)}" target="_blank" rel="noopener">Open live page</a>` : ''}
+    `;
+  }
+  if (openPreviewBtn && pageMeta?.previewUrl) {
+    openPreviewBtn.hidden = false;
+    openPreviewBtn.dataset.href = pageMeta.previewUrl;
+  } else if (openPreviewBtn) {
+    openPreviewBtn.hidden = true;
+  }
 }
 
 function renderEditor() {
@@ -138,30 +340,24 @@ function renderEditor() {
     return;
   }
 
-  const tabMeta = WEBSITE_EDITOR_TABS.find((tab) => tab.id === activeTab);
-  let html = `<h2>${esc(tabMeta?.label || activeTab)}</h2>`;
-  html += renderStringFields(activeTab, section);
+  updatePageChrome();
 
+  let html = `
+    <div class="editor-toolbar">
+      <div class="preview-mode" role="group" aria-label="Preview depth">
+        <button type="button" class="btn small ${previewMode === 'hero' ? 'primary' : ''}" data-preview-mode="hero">Hero</button>
+        <button type="button" class="btn small ${previewMode === 'full' ? 'primary' : ''}" data-preview-mode="full">Full</button>
+        <button type="button" class="btn small ${previewMode === 'empty' ? 'primary' : ''}" data-preview-mode="empty">Empty states</button>
+      </div>
+      <p class="editor-note">${modifiedCount(activeTab)} field${modifiedCount(activeTab) === 1 ? '' : 's'} differ from defaults on this page.</p>
+    </div>
+  `;
+  html += renderGroupedFields(activeTab, section);
   if (activeTab === 'home') html += renderHomeExtras();
   if (activeTab === 'socials') html += renderSocialLinks();
 
-  editorPanel.innerHTML = html;
+  editorPanel.innerHTML = html || '<p class="lead">No fields match your search.</p>';
   renderPreview();
-}
-
-function renderPreview() {
-  const section = content[activeTab] || {};
-  const eyebrow = section.eyebrow || section.brandTitle || '';
-  const title = section.title || section.brandTitle || labelForFieldKey(activeTab);
-  const lead = section.lead || section.signInDescription || section.accountIntro || '';
-  previewEl.innerHTML = `
-    <div class="preview-card">
-      ${eyebrow ? `<p class="eyebrow">${esc(eyebrow)}</p>` : ''}
-      <h3>${esc(title)}</h3>
-      ${lead ? `<p>${esc(lead)}</p>` : ''}
-      <p class="preview-meta">${esc(Object.keys(section).filter((key) => typeof section[key] === 'string').length)} editable text fields</p>
-    </div>
-  `;
 }
 
 function syncFromDom() {
@@ -203,7 +399,8 @@ async function boot() {
     appEl.classList.remove('hidden');
     saveBtn.hidden = false;
     resetBtn.hidden = false;
-    setStatus('Website content loaded. Edit any left-nav page, then Save.');
+    if (resetPageBtn) resetPageBtn.hidden = false;
+    setStatus('Visual Website Editor ready. Edit any left-nav page group, preview live, then Save.');
     renderAll();
   } catch (error) {
     setStatus(error.message || 'Could not load website content.', 'error');
@@ -218,12 +415,34 @@ tablist.addEventListener('click', (event) => {
   renderAll();
 });
 
+fieldSearchEl?.addEventListener('input', () => {
+  syncFromDom();
+  fieldQuery = fieldSearchEl.value || '';
+  renderEditor();
+});
+
 editorPanel.addEventListener('input', () => {
   syncFromDom();
+  renderTabs();
   renderPreview();
+  const note = editorPanel.querySelector('.editor-note');
+  if (note) {
+    const count = modifiedCount(activeTab);
+    note.textContent = `${count} field${count === 1 ? '' : 's'} differ from defaults on this page.`;
+  }
 });
 
 editorPanel.addEventListener('click', (event) => {
+  const modeBtn = event.target.closest('[data-preview-mode]');
+  if (modeBtn) {
+    previewMode = modeBtn.getAttribute('data-preview-mode') || 'full';
+    editorPanel.querySelectorAll('[data-preview-mode]').forEach((btn) => {
+      btn.classList.toggle('primary', btn.getAttribute('data-preview-mode') === previewMode);
+    });
+    renderPreview();
+    return;
+  }
+
   const add = event.target.closest('#addSocialLink');
   if (add) {
     syncFromDom();
@@ -257,6 +476,26 @@ editorPanel.addEventListener('click', (event) => {
   }
 });
 
+openPreviewBtn?.addEventListener('click', () => {
+  const href = openPreviewBtn.dataset.href;
+  if (href) window.open(href, '_blank', 'noopener');
+});
+
+resetPageBtn?.addEventListener('click', async () => {
+  if (busy) return;
+  const tabMeta = WEBSITE_EDITOR_TABS.find((tab) => tab.id === activeTab);
+  const confirmed = await window.StarlightUI?.confirm?.({
+    title: `Reset ${tabMeta?.label || 'this page'}?`,
+    message: 'Restores only this page’s copy to built-in defaults. Save afterward to publish.',
+    confirmText: 'Reset Page'
+  });
+  if (!confirmed) return;
+  syncFromDom();
+  content[activeTab] = structuredClone(defaults[activeTab]);
+  setStatus(`${tabMeta?.label || 'Page'} reset locally. Click Save Changes to publish.`, 'success');
+  renderAll();
+});
+
 saveBtn.addEventListener('click', async () => {
   if (busy) return;
   syncFromDom();
@@ -278,9 +517,9 @@ saveBtn.addEventListener('click', async () => {
 resetBtn.addEventListener('click', async () => {
   if (busy) return;
   const confirmed = await window.StarlightUI?.confirm?.({
-    title: 'Reset website content?',
+    title: 'Reset all website content?',
     message: 'This restores every public page’s marketing copy to the built-in defaults.',
-    confirmText: 'Reset to Defaults'
+    confirmText: 'Reset Everything'
   });
   if (!confirmed) return;
   busy = true;

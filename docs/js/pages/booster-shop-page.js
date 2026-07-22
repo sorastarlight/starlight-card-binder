@@ -105,11 +105,11 @@ function render(){
   const featuredCost=Number(featured.star_bits_cost)||0;
   featuredStage.innerHTML=`<article class="featured-pack">
     <div class="featured-pack-copy">
-      <p class="shop-kicker">Featured Booster</p>
+      <p class="shop-kicker">${escapeHTML(shopCopy.featuredKicker||'Featured Booster')}</p>
       <h2>${escapeHTML(featured.name)}</h2>
       <p>${escapeHTML(featured.description||'A magical Starlight booster ready to join your collection.')}</p>
       <div class="featured-pack-meta"><span>${escapeHTML(modeLabel(featured.reward_mode))}</span><span>${escapeHTML(summarizeBooster(featured))}</span></div>
-      <div class="featured-pack-actions"><strong>★ ${featuredCost.toLocaleString()} Star Bits</strong><button type="button" data-buy="${escapeHTML(featured.id)}" data-cost="${featuredCost}" data-back="${escapeHTML(featured.card_back_url||'')}" ${currentBalance>=featuredCost?'':'disabled'}>${currentBalance>=featuredCost?'Open Featured Pack':'Need More Star Bits'}</button><button type="button" data-details="${escapeHTML(featured.id)}">Preview Contents</button></div>
+      <div class="featured-pack-actions"><strong>★ ${featuredCost.toLocaleString()} Star Bits</strong><button type="button" data-buy="${escapeHTML(featured.id)}" data-cost="${featuredCost}" data-back="${escapeHTML(featured.card_back_url||'')}" ${currentBalance>=featuredCost?'':'disabled'}>${escapeHTML(currentBalance>=featuredCost?(shopCopy.openFeaturedCta||'Open Featured Pack'):(shopCopy.needBitsCta||'Need More Star Bits'))}</button><button type="button" data-details="${escapeHTML(featured.id)}">${escapeHTML(shopCopy.previewContentsCta||'Preview Contents')}</button></div>
     </div>
     <div class="featured-pack-art"><div class="featured-orbit"></div><img src="${escapeHTML(featured.pack_image_url||FALLBACK_PACK)}" alt="${escapeHTML(featured.name)} booster pack"></div>
   </article>`;
@@ -128,8 +128,8 @@ function render(){
         <div class="pack-meta"><span class="meta-pill">${escapeHTML(modeLabel(booster.reward_mode))}</span><span class="meta-pill">${summary}</span></div>
         <div class="pack-price"><span class="price-star">★</span><span>${cost.toLocaleString()}</span></div>
         <div class="pack-actions">
-          <button class="price-button" type="button" data-buy="${escapeHTML(booster.id)}" data-cost="${cost}" data-back="${escapeHTML(booster.card_back_url||'')}" ${affordable?'':'disabled'}>${affordable?'Open Pack':'Need More Star Bits'}</button>
-          <button class="details-button" type="button" data-details="${escapeHTML(booster.id)}">What’s Inside?</button>
+          <button class="price-button" type="button" data-buy="${escapeHTML(booster.id)}" data-cost="${cost}" data-back="${escapeHTML(booster.card_back_url||'')}" ${affordable?'':'disabled'}>${escapeHTML(affordable?(shopCopy.openPackCta||'Open Pack'):(shopCopy.needBitsCta||'Need More Star Bits'))}</button>
+          <button class="details-button" type="button" data-details="${escapeHTML(booster.id)}">${escapeHTML(shopCopy.whatsInsideCta||'What’s Inside?')}</button>
         </div>
       </div>
     </article>`;
