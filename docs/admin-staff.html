@@ -1,7 +1,53 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/><title>Staff Roles | Starlight Card Binder</title><link href="css/style.css?v=1.0.2" rel="stylesheet"/><link rel="stylesheet" href="css/pages/admin-staff.css?v=1.0"><script src="js/browser-performance.js?v=1.0.0" defer></script>
-    <link rel="stylesheet" href="css/shared-ui.css?v=1.6.15">
-<link rel="stylesheet" href="css/qol-ui.css?v=94.2.4">
-</head><body><script src="js/embed-mode.js" type="module"></script><div class="sky"></div><main class="page"><a class="staff-back-link" href="admin-hub.html">← Administration Hub</a><section class="panel"><p class="eyebrow">Owner &amp; Administrator</p><h1>User &amp; Role Management</h1><p>Owners can assign every role. Administrators may assign Moderator and Super Moderator, but cannot modify owners or administrators.</p><p class="status" id="status">Loading users…</p><div class="hidden" id="content"><div class="toolbar"><input id="search" placeholder="Search email, username, or display name…" type="search"/></div><div class="users" id="users"></div></div></section></main><script type="module" src="js/pages/admin-staff-page.js?v=1.0"></script>    <script src="js/shared-ui.js?v=1.6.15"></script>
-<script src="js/qol-ui.js?v=94.2.4" defer></script>
-</body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
+  <title>Staff Roles | Starlight Card Binder</title>
+  <link href="css/style.css?v=1.0.2" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/pages/admin-staff.css?v=1.1.0">
+  <script src="js/browser-performance.js?v=1.0.0" defer></script>
+  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.15">
+  <link rel="stylesheet" href="css/qol-ui.css?v=94.2.4">
+</head>
+<body>
+  <script src="js/embed-mode.js" type="module"></script>
+  <div class="sky"></div>
+  <main class="page">
+    <a class="staff-back-link" href="admin-hub.html">← Administration Hub</a>
+    <section class="panel">
+      <p class="eyebrow">Owner &amp; Administrator</p>
+      <h1>User &amp; Role Management</h1>
+      <p>Owners can assign every role. Administrators may assign Moderator and Super Moderator, but cannot modify owners or administrators.</p>
+      <p class="hint">Custom role labels are display names only. Permissions always come from the mapped tier (Owner, Admin, Super Moderator, or Moderator).</p>
+      <p class="status" id="status">Loading users…</p>
+      <div class="hidden" id="content">
+        <section class="labels-panel" aria-labelledby="labels-heading">
+          <h2 id="labels-heading">Custom role labels</h2>
+          <p class="hint">Create a reusable label such as “Community Lead”, map it to a permission tier, then assign it to users below.</p>
+          <form id="create-label-form" class="label-form">
+            <label>
+              <span>Label name</span>
+              <input id="label-name" type="text" maxlength="40" minlength="2" required placeholder="Community Lead" autocomplete="off"/>
+            </label>
+            <label>
+              <span>Permission tier</span>
+              <select id="label-tier" required></select>
+            </label>
+            <button class="save" type="submit">Create Label</button>
+          </form>
+          <div id="labels" class="labels"></div>
+        </section>
+
+        <div class="toolbar">
+          <input id="search" placeholder="Search email, username, display name, or label…" type="search"/>
+        </div>
+        <div class="users" id="users"></div>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="js/pages/admin-staff-page.js?v=1.1.0"></script>
+  <script src="js/shared-ui.js?v=1.6.15"></script>
+  <script src="js/qol-ui.js?v=94.2.4" defer></script>
+</body>
+</html>

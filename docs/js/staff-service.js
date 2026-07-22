@@ -14,11 +14,11 @@ export async function getMyStaffAccess() {
     if (error) {
         // RPC is granted to authenticated only; signed-out collectors are not staff.
         if (isUnauthenticatedStaffLookup(error)) {
-            return { isStaff: false, role: null };
+            return { isStaff: false, role: null, roleLabel: null };
         }
         throw error;
     }
-    return data || { isStaff: false, role: null };
+    return data || { isStaff: false, role: null, roleLabel: null };
 }
 
 export async function listStaffUsers() {
@@ -27,11 +27,36 @@ export async function listStaffUsers() {
     return data || [];
 }
 
-export async function setStaffRole(userId, role) {
-    const { data, error } = await supabase.rpc('admin_set_staff_role', {
-        requested_user_id: userId,
-        requested_role: role
+export async function listStaffRoleLabels() {
+    const { data, error } = await supabase.rpc('admin_list_staff_role_labels');
+    if (error) throw error;
+    return data || [];
+}
+
+export async function createStaffRoleLabel(name, permissionTier) {
+    const { data, error } = await supabase.rpc('admin_create_staff_role_label', {
+        requested_name: name,
+        requested_permission_tier: permissionTier
     });
+    if (error) throw error;
+    return data;
+}
+
+export async function deleteStaffRoleLabel(labelId) {
+    const { data, error } = await supabase.rpc('admin_delete_staff_role_label', {
+        requested_label_id: labelId
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function setStaffRole(userId, role, labelId = null) {
+    const payload = {
+        requested_user_id: userId,
+        requested_role: labelId ? null : role,
+        requested_label_id: labelId || null
+    };
+    const { data, error } = await supabase.rpc('admin_set_staff_role', payload);
     if (error) throw error;
     return data;
 }
