@@ -39,7 +39,10 @@ const nativeView=document.getElementById('binderNativeView');
 const frameWrap=document.getElementById('shellViewFrame');
 const frame=document.getElementById('shellViewIframe');
 const menuButton=document.getElementById('shellMenuButton');
+const accountMenuButton=document.getElementById('shellAccountMenuButton');
+const accountMenu=document.getElementById('shellAccountMenu');
 const mainContent=document.querySelector('.main');
+const AVATAR_SILHOUETTE='<svg class="shell-avatar-silhouette" viewBox="0 0 40 40" width="22" height="22" focusable="false" aria-hidden="true"><circle cx="20" cy="14" r="7" fill="currentColor"/><path d="M8 33c1.8-7.2 6.4-10.5 12-10.5S30.2 25.8 32 33" fill="currentColor"/></svg>';
 let profileUsername='';
 let currentRoute='binder';
 let currentLoadToken=0;
@@ -120,6 +123,7 @@ function loadEmbeddedView(route,{force=false,resetRetry=false}={}){
 
 function navigate(route,{push=true,extra={}}={}){
   closeNotificationPopover();
+  closeAccountMenu();
   const resolved = aliasShellRoute(route) || (isKnownShellRoute(route) ? route : '');
   if(!resolved){
     console.warn('[Starlight] Unknown shell route ignored:', route);
@@ -200,6 +204,32 @@ function escShell(value){
 function closeNotificationPopover(){
   const pop=document.querySelector('.shell-notification-popover');
   if(pop)pop.hidden=true;
+}
+
+function setAccountMenuOpen(open){
+  if(!accountMenu||!accountMenuButton)return;
+  accountMenu.hidden=!open;
+  accountMenuButton.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+
+function closeAccountMenu(){
+  setAccountMenuOpen(false);
+}
+
+function setShellAvatar(photoUrl){
+  const avatar=document.querySelector('[data-shell-avatar]');
+  if(!avatar)return;
+  if(photoUrl){
+    avatar.innerHTML='';
+    avatar.style.backgroundImage=`url(${photoUrl})`;
+    avatar.classList.add('has-photo');
+    avatar.classList.remove('is-placeholder');
+    return;
+  }
+  avatar.style.backgroundImage='';
+  avatar.classList.remove('has-photo');
+  avatar.classList.add('is-placeholder');
+  avatar.innerHTML=AVATAR_SILHOUETTE;
 }
 
 function ensureNotificationPopover(){
@@ -291,8 +321,11 @@ async function hydrateAccount(){
     const {data}=await supabase.auth.getUser();const user=data?.user;
     if(!user){
       showSignedOut();
+      setShellAvatar('');
       document.querySelector('[data-shell-account-name]').textContent='Welcome to Starlight Cards';
-      document.querySelector('[data-shell-account-sub]').textContent='Log in or create an account to collect cards';
+      document.querySelector('[data-shell-account-sub]').textContent='Sign in or register to collect cards';
+      const link=document.querySelector('[data-shell-profile-link]');
+      if(link)link.href='binder.html?view=profile';
     } else {
       showSignedIn();
       const {data:profile}=await supabase.from('profiles').select('username,display_name,onboarding_complete,username_locked,username_source,avatar_url,selected_title_id').eq('id',user.id).maybeSingle();
@@ -300,10 +333,11 @@ async function hydrateAccount(){
       const name=profile?.display_name||profile?.username||user.email||'Collector';
       document.querySelector('[data-shell-account-name]').textContent=name;
       document.querySelector('[data-shell-account-sub]').textContent=profile?.username?`@${profile.username}`:user.email;
-      const avatar=document.querySelector('[data-shell-avatar]');
-      if(profile?.avatar_url){avatar.textContent='';avatar.style.backgroundImage=`url(${profile.avatar_url})`;avatar.style.backgroundSize='cover';avatar.style.backgroundPosition='center';avatar.classList.add('has-photo')}
-      else{avatar.textContent='✦';avatar.style.backgroundImage='';avatar.classList.remove('has-photo')}
-      const link=document.querySelector('[data-shell-profile-link]');if(link&&profileUsername)link.href=`binder.html?view=collector&username=${encodeURIComponent(profileUsername)}`;
+      setShellAvatar(profile?.avatar_url||'');
+      const link=document.querySelector('[data-shell-profile-link]');
+      if(link)link.href=profileUsername
+        ? `binder.html?view=collector&username=${encodeURIComponent(profileUsername)}`
+        : 'binder.html?view=profile';
       access=await getMyStaffAccess();
       if(profile && profile.onboarding_complete===false){
         try{
@@ -318,6 +352,7 @@ async function hydrateAccount(){
   }catch(e){
     console.warn('[Starlight] Shell account hydration failed',e);
     showSignedOut();
+    setShellAvatar('');
   }
 
   try{
@@ -358,8 +393,41 @@ async function hydrateAccount(){
   document.querySelector('.staff-only-menu')?.toggleAttribute('hidden',!access?.isStaff);
 }
 
-document.addEventListener('click',e=>{const a=e.target.closest('[data-shell-view]');if(a){e.preventDefault();navigate(a.dataset.shellView);}});
+document.addEventListener('click',e=>{
+  const a=e.target.closest('[data-shell-view]');
+  if(a){
+    e.preventDefault();
+    closeAccountMenu();
+    navigate(a.dataset.shellView);
+  }
+});
 menuButton?.addEventListener('click',()=>document.body.classList.toggle('shell-menu-open'));
+accountMenuButton?.addEventListener('click',e=>{
+  e.stopPropagation();
+  setAccountMenuOpen(Boolean(accountMenu?.hidden));
+});
+accountMenu?.addEventListener('click',e=>{
+  const profileLink=e.target.closest('[data-shell-profile-link]');
+  if(profileLink){
+    e.preventDefault();
+    closeAccountMenu();
+    if(profileUsername)navigate('collector',{extra:{username:profileUsername}});
+    else navigate('profile');
+    return;
+  }
+  const item=e.target.closest('[role="menuitem"]');
+  if(!item)return;
+  if(item.matches('[data-shell-signout]'))return;
+  closeAccountMenu();
+});
+document.addEventListener('click',e=>{
+  if(!accountMenu||accountMenu.hidden)return;
+  if(e.target.closest('.shell-account-menu-wrap'))return;
+  closeAccountMenu();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeAccountMenu();
+});
 window.addEventListener('popstate',()=>navigate(new URLSearchParams(location.search).get('view')||'home',{push:false}));
 window.addEventListener('message',e=>{
   if(e.origin!==location.origin)return;
@@ -379,9 +447,10 @@ window.addEventListener('message',e=>{
   if(data.type==='starlight-view-height')resizeEmbeddedView(Number(data.height));
 });
 
-frame?.addEventListener('pointerdown',closeNotificationPopover);
+frame?.addEventListener('pointerdown',()=>{closeNotificationPopover();closeAccountMenu();});
 frame?.addEventListener('load',()=>{
   closeNotificationPopover();
+  closeAccountMenu();
   if(frame.src==='about:blank')return;
   // A successful document load is not enough; the child still must send its ready handshake.
   setViewState('loading');
@@ -399,5 +468,8 @@ hydrateNotificationBadge();
 hydrateReceivedGiftBadge();
 hydrateActiveEventBanner();
 
-
-document.querySelector('[data-shell-signout]')?.addEventListener('click',async()=>{await supabase.auth.signOut();location.href='binder.html?view=home';});
+document.querySelector('[data-shell-signout]')?.addEventListener('click',async()=>{
+  closeAccountMenu();
+  await supabase.auth.signOut();
+  location.href='binder.html?view=home';
+});

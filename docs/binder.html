@@ -9,7 +9,7 @@
     </title>
 <link href="css/style.css?v=1.0.3" rel="stylesheet"/>
 <link href="css/v80-8-ui.css" rel="stylesheet"/>
-<link href="css/app-shell.css?v=1.3.2" rel="stylesheet"/>
+<link href="css/app-shell.css?v=1.3.5" rel="stylesheet"/>
 <link href="css/card-filters.css?v=1.0" rel="stylesheet"/>
 <link href="css/pages/binder.css?v=1.1" rel="stylesheet"/><script src="js/browser-performance.js?v=1.0.0" defer></script>
     <link rel="stylesheet" href="css/shared-ui.css?v=1.6.13">
@@ -28,9 +28,34 @@
 </aside>
 <main class="main">
 <section aria-label="Collector account summary" class="shell-account-bar shell-account-bar-v883">
-<div class="shell-account-left"><button aria-label="Open navigation" class="shell-menu-button" id="shellMenuButton" type="button">☰</button><a class="shell-profile-link" data-shell-profile-link="" href="binder.html?view=profile"><span class="shell-avatar" data-shell-avatar="">✦</span></a><div class="shell-account-main"><strong data-shell-account-name="">Loading collector…</strong><span data-shell-account-sub="">Starlight account</span><div class="shell-profile-mini-stats" data-shell-signed-in hidden><span>Lv. <b data-collector-level="">1</b></span><span>✦ <b data-star-bits="">0</b></span><span><b data-duplicates="">0</b> extras</span></div></div></div>
+<div class="shell-account-left"><button aria-label="Open navigation" class="shell-menu-button" id="shellMenuButton" type="button">☰</button></div>
 <nav class="shell-primary-links" aria-label="Quick navigation"><a data-shell-view="home" href="binder.html?view=home">News &amp; Updates</a><a data-shell-view="binder" href="binder.html?view=binder">Starlight Card Binder</a><a data-shell-view="collection" href="binder.html?view=collection">My Card Collection</a><a data-shell-view="shop" href="binder.html?view=shop">Card Shop</a></nav>
-<div class="shell-account-actions"><div class="shell-signed-out-actions" data-shell-signed-out hidden><a class="shell-auth-button" href="login.html?mode=signin">Sign In</a><a class="shell-auth-button primary" href="login.html?mode=signup">Create Account</a></div><div class="shell-signed-in-actions" data-shell-signed-in hidden><a class="shell-notification-button" data-shell-view="notifications" href="binder.html?view=notifications" aria-label="Open notifications"><span>🔔</span><b data-notification-badge hidden>0</b></a><a class="daily-booster-cta is-loading" data-daily-cta="" data-shell-view="daily" href="binder.html?view=daily"><span aria-hidden="true" class="daily-booster-dot"></span><span data-daily-cta-label="">Daily Booster</span></a><button class="shell-auth-button shell-signout-button" type="button" data-shell-signout>Sign Out</button></div><button aria-label="Toggle sound effects" class="shell-sfx-button sfx-toggle on" id="sfxToggle" title="Turn sound effects on or off" type="button">♪</button></div>
+<div class="shell-account-actions">
+<div class="shell-signed-in-actions" data-shell-signed-in hidden><a class="daily-booster-cta is-loading" data-daily-cta="" data-shell-view="daily" href="binder.html?view=daily"><span aria-hidden="true" class="daily-booster-dot"></span><span data-daily-cta-label="">Daily Booster</span></a></div>
+<button aria-label="Toggle sound effects" class="shell-sfx-button sfx-toggle on" id="sfxToggle" title="Turn sound effects on or off" type="button">♪</button>
+<div class="shell-account-menu-wrap">
+<button type="button" class="shell-account-menu-button" id="shellAccountMenuButton" aria-expanded="false" aria-haspopup="menu" aria-controls="shellAccountMenu">
+<span class="shell-avatar is-placeholder" data-shell-avatar="" aria-hidden="true"><svg class="shell-avatar-silhouette" viewBox="0 0 40 40" width="22" height="22" focusable="false"><circle cx="20" cy="14" r="7" fill="currentColor"/><path d="M8 33c1.8-7.2 6.4-10.5 12-10.5S30.2 25.8 32 33" fill="currentColor"/></svg></span>
+<span class="shell-account-main"><strong data-shell-account-name="">Loading collector…</strong><span data-shell-account-sub="">Starlight account</span><div class="shell-profile-mini-stats" data-shell-signed-in hidden><span>Lv. <b data-collector-level="">1</b></span><span>✦ <b data-star-bits="">0</b></span><span><b data-duplicates="">0</b> extras</span></div></span>
+<span class="shell-account-caret" aria-hidden="true">▾</span>
+<b class="shell-account-notify-badge" data-notification-badge hidden>0</b>
+</button>
+<div class="shell-account-menu" id="shellAccountMenu" role="menu" hidden>
+<div class="shell-account-menu-signed-in" data-shell-signed-in hidden>
+<a role="menuitem" class="shell-profile-link" data-shell-profile-link="" href="binder.html?view=profile">View My Profile</a>
+<a role="menuitem" data-shell-view="profile" href="binder.html?view=profile">Profile &amp; Settings</a>
+<a role="menuitem" data-shell-view="notifications" href="binder.html?view=notifications">View My Notifications</a>
+<a role="menuitem" data-shell-view="redeem" href="binder.html?view=redeem">Redeem A Code</a>
+<hr class="shell-account-menu-sep" aria-hidden="true"/>
+<button role="menuitem" type="button" class="shell-signout-button" data-shell-signout>Sign Out</button>
+</div>
+<div class="shell-account-menu-signed-out" data-shell-signed-out hidden>
+<a role="menuitem" href="login.html?mode=signin">Sign In</a>
+<a role="menuitem" href="login.html?mode=signup">Register</a>
+</div>
+</div>
+</div>
+</div>
 </section>
 <section class="shell-event-banner" data-shell-event-banner hidden><div><span class="shell-event-kicker">Current Starlight Event</span><strong data-shell-event-name></strong><span data-shell-event-time></span></div><a data-shell-view="events" href="binder.html?view=events">View Event ✨</a></section>
 <div class="shell-native-view" id="binderNativeView"><section class="series-hero panel v61-hero">
@@ -56,7 +81,7 @@
 <script src="js/cloud-collection.js?v=1.1.4" type="module"></script>
 <script src="js/site-dashboard.js" type="module"></script>
 <script src="js/pages/binder-page.js?v=1.0"></script>
-<script src="js/app-shell.js?v=1.3.4" type="module"></script>    <script src="js/shared-ui.js?v=1.6.13"></script>
+<script src="js/app-shell.js?v=1.3.5" type="module"></script>    <script src="js/shared-ui.js?v=1.6.13"></script>
 <script src="js/qol-ui.js?v=94.2.8" defer></script>
 </body>
 </html>
