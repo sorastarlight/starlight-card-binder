@@ -1,3 +1,4 @@
+import { bindTablistKeyboard } from '../tablist-a11y.js';
 import { getMyTradeLists, setCardTradePreference, setTradeListVisibility } from '../trade-list-service.js';
 import { buildTradeSearchHaystack } from '../card-filter-utils.js';
 import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
@@ -10,6 +11,8 @@ const search = document.querySelector('#tradeSearch');
 const status = document.querySelector('#tradeStatus');
 const publicToggle = document.querySelector('#publicLists');
 const tabs = [...document.querySelectorAll('[data-tab]')];
+const tablist = document.querySelector('.trade-tabs');
+const panel = document.querySelector('.trade-panel');
 
 let data = [];
 let tab = 'wishlist';
@@ -79,11 +82,25 @@ function render() {
 
 function setActiveTab(nextTab) {
   tab = nextTab;
-  tabs.forEach(button => {
+  tabs.forEach((button) => {
     const active = button.dataset.tab === tab;
-    button.classList.toggle('active', active);
+    const name = button.dataset.tab;
+    button.id = button.id || `trade-tab-${name}`;
+    button.setAttribute('role', 'tab');
     button.setAttribute('aria-selected', String(active));
+    button.setAttribute('tabindex', active ? '0' : '-1');
+    if (panel) {
+      if (!panel.id) panel.id = 'tradePanel';
+      button.setAttribute('aria-controls', panel.id);
+    }
+    button.classList.toggle('active', active);
   });
+  if (panel) {
+    panel.setAttribute('role', 'tabpanel');
+    panel.hidden = false;
+    const activeTab = tabs.find((button) => button.dataset.tab === tab);
+    if (activeTab?.id) panel.setAttribute('aria-labelledby', activeTab.id);
+  }
   render();
 }
 
@@ -117,10 +134,15 @@ document.addEventListener('change', event => {
 });
 
 tabs.forEach(button => {
-  button.setAttribute('role', 'tab');
   button.addEventListener('click', () => setActiveTab(button.dataset.tab));
 });
 
+if (tablist) {
+  tablist.setAttribute('role', 'tablist');
+  bindTablistKeyboard(tablist, tabs, {
+    onActivate: (button) => setActiveTab(button.dataset.tab)
+  });
+}
 grid?.addEventListener('click', event => {
   const button = event.target.closest('[data-open-tab]');
   if (!button) return;

@@ -1,6 +1,7 @@
 import { getTradeOfferContext, createTradeOffer, getMyTradeOffers, respondToTradeOffer, searchTradeCollectors } from '../trade-offer-service.js';
 import { buildTradeSearchHaystack } from '../card-filter-utils.js';
 import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
+import { bindTablistKeyboard, syncTabSelection } from '../tablist-a11y.js';
 
 const siteCopy = await loadAndHydrateWebsiteContent();
 const offersCopy = siteCopy?.offers || {};
@@ -13,6 +14,8 @@ const recipientResults = document.querySelector('#recipientResults');
 const mySearch = document.querySelector('#myCardsSearch');
 const theirSearch = document.querySelector('#theirCardsSearch');
 const sendButton = document.querySelector('#sendOffer');
+const offerTabs = [...document.querySelectorAll('[data-tab]')];
+const offerTablist = document.querySelector('.tabs[role="tablist"], .tabs');
 const offerSummary = document.querySelector('#offerSummary');
 
 let context = null;
@@ -367,14 +370,12 @@ async function loadOffers() {
 }
 
 function setActiveOfferTab(name) {
-  document.querySelectorAll('[data-tab]').forEach(button => {
-    const active = button.dataset.tab === name;
-    button.classList.toggle('active', active);
-    button.setAttribute('aria-selected', String(active));
-  });
-  ['compose', 'incoming', 'outgoing'].forEach(tabName => {
-    const view = document.querySelector(`#${tabName}View`);
-    if (view) view.hidden = tabName !== name;
+  const panels = ['compose', 'incoming', 'outgoing']
+    .map((tabName) => document.querySelector(`#${tabName}View`))
+    .filter(Boolean);
+  syncTabSelection(offerTabs, panels, name, {
+    nameFromTab: (button) => button.dataset.tab,
+    nameFromPanel: (panel) => panel.id.replace(/View$/, '')
   });
 }
 
@@ -533,9 +534,15 @@ document.addEventListener('click', async event => {
 });
 
 document.querySelectorAll('[data-tab]').forEach(button => {
-  button.setAttribute('role', 'tab');
   button.addEventListener('click', () => setActiveOfferTab(button.dataset.tab));
 });
+
+if (offerTablist) {
+  offerTablist.setAttribute('role', 'tablist');
+  bindTablistKeyboard(offerTablist, offerTabs, {
+    onActivate: (button) => setActiveOfferTab(button.dataset.tab)
+  });
+}
 
 if (recipientInput && username) recipientInput.value = username;
 setActiveOfferTab(initialOfferTab());

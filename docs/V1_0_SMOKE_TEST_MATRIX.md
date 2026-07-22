@@ -58,6 +58,8 @@ Third slice: **checklist + collection filter parity** — done: checklist uses s
 
 Fourth slice: **binder browse chrome + trade search** — done: honest owned/not-collected count pill, collector-number badges, mobile filter head stack, trade wishlist search haystack includes collector numbers.
 
+Keyboard/a11y follow-up (2026-07-22): shared `tablist-a11y.js` for collection + trade tabs (arrow/Home/End), shell-safe profile links from trades/comments/reports, live filter summaries, full-view arrow `preventDefault`.
+
 Fifth slice: **profiles + trading polish** — shell-safe public profile links, report CTA, self-trade guard, wishlist/offers a11y + pick search; migration `20260722020000_trade_lists_collector_number` applied to production 2026-07-21.
 
 Sixth slice: **trade offer composer integrity** — selections survive search via qty maps, sticky offer summary, match-first pick sort, send → Sent tab, inbox profile links + deep-link tab, decline/cancel confirms, wishlist empty Browse All CTA.

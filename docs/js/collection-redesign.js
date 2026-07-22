@@ -1,28 +1,34 @@
+import { bindTablistKeyboard, syncTabSelection } from './tablist-a11y.js';
+
 const tabs = [...document.querySelectorAll('[data-collection-tab]')];
 const panels = [...document.querySelectorAll('[data-collection-panel]')];
+const tablist = document.querySelector('.collection-tabs');
 
-function activateCollectionView(name) {
-  tabs.forEach(tab => {
-    const active = tab.dataset.collectionTab === name;
-    tab.classList.toggle('active', active);
-    tab.setAttribute('aria-selected', String(active));
+function activateCollectionView(name, { focus = false } = {}) {
+  syncTabSelection(tabs, panels, name, {
+    nameFromTab: (tab) => tab.dataset.collectionTab,
+    nameFromPanel: (panel) => panel.dataset.collectionPanel
   });
-  panels.forEach(panel => {
-    const active = panel.dataset.collectionPanel === name;
-    panel.classList.toggle('active', active);
-    panel.hidden = !active;
-  });
+  if (focus) {
+    tabs.find((tab) => tab.dataset.collectionTab === name)?.focus();
+  }
+  window.dispatchEvent(new CustomEvent('starlight-collection-tab-changed', {
+    detail: { tab: name }
+  }));
 }
 
-tabs.forEach(tab => {
-  tab.setAttribute('role', 'tab');
+tabs.forEach((tab) => {
   tab.addEventListener('click', () => {
     activateCollectionView(tab.dataset.collectionTab);
-    window.dispatchEvent(new CustomEvent('starlight-collection-tab-changed', {
-      detail: { tab: tab.dataset.collectionTab }
-    }));
   });
 });
 
-document.querySelector('.collection-tabs')?.setAttribute('role', 'tablist');
+if (tablist) {
+  tablist.setAttribute('role', 'tablist');
+  tablist.setAttribute('aria-label', 'Collection views');
+  bindTablistKeyboard(tablist, tabs, {
+    onActivate: (tab) => activateCollectionView(tab.dataset.collectionTab)
+  });
+}
+
 activateCollectionView('all');
