@@ -17,6 +17,12 @@ import {
 } from "../content-studio-service.js?v=1.5";
 import { createAdminBoosterEditors } from "./admin-boosters-editors.js?v=1.5";
 import { starBitAmountHtml } from "../star-bit-icon.js";
+import { avatarFrameClassName } from "../avatar-frame-utils.js";
+import {
+  adminListAvatarFrames,
+  adminSaveAvatarFrame,
+  adminSetRewardFrame,
+} from "../avatar-frames-admin-service.js";
 const $ = (s) => document.querySelector(s),
   status = $("#status"),
   app = $("#app"),
@@ -27,6 +33,9 @@ const data = {
     cards: [],
     boosters: [],
     events: [],
+    frames: [],
+    frameQuests: [],
+    frameSeasonTiers: [],
     dailyMode: "daily",
   },
   assets = [];
@@ -304,6 +313,89 @@ function assetsView() {
 function eventsView() {
   return `<section class="panel"><div class="toolbar"><div><h2>Events & Seasonal Content</h2><p class="lead">Create timed celebrations that can group exclusive cards, booster packs, achievements, and titles.</p></div><button class="btn primary" data-new-event>＋ New Event</button></div><div class="library">${data.events.map((e) => `<article class="item">${e.bannerImageUrl ? `<img src="${esc(e.bannerImageUrl)}" alt="">` : ""}<div class="item-meta"><span>${new Date(e.startAt).toLocaleDateString()} – ${new Date(e.endAt).toLocaleDateString()}</span><span>${e.isActive ? "Active" : "Inactive"}</span></div><h3>${esc(e.name)}</h3><p>${esc(e.description || "No description")}</p><p class="lead">${e.cardCount || 0} card(s) • ${e.boosterCount || 0} booster(s) • ${(e.achievements || []).length} achievement(s)</p><button class="btn" data-edit-event="${esc(e.id)}">Edit Event</button></article>`).join("") || '<div class="empty">No events yet. Create your first seasonal celebration.</div>'}</div></section>`;
 }
+
+function framePreviewMarkup(frame) {
+  const classes = avatarFrameClassName(frame) || "avatar-frame";
+  return `<span class="avatar-frame-preview ${esc(classes)}" aria-hidden="true"></span>`;
+}
+
+function framesView() {
+  const frames = data.frames || [];
+  const optionHtml = (selectedId) =>
+    `<option value="">No frame</option>${frames
+      .map(
+        (f) =>
+          `<option value="${esc(f.id)}" ${f.id === selectedId ? "selected" : ""}>${esc(f.name)}</option>`,
+      )
+      .join("")}`;
+
+  const questHtml = (data.frameQuests || [])
+    .map(
+      (q) => `<div class="reward-row frame-reward-row" data-frame-reward-kind="quest" data-frame-reward-id="${esc(q.id)}">
+        <strong>${esc(q.title || q.id)}</strong>
+        <select data-frame-reward-select>${optionHtml(q.rewardFrameId || "")}</select>
+        <button type="button" class="btn" data-save-frame-reward>Save</button>
+      </div>`,
+    )
+    .join("") || '<p class="lead">No active quests.</p>';
+
+  const tierHtml = (data.frameSeasonTiers || [])
+    .map(
+      (t) => `<div class="reward-row frame-reward-row" data-frame-reward-kind="season_tier" data-frame-reward-id="${esc(t.id)}">
+        <strong>${esc(t.label || t.id)} <small>${esc(t.seasonId || "")} · tier ${esc(t.tierIndex)}</small></strong>
+        <select data-frame-reward-select>${optionHtml(t.rewardFrameId || "")}</select>
+        <button type="button" class="btn" data-save-frame-reward>Save</button>
+      </div>`,
+    )
+    .join("") || '<p class="lead">No season tiers.</p>';
+
+  return `<section class="panel"><div class="toolbar"><div><h2>Avatar Frames</h2><p class="lead">CSS-preset profile frames. Edit display names, activity, and sort order. Attach frames as quest or season-pass rewards.</p></div></div><div class="library">${frames
+    .map(
+      (f) => `<article class="item frame-item">
+        <div class="frame-item-preview">${framePreviewMarkup(f)}</div>
+        <div class="item-meta"><span>${esc(f.cssPreset)} · ${esc(f.effect)}</span><span>${f.isActive ? "Active" : "Inactive"}</span></div>
+        <h3>${esc(f.name)}</h3>
+        <p>${esc(f.description || "No description")}</p>
+        <p class="lead">sort ${Number(f.sortOrder || 0)} · id ${esc(f.id)}</p>
+        <button class="btn" data-edit-frame="${esc(f.id)}">Edit Frame</button>
+      </article>`,
+    )
+    .join("") || '<div class="empty">No avatar frames seeded yet.</div>'}</div>
+    <section class="reward-builder" style="margin-top:22px"><h3>Quest reward frames</h3>${questHtml}</section>
+    <section class="reward-builder" style="margin-top:18px"><h3>Season tier reward frames</h3>${tierHtml}</section>
+  </section>`;
+}
+
+function frameEditor(frame) {
+  openEditor(
+    `Edit Frame · ${frame.name || frame.id}`,
+    `<div class="form-grid">
+      <div class="field full"><label>Live preview</label><div>${framePreviewMarkup(frame)}</div></div>
+      <div class="field"><label>Frame ID</label><input value="${esc(frame.id)}" disabled></div>
+      <div class="field"><label>CSS preset</label><input value="${esc(frame.cssPreset || "")}" disabled></div>
+      <div class="field"><label>Effect</label><input value="${esc(frame.effect || "static")}" disabled></div>
+      <div class="field"><label>Name</label><input id="frameName" value="${esc(frame.name || "")}"></div>
+      <div class="field"><label>Sort order</label><input id="frameSort" type="number" value="${Number(frame.sortOrder || 0)}"></div>
+      <div class="field full"><label>Description</label><textarea id="frameDescription">${esc(frame.description || "")}</textarea></div>
+      <div class="checks full"><label><input id="frameActive" type="checkbox" ${frame.isActive !== false ? "checked" : ""}> Active</label></div>
+    </div>
+    <div class="editor-actions"><button id="saveFrameBtn" class="btn primary">Save Frame</button></div>`,
+  );
+  $("#saveFrameBtn").onclick = async () => {
+    try {
+      await adminSaveAvatarFrame({
+        id: frame.id,
+        name: $("#frameName").value.trim(),
+        description: $("#frameDescription").value,
+        sortOrder: Number($("#frameSort").value || 0),
+        isActive: $("#frameActive").checked,
+      });
+      await reload("Avatar frame saved.");
+    } catch (err) {
+      say(err.message, "error");
+    }
+  };
+}
 function eventEditor(e = {}) {
   const achievements = e.achievements || [];
   openEditor(
@@ -465,6 +557,7 @@ function render() {
   $("#boostersTab").innerHTML = boostersView();
   $("#assetsTab").innerHTML = assetsView();
   $("#eventsTab").innerHTML = eventsView();
+  $("#framesTab").innerHTML = framesView();
   $("#maintenanceTab").innerHTML = maintenanceView();
   $("#dailyMode").value = data.dailyMode || "daily";
   renderCardLibrary();
@@ -616,6 +709,30 @@ function wire() {
         (x.onclick = () =>
           eventEditor(data.events.find((e) => e.id === x.dataset.editEvent))),
     );
+  document
+    .querySelectorAll("[data-edit-frame]")
+    .forEach(
+      (x) =>
+        (x.onclick = () =>
+          frameEditor(data.frames.find((f) => f.id === x.dataset.editFrame))),
+    );
+  document.querySelectorAll("[data-save-frame-reward]").forEach((btn) => {
+    btn.onclick = async () => {
+      const row = btn.closest("[data-frame-reward-kind]");
+      if (!row) return;
+      const kind = row.dataset.frameRewardKind;
+      const id = row.dataset.frameRewardId;
+      const select = row.querySelector("[data-frame-reward-select]");
+      btn.disabled = true;
+      try {
+        await adminSetRewardFrame(kind, id, select?.value || null);
+        await reload("Reward frame assignment saved.");
+      } catch (err) {
+        say(err.message, "error");
+        btn.disabled = false;
+      }
+    };
+  });
   document
     .querySelectorAll("[data-new]")
     .forEach(
@@ -821,6 +938,7 @@ document.querySelectorAll("[data-tab]").forEach(
         "boosters",
         "assets",
         "events",
+        "frames",
         "maintenance",
       ].forEach((t) =>
         $(`#${t}Tab`).classList.toggle("hidden", b.dataset.tab !== t),
@@ -832,15 +950,29 @@ async function reload(message = "") {
   say("Loading Starlight Card Management…");
   try {
     // Catalog/events first — never block booster/card saves on Storage asset listing.
-    const [content, eventRows] = await Promise.all([
+    const [content, eventRows, frameBundle] = await Promise.all([
       loadContentStudio(),
       getAdminEvents().catch((error) => {
         console.warn("[Starlight] Events refresh failed:", error);
         return data.events || [];
       }),
+      adminListAvatarFrames().catch((error) => {
+        console.warn("[Starlight] Avatar frames refresh failed:", error);
+        return {
+          frames: data.frames || [],
+          quests: data.frameQuests || [],
+          seasonTiers: data.frameSeasonTiers || [],
+        };
+      }),
     ]);
     Object.keys(data).forEach((key) => delete data[key]);
-    Object.assign(data, { ...content, events: eventRows });
+    Object.assign(data, {
+      ...content,
+      events: eventRows,
+      frames: frameBundle.frames || [],
+      frameQuests: frameBundle.quests || [],
+      frameSeasonTiers: frameBundle.seasonTiers || [],
+    });
     render();
     app.classList.remove("hidden");
     say(message, message ? "success" : "");

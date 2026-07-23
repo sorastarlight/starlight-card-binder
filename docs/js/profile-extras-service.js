@@ -9,12 +9,14 @@ export async function getMyProfileExtras() {
 export async function setMyProfileExtras({
   avatarUrl = undefined,
   titleId = undefined,
-  bannerUrl = undefined
+  bannerUrl = undefined,
+  frameId = undefined
 } = {}) {
   const payload = {};
   if (avatarUrl !== undefined) payload.requested_avatar_url = avatarUrl;
   if (titleId !== undefined) payload.requested_title_id = titleId;
   if (bannerUrl !== undefined) payload.requested_banner_url = bannerUrl;
+  if (frameId !== undefined) payload.requested_frame_id = frameId;
 
   const { data, error } = await supabase.rpc('set_my_profile_extras', payload);
   if (error) throw error;

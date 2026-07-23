@@ -620,7 +620,7 @@
   .profile-crop-actions{flex-direction:column}
   .profile-crop-actions button{width:100%}
 }
-.profile-flair select{width:100%;min-height:48px;padding:10px;border:2px solid rgba(75,105,155,.24);border-radius:12px}.profile-flair h3{margin:22px 0 12px;color:#405fa1}
+.profile-flair select{width:100%;min-height:48px;padding:10px;border:2px solid rgba(75,105,155,.24);border-radius:12px;margin-bottom:10px}.profile-flair label{display:block;margin:12px 0 6px;color:#405fa1}.profile-flair label:first-child{margin-top:0}.profile-flair h3{margin:22px 0 12px;color:#405fa1}
 .achievement-grid{display:grid;gap:10px}.achievement-badge{display:flex;gap:12px;align-items:center;padding:12px;border:1px solid rgba(255,130,200,.28);border-radius:14px;background:linear-gradient(135deg,#fff,#f8fbff)}.achievement-badge>span{font-size:1.8rem}.achievement-badge strong,.achievement-badge small{display:block}.achievement-badge small{margin-top:3px;color:#6b7089}
 .profile-extras-status{text-align:center;font-weight:800}.profile-extras-status.success{color:#167048}.profile-extras-status.error{color:#b4233f}
 

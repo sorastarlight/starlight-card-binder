@@ -1,0 +1,185 @@
+/* Unlockable CSS profile avatar frames (circular rings + effects). */
+
+.avatar-frame {
+  position: relative;
+  isolation: isolate;
+}
+
+.avatar-frame::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  z-index: 3;
+  box-sizing: border-box;
+}
+
+.shell-avatar.avatar-frame,
+.collector-avatar.avatar-frame,
+.profile-preview-avatar.avatar-frame,
+.rankings-avatar.avatar-frame,
+.avatar-frame-preview {
+  border-radius: 50%;
+  /* Keep ring glow visible outside the circular crop. */
+  overflow: visible;
+}
+
+.collector-avatar-wrap:has(.avatar-frame),
+.shell-account-left:has(.shell-avatar.avatar-frame),
+.profile-preview-header:has(.avatar-frame) {
+  overflow: visible;
+}
+
+.avatar-frame-sky::after {
+  border-color: #6bc6f8;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7), 0 0 14px rgba(107, 198, 248, 0.45);
+}
+
+.avatar-frame-rose::after {
+  border-color: #ff82c8;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7), 0 0 14px rgba(255, 130, 200, 0.45);
+}
+
+.avatar-frame-gold::after {
+  border-color: #fed334;
+  box-shadow: 0 0 0 1px rgba(255, 248, 220, 0.85), 0 0 16px rgba(254, 211, 52, 0.5);
+}
+
+.avatar-frame-violet::after {
+  border-color: #b48cff;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.65), 0 0 14px rgba(180, 140, 255, 0.45);
+}
+
+.avatar-frame-emerald::after {
+  border-color: #4eca9a;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.65), 0 0 14px rgba(78, 202, 154, 0.4);
+}
+
+.avatar-frame-crimson::after {
+  border-color: #ef5b7a;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.65), 0 0 14px rgba(239, 91, 122, 0.42);
+}
+
+.avatar-frame-midnight::after {
+  border-color: #405fa1;
+  box-shadow: 0 0 0 1px rgba(180, 200, 255, 0.55), 0 0 16px rgba(64, 95, 161, 0.5);
+}
+
+.avatar-frame-rainbow::after {
+  border: 3px solid transparent;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(135deg, #ff6b9d, #ffd166, #6bc6f8, #b48cff, #4eca9a) border-box;
+  box-shadow: 0 0 18px rgba(255, 130, 200, 0.35);
+}
+
+.avatar-frame-aurora::after {
+  border: 3px solid transparent;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(120deg, #7ef0d2, #8eb6ff, #ff9ad5, #7ef0d2) border-box;
+  box-shadow: 0 0 18px rgba(126, 240, 210, 0.35);
+}
+
+.avatar-frame-holofoil::after {
+  border: 3px solid transparent;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(145deg, #c8f7ff, #ffd6f3, #fff2b0, #c9ffd8, #d7c8ff) border-box;
+  box-shadow: 0 0 20px rgba(200, 247, 255, 0.4);
+}
+
+.avatar-frame-glitter::after {
+  border-color: #ffb7de;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.8),
+    0 0 10px rgba(255, 183, 222, 0.55),
+    2px -3px 0 0 rgba(255, 255, 255, 0.85),
+    -3px 2px 0 0 rgba(254, 211, 52, 0.75),
+    3px 3px 0 0 rgba(107, 198, 248, 0.7);
+}
+
+.avatar-frame-prism::after {
+  border: 3px solid transparent;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    conic-gradient(from 20deg, #7fd0ff, #ff9ad5, #b8f0a8, #ffd57a, #7fd0ff) border-box;
+  box-shadow: 0 0 18px rgba(127, 208, 255, 0.35);
+}
+
+.avatar-frame-celestial::after {
+  border-color: #8eb6ff;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.85),
+    0 0 22px rgba(142, 182, 255, 0.55),
+    0 0 36px rgba(255, 130, 200, 0.2);
+}
+
+.avatar-frame-sunset::after {
+  border: 3px solid transparent;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(135deg, #ff82c8, #fed334) border-box;
+  box-shadow: 0 0 16px rgba(255, 130, 200, 0.35);
+}
+
+.avatar-frame-ocean::after {
+  border: 3px solid transparent;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(135deg, #6bc6f8, #4eca9a) border-box;
+  box-shadow: 0 0 16px rgba(107, 198, 248, 0.35);
+}
+
+.avatar-frame-preview {
+  width: 56px;
+  height: 56px;
+  display: inline-grid;
+  place-items: center;
+  background: linear-gradient(145deg, #eef7ff, #ffe8f5);
+  box-shadow: inset 0 0 0 1px rgba(107, 198, 248, 0.25);
+}
+
+.avatar-frame-preview::before {
+  content: "✦";
+  color: #405fa1;
+  font-weight: 900;
+  font-size: 1.1rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .avatar-frame-effect-shimmer::after {
+    animation: avatar-frame-shimmer 3.8s ease-in-out infinite;
+  }
+  .avatar-frame-effect-pulse::after {
+    animation: avatar-frame-pulse 2.8s ease-in-out infinite;
+  }
+  .avatar-frame-effect-glitter::after {
+    animation: avatar-frame-glitter 2.2s steps(2, end) infinite;
+  }
+}
+
+@keyframes avatar-frame-shimmer {
+  0%, 100% { filter: hue-rotate(0deg) brightness(1); opacity: 0.92; }
+  50% { filter: hue-rotate(28deg) brightness(1.08); opacity: 1; }
+}
+
+@keyframes avatar-frame-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.04); opacity: 1; }
+}
+
+@keyframes avatar-frame-glitter {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.8), 0 0 10px rgba(255, 183, 222, 0.55), 2px -3px 0 0 rgba(255, 255, 255, 0.85), -3px 2px 0 0 rgba(254, 211, 52, 0.75), 3px 3px 0 0 rgba(107, 198, 248, 0.7); }
+  50% { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.9), 0 0 14px rgba(254, 211, 52, 0.55), -2px 3px 0 0 rgba(255, 255, 255, 0.9), 3px -2px 0 0 rgba(107, 198, 248, 0.8), -3px -3px 0 0 rgba(255, 130, 200, 0.75); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar-frame-effect-shimmer::after,
+  .avatar-frame-effect-pulse::after,
+  .avatar-frame-effect-glitter::after {
+    animation: none;
+  }
+}

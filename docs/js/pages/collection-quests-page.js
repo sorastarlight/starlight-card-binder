@@ -35,7 +35,10 @@ function rewardLine(quest) {
   if (Number(quest.rewardStarBits) > 0) {
     parts.push(starBitAmountHtml(esc, quest.rewardStarBits, { iconSize: 'xs' }));
   }
-  if (quest.rewardTitleName) parts.push(`Title: ${quest.rewardTitleName}`);
+  if (quest.rewardTitleName) parts.push(`Title: ${esc(quest.rewardTitleName)}`);
+  if (quest.rewardFrameName) {
+    parts.push(`<span class="reward-frame-chip">Frame: ${esc(quest.rewardFrameName)}</span>`);
+  }
   return parts.length ? parts.join(' · ') : 'Progress reward';
 }
 
@@ -69,7 +72,7 @@ function render(quests) {
         <div class="quest-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${target}" aria-valuenow="${progress}" aria-label="Quest progress">
           <span style="width:${pct}%"></span>
         </div>
-        <p class="quest-meta">${progress} / ${target} · ${esc(rewardLine(quest))}</p>
+        <p class="quest-meta">${progress} / ${target} · ${rewardLine(quest)}</p>
       </div>
       <div class="quest-actions"></div>
     `;

@@ -14,8 +14,10 @@ import { getShellNavigation } from './shell-navigation-service.js';
 import { applyShellNavigationToDom, applyShellPageTitles } from './shell-navigation-render.js';
 import { isStudioPreview, STUDIO_MSG } from './studio-preview.js';
 import { initLiveFeedWidget } from './live-feed-widget.js';
+import { applyAvatarFrameClass } from './avatar-frame-utils.js';
+import { getMyProfileExtras } from './profile-extras-service.js';
 
-const SHELL_BUILD = '94.3.4';
+const SHELL_BUILD = '94.3.5';
 const VIEW_READY_TIMEOUT_MS = 6500;
 const MAX_VIEW_RETRIES = 1;
 
@@ -245,7 +247,7 @@ function closeAccountMenu(){
   setAccountMenuOpen(false);
 }
 
-function setShellAvatar(photoUrl){
+function setShellAvatar(photoUrl, frame = null){
   const avatar=document.querySelector('[data-shell-avatar]');
   if(!avatar)return;
   if(photoUrl){
@@ -255,12 +257,13 @@ function setShellAvatar(photoUrl){
     avatar.style.backgroundPosition='center';
     avatar.classList.add('has-photo');
     avatar.classList.remove('is-placeholder');
-    return;
+  } else {
+    avatar.style.backgroundImage='';
+    avatar.classList.remove('has-photo');
+    avatar.classList.add('is-placeholder');
+    avatar.innerHTML=AVATAR_SILHOUETTE;
   }
-  avatar.style.backgroundImage='';
-  avatar.classList.remove('has-photo');
-  avatar.classList.add('is-placeholder');
-  avatar.innerHTML=AVATAR_SILHOUETTE;
+  applyAvatarFrameClass(avatar, frame);
 }
 
 function ensureNotificationPopover(){
@@ -378,7 +381,15 @@ async function hydrateAccount(){
       const name=profile?.display_name||profile?.username||user.email||'Collector';
       document.querySelector('[data-shell-account-name]').textContent=name;
       document.querySelector('[data-shell-account-sub]').textContent=profile?.username?`@${profile.username}`:user.email;
-      setShellAvatar(profile?.avatar_url||'');
+      let shellFrame = null;
+      try{
+        const extras = await getMyProfileExtras();
+        const selectedId = extras?.selectedFrameId || '';
+        shellFrame = (extras?.frames || []).find((frame) => frame.id === selectedId) || null;
+      }catch(frameError){
+        console.warn('[Starlight] Shell avatar frame unavailable', frameError);
+      }
+      setShellAvatar(profile?.avatar_url||'', shellFrame);
       access=await getMyStaffAccess();
       if(profile && profile.onboarding_complete===false){
         try{

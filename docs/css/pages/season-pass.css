@@ -15,6 +15,7 @@
 .season-tier-index{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#eaf7ff,#ffe8f5);color:#405fa1;font-weight:900}
 .season-tier-copy h2{margin:0 0 4px;color:#405fa1;font-size:1.04rem}
 .season-tier-copy p{margin:0;color:#626a82}
+.reward-frame-chip{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:linear-gradient(135deg,rgba(107,198,248,.18),rgba(255,130,200,.16));color:#405fa1;font-weight:800}
 .season-status{font-weight:850;color:#405fa1}
 .season-status.muted{color:#8990a4}
 .season-locked{padding:8px 2px}

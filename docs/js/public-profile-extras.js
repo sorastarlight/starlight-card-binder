@@ -1,4 +1,5 @@
 import { getPublicProfileExtras } from './profile-extras-service.js';
+import { applyAvatarFrameClass } from './avatar-frame-utils.js';
 
 const username = new URLSearchParams(location.search).get('username') || '';
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -23,6 +24,7 @@ const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
       avatar.style.backgroundSize = 'cover';
       avatar.style.backgroundPosition = 'center';
     }
+    applyAvatarFrameClass(avatar, data.frame || null);
 
     const banner = document.getElementById('collector-banner') || document.querySelector('.collector-banner');
     if (data.bannerUrl && banner) {

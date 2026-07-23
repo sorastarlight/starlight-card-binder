@@ -46,7 +46,10 @@ function rewardLine(tier) {
   if (Number(tier.rewardStarBits) > 0) {
     parts.push(starBitAmountHtml(esc, tier.rewardStarBits, { iconSize: 'xs' }));
   }
-  if (tier.rewardTitleName) parts.push(`Title: ${tier.rewardTitleName}`);
+  if (tier.rewardTitleName) parts.push(`Title: ${esc(tier.rewardTitleName)}`);
+  if (tier.rewardFrameName) {
+    parts.push(`<span class="reward-frame-chip">Frame: ${esc(tier.rewardFrameName)}</span>`);
+  }
   return parts.length ? parts.join(' · ') : 'Season reward';
 }
 
@@ -133,7 +136,7 @@ function render(data) {
       <div class="season-tier-index" aria-hidden="true">${Number(tier.tierIndex) || '?'}</div>
       <div class="season-tier-copy">
         <h2>${esc(tier.label)}</h2>
-        <p>${Number(tier.pointsRequired) || 0} points · ${esc(rewardLine(tier))}</p>
+        <p>${Number(tier.pointsRequired) || 0} points · ${rewardLine(tier)}</p>
       </div>
       <div class="season-tier-actions"></div>
     `;

@@ -4,6 +4,7 @@ import {
     uploadProfileImage,
     uploadProfileBanner
 } from './profile-extras-service.js';
+import { applyAvatarFrameClass } from './avatar-frame-utils.js';
 
 const avatarFileInput = document.getElementById('profile-image-file');
 const bannerFileInput = document.getElementById('profile-banner-file');
@@ -25,8 +26,12 @@ const bannerPreviewWrap = document.getElementById('profile-banner-preview-wrap')
 const removeBanner = document.getElementById('remove-profile-banner');
 const cropModal = document.getElementById('profile-crop-modal');
 const titleSelect = document.getElementById('collector-title-select');
+const frameSelect = document.getElementById('avatar-frame-select');
 const achievementGrid = document.getElementById('achievement-grid');
 const extrasStatus = document.getElementById('profile-extras-status');
+
+let ownedFrames = [];
+let selectedFrameId = '';
 
 const CROP_MODES = {
     avatar: {
@@ -102,6 +107,13 @@ function setAvatarPreview(url) {
             avatarPreviewWrap.style.backgroundImage = '';
         }
     }
+
+    applySelectedFramePreview();
+}
+
+function applySelectedFramePreview() {
+    const frame = ownedFrames.find((item) => item.id === selectedFrameId) || null;
+    applyAvatarFrameClass(avatarPreviewWrap, frame);
 }
 
 function setBannerPreview(url) {
@@ -489,12 +501,28 @@ titleSelect?.addEventListener('change', async () => {
     }
 });
 
+frameSelect?.addEventListener('change', async () => {
+    selectedFrameId = frameSelect.value || '';
+    applySelectedFramePreview();
+    try {
+        await setMyProfileExtras({
+            frameId: selectedFrameId
+        });
+        status('Avatar frame updated.', 'success');
+    } catch (error) {
+        status(error.message || 'Could not update avatar frame.', 'error');
+    }
+});
+
 applyCropMode('avatar');
 setBannerPreview('');
 
 (async () => {
     try {
         const data = await getMyProfileExtras();
+
+        ownedFrames = Array.isArray(data.frames) ? data.frames : [];
+        selectedFrameId = data.selectedFrameId || '';
 
         setAvatarPreview(data.avatarUrl || '');
         setBannerPreview(data.bannerUrl || '');
@@ -507,6 +535,16 @@ setBannerPreview('');
                     .join('');
 
             titleSelect.value = data.selectedTitleId || '';
+        }
+
+        if (frameSelect) {
+            frameSelect.innerHTML =
+                '<option value="">No avatar frame</option>' +
+                ownedFrames
+                    .map(frame => `<option value="${frame.id}">${frame.name}</option>`)
+                    .join('');
+            frameSelect.value = selectedFrameId;
+            applySelectedFramePreview();
         }
 
         if (achievementGrid) {
