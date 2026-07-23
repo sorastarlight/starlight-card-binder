@@ -1,4 +1,4 @@
-/* Prestige frames from duplicate quantity thresholds (copies are not burned). */
+/* Card Fusion frames (stored prestige_tier). Fusion spends duplicate extras. */
 .prestige-frame,
 .collection-card.prestige-frame,
 .v61-card-slot.prestige-frame,
@@ -27,22 +27,22 @@
   border-radius: 18px;
 }
 
-.prestige-silver::after {
+.prestige-rookie::after {
   border-color: rgba(168, 184, 206, 0.95);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.55), 0 8px 18px rgba(120, 138, 168, 0.22);
 }
 
-.prestige-gold::after {
+.prestige-champion::after {
   border-color: rgba(214, 170, 72, 0.95);
   box-shadow: 0 0 0 1px rgba(255, 244, 210, 0.7), 0 10px 22px rgba(184, 136, 36, 0.24);
 }
 
-.prestige-prismatic::after {
+.prestige-ultimate::after {
   border-image: linear-gradient(135deg, #7fd0ff, #ff9ad5, #b8f0a8, #ffd57a) 1;
   box-shadow: 0 0 18px rgba(127, 208, 255, 0.35), 0 10px 24px rgba(255, 154, 213, 0.2);
 }
 
-.prestige-celestial::after {
+.prestige-mega::after {
   border-color: rgba(120, 168, 255, 0.95);
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.75),
@@ -64,14 +64,35 @@
   color: #405fa1;
 }
 
-.prestige-badge.prestige-silver { background: #eef2f7; color: #5b6b84; }
-.prestige-badge.prestige-gold { background: #fff5df; color: #8a650f; }
-.prestige-badge.prestige-prismatic { background: linear-gradient(135deg, #e9f8ff, #ffe8f5); color: #5a4f8a; }
-.prestige-badge.prestige-celestial { background: #eaf0ff; color: #3550a0; }
+.prestige-badge.prestige-rookie { background: #eef2f7; color: #5b6b84; }
+.prestige-badge.prestige-champion { background: #fff5df; color: #8a650f; }
+.prestige-badge.prestige-ultimate { background: linear-gradient(135deg, #e9f8ff, #ffe8f5); color: #5a4f8a; }
+.prestige-badge.prestige-mega { background: #eaf0ff; color: #3550a0; }
+
+.fusion-action {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(107, 198, 248, 0.35);
+  background: rgba(246, 251, 255, 0.95);
+}
+
+.fusion-action p {
+  margin: 0;
+  color: #6b7089;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.fusion-action .btn {
+  justify-self: start;
+}
 
 @media (prefers-reduced-motion: no-preference) {
-  .prestige-prismatic::after,
-  .prestige-celestial::after {
+  .prestige-ultimate::after,
+  .prestige-mega::after {
     animation: prestige-shimmer 4.5s ease-in-out infinite;
   }
 }
@@ -82,8 +103,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .prestige-prismatic::after,
-  .prestige-celestial::after {
+  .prestige-ultimate::after,
+  .prestige-mega::after {
     animation: none;
   }
 }
@@ -140,4 +161,3 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-

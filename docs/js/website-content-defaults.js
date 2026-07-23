@@ -236,13 +236,13 @@ export function createDefaultWebsiteContent() {
       favoritesShowcaseTitle: 'Favorite Showcase',
       favoritesShowcaseEmptyLead: 'Star a card to put it on the Starlight stage. Your favorites will scroll here like a tiny idol parade.',
       favoritesShowcaseCta: 'Find Favorites',
-      prestigeLegendEyebrow: 'Card Prestige',
-      prestigeLegendTitle: 'Duplicate frames',
-      prestigeLegendLead: 'Owning more copies of a card unlocks a prestige frame. Extra copies are never burned.',
-      prestigeSilver: '10+ copies',
-      prestigeGold: '25+ copies',
-      prestigePrismatic: '100+ copies',
-      prestigeCelestial: '500+ copies'
+      prestigeLegendEyebrow: 'Card Fusion',
+      prestigeLegendTitle: 'Fusion levels',
+      prestigeLegendLead: 'Fuse duplicate copies in My Cards full view to evolve a card frame. Fusion spends extras and always keeps one copy.',
+      prestigeRookie: '10 duplicates → Rookie',
+      prestigeChampion: '25 duplicates → Champion',
+      prestigeUltimate: '75 duplicates → Ultimate',
+      prestigeMega: '200 duplicates → Mega'
     },
     starBits: {
       eyebrow: 'Duplicate Card Exchange',

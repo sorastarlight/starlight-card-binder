@@ -1,7 +1,7 @@
 import {
+  normalizeFusionTier,
   prestigeClassName,
-  prestigeLabel,
-  prestigeTierFromQuantity
+  prestigeLabel
 } from './prestige-utils.js';
 
 const DEFAULT_BACK = 'site_assets/StarlightCard_Back_NewLogo.png';
@@ -77,11 +77,13 @@ export function normalizeRevealCard(card = {}) {
       ?? 0
     ) || 0)
   );
-  const prestigeTier = String(
+  const prestigeTier = normalizeFusionTier(
     card.prestigeTier
     ?? card.prestige_tier
-    ?? prestigeTierFromQuantity(quantity)
-  ).toLowerCase() || 'standard';
+    ?? card.fusionTier
+    ?? card.fusion_tier
+    ?? 'standard'
+  );
   return {
     ...card,
     id,
@@ -128,18 +130,18 @@ function finishEffectBadge(card, doc) {
 }
 
 function prestigeRevealBadge(card, doc) {
-  const tier = String(card?.prestigeTier || prestigeTierFromQuantity(card?.quantity)).toLowerCase();
+  const tier = normalizeFusionTier(card?.prestigeTier);
   if (!tier || tier === 'standard') return null;
   return createElement(
     doc,
     'span',
     `st-r3-badge prestige-badge prestige-${tier}`,
-    `${prestigeLabel(tier)} Prestige`
+    `${prestigeLabel(tier)} Fusion`
   );
 }
 
 function prestigeActorClass(card) {
-  return prestigeClassName(card?.prestigeTier || card?.quantity || 0);
+  return prestigeClassName(normalizeFusionTier(card?.prestigeTier));
 }
 
 function attachHoloSpark(element, card) {
@@ -272,7 +274,7 @@ const REVEAL_STYLESHEET_URL = new URL(
 ).href;
 const PRESTIGE_STYLESHEET_ID = 'starlight-prestige-frames';
 const PRESTIGE_STYLESHEET_URL = new URL(
-  '../css/prestige-frames.css?v=1.1',
+  '../css/prestige-frames.css?v=1.2',
   import.meta.url
 ).href;
 const stylesheetLoads = new WeakMap();

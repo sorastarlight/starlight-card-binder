@@ -3,7 +3,11 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 import {
+  canFuse,
+  fusionCostForNextTier,
+  nextFusionTier,
   prestigeClassName,
+  prestigeLabel,
   prestigeTierFromQuantity
 } from '../docs/js/prestige-utils.js';
 import {
@@ -14,14 +18,24 @@ import { aliasShellRoute, isKnownShellRoute } from '../docs/js/shell-route-utils
 
 const read = (path) => readFile(path, 'utf8');
 
-test('prestige thresholds match product tiers', () => {
-  assert.equal(prestigeTierFromQuantity(9), 'standard');
-  assert.equal(prestigeTierFromQuantity(10), 'silver');
-  assert.equal(prestigeTierFromQuantity(25), 'gold');
-  assert.equal(prestigeTierFromQuantity(100), 'prismatic');
-  assert.equal(prestigeTierFromQuantity(500), 'celestial');
-  assert.equal(prestigeClassName(10), 'prestige-frame prestige-silver');
+test('fusion costs and canFuse match the locked ladder', () => {
+  assert.equal(fusionCostForNextTier('standard'), 10);
+  assert.equal(fusionCostForNextTier('rookie'), 25);
+  assert.equal(fusionCostForNextTier('champion'), 75);
+  assert.equal(fusionCostForNextTier('ultimate'), 200);
+  assert.equal(fusionCostForNextTier('mega'), null);
+  assert.equal(nextFusionTier('standard'), 'rookie');
+  assert.equal(nextFusionTier('ultimate'), 'mega');
+  assert.equal(nextFusionTier('mega'), null);
+  assert.equal(canFuse(11, 'standard'), true);
+  assert.equal(canFuse(10, 'standard'), false);
+  assert.equal(canFuse(26, 'rookie'), true);
+  assert.equal(canFuse(201, 'ultimate'), true);
+  assert.equal(canFuse(999, 'mega'), false);
+  assert.equal(prestigeLabel('champion'), 'Champion');
+  assert.equal(prestigeClassName('rookie'), 'prestige-frame prestige-rookie');
   assert.equal(prestigeClassName('standard'), '');
+  assert.equal(prestigeTierFromQuantity(500), 'standard');
 });
 
 test('quests and season pass are shell destinations', () => {
@@ -53,27 +67,37 @@ test('quests and season pass pages wire services and claim UI', async () => {
   assert.match(shell, /'season-pass':\{title:'Seasonal Collection Pass',src:'season-pass\.html'\}/);
 });
 
-test('binder and collection load prestige frame styles and helpers', async () => {
-  const [app, binder, collection, css, reveal] = await Promise.all([
+test('binder and collection load fusion frame styles and helpers', async () => {
+  const [app, binder, collection, css, reveal, migration] = await Promise.all([
     read('docs/js/app.js'),
     read('docs/binder.html'),
     read('docs/collection.html'),
     read('docs/css/prestige-frames.css'),
-    read('docs/js/reward-reveal.js')
+    read('docs/js/reward-reveal.js'),
+    read('supabase/migrations/20260723190000_card_fusion_leveling.sql')
   ]);
-  assert.match(app, /function prestigeTierFromQuantity/);
+  assert.match(app, /function getCardPrestigeTier/);
   assert.match(app, /prestigeFrameClass/);
+  assert.match(app, /data-fuse-card/);
+  assert.match(app, /fuseSelectedCard/);
   assert.match(app, /full-card-wrap[\s\S]*\$\{prestigeClass\}/);
   assert.match(binder, /prestige-frames\.css/);
   assert.match(collection, /prestige-frames\.css/);
-  assert.match(css, /\.prestige-celestial/);
+  assert.match(css, /\.prestige-mega/);
+  assert.match(css, /\.prestige-rookie/);
   assert.match(css, /\.st-r3-card-actor\.prestige-frame/);
   assert.match(css, /\.prestige-legend/);
   assert.match(collection, /prestige-legend/);
   assert.match(collection, /data-content="collection\.prestigeLegendTitle"/);
+  assert.match(collection, /prestige-rookie/);
   assert.match(reveal, /prestigeRevealBadge/);
   assert.match(reveal, /ensurePrestigeStyles/);
   assert.match(reveal, /prestigeTier/);
+  assert.match(reveal, /normalizeFusionTier/);
+  assert.match(migration, /fuse_my_card/);
+  assert.match(migration, /fusion_cost_for_next_tier/);
+  assert.match(migration, /quantity - 1/);
+  assert.match(migration, /drop trigger if exists trg_user_cards_prestige_tier/);
 });
 
 test('wave-2 collection quest seeds cover Soaring Skies and Epic goals', async () => {
@@ -128,6 +152,8 @@ test('season pass gates to Twitch subscribers and supports unlock gifts', async 
   assert.match(adminPage, /manualSeasonId/);
   assert.match(rewardsPage, /season_pass_unlock/);
   assert.match(defaults, /subscriberLockedLead/);
+  assert.match(defaults, /prestigeRookie/);
+  assert.match(defaults, /Fusion spends extras/);
   assert.match(worker, /\/viewer\/subscription-check/);
   assert.match(worker, /deliver_twitch_season_unlock_v1/);
   assert.match(worker, /confirm_twitch_subscription_access_v1/);

@@ -272,3 +272,30 @@ export async function loadCloudCollection() {
         error: null
     };
 }
+
+/**
+ * Fuses duplicate extras into the next fusion level for one owned card.
+ */
+export async function fuseMyCard(cardId) {
+    const requestedCardId = String(cardId || '').trim();
+    if (!requestedCardId) {
+        throw new Error('Card id is required.');
+    }
+
+    const {
+        data,
+        error
+    } = await supabase.rpc(
+        'fuse_my_card',
+        {
+            requested_card_id: requestedCardId
+        }
+    );
+
+    if (error) {
+        console.error('Card fusion failed:', error);
+        throw error;
+    }
+
+    return data;
+}
