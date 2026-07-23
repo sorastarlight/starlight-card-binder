@@ -39,7 +39,14 @@ export async function beginTwitchLink(flow='collector'){
     window.top.location.assign(body.authorizationUrl);
     return {popup:null};
   }catch(error){
-    if(popup&&!popup.closed)popup.close();
+    if(popup&&!popup.closed){
+      try{
+        popup.document.title='Twitch connection failed';
+        popup.document.body.innerHTML=`<main style="font-family:system-ui,sans-serif;display:grid;place-items:center;min-height:90vh;text-align:center;color:#b4233f;padding:24px"><div><h1>Could not start Twitch link</h1><p>${String(error.message||error).replace(/[<>&]/g,'')}</p><p>You can close this window and try again.</p></div></main>`;
+      }catch(_){
+        popup.close();
+      }
+    }
     throw error;
   }
 }
@@ -49,7 +56,26 @@ export async function saveTwitchWorkerUrl(url){const {data,error}=await supabase
 export async function saveTwitchRule(payload){const {data,error}=await supabase.rpc('admin_save_twitch_reward_rule_v890',{payload});if(error)throw error;return data;}
 export async function deleteTwitchRule(id){const {data,error}=await supabase.rpc('admin_delete_twitch_reward_rule_v890',{requested_id:id});if(error)throw error;return data;}
 export async function grantManualTwitchReward(payload){const {data,error}=await supabase.rpc('admin_manual_twitch_reward_v890',{payload});if(error)throw error;return data;}
-export async function callTwitchWorker(path,body={}){const config=await getTwitchConfig();const {data:{session}}=await supabase.auth.getSession();if(!session?.access_token)throw new Error('Please sign in first.');const response=await fetch(config.workerBaseUrl+path,{method:'POST',headers:{Authorization:`Bearer ${session.access_token}`,'Content-Type':'application/json'},body:JSON.stringify(body)});const out=await response.json().catch(()=>({}));if(!response.ok)throw new Error(out.error||'Twitch request failed.');return out;}
+export async function callTwitchWorker(path,body={}){
+  const config=await getTwitchConfig();
+  const {data:{session}}=await supabase.auth.getSession();
+  if(!session?.access_token)throw new Error('Please sign in first.');
+  const base=String(config.workerBaseUrl||'').replace(/\/$/,'');
+  if(!base)throw new Error('Twitch Worker URL is not configured.');
+  let response;
+  try{
+    response=await fetch(base+path,{
+      method:'POST',
+      headers:{Authorization:`Bearer ${session.access_token}`,'Content-Type':'application/json'},
+      body:JSON.stringify(body)
+    });
+  }catch(error){
+    throw new Error(`Unable to reach Twitch Worker at ${base}. ${error.message||'Failed to fetch'}`);
+  }
+  const out=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(out.error||'Twitch request failed.');
+  return out;
+}
 
 export async function getTwitchCustomRewards(){return callTwitchWorker('/admin/custom-rewards');}
 

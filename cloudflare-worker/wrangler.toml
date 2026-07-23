@@ -3,12 +3,16 @@ main = "src/index.js"
 compatibility_date = "2026-07-01"
 workers_dev = true
 
-# Secrets (set via `wrangler secret put`):
+# Non-secret public configuration. Keep these in wrangler.toml so deploys
+# do not wipe dashboard vars. Secrets stay via `wrangler secret put`.
+[vars]
+SUPABASE_URL = "https://noxfauxbfdqgoxgiwrpu.supabase.co"
+WORKER_PUBLIC_URL = "https://starlight-twitch-integration.fetkun.workers.dev"
+SITE_URL = "https://sorastarlight.github.io/starlight-card-binder"
+
+# Secrets (set via `wrangler secret put`, never commit):
 # TWITCH_CLIENT_ID
 # TWITCH_CLIENT_SECRET
 # EVENTSUB_SECRET
-# SUPABASE_URL
 # SUPABASE_ANON_KEY
 # SUPABASE_SERVICE_ROLE_KEY
-# WORKER_PUBLIC_URL
-# SITE_URL

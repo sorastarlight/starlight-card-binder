@@ -2,6 +2,24 @@ const TWITCH_AUTH = 'https://id.twitch.tv/oauth2/authorize';
 const TWITCH_TOKEN = 'https://id.twitch.tv/oauth2/token';
 const TWITCH_API = 'https://api.twitch.tv/helix';
 
+const REQUIRED_ENV = [
+  'SUPABASE_URL',
+  'SUPABASE_ANON_KEY',
+  'SUPABASE_SERVICE_ROLE_KEY',
+  'TWITCH_CLIENT_ID',
+  'TWITCH_CLIENT_SECRET',
+  'EVENTSUB_SECRET',
+  'WORKER_PUBLIC_URL',
+  'SITE_URL'
+];
+
+function assertEnv(env) {
+  const missing = REQUIRED_ENV.filter((key) => !String(env[key] || '').trim());
+  if (missing.length) {
+    throw new Error(`Worker is missing configuration: ${missing.join(', ')}`);
+  }
+}
+
 const json = (body, status = 200, headers = {}) => new Response(JSON.stringify(body), {
   status,
   headers: {
@@ -781,8 +799,15 @@ export default {
     const url = new URL(request.url);
     try {
       if (url.pathname === '/health') {
-        return json({ ok: true, service: 'starlight-twitch-worker', version: '1.1.0' });
+        const missing = REQUIRED_ENV.filter((key) => !String(env[key] || '').trim());
+        return json({
+          ok: missing.length === 0,
+          service: 'starlight-twitch-worker',
+          version: '1.1.1',
+          missingConfig: missing
+        }, missing.length ? 503 : 200);
       }
+      assertEnv(env);
       if (url.pathname === '/oauth/start' && request.method === 'POST') {
         return oauthStart(env, request, 'collector');
       }
