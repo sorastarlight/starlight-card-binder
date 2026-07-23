@@ -660,12 +660,6 @@ import {
             if (streak > 0) {
                 parts.push(`<article class="highlight-card is-meta"><p class="eyebrow">Pull Streak</p><strong>${streak} day${streak === 1 ? "" : "s"}</strong><span>Daily Booster streak</span></article>`);
             }
-            if (social.profile?.memberSince) {
-                const joined = formatMemberDate(social.profile.memberSince);
-                if (joined) {
-                    parts.push(`<article class="highlight-card is-meta"><p class="eyebrow">Joined</p><strong>${joined}</strong><span>Member since</span></article>`);
-                }
-            }
 
             if (!parts.length) return;
             highlightGrid.innerHTML = parts.join("");
