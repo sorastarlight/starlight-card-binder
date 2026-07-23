@@ -12,6 +12,7 @@ import {
 } from '../website-content-service.js';
 import { labelForFieldKey, sanitizeWebsiteContent } from '../website-content-model.js';
 import { buildContentStudioPreviewUrl, STUDIO_MSG } from '../studio-preview.js';
+import { BRAND_ICON_IDS, BRAND_ICONS, brandIconToken } from '../brand-icons.js';
 
 const byId = (id) => document.getElementById(id);
 const esc = (value) =>
@@ -256,10 +257,21 @@ function renderSocialLinks() {
         ${links.map((link, index) => `
           <article class="link-card-editor" data-link-index="${index}">
             <div class="field-grid">
-              ${field('Icon', `maxlength="8" data-link-field="icon" data-link-index="${index}"`, link.icon)}
+              ${field('Icon', `maxlength="48" data-link-field="icon" data-link-index="${index}"`, link.icon)}
               ${field('Label', `maxlength="40" data-link-field="label" data-link-index="${index}"`, link.label)}
               ${field('Handle', `maxlength="60" data-link-field="handle" data-link-index="${index}"`, link.handle)}
               ${field('URL', `maxlength="240" data-link-field="url" data-link-index="${index}"`, link.url)}
+            </div>
+            <div class="brand-icon-picker social-brand-picker" data-link-index="${index}">
+              ${BRAND_ICON_IDS.map((id) => {
+                const brand = BRAND_ICONS[id];
+                const token = brandIconToken(id);
+                const active = link.icon === token || link.icon === brand.id || link.icon === brand.file;
+                return `<button type="button" class="brand-icon-btn ${active ? 'active' : ''}" data-social-brand="${esc(brand.id)}" data-link-index="${index}" title="${esc(brand.label)}" aria-label="Use ${esc(brand.label)} icon">
+                  <img src="${esc(brand.file)}" alt="" width="18" height="18" decoding="async">
+                </button>`;
+              }).join('')}
+              <span class="brand-picker-hint">Twitch · YouTube · X · Star Bits</span>
             </div>
             <div class="row-actions">
               <button type="button" class="btn" data-link-move="${index}" data-delta="-1">Up</button>
@@ -484,6 +496,19 @@ editorPanel.addEventListener('click', (event) => {
     moveItem(content.socials.links, index, delta);
     renderEditor();
     schedulePreviewDraft();
+    return;
+  }
+
+  const brandBtn = event.target.closest('[data-social-brand]');
+  if (brandBtn) {
+    syncFromDom();
+    const index = Number(brandBtn.getAttribute('data-link-index'));
+    const brandId = brandBtn.getAttribute('data-social-brand');
+    if (content.socials.links[index] && brandId) {
+      content.socials.links[index].icon = brandIconToken(brandId);
+      renderEditor();
+      schedulePreviewDraft();
+    }
   }
 });
 

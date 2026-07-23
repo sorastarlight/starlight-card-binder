@@ -6,7 +6,9 @@ import {
 } from '../shell-navigation-service.js';
 import {
   PUBLIC_SHELL_DESTINATIONS,
-  COMMON_NAV_EMOJIS
+  COMMON_NAV_EMOJIS,
+  BRAND_ICONS,
+  BRAND_ICON_IDS
 } from '../shell-navigation-defaults.js';
 import { uploadStudioAsset } from '../content-studio-service.js';
 import { buildShellStudioPreviewUrl, STUDIO_MSG } from '../studio-preview.js';
@@ -86,6 +88,19 @@ function destinationOptions(selected = '', { allowEmpty = false } = {}) {
   return opts.join('');
 }
 
+function brandPickerHtml(icon, dataAttrs) {
+  const activeSrc = icon?.type === 'image' ? String(icon.url || icon.path || '') : '';
+  return `<div class="brand-icon-picker" ${dataAttrs}>${BRAND_ICON_IDS.map((id) => {
+    const brand = BRAND_ICONS[id];
+    const active = activeSrc === brand.file
+      || activeSrc.endsWith(`/${brand.id}.svg`)
+      || activeSrc.endsWith(`/${brand.id}.png`);
+    return `<button type="button" class="brand-icon-btn ${active ? 'active' : ''}" data-action="set-brand-icon" data-brand="${esc(brand.id)}" ${dataAttrs} title="${esc(brand.label)}" aria-label="${esc(brand.label)} icon">
+      <img src="${esc(brand.file)}" alt="" width="18" height="18" decoding="async">
+    </button>`;
+  }).join('')}</div>`;
+}
+
 function emojiPickerHtml(selectedEmoji, dataAttrs) {
   return `<div class="emoji-picker" ${dataAttrs}>${COMMON_NAV_EMOJIS.map((emoji) => `
     <button type="button" class="emoji-btn ${selectedEmoji === emoji ? 'active' : ''}" data-emoji="${esc(emoji)}" ${dataAttrs} title="${esc(emoji)}">${esc(emoji)}</button>
@@ -117,6 +132,9 @@ function renderIconControls(icon, scopeAttrs) {
       </label>
       ${isImage ? `<button type="button" class="btn small" data-action="clear-icon" ${scopeAttrs}>Use emoji</button>` : ''}
     </div>
+    <p class="icon-picker-label">Brand icons</p>
+    ${brandPickerHtml(icon, scopeAttrs)}
+    <p class="icon-picker-label">Emoji</p>
     ${emojiPickerHtml(isImage ? '' : (icon?.value || ''), scopeAttrs)}
   `;
 }
@@ -429,6 +447,16 @@ function getAccountItem(listKey, itemIndex) {
   return navigation.accountMenu?.[listKey]?.[itemIndex];
 }
 
+function setIconBrand(target, brandId) {
+  const brand = BRAND_ICONS[brandId];
+  if (!target || !brand) return;
+  target.icon = {
+    type: 'image',
+    url: brand.file,
+    path: brand.file
+  };
+}
+
 function setIconEmoji(target, emoji) {
   target.icon = { type: 'emoji', value: String(emoji || '').slice(0, 8) };
 }
@@ -662,6 +690,12 @@ async function onEditorClick(event) {
   if (action === 'clear-icon') {
     const target = btn.dataset.target === 'item' ? getItem(sIndex, iIndex) : getSection(sIndex);
     if (target) setIconEmoji(target, '');
+    renderAll();
+    return;
+  }
+  if (action === 'set-brand-icon') {
+    const target = btn.dataset.target === 'item' ? getItem(sIndex, iIndex) : getSection(sIndex);
+    if (target) setIconBrand(target, btn.dataset.brand);
     renderAll();
     return;
   }

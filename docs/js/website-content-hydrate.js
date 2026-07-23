@@ -1,6 +1,7 @@
 import { getWebsiteContent } from './website-content-service.js';
 import { mergeWebsiteContent } from './website-content-model.js';
 import { isStudioPreview, STUDIO_MSG } from './studio-preview.js';
+import { renderIconMarkup } from './brand-icons.js';
 
 const esc = (value) =>
   (typeof window !== 'undefined' && window.StarlightUI?.escapeHtml
@@ -65,7 +66,7 @@ function rebuildSocialLinks(content) {
   const links = content?.socials?.links || [];
   const html = links.map((link) => `
     <a class="link-card" href="${esc(link.url)}" rel="noopener" target="_blank">
-      <span aria-hidden="true">${esc(link.icon)}</span>
+      ${renderIconMarkup(link.icon, esc, { className: 'brand-icon', size: 36 })}
       <b>${esc(link.label)}</b>
       <small>${esc(link.handle)}</small>
     </a>

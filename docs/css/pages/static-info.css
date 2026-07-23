@@ -12,8 +12,17 @@
   text-align: center;
 }
 
-.social-links .link-card > span {
+.social-links .link-card > span,
+.social-links .link-card > .brand-icon {
   font-size: 2rem;
+}
+
+.social-links .link-card > .brand-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  object-fit: contain;
+  margin: 0 auto;
+  display: block;
 }
 
 .social-links .link-card > small {

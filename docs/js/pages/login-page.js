@@ -89,7 +89,7 @@ import { supabase } from "../supabase-client.js";
             } catch (error) {
                 displayStatus(error.message || "Unable to continue with Twitch.", "error");
                 twitchAuthButton.disabled = false;
-                twitchAuthButton.textContent = loginCopy.twitchCta || "💜 Continue with Twitch";
+                twitchAuthButton.textContent = loginCopy.twitchCta || "Continue with Twitch";
             }
         });
 
@@ -143,7 +143,7 @@ import { supabase } from "../supabase-client.js";
 
             signInModeButton.textContent = loginCopy.signInModeLabel || "Sign In";
             signUpModeButton.textContent = loginCopy.signUpModeLabel || "Create Account";
-            twitchAuthButton.textContent = loginCopy.twitchCta || "💜 Continue with Twitch";
+            twitchAuthButton.textContent = loginCopy.twitchCta || "Continue with Twitch";
             if (returnCtaEl) {
                 returnCtaEl.textContent = loginCopy.returnCta || "Return to the Binder";
             }

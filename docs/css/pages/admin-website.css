@@ -125,6 +125,12 @@ h1,h2,h3{color:#405fa1;margin:0 0 .35em}
   background:rgba(247,251,255,.82);color:#405fa1;font-weight:900
 }
 
+.brand-icon-picker{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
+.brand-icon-btn{width:36px;height:36px;padding:0;border:1px solid rgba(107,198,248,.35);border-radius:10px;background:#fff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.brand-icon-btn img{width:18px;height:18px;object-fit:contain;display:block}
+.brand-icon-btn:hover,.brand-icon-btn.active{border-color:#ff82c8;background:#fff5fb}
+.brand-picker-hint{font-size:.78rem;color:#6d7692;font-weight:700}
+
 @media (max-width:1280px){
   .studio-app{grid-template-columns:minmax(160px,200px) minmax(0,1fr);grid-template-rows:minmax(360px,1fr) minmax(420px,50vh)}
   .studio-preview{grid-column:1 / -1}

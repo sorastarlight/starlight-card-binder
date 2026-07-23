@@ -66,7 +66,7 @@ function sanitizeSocialLinks(links, defaults) {
     };
     return {
       id: text(link?.id, fallback.id, 32) || `link-${index}`,
-      icon: text(link?.icon, fallback.icon, 8),
+      icon: text(link?.icon, fallback.icon, 48),
       label: text(link?.label, fallback.label, 40),
       handle: text(link?.handle, fallback.handle, 60),
       url: safeHttpUrl(link?.url, fallback.url)

@@ -11,7 +11,9 @@ const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
 
 function renderIcon(icon, fallback = '') {
   if (icon?.type === 'image' && icon.url) {
-    return `<img class="shell-nav-icon-img" src="${esc(icon.url)}" alt="" width="20" height="20">`;
+    const isStarBit = String(icon.url).includes('star-bit.');
+    const cls = isStarBit ? 'shell-nav-icon-img star-bit-icon' : 'shell-nav-icon-img';
+    return `<img class="${cls}" src="${esc(icon.url)}" alt="" width="20" height="20" decoding="async">`;
   }
   const emoji = icon?.value || fallback;
   return emoji ? `<span class="shell-nav-icon">${esc(emoji)}</span>` : '';

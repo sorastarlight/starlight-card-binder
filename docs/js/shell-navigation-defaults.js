@@ -1,5 +1,7 @@
 /** Default shell chrome config (mirrors binder.html). */
 
+import { starBitNavIcon } from './star-bit-icon.js';
+
 export const PUBLIC_SHELL_DESTINATIONS = Object.freeze([
   { value: 'home', label: 'Home' },
   { value: 'binder', label: 'Card Binder' },
@@ -26,8 +28,12 @@ export const PUBLIC_SHELL_DESTINATIONS = Object.freeze([
 
 export const COMMON_NAV_EMOJIS = Object.freeze([
   '✦', '♡', '🏠', '🗂️', '✨', '🛍️', '🎉', '🎟️', '☑', '🤝', '💫', '🔔', '🎁', '👤', '🛠️',
-  '⭐', '🌟', '💎', '🎴', '📦', '🛒', '📰', '🎮', '📺', '🔗', '⚙️', '📋', '🧭', '🌈', '💜'
+  '⭐', '🌟', '💎', '🎴', '📦', '🛒', '📰', '🎮', '📺', '🔗', '⚙️', '📋', '🧭', '🌈', '💜',
+  '𝕏', '▶️'
 ]);
+
+/** Brand mark presets for navigation (Twitch, YouTube, X). */
+export { BRAND_ICONS, BRAND_ICON_IDS, brandIconToken } from './brand-icons.js';
 
 export function createDefaultShellNavigation() {
   return {
@@ -79,7 +85,7 @@ export function createDefaultShellNavigation() {
           staffOnly: false,
           items: [
             { id: 'collection', label: 'My Card Collection & Favorites', icon: { type: 'emoji', value: '♡' }, destination: 'collection', enabled: true, features: [] },
-            { id: 'star-bits', label: 'My Star Bits', icon: { type: 'emoji', value: '✦' }, destination: 'star-bits', enabled: true, features: [] },
+            { id: 'star-bits', label: 'My Star Bits', icon: starBitNavIcon(), destination: 'star-bits', enabled: true, features: [] },
             { id: 'checklist', label: 'My Checklist', icon: { type: 'emoji', value: '☑' }, destination: 'checklist', enabled: true, features: [] },
             { id: 'quests', label: 'Collection Quests', icon: { type: 'emoji', value: '🧭' }, destination: 'quests', enabled: true, features: [] },
             { id: 'season-pass', label: 'Seasonal Collection Pass', icon: { type: 'emoji', value: '🌌' }, destination: 'season-pass', enabled: true, features: [] },

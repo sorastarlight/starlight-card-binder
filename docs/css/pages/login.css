@@ -281,7 +281,7 @@
             }
         }
 
-        .provider-login{display:grid;gap:14px;margin:18px 0 8px}.twitch-button{background:linear-gradient(135deg,#9146ff,#c084fc)!important}.provider-divider{display:flex;align-items:center;gap:12px;color:#7a7891;font-size:.85rem;font-weight:800}.provider-divider:before,.provider-divider:after{content:"";height:1px;background:rgba(107,198,248,.35);flex:1}.provider-divider span{white-space:nowrap}
+        .provider-login{display:grid;gap:14px;margin:18px 0 8px}.twitch-button{background:linear-gradient(135deg,#9146ff,#c084fc)!important;display:inline-flex!important;align-items:center;justify-content:center;gap:10px}.twitch-button::before{content:"";width:1.15em;height:1.15em;flex:none;background:url("../../site_assets/icons/twitch.svg") center/contain no-repeat;filter:brightness(0) invert(1)}.provider-divider{display:flex;align-items:center;gap:12px;color:#7a7891;font-size:.85rem;font-weight:800}.provider-divider:before,.provider-divider:after{content:"";height:1px;background:rgba(107,198,248,.35);flex:1}.provider-divider span{white-space:nowrap}
 @media (prefers-reduced-motion: reduce) {
             *,
             *::before,

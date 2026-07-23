@@ -170,7 +170,7 @@ export function createDefaultWebsiteContent() {
       tabSpecial: 'Special Packs',
       footerTitle: 'Turn duplicates into more pulls!',
       footerLead: 'Trade in extra cards for Star Bits and keep your collection growing.',
-      footerCta: '★ Go To My Star Bits',
+      footerCta: 'Go To My Star Bits',
       signedOutTitle: 'Sign in to visit the shop ✨',
       signedOutLead: 'Your purchases and new cards need a Starlight account so they can be saved safely.',
       signedOutCta: 'Log In or Create Account',
@@ -217,7 +217,7 @@ export function createDefaultWebsiteContent() {
       duplicatesEyebrow: 'Extra Copies',
       duplicatesTitle: 'Duplicate Cards',
       duplicatesLead: 'Extra copies can be converted into Star Bits. Your final copy of every card is always protected.',
-      duplicatesCta: '✦ Open Star Bits Exchange',
+      duplicatesCta: 'Open Star Bits Exchange',
       emptyAllTitle: 'No cards here yet',
       emptyAllLead: 'Earn cards from Daily Boosters, redemption codes, and special rewards to fill this collection.',
       emptyAllCta: 'Open Binder',
@@ -240,7 +240,7 @@ export function createDefaultWebsiteContent() {
     },
     starBits: {
       eyebrow: 'Duplicate Card Exchange',
-      title: '✦ Star Bits Exchange',
+      title: 'Star Bits Exchange',
       lead: 'Extra copies can be converted into Star Bits. Your final copy of every card will always stay safely in your collection.',
       ratesTitle: 'Exchange Values',
       chooseTitle: 'Your Extra Copies',
@@ -256,7 +256,7 @@ export function createDefaultWebsiteContent() {
       eyebrow: 'Checklist',
       title: 'My Checklist',
       lead: 'Track every card by set, rarity, collection status, and favorites.',
-      exchangeTitle: '✦ Duplicate Card Exchange',
+      exchangeTitle: 'Duplicate Card Exchange',
       exchangeLead: 'Review duplicate pulls and convert them into Star Bits without removing your final copy.',
       exchangeCta: 'Review Duplicates',
       filtersEyebrow: 'Find your cards',
@@ -417,9 +417,9 @@ export function createDefaultWebsiteContent() {
       title: 'Socials & Links',
       lead: 'Find Sora Starlight around the web, follow the sparkle trail, and come hang out on stream!',
       links: [
-        { id: 'x', icon: '𝕏', label: 'X / Twitter', handle: '@SoraStarlightVT', url: 'https://x.com/SoraStarlightVT' },
-        { id: 'twitch', icon: '💜', label: 'Twitch', handle: 'twitch.tv/sorastarlight', url: 'https://www.twitch.tv/sorastarlight' },
-        { id: 'youtube', icon: '▶', label: 'YouTube', handle: '@SoraStarlightZone', url: 'https://www.youtube.com/@SoraStarlightZone' },
+        { id: 'x', icon: 'brand:x', label: 'X / Twitter', handle: '@SoraStarlightVT', url: 'https://x.com/SoraStarlightVT' },
+        { id: 'twitch', icon: 'brand:twitch', label: 'Twitch', handle: 'twitch.tv/sorastarlight', url: 'https://www.twitch.tv/sorastarlight' },
+        { id: 'youtube', icon: 'brand:youtube', label: 'YouTube', handle: '@SoraStarlightZone', url: 'https://www.youtube.com/@SoraStarlightZone' },
         { id: 'instagram', icon: '📸', label: 'Instagram', handle: '@sorastarlightvt', url: 'https://www.instagram.com/sorastarlightvt' }
       ]
     },
