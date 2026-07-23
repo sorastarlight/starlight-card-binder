@@ -495,6 +495,19 @@ export const WEBSITE_PAGE_META = Object.freeze({
           { key: 'favoritesShowcaseEmptyLead', multiline: true },
           { key: 'favoritesShowcaseCta' }
         ]
+      },
+      {
+        id: 'prestige',
+        label: 'Prestige legend',
+        fields: [
+          { key: 'prestigeLegendEyebrow' },
+          { key: 'prestigeLegendTitle' },
+          { key: 'prestigeLegendLead', multiline: true },
+          { key: 'prestigeSilver' },
+          { key: 'prestigeGold' },
+          { key: 'prestigePrismatic' },
+          { key: 'prestigeCelestial' }
+        ]
       }
     ]
   },

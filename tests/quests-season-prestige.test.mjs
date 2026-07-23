@@ -68,9 +68,21 @@ test('binder and collection load prestige frame styles and helpers', async () =>
   assert.match(collection, /prestige-frames\.css/);
   assert.match(css, /\.prestige-celestial/);
   assert.match(css, /\.st-r3-card-actor\.prestige-frame/);
+  assert.match(css, /\.prestige-legend/);
+  assert.match(collection, /prestige-legend/);
+  assert.match(collection, /data-content="collection\.prestigeLegendTitle"/);
   assert.match(reveal, /prestigeRevealBadge/);
   assert.match(reveal, /ensurePrestigeStyles/);
   assert.match(reveal, /prestigeTier/);
+});
+
+test('wave-2 collection quest seeds cover Soaring Skies and Epic goals', async () => {
+  const migration = await read('supabase/migrations/20260722170000_collection_quest_seeds_wave2.sql');
+  assert.match(migration, /complete_soaring_skies/);
+  assert.match(migration, /own_series_complete',\s*'002'/);
+  assert.match(migration, /own_one_epic/);
+  assert.match(migration, /own_five_characters/);
+  assert.match(migration, /quest_soaring_skies/);
 });
 
 test('quests and season pass pages wire website content hooks', async () => {

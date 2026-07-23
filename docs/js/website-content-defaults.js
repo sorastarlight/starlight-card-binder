@@ -229,7 +229,14 @@ export function createDefaultWebsiteContent() {
       emptyFiltersCta: 'Reset Filters',
       favoritesShowcaseTitle: 'Favorite Showcase',
       favoritesShowcaseEmptyLead: 'Star a card to put it on the Starlight stage. Your favorites will scroll here like a tiny idol parade.',
-      favoritesShowcaseCta: 'Find Favorites'
+      favoritesShowcaseCta: 'Find Favorites',
+      prestigeLegendEyebrow: 'Card Prestige',
+      prestigeLegendTitle: 'Duplicate frames',
+      prestigeLegendLead: 'Owning more copies of a card unlocks a prestige frame. Extra copies are never burned.',
+      prestigeSilver: '10+ copies',
+      prestigeGold: '25+ copies',
+      prestigePrismatic: '100+ copies',
+      prestigeCelestial: '500+ copies'
     },
     starBits: {
       eyebrow: 'Duplicate Card Exchange',

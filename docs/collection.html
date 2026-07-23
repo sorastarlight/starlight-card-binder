@@ -13,7 +13,7 @@
 <link href="css/card-filters.css?v=1.0" rel="stylesheet"/>
 <link href="css/collection-redesign.css?v=1.3" rel="stylesheet"/><script src="js/browser-performance.js?v=1.0.0" defer></script>
     <link rel="stylesheet" href="css/shared-ui.css?v=1.6.15">
-<link rel="stylesheet" href="css/prestige-frames.css?v=1.0">
+<link rel="stylesheet" href="css/prestige-frames.css?v=1.1">
 <link rel="stylesheet" href="css/qol-ui.css?v=94.2.9">
 </head>
 <body data-page="collection"><script src="js/embed-mode.js?v=1.1.1" type="module"></script>
@@ -51,6 +51,19 @@
 <article class="collection-progress-card collection-highlight-card"><div><span>Collection Spotlight</span><strong data-collection-highlight="">Building your showcase…</strong></div><small data-collection-insight="">Your collection story will appear here.</small><div class="collection-rarity-breakdown" data-rarity-breakdown=""></div></article>
 <article class="collection-progress-card collection-series-progress"><div><span>Series Progress</span><strong>Your sets</strong></div><div class="mini-series" id="miniSeries"></div></article>
 </div>
+<section class="prestige-legend" aria-label="Card prestige tiers">
+  <div class="prestige-legend-copy">
+    <p class="eyebrow" data-content="collection.prestigeLegendEyebrow">Card Prestige</p>
+    <h2 data-content="collection.prestigeLegendTitle">Duplicate frames</h2>
+    <p data-content="collection.prestigeLegendLead">Owning more copies of a card unlocks a prestige frame. Extra copies are never burned.</p>
+  </div>
+  <ul class="prestige-legend-tiers">
+    <li class="prestige-frame prestige-silver"><span class="prestige-badge prestige-silver">Silver</span><strong data-content="collection.prestigeSilver">10+ copies</strong></li>
+    <li class="prestige-frame prestige-gold"><span class="prestige-badge prestige-gold">Gold</span><strong data-content="collection.prestigeGold">25+ copies</strong></li>
+    <li class="prestige-frame prestige-prismatic"><span class="prestige-badge prestige-prismatic">Prismatic</span><strong data-content="collection.prestigePrismatic">100+ copies</strong></li>
+    <li class="prestige-frame prestige-celestial"><span class="prestige-badge prestige-celestial">Celestial</span><strong data-content="collection.prestigeCelestial">500+ copies</strong></li>
+  </ul>
+</section>
 </section>
 <section aria-label="Collection views" class="collection-tabs panel">
 <button class="collection-tab active" data-collection-tab="all" type="button" data-content="collection.tabAll">All Cards</button>

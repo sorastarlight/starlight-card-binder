@@ -87,3 +87,57 @@
     animation: none;
   }
 }
+
+.prestige-legend {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 14px;
+  margin-top: 4px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(107, 198, 248, 0.32);
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.prestige-legend-copy h2 {
+  margin: 2px 0 4px;
+  color: #405fa1;
+  font-size: 1.15rem;
+}
+
+.prestige-legend-copy p {
+  margin: 0;
+  color: #6b7089;
+  line-height: 1.5;
+}
+
+.prestige-legend-tiers {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.prestige-legend-tiers li {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 14px;
+  background: #f6fbff;
+}
+
+.prestige-legend-tiers strong {
+  color: #405fa1;
+  font-size: 0.86rem;
+}
+
+@media (max-width: 720px) {
+  .prestige-legend-tiers {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+

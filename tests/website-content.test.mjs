@@ -151,6 +151,7 @@ test('website editor field meta covers binder splash and admin visual chrome', a
   assert.equal(WEBSITE_PAGE_META.rankings.previewUrl, 'user-rankings.html');
   assert.ok(listedFieldKeys('rankings').includes('title'));
   assert.ok(listedFieldKeys('rankings').includes('wishlistCta'));
+  assert.ok(listedFieldKeys('collection').includes('prestigeLegendTitle'));
   assert.ok(WEBSITE_PAGE_META.quests);
   assert.equal(WEBSITE_PAGE_META.quests.previewUrl, 'collection-quests.html');
   assert.ok(listedFieldKeys('quests').includes('claimCta'));
