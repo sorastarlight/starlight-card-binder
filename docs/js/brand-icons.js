@@ -28,12 +28,12 @@ export const BRAND_ICONS = Object.freeze({
     id: 'star-bit',
     label: 'Star Bits',
     emoji: '✦',
-    file: 'site_assets/icons/star-bit.png'
+    file: 'site_assets/icons/star-bit.png?v=2'
   }
 });
 
 const FILE_TO_ID = Object.freeze(
-  Object.fromEntries(Object.values(BRAND_ICONS).map((icon) => [icon.file, icon.id]))
+  Object.fromEntries(Object.values(BRAND_ICONS).map((icon) => [String(icon.file).split('?')[0], icon.id]))
 );
 
 export function brandIconToken(id) {

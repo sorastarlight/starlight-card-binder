@@ -25,7 +25,7 @@ test('brand icons resolve Twitch, YouTube, and X tokens and files', async () => 
     assert.equal(resolveBrandIcon(id)?.id, id);
     assert.equal(resolveBrandIcon(brandIconToken(id))?.id, id);
     assert.equal(resolveBrandIcon(icon.file)?.id, id);
-    await access(new URL(`../docs/${icon.file}`, import.meta.url));
+    await access(new URL(`../docs/${icon.file.split('?')[0]}`, import.meta.url));
   }
   assert.match(renderIconMarkup('brand:twitch', esc, { size: 24 }), /site_assets\/icons\/twitch\.svg/);
   assert.match(renderIconMarkup('📸', esc), /📸/);

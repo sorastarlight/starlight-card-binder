@@ -1,7 +1,7 @@
 /**
  * Canonical Star Bits currency icon for shell, shop, exchange, and rewards UI.
  */
-export const STAR_BIT_ICON_SRC = 'site_assets/icons/star-bit.png';
+export const STAR_BIT_ICON_SRC = 'site_assets/icons/star-bit.png?v=2';
 export const STAR_BIT_ICON_ALT = 'Star Bits';
 
 const SIZE_PX = Object.freeze({
