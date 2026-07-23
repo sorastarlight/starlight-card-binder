@@ -26,3 +26,19 @@ test('public collector profile renders collection dashboard stats', async () => 
   assert.match(page, /renderRaritySpotlight/);
   assert.match(page, /renderSeriesMini/);
 });
+
+test('collector peer gift uses shared modal adoptModal contract', async () => {
+  const [html, page, css] = await Promise.all([
+    read('docs/collector.html'),
+    read('docs/js/pages/collector-page.js'),
+    read('docs/css/pages/collector.css')
+  ]);
+  assert.match(html, /st-dialog-overlay collector-gift-dialog/);
+  assert.doesNotMatch(html, /<dialog\b/);
+  assert.match(html, /data-st-modal-close/);
+  assert.match(page, /adoptModal\(giftDialog/);
+  assert.match(page, /ensureGiftModal/);
+  assert.doesNotMatch(page, /showModal\(/);
+  assert.doesNotMatch(page, /(?<![\w.])alert\s*\(/);
+  assert.match(css, /\.collector-gift-dialog\.st-dialog-overlay/);
+});

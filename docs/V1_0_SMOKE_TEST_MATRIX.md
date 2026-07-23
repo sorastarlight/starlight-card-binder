@@ -48,6 +48,13 @@ These do **not** replace the matrix above, but must stay green:
 
 V1.0 foundation systems are in place (shared modals, reveal engine, design tokens, smoke matrix, anon RPC revokes). Remaining optional smoke: Firefox/Opera GX live pass, redeem with a real code, signed-in mobile re-run. Sign-out was exercised in earlier Chromium work.
 
+### Follow-ups landed 2026-07-23
+
+- Shell Star Bits totals refresh live after gifts/quests/shop/redeem without a full page reload.
+- Twitch / YouTube / X brand icons available in Website UI nav + socials editors.
+- Star Bits currency uses the shared coin artwork (`site_assets/icons/star-bit.png`, transparent).
+- Collector peer-gift dialog migrated onto the shared `st-dialog` / `adoptModal` system.
+
 ## V1.1 — Collector Features (active slice)
 
 First slice: **binder search correctness** — restored in-panel binder search (including series landing); catalog-aware All Series search via `resolveBinderBrowseList`; collector-number matches; grid/showcase share one list. Shell banner search intentionally removed.

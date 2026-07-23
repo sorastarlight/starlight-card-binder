@@ -229,6 +229,15 @@ import {
             document.getElementById("gift-dialog");
         const giftForm =
             document.getElementById("gift-form");
+        let giftModal = null;
+        function ensureGiftModal() {
+            if (giftModal) return giftModal;
+            if (!giftDialog || !window.StarlightUI?.adoptModal) return null;
+            giftModal = window.StarlightUI.adoptModal(giftDialog, {
+                initialFocus: "#gift-type"
+            });
+            return giftModal;
+        }
         const giftType =
             document.getElementById("gift-type");
         const giftAmountWrap =
@@ -974,8 +983,7 @@ import {
                 setFollowButtonState(followState);
             } catch (error) {
                 setFollowButtonState(followState);
-                window.StarlightUI?.toast?.(error.message || "Could not update follow.", "error")
-                    || alert(error.message || "Could not update follow.");
+                window.StarlightUI?.toast?.(error.message || "Could not update follow.", "error");
             } finally {
                 followButton.classList.remove("is-busy");
                 followButton.disabled = false;
@@ -983,8 +991,9 @@ import {
         });
 
         giftButton?.addEventListener("click", async () => {
-            if (!giftDialog) return;
-            giftDialog.showModal();
+            const modal = ensureGiftModal();
+            if (!modal) return;
+            modal.open();
             try {
                 await prepareGiftDialog();
             } catch (error) {
@@ -1006,8 +1015,6 @@ import {
         });
 
         giftForm?.addEventListener("submit", async (event) => {
-            const submitter = event.submitter;
-            if (submitter?.value === "cancel") return;
             event.preventDefault();
             if (!activeUsername) return;
             const type = giftType?.value || "star_bits";
@@ -1047,7 +1054,7 @@ import {
                     }
                     notifyShellEconomyChanged({ source: 'peer-gift', amount });
                 }
-                setTimeout(() => giftDialog?.close(), 900);
+                setTimeout(() => ensureGiftModal()?.close("sent"), 900);
             } catch (error) {
                 if (giftStatus) giftStatus.textContent = error.message || "Could not send gift.";
                 if (giftSendButton) giftSendButton.disabled = false;

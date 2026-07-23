@@ -8,9 +8,9 @@
         Collector Profile | Starlight Card Binder
     </title>
 <link href="css/style.css?v=1.0.2" rel="stylesheet"/>
-<link rel="stylesheet" href="css/pages/collector.css?v=1.14.0">
+<link rel="stylesheet" href="css/pages/collector.css?v=1.15.0">
 <script src="js/browser-performance.js?v=1.0.0" defer></script>
-    <link rel="stylesheet" href="css/shared-ui.css?v=1.6.15">
+    <link rel="stylesheet" href="css/shared-ui.css?v=1.6.17">
 <link rel="stylesheet" href="css/qol-ui.css?v=94.2.8">
 </head>
 <body><script src="js/embed-mode.js" type="module"></script>
@@ -202,9 +202,11 @@
 </section>
 </div>
 </article>
-<dialog class="collector-gift-dialog" id="gift-dialog">
-<form method="dialog" class="collector-gift-panel" id="gift-form">
-<h2>Send a Gift</h2>
+<div class="st-dialog-overlay collector-gift-dialog hidden" id="gift-dialog" hidden aria-hidden="true">
+<section class="st-dialog collector-gift-panel" role="dialog" aria-modal="true" aria-labelledby="gift-dialog-title" tabindex="-1">
+<button type="button" class="st-dialog-close" data-st-modal-close aria-label="Close">×</button>
+<form class="collector-gift-form" id="gift-form">
+<h2 id="gift-dialog-title">Send a Gift</h2>
 <p class="collector-gift-lead">Send Star Bits or a duplicate card to <strong id="gift-recipient-label">this collector</strong>. They’ll find it in Received Gifts.</p>
 <label>Gift type
 <select id="gift-type">
@@ -238,18 +240,19 @@
 </label>
 <p class="collector-gift-status" id="gift-status" role="status"></p>
 <div class="collector-gift-actions">
-<button type="submit" class="collector-button primary" id="gift-send-button" value="send">Send Gift</button>
-<button type="submit" class="collector-button" value="cancel">Cancel</button>
+<button type="submit" class="collector-button primary" id="gift-send-button">Send Gift</button>
+<button type="button" class="collector-button" data-st-modal-close>Cancel</button>
 </div>
 </form>
-</dialog>
+</section>
+</div>
 </main>
 <script type="module" src="js/pages/website-content-hydrate-page.js?v=1.4"></script>
-<script src="js/pages/collector-page.js?v=1.6.3" type="module"></script>
+<script src="js/pages/collector-page.js?v=1.6.4" type="module"></script>
 <script src="js/public-profile-extras.js?v=1.4.1" type="module"></script>
 <script src="js/public-trade-showcase.js?v=1.1" type="module"></script>
 <script type="module" src="js/public-twitch-profile.js?v=1.2.1"></script>
-<script src="js/shared-ui.js?v=1.6.15"></script>
+<script src="js/shared-ui.js?v=1.6.17"></script>
 <script src="js/qol-ui.js?v=94.2.8" defer></script>
 </body>
 </html>
