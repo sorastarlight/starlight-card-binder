@@ -1,8 +1,10 @@
+import { notifyShellEconomyChanged } from '../shell-economy.js';
 import {
   claimCollectionQuest,
   getMyCollectionQuests
 } from '../collection-quests-service.js';
 import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
+import { starBitAmountHtml } from '../star-bit-icon.js';
 
 const siteCopy = await loadAndHydrateWebsiteContent();
 const questsCopy = siteCopy?.quests || {};
@@ -30,7 +32,9 @@ function toast(message, type = '') {
 
 function rewardLine(quest) {
   const parts = [];
-  if (Number(quest.rewardStarBits) > 0) parts.push(`${quest.rewardStarBits} ✦`);
+  if (Number(quest.rewardStarBits) > 0) {
+    parts.push(starBitAmountHtml(esc, quest.rewardStarBits, { iconSize: 'xs' }));
+  }
   if (quest.rewardTitleName) parts.push(`Title: ${quest.rewardTitleName}`);
   return parts.length ? parts.join(' · ') : 'Progress reward';
 }
@@ -87,6 +91,7 @@ function render(quests) {
           const result = await claimCollectionQuest(quest.id);
           const bits = Number(result?.rewardStarBits) || 0;
           toast(bits > 0 ? `Claimed ${bits} Star Bits!` : 'Quest reward claimed!', 'success');
+          if (bits > 0) notifyShellEconomyChanged({ source: 'quest-claim', rewardStarBits: bits });
           await load();
         } catch (error) {
           btn.disabled = false;

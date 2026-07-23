@@ -1,3 +1,4 @@
+import { notifyShellEconomyChanged } from '../shell-economy.js';
 import {
   claimPendingTwitchUnlocks,
   claimSeasonPassTier,
@@ -5,6 +6,7 @@ import {
 } from '../season-pass-service.js';
 import { beginTwitchLink, callTwitchWorker, getMyTwitchConnection } from '../twitch-service.js';
 import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
+import { starBitAmountHtml } from '../star-bit-icon.js';
 
 const siteCopy = await loadAndHydrateWebsiteContent();
 const seasonCopy = siteCopy?.seasonPass || {};
@@ -41,7 +43,9 @@ function formatDate(value) {
 
 function rewardLine(tier) {
   const parts = [];
-  if (Number(tier.rewardStarBits) > 0) parts.push(`${tier.rewardStarBits} ✦`);
+  if (Number(tier.rewardStarBits) > 0) {
+    parts.push(starBitAmountHtml(esc, tier.rewardStarBits, { iconSize: 'xs' }));
+  }
   if (tier.rewardTitleName) parts.push(`Title: ${tier.rewardTitleName}`);
   return parts.length ? parts.join(' · ') : 'Season reward';
 }
@@ -150,6 +154,7 @@ function render(data) {
           const result = await claimSeasonPassTier(tier.id);
           const bits = Number(result?.rewardStarBits) || 0;
           toast(bits > 0 ? `Claimed ${bits} Star Bits!` : 'Season reward claimed!', 'success');
+          if (bits > 0) notifyShellEconomyChanged({ source: 'season-claim', rewardStarBits: bits });
           await load();
         } catch (error) {
           btn.disabled = false;

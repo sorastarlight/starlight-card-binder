@@ -4,6 +4,8 @@ import { openStarBitsBoosterById } from '../daily-booster-service.js';
 import { revealRewardSequence } from '../reward-reveal.js?v=1.5.14';
 import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
 import { maybeCelebrateSeriesCompletions } from '../series-complete-celebration.js?v=1.0.0';
+import { notifyShellEconomyChanged } from '../shell-economy.js';
+import { starBitAmountHtml, starBitIconHtml } from '../star-bit-icon.js';
 
 const siteCopy = await loadAndHydrateWebsiteContent();
 const shopCopy = siteCopy?.shop || {};
@@ -26,6 +28,7 @@ const purchaseImage = document.getElementById('purchase-image');
 const purchaseTitle = document.getElementById('purchase-title');
 const purchaseDescription = document.getElementById('purchase-description');
 const purchaseCost = document.getElementById('purchase-cost');
+const purchaseCostAmount = document.getElementById('purchase-cost-amount');
 const purchaseBalance = document.getElementById('purchase-balance');
 const purchaseCancel = document.getElementById('purchase-cancel');
 const purchaseConfirm = document.getElementById('purchase-confirm');
@@ -110,7 +113,7 @@ function render(){
       <h2>${escapeHTML(featured.name)}</h2>
       <p>${escapeHTML(featured.description||'A magical Starlight booster ready to join your collection.')}</p>
       <div class="featured-pack-meta"><span>${escapeHTML(modeLabel(featured.reward_mode))}</span><span>${escapeHTML(summarizeBooster(featured))}</span></div>
-      <div class="featured-pack-actions"><strong>★ ${featuredCost.toLocaleString()} Star Bits</strong><button type="button" data-buy="${escapeHTML(featured.id)}" data-cost="${featuredCost}" data-back="${escapeHTML(featured.card_back_url||'')}" ${currentBalance>=featuredCost?'':'disabled'}>${escapeHTML(currentBalance>=featuredCost?(shopCopy.openFeaturedCta||'Open Featured Pack'):(shopCopy.needBitsCta||'Need More Star Bits'))}</button><button type="button" data-details="${escapeHTML(featured.id)}">${escapeHTML(shopCopy.previewContentsCta||'Preview Contents')}</button></div>
+      <div class="featured-pack-actions"><strong>${starBitAmountHtml(escapeHTML, featuredCost, { iconSize: 'md', suffix: 'Star Bits' })}</strong><button type="button" data-buy="${escapeHTML(featured.id)}" data-cost="${featuredCost}" data-back="${escapeHTML(featured.card_back_url||'')}" ${currentBalance>=featuredCost?'':'disabled'}>${escapeHTML(currentBalance>=featuredCost?(shopCopy.openFeaturedCta||'Open Featured Pack'):(shopCopy.needBitsCta||'Need More Star Bits'))}</button><button type="button" data-details="${escapeHTML(featured.id)}">${escapeHTML(shopCopy.previewContentsCta||'Preview Contents')}</button></div>
     </div>
     <div class="featured-pack-art"><div class="featured-orbit"></div><img src="${escapeHTML(featured.pack_image_url||FALLBACK_PACK)}" alt="${escapeHTML(featured.name)} booster pack"></div>
   </article>`;
@@ -127,7 +130,7 @@ function render(){
         <h3 class="pack-name">${escapeHTML(booster.name)}</h3>
         <p class="pack-description">${desc}</p>
         <div class="pack-meta"><span class="meta-pill">${escapeHTML(modeLabel(booster.reward_mode))}</span><span class="meta-pill">${summary}</span></div>
-        <div class="pack-price"><span class="price-star">★</span><span>${cost.toLocaleString()}</span></div>
+        <div class="pack-price">${starBitIconHtml(escapeHTML, { size: 'md' })}<span>${cost.toLocaleString()}</span></div>
         <div class="pack-actions">
           <button class="price-button" type="button" data-buy="${escapeHTML(booster.id)}" data-cost="${cost}" data-back="${escapeHTML(booster.card_back_url||'')}" ${affordable?'':'disabled'}>${escapeHTML(affordable?(shopCopy.openPackCta||'Open Pack'):(shopCopy.needBitsCta||'Need More Star Bits'))}</button>
           <button class="details-button" type="button" data-details="${escapeHTML(booster.id)}">${escapeHTML(shopCopy.whatsInsideCta||'What’s Inside?')}</button>
@@ -290,7 +293,7 @@ function openDetails(id){
     rows.push(`<div class="content-row"><span>Reward Style</span><strong>${escapeHTML(modeLabel(booster.reward_mode))}</strong></div>`);
     rows.push(`<div class="content-row"><span>Pack Contents</span><strong>${escapeHTML(summarizeBooster(booster))}</strong></div>`);
   }
-  if(Number(booster.bonus_star_bits)>0) rows.push(`<div class="content-row"><span>Bonus</span><strong>★ ${Number(booster.bonus_star_bits).toLocaleString()} Star Bits</strong></div>`);
+  if(Number(booster.bonus_star_bits)>0) rows.push(`<div class="content-row"><span>Bonus</span><strong>${starBitAmountHtml(escapeHTML, booster.bonus_star_bits, { iconSize: 'sm', suffix: 'Star Bits' })}</strong></div>`);
   modalContents.innerHTML=rows.join('');
   portalModal(modal);
   detailsModalController.open({initialFocus:modalClose});
@@ -305,7 +308,11 @@ function openPurchaseModal(booster,button){
   purchaseImage.alt=`${booster.name} booster pack`;
   purchaseTitle.textContent=`Open “${booster.name}”?`;
   purchaseDescription.textContent='This booster will open immediately and the cards will be saved to your collection.';
-  purchaseCost.textContent=`★ ${cost.toLocaleString()} Star Bits`;
+  if (purchaseCostAmount) {
+    purchaseCostAmount.textContent = `${cost.toLocaleString()} Star Bits`;
+  } else if (purchaseCost) {
+    purchaseCost.innerHTML = `${starBitIconHtml(escapeHTML, { size: 'sm' })} <span>${cost.toLocaleString()} Star Bits</span>`;
+  }
   purchaseBalance.textContent=`Your balance after purchase: ${(currentBalance-cost).toLocaleString()} Star Bits`;
   portalModal(purchaseModal);
   purchaseModalController.open({initialFocus:purchaseConfirm});
@@ -328,6 +335,7 @@ async function confirmPurchase(){
     await revealRewardSequence(awardedCards,{title:booster.name,packImageUrl:booster.pack_image_url||FALLBACK_PACK,cardBackUrl:booster.card_back_url||button.dataset.back||undefined,autoOpen:true});
     await maybeCelebrateSeriesCompletions(awardedCards);
     pendingPurchase=null;
+    notifyShellEconomyChanged({ source: 'shop-purchase', boosterId: booster.id });
     await load();
   }catch(error){
     say(error?.message||'This booster could not be opened.',true);

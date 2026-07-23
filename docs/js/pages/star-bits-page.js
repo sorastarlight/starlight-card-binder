@@ -4,8 +4,18 @@ import {
   getStarBitsExchangePreview
 } from '../star-bits-service.js';
 import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
+import { notifyShellEconomyChanged } from '../shell-economy.js';
+import { starBitAmountHtml, starBitIconHtml } from '../star-bit-icon.js';
 
 await loadAndHydrateWebsiteContent();
+
+const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;'
+}[char]));
 
 const summarySection = document.getElementById('summary-section');
 const rateSection = document.getElementById('rate-section');
@@ -55,7 +65,7 @@ function renderRates(rates) {
   for (const rarity of rarityOrder) {
     const card = document.createElement('div');
     card.className = `rate-card rarity-${rarity.toLowerCase()}`;
-    card.innerHTML = `<span>${rarity}</span><strong>${rates?.[rarity] ?? 0} ✦</strong>`;
+    card.innerHTML = `<span>${esc(rarity)}</span><strong class="star-bit-amount">${starBitIconHtml(esc, { size: 'sm' })}${esc(rates?.[rarity] ?? 0)}</strong>`;
     rateGrid.append(card);
   }
 }
@@ -82,7 +92,7 @@ function selectedCardsForReveal() {
 
 function updateSelectionSummary() {
   const { copies, bits } = getSelectedTotals();
-  selectedSummary.innerHTML = `<strong>${copies}</strong> ${copies === 1 ? 'copy' : 'copies'} selected <span>→</span> <strong>★ ${bits}</strong> Star Bits`;
+  selectedSummary.innerHTML = `<strong>${copies}</strong> ${copies === 1 ? 'copy' : 'copies'} selected <span>→</span> ${starBitAmountHtml(esc, bits, { iconSize: 'sm', suffix: 'Star Bits' })}`;
   exchangeButton.disabled = copies <= 0 || isConverting;
   exchangeDescription.textContent = copies > 0
     ? `Convert ${copies} selected duplicate ${copies === 1 ? 'copy' : 'copies'} into ${bits} Star Bits.`
@@ -148,7 +158,7 @@ function renderDuplicates(cards) {
 
     const value = document.createElement('span');
     value.className = 'value-pill';
-    value.textContent = `${card.bitsPerDuplicate} Star Bits each`;
+    value.innerHTML = `${starBitAmountHtml(esc, card.bitsPerDuplicate, { iconSize: 'xs' })} each`;
 
     const selectRow = document.createElement('label');
     selectRow.className = 'duplicate-select-row qol-card-toggle';
@@ -299,6 +309,7 @@ async function runConversion(payload, revealCards, confirmOptions) {
       `Converted ${converted} duplicate ${converted === 1 ? 'copy' : 'copies'} into ${earned} Star Bits.`
     );
     toast(`Converted ${converted} ${converted === 1 ? 'copy' : 'copies'} into ${earned} Star Bits.`, 'success');
+    notifyShellEconomyChanged({ source: 'duplicate-convert', starBitsEarned: earned });
   } catch (error) {
     console.error('Star Bits conversion failed:', error);
     displayStatus(error.message || 'The selected duplicate cards could not be converted.', 'error');

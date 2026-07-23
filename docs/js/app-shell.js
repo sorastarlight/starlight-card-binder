@@ -508,9 +508,16 @@ window.addEventListener('message',e=>{
   if(data.type==='starlight-trades-changed'||data.type==='starlight-view-ready')hydrateTradeOfferBadge();
   if(data.type==='starlight-notifications-changed'||data.type==='starlight-view-ready')hydrateNotificationBadge();
   if(data.type==='starlight-rewards-changed'||data.type==='starlight-view-ready'||data.type==='starlight-content-ready')hydrateReceivedGiftBadge();
+  if(
+    data.type==='starlight-wallet-changed'
+    || data.type==='starlight-rewards-changed'
+    || data.type==='starlight-view-ready'
+    || data.type==='starlight-content-ready'
+  ){
+    window.dispatchEvent(new CustomEvent('starlight-dashboard-refresh',{detail:data}));
+  }
   if(data.type==='starlight-view-ready'||data.type==='starlight-content-ready'){
     markViewReady(data);
-    window.dispatchEvent(new CustomEvent('starlight-dashboard-refresh',{detail:data}));
   }
   if(data.type==='starlight-view-height')resizeEmbeddedView(Number(data.height));
   if(data.type==='starlight-shell-chrome'){

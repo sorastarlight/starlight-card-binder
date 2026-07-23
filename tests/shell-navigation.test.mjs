@@ -72,3 +72,27 @@ test('website UI admin page and migration are wired', async () => {
   assert.match(shell, /admin-ui/);
   assert.match(shell, /refreshShellBadges|data-notification-dot/);
 });
+
+test('shell refreshes Star Bits totals when wallet or rewards change', async () => {
+  const [shell, economy, gifts, quests, season, shop, redeem, bits] = await Promise.all([
+    read('docs/js/app-shell.js'),
+    read('docs/js/shell-economy.js'),
+    read('docs/js/pages/received-rewards-page.js'),
+    read('docs/js/pages/collection-quests-page.js'),
+    read('docs/js/pages/season-pass-page.js'),
+    read('docs/js/pages/booster-shop-page.js'),
+    read('docs/js/pages/redeem-page.js'),
+    read('docs/js/pages/star-bits-page.js')
+  ]);
+  assert.match(economy, /export function notifyShellEconomyChanged/);
+  assert.match(economy, /starlight-wallet-changed/);
+  assert.match(economy, /starlight-dashboard-refresh/);
+  assert.match(shell, /starlight-wallet-changed/);
+  assert.match(shell, /starlight-rewards-changed[\s\S]*starlight-dashboard-refresh/);
+  assert.match(gifts, /notifyShellEconomyChanged/);
+  assert.match(quests, /notifyShellEconomyChanged/);
+  assert.match(season, /notifyShellEconomyChanged/);
+  assert.match(shop, /notifyShellEconomyChanged/);
+  assert.match(redeem, /notifyShellEconomyChanged/);
+  assert.match(bits, /notifyShellEconomyChanged/);
+});

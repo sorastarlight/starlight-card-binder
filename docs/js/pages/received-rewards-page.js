@@ -2,6 +2,8 @@ import { getReceivedRewards, claimReceivedReward, dismissReceivedReward } from '
 import { revealRewardSequence } from '../reward-reveal.js?v=1.5.14';
 import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
 import { maybeCelebrateSeriesCompletions } from '../series-complete-celebration.js?v=1.0.0';
+import { notifyShellEconomyChanged } from '../shell-economy.js';
+import { starBitAmountHtml } from '../star-bit-icon.js';
 
 const siteCopy = await loadAndHydrateWebsiteContent();
 const rewardsCopy = siteCopy?.rewards || {};
@@ -20,7 +22,9 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({
 
 function label(r) {
   const p = r.rewardPayload || {};
-  if (r.rewardType === 'star_bits') return `★ ${Number(p.amount || 0).toLocaleString()} Star Bits`;
+  if (r.rewardType === 'star_bits') {
+    return starBitAmountHtml(esc, p.amount || 0, { iconSize: 'sm', suffix: 'Star Bits' });
+  }
   if (r.rewardType === 'single_card') return `${p.quantity || 1} card${Number(p.quantity || 1) === 1 ? '' : 's'}`;
   if (r.rewardType === 'booster') return p.boosterName || 'Booster Pack';
   if (r.rewardType === 'season_pass_unlock') return 'Seasonal Collection Pass Unlock';
@@ -77,6 +81,13 @@ async function claim(id) {
     status.textContent = 'Reward claimed successfully!';
     await load();
     window.parent?.postMessage({ type: 'starlight-rewards-changed' }, location.origin);
+    if (
+      out?.rewardType === 'star_bits'
+      || reward?.rewardType === 'star_bits'
+      || Number(snapshot?.amount || reward?.rewardPayload?.amount || 0) > 0
+    ) {
+      notifyShellEconomyChanged({ source: 'received-gift', rewardType: out?.rewardType || reward?.rewardType });
+    }
   } catch (e) {
     status.textContent = e.message || 'Unable to claim reward.';
   }

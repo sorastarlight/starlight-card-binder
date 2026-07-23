@@ -52,10 +52,10 @@ async function loadEconomy() {
     });
   }
   if (!previewError && preview) {
-    setText('[data-star-bits]', preview.starBitsBalance ?? 0);
-    setText('[data-duplicates]', preview.totalDuplicateCopies ?? 0);
-    setText('#starBitsBalance', preview.starBitsBalance ?? 0);
-    setText('#duplicateCardCount', preview.totalDuplicateCopies ?? 0);
+    setText('[data-star-bits]', Number(preview.starBitsBalance ?? 0).toLocaleString());
+    setText('[data-duplicates]', Number(preview.totalDuplicateCopies ?? 0).toLocaleString());
+    setText('#starBitsBalance', Number(preview.starBitsBalance ?? 0).toLocaleString());
+    setText('#duplicateCardCount', Number(preview.totalDuplicateCopies ?? 0).toLocaleString());
   }
   if (!dailyError && daily) {
     const ctas = document.querySelectorAll('[data-daily-cta]');

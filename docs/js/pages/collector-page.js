@@ -11,6 +11,7 @@ import {
         } from "../social-service.js";
         import { levelFromPoints } from "../collector-level.js";
         import { supabase } from "../supabase-client.js";
+        import { notifyShellEconomyChanged } from "../shell-economy.js";
 
         const loadingState =
             document.getElementById(
@@ -1039,6 +1040,13 @@ import {
                     message: document.getElementById("gift-message")?.value || null
                 });
                 if (giftStatus) giftStatus.textContent = "Gift sent! It will appear in their Received Gifts.";
+                if (type === "star_bits") {
+                    starBitsBalance = Math.max(0, starBitsBalance - amount);
+                    if (giftBalanceHint) {
+                        giftBalanceHint.textContent = `You have ${starBitsBalance.toLocaleString()} Star Bits available.`;
+                    }
+                    notifyShellEconomyChanged({ source: 'peer-gift', amount });
+                }
                 setTimeout(() => giftDialog?.close(), 900);
             } catch (error) {
                 if (giftStatus) giftStatus.textContent = error.message || "Could not send gift.";
