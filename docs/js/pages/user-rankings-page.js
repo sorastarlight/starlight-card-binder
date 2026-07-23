@@ -264,7 +264,7 @@ async function toggleFollow(button) {
     setFollowButtonState(button, !nextFollow);
     const message = error?.message || 'Could not update follow.';
     setLive(message);
-    window.StarlightUI?.toast?.(message, 'error') || alert(message);
+    window.StarlightUI?.toast?.(message, 'error');
   } finally {
     button.classList.remove('is-busy');
     button.disabled = false;
