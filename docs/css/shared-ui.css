@@ -239,17 +239,21 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
   height:1.15em;
   max-width:36px;
   max-height:36px;
+  aspect-ratio:1 / 1;
   object-fit:contain;
+  object-position:center;
   display:inline-block;
   vertical-align:-0.22em;
-  flex:none;
+  flex:0 0 auto;
   image-rendering:auto;
+  border-radius:0;
+  background:transparent;
 }
-.star-bit-icon--xs{width:14px;height:14px}
-.star-bit-icon--sm{width:16px;height:16px}
-.star-bit-icon--md{width:20px;height:20px}
-.star-bit-icon--lg{width:28px;height:28px}
-.star-bit-icon--xl{width:36px;height:36px}
+.star-bit-icon--xs{width:14px!important;height:14px!important;max-width:14px!important;max-height:14px!important}
+.star-bit-icon--sm{width:16px!important;height:16px!important;max-width:16px!important;max-height:16px!important}
+.star-bit-icon--md{width:20px!important;height:20px!important;max-width:20px!important;max-height:20px!important}
+.star-bit-icon--lg{width:28px!important;height:28px!important;max-width:28px!important;max-height:28px!important}
+.star-bit-icon--xl{width:36px!important;height:36px!important;max-width:36px!important;max-height:36px!important}
 .star-bit-amount{
   display:inline-flex;
   align-items:center;

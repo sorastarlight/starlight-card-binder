@@ -233,7 +233,7 @@
                 rgba(61, 83, 132, 0.11);
         }
 
-        .duplicate-card img {
+        .duplicate-card > img {
             width: 100%;
             max-width: 185px;
             aspect-ratio: 5 / 7;
@@ -244,23 +244,43 @@
             background: #edf4fa;
         }
 
-        .duplicate-card h3 {
-            margin: 11px 0 5px;
-
-            color: #405fa1;
-            font-size: 1rem;
-            overflow-wrap: anywhere;
+        .duplicate-card .star-bit-icon,
+        .value-pill .star-bit-icon,
+        .rate-card .star-bit-icon,
+        .selected-summary .star-bit-icon,
+        .bits-page .star-bit-icon {
+            width: 16px !important;
+            height: 16px !important;
+            max-width: 16px !important;
+            max-height: 16px !important;
+            aspect-ratio: 1 / 1 !important;
+            object-fit: contain !important;
+            border-radius: 0 !important;
+            background: transparent !important;
+            flex: none !important;
+            display: inline-block !important;
+            vertical-align: -0.2em;
         }
 
-        .duplicate-card p {
-            margin: 5px 0;
+        .bits-header h1 .star-bit-icon {
+            width: 0.72em !important;
+            height: 0.72em !important;
+            max-width: 48px !important;
+            max-height: 48px !important;
+        }
 
-            color: var(--bits-muted);
-            font-size: 0.9rem;
+        .summary-card .star-bit-icon {
+            width: 1.1em !important;
+            height: 1.1em !important;
+            max-width: 28px !important;
+            max-height: 28px !important;
         }
 
         .value-pill {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35em;
+            flex-wrap: wrap;
 
             margin-top: 8px;
             padding: 7px 11px;
@@ -277,6 +297,21 @@
             color: #9a6b00;
 
             font-weight: 900;
+        }
+
+        .duplicate-card h3 {
+            margin: 11px 0 5px;
+
+            color: #405fa1;
+            font-size: 1rem;
+            overflow-wrap: anywhere;
+        }
+
+        .duplicate-card p {
+            margin: 5px 0;
+
+            color: var(--bits-muted);
+            font-size: 0.9rem;
         }
 
         .exchange-box {
@@ -536,6 +571,7 @@
 .duplicate-grid{grid-template-columns:repeat(auto-fit,minmax(310px,1fr))!important;gap:14px!important}
 .duplicate-card{display:grid!important;grid-template-columns:112px 1fr!important;gap:15px!important;align-items:center!important;min-height:190px!important;padding:14px!important;text-align:left!important}
 .duplicate-card>img{width:112px!important;height:158px!important;object-fit:contain!important;margin:0!important}
+.duplicate-card .star-bit-icon,.duplicate-card-info .star-bit-icon,.value-pill .star-bit-icon{width:16px!important;height:16px!important;max-width:16px!important;max-height:16px!important;aspect-ratio:1/1!important;object-fit:contain!important;border-radius:0!important;background:transparent!important}
 .duplicate-card-info{display:grid;gap:6px;min-width:0}
 .duplicate-card-info h3,.duplicate-card-info p{margin:0!important}
 .qol-card-toggle{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;padding:9px 10px!important;border-radius:13px!important;background:#f6faff!important}
