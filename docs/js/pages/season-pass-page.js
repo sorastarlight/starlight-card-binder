@@ -16,6 +16,8 @@ const leadEl = document.getElementById('season-lead');
 const summaryEl = document.getElementById('season-summary');
 const trackEl = document.getElementById('season-track');
 
+let seasonCountdownTimer = null;
+
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
   '&': '&amp;',
   '<': '&lt;',
@@ -33,12 +35,88 @@ function toast(message, type = '') {
   }
 }
 
+function stopSeasonCountdown() {
+  if (seasonCountdownTimer) {
+    clearInterval(seasonCountdownTimer);
+    seasonCountdownTimer = null;
+  }
+}
+
 function formatDate(value) {
   try {
-    return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(new Date(value));
+    return new Intl.DateTimeFormat(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    }).format(new Date(value));
   } catch {
     return '';
   }
+}
+
+function formatCountdown(ms) {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  const days = Math.floor(total / 86400);
+  const hours = Math.floor((total % 86400) / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const seconds = total % 60;
+  const parts = [];
+  if (days > 0) parts.push(`${days}d`);
+  parts.push(`${hours}h`, `${minutes}m`, `${seconds}s`);
+  return parts.join(' ');
+}
+
+function seasonScheduleHtml(season = {}) {
+  const started = formatDate(season.startsAt);
+  const ended = formatDate(season.endsAt);
+  const startLabel = started ? `Started ${started}` : '';
+  const endLabel = ended ? `Ended ${ended}` : 'Season ended';
+  const meta = [
+    season.isActive ? 'Active' : '',
+    season.audience === 'twitch_subscribers' ? 'Subscribers' : ''
+  ].filter(Boolean).join(' · ');
+
+  return `
+    <div class="season-schedule">
+      ${startLabel ? `<p class="season-started">${esc(startLabel)}</p>` : ''}
+      <p class="season-countdown" data-season-countdown data-ends-at="${esc(season.endsAt || '')}" data-ended-label="${esc(endLabel)}" aria-atomic="true">Ends in —</p>
+      ${meta ? `<p class="season-schedule-meta">${esc(meta)}</p>` : ''}
+    </div>
+  `;
+}
+
+function startSeasonCountdown() {
+  stopSeasonCountdown();
+  const el = summaryEl?.querySelector('[data-season-countdown]');
+  if (!el) return;
+
+  const endsAt = el.getAttribute('data-ends-at');
+  const endedLabel = el.getAttribute('data-ended-label') || 'Season ended';
+  if (!endsAt) {
+    el.textContent = endedLabel;
+    return;
+  }
+
+  const target = new Date(endsAt);
+  if (Number.isNaN(target.getTime())) {
+    el.textContent = endedLabel;
+    return;
+  }
+
+  const tick = () => {
+    const remaining = target.getTime() - Date.now();
+    if (remaining <= 0) {
+      el.textContent = endedLabel;
+      el.classList.add('is-ended');
+      stopSeasonCountdown();
+      return;
+    }
+    el.classList.remove('is-ended');
+    el.textContent = `Ends in ${formatCountdown(remaining)}`;
+  };
+
+  tick();
+  seasonCountdownTimer = setInterval(tick, 1000);
 }
 
 function rewardLine(tier) {
@@ -68,6 +146,7 @@ function renderBreakdown(breakdown = {}) {
 }
 
 function renderLocked(data) {
+  stopSeasonCountdown();
   const season = data.season || {};
   titleEl.textContent = season.name || seasonCopy.title || 'Seasonal Collection Pass';
   leadEl.textContent = season.description || seasonCopy.lead || '';
@@ -77,6 +156,7 @@ function renderLocked(data) {
       <p class="eyebrow">${esc(seasonCopy.subscriberEyebrow || 'Twitch Subscribers')}</p>
       <h2>${esc(seasonCopy.subscriberLockedTitle || 'Subscriber Collection Pass')}</h2>
       <p>${esc(seasonCopy.subscriberLockedLead || 'This season is for active Twitch subscribers. Link Twitch and subscribe to unlock the free track. New subs also receive a Season Pass unlock gift in Received Gifts.')}</p>
+      ${seasonScheduleHtml(season)}
       <div class="season-locked-actions">
         ${linked
           ? `<p class="season-status">Linked as @${esc(data.twitchLogin || 'twitch')}</p>
@@ -85,6 +165,7 @@ function renderLocked(data) {
       </div>
     </div>
   `;
+  startSeasonCountdown();
   trackEl.replaceChildren();
   document.getElementById('season-link-twitch')?.addEventListener('click', () => {
     beginTwitchLink('collector').catch((error) => toast(error.message || 'Unable to link Twitch.', 'error'));
@@ -92,6 +173,8 @@ function renderLocked(data) {
 }
 
 function render(data) {
+  stopSeasonCountdown();
+
   if (!data?.found) {
     titleEl.textContent = seasonCopy.title || 'Seasonal Collection Pass';
     leadEl.textContent = seasonCopy.emptyLead || seasonCopy.lead || 'No active season is configured yet.';
@@ -122,10 +205,11 @@ function render(data) {
       <div class="season-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${maxPoints}" aria-valuenow="${points}" aria-label="Season progress">
         <span style="width:${pct}%"></span>
       </div>
-      <p>${esc(formatDate(season.startsAt))} – ${esc(formatDate(season.endsAt))}${season.isActive ? ' · Active' : ''}${season.audience === 'twitch_subscribers' ? ' · Subscribers' : ''}</p>
+      ${seasonScheduleHtml(season)}
     </div>
     <ul class="season-breakdown">${renderBreakdown(data.breakdown || {})}</ul>
   `;
+  startSeasonCountdown();
 
   trackEl.replaceChildren();
   for (const tier of tiers) {
@@ -189,10 +273,12 @@ async function maybeSyncActiveSubscription() {
 
 async function load() {
   try {
+    stopSeasonCountdown();
     summaryEl.innerHTML = `<p>${esc(seasonCopy.loadingLead || 'Loading season progress…')}</p>`;
     await maybeSyncActiveSubscription();
     render(await getMySeasonPass());
   } catch (error) {
+    stopSeasonCountdown();
     summaryEl.innerHTML = `<p>Unable to load the season pass. ${esc(error.message || 'Sign in required.')}</p>`;
     trackEl.replaceChildren();
   }
