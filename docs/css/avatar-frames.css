@@ -1,4 +1,4 @@
-/* Unlockable CSS profile avatar frames (circular rings + effects). */
+/* Unlockable CSS profile avatar frames (ring-only borders + glow). */
 
 .avatar-frame {
   position: relative;
@@ -9,13 +9,14 @@
   content: "";
   pointer-events: none;
   position: absolute;
-  inset: -4px;
+  inset: -7px;
   border-radius: 50%;
-  border: 3px solid transparent;
+  border: 5px solid transparent;
   z-index: 3;
   box-sizing: border-box;
   /* Ring only: never paint an opaque fill over the photo. */
   background-color: transparent;
+  background-image: none;
 }
 
 .shell-avatar.avatar-frame,
@@ -69,34 +70,6 @@
   box-shadow: 0 0 0 1px rgba(180, 200, 255, 0.55), 0 0 16px rgba(64, 95, 161, 0.5);
 }
 
-/* Gradient rings: transparent padding-box so the photo stays visible. */
-.avatar-frame-rainbow::after {
-  border: 3px solid transparent;
-  background:
-    linear-gradient(transparent, transparent) padding-box,
-    linear-gradient(135deg, #ff6b9d, #ffd166, #6bc6f8, #b48cff, #4eca9a) border-box;
-  box-shadow: 0 0 18px rgba(255, 130, 200, 0.35);
-}
-
-.avatar-frame-aurora::after {
-  border: 3px solid transparent;
-  background:
-    linear-gradient(transparent, transparent) padding-box,
-    linear-gradient(120deg, #7ef0d2, #8eb6ff, #ff9ad5, #7ef0d2) border-box;
-  box-shadow: 0 0 18px rgba(126, 240, 210, 0.35);
-}
-
-.avatar-frame-holofoil::after {
-  border: 3px solid transparent;
-  background:
-    linear-gradient(transparent, transparent) padding-box,
-    linear-gradient(145deg, #c8f7ff, #ffd6f3, #fff2b0, #c9ffd8, #d7c8ff) border-box;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.35),
-    0 0 14px rgba(200, 247, 255, 0.28),
-    0 0 22px rgba(255, 214, 243, 0.18);
-}
-
 .avatar-frame-glitter::after {
   border-color: #ffb7de;
   box-shadow:
@@ -107,36 +80,12 @@
     3px 3px 0 0 rgba(107, 198, 248, 0.7);
 }
 
-.avatar-frame-prism::after {
-  border: 3px solid transparent;
-  background:
-    linear-gradient(transparent, transparent) padding-box,
-    conic-gradient(from 20deg, #7fd0ff, #ff9ad5, #b8f0a8, #ffd57a, #7fd0ff) border-box;
-  box-shadow: 0 0 18px rgba(127, 208, 255, 0.35);
-}
-
 .avatar-frame-celestial::after {
   border-color: #8eb6ff;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.85),
     0 0 22px rgba(142, 182, 255, 0.55),
     0 0 36px rgba(255, 130, 200, 0.2);
-}
-
-.avatar-frame-sunset::after {
-  border: 3px solid transparent;
-  background:
-    linear-gradient(transparent, transparent) padding-box,
-    linear-gradient(135deg, #ff82c8, #fed334) border-box;
-  box-shadow: 0 0 16px rgba(255, 130, 200, 0.35);
-}
-
-.avatar-frame-ocean::after {
-  border: 3px solid transparent;
-  background:
-    linear-gradient(transparent, transparent) padding-box,
-    linear-gradient(135deg, #6bc6f8, #4eca9a) border-box;
-  box-shadow: 0 0 16px rgba(107, 198, 248, 0.35);
 }
 
 .avatar-frame-preview {
@@ -165,40 +114,18 @@
   .avatar-frame-effect-glitter::after {
     animation: avatar-frame-glitter 2.2s steps(2, end) infinite;
   }
-  /* Holofoil: subtler hue shift on the ring only (no opacity wash). */
-  .avatar-frame-holofoil.avatar-frame-effect-shimmer::after,
-  .avatar-frame-holofoil.avatar-frame-effect-pulse::after {
-    animation: avatar-frame-holofoil-shimmer 5s ease-in-out infinite;
-  }
 }
 
-/* Hue/brightness on the border ring only — do not fade the overlay opacity. */
+/* Hue/brightness on the border ring only — do not fade overlay opacity. */
 @keyframes avatar-frame-shimmer {
   0%, 100% { filter: hue-rotate(0deg) brightness(1); }
   50% { filter: hue-rotate(28deg) brightness(1.06); }
 }
 
-/* Glow pulse without scaling a white fill over the avatar. */
+/* Glow pulse without scaling a fill over the avatar. */
 @keyframes avatar-frame-pulse {
   0%, 100% { filter: brightness(1); }
   50% { filter: brightness(1.12); }
-}
-
-@keyframes avatar-frame-holofoil-shimmer {
-  0%, 100% {
-    filter: hue-rotate(0deg) brightness(1) saturate(1);
-    box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.3),
-      0 0 12px rgba(200, 247, 255, 0.22),
-      0 0 18px rgba(255, 214, 243, 0.12);
-  }
-  50% {
-    filter: hue-rotate(40deg) brightness(1.05) saturate(1.15);
-    box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.4),
-      0 0 16px rgba(200, 247, 255, 0.32),
-      0 0 24px rgba(255, 214, 243, 0.2);
-  }
 }
 
 @keyframes avatar-frame-glitter {
@@ -209,9 +136,7 @@
 @media (prefers-reduced-motion: reduce) {
   .avatar-frame-effect-shimmer::after,
   .avatar-frame-effect-pulse::after,
-  .avatar-frame-effect-glitter::after,
-  .avatar-frame-holofoil.avatar-frame-effect-shimmer::after,
-  .avatar-frame-holofoil.avatar-frame-effect-pulse::after {
+  .avatar-frame-effect-glitter::after {
     animation: none;
   }
 }

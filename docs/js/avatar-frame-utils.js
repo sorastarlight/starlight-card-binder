@@ -1,10 +1,10 @@
 /**
  * CSS class helpers for unlockable profile avatar frames.
  */
+/* Ring-only presets. Overlay/padding-box fills (rainbow, aurora, holofoil, prism, sunset, ocean) retired. */
 export const AVATAR_FRAME_PRESETS = Object.freeze([
   'sky', 'rose', 'gold', 'violet', 'emerald', 'crimson', 'midnight',
-  'rainbow', 'aurora', 'holofoil', 'glitter', 'prism', 'celestial',
-  'sunset', 'ocean'
+  'glitter', 'celestial'
 ]);
 
 export const AVATAR_FRAME_EFFECTS = Object.freeze(['static', 'shimmer', 'pulse', 'glitter']);
