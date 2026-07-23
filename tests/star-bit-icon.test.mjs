@@ -52,3 +52,23 @@ test('shell and shop surfaces wire the Star Bit image icon', async () => {
   assert.match(checklist, /star-bit\.png/);
   assert.match(shopPage, /starBitIconHtml|starBitAmountHtml/);
 });
+
+test('season pass and quests insert Star Bit HTML without escaping it', async () => {
+  const [seasonPass, quests, received] = await Promise.all([
+    read('docs/js/pages/season-pass-page.js'),
+    read('docs/js/pages/collection-quests-page.js'),
+    read('docs/js/pages/received-rewards-page.js')
+  ]);
+
+  assert.match(seasonPass, /starBitAmountHtml\(esc,\s*tier\.rewardStarBits/);
+  assert.match(seasonPass, /\$\{rewardLine\(tier\)\}/);
+  assert.doesNotMatch(seasonPass, /esc\(rewardLine\(/);
+
+  assert.match(quests, /starBitAmountHtml\(esc,\s*quest\.rewardStarBits/);
+  assert.match(quests, /\$\{rewardLine\(quest\)\}/);
+  assert.doesNotMatch(quests, /esc\(rewardLine\(/);
+
+  assert.match(received, /starBitAmountHtml\(esc,/);
+  assert.match(received, /\$\{labelHtml\(r\)\}/);
+  assert.doesNotMatch(received, /\$\{esc\(label\(r\)\)\}/);
+});

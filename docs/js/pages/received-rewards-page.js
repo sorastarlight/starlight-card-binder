@@ -31,6 +31,11 @@ function label(r) {
   return 'Card Bundle';
 }
 
+function labelHtml(r) {
+  if (r.rewardType === 'star_bits') return label(r);
+  return esc(label(r));
+}
+
 function sourceLabel(r) {
   return ({
     twitch: 'Twitch Redeem',
@@ -44,7 +49,7 @@ function render() {
   const rows = rewards.filter(r => filter === 'all' || r.status === filter);
   const emptyTitle = esc(rewardsCopy.emptyTitle || 'No gifts here right now ✨');
   const emptyLead = esc(rewardsCopy.emptyLead || 'Twitch redeems, codes, and gifts will appear here.');
-  list.innerHTML = rows.map(r => `<article id="gift-${esc(r.id)}" class="reward ${esc(r.status)}"><div class="icon">${r.sourceType === 'twitch' ? '📺' : r.sourceType === 'reward_code' ? '🎟️' : '🎁'}</div><div><h2>${esc(r.title)}</h2><div class="preview"><span class="chip">${esc(label(r))}</span><span class="chip">${esc(sourceLabel(r))}</span><span class="chip">${r.status === 'pending' ? 'Ready to Open' : 'Claimed'}</span></div><p class="desc">${esc(r.message || 'A Starlight reward is waiting for you.')}</p><div class="meta">Received ${new Date(r.createdAt).toLocaleString()}${r.claimedAt ? ` · Claimed ${new Date(r.claimedAt).toLocaleString()}` : ''}</div></div><div class="actions">${r.status === 'pending' ? `<button class="btn claim" data-claim="${r.id}">Open Reward</button>` : `<button class="btn secondary" data-dismiss="${r.id}">Remove</button>`}</div></article>`).join('')
+  list.innerHTML = rows.map(r => `<article id="gift-${esc(r.id)}" class="reward ${esc(r.status)}"><div class="icon">${r.sourceType === 'twitch' ? '📺' : r.sourceType === 'reward_code' ? '🎟️' : '🎁'}</div><div><h2>${esc(r.title)}</h2><div class="preview"><span class="chip">${labelHtml(r)}</span><span class="chip">${esc(sourceLabel(r))}</span><span class="chip">${r.status === 'pending' ? 'Ready to Open' : 'Claimed'}</span></div><p class="desc">${esc(r.message || 'A Starlight reward is waiting for you.')}</p><div class="meta">Received ${new Date(r.createdAt).toLocaleString()}${r.claimedAt ? ` · Claimed ${new Date(r.claimedAt).toLocaleString()}` : ''}</div></div><div class="actions">${r.status === 'pending' ? `<button class="btn claim" data-claim="${r.id}">Open Reward</button>` : `<button class="btn secondary" data-dismiss="${r.id}">Remove</button>`}</div></article>`).join('')
     || `<div class="empty"><h2>${emptyTitle}</h2><p>${emptyLead}</p></div>`;
   document.querySelectorAll('[data-claim]').forEach(b => { b.onclick = () => claim(b.dataset.claim); });
   document.querySelectorAll('[data-dismiss]').forEach(b => {
