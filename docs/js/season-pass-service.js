@@ -13,3 +13,9 @@ export async function claimSeasonPassTier(tierId) {
   if (error) throw error;
   return data;
 }
+
+export async function claimPendingTwitchUnlocks() {
+  const { data, error } = await supabase.rpc('claim_pending_twitch_unlocks_v1');
+  if (error) throw error;
+  return data || { claimed: 0 };
+}

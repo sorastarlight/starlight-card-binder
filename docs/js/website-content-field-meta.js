@@ -627,7 +627,12 @@ export const WEBSITE_PAGE_META = Object.freeze({
           { key: 'claimedLabel' },
           { key: 'lockedLabel' },
           { key: 'emptyTitle' },
-          { key: 'emptyLead', multiline: true }
+          { key: 'emptyLead', multiline: true },
+          { key: 'subscriberEyebrow' },
+          { key: 'subscriberLockedTitle' },
+          { key: 'subscriberLockedLead', multiline: true },
+          { key: 'linkTwitchCta', preview: 'cta-primary' },
+          { key: 'openGiftsCta', preview: 'cta-secondary' }
         ]
       }
     ]

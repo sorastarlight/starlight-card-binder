@@ -23,6 +23,7 @@ function label(r) {
   if (r.rewardType === 'star_bits') return `★ ${Number(p.amount || 0).toLocaleString()} Star Bits`;
   if (r.rewardType === 'single_card') return `${p.quantity || 1} card${Number(p.quantity || 1) === 1 ? '' : 's'}`;
   if (r.rewardType === 'booster') return p.boosterName || 'Booster Pack';
+  if (r.rewardType === 'season_pass_unlock') return 'Seasonal Collection Pass Unlock';
   return 'Card Bundle';
 }
 
@@ -66,6 +67,12 @@ async function claim(id) {
         cardBackUrl: payload.cardBackUrl || payload.card_back_url || snapshot.cardBackUrl || snapshot.card_back_url || undefined
       });
       await maybeCelebrateSeriesCompletions(cards);
+    } else if (out?.rewardType === 'season_pass_unlock' || reward?.rewardType === 'season_pass_unlock') {
+      status.textContent = 'Season Pass unlocked! Open Seasonal Collection Pass to play the track.';
+      window.parent?.postMessage({ type: 'starlight-navigate', view: 'season-pass' }, location.origin);
+      await load();
+      window.parent?.postMessage({ type: 'starlight-rewards-changed' }, location.origin);
+      return;
     }
     status.textContent = 'Reward claimed successfully!';
     await load();

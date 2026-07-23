@@ -1,7 +1,9 @@
 import {
+  claimPendingTwitchUnlocks,
   claimSeasonPassTier,
   getMySeasonPass
 } from '../season-pass-service.js';
+import { beginTwitchLink, callTwitchWorker, getMyTwitchConnection } from '../twitch-service.js';
 import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
 
 const siteCopy = await loadAndHydrateWebsiteContent();
@@ -55,12 +57,41 @@ function renderBreakdown(breakdown = {}) {
     .join('');
 }
 
+function renderLocked(data) {
+  const season = data.season || {};
+  titleEl.textContent = season.name || seasonCopy.title || 'Seasonal Collection Pass';
+  leadEl.textContent = season.description || seasonCopy.lead || '';
+  const linked = Boolean(data.twitchLinked);
+  summaryEl.innerHTML = `
+    <div class="season-locked panel-inner">
+      <p class="eyebrow">${esc(seasonCopy.subscriberEyebrow || 'Twitch Subscribers')}</p>
+      <h2>${esc(seasonCopy.subscriberLockedTitle || 'Subscriber Collection Pass')}</h2>
+      <p>${esc(seasonCopy.subscriberLockedLead || 'This season is for active Twitch subscribers. Link Twitch and subscribe to unlock the free track. New subs also receive a Season Pass unlock gift in Received Gifts.')}</p>
+      <div class="season-locked-actions">
+        ${linked
+          ? `<p class="season-status">Linked as @${esc(data.twitchLogin || 'twitch')}</p>
+             <a class="btn primary" data-shell-view="rewards" href="binder.html?view=rewards">${esc(seasonCopy.openGiftsCta || 'Open Received Gifts')}</a>`
+          : `<button class="btn primary" type="button" id="season-link-twitch">${esc(seasonCopy.linkTwitchCta || 'Link Twitch')}</button>`}
+      </div>
+    </div>
+  `;
+  trackEl.replaceChildren();
+  document.getElementById('season-link-twitch')?.addEventListener('click', () => {
+    beginTwitchLink('collector').catch((error) => toast(error.message || 'Unable to link Twitch.', 'error'));
+  });
+}
+
 function render(data) {
   if (!data?.found) {
     titleEl.textContent = seasonCopy.title || 'Seasonal Collection Pass';
     leadEl.textContent = seasonCopy.emptyLead || seasonCopy.lead || 'No active season is configured yet.';
     summaryEl.innerHTML = `<p>${esc(seasonCopy.emptyTitle || 'No active season')}</p>`;
     trackEl.replaceChildren();
+    return;
+  }
+
+  if (data.hasAccess === false && data.accessRequired === 'twitch_subscribers') {
+    renderLocked(data);
     return;
   }
 
@@ -81,7 +112,7 @@ function render(data) {
       <div class="season-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${maxPoints}" aria-valuenow="${points}" aria-label="Season progress">
         <span style="width:${pct}%"></span>
       </div>
-      <p>${esc(formatDate(season.startsAt))} – ${esc(formatDate(season.endsAt))}${season.isActive ? ' · Active' : ''}</p>
+      <p>${esc(formatDate(season.startsAt))} – ${esc(formatDate(season.endsAt))}${season.isActive ? ' · Active' : ''}${season.audience === 'twitch_subscribers' ? ' · Subscribers' : ''}</p>
     </div>
     <ul class="season-breakdown">${renderBreakdown(data.breakdown || {})}</ul>
   `;
@@ -133,9 +164,22 @@ function render(data) {
   }
 }
 
+async function maybeSyncActiveSubscription() {
+  try {
+    const connection = await getMyTwitchConnection();
+    if (!connection?.linked) return;
+    await claimPendingTwitchUnlocks();
+    // Optional Worker Helix check for already-active subscribers (graceful if unsupported).
+    await callTwitchWorker('/viewer/subscription-check', { seasonId: 'season_2026_starlight_dawn' });
+  } catch (_) {
+    // Worker may not expose this endpoint yet; EventSub gifts + pending unlocks still work.
+  }
+}
+
 async function load() {
   try {
     summaryEl.innerHTML = `<p>${esc(seasonCopy.loadingLead || 'Loading season progress…')}</p>`;
+    await maybeSyncActiveSubscription();
     render(await getMySeasonPass());
   } catch (error) {
     summaryEl.innerHTML = `<p>Unable to load the season pass. ${esc(error.message || 'Sign in required.')}</p>`;

@@ -277,13 +277,18 @@ export function createDefaultWebsiteContent() {
     seasonPass: {
       eyebrow: 'My Stuff',
       title: 'Seasonal Collection Pass',
-      lead: 'A free seasonal track. Earn points from boosters, trades, gifts, favorites, and visits — then claim Star Bits and titles.',
+      lead: 'A free seasonal track for Twitch subscribers. Earn points from boosters, trades, gifts, favorites, and visits — then claim Star Bits and titles.',
       emptyTitle: 'No active season',
       emptyLead: 'Check back when the next Collection Pass begins.',
       claimCta: 'Claim',
       claimedLabel: 'Claimed',
       lockedLabel: 'Locked',
-      loadingLead: 'Loading season progress…'
+      loadingLead: 'Loading season progress…',
+      subscriberEyebrow: 'Twitch Subscribers',
+      subscriberLockedTitle: 'Subscriber Collection Pass',
+      subscriberLockedLead: 'This season is for active Twitch subscribers. Link Twitch and subscribe to unlock the free track. New subs also receive a Season Pass unlock gift in Received Gifts.',
+      linkTwitchCta: 'Link Twitch',
+      openGiftsCta: 'Open Received Gifts'
     },
     trades: {
       eyebrow: 'Collector Connections',
