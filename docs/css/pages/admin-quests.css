@@ -19,13 +19,31 @@ body{min-height:100vh}
 .btn.secondary{background:#eef7ff;color:#405fa1}
 .btn.danger{background:#fff0f3;color:#b4233f}
 .item-list{display:grid;gap:12px}
-.item{display:grid;grid-template-columns:1fr auto;gap:14px;padding:15px;border-radius:16px;background:linear-gradient(145deg,#fff,#f7fbff);border:1px solid #d9e8f6}
+.item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;padding:15px;border-radius:16px;background:linear-gradient(145deg,#fff,#f7fbff);border:1px solid #d9e8f6;min-width:0}
+.item>div{min-width:0}
 .item h3{margin:0 0 4px;color:#405fa1}
-.item p{margin:0;color:#69738f}
-.item .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.badge{display:inline-flex;padding:5px 9px;border-radius:999px;background:#fce8f4;color:#a3437c;font-weight:900;font-size:.82rem}
-.badge.inactive{background:#eef1f6;color:#6d7692}
-.badge.ok{background:#e8f8ef;color:#287a4e}
+.item p{margin:0;color:#69738f;overflow-wrap:anywhere}
+.item .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;min-width:0}
+/* Page-scoped chips — do not reuse global .badge (foundation pins those absolute for binder cards). */
+.meta-badge{
+  position:static;
+  left:auto;
+  top:auto;
+  z-index:auto;
+  display:inline-flex;
+  max-width:100%;
+  padding:5px 9px;
+  border-radius:999px;
+  background:#fce8f4;
+  color:#a3437c;
+  font-weight:900;
+  font-size:.82rem;
+  line-height:1.25;
+  overflow-wrap:anywhere;
+  white-space:normal;
+}
+.meta-badge.inactive{background:#eef1f6;color:#6d7692}
+.meta-badge.ok{background:#e8f8ef;color:#287a4e}
 .item-actions{display:flex;flex-direction:column;gap:8px;align-items:stretch}
 .tiers{margin-top:12px;display:grid;gap:8px}
 .tier-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;padding:10px 12px;border-radius:12px;background:#fff;border:1px solid #e3edf7;align-items:center}

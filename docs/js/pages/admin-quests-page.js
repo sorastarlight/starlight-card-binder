@@ -104,12 +104,12 @@ function renderQuests() {
         <h3>${escapeHtml(q.icon || '✦')} ${escapeHtml(q.title)}</h3>
         <p>${escapeHtml(q.description || '')}</p>
         <div class="meta">
-          <span class="badge ${q.isActive ? 'ok' : 'inactive'}">${q.isActive ? 'Active' : 'Inactive'}</span>
-          <span class="badge">${escapeHtml(formatRequirementSummary(q, pickers))}</span>
-          <span class="badge">${Number(q.rewardStarBits || 0)} Star Bits</span>
-          ${q.rewardTitleName ? `<span class="badge">${escapeHtml(q.rewardTitleName)}</span>` : ''}
-          ${q.rewardFrameName ? `<span class="badge">${escapeHtml(q.rewardFrameName)}</span>` : ''}
-          <span class="badge">Sort ${Number(q.sortOrder || 0)}</span>
+          <span class="meta-badge ${q.isActive ? 'ok' : 'inactive'}">${q.isActive ? 'Active' : 'Inactive'}</span>
+          <span class="meta-badge">${escapeHtml(formatRequirementSummary(q, pickers))}</span>
+          <span class="meta-badge">${Number(q.rewardStarBits || 0)} Star Bits</span>
+          ${q.rewardTitleName ? `<span class="meta-badge">${escapeHtml(q.rewardTitleName)}</span>` : ''}
+          ${q.rewardFrameName ? `<span class="meta-badge">${escapeHtml(q.rewardFrameName)}</span>` : ''}
+          <span class="meta-badge">Sort ${Number(q.sortOrder || 0)}</span>
         </div>
       </div>
       <div class="item-actions">
@@ -135,10 +135,10 @@ function renderSeasons() {
           <h3>${escapeHtml(s.name)}</h3>
           <p>${escapeHtml(s.description || '')}</p>
           <div class="meta">
-            <span class="badge ${s.isActive ? 'ok' : 'inactive'}">${s.isActive ? 'Active' : 'Inactive'}</span>
-            <span class="badge">${escapeHtml(audience)}</span>
-            <span class="badge">${escapeHtml(start)} – ${escapeHtml(end)}</span>
-            <span class="badge">${tiers.length} tier${tiers.length === 1 ? '' : 's'}</span>
+            <span class="meta-badge ${s.isActive ? 'ok' : 'inactive'}">${s.isActive ? 'Active' : 'Inactive'}</span>
+            <span class="meta-badge">${escapeHtml(audience)}</span>
+            <span class="meta-badge">${escapeHtml(start)} – ${escapeHtml(end)}</span>
+            <span class="meta-badge">${tiers.length} tier${tiers.length === 1 ? '' : 's'}</span>
           </div>
           <div class="tiers">
             ${tiers.map((t) => `
@@ -171,9 +171,9 @@ function renderTitles() {
         <h3>${escapeHtml(t.name)}</h3>
         <p>${escapeHtml(t.description || 'No description')}</p>
         <div class="meta">
-          <span class="badge ${t.isActive ? 'ok' : 'inactive'}">${t.isActive ? 'Active' : 'Inactive'}</span>
-          <span class="badge">${escapeHtml(t.id)}</span>
-          <span class="badge">Sort ${Number(t.sortOrder || 0)}</span>
+          <span class="meta-badge ${t.isActive ? 'ok' : 'inactive'}">${t.isActive ? 'Active' : 'Inactive'}</span>
+          <span class="meta-badge">${escapeHtml(t.id)}</span>
+          <span class="meta-badge">Sort ${Number(t.sortOrder || 0)}</span>
         </div>
       </div>
       <div class="item-actions">
