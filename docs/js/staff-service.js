@@ -76,3 +76,41 @@ export async function listStaffAuditLog(limit = 100) {
     if (error) throw error;
     return data || [];
 }
+
+export async function listUserUnlockables(userId) {
+    const { data, error } = await supabase.rpc('admin_list_user_unlockables', {
+        requested_user_id: userId
+    });
+    if (error) throw error;
+    return data || null;
+}
+
+export async function grantUserUnlockable(userId, kind, unlockId) {
+    const { data, error } = await supabase.rpc('admin_grant_user_unlockable', {
+        requested_user_id: userId,
+        unlock_kind: kind,
+        unlock_id: unlockId
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function revokeUserUnlockable(userId, kind, unlockId) {
+    const { data, error } = await supabase.rpc('admin_revoke_user_unlockable', {
+        requested_user_id: userId,
+        unlock_kind: kind,
+        unlock_id: unlockId
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function setUserUnlockables(userId, titleIds = [], frameIds = []) {
+    const { data, error } = await supabase.rpc('admin_set_user_unlockables', {
+        requested_user_id: userId,
+        requested_title_ids: titleIds,
+        requested_frame_ids: frameIds
+    });
+    if (error) throw error;
+    return data;
+}

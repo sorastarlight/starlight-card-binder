@@ -54,8 +54,13 @@ test('avatar frames migration and client wiring stay linked', async () => {
   assert.match(migration, /requested_frame_id/);
   assert.match(migration, /admin_list_avatar_frames/);
   assert.match(migration, /reward_frame_id/);
+  assert.match(migration, /frame_holofoil.*shimmer|'holofoil', 'shimmer'/);
   assert.match(utils, /avatarFrameClassName/);
   assert.match(css, /\.avatar-frame-holofoil/);
+  assert.match(css, /linear-gradient\(transparent, transparent\) padding-box/);
+  assert.match(css, /avatar-frame-holofoil-shimmer/);
+  assert.match(css, /prefers-reduced-motion: reduce/);
+  assert.doesNotMatch(css, /linear-gradient\(#fff, #fff\) padding-box/);
   assert.match(profileHtml, /avatar-frame-select/);
   assert.match(profileHtml, /avatar-frames\.css/);
   assert.match(adminHtml, /data-tab="frames"/);

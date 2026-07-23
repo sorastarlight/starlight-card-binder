@@ -5,7 +5,9 @@ import {
   createStaffRoleLabel,
   deleteStaffRoleLabel,
   setStaffRole,
-  removeStaffRole
+  removeStaffRole,
+  listUserUnlockables,
+  setUserUnlockables
 } from '../staff-service.js';
 
 const status = document.getElementById('status');
@@ -20,6 +22,8 @@ const createLabelForm = document.getElementById('create-label-form');
 let access = null;
 let users = [];
 let labels = [];
+/** @type {Map<string, {loading?: boolean, data?: object|null, error?: string}>} */
+const unlockCache = new Map();
 
 const roleNames = {
   owner: 'Owner',
@@ -99,6 +103,66 @@ function labelTierOptions() {
   )).join('');
 }
 
+function unlockCheckboxList(kind, items, selectedId) {
+  if (!items?.length) {
+    return `<p class="unlock-empty">No ${kind === 'title' ? 'titles' : 'frames'} in catalog.</p>`;
+  }
+  return items.map((item) => {
+    const inactive = item.isActive === false ? ' unlock-item-inactive' : '';
+    const equipped = selectedId && selectedId === item.id
+      ? ' <span class="unlock-equipped">equipped</span>'
+      : '';
+    const hint = item.isActive === false ? ' (inactive)' : '';
+    return `<label class="unlock-item${inactive}">
+      <input type="checkbox" data-unlock-kind="${esc(kind)}" value="${esc(item.id)}" ${item.owned ? 'checked' : ''}/>
+      <span>
+        <strong>${esc(item.name)}</strong>${equipped}
+        <small>${esc(item.id)}${esc(hint)}</small>
+      </span>
+    </label>`;
+  }).join('');
+}
+
+function unlockPanelMarkup(userId) {
+  const entry = unlockCache.get(userId);
+  if (!entry) {
+    return `<div class="unlock-panel" hidden data-unlock-panel>
+      <p class="unlock-hint">Load titles and avatar frames to grant or revoke unlocks for this collector.</p>
+      <button type="button" class="unlock-toggle" data-unlock-toggle>Manage unlocks</button>
+    </div>`;
+  }
+  if (entry.loading) {
+    return `<div class="unlock-panel" data-unlock-panel>
+      <p class="unlock-hint">Loading unlockables…</p>
+    </div>`;
+  }
+  if (entry.error) {
+    return `<div class="unlock-panel" data-unlock-panel>
+      <p class="unlock-error">${esc(entry.error)}</p>
+      <button type="button" class="unlock-toggle" data-unlock-toggle>Retry</button>
+    </div>`;
+  }
+  const data = entry.data || {};
+  const titles = data.titles || [];
+  const frames = data.frames || [];
+  return `<div class="unlock-panel" data-unlock-panel>
+    <div class="unlock-grid">
+      <fieldset class="unlock-fieldset">
+        <legend>Titles</legend>
+        <div class="unlock-list" data-unlock-list="title">${unlockCheckboxList('title', titles, data.selectedTitleId)}</div>
+      </fieldset>
+      <fieldset class="unlock-fieldset">
+        <legend>Avatar frames</legend>
+        <div class="unlock-list" data-unlock-list="frame">${unlockCheckboxList('frame', frames, data.selectedFrameId)}</div>
+      </fieldset>
+    </div>
+    <div class="unlock-actions">
+      <button type="button" class="save" data-unlock-save>Save unlocks</button>
+      <button type="button" class="unlock-collapse" data-unlock-collapse>Hide</button>
+    </div>
+  </div>`;
+}
+
 function renderLabels() {
   if (!labelsEl) return;
   if (labelTierSelect) labelTierSelect.innerHTML = labelTierOptions();
@@ -142,6 +206,91 @@ function renderLabels() {
   });
 }
 
+async function ensureUnlockables(userId, force = false) {
+  const existing = unlockCache.get(userId);
+  if (!force && existing?.data && !existing.error) return existing.data;
+  unlockCache.set(userId, { loading: true });
+  renderUsers();
+  try {
+    const data = await listUserUnlockables(userId);
+    unlockCache.set(userId, { data });
+    renderUsers();
+    return data;
+  } catch (error) {
+    unlockCache.set(userId, { error: error.message || 'Unable to load unlockables.' });
+    renderUsers();
+    throw error;
+  }
+}
+
+function collectCheckedIds(panel, kind) {
+  return [...panel.querySelectorAll(`input[data-unlock-kind="${kind}"]:checked`)]
+    .map((input) => input.value)
+    .filter(Boolean);
+}
+
+function wireUserRow(row) {
+  const id = row.dataset.id;
+  const select = row.querySelector('select');
+  row.querySelector('.save')?.addEventListener('click', async () => {
+    try {
+      const assignment = parseAssignment(select.value);
+      if (!assignment.role && !assignment.labelId) {
+        await removeStaffRole(id);
+      } else {
+        await setStaffRole(id, assignment.role, assignment.labelId);
+      }
+      setStatus('Role updated successfully.', 'success');
+      await load();
+    } catch (error) {
+      setStatus(error.message, 'error');
+    }
+  });
+  row.querySelector('.remove')?.addEventListener('click', async () => {
+    if (!(await StarlightUI.confirm({
+      title: 'Remove staff access?',
+      message: 'This user will immediately lose access to staff tools.',
+      confirmText: 'Remove Access',
+      danger: true
+    }))) return;
+    try {
+      await removeStaffRole(id);
+      setStatus('Staff access removed.', 'success');
+      await load();
+    } catch (error) {
+      setStatus(error.message, 'error');
+    }
+  });
+  row.querySelector('[data-unlock-toggle]')?.addEventListener('click', async () => {
+    try {
+      await ensureUnlockables(id, true);
+    } catch (error) {
+      setStatus(error.message, 'error');
+    }
+  });
+  row.querySelector('[data-unlock-collapse]')?.addEventListener('click', () => {
+    unlockCache.delete(id);
+    renderUsers();
+  });
+  row.querySelector('[data-unlock-save]')?.addEventListener('click', async () => {
+    const panel = row.querySelector('[data-unlock-panel]');
+    if (!panel) return;
+    const saveBtn = row.querySelector('[data-unlock-save]');
+    if (saveBtn) saveBtn.disabled = true;
+    try {
+      const titleIds = collectCheckedIds(panel, 'title');
+      const frameIds = collectCheckedIds(panel, 'frame');
+      await setUserUnlockables(id, titleIds, frameIds);
+      await ensureUnlockables(id, true);
+      setStatus('Unlocks updated for this collector.', 'success');
+    } catch (error) {
+      setStatus(error.message, 'error');
+    } finally {
+      if (saveBtn) saveBtn.disabled = false;
+    }
+  });
+}
+
 function renderUsers() {
   const q = search.value.trim().toLowerCase();
   const list = users.filter((user) => (
@@ -152,52 +301,24 @@ function renderUsers() {
 
   usersEl.innerHTML = list.map((user) => `
     <article class="user" data-id="${esc(user.userId)}">
-      <div>
-        <strong>${esc(user.displayName || user.username || user.email || 'Unnamed collector')}</strong>
-        <small>${esc(user.email || '')}${user.username ? ` · @${esc(user.username)}` : ''}</small>
-        <span class="role-summary">${esc(displayRole(user))}</span>
+      <div class="user-main">
+        <div class="user-identity">
+          <strong>${esc(user.displayName || user.username || user.email || 'Unnamed collector')}</strong>
+          <small>${esc(user.email || '')}${user.username ? ` · @${esc(user.username)}` : ''}</small>
+          <span class="role-summary">${esc(displayRole(user))}</span>
+        </div>
+        <select aria-label="Role for ${esc(user.email || 'user')}">${options(user)}</select>
+        <div class="user-actions">
+          <button class="save" type="button">Save Role</button>
+          ${user.role ? '<button class="remove" type="button">Remove</button>' : ''}
+          ${!unlockCache.has(user.userId) ? '<button class="unlock-toggle" type="button" data-unlock-toggle>Manage unlocks</button>' : ''}
+        </div>
       </div>
-      <select aria-label="Role for ${esc(user.email || 'user')}">${options(user)}</select>
-      <div class="user-actions">
-        <button class="save" type="button">Save Role</button>
-        ${user.role ? '<button class="remove" type="button">Remove</button>' : ''}
-      </div>
+      ${unlockPanelMarkup(user.userId)}
     </article>
   `).join('');
 
-  usersEl.querySelectorAll('.user').forEach((row) => {
-    const id = row.dataset.id;
-    const select = row.querySelector('select');
-    row.querySelector('.save')?.addEventListener('click', async () => {
-      try {
-        const assignment = parseAssignment(select.value);
-        if (!assignment.role && !assignment.labelId) {
-          await removeStaffRole(id);
-        } else {
-          await setStaffRole(id, assignment.role, assignment.labelId);
-        }
-        setStatus('Role updated successfully.', 'success');
-        await load();
-      } catch (error) {
-        setStatus(error.message, 'error');
-      }
-    });
-    row.querySelector('.remove')?.addEventListener('click', async () => {
-      if (!(await StarlightUI.confirm({
-        title: 'Remove staff access?',
-        message: 'This user will immediately lose access to staff tools.',
-        confirmText: 'Remove Access',
-        danger: true
-      }))) return;
-      try {
-        await removeStaffRole(id);
-        setStatus('Staff access removed.', 'success');
-        await load();
-      } catch (error) {
-        setStatus(error.message, 'error');
-      }
-    });
-  });
+  usersEl.querySelectorAll('.user').forEach(wireUserRow);
 }
 
 function render() {
