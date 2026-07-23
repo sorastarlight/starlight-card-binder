@@ -36,7 +36,7 @@ const routes = {
   admin:{title:'Administration Hub',src:'admin-hub.html'}, 'admin-codes':{title:'Reward Code Console',src:'admin-codes.html'},
   'admin-staff':{title:'Staff Management',src:'admin-staff.html'}, 'admin-audit':{title:'Audit Log',src:'admin-audit.html'},
   'admin-moderation':{title:'Moderation Dashboard',src:'admin-moderation.html'},
-  'admin-boosters':{title:'Starlight Card Management',src:'admin-boosters.html'}, 'admin-twitch':{title:'Twitch Redeems',src:'admin-twitch.html'}, 'admin-gifts':{title:'Send Gifts',src:'admin-gifts.html'}, 'admin-news':{title:'News & Updates Management',src:'admin-news.html'}, 'admin-users':{title:'Registered User Directory',src:'admin-users.html'}, 'admin-health':{title:'Database Health',src:'admin-health.html'}, 'admin-notifications':{title:'Notification Broadcasts',src:'admin-notifications.html'},
+  'admin-boosters':{title:'Starlight Card Management',src:'admin-boosters.html'}, 'admin-twitch':{title:'Twitch Redeems',src:'admin-twitch.html'}, 'admin-quests':{title:'Quests & Season Pass',src:'admin-quests.html'}, 'admin-gifts':{title:'Send Gifts',src:'admin-gifts.html'}, 'admin-news':{title:'News & Updates Management',src:'admin-news.html'}, 'admin-users':{title:'Registered User Directory',src:'admin-users.html'}, 'admin-health':{title:'Database Health',src:'admin-health.html'}, 'admin-notifications':{title:'Notification Broadcasts',src:'admin-notifications.html'},
   'admin-ui':{title:'Website User Interface',src:'admin-ui.html'},
   'admin-website':{title:'Website Editor',src:'admin-website.html'}
 };

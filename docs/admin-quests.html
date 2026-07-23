@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Quests &amp; Season Pass | Starlight Cards</title>
+  <link rel="stylesheet" href="css/style.css?v=1.0.2">
+  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.15">
+  <link rel="stylesheet" href="css/pages/admin-quests.css?v=1.0">
+  <link rel="stylesheet" href="css/qol-ui.css?v=94.2.4">
+  <script src="js/browser-performance.js?v=1.0.0" defer></script>
+  <script src="js/shared-ui.js?v=1.6.15"></script>
+</head>
+<body>
+  <script type="module" src="js/embed-mode.js"></script>
+  <main class="page">
+    <section class="studio">
+      <div class="hero">
+        <div>
+          <p class="eyebrow">Administration Hub</p>
+          <h1>Quests &amp; Season Pass</h1>
+          <p>Manage Collection Quests, Seasonal Collection Pass seasons and tiers, and collector titles used as rewards.</p>
+        </div>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="Quests and Season Pass sections">
+        <button class="tab active" type="button" data-tab="quests" role="tab" aria-selected="true">Quests</button>
+        <button class="tab" type="button" data-tab="seasons" role="tab" aria-selected="false">Season Pass</button>
+        <button class="tab" type="button" data-tab="titles" role="tab" aria-selected="false">Titles</button>
+      </div>
+
+      <p id="status" class="status" role="status">Loading…</p>
+
+      <div class="view active" data-view="quests">
+        <div class="actions actions-spread-bottom">
+          <div>
+            <h2 class="heading-flush">Collection Quests</h2>
+            <p class="muted">Create and edit NPC-style objectives, requirement targets, and rewards.</p>
+          </div>
+          <button class="btn" id="newQuest" type="button">＋ New Quest</button>
+        </div>
+        <div id="questList" class="item-list"></div>
+      </div>
+
+      <div class="view" data-view="seasons">
+        <div class="actions actions-spread-bottom">
+          <div>
+            <h2 class="heading-flush">Season Pass</h2>
+            <p class="muted">Configure seasons, audience gates, and reward tiers.</p>
+          </div>
+          <button class="btn" id="newSeason" type="button">＋ New Season</button>
+        </div>
+        <div id="seasonList" class="item-list"></div>
+      </div>
+
+      <div class="view" data-view="titles">
+        <div class="actions actions-spread-bottom">
+          <div>
+            <h2 class="heading-flush">Collector Titles</h2>
+            <p class="muted">Catalog titles for quest and season-tier reward pickers. Id is immutable after create.</p>
+          </div>
+          <button class="btn" id="newTitle" type="button">＋ New Title</button>
+        </div>
+        <div id="titleList" class="item-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="questEditor" class="st-dialog-overlay editor hidden" aria-hidden="true">
+    <section class="st-dialog st-dialog--xl card" role="dialog" aria-modal="true" aria-labelledby="questEditorTitle" tabindex="-1">
+      <button type="button" class="st-dialog-close" id="closeQuestEditor" data-st-modal-close aria-label="Close">×</button>
+      <div class="toolbar"><h2 id="questEditorTitle">New Quest</h2></div>
+      <div class="grid">
+        <label class="full">Id<input id="questId" maxlength="80" placeholder="own_one_legendary"></label>
+        <label>Icon<input id="questIcon" maxlength="8" value="✦"></label>
+        <label>Sort order<input id="questSort" type="number" value="100"></label>
+        <label class="full">Title<input id="questTitle" maxlength="160"></label>
+        <label class="full">Description<textarea id="questDescription" rows="3"></textarea></label>
+        <label>Requirement type
+          <select id="questReqType">
+            <option value="own_rarity">Own rarity</option>
+            <option value="own_series_complete">Complete series</option>
+            <option value="own_unique">Own unique cards</option>
+            <option value="own_category">Own category</option>
+            <option value="favorite_count">Favorite count</option>
+            <option value="trade_count">Trade count</option>
+            <option value="booster_opens">Booster opens</option>
+            <option value="gift_sent">Gifts sent</option>
+            <option value="visit_days">Visit days</option>
+          </select>
+        </label>
+        <label id="questTargetWrap">Requirement target
+          <select id="questReqTarget"></select>
+        </label>
+        <label>Requirement count<input id="questReqCount" type="number" min="1" value="1"></label>
+        <label>Star Bits reward<input id="questBits" type="number" min="0" value="0"></label>
+        <label>Reward title
+          <select id="questRewardTitle"><option value="">None</option></select>
+        </label>
+        <label>Reward frame
+          <select id="questRewardFrame"><option value="">None</option></select>
+        </label>
+        <label class="checks full"><input id="questActive" type="checkbox" checked> Active</label>
+      </div>
+      <div class="actions editor-actions">
+        <button id="saveQuest" class="btn" type="button">Save Quest</button>
+        <button id="deactivateQuest" class="btn secondary" type="button" hidden>Deactivate</button>
+      </div>
+      <p id="questEditorStatus" class="status" role="status"></p>
+    </section>
+  </div>
+
+  <div id="seasonEditor" class="st-dialog-overlay editor hidden" aria-hidden="true">
+    <section class="st-dialog st-dialog--xl card" role="dialog" aria-modal="true" aria-labelledby="seasonEditorTitle" tabindex="-1">
+      <button type="button" class="st-dialog-close" id="closeSeasonEditor" data-st-modal-close aria-label="Close">×</button>
+      <div class="toolbar"><h2 id="seasonEditorTitle">New Season</h2></div>
+      <div class="grid">
+        <label class="full">Id<input id="seasonId" maxlength="80" placeholder="season_2026_starlight_dawn"></label>
+        <label class="full">Name<input id="seasonName" maxlength="160"></label>
+        <label class="full">Description<textarea id="seasonDescription" rows="3"></textarea></label>
+        <label>Starts<input id="seasonStarts" type="datetime-local"></label>
+        <label>Ends<input id="seasonEnds" type="datetime-local"></label>
+        <label>Audience
+          <select id="seasonAudience">
+            <option value="all">All collectors</option>
+            <option value="twitch_subscribers">Twitch subscribers</option>
+          </select>
+        </label>
+        <label class="checks"><input id="seasonActive" type="checkbox" checked> Active</label>
+      </div>
+      <div class="actions editor-actions">
+        <button id="saveSeason" class="btn" type="button">Save Season</button>
+        <button id="deactivateSeason" class="btn secondary" type="button" hidden>Deactivate</button>
+      </div>
+      <p id="seasonEditorStatus" class="status" role="status"></p>
+    </section>
+  </div>
+
+  <div id="tierEditor" class="st-dialog-overlay editor hidden" aria-hidden="true">
+    <section class="st-dialog st-dialog--xl card" role="dialog" aria-modal="true" aria-labelledby="tierEditorTitle" tabindex="-1">
+      <button type="button" class="st-dialog-close" id="closeTierEditor" data-st-modal-close aria-label="Close">×</button>
+      <div class="toolbar"><h2 id="tierEditorTitle">New Tier</h2></div>
+      <input type="hidden" id="tierSeasonId">
+      <div class="grid">
+        <label>Id<input id="tierId" maxlength="80" placeholder="auto from season + index"></label>
+        <label>Tier index<input id="tierIndex" type="number" min="1" value="1"></label>
+        <label>Points required<input id="tierPoints" type="number" min="0" value="0"></label>
+        <label>Star Bits<input id="tierBits" type="number" min="0" value="0"></label>
+        <label class="full">Label<input id="tierLabel" maxlength="160"></label>
+        <label>Reward title
+          <select id="tierRewardTitle"><option value="">None</option></select>
+        </label>
+        <label>Reward frame
+          <select id="tierRewardFrame"><option value="">None</option></select>
+        </label>
+      </div>
+      <div class="actions editor-actions">
+        <button id="saveTier" class="btn" type="button">Save Tier</button>
+        <button id="deleteTier" class="btn danger" type="button" hidden>Delete Tier</button>
+      </div>
+      <p id="tierEditorStatus" class="status" role="status"></p>
+    </section>
+  </div>
+
+  <div id="titleEditor" class="st-dialog-overlay editor hidden" aria-hidden="true">
+    <section class="st-dialog st-dialog--xl card" role="dialog" aria-modal="true" aria-labelledby="titleEditorTitle" tabindex="-1">
+      <button type="button" class="st-dialog-close" id="closeTitleEditor" data-st-modal-close aria-label="Close">×</button>
+      <div class="toolbar"><h2 id="titleEditorTitle">New Title</h2></div>
+      <div class="grid">
+        <label class="full">Id<input id="titleId" maxlength="80" placeholder="quest_trailblazer"></label>
+        <label class="full">Name<input id="titleName" maxlength="160"></label>
+        <label class="full">Description<textarea id="titleDescription" rows="3"></textarea></label>
+        <label>Sort order<input id="titleSort" type="number" value="100"></label>
+        <label class="checks"><input id="titleActive" type="checkbox" checked> Active</label>
+      </div>
+      <div class="actions editor-actions">
+        <button id="saveTitle" class="btn" type="button">Save Title</button>
+        <button id="deactivateTitle" class="btn secondary" type="button" hidden>Deactivate</button>
+      </div>
+      <p id="titleEditorStatus" class="status" role="status"></p>
+    </section>
+  </div>
+
+  <script type="module" src="js/pages/admin-quests-page.js?v=1.0"></script>
+  <script src="js/qol-ui.js?v=94.2.4" defer></script>
+</body>
+</html>

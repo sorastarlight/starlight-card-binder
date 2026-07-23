@@ -30,6 +30,7 @@ export const SHELL_ROUTE_KEYS = Object.freeze([
   'admin-moderation',
   'admin-boosters',
   'admin-twitch',
+  'admin-quests',
   'admin-gifts',
   'admin-news',
   'admin-users',
