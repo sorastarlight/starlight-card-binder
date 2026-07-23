@@ -1,0 +1,14 @@
+name = "starlight-twitch-integration"
+main = "src/index.js"
+compatibility_date = "2026-07-01"
+workers_dev = true
+
+# Secrets (set via `wrangler secret put`):
+# TWITCH_CLIENT_ID
+# TWITCH_CLIENT_SECRET
+# EVENTSUB_SECRET
+# SUPABASE_URL
+# SUPABASE_ANON_KEY
+# SUPABASE_SERVICE_ROLE_KEY
+# WORKER_PUBLIC_URL
+# SITE_URL

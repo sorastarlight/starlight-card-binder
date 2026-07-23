@@ -99,14 +99,15 @@ test('quests and season pass pages wire website content hooks', async () => {
 });
 
 test('season pass gates to Twitch subscribers and supports unlock gifts', async () => {
-  const [migration, seasonPage, seasonService, adminPage, adminHtml, rewardsPage, defaults] = await Promise.all([
+  const [migration, seasonPage, seasonService, adminPage, adminHtml, rewardsPage, defaults, worker] = await Promise.all([
     read('supabase/migrations/20260723120000_season_pass_twitch_subscribers.sql'),
     read('docs/js/pages/season-pass-page.js'),
     read('docs/js/season-pass-service.js'),
     read('docs/js/pages/admin-twitch-page.js'),
     read('docs/admin-twitch.html'),
     read('docs/js/pages/received-rewards-page.js'),
-    read('docs/js/website-content-defaults.js')
+    read('docs/js/website-content-defaults.js'),
+    read('cloudflare-worker/src/index.js')
   ]);
   assert.match(migration, /audience = 'twitch_subscribers'/);
   assert.match(migration, /user_season_access/);
@@ -127,4 +128,8 @@ test('season pass gates to Twitch subscribers and supports unlock gifts', async 
   assert.match(adminPage, /manualSeasonId/);
   assert.match(rewardsPage, /season_pass_unlock/);
   assert.match(defaults, /subscriberLockedLead/);
+  assert.match(worker, /\/viewer\/subscription-check/);
+  assert.match(worker, /deliver_twitch_season_unlock_v1/);
+  assert.match(worker, /confirm_twitch_subscription_access_v1/);
+  assert.match(worker, /season_pass_unlock/);
 });
