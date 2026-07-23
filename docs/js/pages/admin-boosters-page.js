@@ -16,6 +16,7 @@ import {
   deleteEvent,
 } from "../content-studio-service.js?v=1.5";
 import { createAdminBoosterEditors } from "./admin-boosters-editors.js?v=1.5";
+import { starBitAmountHtml } from "../star-bit-icon.js";
 const $ = (s) => document.querySelector(s),
   status = $("#status"),
   app = $("#app"),
@@ -207,7 +208,7 @@ function boostersView() {
       .filter((b) => !b.archived)
       .map(
         (b) =>
-          `<article class="item"><img src="${esc(b.packImageUrl || "site_assets/series01_rising_star_booster.png")}" alt=""><h3>${esc(b.name)}</h3><div class="item-meta"><span>${esc(friendlyRewardMode(b.rewardMode))}</span><span>${b.starBitsCost} ✦</span></div><p>${esc(b.description || "No description")}</p><div class="booster-actions"><button class="btn" data-edit-booster="${esc(b.id)}">Configure Pack</button><button class="btn" data-copy-booster="${esc(b.id)}">Copy Booster</button></div></article>`,
+          `<article class="item"><img src="${esc(b.packImageUrl || "site_assets/series01_rising_star_booster.png")}" alt=""><h3>${esc(b.name)}</h3><div class="item-meta"><span>${esc(friendlyRewardMode(b.rewardMode))}</span><span>${starBitAmountHtml(esc, b.starBitsCost, { iconSize: 'xs' })}</span></div><p>${esc(b.description || "No description")}</p><div class="booster-actions"><button class="btn" data-edit-booster="${esc(b.id)}">Configure Pack</button><button class="btn" data-copy-booster="${esc(b.id)}">Copy Booster</button></div></article>`,
       )
       .join("") || '<div class="empty">No boosters yet.</div>'
   }</div></section>`;

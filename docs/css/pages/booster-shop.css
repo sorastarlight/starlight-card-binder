@@ -31,7 +31,8 @@
     .wallet-card{position:relative;z-index:2;padding:18px 14px;border:2px solid rgba(255,130,200,.4);border-radius:22px;background:rgba(255,255,255,.9);box-shadow:0 16px 34px rgba(75,91,145,.14),inset 0 0 26px rgba(255,130,200,.07);text-align:center}
     .wallet-card small{display:block;color:#6f78a2;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
     .wallet-amount{display:flex;justify-content:center;align-items:center;gap:9px;margin:12px 0 5px;font-size:2.15rem;font-weight:1000;color:#284692}
-    .wallet-amount .star{color:#f4ae25;filter:drop-shadow(0 0 6px rgba(254,211,52,.42))}
+    .wallet-amount .star,.wallet-amount .star-bit-icon{color:#f4ae25;filter:none}
+    .wallet-amount .star-bit-icon{width:1.15em;height:1.15em;max-width:42px;max-height:42px}
     .wallet-link{display:none!important}
 
     .shop-main{padding:22px 22px 30px;background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(255,250,254,.9))}
@@ -57,7 +58,10 @@
     .pack-meta{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin:12px 0}
     .meta-pill{padding:6px 9px;border:1px solid rgba(107,198,248,.28);border-radius:999px;background:rgba(107,198,248,.09);color:#5369aa;font-size:.72rem;font-weight:850}
     .pack-price{display:flex;justify-content:center;align-items:center;gap:7px;margin:4px 0 10px;color:#203d97;font-size:1.28rem;font-weight:1000}
-    .pack-price .price-star{color:#f4ae25}
+    .pack-price .price-star,.pack-price .star-bit-icon{width:18px;height:18px}
+    .featured-pack-actions strong{display:inline-flex;align-items:center;gap:8px}
+    .gallery-link{display:inline-flex;align-items:center;gap:8px}
+    .content-row strong{display:inline-flex;align-items:center;gap:6px}
     .pack-actions{margin-top:auto;display:grid;gap:9px}
     .price-button{width:100%;min-height:46px;border:0;border-radius:999px;background:linear-gradient(90deg,#ff70bf,#c987ef 56%,#69c5ff);color:#fff;font-weight:1000;font-size:.98rem;cursor:pointer;box-shadow:0 9px 20px rgba(221,88,163,.2);transition:transform .18s ease,filter .18s ease}
     .price-button:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.04)}

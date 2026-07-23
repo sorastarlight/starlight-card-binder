@@ -25,6 +25,13 @@
         .checklist-star-bits h2 {
             margin: 0 0 5px;
             color: #405fa1;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35em;
+        }
+        .checklist-star-bits h2 .star-bit-icon {
+            width: 1.05em;
+            height: 1.05em;
         }
 
         .checklist-star-bits p {

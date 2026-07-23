@@ -233,6 +233,32 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
 .card-comments-form-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px;color:#7a89ad;font-size:.82rem}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
+/* Star Bits currency icon */
+.star-bit-icon{
+  width:1.15em;
+  height:1.15em;
+  max-width:36px;
+  max-height:36px;
+  object-fit:contain;
+  display:inline-block;
+  vertical-align:-0.22em;
+  flex:none;
+  image-rendering:auto;
+}
+.star-bit-icon--xs{width:14px;height:14px}
+.star-bit-icon--sm{width:16px;height:16px}
+.star-bit-icon--md{width:20px;height:20px}
+.star-bit-icon--lg{width:28px;height:28px}
+.star-bit-icon--xl{width:36px;height:36px}
+.star-bit-amount{
+  display:inline-flex;
+  align-items:center;
+  gap:.28em;
+  white-space:nowrap;
+  font-weight:inherit;
+}
+.star-bit-amount .star-bit-icon{vertical-align:middle}
+
 /* Discourage casual image save / drag-off (not DRM — DevTools still works). */
 img, picture, svg, canvas, video{
   -webkit-user-drag:none;
