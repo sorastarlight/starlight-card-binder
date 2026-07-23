@@ -40,6 +40,50 @@ function websiteSection(sectionKey) {
   return window.__starlightWebsiteContent?.[sectionKey] || {};
 }
 
+function binderDisplaySettings() {
+  const settings = websiteSection('binderDisplay');
+  return {
+    sidePanel: settings.sidePanel === 'off' ? 'off' : 'on',
+    unownedDisplay: settings.unownedDisplay === 'dullPreview' ? 'dullPreview' : 'cardBack',
+    collectionStatusFilter: settings.collectionStatusFilter === 'off' ? 'off' : 'on'
+  };
+}
+
+function isBinderSidePanelOn() {
+  return binderDisplaySettings().sidePanel === 'on';
+}
+
+function isDullUnownedPreview() {
+  return binderDisplaySettings().unownedDisplay === 'dullPreview';
+}
+
+function unownedArtClass(card, { flipped = false } = {}) {
+  if (flipped || !card || isCollected(card.id)) return '';
+  return isDullUnownedPreview() ? 'is-unowned-dull' : 'obscured';
+}
+
+function applyBinderDisplayLayout() {
+  if (pageName !== 'binder') return;
+  const layout = $('.binder-browser-layout');
+  const panel = $('#v62Showcase');
+  const sideOn = isBinderSidePanelOn();
+  layout?.classList.toggle('is-side-panel-off', !sideOn);
+  if (panel) {
+    panel.hidden = !sideOn;
+    if (!sideOn) panel.setAttribute('aria-hidden', 'true');
+    else panel.removeAttribute('aria-hidden');
+  }
+}
+
+function refreshBinderFiltersForDisplay() {
+  if (pageName !== 'binder') return;
+  const host = $('[data-card-filter-context]');
+  if (!host) return;
+  delete host.dataset.filterControlsReady;
+  renderFilterControls();
+  hydrateFilters();
+}
+
 function hasWebsiteCopy(value) {
   return value != null && String(value).trim() !== '';
 }
@@ -88,7 +132,10 @@ function prestigeBadgeHtml(quantity) {
   const labels = { silver: 'Silver', gold: 'Gold', prismatic: 'Prismatic', celestial: 'Celestial' };
   return `<span class="prestige-badge prestige-${tier}">${labels[tier] || 'Prestige'} Prestige</span>`;
 }
-function binderRarityBadgeHtml(card) { const label=String(card?.rarity || 'Common'); return `<span class="binder-rarity-badge ${rarityClass(card)}">${esc(label)}</span>`; }
+function binderRarityBadgeHtml(card) {
+  const label = getVisibleRarity(card);
+  return `<span class="binder-rarity-badge ${rarityClass(card)}">${esc(label)}</span>`;
+}
 function percent(part, total) { return total ? Math.round((part / total) * 100) : 0; }
 function padNumber(value, fallback) { return String(value || fallback).padStart(3, "0"); }
 function rarityClass(card) { return `rarity-${String(card?.rarity || "common").toLowerCase().replace(/[^a-z0-9]/g, '')}`; }
@@ -472,7 +519,8 @@ function renderFilterControls() {
       : (binderCopy.filtersTitle || 'Binder Filters'));
   const resetLabel = binderCopy.filtersResetCta || 'Reset Filters';
   const showSearch = true;
-  const showView = !isCollection;
+  const display = binderDisplaySettings();
+  const showView = isChecklist || (context === 'binder' && display.collectionStatusFilter === 'on');
   host.innerHTML = `<div class="card-filter-heading">
       <div><p class="eyebrow">${esc(eyebrow)}</p><h2>${esc(title)}</h2></div>
       <p data-filter-summary role="status" aria-live="polite">Preparing cards…</p>
@@ -557,9 +605,18 @@ function applyFilters() {
   return browse;
 }
 
-function getVisibleImage(card) { return isCollected(card.id) ? card.imageUrl : CARD_BACK_URL; }
-function getVisibleName(card) { return isCollected(card.id) ? displayName(card) : "???"; }
-function getVisibleRarity(card) { return isCollected(card.id) ? card.rarity : "Unknown"; }
+function getVisibleImage(card) {
+  if (isCollected(card.id)) return card.imageUrl;
+  return isDullUnownedPreview() ? card.imageUrl : CARD_BACK_URL;
+}
+function getVisibleName(card) {
+  if (isCollected(card.id) || isDullUnownedPreview()) return displayName(card);
+  return "???";
+}
+function getVisibleRarity(card) {
+  if (isCollected(card.id) || isDullUnownedPreview()) return card.rarity;
+  return "Unknown";
+}
 function getVisibleDescription(card) { return isCollected(card.id) ? card.cardDescription : "This card has not been collected yet. Earn it from Daily Boosters, reward codes, or future events."; }
 
 function toggleFavorite(id) {
@@ -693,7 +750,10 @@ function ensureWebsiteBinderLanding() {
 window.addEventListener('starlight-website-content-hydrated', (event) => {
   websiteBinderLanding = event.detail?.binderLanding || websiteBinderLanding;
   try {
+    refreshBinderFiltersForDisplay();
+    applyBinderDisplayLayout();
     renderSeriesHero();
+    if (pageName === 'binder') renderBinder();
   } catch (_error) {
     /* binder may not be ready yet */
   }
@@ -743,7 +803,7 @@ function renderDetail() {
   if (!selected) { detail.innerHTML = '<p class="description">Select a card to view details.</p>'; return; }
   selectedIndex = Math.max(0, cards.findIndex(c => c.id === selected.id));
   const got = isCollected(selected.id);
-  const hidden = !got;
+  const artClass = unownedArtClass(selected, { flipped: previewFlipped });
   const side = websiteSection('binderSidePanel');
   const qty = getCardQuantity(selected.id);
   detail.innerHTML = `
@@ -753,7 +813,7 @@ function renderDetail() {
   </div>
   <button class="preview-card flip-card simple-flip ${previewFlipped ? 'show-back showing-card-back' : ''} ${rarityClass(selected)}" id="previewCard" type="button" aria-label="Open full card view" data-finish-class="${esc(got ? cardFinishClass(selected, true) : '')}" data-holographic="${got && isHolographicCard(selected)}">
     <span class="preview-inner">
-      <span class="face front ${cardFinishClass(selected, got && !previewFlipped)}"><img class="${hidden && !previewFlipped?'obscured':''}" src="${esc(previewFlipped ? CARD_BACK_URL : getVisibleImage(selected))}" alt="${esc(previewFlipped ? 'Card back' : getVisibleName(selected))}" onerror="this.src='${CARD_BACK_URL}'">${holoSparkMarkup(selected, got && !previewFlipped)}</span>
+      <span class="face front ${cardFinishClass(selected, got && !previewFlipped)}"><img class="${artClass}" src="${esc(previewFlipped ? CARD_BACK_URL : getVisibleImage(selected))}" alt="${esc(previewFlipped ? 'Card back' : getVisibleName(selected))}" onerror="this.src='${CARD_BACK_URL}'">${holoSparkMarkup(selected, got && !previewFlipped)}</span>
       <span class="face back"><img src="${CARD_BACK_URL}" alt="Card back"></span>
     </span>
   </button>
@@ -864,7 +924,7 @@ function stepFullView(dir) {
 function renderFullView() {
   const overlay = $('#cardOverlay'); if (!overlay || !selected) return;
   const got = isCollected(selected.id);
-  const hidden = !got;
+  const artClass = unownedArtClass(selected, { flipped: overlayFlipped });
   const visibleName = getVisibleName(selected);
   const visibleRarity = getVisibleRarity(selected);
   const full = websiteSection('binderFullView');
@@ -883,14 +943,18 @@ function renderFullView() {
         <div class="analyzer-reticle" aria-hidden="true"></div>
         <div class="full-card-wrap flip-card simple-flip ${overlayFlipped?'show-back showing-card-back':''} ${rarityClass(selected)} ${prestigeClass}" id="fullCard3d" aria-label="${esc(overlayFlipped ? 'Card back' : visibleName)}" data-holographic="${got && isHolographicCard(selected)}" data-finish-class="${esc(got ? cardFinishClass(selected, true) : '')}">
           <span class="full-inner">
-            <span class="face front ${cardFinishClass(selected, got && !overlayFlipped)}"><img class="${hidden && !overlayFlipped?'obscured':''}" src="${esc(overlayFlipped ? CARD_BACK_URL : getVisibleImage(selected))}" alt="${esc(overlayFlipped ? 'Card back' : visibleName)}" onerror="this.src='${CARD_BACK_URL}'" draggable="false">${holoSparkMarkup(selected, got && !overlayFlipped)}</span>
+            <span class="face front ${cardFinishClass(selected, got && !overlayFlipped)}"><img class="${artClass}" src="${esc(overlayFlipped ? CARD_BACK_URL : getVisibleImage(selected))}" alt="${esc(overlayFlipped ? 'Card back' : visibleName)}" onerror="this.src='${CARD_BACK_URL}'" draggable="false">${holoSparkMarkup(selected, got && !overlayFlipped)}</span>
             <span class="face back"><img src="${CARD_BACK_URL}" alt="Card back" draggable="false"></span>
           </span>
         </div>
       </div>
       <div class="analyzer-info-card db2-full-info">
         <div class="analyzer-title-row"><div><p class="eyebrow">${esc(full.scanEyebrow || 'Card Scan Complete')}</p><h2 id="fullViewCardTitle">${esc(visibleName)}</h2><p class="db2-collector-line">${esc(selected.collectorNumber || selected.number || '???')} · ${esc(selected.series || 'Unknown Series')}</p></div></div>
-        <div class="card-meta-chips">${cardIdentityChips(selected, { full: true, hidden })}</div>
+        <div class="card-meta-chips">${got
+          ? cardIdentityChips(selected, { full: true, hidden: false })
+          : (isDullUnownedPreview()
+            ? `<span class="card-meta-chip rarity ${rarityClass(selected)}">${esc(visibleRarity)}</span><span class="card-meta-chip muted">Details unlock when collected</span>`
+            : cardIdentityChips(selected, { full: true, hidden: true }))}</div>
         <div class="analyzer-data-grid"><span><b>${esc(full.seriesLabel || 'Series')}</b>${esc(selected.series || 'Unknown')}</span><span><b>${esc(full.collectorNumberLabel || 'Collector #')}</b>${esc(selected.collectorNumber || selected.number || '???')}</span>${got && selected.artist ? `<span><b>${esc(full.illustratorLabel || 'Illustrator')}</b>${esc(selected.artist)}</span>` : ''}${got ? `<span><b>${esc(full.ownedLabel || 'Owned')}</b>×${qty}</span>` : ''}</div>
         ${got ? prestigeBadgeHtml(qty) : ''}
         ${got ? `<div class="db2-full-story"><b>${esc(full.storyLabel || 'Card Story')}</b><p>${esc(selected.cardDescription || 'No card story has been added yet.')}</p></div><details class="db2-more"><summary>${esc(full.additionalLabel || 'Additional Information')}</summary><div class="detail-list clean-detail-list">${cardExpandedDetails(selected)}</div></details>` : ''}
@@ -1189,7 +1253,12 @@ document.addEventListener('DOMContentLoaded', () => {
   renderFilterControls();
   if (pageName === 'binder') document.body.classList.add('series-select');
   if (pageName === 'binder') {
-    ensureWebsiteBinderLanding().then(() => renderSeriesHero());
+    ensureWebsiteBinderLanding().then(() => {
+      refreshBinderFiltersForDisplay();
+      applyBinderDisplayLayout();
+      renderSeriesHero();
+      renderBinder();
+    });
   }
   loadCards();
   $('#prevPage')?.addEventListener('click', () => { page = Math.max(1, page - 1); renderAll(); playSfx('page'); });
@@ -1218,7 +1287,11 @@ function flipCardImage(cardEl, frontUrl, frontAlt, showBack) {
     if (frontImg) {
       frontImg.src = showBack ? CARD_BACK_URL : frontUrl;
       frontImg.alt = showBack ? 'Card back' : (frontAlt || 'Card front');
-      frontImg.classList.toggle('obscured', false);
+      frontImg.classList.remove('obscured', 'is-unowned-dull');
+      if (!showBack && selected && !isCollected(selected.id)) {
+        const artClass = unownedArtClass(selected);
+        if (artClass) frontImg.classList.add(artClass);
+      }
     }
     cardEl.classList.toggle('show-back', !!showBack);
     cardEl.classList.toggle('showing-card-back', !!showBack);
@@ -1322,14 +1395,14 @@ function renderV61CardGridHtml(browse = resolveBinderBrowse()) {
 }
 function renderV61Card(card, i) {
   const got = isCollected(card.id);
-  const hidden = !got;
+  const artClass = unownedArtClass(card);
   const img = getVisibleImage(card);
   const numberLabel = window.StarlightCardFilters?.cardDisplayNumber?.(card) || String(card.collectorNumber || card.number || '');
   const qty = getCardQuantity(card.id);
   const prestigeClass = got ? prestigeFrameClass(qty) : '';
   return `<article class="v61-card-slot ${rarityClass(card)} ${got ? 'is-collected' : 'is-hidden'} ${prestigeClass}" style="--i:${i}">
     <button class="v61-card-btn" type="button" data-v61-card="${esc(card.id)}" aria-label="View ${esc(getVisibleName(card))}">
-      <span class="v61-card-art"><img class="${hidden?'obscured':''}" src="${esc(img)}" alt="${esc(getVisibleName(card))}" loading="lazy" onerror="this.src='${CARD_BACK_URL}'"></span>
+      <span class="v61-card-art"><img class="${artClass}" src="${esc(img)}" alt="${esc(getVisibleName(card))}" loading="lazy" onerror="this.src='${CARD_BACK_URL}'"></span>
       <span class="badge">${esc(numberLabel)}</span>
     </button>
     <span class="v61-ownership ${got ? 'owned' : 'locked'}">
@@ -1343,8 +1416,23 @@ function renderV61Card(card, i) {
 }
 
 function renderV62Showcase(inSeriesSelect = false, browse = resolveBinderBrowse()) {
+  applyBinderDisplayLayout();
   const panel = $('#v62Showcase');
   if (!panel) return;
+  if (!isBinderSidePanelOn()) {
+    const list = browse.list || [];
+    filtered = list.slice();
+    if (!list.length) {
+      selected = null;
+      return;
+    }
+    if (!selected || !list.some(c => c.id === selected.id)) {
+      selected = list[0] || null;
+      selectedIndex = selected ? cards.findIndex(c => c.id === selected.id) : 0;
+      previewFlipped = false;
+    }
+    return;
+  }
   if (inSeriesSelect) { panel.innerHTML = ''; return; }
   const list = browse.list || [];
   filtered = list.slice();
@@ -1366,7 +1454,7 @@ function renderV62Showcase(inSeriesSelect = false, browse = resolveBinderBrowse(
   }
   const side = websiteSection('binderSidePanel');
   const got = isCollected(card.id);
-  const hidden = !got;
+  const artClass = unownedArtClass(card, { flipped: previewFlipped });
   const visibleImage = getVisibleImage(card);
   const visibleName = getVisibleName(card);
   const visibleRarity = getVisibleRarity(card);
@@ -1379,7 +1467,7 @@ function renderV62Showcase(inSeriesSelect = false, browse = resolveBinderBrowse(
     </div>
     <button class="v62-preview-card flip-card simple-flip ${previewFlipped ? 'show-back showing-card-back' : ''}" id="v62PreviewCard" type="button" aria-label="Open full view for ${esc(visibleName)}" data-finish-class="${esc(got ? cardFinishClass(card, true) : '')}" data-holographic="${got && isHolographicCard(card)}">
       <span class="preview-inner">
-        <span class="face front ${cardFinishClass(card, got && !previewFlipped)}"><img class="${hidden && !previewFlipped?'obscured':''}" src="${esc(previewFlipped ? CARD_BACK_URL : visibleImage)}" alt="${esc(previewFlipped ? 'Card back' : visibleName)}" onerror="this.src='${CARD_BACK_URL}'">${holoSparkMarkup(card, got && !previewFlipped)}</span>
+        <span class="face front ${cardFinishClass(card, got && !previewFlipped)}"><img class="${artClass}" src="${esc(previewFlipped ? CARD_BACK_URL : visibleImage)}" alt="${esc(previewFlipped ? 'Card back' : visibleName)}" onerror="this.src='${CARD_BACK_URL}'">${holoSparkMarkup(card, got && !previewFlipped)}</span>
         <span class="face back"><img src="${CARD_BACK_URL}" alt="Starlight card back"></span>
       </span>
     </button>
@@ -1435,8 +1523,13 @@ document.addEventListener('click', e => {
     selected = cards.find(c => c.id === cardBtn.dataset.v61Card) || selected;
     selectedIndex = cards.findIndex(c => c.id === cardBtn.dataset.v61Card);
     previewFlipped = false;
-    renderV62Showcase(false);
-    playSfx('sparkle');
+    if (!isBinderSidePanelOn()) {
+      playSfx('analyze');
+      openFullView('filtered');
+    } else {
+      renderV62Showcase(false);
+      playSfx('sparkle');
+    }
     return;
   }
 }, true);

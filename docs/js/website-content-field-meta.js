@@ -3,7 +3,18 @@
  * Keys must exist (or be added) in website-content-defaults.js.
  */
 
-/** @typedef {{ key: string, label?: string, hint?: string, multiline?: boolean, preview?: string }} FieldMeta */
+/**
+ * @typedef {{
+ *   key: string,
+ *   label?: string,
+ *   hint?: string,
+ *   multiline?: boolean,
+ *   preview?: string,
+ *   control?: 'text' | 'select',
+ *   options?: { value: string, label: string }[],
+ *   hideable?: boolean
+ * }} FieldMeta
+ */
 /** @typedef {{ id: string, label: string, description?: string, open?: boolean, fields: FieldMeta[] }} FieldGroup */
 /** @typedef {{ description: string, previewUrl: string, groups: FieldGroup[] }} PageMeta */
 
@@ -246,6 +257,56 @@ export const WEBSITE_PAGE_META = Object.freeze({
           { key: 'ownedLabel' },
           { key: 'storyLabel' },
           { key: 'additionalLabel' }
+        ]
+      }
+    ]
+  },
+  binderDisplay: {
+    description: 'Binder layout and unowned-card display behavior.',
+    previewUrl: 'binder.html?view=binder',
+    groups: [
+      {
+        id: 'layout',
+        label: 'Layout & filters',
+        open: true,
+        fields: [
+          {
+            key: 'sidePanel',
+            label: 'Side panel',
+            control: 'select',
+            options: [
+              { value: 'on', label: 'On' },
+              { value: 'off', label: 'Off' }
+            ],
+            hint: 'When Off, the binder grid is full width and card clicks open Full View.'
+          },
+          {
+            key: 'collectionStatusFilter',
+            label: 'Collection status filter',
+            control: 'select',
+            options: [
+              { value: 'on', label: 'On' },
+              { value: 'off', label: 'Off' }
+            ],
+            hint: 'Shows or hides the All / Collected / Not Collected filter on the Binder only.'
+          }
+        ]
+      },
+      {
+        id: 'unowned',
+        label: 'Unowned cards',
+        open: true,
+        fields: [
+          {
+            key: 'unownedDisplay',
+            label: 'Unowned display',
+            control: 'select',
+            options: [
+              { value: 'cardBack', label: 'Card back' },
+              { value: 'dullPreview', label: 'Dull preview' }
+            ],
+            hint: 'Card back hides art/name/rarity. Dull preview shows desaturated art with real name and rarity; story stays locked.'
+          }
         ]
       }
     ]

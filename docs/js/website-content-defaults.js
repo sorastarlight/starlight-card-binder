@@ -6,6 +6,7 @@ export const WEBSITE_EDITOR_TABS = Object.freeze([
   { id: 'reveal', label: 'Card Pull Reveal' },
   { id: 'binderSidePanel', label: 'Binder Card Panel' },
   { id: 'binderFullView', label: 'Card Full View' },
+  { id: 'binderDisplay', label: 'Binder Display' },
   { id: 'daily', label: 'Daily Booster' },
   { id: 'shop', label: 'Card Shop' },
   { id: 'events', label: 'Events' },
@@ -32,7 +33,7 @@ export const HOME_QUICK_LINK_IDS = Object.freeze(['collection', 'shop', 'events'
 
 export function createDefaultWebsiteContent() {
   return {
-    version: 4,
+    version: 5,
     home: {
       eyebrow: 'Welcome, Starlight Collector!',
       title: 'Your magical card adventure starts here.',
@@ -123,6 +124,11 @@ export function createDefaultWebsiteContent() {
       ownedLabel: 'Owned',
       storyLabel: 'Card Story',
       additionalLabel: 'Additional Information'
+    },
+    binderDisplay: {
+      sidePanel: 'on',
+      unownedDisplay: 'cardBack',
+      collectionStatusFilter: 'on'
     },
     daily: {
       eyebrow: 'Daily Collector Reward',

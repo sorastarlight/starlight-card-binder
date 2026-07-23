@@ -102,6 +102,8 @@ function matchesQuery(label, key, value) {
 
 function field(label, attrs, value, {
   multiline = false,
+  control = 'text',
+  options = [],
   hint = '',
   modified = false,
   key = '',
@@ -109,9 +111,20 @@ function field(label, attrs, value, {
   sectionKey = '',
   visible = true
 } = {}) {
-  const control = multiline
-    ? `<textarea ${attrs} ${visible ? '' : 'disabled'}>${esc(value || '')}</textarea>`
-    : `<input type="text" value="${esc(value || '')}" ${attrs} ${visible ? '' : 'disabled'}>`;
+  let controlHtml;
+  if (control === 'select') {
+    const optionHtml = (Array.isArray(options) ? options : []).map((option) => {
+      const optionValue = String(option?.value ?? '');
+      const optionLabel = String(option?.label ?? optionValue);
+      const selected = optionValue === String(value ?? '') ? ' selected' : '';
+      return `<option value="${esc(optionValue)}"${selected}>${esc(optionLabel)}</option>`;
+    }).join('');
+    controlHtml = `<select ${attrs}>${optionHtml}</select>`;
+  } else if (multiline) {
+    controlHtml = `<textarea ${attrs} ${visible ? '' : 'disabled'}>${esc(value || '')}</textarea>`;
+  } else {
+    controlHtml = `<input type="text" value="${esc(value || '')}" ${attrs} ${visible ? '' : 'disabled'}>`;
+  }
   const visibility = hideable ? `
     <label class="field-visibility">
       <input type="checkbox" data-visibility-path="${esc(sectionKey)}.${esc(key)}" ${visible ? 'checked' : ''}>
@@ -129,7 +142,7 @@ function field(label, attrs, value, {
         </span>
       </div>
       <label class="field-control">
-        ${control}
+        ${controlHtml}
       </label>
       ${hint ? `<p class="field-hint">${esc(hint)}</p>` : ''}
       ${hideable && !visible ? '<p class="field-hint">Hidden on the live page. Turn on “Show on page” to restore it.</p>' : ''}
@@ -154,6 +167,23 @@ function renderStringField(sectionKey, fieldMeta, value) {
   const key = fieldMeta.key;
   const label = fieldMeta.label || labelForFieldKey(key);
   if (!matchesQuery(label, key, value)) return '';
+  if (fieldMeta.control === 'select') {
+    return field(
+      label,
+      `data-path="${esc(sectionKey)}.${esc(key)}"`,
+      value,
+      {
+        control: 'select',
+        options: fieldMeta.options || [],
+        hint: fieldMeta.hint || '',
+        modified: isModified(sectionKey, key),
+        key,
+        hideable: false,
+        sectionKey,
+        visible: true
+      }
+    );
+  }
   const longDefault = new Set(['lead', 'signInLead', 'morePacksLead', 'emptyLead', 'emptyWishlist', 'emptyTrade', 'composeEmpty', 'accountIntro', 'signedOutLead', 'duplicatesLead', 'chooseNote', 'exchangeNote', 'exchangeLead', 'wishlistCardLead', 'offersCardLead', 'publicCardLead', 'footerLead', 'tagline', 'splashTitle', 'gridBrowseLead', 'gridSearchLead', 'readyLead', 'claimedLead', 'disabledLead', 'resultsTitle', 'favoritesShowcaseEmptyLead', 'emptyAllLead', 'emptyFavoritesLead', 'emptyFiltersLead', 'showcaseEmptyLead', 'showcasePickLead', 'signInDescription', 'signUpDescription', 'infoStripCollection', 'loadError']);
   const multiline = Boolean(fieldMeta.multiline || longDefault.has(key) || String(value || '').length > 90);
   const hideable = isHideableField(fieldMeta);
@@ -446,6 +476,17 @@ editorPanel.addEventListener('input', () => {
 });
 
 editorPanel.addEventListener('change', (event) => {
+  if (event.target.matches('select[data-path]')) {
+    syncFromDom();
+    renderTabs();
+    schedulePreviewDraft();
+    const note = editorPanel.querySelector('.editor-note');
+    if (note) {
+      const count = modifiedCount(activeTab);
+      note.textContent = `${count} field${count === 1 ? '' : 's'} differ from defaults on this page.`;
+    }
+    return;
+  }
   const toggle = event.target.closest('[data-visibility-path]');
   if (!toggle) return;
   const path = toggle.getAttribute('data-visibility-path');

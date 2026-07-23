@@ -92,13 +92,34 @@ function sanitizeQuickLinks(links, defaults) {
   )).filter(Boolean);
 }
 
+function sanitizeEnum(value, allowed, fallback) {
+  const next = String(value ?? '').trim();
+  return allowed.includes(next) ? next : fallback;
+}
+
+function sanitizeBinderDisplay(source = {}, defaults = {}) {
+  return {
+    sidePanel: sanitizeEnum(source.sidePanel, ['on', 'off'], defaults.sidePanel),
+    unownedDisplay: sanitizeEnum(
+      source.unownedDisplay,
+      ['cardBack', 'dullPreview'],
+      defaults.unownedDisplay
+    ),
+    collectionStatusFilter: sanitizeEnum(
+      source.collectionStatusFilter,
+      ['on', 'off'],
+      defaults.collectionStatusFilter
+    )
+  };
+}
+
 export function sanitizeWebsiteContent(input) {
   const defaults = cloneDefaultWebsiteContent();
   const source = input && typeof input === 'object' ? input : {};
   const homeSource = normalizeLegacyHome(source.home || {}, defaults.home);
 
   const result = {
-    version: 4,
+    version: 5,
     home: {
       ...sanitizeStringMap(homeSource, {
         eyebrow: defaults.home.eyebrow,
@@ -116,6 +137,7 @@ export function sanitizeWebsiteContent(input) {
     reveal: sanitizeStringMap(source.reveal || {}, defaults.reveal),
     binderSidePanel: sanitizeStringMap(source.binderSidePanel || {}, defaults.binderSidePanel),
     binderFullView: sanitizeStringMap(source.binderFullView || {}, defaults.binderFullView),
+    binderDisplay: sanitizeBinderDisplay(source.binderDisplay || {}, defaults.binderDisplay),
     daily: sanitizeStringMap(source.daily || {}, defaults.daily),
     shop: sanitizeStringMap(source.shop || {}, defaults.shop),
     events: sanitizeStringMap(source.events || {}, defaults.events),

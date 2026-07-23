@@ -20,6 +20,15 @@ body[data-page="binder"].series-select .card-filter-panel {
   gap: 18px;
 }
 
+.binder-browser-layout.is-side-panel-off {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.binder-browser-layout.is-side-panel-off #v62Showcase,
+.binder-browser-layout.is-side-panel-off .v62-showcase {
+  display: none;
+}
+
 .binder-browser-layout #seriesGridStage,
 .binder-browser-layout .v62-showcase {
   grid-column: auto !important;
@@ -179,6 +188,14 @@ html.starlight-embedded #cardOverlay .analyzer-info-card.db2-full-info,
 
 html.starlight-embedded #cardOverlay .analyzer-reticle {
   display: none !important;
+}
+
+/* Dull preview for unowned cards (binderDisplay.unownedDisplay = dullPreview) */
+body[data-page="binder"] img.is-unowned-dull,
+body[data-page="binder"] .v61-card-art img.is-unowned-dull,
+body[data-page="binder"] .v62-preview-card img.is-unowned-dull,
+body[data-page="binder"] #cardOverlay img.is-unowned-dull {
+  filter: grayscale(0.72) saturate(0.35) brightness(0.88);
 }
 
 

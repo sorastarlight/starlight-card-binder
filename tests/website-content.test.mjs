@@ -15,7 +15,7 @@ const read = (relativePath) => readFile(new URL(`../${relativePath}`, import.met
 
 test('default website content includes editable page groups', () => {
   const content = cloneDefaultWebsiteContent();
-  assert.equal(content.version, 4);
+  assert.equal(content.version, 5);
   assert.ok(content.home.title);
   assert.ok(content.home.primaryCta);
   assert.ok(content.home.newsLoading);
@@ -31,6 +31,9 @@ test('default website content includes editable page groups', () => {
   assert.ok(content.binderSidePanel.ownedQtyLabel);
   assert.ok(content.binderFullView.scanEyebrow);
   assert.ok(content.binderFullView.illustratorLabel);
+  assert.equal(content.binderDisplay.sidePanel, 'on');
+  assert.equal(content.binderDisplay.unownedDisplay, 'cardBack');
+  assert.equal(content.binderDisplay.collectionStatusFilter, 'on');
   assert.ok(content.daily.title);
   assert.ok(content.daily.readyTitle);
   assert.ok(content.daily.signInCta);
@@ -68,6 +71,7 @@ test('default website content includes editable page groups', () => {
       'reveal',
       'binderSidePanel',
       'binderFullView',
+      'binderDisplay',
       'daily',
       'shop',
       'events',
@@ -110,7 +114,7 @@ test('sanitizeWebsiteContent keeps quick-link ids and rejects bad social urls', 
     }
   });
 
-  assert.equal(sanitized.version, 4);
+  assert.equal(sanitized.version, 5);
   assert.equal(sanitized.home.title, 'Fresh Home Title');
   assert.deepEqual(
     sanitized.home.quickLinks.map((link) => link.id),
@@ -129,7 +133,44 @@ test('mergeWebsiteContent falls back to defaults for empty remote', () => {
   assert.equal(merged.about.title, cloneDefaultWebsiteContent().about.title);
   assert.equal(merged.binderLanding.eyebrow, 'Starlight Cards');
   assert.equal(merged.daily.badge, 'FREE • DAILY');
-  assert.equal(merged.version, 4);
+  assert.equal(merged.version, 5);
+});
+
+test('sanitizeWebsiteContent clamps binderDisplay enums to defaults', () => {
+  const sanitized = sanitizeWebsiteContent({
+    binderDisplay: {
+      sidePanel: 'maybe',
+      unownedDisplay: 'glow',
+      collectionStatusFilter: 'yes'
+    }
+  });
+  assert.equal(sanitized.binderDisplay.sidePanel, 'on');
+  assert.equal(sanitized.binderDisplay.unownedDisplay, 'cardBack');
+  assert.equal(sanitized.binderDisplay.collectionStatusFilter, 'on');
+
+  const valid = sanitizeWebsiteContent({
+    binderDisplay: {
+      sidePanel: 'off',
+      unownedDisplay: 'dullPreview',
+      collectionStatusFilter: 'off'
+    }
+  });
+  assert.equal(valid.binderDisplay.sidePanel, 'off');
+  assert.equal(valid.binderDisplay.unownedDisplay, 'dullPreview');
+  assert.equal(valid.binderDisplay.collectionStatusFilter, 'off');
+  assert.equal(valid.version, 5);
+});
+
+test('mergeWebsiteContent fills binderDisplay defaults for legacy payloads', () => {
+  const merged = mergeWebsiteContent({
+    version: 4,
+    about: { title: 'Custom About' }
+  });
+  assert.equal(merged.about.title, 'Custom About');
+  assert.equal(merged.binderDisplay.sidePanel, 'on');
+  assert.equal(merged.binderDisplay.unownedDisplay, 'cardBack');
+  assert.equal(merged.binderDisplay.collectionStatusFilter, 'on');
+  assert.equal(merged.version, 5);
 });
 
 test('website editor field meta covers binder splash and admin visual chrome', async () => {
@@ -142,6 +183,10 @@ test('website editor field meta covers binder splash and admin visual chrome', a
   assert.ok(listedFieldKeys('binderSidePanel').includes('ownedQtyLabel'));
   assert.ok(WEBSITE_PAGE_META.binderFullView);
   assert.ok(listedFieldKeys('binderFullView').includes('scanEyebrow'));
+  assert.ok(WEBSITE_PAGE_META.binderDisplay);
+  assert.ok(listedFieldKeys('binderDisplay').includes('sidePanel'));
+  assert.ok(listedFieldKeys('binderDisplay').includes('unownedDisplay'));
+  assert.equal(WEBSITE_PAGE_META.binderDisplay.groups[0].fields[0].control, 'select');
   assert.ok(listedFieldKeys('daily').includes('readyTitle'));
   assert.ok(WEBSITE_PAGE_META.collector);
   assert.equal(WEBSITE_PAGE_META.collector.previewUrl, 'collector.html');
@@ -162,11 +207,12 @@ test('website editor field meta covers binder splash and admin visual chrome', a
   const page = await read('docs/js/pages/admin-website-page.js');
   assert.match(html, /fieldSearch/);
   assert.match(html, /resetPageBtn/);
-  assert.match(html, /admin-website-page\.js\?v=2\.3/);
+  assert.match(html, /admin-website-page\.js\?v=2\.4/);
   assert.match(html, /previewFrame|Live preview/);
   assert.match(page, /WEBSITE_PAGE_META|getPageMeta/);
   assert.match(page, /renderGroupedFields|field-group/);
   assert.match(page, /splashTitle/);
+  assert.match(page, /control === 'select'|control: 'select'/);
   assert.match(page, /data-visibility-path|Show on page/);
   assert.match(page, /renderPreview|CONTENT_DRAFT|buildContentStudioPreviewUrl/);
 });
