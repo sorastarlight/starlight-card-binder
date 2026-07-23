@@ -22,9 +22,10 @@ const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
 function toast(message, type = '') {
   if (window.StarlightUI?.toast) {
     window.StarlightUI.toast(message, type);
-    return;
   }
-  summary.textContent = message;
+  if (summary) {
+    summary.textContent = message;
+  }
 }
 
 function rewardLine(quest) {

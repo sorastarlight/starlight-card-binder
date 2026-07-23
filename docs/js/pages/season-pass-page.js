@@ -26,6 +26,9 @@ function toast(message, type = '') {
   if (window.StarlightUI?.toast) {
     window.StarlightUI.toast(message, type);
   }
+  if (summaryEl) {
+    summaryEl.textContent = message;
+  }
 }
 
 function formatDate(value) {
