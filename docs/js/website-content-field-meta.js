@@ -250,13 +250,20 @@ export const WEBSITE_PAGE_META = Object.freeze({
         label: 'Labels',
         open: true,
         fields: [
+          { key: 'detailsTabLabel' },
+          { key: 'storyTabLabel' },
           { key: 'scanEyebrow', preview: 'eyebrow' },
           { key: 'seriesLabel' },
           { key: 'collectorNumberLabel' },
+          { key: 'rarityLabel' },
+          { key: 'evolutionLabel' },
+          { key: 'traitLabel' },
           { key: 'illustratorLabel' },
           { key: 'ownedLabel' },
+          { key: 'notCollectedLabel' },
           { key: 'storyLabel' },
-          { key: 'additionalLabel' }
+          { key: 'additionalLabel' },
+          { key: 'closeCta', preview: 'cta' }
         ]
       }
     ]

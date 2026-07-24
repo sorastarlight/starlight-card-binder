@@ -119,12 +119,19 @@ export function createDefaultWebsiteContent() {
       favoriteCta: '♡ Favorite',
       favoritedCta: '★ Favorited',
       scanEyebrow: 'Card Scan Complete',
+      detailsTabLabel: 'Card Details',
+      storyTabLabel: 'Story',
       seriesLabel: 'Series',
       collectorNumberLabel: 'Collector #',
-      illustratorLabel: 'Illustrator',
+      illustratorLabel: 'Artist',
       ownedLabel: 'Owned',
+      notCollectedLabel: 'Not collected',
+      rarityLabel: 'Rarity',
+      evolutionLabel: 'Evolution',
+      traitLabel: 'Trait',
       storyLabel: 'Card Story',
-      additionalLabel: 'Additional Information'
+      additionalLabel: 'Additional Information',
+      closeCta: 'Close'
     },
     binderDisplay: {
       sidePanel: 'on',

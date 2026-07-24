@@ -1,88 +1,316 @@
-/* Card analyzer — split screen: interactive card left, scrollable info right.
-   Loads AFTER qol-ui.css so analyzer-split beats #cardOverlay .analyzer-screen width:540px. */
+/* Card Full View — Project Sekai–inspired character details (Starlight cute).
+   Loads AFTER qol-ui.css / legacy so .card-analyzer-open beats width:540px / 720px clamps. */
 
 #cardOverlay.card-analyzer-open,
 #cardOverlay.open.card-analyzer-open {
   display: grid !important;
-  place-items: center;
-  padding: 12px;
+  place-items: center !important;
+  align-content: center !important;
+  padding: max(10px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)) !important;
   overflow: hidden !important;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(255, 176, 221, 0.22), transparent 36%),
+    radial-gradient(circle at 82% 18%, rgba(164, 220, 255, 0.26), transparent 34%),
+    rgba(34, 43, 86, 0.72) !important;
+  backdrop-filter: blur(14px) saturate(1.05) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.05) !important;
 }
 
-#cardOverlay.card-analyzer-open .analyzer-full-stage.analyzer-split-stage,
-#cardOverlay .analyzer-full-stage.analyzer-split-stage {
-  width: min(1080px, calc(100vw - 16px)) !important;
-  max-width: min(1080px, calc(100vw - 16px)) !important;
-  height: min(860px, calc(100dvh - 24px)) !important;
-  max-height: min(860px, calc(100dvh - 24px)) !important;
-  margin: 0 auto !important;
-  padding: 52px 20px 20px !important;
-  overflow: hidden !important;
-  display: grid !important;
-  grid-template-rows: auto 1fr !important;
-  gap: 10px !important;
-}
-
-/* Beat qol-ui `#cardOverlay .analyzer-screen { width:min(540px,100%)!important }` */
-#cardOverlay.card-analyzer-open .analyzer-screen.analyzer-split,
-#cardOverlay .analyzer-screen.analyzer-split,
-#cardOverlay .analyzer-split-stage .analyzer-screen.analyzer-split {
-  display: grid !important;
-  grid-template-columns: minmax(240px, 42%) minmax(0, 1fr) !important;
-  grid-template-rows: auto minmax(0, 1fr) !important;
-  grid-template-areas:
-    "actions actions"
-    "card info" !important;
-  align-items: stretch !important;
-  gap: 18px !important;
-  width: 100% !important;
-  max-width: none !important;
-  min-width: 0 !important;
+/* Beat qol-ui `#cardOverlay .analyzer-full-stage { width:min(720px) }` and legacy 1180px shell */
+#cardOverlay.card-analyzer-open .analyzer-full-stage.analyzer-sekai-stage,
+#cardOverlay .analyzer-full-stage.analyzer-sekai-stage {
+  --ca-ink: var(--st-color-ink, #34466f);
+  --ca-muted: var(--st-color-muted, #68738e);
+  --ca-blue: var(--st-color-blue, #6bc6f8);
+  --ca-pink: var(--st-color-pink, #ff82c8);
+  --ca-gold: var(--st-color-gold, #fed334);
+  --ca-cream: #fffdf8;
+  --ca-soft: #f4f8ff;
+  --ca-panel: #eef2f7;
+  --ca-radius: 22px;
+  position: relative !important;
+  inset: auto !important;
+  width: min(920px, calc(100vw - 20px)) !important;
+  max-width: min(920px, calc(100vw - 20px)) !important;
+  height: min(860px, calc(100dvh - 20px)) !important;
+  max-height: min(860px, calc(100dvh - 20px)) !important;
   min-height: 0 !important;
-  height: 100% !important;
-  margin: 0 !important;
-  overflow: hidden !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  display: grid !important;
+  place-items: center !important;
+  transform: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
 }
 
-/* Legacy .analyzer-screen::before/::after become unwanted grid items */
-#cardOverlay .analyzer-screen.analyzer-split::before,
-#cardOverlay .analyzer-screen.analyzer-split::after {
-  content: none !important;
+#cardOverlay .analyzer-sekai-stage .analyzer-bg {
   display: none !important;
 }
 
-#cardOverlay .analyzer-split .analyzer-actions {
-  grid-area: actions !important;
-  grid-column: auto !important;
-  display: flex !important;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: 8px;
+#cardOverlay .analyzer-sekai-stage .analyzer-modal {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   width: 100%;
+  height: 100%;
+  max-height: inherit;
   min-height: 0;
-  height: auto;
+  overflow: hidden;
+  border-radius: calc(var(--ca-radius) + 4px);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.98) 0%, var(--ca-cream) 48%, #fff6fb 100%);
+  box-shadow:
+    0 28px 70px rgba(40, 55, 100, 0.32),
+    0 0 0 1px rgba(107, 198, 248, 0.18) inset,
+    0 0 40px rgba(255, 130, 200, 0.12);
 }
 
-#cardOverlay .analyzer-card-stage {
-  grid-area: card !important;
+#cardOverlay .analyzer-sekai-stage .analyzer-modal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(255, 211, 52, 0.16), transparent 22%),
+    radial-gradient(circle at 90% 10%, rgba(107, 198, 248, 0.14), transparent 24%);
+  opacity: 0.9;
+  z-index: 0;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-chrome,
+#cardOverlay .analyzer-sekai-stage .analyzer-body,
+#cardOverlay .analyzer-sekai-stage .analyzer-footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* —— Chrome: tabs + close —— */
+#cardOverlay .analyzer-sekai-stage .analyzer-chrome {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px 0;
+  min-height: 52px;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-tab {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  min-height: 40px;
+  padding: 10px 18px 12px;
+  border-radius: 14px 14px 0 0;
+  background: rgba(190, 200, 214, 0.45);
+  color: #5a6480;
+  font: inherit;
+  font-weight: 850;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-tab.is-active {
+  background: #fff;
+  color: var(--ca-ink);
+  box-shadow: 0 -2px 12px rgba(80, 100, 140, 0.08);
+  transform: translateY(1px);
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-tab:not(.is-active):hover {
+  background: rgba(210, 218, 230, 0.7);
+  color: var(--ca-ink);
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-close.overlay-close,
+#cardOverlay.card-analyzer-open .analyzer-sekai-stage .analyzer-close {
+  position: relative !important;
+  top: auto !important;
+  right: auto !important;
+  left: auto !important;
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px;
+  margin: 2px 2px 0 0;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  color: var(--ca-ink) !important;
+  font-size: 1.45rem !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  box-shadow: 0 6px 16px rgba(60, 80, 120, 0.12) !important;
+  cursor: pointer;
+  flex: 0 0 auto;
+  z-index: 5 !important;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-close:hover {
+  background: #fff !important;
+  color: var(--ca-pink) !important;
+}
+
+/* —— Scroll body —— */
+#cardOverlay .analyzer-sekai-stage .analyzer-body {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 8px 20px 8px;
+  background: linear-gradient(180deg, #fff 0%, var(--ca-soft) 100%);
+  border-top: 1px solid rgba(160, 175, 200, 0.28);
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-panel {
+  display: grid;
+  gap: 16px;
+  padding: 8px 0 12px;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-panel[hidden] {
+  display: none !important;
+}
+
+/* —— Identity —— */
+#cardOverlay .analyzer-sekai-stage .analyzer-identity {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px 16px;
+  align-items: start;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-subtitle {
+  margin: 0 0 4px;
+  color: var(--ca-muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-identity h2 {
+  margin: 0;
+  color: var(--ca-ink);
+  font-size: clamp(1.55rem, 3.2vw, 2.15rem);
+  font-weight: 950;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-series-badge {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  min-width: 96px;
+  max-width: 140px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background:
+    linear-gradient(145deg, rgba(107, 198, 248, 0.22), rgba(255, 130, 200, 0.18));
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 18px rgba(80, 110, 160, 0.12);
+  text-align: center;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-series-spark {
+  color: var(--ca-gold);
+  font-size: 1.1rem;
+  filter: drop-shadow(0 0 6px rgba(254, 211, 52, 0.55));
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-series-name {
+  color: var(--ca-ink);
+  font-size: 0.72rem;
+  font-weight: 900;
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+/* —— Main art + stats —— */
+#cardOverlay .analyzer-sekai-stage .analyzer-main-row {
+  display: grid;
+  grid-template-columns: minmax(200px, 42%) minmax(0, 1fr);
+  gap: 18px 22px;
+  align-items: start;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-card-col {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-card-stage {
   position: relative;
   display: grid;
   place-items: center;
   min-height: 0;
   min-width: 0;
   perspective: 1400px;
+  padding: 4px;
 }
 
-#cardOverlay .analyzer-card-stage .full-card-wrap.analyzer-card-3d,
-#cardOverlay #fullCard3d.analyzer-card-3d {
-  width: min(320px, 100%, 48vh) !important;
-  max-width: 320px !important;
+#cardOverlay .analyzer-sekai-stage .analyzer-rarity-stars {
+  position: absolute;
+  left: 10px;
+  bottom: 14px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 1px;
+  pointer-events: none;
+  color: var(--ca-gold);
+  font-size: 1.05rem;
+  line-height: 1;
+  text-shadow:
+    0 1px 0 rgba(120, 80, 0, 0.35),
+    0 0 8px rgba(254, 211, 52, 0.55);
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-attr-chip {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 4;
+  max-width: 46%;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--ca-blue), #8ad4ff);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  box-shadow: 0 6px 14px rgba(70, 140, 200, 0.35);
+  pointer-events: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-card-stage .full-card-wrap.analyzer-card-3d,
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-3d {
+  width: min(280px, 100%, 44vh) !important;
+  max-width: 280px !important;
   max-height: none !important;
   aspect-ratio: 5 / 7;
   transform-style: preserve-3d;
   border-radius: 18px;
   cursor: grab;
-  /* Restore plate under analyzer; legacy #fullCard3d clears shadows/overflow */
   overflow: hidden !important;
   padding: 0 !important;
   filter: none !important;
@@ -91,12 +319,12 @@
   box-shadow: none !important;
 }
 
-#cardOverlay .analyzer-card-stage .full-card-wrap.analyzer-card-3d:active {
+#cardOverlay .analyzer-sekai-stage .analyzer-card-stage .full-card-wrap.analyzer-card-3d:active {
   cursor: grabbing;
 }
 
-#cardOverlay .analyzer-card-3d .full-inner,
-#cardOverlay #fullCard3d.analyzer-card-3d .full-inner {
+#cardOverlay .analyzer-sekai-stage .analyzer-card-3d .full-inner,
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-3d .full-inner {
   position: relative;
   display: block !important;
   width: 100%;
@@ -111,13 +339,13 @@
   box-shadow: none !important;
 }
 
-#cardOverlay .analyzer-card-3d.show-back .full-inner,
-#cardOverlay .analyzer-card-3d.showing-card-back .full-inner {
+#cardOverlay .analyzer-sekai-stage .analyzer-card-3d.show-back .full-inner,
+#cardOverlay .analyzer-sekai-stage .analyzer-card-3d.showing-card-back .full-inner {
   transform: rotateY(180deg);
 }
 
-#cardOverlay .analyzer-card-3d .face,
-#cardOverlay #fullCard3d.analyzer-card-3d .face {
+#cardOverlay .analyzer-sekai-stage .analyzer-card-3d .face,
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-3d .face {
   position: absolute !important;
   inset: 0;
   display: block !important;
@@ -133,21 +361,20 @@
   outline: 0 !important;
   box-shadow:
     0 18px 40px rgba(30, 50, 90, 0.28),
-    0 0 0 1px rgba(255, 255, 255, 0.35) !important;
+    0 0 0 1px rgba(255, 255, 255, 0.4) !important;
 }
 
-#cardOverlay .analyzer-card-3d .face.front {
+#cardOverlay .analyzer-sekai-stage .analyzer-card-3d .face.front {
   transform: translateZ(6px);
   z-index: 2;
 }
 
-#cardOverlay .analyzer-card-3d .face.back {
+#cardOverlay .analyzer-sekai-stage .analyzer-card-3d .face.back {
   transform: rotateY(180deg) translateZ(6px);
   z-index: 1;
 }
 
-/* CSS 3D edge thickness */
-#cardOverlay .analyzer-card-3d::before {
+#cardOverlay .analyzer-sekai-stage .analyzer-card-3d::before {
   content: "";
   position: absolute;
   inset: 4px -5px 4px auto;
@@ -161,8 +388,8 @@
   z-index: 0;
 }
 
-#cardOverlay .analyzer-card-3d img,
-#cardOverlay #fullCard3d.analyzer-card-3d img {
+#cardOverlay .analyzer-sekai-stage .analyzer-card-3d img,
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-3d img {
   width: 100% !important;
   height: 100% !important;
   max-height: none !important;
@@ -178,97 +405,349 @@
   opacity: 1 !important;
 }
 
-#cardOverlay .analyzer-card-3d.is-holo-off .card-finish-effect,
-#cardOverlay .analyzer-card-3d.is-holo-off .holo-spark,
-#cardOverlay .analyzer-card-3d.is-holo-off .finish-effect {
+#cardOverlay .analyzer-sekai-stage .analyzer-card-3d.is-holo-off .card-finish-effect,
+#cardOverlay .analyzer-sekai-stage .analyzer-card-3d.is-holo-off .holo-spark,
+#cardOverlay .analyzer-sekai-stage .analyzer-card-3d.is-holo-off .finish-effect {
   display: none !important;
   opacity: 0 !important;
 }
 
-#cardOverlay .analyzer-card-3d.is-evolution-off.prestige-frame::after,
-#cardOverlay .analyzer-card-3d.is-evolution-off .prestige-frame::after {
+#cardOverlay .analyzer-sekai-stage .analyzer-card-3d.is-evolution-off.prestige-frame::after,
+#cardOverlay .analyzer-sekai-stage .analyzer-card-3d.is-evolution-off .prestige-frame::after {
   display: none !important;
   opacity: 0 !important;
 }
 
-#cardOverlay .analyzer-info-panel {
-  grid-area: info !important;
-  min-width: 0;
-  min-height: 0;
-  height: 100%;
-  max-height: none !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  padding: 16px 16px 20px;
-  border-radius: 18px;
-  border: 1px solid rgba(107, 198, 248, 0.28);
-  background: rgba(255, 255, 255, 0.92);
-  width: 100% !important;
-  max-width: none !important;
-  margin: 0 !important;
+#cardOverlay .analyzer-sekai-stage .analyzer-soft-note {
+  margin: 0;
+  padding: 0 4px;
+  color: #de4da3;
+  font-size: 0.84rem;
+  font-weight: 750;
+  line-height: 1.4;
 }
 
-#cardOverlay .analyzer-info-panel .analyzer-title-row h2 {
-  margin: 4px 0 6px;
+#cardOverlay .analyzer-sekai-stage .analyzer-soft-note span {
+  margin-right: 4px;
+  color: var(--ca-pink);
 }
 
-#cardOverlay .analyzer-info-panel .analyzer-data-grid {
+/* Stats (Talent / Skill style) */
+#cardOverlay .analyzer-sekai-stage .analyzer-stats-panel {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px 12px;
-  margin: 12px 0;
+  gap: 12px;
+  min-width: 0;
+  padding: 4px 2px 0;
 }
 
-#cardOverlay .analyzer-info-panel .analyzer-description {
-  margin: 10px 0 0;
-  color: #5d6480;
+#cardOverlay .analyzer-sekai-stage .analyzer-stat-row {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  align-items: center;
+  gap: 8px 10px;
+  min-height: 32px;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-stat-label {
+  color: var(--ca-ink);
+  font-size: 0.95rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-stat-icon {
+  color: var(--ca-blue);
+  font-size: 0.85rem;
+  font-weight: 900;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-stat-rule {
+  display: block;
+  height: 1px;
+  min-width: 12px;
+  background: linear-gradient(90deg, rgba(120, 140, 180, 0.45), rgba(120, 140, 180, 0.08));
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-stat-value {
+  color: var(--ca-ink);
+  font-size: 1.02rem;
+  font-weight: 850;
+  text-align: right;
+  justify-self: end;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-stat-value b {
+  font-weight: 950;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-evo-value {
+  margin-right: 6px;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-stat-value .prestige-badge {
+  margin-top: 0;
+  vertical-align: middle;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-skill-block {
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(140, 155, 185, 0.4);
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-skill-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 12px;
+  margin-bottom: 6px;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-skill-name {
+  color: var(--ca-muted);
+  font-size: 0.92rem;
+  font-weight: 750;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-skill-detail {
+  margin: 0;
+  color: var(--ca-ink);
+  font-size: 0.92rem;
+  font-weight: 650;
   line-height: 1.5;
 }
 
-#cardOverlay .analyzer-reticle {
+/* Side story block */
+#cardOverlay .analyzer-sekai-stage .analyzer-side-story,
+#cardOverlay .analyzer-sekai-stage .analyzer-story-full {
+  display: grid;
+  gap: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(150, 165, 195, 0.28);
+  background: rgba(255, 255, 255, 0.65);
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-side-story-head {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 8px 14px;
+  background: linear-gradient(90deg, #9aa6bc, #b0b9c9);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-side-story-body {
+  padding: 14px 16px 16px;
+  background: rgba(236, 240, 246, 0.72);
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-side-story-body p {
+  margin: 0;
+  color: var(--ca-ink);
+  font-size: 0.94rem;
+  line-height: 1.55;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-story-link {
+  appearance: none;
+  margin: 10px 0 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #de4da3;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 850;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-more {
+  margin-top: 4px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(107, 198, 248, 0.28);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-more summary {
+  cursor: pointer;
+  font-weight: 850;
+  color: var(--ca-ink);
+}
+
+/* Actions strip — tidy, not a clutter pile */
+#cardOverlay .analyzer-sekai-stage .analyzer-actions-strip {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(107, 198, 248, 0.28);
+  background: rgba(255, 255, 255, 0.78);
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-actions-strip .analyzer-display-toggles {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-actions-strip .analyzer-display-toggles .btn {
+  min-height: 40px;
+  font-size: 0.82rem;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-actions-strip .btn[aria-pressed="true"] {
+  border-color: rgba(255, 130, 200, 0.55);
+  background: linear-gradient(135deg, rgba(107, 198, 248, 0.16), rgba(255, 130, 200, 0.16));
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-evo-strip {
+  margin: 0;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-flip {
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+}
+
+/* —— Footer Close —— */
+#cardOverlay .analyzer-sekai-stage .analyzer-footer {
+  display: grid;
+  place-items: center;
+  padding: 12px 16px 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(250, 252, 255, 0.95));
+  border-top: 1px solid rgba(160, 175, 200, 0.22);
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-footer-close {
+  appearance: none;
+  min-width: min(280px, 72%);
+  min-height: 48px;
+  padding: 12px 36px;
+  border: 2px solid rgba(80, 95, 130, 0.55);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ca-ink);
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(60, 80, 120, 0.1);
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-footer-close:hover {
+  transform: translateY(-1px);
+  border-color: var(--ca-pink);
+  box-shadow: 0 10px 24px rgba(255, 130, 200, 0.18);
+}
+
+/* Nav arrows outside modal */
+#cardOverlay .analyzer-sekai-stage .analyzer-arrow.overlay-arrow {
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 6 !important;
+  width: 44px !important;
+  height: 44px !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  color: var(--ca-ink) !important;
+  font-size: 1.6rem !important;
+  font-weight: 800 !important;
+  box-shadow: 0 10px 24px rgba(40, 55, 100, 0.22) !important;
+  cursor: pointer;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-arrow.left { left: -6px !important; }
+#cardOverlay .analyzer-sekai-stage .analyzer-arrow.right { right: -6px !important; }
+
+#cardOverlay .analyzer-sekai-stage .analyzer-reticle,
+#cardOverlay .analyzer-sekai-stage .analyzer-screen::before,
+#cardOverlay .analyzer-sekai-stage .analyzer-screen::after {
   display: none !important;
+  content: none !important;
 }
 
 @media (max-width: 860px) {
-  #cardOverlay.card-analyzer-open .analyzer-full-stage.analyzer-split-stage,
-  #cardOverlay .analyzer-full-stage.analyzer-split-stage {
+  #cardOverlay.card-analyzer-open .analyzer-full-stage.analyzer-sekai-stage,
+  #cardOverlay .analyzer-full-stage.analyzer-sekai-stage {
+    width: min(100vw - 12px, 640px) !important;
+    max-width: calc(100vw - 12px) !important;
     height: min(920px, calc(100dvh - 12px)) !important;
     max-height: calc(100dvh - 12px) !important;
-    padding: 48px 12px 12px !important;
-    overflow: hidden !important;
   }
 
-  #cardOverlay.card-analyzer-open .analyzer-screen.analyzer-split,
-  #cardOverlay .analyzer-screen.analyzer-split {
-    grid-template-columns: 1fr !important;
-    grid-template-rows: auto auto minmax(0, 1fr) !important;
-    grid-template-areas:
-      "actions"
-      "card"
-      "info" !important;
-    gap: 12px !important;
-    overflow: hidden !important;
-    width: 100% !important;
-    max-width: none !important;
+  #cardOverlay .analyzer-sekai-stage .analyzer-body {
+    padding: 6px 14px 8px;
   }
 
-  #cardOverlay .analyzer-card-stage {
-    max-height: 42vh;
-  }
-
-  #cardOverlay .analyzer-card-stage .full-card-wrap.analyzer-card-3d,
-  #cardOverlay #fullCard3d.analyzer-card-3d {
-    width: min(240px, 70vw, 38vh) !important;
-  }
-
-  #cardOverlay .analyzer-info-panel {
-    max-height: none !important;
-    min-height: 0;
-  }
-
-  #cardOverlay .analyzer-info-panel .analyzer-data-grid {
+  #cardOverlay .analyzer-sekai-stage .analyzer-main-row {
     grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  #cardOverlay .analyzer-sekai-stage .analyzer-identity {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  #cardOverlay .analyzer-sekai-stage .analyzer-card-stage .full-card-wrap.analyzer-card-3d,
+  #cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-3d {
+    width: min(220px, 68vw, 36vh) !important;
+  }
+
+  #cardOverlay .analyzer-sekai-stage .analyzer-arrow.left { left: 2px !important; }
+  #cardOverlay .analyzer-sekai-stage .analyzer-arrow.right { right: 2px !important; }
+
+  #cardOverlay .analyzer-sekai-stage .analyzer-tab {
+    padding: 9px 12px 11px;
+    font-size: 0.84rem;
+  }
+
+  #cardOverlay .analyzer-sekai-stage .analyzer-footer-close {
+    min-width: min(240px, 84%);
+  }
+}
+
+@media (max-width: 520px) {
+  #cardOverlay .analyzer-sekai-stage .analyzer-identity {
+    grid-template-columns: 1fr;
+  }
+
+  #cardOverlay .analyzer-sekai-stage .analyzer-series-badge {
+    justify-self: start;
+    max-width: none;
+  }
+
+  #cardOverlay .analyzer-sekai-stage .analyzer-stat-row {
+    grid-template-columns: auto 1fr auto;
+  }
+
+  #cardOverlay .analyzer-sekai-stage .analyzer-stat-icon {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #cardOverlay .analyzer-sekai-stage .analyzer-tab,
+  #cardOverlay .analyzer-sekai-stage .analyzer-footer-close,
+  #cardOverlay .analyzer-sekai-stage .analyzer-card-3d .full-inner {
+    transition: none !important;
   }
 }

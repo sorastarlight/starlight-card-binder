@@ -33,6 +33,8 @@ let websiteBinderLanding = null;
 /** Analyzer session display toggles (not persisted). */
 let analyzerHoloEnabled = true;
 let analyzerEvolutionEnabled = true;
+/** Full-view modal tab: details | story */
+let analyzerActiveTab = 'details';
 
 function fillWebsiteTokens(template, vars = {}) {
   return String(template || '').replace(/\{(\w+)\}/g, (_, key) => (
@@ -179,6 +181,12 @@ function prestigeBadgeHtml(cardId) {
   const label = utils.prestigeLabel?.(tier) || tier;
   return `<span class="prestige-badge prestige-${tierCssToken(tier)}">${esc(label)}</span>`;
 }
+function analyzerDisplayTogglesHtml() {
+  return `<div class="analyzer-display-toggles">
+    <button class="btn" type="button" data-toggle-analyzer-holo aria-pressed="${analyzerHoloEnabled ? 'true' : 'false'}">${analyzerHoloEnabled ? 'Holo On' : 'Holo Off'}</button>
+    <button class="btn" type="button" data-toggle-analyzer-evolution aria-pressed="${analyzerEvolutionEnabled ? 'true' : 'false'}">${analyzerEvolutionEnabled ? 'Evolution On' : 'Evolution Off'}</button>
+  </div>`;
+}
 function evolutionActionHtml(cardId) {
   if (pageName !== 'collection') return '';
   const utils = prestigeUtils();
@@ -195,18 +203,40 @@ function evolutionActionHtml(cardId) {
   const maxNote = (!next || cost == null)
     ? `<p><strong>★★★★★★ Super Starlight</strong> — maximum Starlight Evolution reached.</p>`
     : `<p>Evolve to <strong>${esc(nextLabel)}</strong> — costs <strong>${cost}</strong> duplicate${cost === 1 ? '' : 's'}.</p>`;
-  return `<div class="evolution-action fusion-action">
+  return `<div class="evolution-action fusion-action analyzer-evo-strip">
     <p><strong>${esc(label)}</strong> · ${extras} extra${extras === 1 ? '' : 's'} available</p>
     ${maxNote}
     <div class="evolution-action-row">
       <button class="btn primary" type="button" data-fuse-card="${esc(cardId)}" ${canEvolve && next ? '' : 'disabled'}>${canEvolve && next ? `Evolve to ${esc(nextLabel)}` : (next ? `Need ${cost} extras` : 'Max Evolution')}</button>
       <button class="btn" type="button" data-unfuse-card="${esc(cardId)}" ${canUnfuse ? '' : 'disabled'}>${canUnfuse ? `Unfuse (+${refund ?? 0})` : 'Cannot Unfuse'}</button>
     </div>
-    <div class="analyzer-display-toggles">
-      <button class="btn" type="button" data-toggle-analyzer-holo aria-pressed="${analyzerHoloEnabled ? 'true' : 'false'}">${analyzerHoloEnabled ? 'Turn Off Holographic' : 'Turn On Holographic'}</button>
-      <button class="btn" type="button" data-toggle-analyzer-evolution aria-pressed="${analyzerEvolutionEnabled ? 'true' : 'false'}">${analyzerEvolutionEnabled ? 'Turn Off Starlight Evolution' : 'Turn On Starlight Evolution'}</button>
-    </div>
   </div>`;
+}
+function rarityStarsHtml(card, label) {
+  const score = RARITY_SCORE[card?.rarity] || RARITY_SCORE[label] || 1;
+  const count = Math.max(1, Math.min(5, score));
+  return `<div class="analyzer-rarity-stars" aria-label="${esc(label || card?.rarity || 'Rarity')}">${Array.from({ length: count }, () => '<span aria-hidden="true">★</span>').join('')}</div>`;
+}
+function analyzerStatRow(label, value, { icon = '' } = {}) {
+  return `<div class="analyzer-stat-row"><span class="analyzer-stat-label">${esc(label)}</span>${icon ? `<span class="analyzer-stat-icon" aria-hidden="true">${icon}</span>` : ''}<span class="analyzer-stat-rule" aria-hidden="true"></span><span class="analyzer-stat-value">${value}</span></div>`;
+}
+function setAnalyzerTab(tab) {
+  analyzerActiveTab = tab === 'story' ? 'story' : 'details';
+  const root = $('#cardOverlay .analyzer-sekai-stage');
+  if (!root) return;
+  root.querySelectorAll('[data-analyzer-tab]').forEach(btn => {
+    const active = btn.dataset.analyzerTab === analyzerActiveTab;
+    btn.classList.toggle('is-active', active);
+    btn.setAttribute('aria-selected', active ? 'true' : 'false');
+  });
+  root.querySelectorAll('[data-analyzer-panel]').forEach(panel => {
+    const match = panel.dataset.analyzerPanel === analyzerActiveTab;
+    panel.hidden = !match;
+    panel.classList.toggle('is-active', match);
+  });
+  if (analyzerActiveTab === 'story') {
+    root.querySelector('.analyzer-body')?.scrollTo?.({ top: 0, behavior: 'smooth' });
+  }
 }
 function fusionActionHtml(cardId) {
   return evolutionActionHtml(cardId);
@@ -1070,6 +1100,7 @@ function fullViewModal() {
 function openFullView(listMode = 'all') {
   if (!selected) return;
   fullViewListMode = listMode;
+  analyzerActiveTab = 'details';
   analyzerHoloEnabled = true;
   analyzerEvolutionEnabled = true;
   if (listMode === 'favorites') {
@@ -1130,48 +1161,147 @@ function renderFullView() {
   const prestigeClass = got && analyzerEvolutionEnabled ? prestigeFrameClass(selected.id) : '';
   const finishClass = got && analyzerHoloEnabled ? cardFinishClass(selected, true) : '';
   const holoMarkup = got && analyzerHoloEnabled && !overlayFlipped ? holoSparkMarkup(selected, true) : '';
-  overlay.innerHTML = `<div class="full-card-stage analyzer-full-stage analyzer-split-stage ${rarityClass(selected)}" role="dialog" aria-modal="true" aria-labelledby="fullViewCardTitle" tabindex="-1">
+  const seriesName = selected.series || 'Unknown Series';
+  const subtitleRaw = String(selected.seriesDescription || seriesName).trim();
+  const subtitle = subtitleRaw.length > 80 ? `${subtitleRaw.slice(0, 77)}…` : subtitleRaw;
+  const collectorNo = selected.collectorNumber || selected.number || '???';
+  const category = got || !isDullUnownedPreview() ? categoryLabel(selected) : '???';
+  const sub = got ? subcategoryLabel(selected) : '';
+  const variant = got ? variantLabel(selected) : '';
+  const finish = got ? finishLabel(selected) : '';
+  const evoTier = got ? (prestigeUtils().prestigeLabel?.(getCardPrestigeTier(selected.id)) || '★ Stardust') : '';
+  const storyText = got
+    ? (selected.cardDescription || 'No card story has been added yet.')
+    : getVisibleDescription(selected);
+  const storyPreview = storyText.length > 140 ? `${storyText.slice(0, 137)}…` : storyText;
+  const noteText = got
+    ? (pageName === 'collection'
+      ? 'Evolve duplicates from this album view · display toggles preview holo & frames.'
+      : 'Tap Flip to peek the back · drag the card to tilt.')
+    : 'Collect this card to unlock its full story and details.';
+  const traitName = got
+    ? [category, sub].filter(Boolean).join(' · ')
+    : (isDullUnownedPreview() ? visibleRarity : 'Details locked');
+  const traitDetail = got
+    ? [variant && !isStandardMeta(variant) ? variant : '', finish && !isStandardMeta(finish) ? finish : '', selected.artist ? `Art by ${selected.artist}` : '']
+        .filter(Boolean)
+        .join(' · ') || `${finishLabel(selected)} finish`
+    : 'Earn this card from Daily Wish, packs, or rewards.';
+  if (analyzerActiveTab !== 'story') analyzerActiveTab = 'details';
+  const detailsTabActive = analyzerActiveTab !== 'story';
+  const evoBadge = got ? prestigeBadgeHtml(selected.id) : '';
+
+  overlay.innerHTML = `<div class="full-card-stage analyzer-full-stage analyzer-sekai-stage ${rarityClass(selected)}" role="dialog" aria-modal="true" aria-labelledby="fullViewCardTitle" tabindex="-1">
     <div class="analyzer-bg" aria-hidden="true"><span></span><span></span><span></span></div>
-    <button class="overlay-close analyzer-close" type="button" aria-label="Close">×</button>
     <button class="overlay-arrow left analyzer-arrow" type="button" aria-label="Previous card">‹</button>
-    <section class="analyzer-screen analyzer-split">
-      <div class="analyzer-actions">
-        <button class="overlay-flip analyzer-flip" type="button">${esc(full.flipCta || '↻ Flip')}</button>
-        ${got ? `<button class="overlay-favorite analyzer-favorite" type="button" data-toggle-favorite="${esc(selected.id)}" aria-pressed="${isFavorite(selected.id) ? 'true' : 'false'}">${esc(isFavorite(selected.id) ? (full.favoritedCta || '★ Favorited') : (full.favoriteCta || '♡ Favorite'))}</button>` : ''}
-      </div>
-      <div class="analyzer-card-stage">
-        <div class="full-card-wrap analyzer-card-3d ${overlayFlipped ? 'show-back showing-card-back' : ''} ${analyzerHoloEnabled ? '' : 'is-holo-off'} ${analyzerEvolutionEnabled ? '' : 'is-evolution-off'} ${rarityClass(selected)} ${prestigeClass}" id="fullCard3d" aria-label="${esc(overlayFlipped ? 'Card back' : visibleName)}" data-holographic="${got && analyzerHoloEnabled && isHolographicCard(selected)}" data-finish-class="${esc(finishClass)}">
-          <span class="full-inner">
-            <span class="face front ${finishClass}"><img class="${artClass}" src="${esc(getVisibleImage(selected))}" alt="${esc(visibleName)}" onerror="this.src='${CARD_BACK_URL}'" draggable="false">${holoMarkup}</span>
-            <span class="face back"><img src="${CARD_BACK_URL}" alt="Card back" draggable="false"></span>
-          </span>
-        </div>
-      </div>
-      <aside class="analyzer-info-panel analyzer-info-card db2-full-info">
-        <div class="analyzer-title-row"><div><p class="eyebrow">${esc(full.scanEyebrow || 'Card Scan Complete')}</p><h2 id="fullViewCardTitle">${esc(visibleName)}</h2><p class="db2-collector-line">${esc(selected.collectorNumber || selected.number || '???')} · ${esc(selected.series || 'Unknown Series')}</p></div></div>
-        <div class="card-meta-chips">${got
-          ? cardIdentityChips(selected, { full: true, hidden: false })
-          : (isDullUnownedPreview()
-            ? `<span class="card-meta-chip rarity ${rarityClass(selected)}">${esc(visibleRarity)}</span><span class="card-meta-chip muted">Details unlock when collected</span>`
-            : cardIdentityChips(selected, { full: true, hidden: true }))}</div>
-        <div class="analyzer-data-grid"><span><b>${esc(full.seriesLabel || 'Series')}</b>${esc(selected.series || 'Unknown')}</span><span><b>${esc(full.collectorNumberLabel || 'Collector #')}</b>${esc(selected.collectorNumber || selected.number || '???')}</span>${got && selected.artist ? `<span><b>${esc(full.illustratorLabel || 'Illustrator')}</b>${esc(selected.artist)}</span>` : ''}${got ? `<span><b>${esc(full.ownedLabel || 'Owned')}</b>×${qty}</span>` : ''}</div>
-        ${got ? prestigeBadgeHtml(selected.id) : ''}
-        ${got ? evolutionActionHtml(selected.id) : ''}
-        ${got ? `<div class="db2-full-story"><b>${esc(full.storyLabel || 'Card Story')}</b><p>${esc(selected.cardDescription || 'No card story has been added yet.')}</p></div><details class="db2-more"><summary>${esc(full.additionalLabel || 'Additional Information')}</summary><div class="detail-list clean-detail-list">${cardExpandedDetails(selected)}</div></details>` : ''}
-        <p class="analyzer-description">${esc(getVisibleDescription(selected))}</p>
-        <div data-card-comments-host></div>
-      </aside>
-    </section>
     <button class="overlay-arrow right analyzer-arrow" type="button" aria-label="Next card">›</button>
+    <div class="analyzer-modal">
+      <header class="analyzer-chrome">
+        <div class="analyzer-tabs" role="tablist" aria-label="Card view sections">
+          <button class="analyzer-tab ${detailsTabActive ? 'is-active' : ''}" type="button" role="tab" data-analyzer-tab="details" aria-selected="${detailsTabActive ? 'true' : 'false'}">${esc(full.detailsTabLabel || 'Card Details')}</button>
+          <button class="analyzer-tab ${detailsTabActive ? '' : 'is-active'}" type="button" role="tab" data-analyzer-tab="story" aria-selected="${detailsTabActive ? 'false' : 'true'}">${esc(full.storyTabLabel || 'Story')}</button>
+        </div>
+        <button class="overlay-close analyzer-close" type="button" aria-label="Close">×</button>
+      </header>
+      <div class="analyzer-body">
+        <section class="analyzer-panel analyzer-panel-details ${detailsTabActive ? 'is-active' : ''}" data-analyzer-panel="details" ${detailsTabActive ? '' : 'hidden'}>
+          <div class="analyzer-identity">
+            <div class="analyzer-identity-copy">
+              <p class="analyzer-subtitle">${esc(subtitle)}</p>
+              <h2 id="fullViewCardTitle">${esc(visibleName)}</h2>
+            </div>
+            <div class="analyzer-series-badge" title="${esc(seriesName)}">
+              <span class="analyzer-series-spark" aria-hidden="true">✦</span>
+              <span class="analyzer-series-name">${esc(seriesName)}</span>
+            </div>
+          </div>
+          <div class="analyzer-main-row">
+            <div class="analyzer-card-col">
+              <div class="analyzer-card-stage">
+                ${rarityStarsHtml(selected, visibleRarity)}
+                <span class="analyzer-attr-chip" title="${esc(category)}">${esc(String(category).slice(0, 14))}</span>
+                <div class="full-card-wrap analyzer-card-3d ${overlayFlipped ? 'show-back showing-card-back' : ''} ${analyzerHoloEnabled ? '' : 'is-holo-off'} ${analyzerEvolutionEnabled ? '' : 'is-evolution-off'} ${rarityClass(selected)} ${prestigeClass}" id="fullCard3d" aria-label="${esc(overlayFlipped ? 'Card back' : visibleName)}" data-holographic="${got && analyzerHoloEnabled && isHolographicCard(selected)}" data-finish-class="${esc(finishClass)}">
+                  <span class="full-inner">
+                    <span class="face front ${finishClass}"><img class="${artClass}" src="${esc(getVisibleImage(selected))}" alt="${esc(visibleName)}" onerror="this.src='${CARD_BACK_URL}'" draggable="false">${holoMarkup}</span>
+                    <span class="face back"><img src="${CARD_BACK_URL}" alt="Card back" draggable="false"></span>
+                  </span>
+                </div>
+              </div>
+              <p class="analyzer-soft-note"><span aria-hidden="true">✧</span> ${esc(noteText)}</p>
+            </div>
+            <aside class="analyzer-stats-panel">
+              ${analyzerStatRow(full.rarityLabel || 'Rarity', `<b class="${rarityClass(selected)}">${esc(visibleRarity)}</b>`, { icon: '★' })}
+              ${analyzerStatRow(full.collectorNumberLabel || 'Collector #', esc(collectorNo), { icon: '#' })}
+              ${got ? analyzerStatRow(full.ownedLabel || 'Owned', `×${qty}`, { icon: '♡' }) : analyzerStatRow(full.ownedLabel || 'Owned', esc(full.notCollectedLabel || 'Not collected'), { icon: '♡' })}
+              ${got ? analyzerStatRow(full.evolutionLabel || 'Evolution', `<span class="analyzer-evo-value">${esc(evoTier)}</span>${evoBadge}`, { icon: '✦' }) : ''}
+              ${got && selected.artist ? analyzerStatRow(full.illustratorLabel || 'Artist', esc(selected.artist), { icon: '✎' }) : ''}
+              <div class="analyzer-skill-block">
+                <div class="analyzer-skill-head">
+                  <span class="analyzer-stat-label">${esc(full.traitLabel || 'Trait')}</span>
+                  <span class="analyzer-skill-name">${esc(traitName)}</span>
+                </div>
+                <p class="analyzer-skill-detail">${esc(traitDetail)}</p>
+              </div>
+            </aside>
+          </div>
+          <div class="analyzer-actions-strip">
+            <div class="analyzer-actions-row">
+              <button class="btn overlay-flip analyzer-flip" type="button">${esc(full.flipCta || '↻ Flip')}</button>
+              ${got ? `<button class="btn overlay-favorite analyzer-favorite" type="button" data-toggle-favorite="${esc(selected.id)}" aria-pressed="${isFavorite(selected.id) ? 'true' : 'false'}">${esc(isFavorite(selected.id) ? (full.favoritedCta || '★ Favorited') : (full.favoriteCta || '♡ Favorite'))}</button>` : ''}
+              ${got ? analyzerDisplayTogglesHtml() : ''}
+            </div>
+            ${got && pageName === 'collection' ? evolutionActionHtml(selected.id) : ''}
+          </div>
+          <section class="analyzer-side-story" aria-label="${esc(full.storyLabel || 'Card Story')}">
+            <header class="analyzer-side-story-head"><span>${esc(full.storyLabel || 'Card Story')}</span></header>
+            <div class="analyzer-side-story-body">
+              <p>${esc(storyPreview)}</p>
+              <button class="analyzer-story-link" type="button" data-analyzer-tab="story">Read full story</button>
+            </div>
+          </section>
+        </section>
+        <section class="analyzer-panel analyzer-panel-story ${detailsTabActive ? '' : 'is-active'}" data-analyzer-panel="story" ${detailsTabActive ? 'hidden' : ''}>
+          <div class="analyzer-story-full">
+            <header class="analyzer-side-story-head"><span>${esc(full.storyLabel || 'Card Story')}</span></header>
+            <div class="analyzer-side-story-body">
+              <p>${esc(storyText)}</p>
+            </div>
+          </div>
+          ${got ? `<details class="analyzer-more"><summary>${esc(full.additionalLabel || 'Additional Information')}</summary><div class="detail-list clean-detail-list">${cardExpandedDetails(selected)}</div></details>` : ''}
+          <div data-card-comments-host></div>
+        </section>
+      </div>
+      <footer class="analyzer-footer">
+        <button class="analyzer-footer-close" type="button">${esc(full.closeCta || 'Close')}</button>
+      </footer>
+    </div>
   </div>`;
-  $('.overlay-close', overlay).addEventListener('click', closeFullView);
-  $('.overlay-arrow.left', overlay).addEventListener('click', () => stepFullView(-1));
-  $('.overlay-arrow.right', overlay).addEventListener('click', () => stepFullView(1));
-  $('.overlay-flip', overlay).addEventListener('click', () => {
+
+  const bindClose = (el) => el?.addEventListener('click', closeFullView);
+  bindClose($('.overlay-close', overlay));
+  bindClose($('.analyzer-footer-close', overlay));
+  $('.overlay-arrow.left', overlay)?.addEventListener('click', () => stepFullView(-1));
+  $('.overlay-arrow.right', overlay)?.addEventListener('click', () => stepFullView(1));
+  overlay.querySelectorAll('[data-analyzer-tab]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      setAnalyzerTab(btn.dataset.analyzerTab === 'story' ? 'story' : 'details');
+      playSfx('page');
+    });
+  });
+  setAnalyzerTab(analyzerActiveTab);
+  $$('.overlay-flip', overlay).forEach(btn => btn.addEventListener('click', () => {
     overlayFlipped = !overlayFlipped;
     flipAnalyzerCard($('#fullCard3d'), overlayFlipped);
+    const stars = overlay.querySelector('.analyzer-rarity-stars');
+    const chip = overlay.querySelector('.analyzer-attr-chip');
+    if (stars) stars.hidden = overlayFlipped;
+    if (chip) chip.hidden = overlayFlipped;
     playSfx('flip');
-  });
+  }));
+  const starsEl = overlay.querySelector('.analyzer-rarity-stars');
+  const chipEl = overlay.querySelector('.analyzer-attr-chip');
+  if (starsEl) starsEl.hidden = overlayFlipped;
+  if (chipEl) chipEl.hidden = overlayFlipped;
   attachFullViewTilt();
   applyAnalyzerDisplayToggles();
   const commentsHost = overlay.querySelector('[data-card-comments-host]');
@@ -1382,7 +1512,7 @@ document.addEventListener('click', e => {
     const btn = e.target.closest('[data-toggle-analyzer-holo]');
     if (btn) {
       btn.setAttribute('aria-pressed', analyzerHoloEnabled ? 'true' : 'false');
-      btn.textContent = analyzerHoloEnabled ? 'Turn Off Holographic' : 'Turn On Holographic';
+      btn.textContent = analyzerHoloEnabled ? 'Holo On' : 'Holo Off';
     }
     return;
   }
@@ -1394,7 +1524,7 @@ document.addEventListener('click', e => {
     const btn = e.target.closest('[data-toggle-analyzer-evolution]');
     if (btn) {
       btn.setAttribute('aria-pressed', analyzerEvolutionEnabled ? 'true' : 'false');
-      btn.textContent = analyzerEvolutionEnabled ? 'Turn Off Starlight Evolution' : 'Turn On Starlight Evolution';
+      btn.textContent = analyzerEvolutionEnabled ? 'Evolution On' : 'Evolution Off';
     }
     return;
   }
