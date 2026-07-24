@@ -50,8 +50,13 @@ test('binder filter panel stays hidden on series landing until a pack is selecte
   assert.match(binder, /id="v62Showcase"/);
   assert.match(binder, /binder\.css\?v=1\.7\.5/);
   assert.match(app, /renderV62Showcase/);
-  assert.match(app, /data-toggle-preview-holo/);
+  assert.match(app, /function cardSupportsHoloToggle\(/);
+  assert.match(app, /function previewDisplayTogglesHtml\(/);
+  assert.match(app, /cardSupportsHoloToggle\(card\)/);
+  assert.match(app, /cardHasStarlightEvolution\(card\.id\)/);
   assert.match(binder, /cloud-collection\.js\?v=1\.3\.5/);
+  assert.match(binder, /card-analyzer\.css\?v=2\.3\.1/);
+  assert.doesNotMatch(binder, /<b data-duplicates="">0<\/b> extras/);
 });
 
 test('shell-safe profile links avoid binder-in-binder nesting', async () => {

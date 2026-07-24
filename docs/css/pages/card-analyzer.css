@@ -438,6 +438,7 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
   display: grid;
   gap: 10px;
   min-width: 0;
+  width: 100%;
   justify-items: center;
 }
 
@@ -445,6 +446,7 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
   position: relative;
   display: grid;
   place-items: center;
+  width: 100%;
   min-height: 0;
   min-width: 0;
   perspective: 1400px;

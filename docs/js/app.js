@@ -204,11 +204,40 @@ function prestigeBadgeHtml(cardId) {
   const label = utils.prestigeLabel?.(tier) || tier;
   return `<span class="prestige-badge prestige-${tierCssToken(tier)}">${esc(label)}</span>`;
 }
-function analyzerDisplayTogglesHtml() {
-  return `<div class="analyzer-display-toggles">
-    <button class="btn" type="button" data-toggle-analyzer-holo aria-pressed="${analyzerHoloEnabled ? 'true' : 'false'}">${analyzerHoloEnabled ? 'Holo On' : 'Holo Off'}</button>
-    <button class="btn" type="button" data-toggle-analyzer-evolution aria-pressed="${analyzerEvolutionEnabled ? 'true' : 'false'}">${analyzerEvolutionEnabled ? 'Evolution On' : 'Evolution Off'}</button>
-  </div>`;
+function cardHasStarlightEvolution(cardId) {
+  const tier = getCardPrestigeTier(cardId);
+  return Boolean(tier && tier !== 'stardust');
+}
+function cardSupportsHoloToggle(card) {
+  return Boolean(card && isHolographicCard(card));
+}
+function analyzerDisplayTogglesHtml(card) {
+  if (!card) return '';
+  const showHolo = cardSupportsHoloToggle(card);
+  const showEvolution = cardHasStarlightEvolution(card.id);
+  if (!showHolo && !showEvolution) return '';
+  const buttons = [];
+  if (showHolo) {
+    buttons.push(`<button class="btn" type="button" data-toggle-analyzer-holo aria-pressed="${analyzerHoloEnabled ? 'true' : 'false'}">${analyzerHoloEnabled ? 'Holo On' : 'Holo Off'}</button>`);
+  }
+  if (showEvolution) {
+    buttons.push(`<button class="btn" type="button" data-toggle-analyzer-evolution aria-pressed="${analyzerEvolutionEnabled ? 'true' : 'false'}">${analyzerEvolutionEnabled ? 'Evolution On' : 'Evolution Off'}</button>`);
+  }
+  return `<div class="analyzer-display-toggles">${buttons.join('')}</div>`;
+}
+function previewDisplayTogglesHtml(card, got = false) {
+  if (!got || !card) return '';
+  const showHolo = cardSupportsHoloToggle(card);
+  const showEvolution = cardHasStarlightEvolution(card.id);
+  if (!showHolo && !showEvolution) return '';
+  const buttons = [];
+  if (showHolo) {
+    buttons.push(`<button class="btn" type="button" data-toggle-preview-holo aria-pressed="${previewHoloEnabled ? 'true' : 'false'}">${previewHoloEnabled ? 'Holo On' : 'Holo Off'}</button>`);
+  }
+  if (showEvolution) {
+    buttons.push(`<button class="btn" type="button" data-toggle-preview-evolution aria-pressed="${previewEvolutionEnabled ? 'true' : 'false'}">${previewEvolutionEnabled ? 'Evolution On' : 'Evolution Off'}</button>`);
+  }
+  return `<div class="v62-panel-toggles analyzer-display-toggles">${buttons.join('')}</div>`;
 }
 function evolutionActionHtml(cardId) {
   if (pageName !== 'collection') return '';
@@ -1325,7 +1354,7 @@ function renderFullView() {
               <div class="analyzer-actions-strip">
                 <div class="analyzer-actions-row">
                   ${got ? `<button class="btn overlay-favorite analyzer-favorite" type="button" data-toggle-favorite="${esc(selected.id)}" aria-pressed="${isFavorite(selected.id) ? 'true' : 'false'}">${esc(isFavorite(selected.id) ? (full.favoritedCta || '★ Favorited') : (full.favoriteCta || '♡ Favorite'))}</button>` : ''}
-                  ${got ? analyzerDisplayTogglesHtml() : ''}
+                  ${got ? analyzerDisplayTogglesHtml(selected) : ''}
                 </div>
                 ${got && pageName === 'collection' ? evolutionActionHtml(selected.id) : ''}
               </div>
@@ -1900,10 +1929,7 @@ function renderV62Showcase(inSeriesSelect = false, browse = resolveBinderBrowse(
       <button class="btn primary" id="v62Flip" type="button">${esc(side.flipCta || '↻ Flip')}</button>
       <button class="btn" id="v62Full" type="button">${esc(side.fullViewCta || '⛶ Full View')}</button>
     </div>
-    <div class="v62-panel-toggles analyzer-display-toggles">
-      <button class="btn" type="button" data-toggle-preview-holo aria-pressed="${previewHoloEnabled ? 'true' : 'false'}">${previewHoloEnabled ? 'Holo On' : 'Holo Off'}</button>
-      <button class="btn" type="button" data-toggle-preview-evolution aria-pressed="${previewEvolutionEnabled ? 'true' : 'false'}">${previewEvolutionEnabled ? 'Evolution On' : 'Evolution Off'}</button>
-    </div>
+    ${previewDisplayTogglesHtml(card, got)}
     <button class="v62-preview-card flip-card simple-flip ${previewFlipped ? 'show-back showing-card-back' : ''} ${previewPrestige} ${previewHoloEnabled ? '' : 'is-holo-off'} ${previewEvolutionEnabled ? '' : 'is-evolution-off'}" id="v62PreviewCard" type="button" aria-label="Open full view for ${esc(visibleName)}" data-finish-class="${esc(finishClass)}" data-holographic="${got && previewHoloEnabled && isHolographicCard(card)}">
       <span class="preview-inner">
         <span class="face front ${finishClass}"><img class="${artClass}" src="${esc(previewFlipped ? CARD_BACK_URL : visibleImage)}" alt="${esc(previewFlipped ? 'Card back' : visibleName)}" onerror="this.src='${CARD_BACK_URL}'">${previewFlipped || !previewHoloEnabled ? '' : holoSparkMarkup(card, got)}</span>
