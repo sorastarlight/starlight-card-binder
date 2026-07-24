@@ -1173,7 +1173,6 @@ function renderFullView() {
   const storyText = got
     ? (selected.cardDescription || 'No card story has been added yet.')
     : getVisibleDescription(selected);
-  const storyPreview = storyText.length > 140 ? `${storyText.slice(0, 137)}…` : storyText;
   const noteText = got
     ? (pageName === 'collection'
       ? 'Evolve duplicates from this album view · display toggles preview holo & frames.'
@@ -1182,19 +1181,20 @@ function renderFullView() {
   const traitName = got
     ? [category, sub].filter(Boolean).join(' · ')
     : (isDullUnownedPreview() ? visibleRarity : 'Details locked');
+  // Artist is shown in its own Illustrator row — keep Trait free of that duplicate.
   const traitDetail = got
-    ? [variant && !isStandardMeta(variant) ? variant : '', finish && !isStandardMeta(finish) ? finish : '', selected.artist ? `Art by ${selected.artist}` : '']
+    ? [variant && !isStandardMeta(variant) ? variant : '', finish && !isStandardMeta(finish) ? finish : '']
         .filter(Boolean)
         .join(' · ') || `${finishLabel(selected)} finish`
     : 'Earn this card from Daily Wish, packs, or rewards.';
   if (analyzerActiveTab !== 'story') analyzerActiveTab = 'details';
   const detailsTabActive = analyzerActiveTab !== 'story';
   const evoBadge = got ? prestigeBadgeHtml(selected.id) : '';
+  // Show Evolution once: badge when present, otherwise plain tier label.
+  const evoValueHtml = evoBadge || `<span class="analyzer-evo-value">${esc(evoTier)}</span>`;
 
   overlay.innerHTML = `<div class="full-card-stage analyzer-full-stage analyzer-sekai-stage ${rarityClass(selected)}" role="dialog" aria-modal="true" aria-labelledby="fullViewCardTitle" tabindex="-1">
     <div class="analyzer-bg" aria-hidden="true"><span></span><span></span><span></span></div>
-    <button class="overlay-arrow left analyzer-arrow" type="button" aria-label="Previous card">‹</button>
-    <button class="overlay-arrow right analyzer-arrow" type="button" aria-label="Next card">›</button>
     <div class="analyzer-modal">
       <span class="analyzer-spark analyzer-spark-tl" aria-hidden="true">✦</span>
       <span class="analyzer-spark analyzer-spark-tr" aria-hidden="true">✧</span>
@@ -1222,6 +1222,8 @@ function renderFullView() {
           <div class="analyzer-main-row">
             <div class="analyzer-card-col">
               <div class="analyzer-card-stage">
+                <button class="overlay-arrow left analyzer-arrow" type="button" aria-label="Previous card">‹</button>
+                <button class="overlay-arrow right analyzer-arrow" type="button" aria-label="Next card">›</button>
                 ${rarityStarsHtml(selected, visibleRarity)}
                 <span class="analyzer-attr-chip" title="${esc(category)}">${esc(String(category).slice(0, 14))}</span>
                 <div class="full-card-wrap analyzer-card-3d ${overlayFlipped ? 'show-back showing-card-back' : ''} ${analyzerHoloEnabled ? '' : 'is-holo-off'} ${analyzerEvolutionEnabled ? '' : 'is-evolution-off'} ${rarityClass(selected)} ${prestigeClass}" id="fullCard3d" aria-label="${esc(overlayFlipped ? 'Card back' : visibleName)}" data-holographic="${got && analyzerHoloEnabled && isHolographicCard(selected)}" data-finish-class="${esc(finishClass)}">
@@ -1231,13 +1233,16 @@ function renderFullView() {
                   </span>
                 </div>
               </div>
-              <p class="analyzer-soft-note"><span aria-hidden="true">✧</span> ${esc(noteText)}</p>
+              <div class="analyzer-card-tools">
+                <button class="btn overlay-flip analyzer-flip" type="button">${esc(full.flipCta || '↻ Flip')}</button>
+                <p class="analyzer-soft-note"><span aria-hidden="true">✧</span> ${esc(noteText)}</p>
+              </div>
             </div>
             <aside class="analyzer-stats-panel">
               ${analyzerStatRow(full.rarityLabel || 'Rarity', `<b class="${rarityClass(selected)}">${esc(visibleRarity)}</b>`, { icon: '★' })}
               ${analyzerStatRow(full.collectorNumberLabel || 'Collector #', esc(collectorNo), { icon: '#' })}
               ${got ? analyzerStatRow(full.ownedLabel || 'Owned', `×${qty}`, { icon: '♡' }) : analyzerStatRow(full.ownedLabel || 'Owned', esc(full.notCollectedLabel || 'Not collected'), { icon: '♡' })}
-              ${got ? analyzerStatRow(full.evolutionLabel || 'Evolution', `<span class="analyzer-evo-value">${esc(evoTier)}</span>${evoBadge}`, { icon: '✦' }) : ''}
+              ${got ? analyzerStatRow(full.evolutionLabel || 'Evolution', evoValueHtml, { icon: '✦' }) : ''}
               ${got && selected.artist ? analyzerStatRow(full.illustratorLabel || 'Artist', esc(selected.artist), { icon: '✎' }) : ''}
               <div class="analyzer-skill-block">
                 <div class="analyzer-skill-head">
@@ -1246,23 +1251,15 @@ function renderFullView() {
                 </div>
                 <p class="analyzer-skill-detail">${esc(traitDetail)}</p>
               </div>
+              <div class="analyzer-actions-strip">
+                <div class="analyzer-actions-row">
+                  ${got ? `<button class="btn overlay-favorite analyzer-favorite" type="button" data-toggle-favorite="${esc(selected.id)}" aria-pressed="${isFavorite(selected.id) ? 'true' : 'false'}">${esc(isFavorite(selected.id) ? (full.favoritedCta || '★ Favorited') : (full.favoriteCta || '♡ Favorite'))}</button>` : ''}
+                  ${got ? analyzerDisplayTogglesHtml() : ''}
+                </div>
+                ${got && pageName === 'collection' ? evolutionActionHtml(selected.id) : ''}
+              </div>
             </aside>
           </div>
-          <div class="analyzer-actions-strip">
-            <div class="analyzer-actions-row">
-              <button class="btn overlay-flip analyzer-flip" type="button">${esc(full.flipCta || '↻ Flip')}</button>
-              ${got ? `<button class="btn overlay-favorite analyzer-favorite" type="button" data-toggle-favorite="${esc(selected.id)}" aria-pressed="${isFavorite(selected.id) ? 'true' : 'false'}">${esc(isFavorite(selected.id) ? (full.favoritedCta || '★ Favorited') : (full.favoriteCta || '♡ Favorite'))}</button>` : ''}
-              ${got ? analyzerDisplayTogglesHtml() : ''}
-            </div>
-            ${got && pageName === 'collection' ? evolutionActionHtml(selected.id) : ''}
-          </div>
-          <section class="analyzer-side-story" aria-label="${esc(full.storyLabel || 'Card Story')}">
-            <header class="analyzer-side-story-head"><span>${esc(full.storyLabel || 'Card Story')}</span></header>
-            <div class="analyzer-side-story-body">
-              <p>${esc(storyPreview)}</p>
-              <button class="analyzer-story-link" type="button" data-analyzer-tab="story">Read full story</button>
-            </div>
-          </section>
         </section>
         <section class="analyzer-panel analyzer-panel-story ${detailsTabActive ? '' : 'is-active'}" data-analyzer-panel="story" ${detailsTabActive ? 'hidden' : ''}>
           <div class="analyzer-story-full">
