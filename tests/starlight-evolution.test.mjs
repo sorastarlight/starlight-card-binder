@@ -134,5 +134,5 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.doesNotMatch(evoPageJs, /data-shell-view=["']collection["']/);
   assert.doesNotMatch(evoPageJs, /binder\.html\?view=collection/);
   assert.match(evoPage, /st-evo-card-modal/);
-  assert.match(evoPage, /starlight-evolution-page\.js\?v=1\.1\.0/);
+  assert.match(evoPage, /starlight-evolution-page\.js\?v=1\.2\.0/);
 });

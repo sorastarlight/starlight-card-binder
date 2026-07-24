@@ -16,7 +16,7 @@ import {
   prestigeLabel,
   previousEvolutionTier
 } from '../prestige-utils.js?v=1.4.0';
-import { playStarlightEvolutionReveal } from '../starlight-evolution-reveal.js?v=1.1.0';
+import { playStarlightEvolutionReveal } from '../starlight-evolution-reveal.js?v=1.2.0';
 import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
 
 await loadAndHydrateWebsiteContent();
