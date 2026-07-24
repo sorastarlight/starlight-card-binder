@@ -31,7 +31,8 @@
 
 .collector-avatar-wrap:has(.avatar-frame),
 .shell-account-left:has(.shell-avatar.avatar-frame),
-.profile-preview-header:has(.avatar-frame) {
+.profile-preview-header:has(.avatar-frame),
+.rankings-avatar-link:has(.avatar-frame) {
   overflow: visible;
 }
 

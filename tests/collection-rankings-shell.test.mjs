@@ -12,6 +12,17 @@ test('collection cards open the shared full-view modal on click', async () => {
   assert.match(app, /listMode === 'duplicates'/);
 });
 
+test('user rankings avatars apply equipped frame classes from RPC payload', async () => {
+  const page = await read('docs/js/pages/user-rankings-page.js');
+  assert.match(page, /import \{ avatarFrameClassName \} from '\.\.\/avatar-frame-utils\.js'/);
+  assert.match(page, /avatarFrameClassName\(entry\.frame/);
+});
+
+test('user rankings page loads avatar frame styles', async () => {
+  const html = await read('docs/user-rankings.html');
+  assert.match(html, /css\/avatar-frames\.css/);
+});
+
 test('user rankings actions are ordered profile, follow, wishlist, trade', async () => {
   const page = await read('docs/js/pages/user-rankings-page.js');
   const block = page.match(/class="rankings-actions">([\s\S]*?)<\/div>\s*<div class="rankings-wishlist"/);
@@ -25,6 +36,21 @@ test('user rankings actions are ordered profile, follow, wishlist, trade', async
   assert.ok(profile < follow, 'View profile comes before follow');
   assert.ok(follow < wishlist, 'Follow comes before wishlist');
   assert.ok(wishlist < trade, 'Wishlist comes before propose trade');
+});
+
+test('admin twitch reward modals use shared modal controllers only', async () => {
+  const page = await read('docs/js/pages/admin-twitch-page.js');
+  assert.match(page, /ruleModalController\.open/);
+  assert.match(page, /testRuleModalController\.close/);
+  assert.doesNotMatch(page, /\$\('ruleModal'\)\.classList\.(add|remove)\('hidden'\)/);
+  assert.doesNotMatch(page, /\$\('testRuleModal'\)\.classList\.(add|remove)\('hidden'\)/);
+});
+
+test('rankings RPC migration exposes equipped avatar frames', async () => {
+  const sql = await read('supabase/migrations/20260724120000_rankings_avatar_frames.sql');
+  assert.match(sql, /collector_avatar_frames/);
+  assert.match(sql, /'frame'/);
+  assert.match(sql, /frame_css_preset/);
 });
 
 test('shell iframe navigation avoids history-pushing src assignment', async () => {

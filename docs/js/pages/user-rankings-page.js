@@ -1,3 +1,4 @@
+import { avatarFrameClassName } from '../avatar-frame-utils.js';
 import { listPublicCollectorRankings } from '../collector-rankings-service.js';
 import { levelFromPoints } from '../collector-level.js';
 import {
@@ -54,10 +55,12 @@ function tradeHref(username) {
 
 function avatarMarkup(entry) {
   const initial = (entry.displayName || entry.username || '?').trim().charAt(0).toUpperCase() || '✦';
+  const frameClass = avatarFrameClassName(entry.frame || null);
+  const frameSuffix = frameClass ? ` ${frameClass}` : '';
   if (entry.avatarUrl) {
-    return `<span class="rankings-avatar has-photo" style="background-image:url('${esc(entry.avatarUrl)}')" aria-hidden="true"></span>`;
+    return `<span class="rankings-avatar has-photo${frameSuffix}" style="background-image:url('${esc(entry.avatarUrl)}')" aria-hidden="true"></span>`;
   }
-  return `<span class="rankings-avatar" aria-hidden="true">${esc(initial)}</span>`;
+  return `<span class="rankings-avatar${frameSuffix}" aria-hidden="true">${esc(initial)}</span>`;
 }
 
 function sortEntries(entries, mode) {
