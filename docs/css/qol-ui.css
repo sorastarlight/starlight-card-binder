@@ -204,7 +204,8 @@ html{scroll-padding-top:110px}
 /* V91.1.1 — Modal navigation and Full View repair */
 
 /* Popups own the viewport. Prefer inset sizing — 100vh clips inside shell iframes. */
-#cardOverlay.open{
+/* Legacy Full View: scroll from top. Sekai analyzer (.card-analyzer-open) centers in card-analyzer.css. */
+#cardOverlay.open:not(.card-analyzer-open){
   position:fixed!important;
   inset:0!important;
   z-index:100000!important;
@@ -220,6 +221,14 @@ html{scroll-padding-top:110px}
   overscroll-behavior:contain!important;
   background:rgba(34,43,86,.78)!important;
   backdrop-filter:blur(12px)!important;
+}
+
+#cardOverlay.open.card-analyzer-open{
+  position:fixed!important;
+  inset:0!important;
+  z-index:100000!important;
+  width:auto!important;
+  height:auto!important;
 }
 
 #cardOverlay .analyzer-full-stage{

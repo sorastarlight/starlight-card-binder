@@ -106,8 +106,9 @@ html.starlight-embedded .main {
  * 100vh is the browser viewport, not the iframe — that clipped Card Story.
  * Keep the overlay sized to the iframe and make the info panel scroll.
  */
-html.starlight-embedded #cardOverlay.open,
-#cardOverlay.open {
+/* Legacy Full View scroll-from-top. Sekai analyzer uses .card-analyzer-open (true center). */
+html.starlight-embedded #cardOverlay.open:not(.card-analyzer-open),
+#cardOverlay.open:not(.card-analyzer-open) {
   position: fixed !important;
   inset: 0 !important;
   width: auto !important;

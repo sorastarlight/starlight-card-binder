@@ -1196,6 +1196,10 @@ function renderFullView() {
     <button class="overlay-arrow left analyzer-arrow" type="button" aria-label="Previous card">‹</button>
     <button class="overlay-arrow right analyzer-arrow" type="button" aria-label="Next card">›</button>
     <div class="analyzer-modal">
+      <span class="analyzer-spark analyzer-spark-tl" aria-hidden="true">✦</span>
+      <span class="analyzer-spark analyzer-spark-tr" aria-hidden="true">✧</span>
+      <span class="analyzer-spark analyzer-spark-bl" aria-hidden="true">✧</span>
+      <span class="analyzer-spark analyzer-spark-br" aria-hidden="true">✦</span>
       <header class="analyzer-chrome">
         <div class="analyzer-tabs" role="tablist" aria-label="Card view sections">
           <button class="analyzer-tab ${detailsTabActive ? 'is-active' : ''}" type="button" role="tab" data-analyzer-tab="details" aria-selected="${detailsTabActive ? 'true' : 'false'}">${esc(full.detailsTabLabel || 'Card Details')}</button>
