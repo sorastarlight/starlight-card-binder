@@ -759,7 +759,8 @@ export const WEBSITE_PAGE_META = Object.freeze({
           },
           { key: 'exclusivePromoTitle' },
           { key: 'exclusivePromoLink' },
-          { key: 'exclusivePromoUrl', hint: 'Full https URL for the Twitch subscribe link.' }
+          { key: 'exclusivePromoUrl', hint: 'Full https URL for the Twitch subscribe link.' },
+          { key: 'exclusivePromoHelp', multiline: true, hint: 'Shown when visitors tap the ? badge on the promo card.' }
         ]
       },
       {

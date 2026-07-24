@@ -18,8 +18,10 @@ const trackEl = document.getElementById('season-track');
 const benefitsEl = document.getElementById('season-benefits');
 const benefitsBodyEl = document.getElementById('season-benefits-body');
 const activationBannerEl = document.getElementById('season-activation-banner');
+const promoHelpEl = document.getElementById('season-promo-help');
 
 let seasonCountdownTimer = null;
+let twitchProfile = { linked: false };
 
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
   '&': '&amp;',
@@ -123,17 +125,27 @@ function renderBenefits(season = {}) {
   `;
 }
 
+function activationIconMarkup(avatarUrl, state = 'active') {
+  const url = String(avatarUrl || '').trim();
+  if (url) {
+    return `<img class="season-activation-avatar" src="${esc(url)}" alt="" width="44" height="44" decoding="async">`;
+  }
+  const glyph = state === 'pending' ? '!' : '✓';
+  return `<span class="season-activation-icon" aria-hidden="true">${glyph}</span>`;
+}
+
 function renderActivationBanner(data = {}, season = {}) {
   if (!activationBannerEl) return;
   const linked = Boolean(data.twitchLinked);
-  const login = String(data.twitchLogin || '').trim();
+  const login = String(data.twitchLogin || twitchProfile.login || '').trim();
+  const avatarUrl = String(twitchProfile.avatarUrl || '').trim();
   const hasAccess = data.hasAccess !== false;
 
   if (hasAccess) {
     activationBannerEl.hidden = false;
     activationBannerEl.className = 'season-activation-banner is-active';
     activationBannerEl.innerHTML = `
-      <span class="season-activation-icon" aria-hidden="true">✓</span>
+      ${activationIconMarkup(avatarUrl, 'active')}
       <div class="season-activation-copy">
         <strong>${esc(seasonCopy.activatedTitle || 'Twitch subscriber · Season Pass active')}</strong>
         <span>${esc(seasonCopy.activatedLead || 'Your pass is unlocked for this season. Keep collecting to earn every tier reward.')}</span>
@@ -148,7 +160,7 @@ function renderActivationBanner(data = {}, season = {}) {
     activationBannerEl.hidden = false;
     activationBannerEl.className = 'season-activation-banner is-pending';
     activationBannerEl.innerHTML = `
-      <span class="season-activation-icon" aria-hidden="true">!</span>
+      ${activationIconMarkup(avatarUrl, 'pending')}
       <div class="season-activation-copy">
         <strong>${esc(seasonCopy.pendingTitle || 'Twitch linked · Pass not active yet')}</strong>
         <span>${esc(seasonCopy.pendingLead || 'Subscribe on Twitch, then open your Season Pass unlock gift in Received Gifts to activate.')}</span>
@@ -348,6 +360,7 @@ function render(data) {
 async function maybeSyncActiveSubscription() {
   try {
     const connection = await getMyTwitchConnection();
+    twitchProfile = connection || { linked: false };
     if (!connection?.linked) return;
     await claimPendingTwitchUnlocks();
     // Optional Worker Helix check for already-active subscribers (graceful if unsupported).
@@ -371,6 +384,18 @@ async function load() {
 }
 
 applyExclusivePromoCopy();
+promoHelpEl?.addEventListener('click', () => {
+  const message = String(seasonCopy.exclusivePromoHelp || '').trim()
+    || 'This exclusive Starlight card cannot be pulled from regular boosters. Subscribe on Twitch during the season to unlock it through your Season Pass rewards.';
+  if (window.StarlightUI?.alert) {
+    window.StarlightUI.alert({
+      title: seasonCopy.exclusivePromoTitle || 'Season Pass exclusive',
+      message
+    });
+    return;
+  }
+  toast(message, 'info');
+});
 window.addEventListener('starlight-website-content-hydrated', (event) => {
   Object.assign(seasonCopy, event.detail?.seasonPass || {});
   applyExclusivePromoCopy();

@@ -295,7 +295,7 @@ function fusionActionHtml(cardId) {
 }
 async function playEvolutionReveal(card, fromTier, toTier, cost, label) {
   try {
-    const mod = await import('./starlight-evolution-reveal.js?v=1.3.0');
+    const mod = await import('./starlight-evolution-reveal.js?v=2.0.0');
     await mod.playStarlightEvolutionReveal({
       imageUrl: getVisibleImage(card),
       cardName: getVisibleName(card),

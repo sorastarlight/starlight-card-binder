@@ -16,7 +16,7 @@ import {
   prestigeLabel,
   previousEvolutionTier
 } from '../prestige-utils.js?v=1.5.0';
-import { playStarlightEvolutionReveal } from '../starlight-evolution-reveal.js?v=1.3.0';
+import { playStarlightEvolutionReveal } from '../starlight-evolution-reveal.js?v=2.0.0';
 import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
 
 await loadAndHydrateWebsiteContent();
@@ -300,8 +300,6 @@ async function handleEvolve(cardId) {
     });
     toast(`Evolved to ${nextLabel}!`, 'success');
     await renderOwned();
-    const refreshed = cardById(card.id);
-    if (refreshed) openCardDetail(card.id);
   } catch (error) {
     toast(error?.message || error?.error_description || 'Evolution failed.', 'error');
   } finally {

@@ -1,6 +1,6 @@
 /**
- * Starlight Evolution reveal — compact 3D duplicate carousel fusing into the evolved card.
- * Duplicates orbit the primary card, then shake/flash into the new Radiance appearance.
+ * Starlight Evolution reveal — Digimon-inspired digital evolution sequence.
+ * Duplicate data fragments spiral inward, rupture in a burst, and the card emerges evolved.
  */
 
 import {
@@ -10,19 +10,20 @@ import {
 } from './prestige-utils.js?v=1.5.0';
 
 const STYLESHEET_ID = 'starlight-evolution-reveal-css';
-const STYLESHEET_HREF = '../css/starlight-evolution-reveal.css?v=1.3.0';
+const STYLESHEET_HREF = '../css/starlight-evolution-reveal.css?v=2.0.0';
 
-/** Full-motion phase timings (ms). Total ≈ 5.8s before leave. */
 const TIMING = Object.freeze({
-  enter: 320,
-  carousel: 2600,
-  fuse: 900,
-  reveal: 1500,
-  leave: 260
+  boot: 420,
+  scan: 1300,
+  charge: 2400,
+  rupture: 920,
+  break: 680,
+  complete: 1900,
+  leave: 280
 });
 
 const REDUCED_TIMING = Object.freeze({
-  reveal: 1000,
+  complete: 1100,
   leave: 220
 });
 
@@ -72,17 +73,15 @@ function starsMarkup(count) {
   return n ? '⭐'.repeat(n) : '';
 }
 
-/** Visual intensity 1–5 from target tier (glow strength). */
 function intensityForTier(tier) {
   const key = normalizeEvolutionTier(tier);
   const index = Math.max(0, EVOLUTION_TIERS.indexOf(key));
   return Math.min(5, Math.max(1, index || 1));
 }
 
-/** Duplicate cards shown in the 3D carousel (matches spent cost, capped for layout). */
 function orbiterCountForCost(cost) {
   const spent = Math.max(1, Number(cost) || 1);
-  return Math.min(12, spent);
+  return Math.min(14, spent);
 }
 
 function getUiApi() {
@@ -111,6 +110,42 @@ function clearRevealAnchor(root) {
     .forEach((property) => root.style.removeProperty(property));
 }
 
+function notifyEmbedHeight() {
+  try {
+    window.parent?.postMessage?.({
+      type: 'starlight-view-height',
+      height: Math.max(
+        document.documentElement?.scrollHeight || 0,
+        document.body?.scrollHeight || 0
+      )
+    }, window.location.origin);
+  } catch {}
+}
+
+function releaseRevealDocumentState() {
+  try {
+    document.documentElement.classList.remove('st-evo-open');
+    document.documentElement.style.removeProperty('overflow');
+    document.documentElement.style.removeProperty('overflow-x');
+    document.documentElement.style.removeProperty('overflow-y');
+    document.body?.classList.remove('st-evo-open');
+    document.body?.style.removeProperty('overflow');
+    document.body?.style.removeProperty('overflow-x');
+    document.body?.style.removeProperty('overflow-y');
+  } catch {}
+}
+
+function buildDigicodeRows(count = 6) {
+  const glyphs = '01★◆◇▲▼✦✧';
+  return Array.from({ length: count }, (_, row) => {
+    let line = '';
+    for (let i = 0; i < 18; i += 1) {
+      line += glyphs[(row + i) % glyphs.length];
+    }
+    return `<span class="st-evo-digicode-row" style="--row:${row}">${esc(line)}</span>`;
+  }).join('');
+}
+
 /**
  * @param {object} options
  * @param {string} options.imageUrl
@@ -118,7 +153,7 @@ function clearRevealAnchor(root) {
  * @param {string} options.fromTier
  * @param {string} options.toTier
  * @param {string} [options.label]
- * @param {number} [options.cost] duplicates spent — drives carousel count
+ * @param {number} [options.cost] duplicates spent — drives fragment count
  * @returns {Promise<void>}
  */
 export async function playStarlightEvolutionReveal(options = {}) {
@@ -139,31 +174,41 @@ export async function playStarlightEvolutionReveal(options = {}) {
   const safeName = esc(cardName);
   const safeLabel = esc(label);
   const safeStars = esc(starsMarkup(starRank));
-  const orbitMs = TIMING.carousel;
 
   const root = document.createElement('div');
   root.className = `st-evo-root${reduced ? ' is-reduced' : ''}`;
   root.dataset.intensity = String(intensity);
-  root.style.setProperty('--evo-orbit-ms', `${orbitMs}ms`);
   root.style.setProperty('--evo-orbit-n', String(orbiters));
   root.setAttribute('role', 'dialog');
   root.setAttribute('aria-modal', 'true');
   root.setAttribute('aria-label', `Evolving to ${label}`);
   root.innerHTML = `
-    <div class="st-evo-backdrop" aria-hidden="true"></div>
-    <div class="st-evo-panel prestige-${toToken}" data-intensity="${intensity}">
+    <div class="st-evo-backdrop" aria-hidden="true">
+      <div class="st-evo-scanlines"></div>
+      <div class="st-evo-matrix"></div>
+    </div>
+    <div class="st-evo-stage prestige-${toToken}" data-intensity="${intensity}">
       <p class="st-evo-caption">Starlight Evolution</p>
+      <p class="st-evo-phase-label" aria-live="polite">Initializing…</p>
+      <div class="st-evo-ring-system" aria-hidden="true">
+        <span class="st-evo-ring st-evo-ring-outer"></span>
+        <span class="st-evo-ring st-evo-ring-inner"></span>
+        <span class="st-evo-ring st-evo-ring-core"></span>
+      </div>
+      <div class="st-evo-digicode" aria-hidden="true">${buildDigicodeRows()}</div>
       <div class="st-evo-arena">
         <div class="st-evo-orbit-rig" aria-hidden="true">
           <div class="st-evo-orbit"></div>
         </div>
         <div class="st-evo-hero-wrap">
+          <span class="st-evo-silhouette" aria-hidden="true"></span>
           <div class="st-evo-hero prestige-frame prestige-${fromToken}" data-from-tier="${esc(fromToken)}" data-to-tier="${esc(toToken)}">
             <span class="st-evo-hero-halo" aria-hidden="true"></span>
             <img src="${safeImg}" alt="${safeName}" draggable="false">
             <span class="st-evo-border prestige-frame prestige-${fromToken}" aria-hidden="true"></span>
           </div>
         </div>
+        <div class="st-evo-data-burst" aria-hidden="true"></div>
         <div class="st-evo-flash" aria-hidden="true"></div>
         <div class="st-evo-sparks" aria-hidden="true"></div>
       </div>
@@ -188,8 +233,13 @@ export async function playStarlightEvolutionReveal(options = {}) {
     orbit.appendChild(mote);
   }
 
+  const phaseLabel = root.querySelector('.st-evo-phase-label');
+  const hero = root.querySelector('.st-evo-hero');
+  const border = root.querySelector('.st-evo-border');
+
   document.body.appendChild(root);
   document.body.classList.add('st-evo-open');
+  document.documentElement.classList.add('st-evo-open');
   anchorReveal(root);
   void root.offsetWidth;
   root.classList.add('is-open');
@@ -201,32 +251,44 @@ export async function playStarlightEvolutionReveal(options = {}) {
     window.parent?.addEventListener?.('resize', onViewportChange);
   } catch {}
 
-  const hero = root.querySelector('.st-evo-hero');
-  const border = root.querySelector('.st-evo-border');
+  const setPhaseLabel = (text) => {
+    if (phaseLabel) phaseLabel.textContent = text;
+  };
 
   try {
     if (reduced) {
-      root.classList.add('is-reveal');
-      if (hero) hero.className = `st-evo-hero prestige-frame prestige-${toToken}`;
+      setPhaseLabel('Evolution complete');
+      root.classList.add('is-complete');
+      if (hero) hero.className = `st-evo-hero prestige-frame prestige-${toToken} is-evolved`;
       if (border) border.className = `st-evo-border prestige-frame prestige-${toToken}`;
-      await wait(REDUCED_TIMING.reveal);
+      await wait(REDUCED_TIMING.complete);
       return;
     }
 
-    root.classList.add('is-enter');
-    await wait(TIMING.enter);
+    setPhaseLabel('Scanning card data…');
+    root.classList.add('is-boot');
+    await wait(TIMING.boot);
 
-    root.classList.add('is-carousel');
-    await wait(TIMING.carousel);
+    root.classList.add('is-scan');
+    setPhaseLabel('Uploading Starlight energy…');
+    await wait(TIMING.scan);
 
-    root.classList.add('is-fuse');
-    await wait(Math.round(TIMING.fuse * 0.55));
+    root.classList.add('is-charge');
+    setPhaseLabel('Infusing duplicate fragments…');
+    await wait(TIMING.charge);
 
+    root.classList.add('is-rupture');
+    setPhaseLabel('Radiance rupture!');
+    await wait(Math.round(TIMING.rupture * 0.58));
+
+    root.classList.add('is-break');
     if (hero) hero.className = `st-evo-hero prestige-frame prestige-${toToken} is-evolved`;
     if (border) border.className = `st-evo-border prestige-frame prestige-${toToken}`;
+    setPhaseLabel('Evolution complete!');
+    await wait(Math.round(TIMING.rupture * 0.42) + TIMING.break);
 
-    root.classList.add('is-reveal');
-    await wait(Math.round(TIMING.fuse * 0.45) + TIMING.reveal);
+    root.classList.add('is-complete');
+    await wait(TIMING.complete);
   } finally {
     try {
       window.removeEventListener('resize', onViewportChange);
@@ -237,7 +299,9 @@ export async function playStarlightEvolutionReveal(options = {}) {
     await wait(reduced ? REDUCED_TIMING.leave : TIMING.leave);
     clearRevealAnchor(root);
     root.remove();
-    document.body.classList.remove('st-evo-open');
+    releaseRevealDocumentState();
+    notifyEmbedHeight();
+    window.requestAnimationFrame(() => notifyEmbedHeight());
   }
 }
 
