@@ -1,13 +1,21 @@
 /**
  * CSS class helpers for unlockable profile avatar frames.
  */
-/* Ring-only presets. Overlay/padding-box fills (rainbow, aurora, holofoil, prism, sunset, ocean) retired. */
 export const AVATAR_FRAME_PRESETS = Object.freeze([
+  // Basic solid rings
   'sky', 'rose', 'gold', 'violet', 'emerald', 'crimson', 'midnight',
-  'glitter', 'celestial'
+  'coral', 'amber', 'teal', 'slate', 'lavender', 'mint', 'peach', 'onyx',
+  // Gradient and animated rings (ring-safe masked gradients)
+  'sunset', 'ocean', 'rainbow', 'aurora', 'holofoil', 'prism', 'nebula', 'eclipse', 'candy',
+  // Sparkle / halo presets
+  'glitter', 'celestial',
+  // Creative ornament frames
+  'angel-wings', 'star-crown', 'moon-orbit', 'phoenix', 'fairy', 'thorns'
 ]);
 
-export const AVATAR_FRAME_EFFECTS = Object.freeze(['static', 'shimmer', 'pulse', 'glitter']);
+export const AVATAR_FRAME_EFFECTS = Object.freeze([
+  'static', 'shimmer', 'pulse', 'glitter', 'breathe'
+]);
 
 export function normalizeAvatarFramePreset(preset) {
   const value = String(preset || '').trim().toLowerCase();

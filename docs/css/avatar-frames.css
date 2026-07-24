@@ -1,4 +1,10 @@
-/* Unlockable CSS profile avatar frames (ring-only borders + glow). */
+/* Unlockable CSS profile avatar frames (ring-only borders, glow, and side ornaments). */
+
+@property --frame-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
 
 .avatar-frame {
   position: relative;
@@ -19,6 +25,21 @@
   background-image: none;
 }
 
+.avatar-frame::before {
+  content: none;
+}
+
+.avatar-frame[class*="-wings"]::before,
+.avatar-frame-star-crown::before,
+.avatar-frame-moon-orbit::before,
+.avatar-frame-phoenix::before,
+.avatar-frame-fairy::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+}
+
 .shell-avatar.avatar-frame,
 .collector-avatar.avatar-frame,
 .profile-preview-avatar.avatar-frame,
@@ -35,6 +56,8 @@
 .rankings-avatar-link:has(.avatar-frame) {
   overflow: visible;
 }
+
+/* --- Basic solid rings --- */
 
 .avatar-frame-sky::after {
   border-color: #6bc6f8;
@@ -71,6 +94,152 @@
   box-shadow: 0 0 0 1px rgba(180, 200, 255, 0.55), 0 0 16px rgba(64, 95, 161, 0.5);
 }
 
+.avatar-frame-coral::after {
+  border-color: #ff8f6b;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7), 0 0 14px rgba(255, 143, 107, 0.45);
+}
+
+.avatar-frame-amber::after {
+  border-color: #ffb347;
+  box-shadow: 0 0 0 1px rgba(255, 248, 220, 0.8), 0 0 15px rgba(255, 179, 71, 0.48);
+}
+
+.avatar-frame-teal::after {
+  border-color: #2ec4b6;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.68), 0 0 14px rgba(46, 196, 182, 0.42);
+}
+
+.avatar-frame-slate::after {
+  border-color: #7b8794;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.55), 0 0 12px rgba(123, 135, 148, 0.35);
+}
+
+.avatar-frame-lavender::after {
+  border-color: #c4a7ff;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.72), 0 0 14px rgba(196, 167, 255, 0.42);
+}
+
+.avatar-frame-mint::after {
+  border-color: #8fe3c8;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.72), 0 0 14px rgba(143, 227, 200, 0.42);
+}
+
+.avatar-frame-peach::after {
+  border-color: #ffc4a3;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.72), 0 0 14px rgba(255, 196, 163, 0.42);
+}
+
+.avatar-frame-onyx::after {
+  border-color: #2a3142;
+  box-shadow: 0 0 0 1px rgba(180, 190, 210, 0.45), 0 0 14px rgba(42, 49, 66, 0.55);
+}
+
+/* --- Gradient rings (masked; transparent center) --- */
+
+.avatar-frame-sunset::after,
+.avatar-frame-ocean::after,
+.avatar-frame-rainbow::after,
+.avatar-frame-aurora::after,
+.avatar-frame-holofoil::after,
+.avatar-frame-prism::after,
+.avatar-frame-nebula::after,
+.avatar-frame-eclipse::after,
+.avatar-frame-candy::after,
+.avatar-frame-thorns::after {
+  border: none;
+  padding: 5px;
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4.5px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4.5px));
+}
+
+.avatar-frame-sunset::after {
+  background: linear-gradient(135deg, #ff82c8 0%, #fed334 52%, #ff9a5a 100%);
+  box-shadow: 0 0 16px rgba(255, 154, 90, 0.35);
+}
+
+.avatar-frame-ocean::after {
+  background: linear-gradient(145deg, #6bc6f8 0%, #2ec4b6 55%, #405fa1 100%);
+  box-shadow: 0 0 16px rgba(46, 196, 182, 0.35);
+}
+
+.avatar-frame-rainbow::after {
+  background: conic-gradient(
+    from var(--frame-angle),
+    #ff82c8,
+    #fed334,
+    #4eca9a,
+    #6bc6f8,
+    #b48cff,
+    #ff82c8
+  );
+  box-shadow: 0 0 18px rgba(180, 140, 255, 0.35);
+}
+
+.avatar-frame-aurora::after {
+  background: conic-gradient(
+    from var(--frame-angle),
+    #6bc6f8 0deg,
+    #b48cff 72deg,
+    #4eca9a 144deg,
+    #ff82c8 216deg,
+    #fed334 288deg,
+    #6bc6f8 360deg
+  );
+  box-shadow: 0 0 20px rgba(107, 198, 248, 0.35), 0 0 28px rgba(180, 140, 255, 0.2);
+}
+
+.avatar-frame-holofoil::after {
+  background: conic-gradient(
+    from var(--frame-angle),
+    #ff82c8,
+    #fed334,
+    #8fe3c8,
+    #6bc6f8,
+    #c4a7ff,
+    #ffc4a3,
+    #ff82c8
+  );
+  box-shadow: 0 0 14px rgba(255, 130, 200, 0.35), 0 0 22px rgba(107, 198, 248, 0.25);
+}
+
+.avatar-frame-prism::after {
+  background: conic-gradient(
+    from calc(var(--frame-angle) + 20deg),
+    #ef5b7a,
+    #fed334,
+    #4eca9a,
+    #6bc6f8,
+    #b48cff,
+    #ef5b7a
+  );
+  box-shadow: 0 0 18px rgba(107, 198, 248, 0.32);
+}
+
+.avatar-frame-nebula::after {
+  background: radial-gradient(circle at 30% 30%, #ff82c8 0%, transparent 34%),
+    radial-gradient(circle at 72% 68%, #6bc6f8 0%, transparent 32%),
+    conic-gradient(from var(--frame-angle), #405fa1, #b48cff, #2ec4b6, #405fa1);
+  box-shadow: 0 0 20px rgba(180, 140, 255, 0.38);
+}
+
+.avatar-frame-eclipse::after {
+  background: conic-gradient(from var(--frame-angle), #2a3142 0deg, #405fa1 90deg, #fed334 180deg, #2a3142 270deg, #2a3142 360deg);
+  box-shadow: 0 0 18px rgba(254, 211, 52, 0.28), 0 0 24px rgba(64, 95, 161, 0.35);
+}
+
+.avatar-frame-candy::after {
+  background: linear-gradient(135deg, #ff82c8 0%, #c4a7ff 35%, #6bc6f8 68%, #8fe3c8 100%);
+  box-shadow: 0 0 16px rgba(255, 130, 200, 0.32);
+}
+
+.avatar-frame-thorns::after {
+  padding: 6px;
+  background: repeating-conic-gradient(from 0deg, #4eca9a 0deg 10deg, transparent 10deg 20deg);
+  box-shadow: 0 0 14px rgba(78, 202, 154, 0.35);
+}
+
+/* --- Sparkle / halo presets --- */
+
 .avatar-frame-glitter::after {
   border-color: #ffb7de;
   box-shadow:
@@ -89,6 +258,90 @@
     0 0 36px rgba(255, 130, 200, 0.2);
 }
 
+/* --- Creative ornament frames --- */
+
+.avatar-frame-angel-wings::before {
+  inset: -2px -20px -4px -20px;
+  background:
+    radial-gradient(ellipse 46% 58% at 16% 54%, rgba(255, 255, 255, 0.96) 0 36%, transparent 42%),
+    radial-gradient(ellipse 46% 58% at 84% 54%, rgba(255, 255, 255, 0.96) 0 36%, transparent 42%),
+    linear-gradient(168deg, transparent 40%, rgba(255, 248, 220, 0.88) 47%, rgba(254, 211, 52, 0.5) 56%, transparent 64%),
+    linear-gradient(12deg, transparent 40%, rgba(255, 248, 220, 0.88) 47%, rgba(254, 211, 52, 0.5) 56%, transparent 64%);
+  filter: drop-shadow(0 2px 8px rgba(254, 211, 52, 0.35));
+  opacity: 0.94;
+}
+
+.avatar-frame-angel-wings::after {
+  border-color: #fed334;
+  box-shadow: 0 0 0 1px rgba(255, 248, 220, 0.85), 0 0 18px rgba(254, 211, 52, 0.45);
+}
+
+.avatar-frame-star-crown::before {
+  inset: -16px -6px auto -6px;
+  height: 28px;
+  background:
+    radial-gradient(circle at 50% 88%, #fed334 0 16%, transparent 18%),
+    radial-gradient(circle at 18% 72%, #ff82c8 0 14%, transparent 16%),
+    radial-gradient(circle at 82% 72%, #6bc6f8 0 14%, transparent 16%),
+    radial-gradient(circle at 34% 58%, #fed334 0 12%, transparent 14%),
+    radial-gradient(circle at 66% 58%, #fed334 0 12%, transparent 14%),
+    linear-gradient(180deg, transparent 55%, rgba(254, 211, 52, 0.35) 100%);
+  filter: drop-shadow(0 2px 6px rgba(254, 211, 52, 0.35));
+}
+
+.avatar-frame-star-crown::after {
+  border-color: #fed334;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.82), 0 0 16px rgba(254, 211, 52, 0.45);
+}
+
+.avatar-frame-moon-orbit::before {
+  inset: -12px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 8%, rgba(255, 255, 255, 0.95) 0 5%, transparent 6%),
+    radial-gradient(circle at 88% 50%, rgba(196, 167, 255, 0.85) 0 4%, transparent 5%),
+    radial-gradient(circle at 50% 92%, rgba(142, 182, 255, 0.85) 0 4%, transparent 5%),
+    radial-gradient(circle at 12% 50%, rgba(255, 255, 255, 0.8) 0 3.5%, transparent 4.5%);
+  transform-origin: 50% 50%;
+}
+
+.avatar-frame-moon-orbit::after {
+  border-color: #c4a7ff;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.75), 0 0 18px rgba(196, 167, 255, 0.42);
+}
+
+.avatar-frame-phoenix::before {
+  inset: -4px -22px -6px -22px;
+  background:
+    radial-gradient(ellipse 48% 62% at 14% 58%, rgba(255, 248, 220, 0.95) 0 34%, transparent 42%),
+    radial-gradient(ellipse 48% 62% at 86% 58%, rgba(255, 248, 220, 0.95) 0 34%, transparent 42%),
+    linear-gradient(165deg, transparent 38%, rgba(255, 143, 107, 0.85) 46%, rgba(239, 91, 122, 0.55) 58%, transparent 66%),
+    linear-gradient(15deg, transparent 38%, rgba(255, 179, 71, 0.85) 46%, rgba(239, 91, 122, 0.55) 58%, transparent 66%);
+  filter: drop-shadow(0 2px 10px rgba(239, 91, 122, 0.35));
+  opacity: 0.95;
+}
+
+.avatar-frame-phoenix::after {
+  border-color: #ff8f6b;
+  box-shadow: 0 0 0 1px rgba(255, 248, 220, 0.75), 0 0 18px rgba(239, 91, 122, 0.42);
+}
+
+.avatar-frame-fairy::before {
+  inset: -6px -18px -4px -18px;
+  background:
+    radial-gradient(ellipse 42% 52% at 18% 48%, rgba(255, 196, 163, 0.92) 0 32%, transparent 40%),
+    radial-gradient(ellipse 42% 52% at 82% 48%, rgba(196, 167, 255, 0.92) 0 32%, transparent 40%),
+    radial-gradient(ellipse 42% 52% at 18% 48%, rgba(143, 227, 200, 0.55) 0 18%, transparent 24%),
+    radial-gradient(ellipse 42% 52% at 82% 48%, rgba(107, 198, 248, 0.55) 0 18%, transparent 24%);
+  filter: drop-shadow(0 2px 8px rgba(196, 167, 255, 0.32));
+  opacity: 0.92;
+}
+
+.avatar-frame-fairy::after {
+  border-color: #c4a7ff;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.78), 0 0 16px rgba(255, 130, 200, 0.35);
+}
+
 .avatar-frame-preview {
   width: 56px;
   height: 56px;
@@ -99,7 +352,17 @@
 }
 
 .avatar-frame-preview::before {
+  content: none;
+}
+
+.avatar-frame-preview::after {
+  inset: -5px;
+}
+
+.avatar-frame-preview:not([class*="avatar-frame-"])::before {
   content: "✦";
+  position: static;
+  z-index: 1;
   color: #405fa1;
   font-weight: 900;
   font-size: 1.1rem;
@@ -109,11 +372,44 @@
   .avatar-frame-effect-shimmer::after {
     animation: avatar-frame-shimmer 4.2s ease-in-out infinite;
   }
+
   .avatar-frame-effect-pulse::after {
     animation: avatar-frame-pulse 3.2s ease-in-out infinite;
   }
+
   .avatar-frame-effect-glitter::after {
     animation: avatar-frame-glitter 2.2s steps(2, end) infinite;
+  }
+
+  .avatar-frame-effect-breathe::after {
+    animation: avatar-frame-breathe 3.6s ease-in-out infinite;
+  }
+
+  .avatar-frame-rainbow::after,
+  .avatar-frame-aurora::after,
+  .avatar-frame-holofoil::after,
+  .avatar-frame-prism::after,
+  .avatar-frame-nebula::after,
+  .avatar-frame-eclipse::after {
+    animation: avatar-frame-spin 7s linear infinite;
+  }
+
+  .avatar-frame-rainbow.avatar-frame-effect-shimmer::after,
+  .avatar-frame-aurora.avatar-frame-effect-shimmer::after,
+  .avatar-frame-holofoil.avatar-frame-effect-shimmer::after,
+  .avatar-frame-prism.avatar-frame-effect-shimmer::after {
+    animation:
+      avatar-frame-spin 5.5s linear infinite,
+      avatar-frame-shimmer 4.2s ease-in-out infinite;
+  }
+
+  .avatar-frame-moon-orbit::before {
+    animation: avatar-frame-orbit 8s linear infinite;
+  }
+
+  .avatar-frame-moon-orbit.avatar-frame-effect-pulse::before,
+  .avatar-frame-moon-orbit.avatar-frame-effect-breathe::before {
+    animation: avatar-frame-orbit 8s linear infinite, avatar-frame-orbit-glow 3.2s ease-in-out infinite;
   }
 }
 
@@ -129,15 +425,41 @@
   50% { filter: brightness(1.12); }
 }
 
+@keyframes avatar-frame-breathe {
+  0%, 100% { filter: brightness(1) saturate(1); }
+  50% { filter: brightness(1.14) saturate(1.08); }
+}
+
 @keyframes avatar-frame-glitter {
   0%, 100% { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.8), 0 0 10px rgba(255, 183, 222, 0.55), 2px -3px 0 0 rgba(255, 255, 255, 0.85), -3px 2px 0 0 rgba(254, 211, 52, 0.75), 3px 3px 0 0 rgba(107, 198, 248, 0.7); }
   50% { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.9), 0 0 14px rgba(254, 211, 52, 0.55), -2px 3px 0 0 rgba(255, 255, 255, 0.9), 3px -2px 0 0 rgba(107, 198, 248, 0.8), -3px -3px 0 0 rgba(255, 130, 200, 0.75); }
 }
 
+@keyframes avatar-frame-spin {
+  to { --frame-angle: 360deg; }
+}
+
+@keyframes avatar-frame-orbit {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes avatar-frame-orbit-glow {
+  0%, 100% { opacity: 0.82; filter: brightness(1); }
+  50% { opacity: 1; filter: brightness(1.12); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .avatar-frame-effect-shimmer::after,
   .avatar-frame-effect-pulse::after,
-  .avatar-frame-effect-glitter::after {
+  .avatar-frame-effect-glitter::after,
+  .avatar-frame-effect-breathe::after,
+  .avatar-frame-rainbow::after,
+  .avatar-frame-aurora::after,
+  .avatar-frame-holofoil::after,
+  .avatar-frame-prism::after,
+  .avatar-frame-nebula::after,
+  .avatar-frame-eclipse::after,
+  .avatar-frame-moon-orbit::before {
     animation: none;
   }
 }
