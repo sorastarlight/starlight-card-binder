@@ -55,7 +55,7 @@ test('binder filter panel stays hidden on series landing until a pack is selecte
   assert.match(app, /cardSupportsHoloToggle\(card\)/);
   assert.match(app, /cardHasStarlightEvolution\(card\.id\)/);
   assert.match(binder, /cloud-collection\.js\?v=1\.3\.5/);
-  assert.match(binder, /card-analyzer\.css\?v=2\.4\.0/);
+  assert.match(binder, /card-analyzer\.css\?v=2\.4\.1/);
   assert.doesNotMatch(binder, /<b data-duplicates="">0<\/b> extras/);
 });
 

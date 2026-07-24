@@ -1328,7 +1328,8 @@ function renderFullView() {
                 <button class="overlay-arrow right analyzer-arrow" type="button" aria-label="Next card">›</button>
                 <div class="full-card-wrap simple-flip analyzer-card-shell analyzer-card-3d ${overlayFlipped ? 'show-back showing-card-back' : ''} ${analyzerHoloEnabled ? '' : 'is-holo-off'} ${analyzerEvolutionEnabled ? '' : 'is-evolution-off'} ${rarityClass(selected)} ${prestigeClass}" id="fullCard3d" aria-label="${esc(overlayFlipped ? 'Card back' : visibleName)}" data-holographic="${got && analyzerHoloEnabled && isHolographicCard(selected)}" data-finish-class="${esc(finishClass)}">
                   <span class="full-inner">
-                    <span class="face front ${finishClass}"><img class="${artClass}" src="${esc(overlayFlipped ? CARD_BACK_URL : getVisibleImage(selected))}" alt="${esc(overlayFlipped ? 'Card back' : visibleName)}" onerror="this.src='${CARD_BACK_URL}'" draggable="false">${overlayFlipped ? '' : holoMarkup}</span>
+                    <span class="face front ${finishClass}"><img class="${artClass}" src="${esc(getVisibleImage(selected))}" alt="${esc(visibleName)}" onerror="this.src='${CARD_BACK_URL}'" draggable="false">${!overlayFlipped ? holoMarkup : ''}</span>
+                    <span class="face back"><img src="${esc(CARD_BACK_URL)}" alt="Card back" draggable="false"></span>
                   </span>
                 </div>
               </div>
@@ -1392,7 +1393,7 @@ function renderFullView() {
   setAnalyzerTab(analyzerActiveTab);
   $$('.overlay-flip', overlay).forEach(btn => btn.addEventListener('click', () => {
     overlayFlipped = !overlayFlipped;
-    flipCardImage($('#fullCard3d'), getVisibleImage(selected), getVisibleName(selected), overlayFlipped);
+    flipAnalyzerCard($('#fullCard3d'), getVisibleName(selected));
     const stars = overlay.querySelector('.analyzer-rarity-stars');
     if (stars) stars.hidden = overlayFlipped;
     playSfx('flip');
@@ -1734,14 +1735,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 /* ===== V79.3 regression fix: shared preview/full flip helper ===== */
+function flipAnalyzerCard(cardEl, frontAlt) {
+  if (!cardEl || cardEl.classList.contains('flip-turning')) return;
+  const willShowBack = !cardEl.classList.contains('show-back');
+  const duration = 920;
+
+  cardEl.classList.remove('flip-turning', 'flip-to-back', 'flip-to-front');
+  void cardEl.offsetWidth;
+  cardEl.classList.add('flip-turning', willShowBack ? 'flip-to-back' : 'flip-to-front');
+  cardEl.setAttribute('aria-label', willShowBack ? 'Card back' : (frontAlt || 'Card front'));
+
+  window.setTimeout(() => {
+    cardEl.classList.toggle('show-back', willShowBack);
+    cardEl.classList.toggle('showing-card-back', willShowBack);
+    cardEl.classList.remove('flip-turning', 'flip-to-back', 'flip-to-front');
+  }, duration);
+}
+
 function flipCardImage(cardEl, frontUrl, frontAlt, showBack) {
   if (!cardEl) return;
 
-  const isAnalyzer = cardEl.classList.contains('analyzer-card-shell');
-  const swapMs = isAnalyzer ? 420 : 280;
-  const cleanupMs = isAnalyzer ? 960 : 640;
+  if (cardEl.classList.contains('analyzer-card-shell')) {
+    flipAnalyzerCard(cardEl, frontAlt);
+    return;
+  }
 
-  // Final readable flip guard: one visible image surface, no mirrored back face, simple spin swap.
+  const swapMs = 280;
+  const cleanupMs = 640;
+
+  // Preview panels: one visible image surface with a quick spin swap.
   const frontImg = cardEl.querySelector('.face.front img');
   const frontFace = cardEl.querySelector('.face.front');
   cardEl.classList.remove('flip-turning', 'flipped', 'show-back', 'showing-card-back');

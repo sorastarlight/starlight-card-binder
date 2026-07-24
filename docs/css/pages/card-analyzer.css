@@ -1,12 +1,16 @@
 /* Card Full View — magical-girl Starlight character details.
    Loads AFTER qol-ui.css / legacy so .card-analyzer-open beats width clamps + flex-start. */
 
-@keyframes analyzer-readable-spin {
-  0%, 10% { transform: rotateY(0deg) scale(1); filter: brightness(1); }
-  44% { transform: rotateY(92deg) scale(1.05); filter: brightness(1.16) drop-shadow(0 0 20px rgba(255, 143, 208, 0.34)); }
-  56% { transform: rotateY(448deg) scale(1.05); filter: brightness(1.12) drop-shadow(0 0 18px rgba(122, 208, 255, 0.28)); }
-  88% { transform: rotateY(540deg) scale(1.02); filter: brightness(1.06); }
-  100% { transform: rotateY(540deg) scale(1); filter: brightness(1); }
+@keyframes analyzer-flip-to-back {
+  0%, 8% { transform: rotateY(0deg) scale(1) !important; filter: brightness(1); }
+  44% { transform: rotateY(200deg) scale(1.06) !important; filter: brightness(1.14) drop-shadow(0 0 22px rgba(255, 143, 208, 0.38)); }
+  100% { transform: rotateY(540deg) scale(1) !important; filter: brightness(1); }
+}
+
+@keyframes analyzer-flip-to-front {
+  0%, 8% { transform: rotateY(180deg) scale(1) !important; filter: brightness(1); }
+  44% { transform: rotateY(380deg) scale(1.06) !important; filter: brightness(1.14) drop-shadow(0 0 22px rgba(122, 208, 255, 0.32)); }
+  100% { transform: rotateY(720deg) scale(1) !important; filter: brightness(1); }
 }
 
 @keyframes analyzer-modal-in {
@@ -514,17 +518,28 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
   height: 100%;
   transform-style: preserve-3d;
   border-radius: inherit;
-  overflow: hidden !important;
+  overflow: visible !important;
   padding: 0 !important;
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
-  transform: none !important;
+  transform: rotateY(0deg) !important;
+  transition: none !important;
 }
 
-#cardOverlay .analyzer-sekai-stage .analyzer-card-shell.flip-turning .full-inner,
-#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell.flip-turning .full-inner {
-  animation: analyzer-readable-spin 0.92s cubic-bezier(0.2, 0.82, 0.18, 1) both;
+#cardOverlay .analyzer-sekai-stage .analyzer-card-shell.show-back .full-inner,
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell.show-back .full-inner {
+  transform: rotateY(180deg) !important;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-card-shell.flip-to-back .full-inner,
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell.flip-to-back .full-inner {
+  animation: analyzer-flip-to-back 0.92s cubic-bezier(0.2, 0.82, 0.18, 1) both !important;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-card-shell.flip-to-front .full-inner,
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell.flip-to-front .full-inner {
+  animation: analyzer-flip-to-front 0.92s cubic-bezier(0.2, 0.82, 0.18, 1) both !important;
 }
 
 #cardOverlay .analyzer-sekai-stage .analyzer-card-shell .face,
@@ -540,18 +555,31 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
   background: transparent !important;
   border: 0 !important;
   outline: 0 !important;
-  transform: none !important;
-  backface-visibility: visible !important;
-  -webkit-backface-visibility: visible !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  transform-style: preserve-3d;
   box-shadow:
     0 20px 44px rgba(30, 50, 90, 0.3),
     0 0 0 1px rgba(255, 255, 255, 0.45) !important;
 }
 
 #cardOverlay .analyzer-sekai-stage .analyzer-card-shell .face.front,
-#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front,
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front {
+  transform: rotateY(0deg) translateZ(1px) !important;
+  z-index: 2;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-card-shell .face.back,
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.back {
+  display: block !important;
+  transform: rotateY(180deg) translateZ(1px) !important;
+  z-index: 1;
+}
+
 #cardOverlay .analyzer-sekai-stage .analyzer-card-shell .face.front img,
-#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front img {
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front img,
+#cardOverlay .analyzer-sekai-stage .analyzer-card-shell .face.back img,
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.back img {
   transform: none !important;
 }
 
@@ -1006,7 +1034,8 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
   #cardOverlay .analyzer-sekai-stage .analyzer-footer-close,
   #cardOverlay .analyzer-sekai-stage .analyzer-close,
   #cardOverlay .analyzer-sekai-stage .analyzer-card-shell .full-inner,
-  #cardOverlay .analyzer-sekai-stage .analyzer-card-shell.flip-turning .full-inner {
+  #cardOverlay .analyzer-sekai-stage .analyzer-card-shell.flip-to-back .full-inner,
+  #cardOverlay .analyzer-sekai-stage .analyzer-card-shell.flip-to-front .full-inner {
     transition: none !important;
     animation: none !important;
   }
