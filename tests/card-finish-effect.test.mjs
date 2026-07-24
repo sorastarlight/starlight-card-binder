@@ -47,9 +47,11 @@ test('finish effects are limited to reveal and full-card view surfaces', async (
     read('docs/js/pages/admin-boosters-page.js')
   ]);
 
-  assert.match(app, /face front \$\{cardFinishClass\(selected, got && !overlayFlipped\)\}/);
+  assert.match(app, /const finishClass = got && analyzerHoloEnabled \? cardFinishClass\(selected, true\) : ''/);
+  assert.match(app, /face front \$\{finishClass\}/);
   assert.match(app, /face front \$\{cardFinishClass\(card, got && !previewFlipped\)\}/);
-  assert.match(app, /holoSparkMarkup\(selected, got && !overlayFlipped\)/);
+  assert.match(app, /holoSparkMarkup\(selected, got && !previewFlipped\)/);
+  assert.match(app, /analyzerHoloEnabled/);
   assert.match(app, /data-finish-class=/);
   assert.match(app, /ensureFinishEffectLayer/);
   assert.match(app, /attachCardDragTilt/);

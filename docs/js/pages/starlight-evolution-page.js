@@ -46,7 +46,10 @@ const cardModal = dialogEl && window.StarlightUI?.adoptModal
       dialog: dialogEl.querySelector('.st-dialog'),
       labelledBy: 'st-evo-card-title',
       describedBy: 'st-evo-card-body',
-      initialFocus: dialogCloseEl
+      initialFocus: dialogCloseEl,
+      onClose: () => {
+        activeCardId = '';
+      }
     })
   : null;
 
@@ -190,25 +193,14 @@ function renderCardDetail(card) {
 function openCardDetail(cardId) {
   const id = String(cardId || '').trim();
   const card = ownedById.get(id);
-  if (!card) return;
+  if (!card || !cardModal) return;
   activeCardId = id;
   renderCardDetail(card);
-  if (cardModal) {
-    cardModal.open({ initialFocus: dialogCloseEl });
-    return;
-  }
-  dialogEl?.classList.remove('hidden');
-  dialogEl?.setAttribute('aria-hidden', 'false');
+  cardModal.open({ initialFocus: dialogCloseEl });
 }
 
 function closeCardDetail() {
-  activeCardId = '';
-  if (cardModal) {
-    cardModal.close();
-    return;
-  }
-  dialogEl?.classList.add('hidden');
-  dialogEl?.setAttribute('aria-hidden', 'true');
+  cardModal?.close();
 }
 
 async function confirmEvolve(card) {
@@ -351,7 +343,5 @@ dialogBodyEl?.addEventListener('click', (event) => {
     handleUnfuse(unfuseBtn.getAttribute('data-evo-unfuse'));
   }
 });
-
-dialogCloseEl?.addEventListener('click', () => closeCardDetail());
 
 renderOwned();

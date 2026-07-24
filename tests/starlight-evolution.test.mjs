@@ -133,6 +133,8 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.match(evoPageJs, /playStarlightEvolutionReveal/);
   assert.doesNotMatch(evoPageJs, /data-shell-view=["']collection["']/);
   assert.doesNotMatch(evoPageJs, /binder\.html\?view=collection/);
+  assert.match(evoPageJs, /adoptModal/);
+  assert.doesNotMatch(evoPageJs, /dialogEl\?\.classList\.(add|remove)\(['"]hidden['"]\)/);
   assert.match(evoPage, /st-evo-card-modal/);
-  assert.match(evoPage, /starlight-evolution-page\.js\?v=1\.2\.0/);
+  assert.match(evoPage, /starlight-evolution-page\.js\?v=1\.2\.1/);
 });
