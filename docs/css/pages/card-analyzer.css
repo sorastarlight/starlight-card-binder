@@ -1,6 +1,13 @@
 /* Card Full View — magical-girl Starlight character details.
    Loads AFTER qol-ui.css / legacy so .card-analyzer-open beats width clamps + flex-start. */
 
+@keyframes analyzer-readable-spin {
+  0% { transform: rotateY(0deg) scale(1); filter: brightness(1); }
+  47% { transform: rotateY(88deg) scale(1.035); filter: brightness(1.18) drop-shadow(0 0 16px rgba(255, 143, 208, 0.28)); }
+  53% { transform: rotateY(-88deg) scale(1.035); filter: brightness(1.18) drop-shadow(0 0 16px rgba(122, 208, 255, 0.24)); }
+  100% { transform: rotateY(0deg) scale(1); filter: brightness(1); }
+}
+
 @keyframes analyzer-modal-in {
   from {
     opacity: 0;
@@ -319,54 +326,71 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
   display: none !important;
 }
 
-/* —— Identity —— */
-#cardOverlay .analyzer-sekai-stage .analyzer-identity {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 8px 18px;
-  align-items: start;
+/* —— Unified card header —— */
+#cardOverlay .analyzer-sekai-stage .analyzer-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px 18px;
+  padding: 2px 2px 12px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid rgba(180, 200, 230, 0.38);
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-header-copy {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-header-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex: 0 0 auto;
+  max-width: min(220px, 42%);
 }
 
 #cardOverlay .analyzer-sekai-stage .analyzer-subtitle {
-  margin: 0 0 4px;
+  margin: 0 0 6px;
   color: var(--ca-muted);
   font-size: 0.82rem;
   font-weight: 700;
   line-height: 1.35;
 }
 
-#cardOverlay .analyzer-sekai-stage .analyzer-identity h2 {
+#cardOverlay .analyzer-sekai-stage .analyzer-header-copy h2 {
   margin: 0;
   color: var(--ca-ink);
-  font-size: clamp(1.55rem, 3.2vw, 2.15rem);
+  font-size: clamp(1.35rem, 2.8vw, 1.95rem);
   font-weight: 950;
   letter-spacing: -0.02em;
-  line-height: 1.15;
+  line-height: 1.12;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 #cardOverlay .analyzer-sekai-stage .analyzer-series-badge {
-  display: grid;
-  justify-items: center;
-  gap: 4px;
-  min-width: 96px;
-  max-width: 140px;
-  padding: 10px 12px;
-  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 8px 12px;
+  border-radius: 999px;
   background:
     linear-gradient(145deg, rgba(122, 208, 255, 0.28), rgba(255, 143, 208, 0.22));
   border: 1px solid rgba(255, 255, 255, 0.85);
   box-shadow:
-    0 10px 22px rgba(90, 120, 180, 0.14),
-    0 0 18px rgba(255, 143, 208, 0.12);
-  text-align: center;
+    0 8px 18px rgba(90, 120, 180, 0.12),
+    0 0 14px rgba(255, 143, 208, 0.1);
 }
 
 #cardOverlay .analyzer-sekai-stage .analyzer-series-spark {
   color: var(--ca-gold);
-  font-size: 1.15rem;
+  font-size: 0.95rem;
   filter: drop-shadow(0 0 8px rgba(255, 213, 106, 0.65));
   animation: analyzer-sparkle-twinkle 5.2s ease-in-out infinite;
+  flex: 0 0 auto;
 }
 
 #cardOverlay .analyzer-sekai-stage .analyzer-series-name {
@@ -374,7 +398,32 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
   font-size: 0.72rem;
   font-weight: 900;
   line-height: 1.25;
-  word-break: break-word;
+  text-align: left;
+}
+
+#cardOverlay .analyzer-sekai-stage .analyzer-category-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--ca-blue), #a0dcff 55%, #ffb8e0);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  box-shadow:
+    0 6px 16px rgba(90, 150, 210, 0.28),
+    0 0 12px rgba(255, 143, 208, 0.18);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Legacy identity block removed — keep selectors from breaking cached markup. */
+#cardOverlay .analyzer-sekai-stage .analyzer-identity {
+  display: none;
 }
 
 /* —— Main art + stats —— */
@@ -387,8 +436,9 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
 
 #cardOverlay .analyzer-sekai-stage .analyzer-card-col {
   display: grid;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
+  justify-items: center;
 }
 
 #cardOverlay .analyzer-sekai-stage .analyzer-card-stage {
@@ -418,13 +468,14 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
 }
 
 #cardOverlay .analyzer-sekai-stage .analyzer-rarity-stars {
-  position: absolute;
-  left: 10px;
-  bottom: 14px;
-  z-index: 4;
+  position: static;
+  z-index: 1;
   display: flex;
-  flex-direction: column-reverse;
-  gap: 1px;
+  flex-direction: row;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  max-width: min(300px, 100%);
   pointer-events: none;
   color: var(--ca-gold);
   font-size: 1.05rem;
@@ -435,29 +486,11 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
 }
 
 #cardOverlay .analyzer-sekai-stage .analyzer-attr-chip {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 4;
-  max-width: 46%;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, var(--ca-blue), #a0dcff 55%, #ffb8e0);
-  color: #fff;
-  font-size: 0.68rem;
-  font-weight: 900;
-  letter-spacing: 0.02em;
-  box-shadow:
-    0 6px 16px rgba(90, 150, 210, 0.35),
-    0 0 12px rgba(255, 143, 208, 0.25);
-  pointer-events: none;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: none;
 }
 
-#cardOverlay .analyzer-sekai-stage .analyzer-card-stage .full-card-wrap.analyzer-card-3d,
-#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-3d {
+#cardOverlay .analyzer-sekai-stage .analyzer-card-stage .full-card-wrap.analyzer-card-shell,
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell {
   position: relative;
   z-index: 1;
   width: min(300px, 100%, 42vh) !important;
@@ -478,33 +511,33 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
     0 0 40px rgba(122, 208, 255, 0.22) !important;
 }
 
-#cardOverlay .analyzer-sekai-stage .analyzer-card-stage .full-card-wrap.analyzer-card-3d:active {
+#cardOverlay .analyzer-sekai-stage .analyzer-card-stage .full-card-wrap.analyzer-card-shell:active {
   cursor: grabbing;
 }
 
-#cardOverlay .analyzer-sekai-stage .analyzer-card-3d .full-inner,
-#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-3d .full-inner {
+#cardOverlay .analyzer-sekai-stage .analyzer-card-shell .full-inner,
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .full-inner {
   position: relative;
   display: block !important;
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  transition: transform 0.55s cubic-bezier(0.22, 0.8, 0.28, 1);
   border-radius: inherit;
   overflow: hidden !important;
   padding: 0 !important;
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
+  transform: none !important;
 }
 
-#cardOverlay .analyzer-sekai-stage .analyzer-card-3d.show-back .full-inner,
-#cardOverlay .analyzer-sekai-stage .analyzer-card-3d.showing-card-back .full-inner {
-  transform: rotateY(180deg);
+#cardOverlay .analyzer-sekai-stage .analyzer-card-shell.flip-turning .full-inner,
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell.flip-turning .full-inner {
+  animation: analyzer-readable-spin 0.58s cubic-bezier(0.2, 0.82, 0.18, 1) both;
 }
 
-#cardOverlay .analyzer-sekai-stage .analyzer-card-3d .face,
-#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-3d .face {
+#cardOverlay .analyzer-sekai-stage .analyzer-card-shell .face,
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face {
   position: absolute !important;
   inset: 0;
   display: block !important;
@@ -512,43 +545,27 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
   height: 100% !important;
   border-radius: inherit;
   overflow: hidden !important;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
   pointer-events: auto !important;
   background: transparent !important;
   border: 0 !important;
   outline: 0 !important;
+  transform: none !important;
+  backface-visibility: visible !important;
+  -webkit-backface-visibility: visible !important;
   box-shadow:
     0 20px 44px rgba(30, 50, 90, 0.3),
     0 0 0 1px rgba(255, 255, 255, 0.45) !important;
 }
 
-#cardOverlay .analyzer-sekai-stage .analyzer-card-3d .face.front {
-  transform: translateZ(6px);
-  z-index: 2;
+#cardOverlay .analyzer-sekai-stage .analyzer-card-shell .face.front,
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front,
+#cardOverlay .analyzer-sekai-stage .analyzer-card-shell .face.front img,
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front img {
+  transform: none !important;
 }
 
-#cardOverlay .analyzer-sekai-stage .analyzer-card-3d .face.back {
-  transform: rotateY(180deg) translateZ(6px);
-  z-index: 1;
-}
-
-#cardOverlay .analyzer-sekai-stage .analyzer-card-3d::before {
-  content: "";
-  position: absolute;
-  inset: 4px -5px 4px auto;
-  width: 10px;
-  border-radius: 4px;
-  background: linear-gradient(180deg, #e8eef8, #b8c4d8 45%, #8e9bb0);
-  transform: rotateY(-90deg) translateZ(6px);
-  transform-origin: right center;
-  opacity: 0.85;
-  pointer-events: none;
-  z-index: 0;
-}
-
-#cardOverlay .analyzer-sekai-stage .analyzer-card-3d img,
-#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-3d img {
+#cardOverlay .analyzer-sekai-stage .analyzer-card-shell img,
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell img {
   width: 100% !important;
   height: 100% !important;
   max-height: none !important;
@@ -564,15 +581,15 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
   opacity: 1 !important;
 }
 
-#cardOverlay .analyzer-sekai-stage .analyzer-card-3d.is-holo-off .card-finish-effect,
-#cardOverlay .analyzer-sekai-stage .analyzer-card-3d.is-holo-off .holo-spark,
-#cardOverlay .analyzer-sekai-stage .analyzer-card-3d.is-holo-off .finish-effect {
+#cardOverlay .analyzer-sekai-stage .analyzer-card-shell.is-holo-off .card-finish-effect,
+#cardOverlay .analyzer-sekai-stage .analyzer-card-shell.is-holo-off .holo-spark,
+#cardOverlay .analyzer-sekai-stage .analyzer-card-shell.is-holo-off .finish-effect {
   display: none !important;
   opacity: 0 !important;
 }
 
-#cardOverlay .analyzer-sekai-stage .analyzer-card-3d.is-evolution-off.prestige-frame::after,
-#cardOverlay .analyzer-sekai-stage .analyzer-card-3d.is-evolution-off .prestige-frame::after {
+#cardOverlay .analyzer-sekai-stage .analyzer-card-shell.is-evolution-off.prestige-frame::after,
+#cardOverlay .analyzer-sekai-stage .analyzer-card-shell.is-evolution-off .prestige-frame::after {
   display: none !important;
   opacity: 0 !important;
 }
@@ -897,6 +914,19 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
     gap: 12px;
   }
 
+  #cardOverlay .analyzer-sekai-stage .analyzer-card-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #cardOverlay .analyzer-sekai-stage .analyzer-header-meta {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    max-width: none;
+  }
+
   #cardOverlay .analyzer-sekai-stage .analyzer-identity {
     grid-template-columns: minmax(0, 1fr) auto;
   }
@@ -905,8 +935,8 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
     padding: 8px 40px;
   }
 
-  #cardOverlay .analyzer-sekai-stage .analyzer-card-stage .full-card-wrap.analyzer-card-3d,
-  #cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-3d {
+  #cardOverlay .analyzer-sekai-stage .analyzer-card-stage .full-card-wrap.analyzer-card-shell,
+  #cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell {
     width: min(240px, 68vw, 38vh) !important;
     max-width: 240px !important;
   }
@@ -929,13 +959,9 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
 }
 
 @media (max-width: 520px) {
-  #cardOverlay .analyzer-sekai-stage .analyzer-identity {
-    grid-template-columns: 1fr;
-  }
-
-  #cardOverlay .analyzer-sekai-stage .analyzer-series-badge {
-    justify-self: start;
-    max-width: none;
+  #cardOverlay .analyzer-sekai-stage .analyzer-header-meta {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   #cardOverlay .analyzer-sekai-stage .analyzer-stat-row {
@@ -969,8 +995,10 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
   #cardOverlay .analyzer-sekai-stage .analyzer-tab,
   #cardOverlay .analyzer-sekai-stage .analyzer-footer-close,
   #cardOverlay .analyzer-sekai-stage .analyzer-close,
-  #cardOverlay .analyzer-sekai-stage .analyzer-card-3d .full-inner {
+  #cardOverlay .analyzer-sekai-stage .analyzer-card-shell .full-inner,
+  #cardOverlay .analyzer-sekai-stage .analyzer-card-shell.flip-turning .full-inner {
     transition: none !important;
+    animation: none !important;
   }
 }
 

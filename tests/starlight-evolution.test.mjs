@@ -45,12 +45,12 @@ test('Starlight Evolution costs and refunds match the locked ladder', () => {
   assert.equal(evolutionUnfuseRefund('starlight_burst'), 110);
   assert.equal(evolutionUnfuseRefund('stardust'), null);
 
-  assert.equal(prestigeLabel('stardust'), '★ Stardust');
-  assert.equal(prestigeLabel('star_bit'), '★★ Star Bit');
-  assert.equal(prestigeLabel('protostar'), '★★★ Protostar');
-  assert.equal(prestigeLabel('starlight'), '★★★★ Star');
-  assert.equal(prestigeLabel('super_starlight'), '★★★★★ Super Star');
-  assert.equal(prestigeLabel('starlight_burst'), '★★★★★★ Super Starlight');
+  assert.equal(prestigeLabel('stardust'), 'Standard');
+  assert.equal(prestigeLabel('star_bit'), '⭐ Radiance I');
+  assert.equal(prestigeLabel('protostar'), '⭐⭐ Radiance II');
+  assert.equal(prestigeLabel('starlight'), '⭐⭐⭐ Radiance III');
+  assert.equal(prestigeLabel('super_starlight'), '⭐⭐⭐⭐ Radiance IV');
+  assert.equal(prestigeLabel('starlight_burst'), '⭐⭐⭐⭐⭐ Radiance V');
   assert.equal(prestigeClassName('star_bit'), 'prestige-frame prestige-star-bit');
   assert.equal(prestigeClassName('starlight_burst'), 'prestige-frame prestige-starlight-burst');
   assert.equal(prestigeClassName('stardust'), '');
@@ -75,7 +75,7 @@ test('Starlight Evolution migration and client wiring are present', async () => 
     appShell
   ] = await Promise.all([
     read('supabase/migrations/20260723200000_starlight_evolution.sql'),
-    read('supabase/migrations/20260723210000_starlight_evolution_tier_labels.sql'),
+    read('supabase/migrations/20260724150000_radiance_evolution_labels.sql'),
     read('docs/js/prestige-utils.js'),
     read('docs/js/collection-sync.js'),
     read('docs/js/cloud-collection.js'),
@@ -95,11 +95,11 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.match(migration, /starlight_burst/);
   assert.match(migration, /floor\(step_cost \/ 2\.0\)/);
   assert.match(migration, /set prestige_tier = 'stardust'/);
-  assert.match(labelMigration, /★★★★★★ Super Starlight/);
-  assert.match(labelMigration, /already at Super Starlight/);
+  assert.match(labelMigration, /⭐⭐⭐⭐⭐ Radiance V/);
+  assert.match(labelMigration, /already at Radiance V/);
   assert.match(utils, /canEvolve/);
   assert.match(utils, /canUnfuse/);
-  assert.match(utils, /★★★★ Star/);
+  assert.match(utils, /Radiance III/);
   assert.match(sync, /export async function evolveMyCard/);
   assert.match(sync, /export async function unfuseMyCard/);
   assert.match(cloud, /unfuseMyCard/);

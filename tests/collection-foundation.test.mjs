@@ -31,6 +31,8 @@ test('places shared card filters in the binder and collection content areas', as
 
   assert.doesNotMatch(binder, /side-card filters/);
   assert.match(binder, /data-card-filter-context="binder"/);
+  assert.match(binder, /binder-browse-chrome/);
+  assert.match(binder, /id="seriesHeroToolbar"/);
   assert.match(collection, /data-card-filter-context="collection"/);
   assert.match(checklist, /data-card-filter-context="checklist"/);
   assert.match(checklist, /css\/card-filters\.css/);

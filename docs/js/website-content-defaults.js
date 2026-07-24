@@ -7,7 +7,7 @@ export const WEBSITE_EDITOR_TABS = Object.freeze([
   { id: 'binderSidePanel', label: 'Binder Card Panel' },
   { id: 'binderFullView', label: 'Card Full View' },
   { id: 'binderDisplay', label: 'Binder Display' },
-  { id: 'daily', label: 'Daily Wish' },
+  { id: 'daily', label: 'Daily Booster' },
   { id: 'shop', label: 'Card Boutique' },
   { id: 'events', label: 'Events' },
   { id: 'redeem', label: 'Redeem' },
@@ -39,7 +39,7 @@ export function createDefaultWebsiteContent() {
       eyebrow: 'Welcome, Starlight Collector!',
       title: 'Your magical card adventure starts here.',
       lead: 'Collect Starlight Cards, open booster packs, trade with other collectors, join seasonal events, and keep up with the latest news from Sora Starlight.',
-      primaryCta: '✨ Open Daily Wish',
+      primaryCta: '✨ Open Daily Booster',
       secondaryCta: '🗂️ Browse Card Binder',
       quickLinks: [
         { id: 'collection', label: '♡ My Album' },
@@ -140,7 +140,7 @@ export function createDefaultWebsiteContent() {
     },
     daily: {
       eyebrow: 'Daily Collector Reward',
-      title: 'Daily Wish',
+      title: 'Daily Free Booster Pack',
       lead: 'Open today’s free pack, reveal four cards one at a time, and grow your Starlight collection. Your next free pack becomes available at midnight Eastern Time.',
       badge: 'FREE • DAILY',
       pullsTitle: 'Your Pulls',
@@ -247,17 +247,17 @@ export function createDefaultWebsiteContent() {
       prestigeLegendEyebrow: 'Starlight Evolution',
       prestigeLegendTitle: 'Evolution tiers',
       prestigeLegendLead: 'Infuse duplicate cards with Starlight Energy to awaken their true brilliance.',
-      prestigeStardust: 'Base tier · ★ Stardust',
-      prestigeStarBit: '8 duplicates → ★★ Star Bit',
-      prestigeProtostar: '20 duplicates → ★★★ Protostar',
-      prestigeStarlight: '45 duplicates → ★★★★ Star',
-      prestigeSuperStarlight: '100 duplicates → ★★★★★ Super Star',
-      prestigeStarlightBurst: '220 duplicates → ★★★★★★ Super Starlight',
+      prestigeStardust: 'Every card starts unevolved.',
+      prestigeStarBit: '8 duplicates → ⭐ Radiance I',
+      prestigeProtostar: '20 duplicates → ⭐⭐ Radiance II',
+      prestigeStarlight: '45 duplicates → ⭐⭐⭐ Radiance III',
+      prestigeSuperStarlight: '100 duplicates → ⭐⭐⭐⭐ Radiance IV',
+      prestigeStarlightBurst: '220 duplicates → ⭐⭐⭐⭐⭐ Radiance V',
       // Legacy CMS keys kept for older Website Editor rows
-      prestigeRookie: '8 duplicates → ★★ Star Bit',
-      prestigeChampion: '20 duplicates → ★★★ Protostar',
-      prestigeUltimate: '45 duplicates → ★★★★ Star',
-      prestigeMega: '220 duplicates → ★★★★★★ Super Starlight'
+      prestigeRookie: '8 duplicates → ⭐ Radiance I',
+      prestigeChampion: '20 duplicates → ⭐⭐ Radiance II',
+      prestigeUltimate: '45 duplicates → ⭐⭐⭐ Radiance III',
+      prestigeMega: '220 duplicates → ⭐⭐⭐⭐⭐ Radiance V'
     },
     starlightEvolution: {
       eyebrow: 'My Stuff',
@@ -267,15 +267,14 @@ export function createDefaultWebsiteContent() {
       howLead: 'Tap an evolved card below to open details and Evolve when you have enough duplicate extras. Each step spends extras and keeps one protected copy.',
       tiersTitle: 'Evolution tiers',
       ownedTitle: 'Your evolved cards',
-      ownedLead: 'Cards you have raised above Stardust appear here. Tap a card to view details and Evolve in place.',
+      ownedLead: 'Cards evolved to Radiance I or higher appear here. Tap a card to view details and Evolve in place.',
       ownedEmpty: 'No evolved cards yet. Gather duplicates, then Evolve from Collection.',
       collectionCta: 'Open My Starlight Album',
-      stardust: '★ Stardust',
-      starBit: '★★ Star Bit · 8 extras',
-      protostar: '★★★ Protostar · 20 extras',
-      star: '★★★★ Star · 45 extras',
-      superStar: '★★★★★ Super Star · 100 extras',
-      superStarlight: '★★★★★★ Super Starlight · 220 extras'
+      starBit: '⭐ Radiance I · 8 extras',
+      protostar: '⭐⭐ Radiance II · 20 extras',
+      star: '⭐⭐⭐ Radiance III · 45 extras',
+      superStar: '⭐⭐⭐⭐ Radiance IV · 100 extras',
+      superStarlight: '⭐⭐⭐⭐⭐ Radiance V · 220 extras'
     },
     starBits: {
       eyebrow: 'Duplicate Card Exchange',
@@ -304,7 +303,7 @@ export function createDefaultWebsiteContent() {
     quests: {
       eyebrow: 'My Stuff',
       title: 'Starlight Missions',
-      lead: 'Complete Daily and Weekly Missions to earn Star Bits and titles. Daily resets at 00:00 UTC. Weekly resets Monday 00:00 UTC.',
+      lead: 'Complete Daily and Weekly Missions to earn Star Bits and titles. Reset times appear below in your local time.',
       refreshCta: 'Refresh',
       emptyTitle: 'No missions yet',
       emptyLead: 'Check back soon for new collector goals.',
@@ -318,16 +317,32 @@ export function createDefaultWebsiteContent() {
       dailySectionTitle: 'Daily Missions',
       weeklySectionTitle: 'Weekly Missions',
       legacySectionTitle: 'One-time Missions',
-      dailyResetNote: 'Resets next UTC day:',
-      weeklyResetNote: 'Resets next Monday UTC:',
-      dailyResetFallback: 'Resets each day at 00:00 UTC.',
-      weeklyResetFallback: 'Resets each Monday at 00:00 UTC.',
+      dailyResetNote: 'Next reset:',
+      weeklyResetNote: 'Next weekly reset:',
+      dailyResetFallback: 'Resets once per day.',
+      weeklyResetFallback: 'Resets each Monday.',
       legacyResetNote: 'One-time missions do not reset.'
     },
     seasonPass: {
       eyebrow: 'My Stuff',
       title: 'Seasonal Collection Pass',
-      lead: 'A free seasonal track for Twitch subscribers. Earn points from boosters, trades, gifts, favorites, and visits — then claim Star Bits and titles.',
+      lead: 'Earn points from boosters, trades, gifts, favorites, and visits — then claim Star Bits and titles along the track.',
+      benefitsTitle: 'Included with your Twitch subscription',
+      benefitsList: `Monthly Season Pass reward track
+Exclusive Season Pass card
+5 Season Pass booster packs
+500 Star Bits
+1 booster voucher (any standard booster)
+Exclusive profile flair and badge
+Exclusive profile background
+Exclusive chat emote on your card site
+Season Pass name color (pink/gold gradient)`,
+      activatedTitle: 'Twitch subscriber · Season Pass active',
+      activatedLead: 'Your pass is unlocked for this season. Keep collecting to earn every tier reward.',
+      activatedBadge: 'Active now',
+      activatedLinkedLabel: 'Linked as @{login}',
+      pendingTitle: 'Twitch linked · Pass not active yet',
+      pendingLead: 'Subscribe on Twitch, then open your Season Pass unlock gift in Received Gifts to activate.',
       emptyTitle: 'No active season',
       emptyLead: 'Check back when the next Collection Pass begins.',
       claimCta: 'Claim',

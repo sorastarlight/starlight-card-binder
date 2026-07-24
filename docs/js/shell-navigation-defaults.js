@@ -5,7 +5,7 @@ import { starBitNavIcon } from './star-bit-icon.js';
 export const PUBLIC_SHELL_DESTINATIONS = Object.freeze([
   { value: 'home', label: 'Home' },
   { value: 'binder', label: 'Card Binder' },
-  { value: 'daily', label: 'Daily Wish' },
+  { value: 'daily', label: 'Free Daily Booster' },
   { value: 'shop', label: 'Card Boutique' },
   { value: 'events', label: 'Starlight Events' },
   { value: 'redeem', label: 'Redeem A Code' },
@@ -39,6 +39,7 @@ export { BRAND_ICONS, BRAND_ICON_IDS, brandIconToken } from './brand-icons.js';
 /** Old default labels → new product names (overwrite saved studio defaults). */
 export const SHELL_LABEL_REWRITES = Object.freeze({
   daily: Object.freeze([
+    'Daily Wish',
     'Free Daily Booster',
     'Daily Booster',
     'Daily Free Booster Pack'
@@ -81,7 +82,7 @@ export function createDefaultShellNavigation() {
       home: 'Home',
       binder: 'The Starlight Card Series Binder',
       collection: 'My Starlight Album',
-      daily: 'Daily Wish',
+      daily: 'Daily Free Booster Pack',
       shop: 'Card Boutique',
       events: 'Starlight Events',
       redeem: 'Redeem A Code',
@@ -111,7 +112,7 @@ export function createDefaultShellNavigation() {
           items: [
             { id: 'home', label: 'Home', icon: { type: 'emoji', value: '🏠' }, destination: 'home', enabled: true, features: [] },
             { id: 'binder', label: 'The Starlight Card Series Binder', icon: { type: 'emoji', value: '🗂️' }, destination: 'binder', enabled: true, features: [] },
-            { id: 'daily', label: 'Daily Wish', icon: { type: 'emoji', value: '✨' }, destination: 'daily', enabled: true, features: ['dailyBadge'], className: 'shell-daily-link' },
+            { id: 'daily', label: 'Free Daily Booster', icon: { type: 'emoji', value: '✨' }, destination: 'daily', enabled: true, features: ['dailyBadge'], className: 'shell-daily-link' },
             { id: 'shop', label: 'Card Boutique', icon: { type: 'emoji', value: '🛍️' }, destination: 'shop', enabled: true, features: [], className: 'shell-shop-link' },
             { id: 'events', label: 'Starlight Events', icon: { type: 'emoji', value: '🎉' }, destination: 'events', enabled: true, features: [] },
             { id: 'redeem', label: 'Redeem A Code', icon: { type: 'emoji', value: '🎟️' }, destination: 'redeem', enabled: true, features: [] }

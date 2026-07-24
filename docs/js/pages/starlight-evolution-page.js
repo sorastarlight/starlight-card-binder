@@ -15,7 +15,7 @@ import {
   prestigeClassName,
   prestigeLabel,
   previousEvolutionTier
-} from '../prestige-utils.js?v=1.4.0';
+} from '../prestige-utils.js?v=1.5.0';
 import { playStarlightEvolutionReveal } from '../starlight-evolution-reveal.js?v=1.2.0';
 import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
 
@@ -152,7 +152,7 @@ function detailActionMarkup(card) {
 
   let evolveBlock = '';
   if (!next || cost == null) {
-    evolveBlock = `<p class="st-evo-detail-note">This card is already at Super Starlight.</p>`;
+    evolveBlock = `<p class="st-evo-detail-note">This card is already at Radiance V.</p>`;
   } else if (ready) {
     evolveBlock = `<button type="button" class="btn primary" data-evo-evolve="${esc(card.id)}">Evolve to ${esc(nextLabel)} (−${cost})</button>
       <p class="st-evo-detail-note">Spends ${cost} duplicate${cost === 1 ? '' : 's'} and keeps 1 protected copy.</p>`;
@@ -207,7 +207,7 @@ async function confirmEvolve(card) {
   const next = nextEvolutionTier(card.tier);
   const cost = evolutionCostForNextTier(card.tier);
   if (!next || cost == null) {
-    toast('This card is already at Super Starlight.', 'info');
+    toast('This card is already at Radiance V.', 'info');
     return false;
   }
   if (!canEvolve(card.quantity, card.tier)) {
@@ -268,7 +268,7 @@ async function handleUnfuse(cardId) {
   const prev = previousEvolutionTier(card.tier);
   const refund = evolutionUnfuseRefund(card.tier);
   if (!prev || refund == null) {
-    toast('This card is already at Stardust.', 'info');
+    toast('This card has not been evolved yet.', 'info');
     return;
   }
   const prevLabel = prestigeLabel(prev);

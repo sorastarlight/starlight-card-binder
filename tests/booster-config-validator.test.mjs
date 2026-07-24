@@ -51,7 +51,7 @@ test('empty eligible pools fail validation for active boosters', async () => {
 test('validateBooster rejects active slot boosters with no slots', () => {
   const result = validateBooster({
     id: 'daily',
-    name: 'Daily Wish',
+    name: 'Daily Booster',
     rewardMode: 'slots',
     cardCount: 1,
     isActive: true,

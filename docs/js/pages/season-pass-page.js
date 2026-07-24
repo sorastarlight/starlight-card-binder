@@ -15,6 +15,8 @@ const titleEl = document.getElementById('season-title');
 const leadEl = document.getElementById('season-lead');
 const summaryEl = document.getElementById('season-summary');
 const trackEl = document.getElementById('season-track');
+const benefitsEl = document.getElementById('season-benefits');
+const activationBannerEl = document.getElementById('season-activation-banner');
 
 let seasonCountdownTimer = null;
 
@@ -71,18 +73,97 @@ function seasonScheduleHtml(season = {}) {
   const ended = formatDate(season.endsAt);
   const startLabel = started ? `Started ${started}` : '';
   const endLabel = ended ? `Ended ${ended}` : 'Season ended';
-  const meta = [
-    season.isActive ? 'Active' : '',
-    season.audience === 'twitch_subscribers' ? 'Subscribers' : ''
-  ].filter(Boolean).join(' · ');
 
   return `
     <div class="season-schedule">
       ${startLabel ? `<p class="season-started">${esc(startLabel)}</p>` : ''}
       <p class="season-countdown" data-season-countdown data-ends-at="${esc(season.endsAt || '')}" data-ended-label="${esc(endLabel)}" aria-atomic="true">Ends in —</p>
-      ${meta ? `<p class="season-schedule-meta">${esc(meta)}</p>` : ''}
     </div>
   `;
+}
+
+function parseSeasonBenefits(season = {}) {
+  const raw = String(season.description || '').trim();
+  const cmsList = String(seasonCopy.benefitsList || '').trim();
+  if (raw.includes('*')) {
+    return raw.split(/\s*\*\s*/).map((item) => item.trim()).filter(Boolean);
+  }
+  if (cmsList) {
+    return cmsList.split(/\r?\n+/).map((item) => item.trim()).filter(Boolean);
+  }
+  if (raw) return [raw];
+  return [];
+}
+
+function renderBenefits(season = {}) {
+  if (!benefitsEl) return;
+  const benefits = parseSeasonBenefits(season);
+  if (!benefits.length) {
+    benefitsEl.replaceChildren();
+    benefitsEl.hidden = true;
+    return;
+  }
+  benefitsEl.hidden = false;
+  benefitsEl.innerHTML = `
+    <h2 class="season-benefits-title">${esc(seasonCopy.benefitsTitle || 'Included with your Twitch subscription')}</h2>
+    <ul class="season-benefits-list">
+      ${benefits.map((benefit) => `<li>${esc(benefit.replace(/^🎁\s*/, ''))}</li>`).join('')}
+    </ul>
+  `;
+}
+
+function renderActivationBanner(data = {}, season = {}) {
+  if (!activationBannerEl) return;
+  const linked = Boolean(data.twitchLinked);
+  const login = String(data.twitchLogin || '').trim();
+  const hasAccess = data.hasAccess !== false;
+
+  if (hasAccess) {
+    activationBannerEl.hidden = false;
+    activationBannerEl.className = 'season-activation-banner is-active';
+    activationBannerEl.innerHTML = `
+      <span class="season-activation-icon" aria-hidden="true">✓</span>
+      <div class="season-activation-copy">
+        <strong>${esc(seasonCopy.activatedTitle || 'Twitch subscriber · Season Pass active')}</strong>
+        <span>${esc(seasonCopy.activatedLead || 'Your pass is unlocked for this season. Keep collecting to earn every tier reward.')}</span>
+        ${login ? `<span class="season-activation-login">${esc(fillLoginToken(seasonCopy.activatedLinkedLabel || 'Linked as @{login}', login))}</span>` : ''}
+      </div>
+      <span class="season-activation-badge">${esc(seasonCopy.activatedBadge || 'Active now')}</span>
+    `;
+    return;
+  }
+
+  if (linked) {
+    activationBannerEl.hidden = false;
+    activationBannerEl.className = 'season-activation-banner is-pending';
+    activationBannerEl.innerHTML = `
+      <span class="season-activation-icon" aria-hidden="true">!</span>
+      <div class="season-activation-copy">
+        <strong>${esc(seasonCopy.pendingTitle || 'Twitch linked · Pass not active yet')}</strong>
+        <span>${esc(seasonCopy.pendingLead || 'Subscribe on Twitch, then open your Season Pass unlock gift in Received Gifts to activate.')}</span>
+        ${login ? `<span class="season-activation-login">${esc(fillLoginToken(seasonCopy.activatedLinkedLabel || 'Linked as @{login}', login))}</span>` : ''}
+      </div>
+    `;
+    return;
+  }
+
+  activationBannerEl.hidden = true;
+  activationBannerEl.className = 'season-activation-banner';
+  activationBannerEl.replaceChildren();
+}
+
+function fillLoginToken(template, login) {
+  return String(template || '').replace(/\{login\}/g, login);
+}
+
+function renderHero(data = {}, season = {}) {
+  titleEl.textContent = season.name || seasonCopy.title || 'Seasonal Collection Pass';
+  if (leadEl) {
+    leadEl.hidden = true;
+    leadEl.textContent = '';
+  }
+  renderBenefits(season);
+  renderActivationBanner(data, season);
 }
 
 function startSeasonCountdown() {
@@ -131,25 +212,10 @@ function rewardLine(tier) {
   return parts.length ? parts.join(' · ') : 'Season reward';
 }
 
-function renderBreakdown(breakdown = {}) {
-  const rows = [
-    ['Booster opens', breakdown.boosterOpens],
-    ['Trades', breakdown.trades],
-    ['Gifts sent', breakdown.giftsSent],
-    ['Series complete', breakdown.seriesComplete],
-    ['Favorites', breakdown.favorites],
-    ['Visit days', breakdown.visitDays]
-  ];
-  return rows
-    .map(([label, value]) => `<li><span>${esc(label)}</span><strong>${Number(value) || 0}</strong></li>`)
-    .join('');
-}
-
 function renderLocked(data) {
   stopSeasonCountdown();
   const season = data.season || {};
-  titleEl.textContent = season.name || seasonCopy.title || 'Seasonal Collection Pass';
-  leadEl.textContent = season.description || seasonCopy.lead || '';
+  renderHero({ ...data, hasAccess: false }, season);
   const linked = Boolean(data.twitchLinked);
   summaryEl.innerHTML = `
     <div class="season-locked panel-inner">
@@ -177,7 +243,18 @@ function render(data) {
 
   if (!data?.found) {
     titleEl.textContent = seasonCopy.title || 'Seasonal Collection Pass';
-    leadEl.textContent = seasonCopy.emptyLead || seasonCopy.lead || 'No active season is configured yet.';
+    if (leadEl) {
+      leadEl.hidden = false;
+      leadEl.textContent = seasonCopy.emptyLead || seasonCopy.lead || 'No active season is configured yet.';
+    }
+    if (benefitsEl) {
+      benefitsEl.hidden = true;
+      benefitsEl.replaceChildren();
+    }
+    if (activationBannerEl) {
+      activationBannerEl.hidden = true;
+      activationBannerEl.replaceChildren();
+    }
     summaryEl.innerHTML = `<p>${esc(seasonCopy.emptyTitle || 'No active season')}</p>`;
     trackEl.replaceChildren();
     return;
@@ -189,8 +266,7 @@ function render(data) {
   }
 
   const season = data.season || {};
-  titleEl.textContent = season.name || seasonCopy.title || 'Seasonal Collection Pass';
-  leadEl.textContent = season.description || seasonCopy.lead || '';
+  renderHero(data, season);
   const points = Number(data.points) || 0;
   const tiers = Array.isArray(data.tiers) ? data.tiers : [];
   const maxPoints = Math.max(...tiers.map((t) => Number(t.pointsRequired) || 0), 1);
@@ -207,7 +283,6 @@ function render(data) {
       </div>
       ${seasonScheduleHtml(season)}
     </div>
-    <ul class="season-breakdown">${renderBreakdown(data.breakdown || {})}</ul>
   `;
   startSeasonCountdown();
 

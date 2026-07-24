@@ -25,12 +25,12 @@ export const EVOLUTION_COSTS = Object.freeze({
 export const FUSION_COSTS = EVOLUTION_COSTS;
 
 export const EVOLUTION_LABELS = Object.freeze({
-  stardust: '★ Stardust',
-  star_bit: '★★ Star Bit',
-  protostar: '★★★ Protostar',
-  starlight: '★★★★ Star',
-  super_starlight: '★★★★★ Super Star',
-  starlight_burst: '★★★★★★ Super Starlight'
+  stardust: 'Standard',
+  star_bit: '⭐ Radiance I',
+  protostar: '⭐⭐ Radiance II',
+  starlight: '⭐⭐⭐ Radiance III',
+  super_starlight: '⭐⭐⭐⭐ Radiance IV',
+  starlight_burst: '⭐⭐⭐⭐⭐ Radiance V'
 });
 
 /** @deprecated Prefer EVOLUTION_LABELS */

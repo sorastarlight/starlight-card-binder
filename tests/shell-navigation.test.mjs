@@ -14,7 +14,7 @@ test('default shell navigation includes core destinations and staff section', ()
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'rankings'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'feed' && entry.label === 'LIVE Feed'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'collection' && entry.label === 'My Starlight Album'));
-  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'daily' && entry.label === 'Daily Wish'));
+  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'daily' && entry.label === 'Free Daily Booster'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'shop' && entry.label === 'Card Boutique'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'checklist' && entry.label === 'Star Registry'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'quests' && entry.label === 'Starlight Missions'));
@@ -25,7 +25,7 @@ test('default shell navigation includes core destinations and staff section', ()
   assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'quests' && item.label === 'Starlight Missions'));
   assert.equal(nav.pageTitles.feed, 'LIVE Feed');
   assert.equal(nav.pageTitles.collection, 'My Starlight Album');
-  assert.equal(nav.pageTitles.daily, 'Daily Wish');
+  assert.equal(nav.pageTitles.daily, 'Daily Free Booster Pack');
   assert.equal(nav.topBar.quickLinks.length, 4);
   assert.ok(nav.accountMenu.signedIn.some(item => (item.features || []).includes('notificationBadge')));
   assert.ok(nav.accountMenu.signedIn.some(item => (item.features || []).includes('receivedGiftBadge')));
@@ -62,7 +62,7 @@ test('sanitizeShellNavigation overwrites legacy product labels with new defaults
     }
   });
   assert.equal(renamed.pageTitles.collection, 'My Starlight Album');
-  assert.equal(renamed.pageTitles.daily, 'Daily Wish');
+  assert.equal(renamed.pageTitles.daily, 'Free Daily Booster');
   assert.equal(renamed.pageTitles.shop, 'Card Boutique');
   assert.equal(renamed.pageTitles.checklist, 'Star Registry');
   assert.equal(renamed.pageTitles.quests, 'Starlight Missions');
@@ -70,7 +70,7 @@ test('sanitizeShellNavigation overwrites legacy product labels with new defaults
   assert.equal(renamed.pageTitles.profile, 'Profile');
   assert.equal(renamed.pageTitles.feed, 'LIVE Feed');
   assert.equal(renamed.sidebar.sections[0].items[0].label, 'My Starlight Album');
-  assert.equal(renamed.sidebar.sections[0].items[1].label, 'Daily Wish');
+  assert.equal(renamed.sidebar.sections[0].items[1].label, 'Free Daily Booster');
   assert.equal(renamed.sidebar.sections[0].items[2].label, 'LIVE Feed');
 });
 

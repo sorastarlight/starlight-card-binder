@@ -9,7 +9,7 @@ import {
   EVOLUTION_TIERS,
   normalizeEvolutionTier,
   prestigeLabel
-} from './prestige-utils.js?v=1.4.0';
+} from './prestige-utils.js?v=1.5.0';
 
 const STYLESHEET_ID = 'starlight-evolution-reveal-css';
 const STYLESHEET_HREF = '../css/starlight-evolution-reveal.css?v=1.2.0';
@@ -63,16 +63,17 @@ function tierCssToken(tier) {
   return String(tier || 'stardust').trim().toLowerCase().replace(/_/g, '-');
 }
 
-/** 1★ Stardust … 6★ Super Starlight */
+/** Radiance I–V star count for reveal (unevolved cards use 0). */
 function starRankForTier(tier) {
   const key = normalizeEvolutionTier(tier);
   const index = EVOLUTION_TIERS.indexOf(key);
-  return Math.max(1, index + 1);
+  if (index <= 0) return 0;
+  return Math.min(5, index);
 }
 
 function starsMarkup(count) {
-  const n = Math.max(1, Math.min(6, Number(count) || 1));
-  return '★'.repeat(n);
+  const n = Math.max(0, Math.min(5, Number(count) || 0));
+  return n ? '⭐'.repeat(n) : '';
 }
 
 /**

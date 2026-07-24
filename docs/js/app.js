@@ -191,14 +191,14 @@ function evolutionActionHtml(cardId) {
   const tier = getCardPrestigeTier(cardId);
   const next = utils.nextEvolutionTier?.(tier) || utils.nextFusionTier?.(tier) || utils.nextTier?.(tier);
   const cost = utils.evolutionCostForNextTier?.(tier) ?? utils.fusionCostForNextTier?.(tier) ?? utils.fusionCostForNext?.(tier);
-  const label = utils.prestigeLabel?.(tier) || '★ Stardust';
+  const label = utils.prestigeLabel?.(tier) || 'Standard';
   const extras = utils.evolutionExtras?.(qty) ?? utils.fusionExtras?.(qty) ?? Math.max(0, qty - 1);
   const canEvolve = utils.canEvolve?.(qty, tier) ?? utils.canFuse?.(qty, tier) ?? (cost != null && extras >= cost);
   const canUnfuse = utils.canUnfuse?.(tier) ?? (tier !== 'stardust');
   const refund = utils.evolutionUnfuseRefund?.(tier);
   const nextLabel = next ? (utils.prestigeLabel?.(next) || next) : '';
   const maxNote = (!next || cost == null)
-    ? `<p><strong>★★★★★★ Super Starlight</strong> — maximum Starlight Evolution reached.</p>`
+    ? `<p><strong>⭐⭐⭐⭐⭐ Radiance V</strong> — maximum Starlight Evolution reached.</p>`
     : `<p>Evolve to <strong>${esc(nextLabel)}</strong> — costs <strong>${cost}</strong> duplicate${cost === 1 ? '' : 's'}.</p>`;
   return `<div class="evolution-action fusion-action analyzer-evo-strip">
     <p><strong>${esc(label)}</strong> · ${extras} extra${extras === 1 ? '' : 's'} available</p>
@@ -262,7 +262,7 @@ async function fuseSelectedCard(cardId) {
   const next = utils.nextEvolutionTier?.(tier) || utils.nextFusionTier?.(tier) || utils.nextTier?.(tier);
   const cost = utils.evolutionCostForNextTier?.(tier) ?? utils.fusionCostForNextTier?.(tier) ?? utils.fusionCostForNext?.(tier);
   if (!next || cost == null) {
-    window.StarlightUI?.toast?.('This card is already at Super Starlight.', 'info');
+    window.StarlightUI?.toast?.('This card is already at Radiance V.', 'info');
     return;
   }
   if (!(utils.canEvolve?.(qty, tier) ?? utils.canFuse?.(qty, tier))) {
@@ -305,7 +305,7 @@ async function unfuseSelectedCard(cardId) {
   const prev = utils.previousEvolutionTier?.(tier);
   const refund = utils.evolutionUnfuseRefund?.(tier);
   if (!prev || refund == null) {
-    window.StarlightUI?.toast?.('This card is already at Stardust.', 'info');
+    window.StarlightUI?.toast?.('This card has not been evolved yet.', 'info');
     return;
   }
   const prevLabel = utils.prestigeLabel?.(prev) || prev;
@@ -727,6 +727,7 @@ function renderFilterControls() {
   const context = host.dataset.cardFilterContext || 'binder';
   const isCollection = context === 'collection';
   const isChecklist = context === 'checklist';
+  const isBinder = context === 'binder';
   const binderCopy = websiteBinderLanding || websiteSection('binderLanding');
   const checklistCopy = websiteSection('checklist');
   const eyebrow = isChecklist
@@ -741,11 +742,7 @@ function renderFilterControls() {
   const showSearch = true;
   const display = binderDisplaySettings();
   const showView = isChecklist || (context === 'binder' && display.collectionStatusFilter === 'on');
-  host.innerHTML = `<div class="card-filter-heading">
-      <div><p class="eyebrow">${esc(eyebrow)}</p><h2>${esc(title)}</h2></div>
-      <p data-filter-summary role="status" aria-live="polite">Preparing cards…</p>
-    </div>
-    <div class="card-filter-fields">
+  const fieldsHtml = `<div class="card-filter-fields${isBinder ? ' card-filter-fields--binder' : ''}">
       ${showSearch ? `<label class="card-filter-search"><span>Search</span><input id="globalSearch" type="search" placeholder="Search names, numbers, artists…" autocomplete="off"></label>` : ''}
       <label><span>Series</span><select data-series aria-label="Filter by series"></select></label>
       <label><span>Rarity</span><select data-rarity aria-label="Filter by rarity"><option>All Rarities</option><option>Common</option><option>Uncommon</option><option>Rare</option><option>Epic</option><option>Legendary</option></select></label>
@@ -753,6 +750,13 @@ function renderFilterControls() {
       ${showView ? `<fieldset class="card-filter-view"><legend>Collection Status</legend><label><input checked name="viewFilter" type="radio" value="all"> All Cards</label><label><input name="viewFilter" type="radio" value="collected"> Collected</label><label><input name="viewFilter" type="radio" value="missing"> Not Collected</label></fieldset>` : ''}
       <button class="card-filter-reset" type="button" data-reset-card-filters>${esc(resetLabel)}</button>
     </div>`;
+  host.innerHTML = isBinder
+    ? fieldsHtml
+    : `<div class="card-filter-heading">
+      <div><p class="eyebrow">${esc(eyebrow)}</p><h2>${esc(title)}</h2></div>
+      <p data-filter-summary role="status" aria-live="polite">Preparing cards…</p>
+    </div>
+    ${fieldsHtml}`;
   host.dataset.filterControlsReady = '1';
 }
 
@@ -1004,11 +1008,13 @@ function renderSeriesHero() {
   const desc = $('#seriesHeroDescription');
   const eyebrow = $('.series-hero .eyebrow');
   const stats = $('#seriesHeroStats');
+  const toolbar = $('#seriesHeroToolbar');
   if (!title || !desc) return;
   const inSeriesSelect = document.body.classList.contains('series-select');
   const list = f.series === 'All Series' ? cards : cards.filter(c => c.series === f.series);
   const got = list.filter(c => isCollected(c.id)).length;
   const landing = websiteBinderLanding || window.__starlightWebsiteContent?.binderLanding || websiteSection('binderLanding');
+  const browsingSeries = !inSeriesSelect && f.series !== 'All Series';
   if (inSeriesSelect || f.series === 'All Series') {
     applyOptionalText(title, landing?.title, 'Starlight Card Series Binder 📦');
     applyOptionalText(desc, landing?.lead, 'Choose a booster pack to enter that series binder.');
@@ -1023,6 +1029,13 @@ function renderSeriesHero() {
     desc.removeAttribute('aria-hidden');
     desc.textContent = list.find(c => c.seriesDescription)?.seriesDescription || '';
   }
+  if (eyebrow) {
+    const hideEyebrow = browsingSeries;
+    eyebrow.hidden = hideEyebrow;
+    eyebrow.classList.toggle('is-content-hidden', hideEyebrow);
+    if (hideEyebrow) eyebrow.setAttribute('aria-hidden', 'true');
+    else eyebrow.removeAttribute('aria-hidden');
+  }
   if (stats) {
     const rarityBits = ['Common','Uncommon','Rare','Epic','Legendary'].map(r => {
       const n = list.filter(c => c.rarity === r).length;
@@ -1033,6 +1046,15 @@ function renderSeriesHero() {
     stats.innerHTML = inSeriesSelect
       ? `<span class="hero-pill progress">${esc(totalPill)}</span>`
       : `<span class="hero-pill progress">${esc(collectedPill)}</span>${rarityBits}`;
+  }
+  if (toolbar) {
+    if (browsingSeries) {
+      toolbar.hidden = false;
+      toolbar.innerHTML = `<button id="backToSeries" class="v61-back-btn" type="button">${esc(landing.backToSeriesCta || '← Back to Series')}</button><p class="series-hero-summary" data-filter-summary role="status" aria-live="polite"></p>`;
+    } else {
+      toolbar.hidden = true;
+      toolbar.innerHTML = '';
+    }
   }
 }
 
@@ -1185,7 +1207,7 @@ function renderFullView() {
   const sub = got ? subcategoryLabel(selected) : '';
   const variant = got ? variantLabel(selected) : '';
   const finish = got ? finishLabel(selected) : '';
-  const evoTier = got ? (prestigeUtils().prestigeLabel?.(getCardPrestigeTier(selected.id)) || '★ Stardust') : '';
+  const evoTier = got ? (prestigeUtils().prestigeLabel?.(getCardPrestigeTier(selected.id)) || 'Standard') : '';
   const storyText = got
     ? (selected.cardDescription || 'No card story has been added yet.')
     : getVisibleDescription(selected);
@@ -1202,7 +1224,7 @@ function renderFullView() {
     ? [variant && !isStandardMeta(variant) ? variant : '', finish && !isStandardMeta(finish) ? finish : '']
         .filter(Boolean)
         .join(' · ') || `${finishLabel(selected)} finish`
-    : 'Earn this card from Daily Wish, packs, or rewards.';
+    : 'Earn this card from Daily Boosters, packs, or rewards.';
   if (analyzerActiveTab !== 'story') analyzerActiveTab = 'details';
   const detailsTabActive = analyzerActiveTab !== 'story';
   const evoBadge = got ? prestigeBadgeHtml(selected.id) : '';
@@ -1225,30 +1247,31 @@ function renderFullView() {
       </header>
       <div class="analyzer-body">
         <section class="analyzer-panel analyzer-panel-details ${detailsTabActive ? 'is-active' : ''}" data-analyzer-panel="details" ${detailsTabActive ? '' : 'hidden'}>
-          <div class="analyzer-identity">
-            <div class="analyzer-identity-copy">
+          <header class="analyzer-card-header">
+            <div class="analyzer-header-copy">
               <p class="analyzer-subtitle">${esc(subtitle)}</p>
               <h2 id="fullViewCardTitle">${esc(visibleName)}</h2>
             </div>
-            <div class="analyzer-series-badge" title="${esc(seriesName)}">
-              <span class="analyzer-series-spark" aria-hidden="true">✦</span>
-              <span class="analyzer-series-name">${esc(seriesName)}</span>
+            <div class="analyzer-header-meta">
+              <div class="analyzer-series-badge" title="${esc(seriesName)}">
+                <span class="analyzer-series-spark" aria-hidden="true">✦</span>
+                <span class="analyzer-series-name">${esc(seriesName)}</span>
+              </div>
+              <span class="analyzer-category-chip" title="${esc(category)}">${esc(category)}</span>
             </div>
-          </div>
+          </header>
           <div class="analyzer-main-row">
             <div class="analyzer-card-col">
               <div class="analyzer-card-stage">
                 <button class="overlay-arrow left analyzer-arrow" type="button" aria-label="Previous card">‹</button>
                 <button class="overlay-arrow right analyzer-arrow" type="button" aria-label="Next card">›</button>
-                ${rarityStarsHtml(selected, visibleRarity)}
-                <span class="analyzer-attr-chip" title="${esc(category)}">${esc(String(category).slice(0, 14))}</span>
-                <div class="full-card-wrap analyzer-card-3d ${overlayFlipped ? 'show-back showing-card-back' : ''} ${analyzerHoloEnabled ? '' : 'is-holo-off'} ${analyzerEvolutionEnabled ? '' : 'is-evolution-off'} ${rarityClass(selected)} ${prestigeClass}" id="fullCard3d" aria-label="${esc(overlayFlipped ? 'Card back' : visibleName)}" data-holographic="${got && analyzerHoloEnabled && isHolographicCard(selected)}" data-finish-class="${esc(finishClass)}">
+                <div class="full-card-wrap simple-flip analyzer-card-shell analyzer-card-3d ${overlayFlipped ? 'show-back showing-card-back' : ''} ${analyzerHoloEnabled ? '' : 'is-holo-off'} ${analyzerEvolutionEnabled ? '' : 'is-evolution-off'} ${rarityClass(selected)} ${prestigeClass}" id="fullCard3d" aria-label="${esc(overlayFlipped ? 'Card back' : visibleName)}" data-holographic="${got && analyzerHoloEnabled && isHolographicCard(selected)}" data-finish-class="${esc(finishClass)}">
                   <span class="full-inner">
-                    <span class="face front ${finishClass}"><img class="${artClass}" src="${esc(getVisibleImage(selected))}" alt="${esc(visibleName)}" onerror="this.src='${CARD_BACK_URL}'" draggable="false">${holoMarkup}</span>
-                    <span class="face back"><img src="${CARD_BACK_URL}" alt="Card back" draggable="false"></span>
+                    <span class="face front ${finishClass}"><img class="${artClass}" src="${esc(overlayFlipped ? CARD_BACK_URL : getVisibleImage(selected))}" alt="${esc(overlayFlipped ? 'Card back' : visibleName)}" onerror="this.src='${CARD_BACK_URL}'" draggable="false">${overlayFlipped ? '' : holoMarkup}</span>
                   </span>
                 </div>
               </div>
+              ${rarityStarsHtml(selected, visibleRarity)}
               <div class="analyzer-card-tools">
                 <button class="btn overlay-flip analyzer-flip" type="button">${esc(full.flipCta || '↻ Flip')}</button>
                 <p class="analyzer-soft-note"><span aria-hidden="true">✧</span> ${esc(noteText)}</p>
@@ -1308,17 +1331,13 @@ function renderFullView() {
   setAnalyzerTab(analyzerActiveTab);
   $$('.overlay-flip', overlay).forEach(btn => btn.addEventListener('click', () => {
     overlayFlipped = !overlayFlipped;
-    flipAnalyzerCard($('#fullCard3d'), overlayFlipped);
+    flipCardImage($('#fullCard3d'), getVisibleImage(selected), getVisibleName(selected), overlayFlipped);
     const stars = overlay.querySelector('.analyzer-rarity-stars');
-    const chip = overlay.querySelector('.analyzer-attr-chip');
     if (stars) stars.hidden = overlayFlipped;
-    if (chip) chip.hidden = overlayFlipped;
     playSfx('flip');
   }));
   const starsEl = overlay.querySelector('.analyzer-rarity-stars');
-  const chipEl = overlay.querySelector('.analyzer-attr-chip');
   if (starsEl) starsEl.hidden = overlayFlipped;
-  if (chipEl) chipEl.hidden = overlayFlipped;
   attachFullViewTilt();
   applyAnalyzerDisplayToggles();
   const commentsHost = overlay.querySelector('[data-card-comments-host]');
@@ -1664,14 +1683,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function flipCardImage(cardEl, frontUrl, frontAlt, showBack) {
   if (!cardEl) return;
 
-  // Analyzer uses true dual-face 3D flip; other previews keep mid-spin image swap.
-  if (cardEl.classList.contains('analyzer-card-3d')) {
-    flipAnalyzerCard(cardEl, showBack);
-    return;
-  }
-
-  // V79.6: one visible surface + mid-spin image swap.
-  // This keeps the official back artwork readable instead of mirrored/reversed during the flip.
+  // Final readable flip guard: one visible image surface, no mirrored back face, simple spin swap.
   const frontImg = cardEl.querySelector('.face.front img');
   const frontFace = cardEl.querySelector('.face.front');
   cardEl.classList.remove('flip-turning', 'flipped', 'show-back', 'showing-card-back');
@@ -1700,13 +1712,6 @@ function flipCardImage(cardEl, frontUrl, frontAlt, showBack) {
   window.setTimeout(() => cardEl.classList.remove('flip-turning'), 640);
 }
 
-function flipAnalyzerCard(cardEl, showBack) {
-  if (!cardEl) return;
-  cardEl.classList.toggle('show-back', !!showBack);
-  cardEl.classList.toggle('showing-card-back', !!showBack);
-  cardEl.setAttribute('aria-label', showBack ? 'Card back' : (selected ? getVisibleName(selected) : 'Card front'));
-}
-
 function attachFullViewTilt() {
   const card = $('#fullCard3d');
   if (!card) return;
@@ -1725,12 +1730,13 @@ function attachFullViewTilt() {
 
 /* ===== V61: Booster splash + magical grid binder replacement ===== */
 function renderBinder() {
-  renderSeriesHero();
   const browse = applyFilters();
   const searching = Boolean(activeFilters().q);
-  const inSeriesSelect = document.body.classList.contains('series-select') && browse.showLanding && !searching;
   if (searching) document.body.classList.remove('series-select');
   else if (browse.showLanding) document.body.classList.add('series-select');
+  else document.body.classList.remove('series-select');
+  renderSeriesHero();
+  const inSeriesSelect = document.body.classList.contains('series-select') && browse.showLanding && !searching;
   if (browse.showLanding && browse.summary) {
     $$('[data-filter-summary]').forEach(element => {
       element.textContent = browse.summary;
@@ -1769,34 +1775,16 @@ function renderV61SeriesLandingHtml() {
   </div>`;
 }
 function renderV61CardGridHtml(browse = resolveBinderBrowse()) {
-  const f = activeFilters();
   const list = browse.list || [];
   const poolSize = browse.poolSize || list.length;
-  const heading = browse.heading || f.series;
   $$('[data-filter-summary]').forEach(element => {
     element.textContent = browse.summary || `Showing ${list.length} of ${poolSize} cards`;
   });
-  const gotCount = list.filter(c => isCollected(c.id)).length;
-  const api = window.StarlightCardFilters;
   const copy = websiteBinderLanding || websiteSection('binderLanding');
-  const countPill = api?.formatBinderOwnedPill
-    ? api.formatBinderOwnedPill({ shown: list.length, owned: gotCount, view: f.view })
-    : (f.view === 'missing'
-      ? `Showing ${list.length} not collected`
-      : `Collected: ${gotCount} / ${list.length}`);
-  const browseLead = f.q
-    ? (Object.prototype.hasOwnProperty.call(copy, 'gridSearchLead') ? copy.gridSearchLead : 'Search matches across your selected filters.')
-    : (Object.prototype.hasOwnProperty.call(copy, 'gridBrowseLead') ? copy.gridBrowseLead : 'Browse the set and see which Starlight cards you have earned.');
   const emptyTitle = copy.emptyFiltersTitle || 'No cards match these filters';
   const emptyLead = copy.emptyFiltersLead || 'Reset one or more filters to browse this series again.';
   const emptyCta = copy.emptyFiltersCta || copy.filtersResetCta || 'Reset Filters';
-  const leadHtml = hasWebsiteCopy(browseLead) ? `<p>${esc(browseLead)}</p>` : '';
   return `<div class="v61-grid-shell">
-    <div class="v61-grid-head">
-      <button id="backToSeries" class="v61-back-btn" type="button">${esc(copy.backToSeriesCta || '← Back to Series')}</button>
-      <div><h2>${esc(heading)}</h2>${leadHtml}</div>
-      <span class="v61-count-pill">${esc(countPill)}</span>
-    </div>
     <div class="v61-grid">${list.length ? list.map((card,i)=>renderV61Card(card,i)).join('') : `<div class="empty-state"><h2>${esc(emptyTitle)}</h2><p>${esc(emptyLead)}</p><button class="btn primary" type="button" data-reset-card-filters>${esc(emptyCta)}</button></div>`}</div>
   </div>`;
 }

@@ -24,7 +24,7 @@ const MAX_VIEW_RETRIES = 1;
 const routes = {
   home:{title:'Home',src:'home.html'},
   binder:{title:'The Starlight Card Series Binder',src:null}, collection:{title:'My Starlight Album',src:'collection.html'},
-  daily:{title:'Daily Wish',src:'daily-booster.html'}, shop:{title:'Card Boutique',src:'booster-shop.html'}, events:{title:'Starlight Events',src:'events.html'}, redeem:{title:'Redeem A Code',src:'redeem.html'},
+  daily:{title:'Daily Free Booster Pack',src:'daily-booster.html'}, shop:{title:'Card Boutique',src:'booster-shop.html'}, events:{title:'Starlight Events',src:'events.html'}, redeem:{title:'Redeem A Code',src:'redeem.html'},
   'star-bits':{title:'Star Bits Exchange',src:'star-bits.html'},
   'starlight-evolution':{title:'Starlight Card Evolution',src:'starlight-evolution.html'},
   checklist:{title:'Star Registry',src:'checklist.html'},

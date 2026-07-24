@@ -36,10 +36,10 @@ test('Starlight Evolution costs and canEvolve match the locked ladder', () => {
   assert.equal(canFuse(8, 'stardust'), false);
   assert.equal(canEvolve(221, 'super_starlight'), true);
   assert.equal(canEvolve(999, 'starlight_burst'), false);
-  assert.equal(prestigeLabel('protostar'), '★★★ Protostar');
-  assert.equal(prestigeLabel('starlight'), '★★★★ Star');
-  assert.equal(prestigeLabel('super_starlight'), '★★★★★ Super Star');
-  assert.equal(prestigeLabel('starlight_burst'), '★★★★★★ Super Starlight');
+  assert.equal(prestigeLabel('protostar'), '⭐⭐ Radiance II');
+  assert.equal(prestigeLabel('starlight'), '⭐⭐⭐ Radiance III');
+  assert.equal(prestigeLabel('super_starlight'), '⭐⭐⭐⭐ Radiance IV');
+  assert.equal(prestigeLabel('starlight_burst'), '⭐⭐⭐⭐⭐ Radiance V');
   assert.equal(prestigeClassName('star_bit'), 'prestige-frame prestige-star-bit');
   assert.equal(prestigeClassName('stardust'), '');
   assert.equal(prestigeTierFromQuantity(500), 'stardust');

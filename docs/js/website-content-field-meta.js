@@ -606,7 +606,6 @@ export const WEBSITE_PAGE_META = Object.freeze({
           { key: 'ownedTitle' },
           { key: 'ownedLead', multiline: true },
           { key: 'ownedEmpty', multiline: true },
-          { key: 'stardust' },
           { key: 'starBit' },
           { key: 'protostar' },
           { key: 'star' },
@@ -737,7 +736,21 @@ export const WEBSITE_PAGE_META = Object.freeze({
         fields: [
           { key: 'eyebrow', preview: 'eyebrow' },
           { key: 'title', preview: 'title' },
-          { key: 'lead', multiline: true, preview: 'lead' }
+          { key: 'lead', multiline: true, preview: 'lead' },
+          { key: 'benefitsTitle' },
+          { key: 'benefitsList', multiline: true }
+        ]
+      },
+      {
+        id: 'activation',
+        label: 'Activation banner',
+        fields: [
+          { key: 'activatedTitle' },
+          { key: 'activatedLead', multiline: true },
+          { key: 'activatedBadge' },
+          { key: 'activatedLinkedLabel' },
+          { key: 'pendingTitle' },
+          { key: 'pendingLead', multiline: true }
         ]
       },
       {

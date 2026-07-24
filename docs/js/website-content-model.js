@@ -99,7 +99,9 @@ function sanitizeEnum(value, allowed, fallback) {
 
 /** Overwrite known legacy page titles with the current product defaults. */
 const WEBSITE_TITLE_REWRITES = Object.freeze({
-  'Daily Free Booster Pack': 'Daily Wish',
+  'Daily Wish': 'Daily Free Booster Pack',
+  'Open Daily Wish': 'Open Daily Booster',
+  '✨ Open Daily Wish': '✨ Open Daily Booster',
   'Starlight Card Shop': 'Card Boutique',
   'My Card Collection & Favorites': 'My Starlight Album',
   'My Checklist': 'Star Registry',
@@ -114,11 +116,29 @@ const WEBSITE_TITLE_REWRITES = Object.freeze({
     'Trade updates, event announcements, Starlight Memories, rewards, and other Starlight news all live here.',
   'See how your profile, showcase, achievements, and trade lists appear.':
     'See how your profile, showcase, Starlight Memories, and trade lists appear.',
-  'Open Daily Booster': 'Open Daily Wish',
-  '✨ Open Daily Booster': '✨ Open Daily Wish',
   'Visit Card Shop': 'Visit Card Boutique',
   'Open My Collection': 'Open My Starlight Album',
-  '💫 Wishlist & Trade List': '💫 Card Exchange'
+  '💫 Wishlist & Trade List': '💫 Card Exchange',
+  'Resets next UTC day:': 'Next reset:',
+  'Resets next Monday UTC:': 'Next weekly reset:',
+  'Resets each day at 00:00 UTC.': 'Resets once per day.',
+  'Resets each Monday at 00:00 UTC.': 'Resets each Monday.',
+  'Complete Daily and Weekly Missions to earn Star Bits and titles. Daily resets at 00:00 UTC. Weekly resets Monday 00:00 UTC.':
+    'Complete Daily and Weekly Missions to earn Star Bits and titles. Reset times appear below in your local time.',
+  '★ Stardust': 'Standard',
+  '★★ Star Bit': '⭐ Radiance I',
+  '★★★ Protostar': '⭐⭐ Radiance II',
+  '★★★★ Star': '⭐⭐⭐ Radiance III',
+  '★★★★★ Super Star': '⭐⭐⭐⭐ Radiance IV',
+  '★★★★★★ Super Starlight': '⭐⭐⭐⭐⭐ Radiance V',
+  'Base tier · ★ Stardust': 'Every card starts unevolved.',
+  '8 duplicates → ★★ Star Bit': '8 duplicates → ⭐ Radiance I',
+  '20 duplicates → ★★★ Protostar': '20 duplicates → ⭐⭐ Radiance II',
+  '45 duplicates → ★★★★ Star': '45 duplicates → ⭐⭐⭐ Radiance III',
+  '100 duplicates → ★★★★★ Super Star': '100 duplicates → ⭐⭐⭐⭐ Radiance IV',
+  '220 duplicates → ★★★★★★ Super Starlight': '220 duplicates → ⭐⭐⭐⭐⭐ Radiance V',
+  'Cards you have raised above Stardust appear here. Tap a card to view details and Evolve in place.':
+    'Cards evolved to Radiance I or higher appear here. Tap a card to view details and Evolve in place.'
 });
 
 function rewriteLegacyWebsiteText(value) {

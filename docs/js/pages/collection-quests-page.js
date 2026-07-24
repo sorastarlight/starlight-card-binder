@@ -115,13 +115,13 @@ function updateResetNote(rows) {
   const when = formatReset(sample?.resetsAt);
   if (activeCadence === 'daily') {
     resetNote.textContent = when
-      ? `${questsCopy.dailyResetNote || 'Resets next UTC day:'} ${when}`
-      : (questsCopy.dailyResetFallback || 'Resets each day at 00:00 UTC.');
+      ? `${questsCopy.dailyResetNote || 'Next reset:'} ${when}`
+      : (questsCopy.dailyResetFallback || 'Resets once per day.');
     return;
   }
   resetNote.textContent = when
-    ? `${questsCopy.weeklyResetNote || 'Resets next Monday UTC:'} ${when}`
-    : (questsCopy.weeklyResetFallback || 'Resets each Monday at 00:00 UTC.');
+    ? `${questsCopy.weeklyResetNote || 'Next weekly reset:'} ${when}`
+    : (questsCopy.weeklyResetFallback || 'Resets each Monday.');
 }
 
 function renderQuestCard(quest) {

@@ -38,13 +38,13 @@ test('binder filter panel stays hidden on series landing until a pack is selecte
   assert.match(app, /role="status" aria-live="polite"/);
   assert.match(app, /if \(filters\.q\) document\.body\.classList\.remove\('series-select'\)/);
   assert.match(app, /e\.preventDefault\(\);\s*stepFullView/s);
-  assert.match(css, /Hide binder filters on the series landing until a pack is selected/);
-  assert.match(css, /series-select \.card-filter-panel \{\s*display: none;/);
+  assert.match(css, /Hide binder browse chrome on the series landing until a pack is selected/);
+  assert.match(css, /series-select \.binder-browse-chrome,\s*body\[data-page="binder"\]\.series-select \.card-filter-panel \{\s*display: none;/);
   assert.doesNotMatch(
     css,
     /series-select \.card-filter-panel,\s*body\[data-page="binder"\]\.series-select \.binder-browser-layout \{\s*display: none;/
   );
-  assert.match(binder, /binder\.css\?v=1\.6\.1/);
+  assert.match(binder, /binder\.css\?v=1\.7\.0/);
   assert.match(binder, /cloud-collection\.js\?v=1\.3\.5/);
 });
 
