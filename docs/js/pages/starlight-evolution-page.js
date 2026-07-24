@@ -16,7 +16,7 @@ import {
   prestigeLabel,
   previousEvolutionTier
 } from '../prestige-utils.js?v=1.5.0';
-import { playStarlightEvolutionReveal } from '../starlight-evolution-reveal.js?v=1.2.0';
+import { playStarlightEvolutionReveal } from '../starlight-evolution-reveal.js?v=1.3.0';
 import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
 
 await loadAndHydrateWebsiteContent();
@@ -31,6 +31,8 @@ const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
 
 const statusEl = document.getElementById('st-evo-status');
 const gridEl = document.getElementById('st-evo-owned-grid');
+const readyStatusEl = document.getElementById('st-evo-ready-status');
+const readyGridEl = document.getElementById('st-evo-ready-grid');
 const dialogEl = document.getElementById('st-evo-card-modal');
 const dialogBodyEl = document.getElementById('st-evo-card-body');
 const dialogTitleEl = document.getElementById('st-evo-card-title');
@@ -38,6 +40,8 @@ const dialogCloseEl = document.getElementById('st-evo-card-close');
 
 /** @type {Map<string, object>} */
 let ownedById = new Map();
+/** @type {Map<string, object>} */
+let readyById = new Map();
 let activeCardId = '';
 let actionBusy = false;
 
@@ -84,28 +88,63 @@ function tierRank(tier) {
   return EVOLUTION_TIERS.indexOf(normalizeEvolutionTier(tier));
 }
 
+function mapOwnedRow(row, byId) {
+  const cardId = String(row.card_id || row.cards?.id || '').trim();
+  const tier = normalizeEvolutionTier(row.prestige_tier);
+  const quantity = Math.max(1, Number(row.quantity || 1));
+  const catalogCard = byId.get(cardId) || {};
+  const joined = row.cards || {};
+  return {
+    id: cardId,
+    tier,
+    quantity,
+    name: catalogCard.name || joined.name || cardId,
+    imageUrl: catalogCard.thumbnailUrl
+      || catalogCard.imageUrl
+      || joined.thumbnail_url
+      || joined.image_url
+      || ''
+  };
+}
+
 function normalizeOwnedRows(cards, byId) {
   return (cards || [])
-    .map((row) => {
-      const cardId = String(row.card_id || row.cards?.id || '').trim();
-      const tier = normalizeEvolutionTier(row.prestige_tier);
-      const quantity = Math.max(1, Number(row.quantity || 1));
-      const catalogCard = byId.get(cardId) || {};
-      const joined = row.cards || {};
-      return {
-        id: cardId,
-        tier,
-        quantity,
-        name: catalogCard.name || joined.name || cardId,
-        imageUrl: catalogCard.thumbnailUrl
-          || catalogCard.imageUrl
-          || joined.thumbnail_url
-          || joined.image_url
-          || ''
-      };
-    })
+    .map((row) => mapOwnedRow(row, byId))
     .filter((card) => card.id && tierRank(card.tier) > 0)
     .sort((a, b) => tierRank(b.tier) - tierRank(a.tier) || a.name.localeCompare(b.name));
+}
+
+function normalizeReadyRows(cards, byId) {
+  return (cards || [])
+    .map((row) => mapOwnedRow(row, byId))
+    .filter((card) => card.id && card.tier === 'stardust' && canEvolve(card.quantity, card.tier))
+    .sort((a, b) => b.quantity - a.quantity || a.name.localeCompare(b.name));
+}
+
+function cardById(cardId) {
+  const id = String(cardId || '').trim();
+  return ownedById.get(id) || readyById.get(id) || null;
+}
+
+function renderOwnedCardButton(card, { readyFirstEvolution = false } = {}) {
+  const frame = prestigeClassName(card.tier);
+  const label = prestigeLabel(card.tier);
+  const tierToken = String(card.tier).replace(/_/g, '-');
+  const ready = canEvolve(card.quantity, card.tier);
+  const next = nextEvolutionTier(card.tier);
+  const nextLabel = next ? prestigeLabel(next) : '';
+  const readyNote = readyFirstEvolution && nextLabel
+    ? `<span class="st-evo-ready-chip">Evolve to ${esc(nextLabel)}</span>`
+    : (ready ? '<span class="st-evo-ready-chip">Ready to evolve</span>' : '');
+  return `<button type="button" class="st-evo-owned-card${ready ? ' is-ready' : ''}" data-evo-open-card="${esc(card.id)}" aria-label="Open ${esc(card.name)} evolution details">
+      <span class="collection-image ${esc(frame)}"><img src="${esc(card.imageUrl)}" alt="" loading="lazy" onerror="this.style.opacity='0.35'"></span>
+      <strong>${esc(card.name)}</strong>
+      <div class="st-evo-owned-meta">
+        ${card.tier !== 'stardust' ? `<span class="prestige-badge prestige-${esc(tierToken)}">${esc(label)}</span>` : '<span class="prestige-badge">Standard</span>'}
+        <span class="qty">×${card.quantity}</span>
+        ${readyNote}
+      </div>
+    </button>`;
 }
 
 function renderGrid(evolved) {
@@ -120,23 +159,31 @@ function renderGrid(evolved) {
     return;
   }
 
-  gridEl.innerHTML = evolved.map((card) => {
-    const frame = prestigeClassName(card.tier);
-    const label = prestigeLabel(card.tier);
-    const tierToken = String(card.tier).replace(/_/g, '-');
-    const ready = canEvolve(card.quantity, card.tier);
-    return `<button type="button" class="st-evo-owned-card ${esc(frame)}${ready ? ' is-ready' : ''}" data-evo-open-card="${esc(card.id)}" aria-label="Open ${esc(card.name)} evolution details">
-      <img src="${esc(card.imageUrl)}" alt="" loading="lazy" onerror="this.style.opacity='0.35'">
-      <strong>${esc(card.name)}</strong>
-      <div class="st-evo-owned-meta">
-        <span class="prestige-badge prestige-${esc(tierToken)}">${esc(label)}</span>
-        <span class="qty">×${card.quantity}</span>
-        ${ready ? '<span class="st-evo-ready-chip">Ready to evolve</span>' : ''}
-      </div>
-    </button>`;
-  }).join('');
+  gridEl.innerHTML = evolved.map((card) => renderOwnedCardButton(card)).join('');
   gridEl.hidden = false;
   setStatus(`${evolved.length} evolved card${evolved.length === 1 ? '' : 's'}.`);
+}
+
+function renderReadyGrid(ready) {
+  if (!readyGridEl) return;
+  readyById = new Map(ready.map((card) => [card.id, card]));
+
+  if (!ready.length) {
+    readyGridEl.hidden = true;
+    readyGridEl.innerHTML = '';
+    if (readyStatusEl) {
+      readyStatusEl.hidden = true;
+      readyStatusEl.textContent = '';
+    }
+    return;
+  }
+
+  readyGridEl.innerHTML = ready.map((card) => renderOwnedCardButton(card, { readyFirstEvolution: true })).join('');
+  readyGridEl.hidden = false;
+  if (readyStatusEl) {
+    readyStatusEl.hidden = false;
+    readyStatusEl.textContent = `${ready.length} card${ready.length === 1 ? '' : 's'} ready for first Evolution.`;
+  }
 }
 
 function detailActionMarkup(card) {
@@ -192,7 +239,7 @@ function renderCardDetail(card) {
 
 function openCardDetail(cardId) {
   const id = String(cardId || '').trim();
-  const card = ownedById.get(id);
+  const card = cardById(id);
   if (!card || !cardModal) return;
   activeCardId = id;
   renderCardDetail(card);
@@ -228,7 +275,7 @@ async function confirmEvolve(card) {
 
 async function handleEvolve(cardId) {
   if (actionBusy) return;
-  const card = ownedById.get(String(cardId || '').trim());
+  const card = cardById(String(cardId || '').trim());
   if (!card) return;
   if (!(await confirmEvolve(card))) return;
 
@@ -252,7 +299,7 @@ async function handleEvolve(cardId) {
     });
     toast(`Evolved to ${nextLabel}!`, 'success');
     await renderOwned();
-    const refreshed = ownedById.get(card.id);
+    const refreshed = cardById(card.id);
     if (refreshed) openCardDetail(card.id);
   } catch (error) {
     toast(error?.message || error?.error_description || 'Evolution failed.', 'error');
@@ -263,7 +310,7 @@ async function handleEvolve(cardId) {
 
 async function handleUnfuse(cardId) {
   if (actionBusy) return;
-  const card = ownedById.get(String(cardId || '').trim());
+  const card = cardById(String(cardId || '').trim());
   if (!card) return;
   const prev = previousEvolutionTier(card.tier);
   const refund = evolutionUnfuseRefund(card.tier);
@@ -290,7 +337,7 @@ async function handleUnfuse(cardId) {
     );
     toast(`Unfused to ${nextLabel}. +${result.refund ?? refund} copies restored.`, 'success');
     await renderOwned();
-    const refreshed = ownedById.get(card.id);
+    const refreshed = cardById(card.id);
     if (refreshed) {
       renderCardDetail(refreshed);
     } else {
@@ -309,6 +356,14 @@ async function renderOwned() {
     gridEl.hidden = true;
     gridEl.innerHTML = '';
   }
+  if (readyGridEl) {
+    readyGridEl.hidden = true;
+    readyGridEl.innerHTML = '';
+  }
+  if (readyStatusEl) {
+    readyStatusEl.hidden = true;
+    readyStatusEl.textContent = '';
+  }
 
   try {
     const [{ cards, error }, byId] = await Promise.all([
@@ -316,7 +371,10 @@ async function renderOwned() {
       catalogById()
     ]);
     if (error) throw error;
-    renderGrid(normalizeOwnedRows(cards, byId));
+    const evolved = normalizeOwnedRows(cards, byId);
+    const ready = normalizeReadyRows(cards, byId);
+    renderGrid(evolved);
+    renderReadyGrid(ready);
   } catch (error) {
     console.error('[Starlight] Evolution page failed to load', error);
     setStatus(error?.message || 'Unable to load Evolution progress. Sign in and try again.', 'error');
@@ -324,6 +382,13 @@ async function renderOwned() {
 }
 
 gridEl?.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-evo-open-card]');
+  if (!button) return;
+  event.preventDefault();
+  openCardDetail(button.getAttribute('data-evo-open-card'));
+});
+
+readyGridEl?.addEventListener('click', (event) => {
   const button = event.target.closest('[data-evo-open-card]');
   if (!button) return;
   event.preventDefault();

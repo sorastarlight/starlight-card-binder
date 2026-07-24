@@ -49,7 +49,9 @@ test('finish effects are limited to reveal and full-card view surfaces', async (
 
   assert.match(app, /const finishClass = got && analyzerHoloEnabled \? cardFinishClass\(selected, true\) : ''/);
   assert.match(app, /face front \$\{finishClass\}/);
-  assert.match(app, /face front \$\{cardFinishClass\(card, got && !previewFlipped\)\}/);
+  assert.match(app, /face front \$\{cardFinishClass\(selected, got && !previewFlipped\)\}/);
+  assert.doesNotMatch(app, /v62-preview-card/);
+  assert.doesNotMatch(app, /renderV62Showcase/);
   assert.match(app, /holoSparkMarkup\(selected, got && !previewFlipped\)/);
   assert.match(app, /analyzerHoloEnabled/);
   assert.match(app, /data-finish-class=/);

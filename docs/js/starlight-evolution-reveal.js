@@ -1,8 +1,6 @@
 /**
- * Starlight Evolution reveal — cinematic near-fullscreen fuse:
- * glow → long same-card carousel orbit → merge → energy burst → big tier title/★ reveal.
- * Prefers CSS phases; prefers-reduced-motion keeps center + final title/stars.
- * Embed-anchored so the reveal stays centered in the visible viewport (above Full View).
+ * Starlight Evolution reveal — compact 3D duplicate carousel fusing into the evolved card.
+ * Duplicates orbit the primary card, then shake/flash into the new Radiance appearance.
  */
 
 import {
@@ -12,21 +10,20 @@ import {
 } from './prestige-utils.js?v=1.5.0';
 
 const STYLESHEET_ID = 'starlight-evolution-reveal-css';
-const STYLESHEET_HREF = '../css/starlight-evolution-reveal.css?v=1.2.0';
+const STYLESHEET_HREF = '../css/starlight-evolution-reveal.css?v=1.3.0';
 
-/** Full-motion phase timings (ms). Total ≈ 8.2–9.0s before leave. */
+/** Full-motion phase timings (ms). Total ≈ 5.8s before leave. */
 const TIMING = Object.freeze({
-  glow: 700,
-  orbit: 4600,
-  merge: 750,
-  burst: 1200,
-  reveal: 2000,
-  leave: 320
+  enter: 320,
+  carousel: 2600,
+  fuse: 900,
+  reveal: 1500,
+  leave: 260
 });
 
 const REDUCED_TIMING = Object.freeze({
-  reveal: 1100,
-  leave: 240
+  reveal: 1000,
+  leave: 220
 });
 
 function preferReducedMotion() {
@@ -63,7 +60,6 @@ function tierCssToken(tier) {
   return String(tier || 'stardust').trim().toLowerCase().replace(/_/g, '-');
 }
 
-/** Radiance I–V star count for reveal (unevolved cards use 0). */
 function starRankForTier(tier) {
   const key = normalizeEvolutionTier(tier);
   const index = EVOLUTION_TIERS.indexOf(key);
@@ -76,17 +72,17 @@ function starsMarkup(count) {
   return n ? '⭐'.repeat(n) : '';
 }
 
-/**
- * Orbiter count + CSS intensity 1–5 from target tier (higher = more dramatic).
- * @returns {{ orbiters: number, intensity: number }}
- */
+/** Visual intensity 1–5 from target tier (glow strength). */
 function intensityForTier(tier) {
   const key = normalizeEvolutionTier(tier);
   const index = Math.max(0, EVOLUTION_TIERS.indexOf(key));
-  // stardust/star_bit → 5 orbiters … starlight_burst → 9
-  const orbiters = Math.min(9, Math.max(5, 4 + index));
-  const intensity = Math.min(5, Math.max(1, index || 1));
-  return { orbiters, intensity };
+  return Math.min(5, Math.max(1, index || 1));
+}
+
+/** Duplicate cards shown in the 3D carousel (matches spent cost, capped for layout). */
+function orbiterCountForCost(cost) {
+  const spent = Math.max(1, Number(cost) || 1);
+  return Math.min(12, spent);
 }
 
 function getUiApi() {
@@ -122,7 +118,7 @@ function clearRevealAnchor(root) {
  * @param {string} options.fromTier
  * @param {string} options.toTier
  * @param {string} [options.label]
- * @param {number} [options.cost] unused for visuals; kept for caller compatibility
+ * @param {number} [options.cost] duplicates spent — drives carousel count
  * @returns {Promise<void>}
  */
 export async function playStarlightEvolutionReveal(options = {}) {
@@ -130,47 +126,46 @@ export async function playStarlightEvolutionReveal(options = {}) {
 
   const imageUrl = String(options.imageUrl || '').trim();
   const cardName = String(options.cardName || 'Card').trim();
+  const fromTier = normalizeEvolutionTier(options.fromTier || 'stardust');
   const toTier = normalizeEvolutionTier(options.toTier || 'star_bit');
   const label = String(options.label || prestigeLabel(toTier)).trim();
-  const token = tierCssToken(toTier);
+  const fromToken = tierCssToken(fromTier);
+  const toToken = tierCssToken(toTier);
   const starRank = starRankForTier(toTier);
-  const { orbiters, intensity } = intensityForTier(toTier);
+  const intensity = intensityForTier(toTier);
+  const orbiters = orbiterCountForCost(options.cost);
   const reduced = preferReducedMotion();
   const safeImg = esc(imageUrl);
   const safeName = esc(cardName);
   const safeLabel = esc(label);
   const safeStars = esc(starsMarkup(starRank));
-  const orbitMs = TIMING.orbit;
+  const orbitMs = TIMING.carousel;
 
   const root = document.createElement('div');
   root.className = `st-evo-root${reduced ? ' is-reduced' : ''}`;
   root.dataset.intensity = String(intensity);
   root.style.setProperty('--evo-orbit-ms', `${orbitMs}ms`);
+  root.style.setProperty('--evo-orbit-n', String(orbiters));
   root.setAttribute('role', 'dialog');
   root.setAttribute('aria-modal', 'true');
   root.setAttribute('aria-label', `Evolving to ${label}`);
   root.innerHTML = `
     <div class="st-evo-backdrop" aria-hidden="true"></div>
-    <div class="st-evo-energy" aria-hidden="true"></div>
-    <div class="st-evo-vignette" aria-hidden="true"></div>
-    <div class="st-evo-stage prestige-${token}" data-intensity="${intensity}">
+    <div class="st-evo-panel prestige-${toToken}" data-intensity="${intensity}">
       <p class="st-evo-caption">Starlight Evolution</p>
       <div class="st-evo-arena">
-        <div class="st-evo-orbit" aria-hidden="true"></div>
-        <div class="st-evo-hero">
-          <span class="st-evo-hero-glow" aria-hidden="true"></span>
-          <span class="st-evo-hero-ring" aria-hidden="true"></span>
-          <img src="${safeImg}" alt="${safeName}" draggable="false">
-          <span class="st-evo-border prestige-frame prestige-${token}" aria-hidden="true"></span>
+        <div class="st-evo-orbit-rig" aria-hidden="true">
+          <div class="st-evo-orbit"></div>
         </div>
-        <div class="st-evo-burst" aria-hidden="true">
-          <span class="st-evo-burst-core"></span>
-          <span class="st-evo-burst-ring st-evo-burst-ring--a"></span>
-          <span class="st-evo-burst-ring st-evo-burst-ring--b"></span>
-          <span class="st-evo-burst-ring st-evo-burst-ring--c"></span>
-          <span class="st-evo-burst-rays"></span>
-          <span class="st-evo-burst-sparkles"></span>
+        <div class="st-evo-hero-wrap">
+          <div class="st-evo-hero prestige-frame prestige-${fromToken}" data-from-tier="${esc(fromToken)}" data-to-tier="${esc(toToken)}">
+            <span class="st-evo-hero-halo" aria-hidden="true"></span>
+            <img src="${safeImg}" alt="${safeName}" draggable="false">
+            <span class="st-evo-border prestige-frame prestige-${fromToken}" aria-hidden="true"></span>
+          </div>
         </div>
+        <div class="st-evo-flash" aria-hidden="true"></div>
+        <div class="st-evo-sparks" aria-hidden="true"></div>
       </div>
       <div class="st-evo-reveal-meta">
         <p class="st-evo-stars" aria-hidden="true">${safeStars}</p>
@@ -206,26 +201,32 @@ export async function playStarlightEvolutionReveal(options = {}) {
     window.parent?.addEventListener?.('resize', onViewportChange);
   } catch {}
 
+  const hero = root.querySelector('.st-evo-hero');
+  const border = root.querySelector('.st-evo-border');
+
   try {
     if (reduced) {
-      root.classList.add('is-glow', 'is-reveal');
+      root.classList.add('is-reveal');
+      if (hero) hero.className = `st-evo-hero prestige-frame prestige-${toToken}`;
+      if (border) border.className = `st-evo-border prestige-frame prestige-${toToken}`;
       await wait(REDUCED_TIMING.reveal);
       return;
     }
 
-    root.classList.add('is-glow');
-    await wait(TIMING.glow);
+    root.classList.add('is-enter');
+    await wait(TIMING.enter);
 
-    root.classList.add('is-orbit');
-    await wait(TIMING.orbit);
+    root.classList.add('is-carousel');
+    await wait(TIMING.carousel);
 
-    root.classList.add('is-merge');
-    await wait(TIMING.merge);
+    root.classList.add('is-fuse');
+    await wait(Math.round(TIMING.fuse * 0.55));
 
-    root.classList.add('is-burst');
-    await wait(Math.round(TIMING.burst * 0.4));
+    if (hero) hero.className = `st-evo-hero prestige-frame prestige-${toToken} is-evolved`;
+    if (border) border.className = `st-evo-border prestige-frame prestige-${toToken}`;
+
     root.classList.add('is-reveal');
-    await wait(Math.round(TIMING.burst * 0.6) + TIMING.reveal);
+    await wait(Math.round(TIMING.fuse * 0.45) + TIMING.reveal);
   } finally {
     try {
       window.removeEventListener('resize', onViewportChange);

@@ -82,6 +82,28 @@
   opacity: 0;
 }
 
+/* Border-only frames — no inner rainbow holo wash over card art or tier swatches. */
+.prestige-frame .v61-card-btn::before,
+.prestige-frame .collection-image::before,
+.full-card-wrap.prestige-frame::before,
+.preview-card.prestige-frame::before,
+.v62-preview-card.prestige-frame::before,
+.st-r3-card-actor.prestige-frame::before,
+.st-r3-result-art.prestige-frame::before,
+.st-r3-result-card.prestige-frame::before,
+.st-evo-border.prestige-frame::before,
+.st-evo-owned-card::before,
+.st-evo-detail-art::before,
+.prestige-legend-tiers .prestige-frame::before,
+.prestige-star-bit::before,
+.prestige-protostar::before,
+.prestige-starlight::before,
+.prestige-super-starlight::before,
+.prestige-starlight-burst::before {
+  display: none !important;
+  content: none !important;
+}
+
 .full-card-wrap.prestige-frame,
 .preview-card.prestige-frame,
 .v62-preview-card.prestige-frame,

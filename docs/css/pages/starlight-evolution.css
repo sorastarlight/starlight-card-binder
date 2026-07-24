@@ -193,13 +193,23 @@
   }
 }
 
-.st-evo-owned-card img {
+.st-evo-owned-card .collection-image {
+  display: block;
+  width: 100%;
+  border-radius: 12px;
+}
+
+.st-evo-owned-card .collection-image img {
   width: 100%;
   aspect-ratio: 5 / 7;
   object-fit: cover;
   border-radius: 12px;
   display: block;
   background: #e8f2fb;
+}
+
+.st-evo-ready-grid {
+  margin-top: 0;
 }
 
 .st-evo-owned-card strong {

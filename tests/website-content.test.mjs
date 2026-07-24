@@ -31,7 +31,7 @@ test('default website content includes editable page groups', () => {
   assert.ok(content.binderSidePanel.ownedQtyLabel);
   assert.ok(content.binderFullView.scanEyebrow);
   assert.ok(content.binderFullView.illustratorLabel);
-  assert.equal(content.binderDisplay.sidePanel, 'on');
+  assert.equal(content.binderDisplay.sidePanel, 'off');
   assert.equal(content.binderDisplay.unownedDisplay, 'cardBack');
   assert.equal(content.binderDisplay.collectionStatusFilter, 'on');
   assert.ok(content.daily.title);
@@ -157,7 +157,7 @@ test('sanitizeWebsiteContent clamps binderDisplay enums to defaults', () => {
       collectionStatusFilter: 'yes'
     }
   });
-  assert.equal(sanitized.binderDisplay.sidePanel, 'on');
+  assert.equal(sanitized.binderDisplay.sidePanel, 'off');
   assert.equal(sanitized.binderDisplay.unownedDisplay, 'cardBack');
   assert.equal(sanitized.binderDisplay.collectionStatusFilter, 'on');
 
@@ -180,7 +180,7 @@ test('mergeWebsiteContent fills binderDisplay defaults for legacy payloads', () 
     about: { title: 'Custom About' }
   });
   assert.equal(merged.about.title, 'Custom About');
-  assert.equal(merged.binderDisplay.sidePanel, 'on');
+  assert.equal(merged.binderDisplay.sidePanel, 'off');
   assert.equal(merged.binderDisplay.unownedDisplay, 'cardBack');
   assert.equal(merged.binderDisplay.collectionStatusFilter, 'on');
   assert.equal(merged.version, 5);
@@ -351,7 +351,8 @@ test('website editor admin page and public hooks are wired', async () => {
   assert.match(login, /data-content="login\.returnCta"/);
   assert.match(loginPage, /loginCopy/);
   assert.match(loginPage, /loadAndHydrateWebsiteContent/);
-  assert.match(binder, /data-content="binder\.title"/);
+  assert.match(binder, /id="seriesHeroTitle"/);
+  assert.match(app, /function renderSeriesHero\(\)/);
   assert.match(daily, /data-content="daily\.title"/);
   assert.match(daily, /data-content="daily\.signInCta"/);
   assert.match(daily, /data-content="daily\.loopStep1"/);

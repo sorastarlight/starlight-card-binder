@@ -134,7 +134,7 @@ export function createDefaultWebsiteContent() {
       closeCta: 'Close'
     },
     binderDisplay: {
-      sidePanel: 'on',
+      sidePanel: 'off',
       unownedDisplay: 'cardBack',
       collectionStatusFilter: 'on'
     },

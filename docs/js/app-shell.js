@@ -182,6 +182,7 @@ function navigate(route,{push=true,extra={}}={}){
     frameWrap?.classList.remove('active','is-loading','has-error');
     if(frame)setFrameLocation('about:blank');
     document.title='The Starlight Card Series Binder | Starlight Card Binder';
+    window.renderAll?.();
     return;
   }
   nativeView?.classList.add('hidden');
