@@ -1067,12 +1067,13 @@ function renderDetail() {
   const artClass = unownedArtClass(selected, { flipped: previewFlipped });
   const side = websiteSection('binderSidePanel');
   const qty = getCardQuantity(selected.id);
+  const previewPrestige = got ? prestigeFrameClass(selected.id) : '';
   detail.innerHTML = `
   <div class="detail-actions top-actions-preview">
     <button class="btn primary" id="flipPreview" type="button">${esc(side.flipCta || '↻ Flip')}</button>
     <button class="btn" id="openFullView" type="button">${esc(side.fullViewCta || '⛶ Full View')}</button>
   </div>
-  <button class="preview-card flip-card simple-flip ${previewFlipped ? 'show-back showing-card-back' : ''} ${rarityClass(selected)}" id="previewCard" type="button" aria-label="Open full card view" data-finish-class="${esc(got ? cardFinishClass(selected, true) : '')}" data-holographic="${got && isHolographicCard(selected)}">
+  <button class="preview-card flip-card simple-flip ${previewFlipped ? 'show-back showing-card-back' : ''} ${rarityClass(selected)} ${previewPrestige}" id="previewCard" type="button" aria-label="Open full card view" data-finish-class="${esc(got ? cardFinishClass(selected, true) : '')}" data-holographic="${got && isHolographicCard(selected)}">
     <span class="preview-inner">
       <span class="face front ${cardFinishClass(selected, got && !previewFlipped)}"><img class="${artClass}" src="${esc(previewFlipped ? CARD_BACK_URL : getVisibleImage(selected))}" alt="${esc(previewFlipped ? 'Card back' : getVisibleName(selected))}" onerror="this.src='${CARD_BACK_URL}'">${holoSparkMarkup(selected, got && !previewFlipped)}</span>
       <span class="face back"><img src="${CARD_BACK_URL}" alt="Card back"></span>
@@ -1855,12 +1856,13 @@ function renderV62Showcase(inSeriesSelect = false, browse = resolveBinderBrowse(
   const visibleRarity = getVisibleRarity(card);
   const qty = getCardQuantity(card.id);
   const ownedQtyText = fillWebsiteTokens(side.ownedQtyLabel || 'Owned ×{qty}', { qty });
+  const previewPrestige = got ? prestigeFrameClass(card.id) : '';
   panel.innerHTML = `<div class="v62-panel-inner ${rarityClass(card)} ${got ? 'is-collected' : 'is-hidden'}">
     <div class="v62-panel-actions">
       <button class="btn primary" id="v62Flip" type="button">${esc(side.flipCta || '↻ Flip')}</button>
       <button class="btn" id="v62Full" type="button">${esc(side.fullViewCta || '⛶ Full View')}</button>
     </div>
-    <button class="v62-preview-card flip-card simple-flip ${previewFlipped ? 'show-back showing-card-back' : ''}" id="v62PreviewCard" type="button" aria-label="Open full view for ${esc(visibleName)}" data-finish-class="${esc(got ? cardFinishClass(card, true) : '')}" data-holographic="${got && isHolographicCard(card)}">
+    <button class="v62-preview-card flip-card simple-flip ${previewFlipped ? 'show-back showing-card-back' : ''} ${previewPrestige}" id="v62PreviewCard" type="button" aria-label="Open full view for ${esc(visibleName)}" data-finish-class="${esc(got ? cardFinishClass(card, true) : '')}" data-holographic="${got && isHolographicCard(card)}">
       <span class="preview-inner">
         <span class="face front ${cardFinishClass(card, got && !previewFlipped)}"><img class="${artClass}" src="${esc(previewFlipped ? CARD_BACK_URL : visibleImage)}" alt="${esc(previewFlipped ? 'Card back' : visibleName)}" onerror="this.src='${CARD_BACK_URL}'">${holoSparkMarkup(card, got && !previewFlipped)}</span>
         <span class="face back"><img src="${CARD_BACK_URL}" alt="Starlight card back"></span>

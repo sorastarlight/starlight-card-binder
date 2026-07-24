@@ -1,70 +1,261 @@
-/* Starlight Evolution frames (stored prestige_tier). Evolution spends duplicate extras. */
-.prestige-frame,
-.collection-card.prestige-frame,
-.v61-card-slot.prestige-frame,
+/* Starlight Evolution frames — Radiance I–V progressive card borders. */
+
+:root {
+  --radiance-i-border: rgba(196, 210, 232, 0.96);
+  --radiance-i-glow: rgba(196, 210, 232, 0.28);
+  --radiance-ii-border: rgba(228, 178, 88, 0.96);
+  --radiance-ii-glow: rgba(255, 196, 96, 0.34);
+  --radiance-iii-a: #7fd0ff;
+  --radiance-iii-b: #ff9ad5;
+  --radiance-iii-c: #b8f0a8;
+  --radiance-iv-border: rgba(118, 156, 255, 0.98);
+  --radiance-iv-glow: rgba(118, 156, 255, 0.48);
+  --radiance-v-a: #fff4b8;
+  --radiance-v-b: #9ad8ff;
+  --radiance-v-c: #ffb0e8;
+  --radiance-v-d: #ffe27a;
+}
+
+/* Card art hosts that receive the visible frame ring */
+.prestige-frame .v61-card-btn,
+.prestige-frame .collection-image,
 .full-card-wrap.prestige-frame,
+.preview-card.prestige-frame,
+.v62-preview-card.prestige-frame,
 .st-r3-card-actor.prestige-frame,
 .st-r3-result-art.prestige-frame,
 .st-r3-result-card.prestige-frame,
-.st-evo-border.prestige-frame {
+.st-evo-border.prestige-frame,
+.prestige-legend-tiers .prestige-frame {
   position: relative;
+  isolation: isolate;
 }
 
-.prestige-frame::after {
+.prestige-frame .v61-card-btn::before,
+.prestige-frame .v61-card-btn::after,
+.prestige-frame .collection-image::before,
+.prestige-frame .collection-image::after,
+.full-card-wrap.prestige-frame::before,
+.full-card-wrap.prestige-frame::after,
+.preview-card.prestige-frame::before,
+.preview-card.prestige-frame::after,
+.st-r3-card-actor.prestige-frame::before,
+.st-r3-card-actor.prestige-frame::after,
+.st-r3-result-art.prestige-frame::before,
+.st-r3-result-art.prestige-frame::after,
+.st-r3-result-card.prestige-frame::before,
+.st-r3-result-card.prestige-frame::after,
+.st-evo-border.prestige-frame::before,
+.st-evo-border.prestige-frame::after,
+.prestige-legend-tiers .prestige-frame::before,
+.prestige-legend-tiers .prestige-frame::after {
   content: "";
   pointer-events: none;
   position: absolute;
-  inset: -3px;
   border-radius: inherit;
+  z-index: 4;
+}
+
+.prestige-frame .v61-card-btn::after,
+.prestige-frame .collection-image::after,
+.full-card-wrap.prestige-frame::after,
+.preview-card.prestige-frame::after,
+.st-r3-card-actor.prestige-frame::after,
+.st-r3-result-art.prestige-frame::after,
+.st-r3-result-card.prestige-frame::after,
+.st-evo-border.prestige-frame::after,
+.prestige-legend-tiers .prestige-frame::after {
+  inset: -3px;
   border: 2px solid transparent;
-  z-index: 2;
 }
 
-.collection-card.prestige-frame,
-.v61-card-slot.prestige-frame,
+.prestige-frame .v61-card-btn::before,
+.prestige-frame .collection-image::before,
+.full-card-wrap.prestige-frame::before,
+.preview-card.prestige-frame::before,
+.st-r3-card-actor.prestige-frame::before,
+.st-r3-result-art.prestige-frame::before,
+.st-r3-result-card.prestige-frame::before,
+.st-evo-border.prestige-frame::before,
+.prestige-legend-tiers .prestige-frame::before {
+  inset: -7px;
+  opacity: 0;
+}
+
 .full-card-wrap.prestige-frame,
+.preview-card.prestige-frame,
+.v62-preview-card.prestige-frame,
 .st-r3-card-actor.prestige-frame,
-.st-r3-result-art.prestige-frame {
-  border-radius: 18px;
+.st-r3-result-art.prestige-frame,
+.collection-card.prestige-frame .collection-image {
+  border-radius: 14px;
 }
 
-/* Base tier: no decorative frame */
+.v62-preview-card.prestige-frame {
+  border-radius: 12px;
+}
+
+.prestige-frame .v61-card-btn {
+  border-radius: 12px;
+}
+
+/* Unevolved — no decorative frame */
+.prestige-stardust .v61-card-btn::before,
+.prestige-stardust .v61-card-btn::after,
+.prestige-stardust .collection-image::before,
+.prestige-stardust .collection-image::after,
+.prestige-stardust.full-card-wrap::before,
+.prestige-stardust.full-card-wrap::after,
+.prestige-stardust.preview-card::before, .v62-preview-card::before,
+.prestige-stardust.preview-card::after, .v62-preview-card::after,
+.prestige-stardust::before,
 .prestige-stardust::after {
   display: none;
 }
 
+/* ⭐ Radiance I — pearlescent silver ring */
+.prestige-star-bit .v61-card-btn::after,
+.prestige-star-bit .collection-image::after,
+.prestige-star-bit.full-card-wrap::after,
+.prestige-star-bit.preview-card::after, .v62-preview-card::after,
+.prestige-star-bit.st-r3-card-actor::after,
+.prestige-star-bit.st-r3-result-art::after,
+.prestige-star-bit.st-evo-border::after,
 .prestige-star-bit::after {
-  border-color: rgba(168, 184, 206, 0.95);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.55), 0 8px 18px rgba(120, 138, 168, 0.22);
+  border-color: var(--radiance-i-border);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.72),
+    0 0 12px var(--radiance-i-glow),
+    inset 0 0 10px rgba(255, 255, 255, 0.35);
 }
 
+/* ⭐⭐ Radiance II — warm rose-gold bevel */
+.prestige-protostar .v61-card-btn::after,
+.prestige-protostar .collection-image::after,
+.prestige-protostar.full-card-wrap::after,
+.prestige-protostar.preview-card::after, .v62-preview-card::after,
+.prestige-protostar.st-r3-card-actor::after,
+.prestige-protostar.st-r3-result-art::after,
+.prestige-protostar.st-evo-border::after,
 .prestige-protostar::after {
-  border-color: rgba(214, 170, 72, 0.95);
-  box-shadow: 0 0 0 1px rgba(255, 244, 210, 0.7), 0 10px 22px rgba(184, 136, 36, 0.24);
+  inset: -4px;
+  border-width: 2px;
+  border-color: var(--radiance-ii-border);
+  box-shadow:
+    0 0 0 1px rgba(255, 244, 210, 0.82),
+    0 0 16px var(--radiance-ii-glow),
+    0 8px 18px rgba(184, 136, 36, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
+.prestige-protostar .v61-card-btn::before,
+.prestige-protostar .collection-image::before,
+.prestige-protostar.full-card-wrap::before,
+.prestige-protostar.preview-card::before, .v62-preview-card::before,
+.prestige-protostar::before {
+  opacity: 0.55;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 214, 120, 0.22), transparent 68%);
+}
+
+/* ⭐⭐⭐ Radiance III — aurora gradient ring */
+.prestige-starlight .v61-card-btn::after,
+.prestige-starlight .collection-image::after,
+.prestige-starlight.full-card-wrap::after,
+.prestige-starlight.preview-card::after, .v62-preview-card::after,
+.prestige-starlight.st-r3-card-actor::after,
+.prestige-starlight.st-r3-result-art::after,
+.prestige-starlight.st-evo-border::after,
 .prestige-starlight::after {
-  border-image: linear-gradient(135deg, #7fd0ff, #ff9ad5, #b8f0a8, #ffd57a) 1;
-  box-shadow: 0 0 18px rgba(127, 208, 255, 0.35), 0 10px 24px rgba(255, 154, 213, 0.2);
+  inset: -4px;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04)) padding-box,
+    linear-gradient(135deg, var(--radiance-iii-a), var(--radiance-iii-b), var(--radiance-iii-c), var(--radiance-iii-a)) border-box;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.65),
+    0 0 20px rgba(127, 208, 255, 0.38),
+    0 0 28px rgba(255, 154, 213, 0.24),
+    0 10px 22px rgba(90, 120, 180, 0.2);
 }
 
+.prestige-starlight .v61-card-btn::before,
+.prestige-starlight .collection-image::before,
+.prestige-starlight.full-card-wrap::before,
+.prestige-starlight.preview-card::before, .v62-preview-card::before,
+.prestige-starlight::before {
+  opacity: 0.7;
+  background: radial-gradient(circle at 50% 42%, rgba(127, 208, 255, 0.28), rgba(255, 154, 213, 0.12) 52%, transparent 72%);
+}
+
+/* ⭐⭐⭐⭐ Radiance IV — sapphire neon halo */
+.prestige-super-starlight .v61-card-btn::after,
+.prestige-super-starlight .collection-image::after,
+.prestige-super-starlight.full-card-wrap::after,
+.prestige-super-starlight.preview-card::after, .v62-preview-card::after,
+.prestige-super-starlight.st-r3-card-actor::after,
+.prestige-super-starlight.st-r3-result-art::after,
+.prestige-super-starlight.st-evo-border::after,
 .prestige-super-starlight::after {
-  border-color: rgba(120, 168, 255, 0.95);
+  inset: -5px;
+  border: 2px solid var(--radiance-iv-border);
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.75),
-    0 0 22px rgba(120, 168, 255, 0.45),
-    0 12px 28px rgba(90, 120, 210, 0.28);
+    0 0 0 1px rgba(255, 255, 255, 0.82),
+    0 0 18px var(--radiance-iv-glow),
+    0 0 32px rgba(170, 120, 255, 0.34),
+    0 12px 26px rgba(70, 90, 180, 0.28),
+    inset 0 0 14px rgba(180, 210, 255, 0.22);
 }
 
+.prestige-super-starlight .v61-card-btn::before,
+.prestige-super-starlight .collection-image::before,
+.prestige-super-starlight.full-card-wrap::before,
+.prestige-super-starlight.preview-card::before, .v62-preview-card::before,
+.prestige-super-starlight::before {
+  opacity: 0.85;
+  inset: -10px;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(118, 156, 255, 0.34), transparent 62%),
+    radial-gradient(circle at 18% 22%, rgba(255, 154, 213, 0.18), transparent 42%),
+    radial-gradient(circle at 82% 78%, rgba(154, 216, 255, 0.16), transparent 40%);
+}
+
+/* ⭐⭐⭐⭐⭐ Radiance V — prismatic crown frame */
+.prestige-starlight-burst .v61-card-btn::after,
+.prestige-starlight-burst .collection-image::after,
+.prestige-starlight-burst.full-card-wrap::after,
+.prestige-starlight-burst.preview-card::after, .v62-preview-card::after,
+.prestige-starlight-burst.st-r3-card-actor::after,
+.prestige-starlight-burst.st-r3-result-art::after,
+.prestige-starlight-burst.st-evo-border::after,
 .prestige-starlight-burst::after {
-  border-image: linear-gradient(135deg, #fff4b8, #9ad8ff, #ffb0e8, #fff4b8) 1;
+  inset: -6px;
+  border: 3px solid transparent;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.04)) padding-box,
+    conic-gradient(from 210deg, var(--radiance-v-a), var(--radiance-v-b), var(--radiance-v-c), var(--radiance-v-d), var(--radiance-v-a)) border-box;
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.85),
-    0 0 28px rgba(255, 220, 140, 0.55),
-    0 0 36px rgba(140, 190, 255, 0.4),
-    0 14px 32px rgba(90, 120, 210, 0.3);
+    0 0 0 1px rgba(255, 255, 255, 0.92),
+    0 0 24px rgba(255, 220, 140, 0.55),
+    0 0 38px rgba(140, 190, 255, 0.42),
+    0 0 48px rgba(255, 130, 200, 0.28),
+    0 16px 34px rgba(90, 70, 170, 0.32),
+    inset 0 0 18px rgba(255, 255, 255, 0.28);
 }
 
+.prestige-starlight-burst .v61-card-btn::before,
+.prestige-starlight-burst .collection-image::before,
+.prestige-starlight-burst.full-card-wrap::before,
+.prestige-starlight-burst.preview-card::before, .v62-preview-card::before,
+.prestige-starlight-burst::before {
+  opacity: 1;
+  inset: -14px;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 236, 160, 0.36), transparent 58%),
+    conic-gradient(from 0deg, rgba(255, 220, 140, 0.16), rgba(154, 216, 255, 0.14), rgba(255, 176, 232, 0.16), rgba(255, 220, 140, 0.16));
+  filter: blur(1px);
+}
+
+/* Tier badges */
 .prestige-badge {
   display: inline-flex;
   align-items: center;
@@ -80,13 +271,30 @@
 }
 
 .prestige-badge.prestige-stardust { background: #f3f5f8; color: #6b7388; }
-.prestige-badge.prestige-star-bit { background: #eef2f7; color: #5b6b84; }
-.prestige-badge.prestige-protostar { background: #fff5df; color: #8a650f; }
-.prestige-badge.prestige-starlight { background: linear-gradient(135deg, #e9f8ff, #ffe8f5); color: #5a4f8a; }
-.prestige-badge.prestige-super-starlight { background: #eaf0ff; color: #3550a0; }
+.prestige-badge.prestige-star-bit {
+  background: linear-gradient(135deg, #f4f7fb, #e6edf6);
+  color: #526079;
+  box-shadow: inset 0 0 0 1px rgba(196, 210, 232, 0.65);
+}
+.prestige-badge.prestige-protostar {
+  background: linear-gradient(135deg, #fff8e8, #ffe9bc);
+  color: #8a650f;
+  box-shadow: inset 0 0 0 1px rgba(228, 178, 88, 0.45);
+}
+.prestige-badge.prestige-starlight {
+  background: linear-gradient(135deg, #e9f8ff, #ffe8f5, #efffe8);
+  color: #5a4f8a;
+  box-shadow: inset 0 0 0 1px rgba(127, 208, 255, 0.35);
+}
+.prestige-badge.prestige-super-starlight {
+  background: linear-gradient(135deg, #eaf0ff, #f3e8ff);
+  color: #3550a0;
+  box-shadow: 0 0 10px rgba(118, 156, 255, 0.22);
+}
 .prestige-badge.prestige-starlight-burst {
-  background: linear-gradient(135deg, #fff8df, #e8f4ff, #ffe8f5);
+  background: linear-gradient(135deg, #fff8df, #e8f4ff, #ffe8f5, #fff4c8);
   color: #5a4080;
+  box-shadow: 0 0 12px rgba(255, 200, 120, 0.28);
 }
 
 .fusion-action,
@@ -132,30 +340,122 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .prestige-starlight::after,
+  .prestige-protostar .v61-card-btn::after,
+  .prestige-protostar .collection-image::after,
+  .prestige-protostar.full-card-wrap::after,
+  .prestige-protostar.preview-card::after, .v62-preview-card::after,
+  .prestige-protostar::after {
+    animation: radiance-ii-pulse 3.6s ease-in-out infinite;
+  }
+
+  .prestige-starlight .v61-card-btn::after,
+  .prestige-starlight .collection-image::after,
+  .prestige-starlight.full-card-wrap::after,
+  .prestige-starlight.preview-card::after, .v62-preview-card::after,
+  .prestige-starlight::after {
+    animation: radiance-iii-shimmer 4.2s ease-in-out infinite;
+  }
+
+  .prestige-super-starlight .v61-card-btn::after,
+  .prestige-super-starlight .collection-image::after,
+  .prestige-super-starlight.full-card-wrap::after,
+  .prestige-super-starlight.preview-card::after, .v62-preview-card::after,
   .prestige-super-starlight::after,
+  .prestige-super-starlight .v61-card-btn::before,
+  .prestige-super-starlight .collection-image::before,
+  .prestige-super-starlight.full-card-wrap::before,
+  .prestige-super-starlight.preview-card::before, .v62-preview-card::before,
+  .prestige-super-starlight::before {
+    animation: radiance-iv-glow 3.8s ease-in-out infinite;
+  }
+
+  .prestige-starlight-burst .v61-card-btn::after,
+  .prestige-starlight-burst .collection-image::after,
+  .prestige-starlight-burst.full-card-wrap::after,
+  .prestige-starlight-burst.preview-card::after, .v62-preview-card::after,
   .prestige-starlight-burst::after {
-    animation: prestige-shimmer 4.5s ease-in-out infinite;
+    animation: radiance-v-spin 7s linear infinite;
+  }
+
+  .prestige-starlight-burst .v61-card-btn::before,
+  .prestige-starlight-burst .collection-image::before,
+  .prestige-starlight-burst.full-card-wrap::before,
+  .prestige-starlight-burst.preview-card::before, .v62-preview-card::before,
+  .prestige-starlight-burst::before {
+    animation: radiance-v-aura 4.5s ease-in-out infinite;
   }
 }
 
-@keyframes prestige-shimmer {
-  0%, 100% { opacity: 0.85; }
+@keyframes radiance-ii-pulse {
+  0%, 100% { filter: brightness(1); box-shadow: 0 0 0 1px rgba(255, 244, 210, 0.82), 0 0 16px var(--radiance-ii-glow), 0 8px 18px rgba(184, 136, 36, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.55); }
+  50% { filter: brightness(1.08); box-shadow: 0 0 0 1px rgba(255, 244, 210, 0.92), 0 0 22px rgba(255, 196, 96, 0.48), 0 10px 22px rgba(184, 136, 36, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.65); }
+}
+
+@keyframes radiance-iii-shimmer {
+  0%, 100% { opacity: 0.88; filter: saturate(1); }
+  50% { opacity: 1; filter: saturate(1.15); }
+}
+
+@keyframes radiance-iv-glow {
+  0%, 100% { opacity: 0.82; }
   50% { opacity: 1; }
 }
 
+@keyframes radiance-v-spin {
+  to { filter: hue-rotate(360deg); }
+}
+
+@keyframes radiance-v-aura {
+  0%, 100% { transform: scale(1); opacity: 0.88; }
+  50% { transform: scale(1.04); opacity: 1; }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .prestige-protostar .v61-card-btn::after,
+  .prestige-protostar .collection-image::after,
+  .prestige-protostar.full-card-wrap::after,
+  .prestige-protostar.preview-card::after, .v62-preview-card::after,
+  .prestige-protostar::after,
+  .prestige-starlight .v61-card-btn::after,
+  .prestige-starlight .collection-image::after,
+  .prestige-starlight.full-card-wrap::after,
+  .prestige-starlight.preview-card::after, .v62-preview-card::after,
   .prestige-starlight::after,
+  .prestige-super-starlight .v61-card-btn::after,
+  .prestige-super-starlight .collection-image::after,
+  .prestige-super-starlight.full-card-wrap::after,
+  .prestige-super-starlight.preview-card::after, .v62-preview-card::after,
   .prestige-super-starlight::after,
-  .prestige-starlight-burst::after {
+  .prestige-super-starlight .v61-card-btn::before,
+  .prestige-super-starlight .collection-image::before,
+  .prestige-super-starlight.full-card-wrap::before,
+  .prestige-super-starlight.preview-card::before, .v62-preview-card::before,
+  .prestige-super-starlight::before,
+  .prestige-starlight-burst .v61-card-btn::after,
+  .prestige-starlight-burst .collection-image::after,
+  .prestige-starlight-burst.full-card-wrap::after,
+  .prestige-starlight-burst.preview-card::after, .v62-preview-card::after,
+  .prestige-starlight-burst::after,
+  .prestige-starlight-burst .v61-card-btn::before,
+  .prestige-starlight-burst .collection-image::before,
+  .prestige-starlight-burst.full-card-wrap::before,
+  .prestige-starlight-burst.preview-card::before, .v62-preview-card::before,
+  .prestige-starlight-burst::before {
     animation: none;
   }
 }
 
-/* Lite / hidden pages: keep the frame glow static to cut continuous paint. */
-:is(.firefox-performance-mode, .starlight-performance-lite, .starlight-page-hidden) .prestige-starlight::after,
-:is(.firefox-performance-mode, .starlight-performance-lite, .starlight-page-hidden) .prestige-super-starlight::after,
-:is(.firefox-performance-mode, .starlight-performance-lite, .starlight-page-hidden) .prestige-starlight-burst::after {
+:is(.firefox-performance-mode, .starlight-performance-lite, .starlight-page-hidden) .prestige-protostar .v61-card-btn::after,
+:is(.firefox-performance-mode, .starlight-performance-lite, .starlight-page-hidden) .prestige-starlight .v61-card-btn::after,
+:is(.firefox-performance-mode, .starlight-performance-lite, .starlight-page-hidden) .prestige-super-starlight .v61-card-btn::after,
+:is(.firefox-performance-mode, .starlight-performance-lite, .starlight-page-hidden) .prestige-starlight-burst .v61-card-btn::after,
+:is(.firefox-performance-mode, .starlight-performance-lite, .starlight-page-hidden) .prestige-protostar .collection-image::after,
+:is(.firefox-performance-mode, .starlight-performance-lite, .starlight-page-hidden) .prestige-starlight .collection-image::after,
+:is(.firefox-performance-mode, .starlight-performance-lite, .starlight-page-hidden) .prestige-super-starlight .collection-image::after,
+:is(.firefox-performance-mode, .starlight-performance-lite, .starlight-page-hidden) .prestige-starlight-burst .collection-image::after,
+:is(.firefox-performance-mode, .starlight-performance-lite, .starlight-page-hidden) .prestige-super-starlight .v61-card-btn::before,
+:is(.firefox-performance-mode, .starlight-performance-lite, .starlight-page-hidden) .prestige-starlight-burst .v61-card-btn::before,
+:is(.firefox-performance-mode, .starlight-performance-lite, .starlight-page-hidden) .prestige-starlight-burst .v61-card-btn::after {
   animation: none;
 }
 
@@ -196,9 +496,20 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 8px;
+  min-height: 118px;
   padding: 12px;
   border-radius: 14px;
   background: #f6fbff;
+}
+
+.prestige-legend-tiers .prestige-frame::after {
+  inset: 8px;
+  border-radius: 12px;
+}
+
+.prestige-legend-tiers .prestige-frame::before {
+  inset: 4px;
+  border-radius: 14px;
 }
 
 .prestige-legend-tiers strong {
