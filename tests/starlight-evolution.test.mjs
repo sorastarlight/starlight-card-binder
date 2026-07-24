@@ -105,8 +105,8 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.match(cloud, /unfuseMyCard/);
   assert.match(cloud, /evolveMyCard/);
   assert.match(app, /confirmAction/);
-  assert.match(app, /window\.confirm/);
-  assert.match(app, /fallbackConfirm/);
+  assert.match(app, /window\.StarlightUI\?\.confirm/);
+  assert.doesNotMatch(app, /window\.confirm/);
   assert.match(app, /playStarlightEvolutionReveal|starlight-evolution-reveal/);
   assert.match(app, /data-unfuse-card/);
   assert.match(app, /analyzer-display-toggles|data-toggle-analyzer-evolution/);

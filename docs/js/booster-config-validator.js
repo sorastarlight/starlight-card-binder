@@ -170,6 +170,13 @@ export function validateBooster(booster, { cards = [], tolerance = 0.001 } = {})
   return { valid: errors.length === 0, errors, warnings };
 }
 
+export function formatBoosterValidationLines(result = {}) {
+  return [
+    ...asArray(result.errors).map(item => `error ${item.path}: ${item.message}`),
+    ...asArray(result.warnings).map(item => `warning ${item.path}: ${item.message}`)
+  ];
+}
+
 export function validateBoosterCatalog(config = {}, options = {}) {
   const boosters = asArray(config.boosters ?? config.boosterTypes ?? config.booster_types);
   const cards = asArray(config.cards);

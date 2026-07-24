@@ -31,7 +31,7 @@ test('V1.0 smoke-test matrix covers the critical foundation journeys', async () 
 });
 
 test('shell and shop/star-bits page tokens alias shared --st-* design tokens', async () => {
-  const [shell, shop, bits, admin, daily, home, redeem, qol] = await Promise.all([
+  const [shell, shop, bits, admin, daily, home, redeem, qol, evolution, collection, profile] = await Promise.all([
     read('docs/css/app-shell.css'),
     read('docs/css/pages/booster-shop.css'),
     read('docs/css/pages/star-bits.css'),
@@ -39,7 +39,10 @@ test('shell and shop/star-bits page tokens alias shared --st-* design tokens', a
     read('docs/css/pages/daily-booster.css'),
     read('docs/css/pages/home.css'),
     read('docs/css/pages/redeem.css'),
-    read('docs/css/qol-ui.css')
+    read('docs/css/qol-ui.css'),
+    read('docs/css/pages/starlight-evolution.css'),
+    read('docs/css/pages/collection.css'),
+    read('docs/css/pages/profile-settings.css')
   ]);
   assert.match(shell, /--shell-blue:var\(--st-color-blue/);
   assert.match(shop, /--shop-pink:var\(--st-color-pink/);
@@ -49,4 +52,7 @@ test('shell and shop/star-bits page tokens alias shared --st-* design tokens', a
   assert.match(home, /--gold:var\(--st-color-gold/);
   assert.match(redeem, /--redeem-blue:var\(--st-color-blue/);
   assert.match(qol, /--qol-blue:var\(--st-color-blue/);
+  assert.match(evolution, /--evo-ink: var\(--st-color-ink/);
+  assert.match(collection, /--collection-ink: var\(--st-color-ink/);
+  assert.match(profile, /--profile-blue: var\(--st-color-blue/);
 });

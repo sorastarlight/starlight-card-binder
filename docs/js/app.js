@@ -133,19 +133,16 @@ async function confirmAction(options = {}) {
     cancelText: options.cancelText || 'Cancel',
     danger: !!options.danger
   };
-  const fallbackConfirm = () => {
-    const lines = [opts.title, opts.message, opts.warning].filter(Boolean);
-    return window.confirm(lines.join('\n\n'));
-  };
   if (typeof window.StarlightUI?.confirm === 'function') {
     try {
       return !!(await window.StarlightUI.confirm(opts));
     } catch (error) {
-      console.warn('[Starlight] confirm dialog failed; using browser confirm', error);
-      return fallbackConfirm();
+      console.warn('[Starlight] confirm dialog failed', error);
+      return false;
     }
   }
-  return fallbackConfirm();
+  console.warn('[Starlight] confirm dialog unavailable');
+  return false;
 }
 function getCardPrestigeTier(id) {
   const utils = prestigeUtils();

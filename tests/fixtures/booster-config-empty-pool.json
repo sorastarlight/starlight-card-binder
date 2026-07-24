@@ -1,0 +1,39 @@
+{
+  "cards": [
+    { "id": "c-001", "seriesId": "series-1", "rarity": "Common", "pullWeight": 1, "isPullable": true }
+  ],
+  "boosters": [
+    {
+      "id": "empty-legendary-pool",
+      "name": "Empty Legendary Pool",
+      "rewardMode": "slots",
+      "seriesId": "series-1",
+      "cardCount": 1,
+      "isActive": true,
+      "slots": [
+        {
+          "slotKey": "legendary",
+          "quantity": 1,
+          "rates": { "Legendary": 100 }
+        }
+      ]
+    },
+    {
+      "id": "empty-series",
+      "name": "Empty Series",
+      "rewardMode": "series",
+      "seriesId": "missing-series",
+      "cardCount": 1,
+      "isActive": true,
+      "slots": []
+    },
+    {
+      "id": "inactive-empty-slots",
+      "name": "Inactive Empty Slots",
+      "rewardMode": "slots",
+      "cardCount": 1,
+      "isActive": false,
+      "slots": []
+    }
+  ]
+}

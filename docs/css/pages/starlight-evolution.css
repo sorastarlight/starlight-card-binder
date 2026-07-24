@@ -1,4 +1,9 @@
 .starlight-evolution-page {
+  --evo-ink: var(--st-color-ink, #34466f);
+  --evo-muted: var(--st-color-muted, #68738e);
+  --evo-error: var(--st-color-danger, #b4233f);
+  --evo-surface: var(--st-surface, #fff);
+  --evo-surface-soft: var(--st-surface-soft, #f7fbff);
   width: min(100%, 980px);
   margin: auto;
   padding: 18px 16px 56px;
@@ -16,12 +21,12 @@
 
 .st-evo-page-hero h1 {
   margin: 0.2rem 0;
-  color: #405fa1;
+  color: var(--evo-ink);
 }
 
 .st-evo-tagline {
   margin: 0 0 16px;
-  color: #626a82;
+  color: var(--evo-muted);
   font-weight: 650;
   line-height: 1.45;
   max-width: 42rem;
@@ -37,20 +42,20 @@
 
 .st-evo-page-panel h2 {
   margin: 0 0 8px;
-  color: #405fa1;
+  color: var(--evo-ink);
   font-size: 1.15rem;
 }
 
 .st-evo-page-panel p {
   margin: 0 0 12px;
-  color: #626a82;
+  color: var(--evo-muted);
   line-height: 1.45;
 }
 
 .st-evo-steps {
   margin: 0;
   padding-left: 1.2rem;
-  color: #405fa1;
+  color: var(--evo-ink);
   font-weight: 650;
   line-height: 1.55;
 }
@@ -72,12 +77,12 @@
 
 .st-evo-status {
   margin: 0;
-  color: #626a82;
+  color: var(--evo-muted);
   font-weight: 700;
 }
 
 .st-evo-status.is-error {
-  color: #b42318;
+  color: var(--evo-error);
 }
 
 .st-evo-owned-grid {
@@ -93,7 +98,7 @@
   padding: 10px;
   border-radius: 16px;
   border: 1px solid rgba(107, 198, 248, 0.28);
-  background: #f7fbff;
+  background: var(--evo-surface-soft);
   text-decoration: none;
   color: inherit;
   cursor: pointer;
@@ -172,7 +177,7 @@
 
 .st-evo-detail-note {
   margin: 0;
-  color: #626a82;
+  color: var(--evo-muted);
   font-size: 0.88rem;
   line-height: 1.4;
 }
@@ -198,7 +203,7 @@
 }
 
 .st-evo-owned-card strong {
-  color: #405fa1;
+  color: var(--evo-ink);
   font-size: 0.92rem;
   line-height: 1.25;
 }
@@ -211,7 +216,7 @@
 }
 
 .st-evo-owned-card .qty {
-  color: #626a82;
+  color: var(--evo-muted);
   font-size: 0.78rem;
   font-weight: 750;
 }
