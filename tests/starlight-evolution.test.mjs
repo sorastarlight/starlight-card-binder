@@ -109,13 +109,12 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.match(app, /fallbackConfirm/);
   assert.match(app, /playStarlightEvolutionReveal|starlight-evolution-reveal/);
   assert.match(app, /data-unfuse-card/);
-  assert.match(app, /analyzer-split/);
+  assert.match(app, /analyzer-display-toggles|data-toggle-analyzer-evolution/);
   assert.doesNotMatch(app, /full-card-wrap flip-card analyzer-card-3d/);
-  assert.match(app, /Turn Off Holographic/);
-  assert.match(app, /Turn Off Starlight Evolution/);
+  assert.match(app, /Holo On|Turn Off Holographic/);
+  assert.match(app, /Evolution On|Turn Off Starlight Evolution/);
   assert.match(reveal, /prefers-reduced-motion|preferReducedMotion/);
   assert.match(css, /\.prestige-starlight-burst/);
-  assert.match(analyzerCss, /\.analyzer-split/);
   assert.match(analyzerCss, /Beat qol-ui/);
   assert.match(collection, /Infuse duplicate cards with Starlight Energy/);
   assert.match(collection, /card-analyzer\.css/);
@@ -127,4 +126,13 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.match(shellDefaults, /starlight-evolution/);
   assert.match(shellRoutes, /starlight-evolution/);
   assert.match(appShell, /starlight-evolution\.html/);
+
+  const evoPageJs = await read('docs/js/pages/starlight-evolution-page.js');
+  assert.match(evoPageJs, /data-evo-open-card/);
+  assert.match(evoPageJs, /evolveMyCard/);
+  assert.match(evoPageJs, /playStarlightEvolutionReveal/);
+  assert.doesNotMatch(evoPageJs, /data-shell-view=["']collection["']/);
+  assert.doesNotMatch(evoPageJs, /binder\.html\?view=collection/);
+  assert.match(evoPage, /st-evo-card-modal/);
+  assert.match(evoPage, /starlight-evolution-page\.js\?v=1\.1\.0/);
 });
