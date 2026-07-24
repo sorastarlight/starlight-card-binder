@@ -131,11 +131,19 @@ async function confirmAction(options = {}) {
     cancelText: options.cancelText || 'Cancel',
     danger: !!options.danger
   };
+  const fallbackConfirm = () => {
+    const lines = [opts.title, opts.message, opts.warning].filter(Boolean);
+    return window.confirm(lines.join('\n\n'));
+  };
   if (typeof window.StarlightUI?.confirm === 'function') {
-    return !!(await window.StarlightUI.confirm(opts));
+    try {
+      return !!(await window.StarlightUI.confirm(opts));
+    } catch (error) {
+      console.warn('[Starlight] confirm dialog failed; using browser confirm', error);
+      return fallbackConfirm();
+    }
   }
-  const lines = [opts.title, opts.message, opts.warning].filter(Boolean);
-  return window.confirm(lines.join('\n\n'));
+  return fallbackConfirm();
 }
 function getCardPrestigeTier(id) {
   const utils = prestigeUtils();
@@ -178,14 +186,14 @@ function evolutionActionHtml(cardId) {
   const tier = getCardPrestigeTier(cardId);
   const next = utils.nextEvolutionTier?.(tier) || utils.nextFusionTier?.(tier) || utils.nextTier?.(tier);
   const cost = utils.evolutionCostForNextTier?.(tier) ?? utils.fusionCostForNextTier?.(tier) ?? utils.fusionCostForNext?.(tier);
-  const label = utils.prestigeLabel?.(tier) || '☆ Stardust';
+  const label = utils.prestigeLabel?.(tier) || '★ Stardust';
   const extras = utils.evolutionExtras?.(qty) ?? utils.fusionExtras?.(qty) ?? Math.max(0, qty - 1);
   const canEvolve = utils.canEvolve?.(qty, tier) ?? utils.canFuse?.(qty, tier) ?? (cost != null && extras >= cost);
   const canUnfuse = utils.canUnfuse?.(tier) ?? (tier !== 'stardust');
   const refund = utils.evolutionUnfuseRefund?.(tier);
   const nextLabel = next ? (utils.prestigeLabel?.(next) || next) : '';
   const maxNote = (!next || cost == null)
-    ? `<p><strong>★★★★★ Starlight Burst</strong> — maximum Evolution reached.</p>`
+    ? `<p><strong>★★★★★★ Super Starlight</strong> — maximum Starlight Evolution reached.</p>`
     : `<p>Evolve to <strong>${esc(nextLabel)}</strong> — costs <strong>${cost}</strong> duplicate${cost === 1 ? '' : 's'}.</p>`;
   return `<div class="evolution-action fusion-action">
     <p><strong>${esc(label)}</strong> · ${extras} extra${extras === 1 ? '' : 's'} available</p>
@@ -227,7 +235,7 @@ async function fuseSelectedCard(cardId) {
   const next = utils.nextEvolutionTier?.(tier) || utils.nextFusionTier?.(tier) || utils.nextTier?.(tier);
   const cost = utils.evolutionCostForNextTier?.(tier) ?? utils.fusionCostForNextTier?.(tier) ?? utils.fusionCostForNext?.(tier);
   if (!next || cost == null) {
-    window.StarlightUI?.toast?.('This card is already at Starlight Burst.', 'info');
+    window.StarlightUI?.toast?.('This card is already at Super Starlight.', 'info');
     return;
   }
   if (!(utils.canEvolve?.(qty, tier) ?? utils.canFuse?.(qty, tier))) {
@@ -1132,7 +1140,7 @@ function renderFullView() {
         ${got ? `<button class="overlay-favorite analyzer-favorite" type="button" data-toggle-favorite="${esc(selected.id)}" aria-pressed="${isFavorite(selected.id) ? 'true' : 'false'}">${esc(isFavorite(selected.id) ? (full.favoritedCta || '★ Favorited') : (full.favoriteCta || '♡ Favorite'))}</button>` : ''}
       </div>
       <div class="analyzer-card-stage">
-        <div class="full-card-wrap flip-card analyzer-card-3d ${overlayFlipped ? 'show-back showing-card-back' : ''} ${analyzerHoloEnabled ? '' : 'is-holo-off'} ${analyzerEvolutionEnabled ? '' : 'is-evolution-off'} ${rarityClass(selected)} ${prestigeClass}" id="fullCard3d" aria-label="${esc(overlayFlipped ? 'Card back' : visibleName)}" data-holographic="${got && analyzerHoloEnabled && isHolographicCard(selected)}" data-finish-class="${esc(finishClass)}">
+        <div class="full-card-wrap analyzer-card-3d ${overlayFlipped ? 'show-back showing-card-back' : ''} ${analyzerHoloEnabled ? '' : 'is-holo-off'} ${analyzerEvolutionEnabled ? '' : 'is-evolution-off'} ${rarityClass(selected)} ${prestigeClass}" id="fullCard3d" aria-label="${esc(overlayFlipped ? 'Card back' : visibleName)}" data-holographic="${got && analyzerHoloEnabled && isHolographicCard(selected)}" data-finish-class="${esc(finishClass)}">
           <span class="full-inner">
             <span class="face front ${finishClass}"><img class="${artClass}" src="${esc(getVisibleImage(selected))}" alt="${esc(visibleName)}" onerror="this.src='${CARD_BACK_URL}'" draggable="false">${holoMarkup}</span>
             <span class="face back"><img src="${CARD_BACK_URL}" alt="Card back" draggable="false"></span>

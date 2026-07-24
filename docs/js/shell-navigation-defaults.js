@@ -11,6 +11,7 @@ export const PUBLIC_SHELL_DESTINATIONS = Object.freeze([
   { value: 'redeem', label: 'Redeem A Code' },
   { value: 'collection', label: 'My Card Collection & Favorites' },
   { value: 'star-bits', label: 'My Star Bits' },
+  { value: 'starlight-evolution', label: 'Starlight Card Evolution' },
   { value: 'checklist', label: 'My Checklist' },
   { value: 'quests', label: 'Collection Quests' },
   { value: 'season-pass', label: 'Seasonal Collection Pass' },
@@ -48,6 +49,7 @@ export function createDefaultShellNavigation() {
       events: 'Starlight Events',
       redeem: 'Redeem A Code',
       'star-bits': 'Star Bits Exchange',
+      'starlight-evolution': 'Starlight Card Evolution',
       checklist: 'My Checklist',
       quests: 'Collection Quests',
       'season-pass': 'Seasonal Collection Pass',
@@ -86,6 +88,7 @@ export function createDefaultShellNavigation() {
           items: [
             { id: 'collection', label: 'My Card Collection & Favorites', icon: { type: 'emoji', value: '♡' }, destination: 'collection', enabled: true, features: [] },
             { id: 'star-bits', label: 'My Star Bits', icon: starBitNavIcon(), destination: 'star-bits', enabled: true, features: [] },
+            { id: 'starlight-evolution', label: 'Starlight Card Evolution', icon: { type: 'emoji', value: '⭐' }, destination: 'starlight-evolution', enabled: true, features: [] },
             { id: 'checklist', label: 'My Checklist', icon: { type: 'emoji', value: '☑' }, destination: 'checklist', enabled: true, features: [] },
             { id: 'quests', label: 'Collection Quests', icon: { type: 'emoji', value: '🧭' }, destination: 'quests', enabled: true, features: [] },
             { id: 'season-pass', label: 'Seasonal Collection Pass', icon: { type: 'emoji', value: '🌌' }, destination: 'season-pass', enabled: true, features: [] },

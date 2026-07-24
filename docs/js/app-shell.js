@@ -17,7 +17,7 @@ import { initLiveFeedWidget } from './live-feed-widget.js';
 import { applyAvatarFrameClass } from './avatar-frame-utils.js';
 import { getMyProfileExtras } from './profile-extras-service.js';
 
-const SHELL_BUILD = '94.3.5';
+const SHELL_BUILD = '94.3.6';
 const VIEW_READY_TIMEOUT_MS = 6500;
 const MAX_VIEW_RETRIES = 1;
 
@@ -25,7 +25,9 @@ const routes = {
   home:{title:'Home',src:'home.html'},
   binder:{title:'The Starlight Card Series Binder',src:null}, collection:{title:'My Card Collection & Favorites',src:'collection.html'},
   daily:{title:'Daily Free Booster Pack',src:'daily-booster.html'}, shop:{title:'Starlight Card Shop',src:'booster-shop.html'}, events:{title:'Starlight Events',src:'events.html'}, redeem:{title:'Redeem A Code',src:'redeem.html'},
-  'star-bits':{title:'Star Bits Exchange',src:'star-bits.html'}, checklist:{title:'My Checklist',src:'checklist.html'},
+  'star-bits':{title:'Star Bits Exchange',src:'star-bits.html'},
+  'starlight-evolution':{title:'Starlight Card Evolution',src:'starlight-evolution.html'},
+  checklist:{title:'My Checklist',src:'checklist.html'},
   quests:{title:'Collection Quests',src:'collection-quests.html'},
   'season-pass':{title:'Seasonal Collection Pass',src:'season-pass.html'},
   trades:{title:'Wishlist & Trades',src:'trade-lists.html'}, offers:{title:'Trade Offers',src:'trade-offers.html'},
@@ -218,7 +220,7 @@ function normalizeNotificationRoute(value,notice={}){
   const raw=String(value||'binder').trim();
   const withoutShell=raw.replace(/^https?:\/\/[^/]+\/?/i,'').replace(/^\/?binder\.html\?view=/i,'').replace(/^\/?/,'');
   const key=withoutShell.split(/[?&#]/)[0].toLowerCase();
-  const aliases={daily:'daily','daily-booster':'daily','daily-booster.html':'daily','free-daily-booster':'daily',notifications:'notifications','notifications.html':'notifications',collection:'collection','collection.html':'collection',offers:'offers','trade-offers':'offers','trade-offers.html':'offers',trades:'trades','trade-lists':'trades','trade-lists.html':'trades',events:'events','events.html':'events',shop:'shop','booster-shop':'shop','booster-shop.html':'shop',profile:'profile','profile-settings':'profile','profile-settings.html':'profile',rewards:'rewards','received-rewards':'rewards','received-rewards.html':'rewards',collector:'collector','collector.html':'collector',report:'report','report-profile':'report','report-profile.html':'report',quests:'quests','collection-quests':'quests','collection-quests.html':'quests','season-pass':'season-pass','season-pass.html':'season-pass'};
+  const aliases={daily:'daily','daily-booster':'daily','daily-booster.html':'daily','free-daily-booster':'daily',notifications:'notifications','notifications.html':'notifications',collection:'collection','collection.html':'collection',offers:'offers','trade-offers':'offers','trade-offers.html':'offers',trades:'trades','trade-lists':'trades','trade-lists.html':'trades',events:'events','events.html':'events',shop:'shop','booster-shop':'shop','booster-shop.html':'shop',profile:'profile','profile-settings':'profile','profile-settings.html':'profile',rewards:'rewards','received-rewards':'rewards','received-rewards.html':'rewards',collector:'collector','collector.html':'collector',report:'report','report-profile':'report','report-profile.html':'report',quests:'quests','collection-quests':'quests','collection-quests.html':'quests','season-pass':'season-pass','season-pass.html':'season-pass','starlight-evolution':'starlight-evolution','starlight-evolution.html':'starlight-evolution','starlight-card-evolution':'starlight-evolution'};
   return aliases[key]||key||'binder';
 }
 

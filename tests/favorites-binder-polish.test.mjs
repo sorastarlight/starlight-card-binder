@@ -45,7 +45,7 @@ test('binder filter panel stays hidden on series landing until a pack is selecte
     /series-select \.card-filter-panel,\s*body\[data-page="binder"\]\.series-select \.binder-browser-layout \{\s*display: none;/
   );
   assert.match(binder, /binder\.css\?v=1\.6\.0/);
-  assert.match(binder, /cloud-collection\.js\?v=1\.3\.0/);
+  assert.match(binder, /cloud-collection\.js\?v=1\.3\.1/);
 });
 
 test('shell-safe profile links avoid binder-in-binder nesting', async () => {

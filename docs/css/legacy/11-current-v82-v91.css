@@ -445,13 +445,13 @@ body[data-page="binder"] .v61-grid-head::after{
    preserving the card image, flip control, and analyzer panel.
    ============================================================ */
 .analyzer-full-stage .full-card-wrap,
-.analyzer-full-stage .full-card-wrap .full-inner,
-.analyzer-full-stage .full-card-wrap .face,
-.analyzer-full-stage .full-card-wrap .face.front,
-.analyzer-full-stage .full-card-wrap .face.back,
-#fullCard3d,
-#fullCard3d .full-inner,
-#fullCard3d .face {
+.analyzer-full-stage .full-card-wrap:not(.analyzer-card-3d) .full-inner,
+.analyzer-full-stage .full-card-wrap:not(.analyzer-card-3d) .face,
+.analyzer-full-stage .full-card-wrap:not(.analyzer-card-3d) .face.front,
+.analyzer-full-stage .full-card-wrap:not(.analyzer-card-3d) .face.back,
+#fullCard3d:not(.analyzer-card-3d),
+#fullCard3d:not(.analyzer-card-3d) .full-inner,
+#fullCard3d:not(.analyzer-card-3d) .face {
   background: transparent !important;
   background-color: transparent !important;
   border: 0 !important;
@@ -459,26 +459,26 @@ body[data-page="binder"] .v61-grid-head::after{
   box-shadow: none !important;
 }
 
-.analyzer-full-stage .full-card-wrap,
-#fullCard3d {
+.analyzer-full-stage .full-card-wrap:not(.analyzer-card-3d),
+#fullCard3d:not(.analyzer-card-3d) {
   padding: 0 !important;
   overflow: visible !important;
   filter: drop-shadow(0 22px 30px rgba(8,39,125,.30)) !important;
 }
 
-.analyzer-full-stage .full-card-wrap .full-inner,
-#fullCard3d .full-inner {
+.analyzer-full-stage .full-card-wrap:not(.analyzer-card-3d) .full-inner,
+#fullCard3d:not(.analyzer-card-3d) .full-inner {
   padding: 0 !important;
   overflow: visible !important;
 }
 
-.analyzer-full-stage .full-card-wrap .face,
-#fullCard3d .face {
+.analyzer-full-stage .full-card-wrap:not(.analyzer-card-3d) .face,
+#fullCard3d:not(.analyzer-card-3d) .face {
   overflow: visible !important;
 }
 
-.analyzer-full-stage .full-card-wrap img,
-#fullCard3d img {
+.analyzer-full-stage .full-card-wrap:not(.analyzer-card-3d) img,
+#fullCard3d:not(.analyzer-card-3d) img {
   background: transparent !important;
   box-shadow: none !important;
   border: 0 !important;

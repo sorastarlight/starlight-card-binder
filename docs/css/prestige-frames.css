@@ -79,6 +79,7 @@
   color: #405fa1;
 }
 
+.prestige-badge.prestige-stardust { background: #f3f5f8; color: #6b7388; }
 .prestige-badge.prestige-star-bit { background: #eef2f7; color: #5b6b84; }
 .prestige-badge.prestige-protostar { background: #fff5df; color: #8a650f; }
 .prestige-badge.prestige-starlight { background: linear-gradient(135deg, #e9f8ff, #ffe8f5); color: #5a4f8a; }

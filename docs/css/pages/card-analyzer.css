@@ -1,4 +1,5 @@
-/* Card analyzer — split screen: interactive card left, scrollable info right */
+/* Card analyzer — split screen: interactive card left, scrollable info right.
+   Loads AFTER qol-ui.css so analyzer-split beats #cardOverlay .analyzer-screen width:540px. */
 
 #cardOverlay.card-analyzer-open,
 #cardOverlay.open.card-analyzer-open {
@@ -8,6 +9,7 @@
   overflow: hidden !important;
 }
 
+#cardOverlay.card-analyzer-open .analyzer-full-stage.analyzer-split-stage,
 #cardOverlay .analyzer-full-stage.analyzer-split-stage {
   width: min(1080px, calc(100vw - 16px)) !important;
   max-width: min(1080px, calc(100vw - 16px)) !important;
@@ -21,20 +23,37 @@
   gap: 10px !important;
 }
 
-#cardOverlay .analyzer-split {
+/* Beat qol-ui `#cardOverlay .analyzer-screen { width:min(540px,100%)!important }` */
+#cardOverlay.card-analyzer-open .analyzer-screen.analyzer-split,
+#cardOverlay .analyzer-screen.analyzer-split,
+#cardOverlay .analyzer-split-stage .analyzer-screen.analyzer-split {
   display: grid !important;
   grid-template-columns: minmax(240px, 42%) minmax(0, 1fr) !important;
+  grid-template-rows: auto minmax(0, 1fr) !important;
+  grid-template-areas:
+    "actions actions"
+    "card info" !important;
   align-items: stretch !important;
   gap: 18px !important;
   width: 100% !important;
   max-width: none !important;
+  min-width: 0 !important;
   min-height: 0 !important;
   height: 100% !important;
+  margin: 0 !important;
   overflow: hidden !important;
 }
 
+/* Legacy .analyzer-screen::before/::after become unwanted grid items */
+#cardOverlay .analyzer-screen.analyzer-split::before,
+#cardOverlay .analyzer-screen.analyzer-split::after {
+  content: none !important;
+  display: none !important;
+}
+
 #cardOverlay .analyzer-split .analyzer-actions {
-  grid-column: 1 / -1;
+  grid-area: actions !important;
+  grid-column: auto !important;
   display: flex !important;
   flex-wrap: wrap;
   justify-content: flex-start;
@@ -45,6 +64,7 @@
 }
 
 #cardOverlay .analyzer-card-stage {
+  grid-area: card !important;
   position: relative;
   display: grid;
   place-items: center;
@@ -53,7 +73,8 @@
   perspective: 1400px;
 }
 
-#cardOverlay .analyzer-card-stage .full-card-wrap.analyzer-card-3d {
+#cardOverlay .analyzer-card-stage .full-card-wrap.analyzer-card-3d,
+#cardOverlay #fullCard3d.analyzer-card-3d {
   width: min(320px, 100%, 48vh) !important;
   max-width: 320px !important;
   max-height: none !important;
@@ -61,13 +82,21 @@
   transform-style: preserve-3d;
   border-radius: 18px;
   cursor: grab;
+  /* Restore plate under analyzer; legacy #fullCard3d clears shadows/overflow */
+  overflow: hidden !important;
+  padding: 0 !important;
+  filter: none !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
 }
 
 #cardOverlay .analyzer-card-stage .full-card-wrap.analyzer-card-3d:active {
   cursor: grabbing;
 }
 
-#cardOverlay .analyzer-card-3d .full-inner {
+#cardOverlay .analyzer-card-3d .full-inner,
+#cardOverlay #fullCard3d.analyzer-card-3d .full-inner {
   position: relative;
   display: block !important;
   width: 100%;
@@ -75,6 +104,11 @@
   transform-style: preserve-3d;
   transition: transform 0.55s cubic-bezier(0.22, 0.8, 0.28, 1);
   border-radius: inherit;
+  overflow: hidden !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
 }
 
 #cardOverlay .analyzer-card-3d.show-back .full-inner,
@@ -82,27 +116,34 @@
   transform: rotateY(180deg);
 }
 
-#cardOverlay .analyzer-card-3d .face {
+#cardOverlay .analyzer-card-3d .face,
+#cardOverlay #fullCard3d.analyzer-card-3d .face {
   position: absolute !important;
   inset: 0;
   display: block !important;
   width: 100% !important;
   height: 100% !important;
   border-radius: inherit;
-  overflow: hidden;
+  overflow: hidden !important;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  pointer-events: auto !important;
+  background: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
   box-shadow:
     0 18px 40px rgba(30, 50, 90, 0.28),
-    0 0 0 1px rgba(255, 255, 255, 0.35);
+    0 0 0 1px rgba(255, 255, 255, 0.35) !important;
 }
 
 #cardOverlay .analyzer-card-3d .face.front {
   transform: translateZ(6px);
+  z-index: 2;
 }
 
 #cardOverlay .analyzer-card-3d .face.back {
   transform: rotateY(180deg) translateZ(6px);
+  z-index: 1;
 }
 
 /* CSS 3D edge thickness */
@@ -120,12 +161,21 @@
   z-index: 0;
 }
 
-#cardOverlay .analyzer-card-3d img {
+#cardOverlay .analyzer-card-3d img,
+#cardOverlay #fullCard3d.analyzer-card-3d img {
   width: 100% !important;
   height: 100% !important;
   max-height: none !important;
   object-fit: cover !important;
   display: block;
+  background: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  border-radius: inherit !important;
+  filter: none !important;
+  transform: none !important;
+  opacity: 1 !important;
 }
 
 #cardOverlay .analyzer-card-3d.is-holo-off .card-finish-effect,
@@ -142,6 +192,7 @@
 }
 
 #cardOverlay .analyzer-info-panel {
+  grid-area: info !important;
   min-width: 0;
   min-height: 0;
   height: 100%;
@@ -181,6 +232,7 @@
 }
 
 @media (max-width: 860px) {
+  #cardOverlay.card-analyzer-open .analyzer-full-stage.analyzer-split-stage,
   #cardOverlay .analyzer-full-stage.analyzer-split-stage {
     height: min(920px, calc(100dvh - 12px)) !important;
     max-height: calc(100dvh - 12px) !important;
@@ -188,18 +240,26 @@
     overflow: hidden !important;
   }
 
-  #cardOverlay .analyzer-split {
+  #cardOverlay.card-analyzer-open .analyzer-screen.analyzer-split,
+  #cardOverlay .analyzer-screen.analyzer-split {
     grid-template-columns: 1fr !important;
-    grid-template-rows: auto minmax(0, 1fr) !important;
+    grid-template-rows: auto auto minmax(0, 1fr) !important;
+    grid-template-areas:
+      "actions"
+      "card"
+      "info" !important;
     gap: 12px !important;
     overflow: hidden !important;
+    width: 100% !important;
+    max-width: none !important;
   }
 
   #cardOverlay .analyzer-card-stage {
     max-height: 42vh;
   }
 
-  #cardOverlay .analyzer-card-stage .full-card-wrap.analyzer-card-3d {
+  #cardOverlay .analyzer-card-stage .full-card-wrap.analyzer-card-3d,
+  #cardOverlay #fullCard3d.analyzer-card-3d {
     width: min(240px, 70vw, 38vh) !important;
   }
 

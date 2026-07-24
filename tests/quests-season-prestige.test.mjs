@@ -36,7 +36,10 @@ test('Starlight Evolution costs and canEvolve match the locked ladder', () => {
   assert.equal(canFuse(8, 'stardust'), false);
   assert.equal(canEvolve(221, 'super_starlight'), true);
   assert.equal(canEvolve(999, 'starlight_burst'), false);
-  assert.equal(prestigeLabel('protostar'), '★★ Protostar');
+  assert.equal(prestigeLabel('protostar'), '★★★ Protostar');
+  assert.equal(prestigeLabel('starlight'), '★★★★ Star');
+  assert.equal(prestigeLabel('super_starlight'), '★★★★★ Super Star');
+  assert.equal(prestigeLabel('starlight_burst'), '★★★★★★ Super Starlight');
   assert.equal(prestigeClassName('star_bit'), 'prestige-frame prestige-star-bit');
   assert.equal(prestigeClassName('stardust'), '');
   assert.equal(prestigeTierFromQuantity(500), 'stardust');
@@ -45,14 +48,18 @@ test('Starlight Evolution costs and canEvolve match the locked ladder', () => {
 test('quests and season pass are shell destinations', () => {
   assert.ok(isKnownShellRoute('quests'));
   assert.ok(isKnownShellRoute('season-pass'));
+  assert.ok(isKnownShellRoute('starlight-evolution'));
   assert.equal(aliasShellRoute('collection-quests.html'), 'quests');
   assert.equal(aliasShellRoute('season-pass'), 'season-pass');
+  assert.equal(aliasShellRoute('starlight-evolution.html'), 'starlight-evolution');
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some((entry) => entry.value === 'quests'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some((entry) => entry.value === 'season-pass'));
+  assert.ok(PUBLIC_SHELL_DESTINATIONS.some((entry) => entry.value === 'starlight-evolution'));
   const nav = createDefaultShellNavigation();
   const myStuff = nav.sidebar.sections.find((section) => section.id === 'my-stuff');
   assert.ok(myStuff.items.some((item) => item.destination === 'quests'));
   assert.ok(myStuff.items.some((item) => item.destination === 'season-pass'));
+  assert.ok(myStuff.items.some((item) => item.destination === 'starlight-evolution'));
 });
 
 test('quests and season pass pages wire services and claim UI', async () => {

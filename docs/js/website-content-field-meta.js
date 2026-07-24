@@ -564,11 +564,47 @@ export const WEBSITE_PAGE_META = Object.freeze({
           { key: 'prestigeLegendEyebrow' },
           { key: 'prestigeLegendTitle' },
           { key: 'prestigeLegendLead', multiline: true },
+          { key: 'prestigeStardust' },
           { key: 'prestigeStarBit' },
           { key: 'prestigeProtostar' },
           { key: 'prestigeStarlight' },
           { key: 'prestigeSuperStarlight' },
           { key: 'prestigeStarlightBurst' }
+        ]
+      }
+    ]
+  },
+  starlightEvolution: {
+    description: 'Starlight Card Evolution explainer page.',
+    previewUrl: 'starlight-evolution.html',
+    groups: [
+      {
+        id: 'hero',
+        label: 'Hero',
+        open: true,
+        fields: [
+          { key: 'eyebrow', preview: 'eyebrow' },
+          { key: 'title', preview: 'title' },
+          { key: 'tagline', multiline: true, preview: 'tagline' },
+          { key: 'collectionCta' }
+        ]
+      },
+      {
+        id: 'copy',
+        label: 'How it works',
+        fields: [
+          { key: 'howTitle' },
+          { key: 'howLead', multiline: true },
+          { key: 'tiersTitle' },
+          { key: 'ownedTitle' },
+          { key: 'ownedLead', multiline: true },
+          { key: 'ownedEmpty', multiline: true },
+          { key: 'stardust' },
+          { key: 'starBit' },
+          { key: 'protostar' },
+          { key: 'star' },
+          { key: 'superStar' },
+          { key: 'superStarlight' }
         ]
       }
     ]
