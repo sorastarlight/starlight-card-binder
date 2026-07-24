@@ -108,14 +108,21 @@ const WEBSITE_TITLE_REWRITES = Object.freeze({
   'Collection Quests': 'Starlight Missions',
   '💫 Wishlist & Trade Binder': '💫 Card Exchange',
   'Wishlist & Trade Binder': 'Card Exchange',
-  'Event Achievements': 'Starlight Memories',
+  'Event Achievements': 'Achievements',
+  'Starlight Memories': 'Achievements',
   'My Journal': 'Profile',
   'Limited-time cards, boosters, achievements, and titles live here.':
-    'Limited-time cards, boosters, Starlight Memories, and titles live here.',
+    'Limited-time cards, boosters, Achievements, and titles live here.',
+  'Limited-time cards, boosters, Starlight Memories, and titles live here.':
+    'Limited-time cards, boosters, Achievements, and titles live here.',
   'Trade updates, event announcements, achievements, rewards, and other Starlight news all live here.':
-    'Trade updates, event announcements, Starlight Memories, rewards, and other Starlight news all live here.',
+    'Trade updates, event announcements, Achievements, rewards, and other Starlight news all live here.',
+  'Trade updates, event announcements, Starlight Memories, rewards, and other Starlight news all live here.':
+    'Trade updates, event announcements, Achievements, rewards, and other Starlight news all live here.',
   'See how your profile, showcase, achievements, and trade lists appear.':
-    'See how your profile, showcase, Starlight Memories, and trade lists appear.',
+    'See how your profile, showcase, Achievements, and trade lists appear.',
+  'See how your profile, showcase, Starlight Memories, and trade lists appear.':
+    'See how your profile, showcase, Achievements, and trade lists appear.',
   'Visit Card Shop': 'Visit Card Boutique',
   'Open My Collection': 'Open My Starlight Album',
   '💫 Wishlist & Trade List': '💫 Card Exchange',

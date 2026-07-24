@@ -134,7 +134,7 @@ export function createDefaultWebsiteContent() {
       closeCta: 'Close'
     },
     binderDisplay: {
-      sidePanel: 'off',
+      sidePanel: 'on',
       unownedDisplay: 'cardBack',
       collectionStatusFilter: 'on'
     },
@@ -199,12 +199,12 @@ export function createDefaultWebsiteContent() {
     events: {
       eyebrow: 'Seasonal Collections',
       title: '✨ Starlight Events',
-      lead: 'Limited-time cards, boosters, Starlight Memories, and titles live here.',
+      lead: 'Limited-time cards, boosters, Achievements, and titles live here.',
       loading: 'Loading active events…',
       emptyTitle: 'No active events right now',
       emptyLead: 'Check back soon for the next Starlight celebration.',
       boostersHeading: 'Event Booster Packs',
-      achievementsHeading: 'Starlight Memories',
+      achievementsHeading: 'Achievements',
       shopCta: 'Visit Card Boutique',
       loadError: 'Events could not load'
     },
@@ -385,7 +385,7 @@ Season Pass name color (pink/gold gradient)`,
     notifications: {
       eyebrow: 'Collector Activity',
       title: '🔔 Notifications',
-      lead: 'Trade updates, event announcements, Starlight Memories, rewards, and other Starlight news all live here.',
+      lead: 'Trade updates, event announcements, Achievements, rewards, and other Starlight news all live here.',
       preferencesTitle: 'Notification Preferences',
       emptyTitle: 'All caught up ✨',
       emptyLead: 'New collector activity will appear here.',
@@ -420,7 +420,7 @@ Season Pass name color (pink/gold gradient)`,
       offersCardTitle: '🤝 Trade Offers',
       offersCardLead: 'Review incoming offers, sent offers, and create a new exchange.',
       publicCardTitle: '🌟 Public Collector Profile',
-      publicCardLead: 'See how your profile, showcase, Starlight Memories, and trade lists appear.',
+      publicCardLead: 'See how your profile, showcase, Achievements, and trade lists appear.',
       accountIntro: 'Manage your local backup and collection data. Cloud ownership remains protected by your account.'
     },
     collector: {

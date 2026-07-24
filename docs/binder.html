@@ -3,17 +3,18 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
+<script src="js/theme-mode-boot.js"></script>
 <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
 <title>
         The Starlight Card Series Binder | Starlight Card Binder
     </title>
 <link href="css/style.css?v=1.0.3" rel="stylesheet"/>
 <link href="css/v80-8-ui.css" rel="stylesheet"/>
-<link href="css/app-shell.css?v=1.3.16" rel="stylesheet"/>
+<link href="css/app-shell.css?v=1.3.17" rel="stylesheet"/>
 <link href="css/card-filters.css?v=1.0" rel="stylesheet"/>
-<link href="css/pages/binder.css?v=1.7.2" rel="stylesheet"/><script src="js/browser-performance.js?v=1.0.0" defer></script>
+<link href="css/pages/binder.css?v=1.7.3" rel="stylesheet"/><script src="js/browser-performance.js?v=1.0.0" defer></script>
     <link rel="stylesheet" href="css/shared-ui.css?v=1.6.19">
-<link rel="stylesheet" href="css/prestige-frames.css?v=1.7">
+<link rel="stylesheet" href="css/prestige-frames.css?v=1.8">
 <link rel="stylesheet" href="css/qol-ui.css?v=94.2.11">
 <link rel="stylesheet" href="css/pages/card-analyzer.css?v=2.3.0">
 </head>
@@ -34,6 +35,11 @@
 <nav class="shell-primary-links" aria-label="Quick navigation"><a data-shell-view="home" href="binder.html?view=home">News &amp; Updates</a><a data-shell-view="binder" href="binder.html?view=binder">Starlight Card Binder</a><a data-shell-view="collection" href="binder.html?view=collection">My Starlight Album</a><a data-shell-view="shop" href="binder.html?view=shop">Card Boutique</a></nav>
 <div class="shell-account-actions">
 <div class="shell-signed-in-actions" data-shell-signed-in hidden><a class="daily-booster-cta is-loading" data-daily-cta="" data-shell-view="daily" href="binder.html?view=daily"><span aria-hidden="true" class="daily-booster-dot"></span><span data-daily-cta-label="">Daily Booster</span></a></div>
+<label class="shell-theme-toggle" title="Dark mode">
+<span class="shell-theme-toggle-label">Dark</span>
+<span aria-hidden="true" class="shell-theme-toggle-icon">☾</span>
+<input aria-label="Dark mode" class="shell-theme-slider" id="themeToggle" max="1" min="0" step="1" type="range" value="0"/>
+</label>
 <button aria-label="Toggle sound effects" class="shell-sfx-button sfx-toggle on" id="sfxToggle" title="Turn sound effects on or off" type="button">♪</button>
 <a class="shell-notify-bell" data-shell-view="notifications" href="binder.html?view=notifications" aria-label="Open notifications" data-shell-signed-in hidden>
   <svg class="shell-notify-bell-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm8-5.2c-.8-.9-2.3-2.3-2.3-6.1 0-3.3-2.1-6-5-6.7V3.5a1.7 1.7 0 1 0-3.4 0v.5c-2.9.7-5 3.4-5 6.7 0 3.8-1.5 5.2-2.3 6.1A1 1 0 0 0 3 18h18a1 1 0 0 0 .8-1.2Z"/></svg>
@@ -79,7 +85,7 @@
                     </p>
 <div class="series-stats" id="seriesHeroStats"></div>
 </div>
-</section><section class="card-filter-panel panel" data-card-filter-context="binder" aria-label="Filter binder cards"></section></div><section aria-label="Choose a series booster pack" class="v61-series-stage" id="seriesLanding"></section><div class="binder-browser-layout is-side-panel-off"><section aria-label="Selected card series" class="v61-card-stage" id="seriesGridStage"></section></div></div><section aria-live="polite" class="shell-view-frame" id="shellViewFrame"><iframe id="shellViewIframe" title="Starlight Binder view"></iframe></section></main>
+</section><section class="card-filter-panel panel" data-card-filter-context="binder" aria-label="Filter binder cards"></section></div><section aria-label="Choose a series booster pack" class="v61-series-stage" id="seriesLanding"></section><div class="binder-browser-layout"><section aria-label="Selected card series" class="v61-card-stage" id="seriesGridStage"></section><aside aria-label="Selected card showcase" class="v62-showcase" id="v62Showcase"></aside></div></div><section aria-live="polite" class="shell-view-frame" id="shellViewFrame"><iframe id="shellViewIframe" title="Starlight Binder view"></iframe></section></main>
 </div>
 <aside class="shell-live-feed" id="shellLiveFeed" aria-label="Live collector activity feed">
   <div class="shell-live-feed-head">

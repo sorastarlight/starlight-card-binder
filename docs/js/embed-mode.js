@@ -1,3 +1,8 @@
+import { applyTheme, listenForShellThemeMessages } from './theme-mode.js';
+
+applyTheme();
+listenForShellThemeMessages();
+
 const params = new URLSearchParams(location.search);
 const routes = {
   'binder.html':'binder','index.html':'binder','home.html':'home','collection.html':'collection','checklist.html':'checklist','daily-booster.html':'daily',
@@ -144,7 +149,7 @@ if (!embedded && currentRoute && file !== 'binder.html' && file !== 'index.html'
     const observerRoot = document.documentElement || document.body;
     if (observerRoot?.nodeType) {
       try {
-        mo.observe(observerRoot, {childList:true, subtree:true, attributes:true, characterData:true});
+        mo.observe(observerRoot, { childList: true, subtree: true, characterData: true });
       } catch (error) {
         console.warn('[Starlight] Embedded resize observer unavailable.', error);
       }

@@ -16,6 +16,7 @@ import { isStudioPreview, STUDIO_MSG } from './studio-preview.js';
 import { initLiveFeedWidget } from './live-feed-widget.js';
 import { applyAvatarFrameClass } from './avatar-frame-utils.js';
 import { getMyProfileExtras } from './profile-extras-service.js';
+import { initThemeMode, broadcastThemeToChildren } from './theme-mode.js';
 
 const SHELL_BUILD = '94.3.7';
 const VIEW_READY_TIMEOUT_MS = 6500;
@@ -539,11 +540,14 @@ window.addEventListener('message',e=>{
   }
 });
 
+initThemeMode({ input: document.getElementById('themeToggle') });
+
 frame?.addEventListener('pointerdown',()=>{closeNotificationPopover();closeAccountMenu();});
 frame?.addEventListener('load',()=>{
   closeNotificationPopover();
   closeAccountMenu();
   if(getFrameLocation().includes('about:blank')||frame.getAttribute('src')==='about:blank')return;
+  broadcastThemeToChildren();
   // A successful document load is not enough; the child still must send its ready handshake.
   setViewState('loading');
 });

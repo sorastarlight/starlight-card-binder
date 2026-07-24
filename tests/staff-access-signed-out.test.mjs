@@ -40,13 +40,15 @@ test('admin staff page wires custom role labels and assignment', async () => {
   const html = await read('docs/admin-staff.html');
   assert.match(html, /Custom role labels/);
   assert.match(html, /id="create-label-form"/);
-  assert.match(html, /admin-staff-page\.js\?v=1\.2\.0/);
+  assert.match(html, /admin-staff-page\.js\?v=1\.2\.1/);
   assert.match(html, /Manage unlocks/);
   assert.match(page, /createStaffRoleLabel/);
   assert.match(page, /deleteStaffRoleLabel/);
   assert.match(page, /listStaffRoleLabels/);
   assert.match(page, /listUserUnlockables/);
   assert.match(page, /setUserUnlockables/);
+  assert.match(page, /silent: true/);
+  assert.match(page, /replaceUnlockPanel/);
   assert.match(page, /data-unlock-save/);
   assert.match(page, /label:/);
   assert.match(page, /optgroup label="Custom labels"/);

@@ -126,13 +126,10 @@ function unlockCheckboxList(kind, items, selectedId) {
 function unlockPanelMarkup(userId) {
   const entry = unlockCache.get(userId);
   if (!entry) {
-    return `<div class="unlock-panel" hidden data-unlock-panel>
-      <p class="unlock-hint">Load titles and avatar frames to grant or revoke unlocks for this collector.</p>
-      <button type="button" class="unlock-toggle" data-unlock-toggle>Manage unlocks</button>
-    </div>`;
+    return `<div class="unlock-panel" hidden data-unlock-panel></div>`;
   }
   if (entry.loading) {
-    return `<div class="unlock-panel" data-unlock-panel>
+    return `<div class="unlock-panel is-loading" data-unlock-panel aria-busy="true">
       <p class="unlock-hint">Loading unlockables…</p>
     </div>`;
   }
@@ -161,6 +158,127 @@ function unlockPanelMarkup(userId) {
       <button type="button" class="unlock-collapse" data-unlock-collapse>Hide</button>
     </div>
   </div>`;
+}
+
+function findUserRow(userId) {
+  return usersEl.querySelector(`.user[data-id="${CSS.escape(userId)}"]`);
+}
+
+function captureUnlockScroll(row) {
+  return {
+    title: row?.querySelector('[data-unlock-list="title"]')?.scrollTop || 0,
+    frame: row?.querySelector('[data-unlock-list="frame"]')?.scrollTop || 0
+  };
+}
+
+function restoreUnlockScroll(row, scrollState = { title: 0, frame: 0 }) {
+  row?.querySelector('[data-unlock-list="title"]')?.scrollTo(0, scrollState.title);
+  row?.querySelector('[data-unlock-list="frame"]')?.scrollTo(0, scrollState.frame);
+}
+
+function syncUnlockToggleButton(row, userId) {
+  if (!row) return;
+  const actions = row.querySelector('.user-actions');
+  if (!actions) return;
+  const toggle = actions.querySelector('[data-unlock-toggle]');
+  const panelOpen = unlockCache.has(userId);
+  if (panelOpen && toggle) toggle.remove();
+  if (!panelOpen && !toggle) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'unlock-toggle';
+    button.dataset.unlockToggle = '';
+    button.textContent = 'Manage unlocks';
+    button.addEventListener('click', () => {
+      openUnlockPanel(userId).catch((error) => setStatus(error.message, 'error'));
+    });
+    actions.appendChild(button);
+  }
+}
+
+function replaceUnlockPanel(row, userId) {
+  if (!row) return;
+  const scrollState = captureUnlockScroll(row);
+  const current = row.querySelector('[data-unlock-panel]');
+  const wrap = document.createElement('div');
+  wrap.innerHTML = unlockPanelMarkup(userId);
+  const next = wrap.firstElementChild;
+  if (current) current.replaceWith(next);
+  else row.appendChild(next);
+  restoreUnlockScroll(row, scrollState);
+  row.classList.toggle('is-unlock-open', unlockCache.has(userId));
+  wireUnlockPanel(row, userId);
+}
+
+function collectCheckedIds(panel, kind) {
+  return [...panel.querySelectorAll(`input[data-unlock-kind="${kind}"]:checked`)]
+    .map((input) => input.value)
+    .filter(Boolean);
+}
+
+async function ensureUnlockables(userId, { force = false, silent = false } = {}) {
+  const existing = unlockCache.get(userId);
+  if (!force && existing?.data && !existing.error) {
+    replaceUnlockPanel(findUserRow(userId), userId);
+    syncUnlockToggleButton(findUserRow(userId), userId);
+    return existing.data;
+  }
+
+  if (!silent) {
+    unlockCache.set(userId, { loading: true });
+    replaceUnlockPanel(findUserRow(userId), userId);
+    syncUnlockToggleButton(findUserRow(userId), userId);
+  }
+
+  try {
+    const data = await listUserUnlockables(userId);
+    unlockCache.set(userId, { data });
+    replaceUnlockPanel(findUserRow(userId), userId);
+    syncUnlockToggleButton(findUserRow(userId), userId);
+    return data;
+  } catch (error) {
+    unlockCache.set(userId, { error: error.message || 'Unable to load unlockables.' });
+    replaceUnlockPanel(findUserRow(userId), userId);
+    syncUnlockToggleButton(findUserRow(userId), userId);
+    throw error;
+  }
+}
+
+async function openUnlockPanel(userId) {
+  if (!unlockCache.has(userId)) {
+    unlockCache.set(userId, { loading: true });
+    replaceUnlockPanel(findUserRow(userId), userId);
+    syncUnlockToggleButton(findUserRow(userId), userId);
+  }
+  return ensureUnlockables(userId, { force: Boolean(unlockCache.get(userId)?.error) });
+}
+
+function wireUnlockPanel(row, userId) {
+  row.querySelector('[data-unlock-toggle]')?.addEventListener('click', () => {
+    openUnlockPanel(userId).catch((error) => setStatus(error.message, 'error'));
+  });
+  row.querySelector('[data-unlock-collapse]')?.addEventListener('click', () => {
+    unlockCache.delete(userId);
+    replaceUnlockPanel(row, userId);
+    syncUnlockToggleButton(row, userId);
+  });
+  row.querySelector('[data-unlock-save]')?.addEventListener('click', async () => {
+    const panel = row.querySelector('[data-unlock-panel]');
+    if (!panel) return;
+    const saveBtn = row.querySelector('[data-unlock-save]');
+    if (saveBtn) saveBtn.disabled = true;
+    try {
+      const titleIds = collectCheckedIds(panel, 'title');
+      const frameIds = collectCheckedIds(panel, 'frame');
+      await setUserUnlockables(userId, titleIds, frameIds);
+      await ensureUnlockables(userId, { force: true, silent: true });
+      setStatus('Unlocks updated for this collector.', 'success');
+    } catch (error) {
+      setStatus(error.message, 'error');
+    } finally {
+      if (saveBtn) saveBtn.disabled = false;
+    }
+  });
 }
 
 function renderLabels() {
@@ -206,29 +324,6 @@ function renderLabels() {
   });
 }
 
-async function ensureUnlockables(userId, force = false) {
-  const existing = unlockCache.get(userId);
-  if (!force && existing?.data && !existing.error) return existing.data;
-  unlockCache.set(userId, { loading: true });
-  renderUsers();
-  try {
-    const data = await listUserUnlockables(userId);
-    unlockCache.set(userId, { data });
-    renderUsers();
-    return data;
-  } catch (error) {
-    unlockCache.set(userId, { error: error.message || 'Unable to load unlockables.' });
-    renderUsers();
-    throw error;
-  }
-}
-
-function collectCheckedIds(panel, kind) {
-  return [...panel.querySelectorAll(`input[data-unlock-kind="${kind}"]:checked`)]
-    .map((input) => input.value)
-    .filter(Boolean);
-}
-
 function wireUserRow(row) {
   const id = row.dataset.id;
   const select = row.querySelector('select');
@@ -261,37 +356,22 @@ function wireUserRow(row) {
       setStatus(error.message, 'error');
     }
   });
-  row.querySelector('[data-unlock-toggle]')?.addEventListener('click', async () => {
-    try {
-      await ensureUnlockables(id, true);
-    } catch (error) {
-      setStatus(error.message, 'error');
-    }
-  });
-  row.querySelector('[data-unlock-collapse]')?.addEventListener('click', () => {
-    unlockCache.delete(id);
-    renderUsers();
-  });
-  row.querySelector('[data-unlock-save]')?.addEventListener('click', async () => {
-    const panel = row.querySelector('[data-unlock-panel]');
-    if (!panel) return;
-    const saveBtn = row.querySelector('[data-unlock-save]');
-    if (saveBtn) saveBtn.disabled = true;
-    try {
-      const titleIds = collectCheckedIds(panel, 'title');
-      const frameIds = collectCheckedIds(panel, 'frame');
-      await setUserUnlockables(id, titleIds, frameIds);
-      await ensureUnlockables(id, true);
-      setStatus('Unlocks updated for this collector.', 'success');
-    } catch (error) {
-      setStatus(error.message, 'error');
-    } finally {
-      if (saveBtn) saveBtn.disabled = false;
-    }
-  });
+  syncUnlockToggleButton(row, id);
+  if (unlockCache.has(id)) {
+    replaceUnlockPanel(row, id);
+  }
 }
 
 function renderUsers() {
+  const pageScroll = window.scrollY;
+  const panelScroll = new Map();
+  usersEl.querySelectorAll('.user').forEach((row) => {
+    const userId = row.dataset.id;
+    if (userId && unlockCache.has(userId)) {
+      panelScroll.set(userId, captureUnlockScroll(row));
+    }
+  });
+
   const q = search.value.trim().toLowerCase();
   const list = users.filter((user) => (
     `${user.email || ''} ${user.username || ''} ${user.displayName || ''} ${user.labelName || ''} ${user.role || ''}`
@@ -300,7 +380,7 @@ function renderUsers() {
   ));
 
   usersEl.innerHTML = list.map((user) => `
-    <article class="user" data-id="${esc(user.userId)}">
+    <article class="user${unlockCache.has(user.userId) ? ' is-unlock-open' : ''}" data-id="${esc(user.userId)}">
       <div class="user-main">
         <div class="user-identity">
           <strong>${esc(user.displayName || user.username || user.email || 'Unnamed collector')}</strong>
@@ -311,14 +391,21 @@ function renderUsers() {
         <div class="user-actions">
           <button class="save" type="button">Save Role</button>
           ${user.role ? '<button class="remove" type="button">Remove</button>' : ''}
-          ${!unlockCache.has(user.userId) ? '<button class="unlock-toggle" type="button" data-unlock-toggle>Manage unlocks</button>' : ''}
         </div>
       </div>
       ${unlockPanelMarkup(user.userId)}
     </article>
   `).join('');
 
-  usersEl.querySelectorAll('.user').forEach(wireUserRow);
+  usersEl.querySelectorAll('.user').forEach((row) => {
+    wireUserRow(row);
+    const userId = row.dataset.id;
+    if (userId && panelScroll.has(userId)) {
+      restoreUnlockScroll(row, panelScroll.get(userId));
+    }
+  });
+
+  window.scrollTo(0, pageScroll);
 }
 
 function render() {

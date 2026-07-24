@@ -31,7 +31,7 @@ test('default website content includes editable page groups', () => {
   assert.ok(content.binderSidePanel.ownedQtyLabel);
   assert.ok(content.binderFullView.scanEyebrow);
   assert.ok(content.binderFullView.illustratorLabel);
-  assert.equal(content.binderDisplay.sidePanel, 'off');
+  assert.equal(content.binderDisplay.sidePanel, 'on');
   assert.equal(content.binderDisplay.unownedDisplay, 'cardBack');
   assert.equal(content.binderDisplay.collectionStatusFilter, 'on');
   assert.ok(content.daily.title);
@@ -58,10 +58,10 @@ test('default website content includes editable page groups', () => {
   assert.ok(content.collector.followCta);
   assert.ok(content.rankings.title);
   assert.ok(content.rankings.sortLevel);
-  assert.equal(content.events.achievementsHeading, 'Starlight Memories');
-  assert.match(content.events.lead, /Starlight Memories/);
-  assert.match(content.notifications.lead, /Starlight Memories/);
-  assert.match(content.profile.publicCardLead, /Starlight Memories/);
+  assert.equal(content.events.achievementsHeading, 'Achievements');
+  assert.match(content.events.lead, /Achievements/);
+  assert.match(content.notifications.lead, /Achievements/);
+  assert.match(content.profile.publicCardLead, /Achievements/);
   assert.ok(content.shared.infoStripCopyright);
   assert.deepEqual(
     content.home.quickLinks.map((link) => link.id),
@@ -127,8 +127,8 @@ test('sanitizeWebsiteContent keeps quick-link ids and rejects bad social urls', 
       achievementsHeading: 'Event Achievements'
     }
   });
-  assert.match(legacyEvents.events.lead, /Starlight Memories/);
-  assert.equal(legacyEvents.events.achievementsHeading, 'Starlight Memories');
+  assert.match(legacyEvents.events.lead, /Achievements/);
+  assert.equal(legacyEvents.events.achievementsHeading, 'Achievements');
   assert.deepEqual(
     sanitized.home.quickLinks.map((link) => link.id),
     [...HOME_QUICK_LINK_IDS]
@@ -157,7 +157,7 @@ test('sanitizeWebsiteContent clamps binderDisplay enums to defaults', () => {
       collectionStatusFilter: 'yes'
     }
   });
-  assert.equal(sanitized.binderDisplay.sidePanel, 'off');
+  assert.equal(sanitized.binderDisplay.sidePanel, 'on');
   assert.equal(sanitized.binderDisplay.unownedDisplay, 'cardBack');
   assert.equal(sanitized.binderDisplay.collectionStatusFilter, 'on');
 
@@ -180,7 +180,7 @@ test('mergeWebsiteContent fills binderDisplay defaults for legacy payloads', () 
     about: { title: 'Custom About' }
   });
   assert.equal(merged.about.title, 'Custom About');
-  assert.equal(merged.binderDisplay.sidePanel, 'off');
+  assert.equal(merged.binderDisplay.sidePanel, 'on');
   assert.equal(merged.binderDisplay.unownedDisplay, 'cardBack');
   assert.equal(merged.binderDisplay.collectionStatusFilter, 'on');
   assert.equal(merged.version, 5);

@@ -269,12 +269,22 @@
 .prestige-starlight-burst.full-card-wrap::before,
 .prestige-starlight-burst.preview-card::before, .v62-preview-card::before,
 .prestige-starlight-burst::before {
-  opacity: 1;
-  inset: -14px;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(255, 236, 160, 0.36), transparent 58%),
-    conic-gradient(from 0deg, rgba(255, 220, 140, 0.16), rgba(154, 216, 255, 0.14), rgba(255, 176, 232, 0.16), rgba(255, 220, 140, 0.16));
-  filter: blur(1px);
+  display: none !important;
+  content: none !important;
+}
+
+.v61-card-slot::before,
+.v61-card-slot::after,
+.v61-card-slot.prestige-frame::before,
+.v61-card-slot.prestige-frame::after,
+.prestige-frame.v61-card-slot::before,
+.prestige-frame.v61-card-slot::after,
+.prestige-starlight-burst.v61-card-slot::before,
+.prestige-starlight-burst.v61-card-slot::after,
+.prestige-super-starlight.v61-card-slot::before,
+.prestige-super-starlight.v61-card-slot::after {
+  display: none !important;
+  content: none !important;
 }
 
 /* Tier badges */
