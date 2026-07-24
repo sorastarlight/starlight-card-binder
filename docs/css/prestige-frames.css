@@ -152,6 +152,13 @@
   }
 }
 
+/* Lite / hidden pages: keep the frame glow static to cut continuous paint. */
+:is(.firefox-performance-mode, .starlight-performance-lite, .starlight-page-hidden) .prestige-starlight::after,
+:is(.firefox-performance-mode, .starlight-performance-lite, .starlight-page-hidden) .prestige-super-starlight::after,
+:is(.firefox-performance-mode, .starlight-performance-lite, .starlight-page-hidden) .prestige-starlight-burst::after {
+  animation: none;
+}
+
 .prestige-legend {
   grid-column: 1 / -1;
   display: grid;

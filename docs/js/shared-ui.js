@@ -115,6 +115,7 @@ function ensureHoloSparkLayer(element, enabled = true) {
 /**
  * Left-click / touch-drag 3D tilt. Release returns the card to its resting pose.
  * Foil rainbow is CSS-only and independent of this tilt.
+ * Pointer moves are rAF-throttled to limit layout thrash during drag.
  */
 function attachCardDragTilt(card, options = {}) {
   if (!card || card.dataset.dragTiltBound === '1') return card;
@@ -124,6 +125,9 @@ function attachCardDragTilt(card, options = {}) {
   const max = Number(options.max ?? 16);
   let dragging = false;
   let activePointer = null;
+  let rafId = 0;
+  let pendingX = 0;
+  let pendingY = 0;
   const clamp = (value) => Math.max(-max, Math.min(max, value));
 
   const applyTilt = (clientX, clientY) => {
@@ -137,11 +141,29 @@ function attachCardDragTilt(card, options = {}) {
     card.classList.add('is-dragging', 'tilting');
   };
 
+  const scheduleTilt = (clientX, clientY) => {
+    pendingX = clientX;
+    pendingY = clientY;
+    if (rafId) return;
+    rafId = window.requestAnimationFrame(() => {
+      rafId = 0;
+      if (!dragging) return;
+      applyTilt(pendingX, pendingY);
+    });
+  };
+
+  const cancelScheduledTilt = () => {
+    if (!rafId) return;
+    window.cancelAnimationFrame(rafId);
+    rafId = 0;
+  };
+
   const endDrag = (event) => {
     if (!dragging) return;
     if (activePointer != null && event?.pointerId != null && event.pointerId !== activePointer) return;
     dragging = false;
     activePointer = null;
+    cancelScheduledTilt();
     try { if (event?.pointerId != null) card.releasePointerCapture?.(event.pointerId); } catch {}
     card.classList.remove('is-dragging', 'tilting');
     card.style.setProperty('--tiltX', '0deg');
@@ -161,7 +183,7 @@ function attachCardDragTilt(card, options = {}) {
 
   card.addEventListener('pointermove', event => {
     if (!dragging || event.pointerId !== activePointer) return;
-    applyTilt(event.clientX, event.clientY);
+    scheduleTilt(event.clientX, event.clientY);
   });
 
   card.addEventListener('pointerup', endDrag);

@@ -857,6 +857,7 @@ function toggleFavorite(id) {
   playSfx('favorite');
 
   const overlayOpen = Boolean($('#cardOverlay')?.classList.contains('open'));
+  let needsFullViewRebuild = false;
   if (overlayOpen) {
     const resolved = api?.resolveFullViewAfterFavoriteChange
       ? api.resolveFullViewAfterFavoriteChange({
@@ -884,11 +885,29 @@ function toggleFavorite(id) {
       selectedIndex = Math.max(0, fullViewList.findIndex(card => card.id === selected?.id));
       previewFlipped = false;
       overlayFlipped = false;
+      needsFullViewRebuild = true;
+    } else if (fullViewListMode === 'favorites' && !result.isFavorite) {
+      needsFullViewRebuild = true;
     }
   }
 
   renderAll();
-  if (overlayOpen && selected) renderFullView();
+  if (overlayOpen && selected) {
+    if (needsFullViewRebuild) {
+      renderFullView();
+    } else {
+      const favBtn = $('#cardOverlay [data-toggle-favorite]');
+      if (favBtn && favBtn.dataset.toggleFavorite === selected.id) {
+        const full = websiteSection('binderFullView');
+        favBtn.setAttribute('aria-pressed', result.isFavorite ? 'true' : 'false');
+        favBtn.textContent = result.isFavorite
+          ? (full.favoritedCta || '★ Favorited')
+          : (full.favoriteCta || '♡ Favorite');
+      } else {
+        renderFullView();
+      }
+    }
+  }
   return result.isFavorite;
 }
 function renderShell() {
