@@ -2,9 +2,11 @@ import { supabase } from "./supabase-client.js";
 import "./card-catalog-service.js";
 
 import {
+    evolveMyCard,
     fuseMyCard,
     getCurrentUser,
-    loadCloudCollection
+    loadCloudCollection,
+    unfuseMyCard
 } from "./collection-sync.js";
 
 const COLLECTION_KEY =
@@ -75,15 +77,18 @@ function writeLocalObject(key, value) {
  * by the original Binder.
  */
 function normalizePrestigeTier(value) {
-    const tier = String(value || "standard").trim().toLowerCase();
+    const tier = String(value || "stardust").trim().toLowerCase();
     const allowed = new Set([
-        "standard",
-        "rookie",
-        "champion",
-        "ultimate",
-        "mega"
+        "stardust",
+        "star_bit",
+        "protostar",
+        "starlight",
+        "super_starlight",
+        "starlight_burst"
     ]);
-    return allowed.has(tier) ? tier : "standard";
+    if (allowed.has(tier)) return tier;
+    // Legacy fusion tiers map to base after Starlight Evolution reset.
+    return "stardust";
 }
 
 function createLocalStores(cloudRows) {
@@ -392,30 +397,35 @@ async function loadBinderApplication() {
 
     window.StarlightCardFilters = await import('./card-filter-utils.js?v=1.1.0');
     window.StarlightFavoriteUtils = await import('./favorite-utils.js?v=1.0.0');
-    window.StarlightPrestigeUtils = await import('./prestige-utils.js?v=1.2.0');
+    window.StarlightPrestigeUtils = await import('./prestige-utils.js?v=1.3.0');
+    const applyLocalEvolutionResult = (cardId, result) => {
+        const id = String(cardId || '').trim();
+        if (!id || !result) return;
+        const quantities = readLocalObject(QUANTITIES_KEY);
+        const prestigeTiers = readLocalObject(PRESTIGE_KEY);
+        const nextQty = Math.max(1, Number(result.quantity || quantities[id] || 1));
+        const nextTier = normalizePrestigeTier(
+            result.evolutionTier || result.fusionTier || result.prestigeTier || prestigeTiers[id]
+        );
+        quantities[id] = nextQty;
+        prestigeTiers[id] = nextTier;
+        writeLocalObject(QUANTITIES_KEY, quantities);
+        writeLocalObject(PRESTIGE_KEY, prestigeTiers);
+    };
     window.StarlightFusion = {
         fuseMyCard,
-        applyLocalFusionResult(cardId, result) {
-            const id = String(cardId || '').trim();
-            if (!id || !result) return;
-            const quantities = readLocalObject(QUANTITIES_KEY);
-            const prestigeTiers = readLocalObject(PRESTIGE_KEY);
-            const nextQty = Math.max(1, Number(result.quantity || quantities[id] || 1));
-            const nextTier = normalizePrestigeTier(
-                result.fusionTier || result.prestigeTier || prestigeTiers[id]
-            );
-            quantities[id] = nextQty;
-            prestigeTiers[id] = nextTier;
-            writeLocalObject(QUANTITIES_KEY, quantities);
-            writeLocalObject(PRESTIGE_KEY, prestigeTiers);
-        }
+        evolveMyCard,
+        unfuseMyCard,
+        applyLocalFusionResult: applyLocalEvolutionResult,
+        applyLocalEvolutionResult
     };
+    window.StarlightEvolution = window.StarlightFusion;
 
     return new Promise((resolve, reject) => {
         const script =
             document.createElement("script");
 
-        script.src = "./js/app.js?v=1.6.0";
+        script.src = "./js/app.js?v=1.7.0";
         script.async = false;
         script.dataset.starlightApp = "true";
 

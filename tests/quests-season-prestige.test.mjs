@@ -3,8 +3,11 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 import {
+  canEvolve,
   canFuse,
+  evolutionCostForNextTier,
   fusionCostForNextTier,
+  nextEvolutionTier,
   nextFusionTier,
   prestigeClassName,
   prestigeLabel,
@@ -18,24 +21,25 @@ import { aliasShellRoute, isKnownShellRoute } from '../docs/js/shell-route-utils
 
 const read = (path) => readFile(path, 'utf8');
 
-test('fusion costs and canFuse match the locked ladder', () => {
-  assert.equal(fusionCostForNextTier('standard'), 10);
-  assert.equal(fusionCostForNextTier('rookie'), 25);
-  assert.equal(fusionCostForNextTier('champion'), 75);
-  assert.equal(fusionCostForNextTier('ultimate'), 200);
-  assert.equal(fusionCostForNextTier('mega'), null);
-  assert.equal(nextFusionTier('standard'), 'rookie');
-  assert.equal(nextFusionTier('ultimate'), 'mega');
-  assert.equal(nextFusionTier('mega'), null);
-  assert.equal(canFuse(11, 'standard'), true);
-  assert.equal(canFuse(10, 'standard'), false);
-  assert.equal(canFuse(26, 'rookie'), true);
-  assert.equal(canFuse(201, 'ultimate'), true);
-  assert.equal(canFuse(999, 'mega'), false);
-  assert.equal(prestigeLabel('champion'), 'Champion');
-  assert.equal(prestigeClassName('rookie'), 'prestige-frame prestige-rookie');
-  assert.equal(prestigeClassName('standard'), '');
-  assert.equal(prestigeTierFromQuantity(500), 'standard');
+test('Starlight Evolution costs and canEvolve match the locked ladder', () => {
+  assert.equal(evolutionCostForNextTier('stardust'), 8);
+  assert.equal(evolutionCostForNextTier('star_bit'), 20);
+  assert.equal(evolutionCostForNextTier('protostar'), 45);
+  assert.equal(evolutionCostForNextTier('starlight'), 100);
+  assert.equal(evolutionCostForNextTier('super_starlight'), 220);
+  assert.equal(evolutionCostForNextTier('starlight_burst'), null);
+  assert.equal(fusionCostForNextTier('stardust'), 8);
+  assert.equal(nextEvolutionTier('stardust'), 'star_bit');
+  assert.equal(nextFusionTier('super_starlight'), 'starlight_burst');
+  assert.equal(nextFusionTier('starlight_burst'), null);
+  assert.equal(canEvolve(9, 'stardust'), true);
+  assert.equal(canFuse(8, 'stardust'), false);
+  assert.equal(canEvolve(221, 'super_starlight'), true);
+  assert.equal(canEvolve(999, 'starlight_burst'), false);
+  assert.equal(prestigeLabel('protostar'), '★★ Protostar');
+  assert.equal(prestigeClassName('star_bit'), 'prestige-frame prestige-star-bit');
+  assert.equal(prestigeClassName('stardust'), '');
+  assert.equal(prestigeTierFromQuantity(500), 'stardust');
 });
 
 test('quests and season pass are shell destinations', () => {
@@ -67,14 +71,15 @@ test('quests and season pass pages wire services and claim UI', async () => {
   assert.match(shell, /'season-pass':\{title:'Seasonal Collection Pass',src:'season-pass\.html'\}/);
 });
 
-test('binder and collection load fusion frame styles and helpers', async () => {
-  const [app, binder, collection, css, reveal, migration] = await Promise.all([
+test('binder and collection load Starlight Evolution frame styles and helpers', async () => {
+  const [app, binder, collection, css, reveal, migration, evolutionMigration] = await Promise.all([
     read('docs/js/app.js'),
     read('docs/binder.html'),
     read('docs/collection.html'),
     read('docs/css/prestige-frames.css'),
     read('docs/js/reward-reveal.js'),
-    read('supabase/migrations/20260723190000_card_fusion_leveling.sql')
+    read('supabase/migrations/20260723190000_card_fusion_leveling.sql'),
+    read('supabase/migrations/20260723200000_starlight_evolution.sql')
   ]);
   assert.match(app, /function getCardPrestigeTier/);
   assert.match(app, /prestigeFrameClass/);
@@ -83,13 +88,13 @@ test('binder and collection load fusion frame styles and helpers', async () => {
   assert.match(app, /full-card-wrap[\s\S]*\$\{prestigeClass\}/);
   assert.match(binder, /prestige-frames\.css/);
   assert.match(collection, /prestige-frames\.css/);
-  assert.match(css, /\.prestige-mega/);
-  assert.match(css, /\.prestige-rookie/);
+  assert.match(css, /\.prestige-starlight-burst/);
+  assert.match(css, /\.prestige-star-bit/);
   assert.match(css, /\.st-r3-card-actor\.prestige-frame/);
   assert.match(css, /\.prestige-legend/);
   assert.match(collection, /prestige-legend/);
   assert.match(collection, /data-content="collection\.prestigeLegendTitle"/);
-  assert.match(collection, /prestige-rookie/);
+  assert.match(collection, /prestige-star-bit/);
   assert.match(reveal, /prestigeRevealBadge/);
   assert.match(reveal, /ensurePrestigeStyles/);
   assert.match(reveal, /prestigeTier/);
@@ -98,6 +103,8 @@ test('binder and collection load fusion frame styles and helpers', async () => {
   assert.match(migration, /fusion_cost_for_next_tier/);
   assert.match(migration, /quantity - 1/);
   assert.match(migration, /drop trigger if exists trg_user_cards_prestige_tier/);
+  assert.match(evolutionMigration, /unfuse_my_card/);
+  assert.match(evolutionMigration, /starlight_burst/);
 });
 
 test('wave-2 collection quest seeds cover Soaring Skies and Epic goals', async () => {
@@ -152,8 +159,8 @@ test('season pass gates to Twitch subscribers and supports unlock gifts', async 
   assert.match(adminPage, /manualSeasonId/);
   assert.match(rewardsPage, /season_pass_unlock/);
   assert.match(defaults, /subscriberLockedLead/);
-  assert.match(defaults, /prestigeRookie/);
-  assert.match(defaults, /Fusion spends extras/);
+  assert.match(defaults, /prestigeStarBit/);
+  assert.match(defaults, /Infuse duplicate cards with Starlight Energy/);
   assert.match(worker, /\/viewer\/subscription-check/);
   assert.match(worker, /deliver_twitch_season_unlock_v1/);
   assert.match(worker, /confirm_twitch_subscription_access_v1/);

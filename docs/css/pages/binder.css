@@ -8,9 +8,9 @@ body[data-page="binder"].series-select .binder-browser-layout {
   display: none;
 }
 
-/* Keep binder filters (including search) available on the series landing. */
+/* Hide binder filters on the series landing until a pack is selected. */
 body[data-page="binder"].series-select .card-filter-panel {
-  display: block;
+  display: none;
 }
 
 .binder-browser-layout {
@@ -125,68 +125,9 @@ html.starlight-embedded #cardOverlay.open,
   -webkit-overflow-scrolling: touch !important;
 }
 
-html.starlight-embedded #cardOverlay .analyzer-full-stage,
-#cardOverlay .analyzer-full-stage {
-  width: min(720px, calc(100% - 8px)) !important;
-  max-width: 720px !important;
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  margin: 0 auto !important;
-  padding: 48px 24px 28px !important;
-  overflow: visible !important;
-}
-
-html.starlight-embedded #cardOverlay .v9112-full-view,
-#cardOverlay .v9112-full-view {
-  width: 100% !important;
-  max-width: 560px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: center !important;
-  gap: 14px !important;
-  overflow: visible !important;
-}
-
-html.starlight-embedded #cardOverlay .analyzer-actions,
-#cardOverlay .analyzer-actions {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  justify-content: center !important;
-  gap: 8px !important;
-  width: 100% !important;
-  min-height: 40px !important;
-  height: auto !important;
-}
-
-html.starlight-embedded #cardOverlay .full-card-wrap,
-#cardOverlay .full-card-wrap {
-  width: min(300px, 70vw, 46vh) !important;
-  max-width: 300px !important;
-  max-height: min(46vh, 420px) !important;
-}
-
-html.starlight-embedded #cardOverlay .full-card-wrap img,
-#cardOverlay .full-card-wrap img {
-  max-height: min(46vh, 420px) !important;
-  width: 100% !important;
-  height: auto !important;
-  object-fit: contain !important;
-}
-
-html.starlight-embedded #cardOverlay .analyzer-info-card.db2-full-info,
-#cardOverlay .analyzer-info-card.db2-full-info {
-  width: min(520px, 100%) !important;
-  max-width: 520px !important;
-  max-height: min(42vh, 360px) !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-  overscroll-behavior: contain !important;
-  -webkit-overflow-scrolling: touch !important;
-  margin: 0 auto !important;
-}
-
-html.starlight-embedded #cardOverlay .analyzer-reticle {
+/* Analyzer layout lives in pages/card-analyzer.css (split-screen overhaul). */
+html.starlight-embedded #cardOverlay .analyzer-reticle,
+#cardOverlay .analyzer-reticle {
   display: none !important;
 }
 

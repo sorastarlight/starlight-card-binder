@@ -13,7 +13,8 @@
 <link href="css/card-filters.css?v=1.0" rel="stylesheet"/>
 <link href="css/collection-redesign.css?v=1.3" rel="stylesheet"/><script src="js/browser-performance.js?v=1.0.0" defer></script>
     <link rel="stylesheet" href="css/shared-ui.css?v=1.6.18">
-<link rel="stylesheet" href="css/prestige-frames.css?v=1.2">
+<link rel="stylesheet" href="css/prestige-frames.css?v=1.3">
+<link rel="stylesheet" href="css/pages/card-analyzer.css?v=1.0.0">
 <link rel="stylesheet" href="css/qol-ui.css?v=94.2.9">
 </head>
 <body data-page="collection"><script src="js/embed-mode.js?v=1.1.1" type="module"></script>
@@ -51,17 +52,18 @@
 <article class="collection-progress-card collection-highlight-card"><div><span>Collection Spotlight</span><strong data-collection-highlight="">Building your showcase…</strong></div><small data-collection-insight="">Your collection story will appear here.</small><div class="collection-rarity-breakdown" data-rarity-breakdown=""></div></article>
 <article class="collection-progress-card collection-series-progress"><div><span>Series Progress</span><strong>Your sets</strong></div><div class="mini-series" id="miniSeries"></div></article>
 </div>
-<section class="prestige-legend" aria-label="Card fusion levels">
+<section class="prestige-legend" aria-label="Starlight Evolution tiers">
   <div class="prestige-legend-copy">
-    <p class="eyebrow" data-content="collection.prestigeLegendEyebrow">Card Fusion</p>
-    <h2 data-content="collection.prestigeLegendTitle">Fusion levels</h2>
-    <p data-content="collection.prestigeLegendLead">Fuse duplicate copies in My Cards full view to evolve a card frame. Fusion spends extras and always keeps one copy.</p>
+    <p class="eyebrow" data-content="collection.prestigeLegendEyebrow">Starlight Evolution</p>
+    <h2 data-content="collection.prestigeLegendTitle">Evolution tiers</h2>
+    <p data-content="collection.prestigeLegendLead">Infuse duplicate cards with Starlight Energy to awaken their true brilliance.</p>
   </div>
   <ul class="prestige-legend-tiers">
-    <li class="prestige-frame prestige-rookie"><span class="prestige-badge prestige-rookie">Rookie</span><strong data-content="collection.prestigeRookie">10 duplicates → Rookie</strong></li>
-    <li class="prestige-frame prestige-champion"><span class="prestige-badge prestige-champion">Champion</span><strong data-content="collection.prestigeChampion">25 duplicates → Champion</strong></li>
-    <li class="prestige-frame prestige-ultimate"><span class="prestige-badge prestige-ultimate">Ultimate</span><strong data-content="collection.prestigeUltimate">75 duplicates → Ultimate</strong></li>
-    <li class="prestige-frame prestige-mega"><span class="prestige-badge prestige-mega">Mega</span><strong data-content="collection.prestigeMega">200 duplicates → Mega</strong></li>
+    <li class="prestige-frame prestige-star-bit"><span class="prestige-badge prestige-star-bit">★ Star Bit</span><strong data-content="collection.prestigeStarBit">8 duplicates → ★ Star Bit</strong></li>
+    <li class="prestige-frame prestige-protostar"><span class="prestige-badge prestige-protostar">★★ Protostar</span><strong data-content="collection.prestigeProtostar">20 duplicates → ★★ Protostar</strong></li>
+    <li class="prestige-frame prestige-starlight"><span class="prestige-badge prestige-starlight">★★★ Starlight</span><strong data-content="collection.prestigeStarlight">45 duplicates → ★★★ Starlight</strong></li>
+    <li class="prestige-frame prestige-super-starlight"><span class="prestige-badge prestige-super-starlight">★★★★ Super Starlight</span><strong data-content="collection.prestigeSuperStarlight">100 duplicates → ★★★★ Super Starlight</strong></li>
+    <li class="prestige-frame prestige-starlight-burst"><span class="prestige-badge prestige-starlight-burst">★★★★★ Starlight Burst</span><strong data-content="collection.prestigeStarlightBurst">220 duplicates → ★★★★★ Starlight Burst</strong></li>
   </ul>
 </section>
 </section>
@@ -109,7 +111,7 @@
         Cloud synchronization finishes before app.js starts.
     -->
 <script type="module" src="js/pages/website-content-hydrate-page.js?v=1.2"></script>
-<script src="js/cloud-collection.js?v=1.2.0" type="module"></script>
+<script src="js/cloud-collection.js?v=1.3.0" type="module"></script>
 <script src="js/site-dashboard.js" type="module"></script>
 <script src="js/pages/collection-page.js?v=1.0"></script>
 <script src="js/collection-redesign.js?v=1.3.0" type="module"></script>    <script src="js/shared-ui.js?v=1.6.18"></script>

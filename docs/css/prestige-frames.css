@@ -1,11 +1,12 @@
-/* Card Fusion frames (stored prestige_tier). Fusion spends duplicate extras. */
+/* Starlight Evolution frames (stored prestige_tier). Evolution spends duplicate extras. */
 .prestige-frame,
 .collection-card.prestige-frame,
 .v61-card-slot.prestige-frame,
 .full-card-wrap.prestige-frame,
 .st-r3-card-actor.prestige-frame,
 .st-r3-result-art.prestige-frame,
-.st-r3-result-card.prestige-frame {
+.st-r3-result-card.prestige-frame,
+.st-evo-border.prestige-frame {
   position: relative;
 }
 
@@ -27,27 +28,41 @@
   border-radius: 18px;
 }
 
-.prestige-rookie::after {
+/* Base tier: no decorative frame */
+.prestige-stardust::after {
+  display: none;
+}
+
+.prestige-star-bit::after {
   border-color: rgba(168, 184, 206, 0.95);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.55), 0 8px 18px rgba(120, 138, 168, 0.22);
 }
 
-.prestige-champion::after {
+.prestige-protostar::after {
   border-color: rgba(214, 170, 72, 0.95);
   box-shadow: 0 0 0 1px rgba(255, 244, 210, 0.7), 0 10px 22px rgba(184, 136, 36, 0.24);
 }
 
-.prestige-ultimate::after {
+.prestige-starlight::after {
   border-image: linear-gradient(135deg, #7fd0ff, #ff9ad5, #b8f0a8, #ffd57a) 1;
   box-shadow: 0 0 18px rgba(127, 208, 255, 0.35), 0 10px 24px rgba(255, 154, 213, 0.2);
 }
 
-.prestige-mega::after {
+.prestige-super-starlight::after {
   border-color: rgba(120, 168, 255, 0.95);
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.75),
     0 0 22px rgba(120, 168, 255, 0.45),
     0 12px 28px rgba(90, 120, 210, 0.28);
+}
+
+.prestige-starlight-burst::after {
+  border-image: linear-gradient(135deg, #fff4b8, #9ad8ff, #ffb0e8, #fff4b8) 1;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.85),
+    0 0 28px rgba(255, 220, 140, 0.55),
+    0 0 36px rgba(140, 190, 255, 0.4),
+    0 14px 32px rgba(90, 120, 210, 0.3);
 }
 
 .prestige-badge {
@@ -64,12 +79,17 @@
   color: #405fa1;
 }
 
-.prestige-badge.prestige-rookie { background: #eef2f7; color: #5b6b84; }
-.prestige-badge.prestige-champion { background: #fff5df; color: #8a650f; }
-.prestige-badge.prestige-ultimate { background: linear-gradient(135deg, #e9f8ff, #ffe8f5); color: #5a4f8a; }
-.prestige-badge.prestige-mega { background: #eaf0ff; color: #3550a0; }
+.prestige-badge.prestige-star-bit { background: #eef2f7; color: #5b6b84; }
+.prestige-badge.prestige-protostar { background: #fff5df; color: #8a650f; }
+.prestige-badge.prestige-starlight { background: linear-gradient(135deg, #e9f8ff, #ffe8f5); color: #5a4f8a; }
+.prestige-badge.prestige-super-starlight { background: #eaf0ff; color: #3550a0; }
+.prestige-badge.prestige-starlight-burst {
+  background: linear-gradient(135deg, #fff8df, #e8f4ff, #ffe8f5);
+  color: #5a4080;
+}
 
-.fusion-action {
+.fusion-action,
+.evolution-action {
   display: grid;
   gap: 8px;
   margin-top: 10px;
@@ -79,20 +99,41 @@
   background: rgba(246, 251, 255, 0.95);
 }
 
-.fusion-action p {
+.fusion-action p,
+.evolution-action p {
   margin: 0;
   color: #6b7089;
   font-size: 0.88rem;
   line-height: 1.45;
 }
 
-.fusion-action .btn {
+.fusion-action .btn,
+.evolution-action .btn,
+.evolution-action-row {
   justify-self: start;
 }
 
+.evolution-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.analyzer-display-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.analyzer-display-toggles .btn {
+  font-size: 0.82rem;
+}
+
 @media (prefers-reduced-motion: no-preference) {
-  .prestige-ultimate::after,
-  .prestige-mega::after {
+  .prestige-starlight::after,
+  .prestige-super-starlight::after,
+  .prestige-starlight-burst::after {
     animation: prestige-shimmer 4.5s ease-in-out infinite;
   }
 }
@@ -103,8 +144,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .prestige-ultimate::after,
-  .prestige-mega::after {
+  .prestige-starlight::after,
+  .prestige-super-starlight::after,
+  .prestige-starlight-burst::after {
     animation: none;
   }
 }
@@ -137,7 +179,7 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -154,6 +196,12 @@
 .prestige-legend-tiers strong {
   color: #405fa1;
   font-size: 0.86rem;
+}
+
+@media (max-width: 980px) {
+  .prestige-legend-tiers {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 720px) {

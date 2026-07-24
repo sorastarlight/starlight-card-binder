@@ -236,13 +236,19 @@ export function createDefaultWebsiteContent() {
       favoritesShowcaseTitle: 'Favorite Showcase',
       favoritesShowcaseEmptyLead: 'Star a card to put it on the Starlight stage. Your favorites will scroll here like a tiny idol parade.',
       favoritesShowcaseCta: 'Find Favorites',
-      prestigeLegendEyebrow: 'Card Fusion',
-      prestigeLegendTitle: 'Fusion levels',
-      prestigeLegendLead: 'Fuse duplicate copies in My Cards full view to evolve a card frame. Fusion spends extras and always keeps one copy.',
-      prestigeRookie: '10 duplicates → Rookie',
-      prestigeChampion: '25 duplicates → Champion',
-      prestigeUltimate: '75 duplicates → Ultimate',
-      prestigeMega: '200 duplicates → Mega'
+      prestigeLegendEyebrow: 'Starlight Evolution',
+      prestigeLegendTitle: 'Evolution tiers',
+      prestigeLegendLead: 'Infuse duplicate cards with Starlight Energy to awaken their true brilliance.',
+      prestigeStarBit: '8 duplicates → ★ Star Bit',
+      prestigeProtostar: '20 duplicates → ★★ Protostar',
+      prestigeStarlight: '45 duplicates → ★★★ Starlight',
+      prestigeSuperStarlight: '100 duplicates → ★★★★ Super Starlight',
+      prestigeStarlightBurst: '220 duplicates → ★★★★★ Starlight Burst',
+      // Legacy CMS keys kept for older Website Editor rows
+      prestigeRookie: '8 duplicates → ★ Star Bit',
+      prestigeChampion: '20 duplicates → ★★ Protostar',
+      prestigeUltimate: '45 duplicates → ★★★ Starlight',
+      prestigeMega: '220 duplicates → ★★★★★ Starlight Burst'
     },
     starBits: {
       eyebrow: 'Duplicate Card Exchange',

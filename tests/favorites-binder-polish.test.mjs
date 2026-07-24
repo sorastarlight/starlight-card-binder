@@ -28,7 +28,7 @@ test('favorite sync failure rolls back UI and notifies the collector', async () 
   assert.match(cloud, /StarlightUI\?\.toast/);
 });
 
-test('binder filter panel exposes search on series landing', async () => {
+test('binder filter panel stays hidden on series landing until a pack is selected', async () => {
   const app = await read('docs/js/app.js');
   const css = await read('docs/css/pages/binder.css');
   const binder = await read('docs/binder.html');
@@ -38,14 +38,14 @@ test('binder filter panel exposes search on series landing', async () => {
   assert.match(app, /role="status" aria-live="polite"/);
   assert.match(app, /if \(filters\.q\) document\.body\.classList\.remove\('series-select'\)/);
   assert.match(app, /e\.preventDefault\(\);\s*stepFullView/s);
-  assert.match(css, /Keep binder filters \(including search\) available on the series landing/);
-  assert.match(css, /series-select \.card-filter-panel \{\s*display: block;/);
+  assert.match(css, /Hide binder filters on the series landing until a pack is selected/);
+  assert.match(css, /series-select \.card-filter-panel \{\s*display: none;/);
   assert.doesNotMatch(
     css,
     /series-select \.card-filter-panel,\s*body\[data-page="binder"\]\.series-select \.binder-browser-layout \{\s*display: none;/
   );
-  assert.match(binder, /binder\.css\?v=1\.4\.0/);
-  assert.match(binder, /cloud-collection\.js\?v=1\.1\.9/);
+  assert.match(binder, /binder\.css\?v=1\.6\.0/);
+  assert.match(binder, /cloud-collection\.js\?v=1\.3\.0/);
 });
 
 test('shell-safe profile links avoid binder-in-binder nesting', async () => {

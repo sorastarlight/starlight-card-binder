@@ -559,15 +559,16 @@ export const WEBSITE_PAGE_META = Object.freeze({
       },
       {
         id: 'prestige',
-        label: 'Fusion legend',
+        label: 'Starlight Evolution legend',
         fields: [
           { key: 'prestigeLegendEyebrow' },
           { key: 'prestigeLegendTitle' },
           { key: 'prestigeLegendLead', multiline: true },
-          { key: 'prestigeRookie' },
-          { key: 'prestigeChampion' },
-          { key: 'prestigeUltimate' },
-          { key: 'prestigeMega' }
+          { key: 'prestigeStarBit' },
+          { key: 'prestigeProtostar' },
+          { key: 'prestigeStarlight' },
+          { key: 'prestigeSuperStarlight' },
+          { key: 'prestigeStarlightBurst' }
         ]
       }
     ]

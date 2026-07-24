@@ -131,12 +131,13 @@ function finishEffectBadge(card, doc) {
 
 function prestigeRevealBadge(card, doc) {
   const tier = normalizeFusionTier(card?.prestigeTier);
-  if (!tier || tier === 'standard') return null;
+  if (!tier || tier === 'stardust' || tier === 'standard') return null;
+  const token = String(tier).replace(/_/g, '-');
   return createElement(
     doc,
     'span',
-    `st-r3-badge prestige-badge prestige-${tier}`,
-    `${prestigeLabel(tier)} Fusion`
+    `st-r3-badge prestige-badge prestige-${token}`,
+    prestigeLabel(tier)
   );
 }
 
@@ -274,7 +275,7 @@ const REVEAL_STYLESHEET_URL = new URL(
 ).href;
 const PRESTIGE_STYLESHEET_ID = 'starlight-prestige-frames';
 const PRESTIGE_STYLESHEET_URL = new URL(
-  '../css/prestige-frames.css?v=1.2',
+  '../css/prestige-frames.css?v=1.3',
   import.meta.url
 ).href;
 const stylesheetLoads = new WeakMap();

@@ -30,6 +30,9 @@ let fullViewList = [];
 let fullViewListMode = 'all';
 let websiteContentPromise = null;
 let websiteBinderLanding = null;
+/** Analyzer session display toggles (not persisted). */
+let analyzerHoloEnabled = true;
+let analyzerEvolutionEnabled = true;
 
 function fillWebsiteTokens(template, vars = {}) {
   return String(template || '').replace(/\{(\w+)\}/g, (_, key) => (
@@ -116,19 +119,41 @@ function isCollected(id) { return !!readStore(STORAGE_KEY)[id]; }
 function isFavorite(id) { return !!readStore(FAVORITES_KEY)[id]; }
 function getCardQuantity(id) { return Math.max(isCollected(id) ? 1 : 0, Number(readStore(QUANTITIES_KEY)[id] || 0)); }
 function prestigeUtils() { return window.StarlightPrestigeUtils || {}; }
+function tierCssToken(tier) {
+  return String(tier || 'stardust').trim().toLowerCase().replace(/_/g, '-');
+}
+async function confirmAction(options = {}) {
+  const opts = {
+    title: options.title || 'Confirm',
+    message: options.message || '',
+    warning: options.warning || '',
+    confirmText: options.confirmText || 'Confirm',
+    cancelText: options.cancelText || 'Cancel',
+    danger: !!options.danger
+  };
+  if (typeof window.StarlightUI?.confirm === 'function') {
+    return !!(await window.StarlightUI.confirm(opts));
+  }
+  const lines = [opts.title, opts.message, opts.warning].filter(Boolean);
+  return window.confirm(lines.join('\n\n'));
+}
 function getCardPrestigeTier(id) {
   const utils = prestigeUtils();
   const stored = readStore(PRESTIGE_KEY)[id];
+  if (utils.normalizeEvolutionTier) return utils.normalizeEvolutionTier(stored);
   if (utils.normalizeFusionTier) return utils.normalizeFusionTier(stored);
-  const tier = String(stored || 'standard').trim().toLowerCase();
-  return ['standard', 'rookie', 'champion', 'ultimate', 'mega'].includes(tier) ? tier : 'standard';
+  const tier = String(stored || 'stardust').trim().toLowerCase();
+  const allowed = ['stardust', 'star_bit', 'protostar', 'starlight', 'super_starlight', 'starlight_burst'];
+  return allowed.includes(tier) ? tier : 'stardust';
 }
 function setCardLocalFusion(id, quantity, tier) {
   const quantities = readStore(QUANTITIES_KEY);
   const prestige = readStore(PRESTIGE_KEY);
   const utils = prestigeUtils();
   quantities[id] = Math.max(1, Number(quantity) || 1);
-  prestige[id] = utils.normalizeFusionTier?.(tier) || String(tier || 'standard').toLowerCase();
+  prestige[id] = utils.normalizeEvolutionTier?.(tier)
+    || utils.normalizeFusionTier?.(tier)
+    || String(tier || 'stardust').toLowerCase();
   writeStore(QUANTITIES_KEY, quantities);
   writeStore(PRESTIGE_KEY, prestige);
 }
@@ -136,34 +161,62 @@ function prestigeFrameClass(cardId) {
   const utils = prestigeUtils();
   const tier = getCardPrestigeTier(cardId);
   if (utils.prestigeClassName) return utils.prestigeClassName(tier);
-  return !tier || tier === 'standard' ? '' : `prestige-frame prestige-${tier}`;
+  if (!tier || tier === 'stardust') return '';
+  return `prestige-frame prestige-${tierCssToken(tier)}`;
 }
 function prestigeBadgeHtml(cardId) {
   const utils = prestigeUtils();
   const tier = getCardPrestigeTier(cardId);
-  if (!tier || tier === 'standard') return '';
+  if (!tier || tier === 'stardust') return '';
   const label = utils.prestigeLabel?.(tier) || tier;
-  return `<span class="prestige-badge prestige-${tier}">${esc(label)} Fusion</span>`;
+  return `<span class="prestige-badge prestige-${tierCssToken(tier)}">${esc(label)}</span>`;
 }
-function fusionActionHtml(cardId) {
+function evolutionActionHtml(cardId) {
   if (pageName !== 'collection') return '';
   const utils = prestigeUtils();
   const qty = getCardQuantity(cardId);
   const tier = getCardPrestigeTier(cardId);
-  const next = utils.nextFusionTier?.(tier) || utils.nextTier?.(tier);
-  const cost = utils.fusionCostForNextTier?.(tier) ?? utils.fusionCostForNext?.(tier);
-  const label = utils.prestigeLabel?.(tier) || 'Standard';
-  if (!next || cost == null) {
-    return `<div class="fusion-action"><p><strong>Mega Fusion</strong> — maximum level reached.</p></div>`;
-  }
-  const extras = utils.fusionExtras?.(qty) ?? Math.max(0, qty - 1);
-  const can = utils.canFuse?.(qty, tier) ?? extras >= cost;
-  const nextLabel = utils.prestigeLabel?.(next) || next;
-  return `<div class="fusion-action">
+  const next = utils.nextEvolutionTier?.(tier) || utils.nextFusionTier?.(tier) || utils.nextTier?.(tier);
+  const cost = utils.evolutionCostForNextTier?.(tier) ?? utils.fusionCostForNextTier?.(tier) ?? utils.fusionCostForNext?.(tier);
+  const label = utils.prestigeLabel?.(tier) || '☆ Stardust';
+  const extras = utils.evolutionExtras?.(qty) ?? utils.fusionExtras?.(qty) ?? Math.max(0, qty - 1);
+  const canEvolve = utils.canEvolve?.(qty, tier) ?? utils.canFuse?.(qty, tier) ?? (cost != null && extras >= cost);
+  const canUnfuse = utils.canUnfuse?.(tier) ?? (tier !== 'stardust');
+  const refund = utils.evolutionUnfuseRefund?.(tier);
+  const nextLabel = next ? (utils.prestigeLabel?.(next) || next) : '';
+  const maxNote = (!next || cost == null)
+    ? `<p><strong>★★★★★ Starlight Burst</strong> — maximum Evolution reached.</p>`
+    : `<p>Evolve to <strong>${esc(nextLabel)}</strong> — costs <strong>${cost}</strong> duplicate${cost === 1 ? '' : 's'}.</p>`;
+  return `<div class="evolution-action fusion-action">
     <p><strong>${esc(label)}</strong> · ${extras} extra${extras === 1 ? '' : 's'} available</p>
-    <p>Fuse to <strong>${esc(nextLabel)}</strong> — costs <strong>${cost}</strong> duplicate${cost === 1 ? '' : 's'}.</p>
-    <button class="btn primary" type="button" data-fuse-card="${esc(cardId)}" ${can ? '' : 'disabled'}>${can ? `Fuse to ${esc(nextLabel)}` : `Need ${cost} extras`}</button>
+    ${maxNote}
+    <div class="evolution-action-row">
+      <button class="btn primary" type="button" data-fuse-card="${esc(cardId)}" ${canEvolve && next ? '' : 'disabled'}>${canEvolve && next ? `Evolve to ${esc(nextLabel)}` : (next ? `Need ${cost} extras` : 'Max Evolution')}</button>
+      <button class="btn" type="button" data-unfuse-card="${esc(cardId)}" ${canUnfuse ? '' : 'disabled'}>${canUnfuse ? `Unfuse (+${refund ?? 0})` : 'Cannot Unfuse'}</button>
+    </div>
+    <div class="analyzer-display-toggles">
+      <button class="btn" type="button" data-toggle-analyzer-holo aria-pressed="${analyzerHoloEnabled ? 'true' : 'false'}">${analyzerHoloEnabled ? 'Turn Off Holographic' : 'Turn On Holographic'}</button>
+      <button class="btn" type="button" data-toggle-analyzer-evolution aria-pressed="${analyzerEvolutionEnabled ? 'true' : 'false'}">${analyzerEvolutionEnabled ? 'Turn Off Starlight Evolution' : 'Turn On Starlight Evolution'}</button>
+    </div>
   </div>`;
+}
+function fusionActionHtml(cardId) {
+  return evolutionActionHtml(cardId);
+}
+async function playEvolutionReveal(card, fromTier, toTier, cost, label) {
+  try {
+    const mod = await import('./starlight-evolution-reveal.js?v=1.0.0');
+    await mod.playStarlightEvolutionReveal({
+      imageUrl: getVisibleImage(card),
+      cardName: getVisibleName(card),
+      fromTier,
+      toTier,
+      label,
+      cost
+    });
+  } catch (error) {
+    console.warn('[Starlight] Evolution reveal unavailable', error);
+  }
 }
 async function fuseSelectedCard(cardId) {
   const id = String(cardId || selected?.id || '').trim();
@@ -171,38 +224,97 @@ async function fuseSelectedCard(cardId) {
   const utils = prestigeUtils();
   const qty = getCardQuantity(id);
   const tier = getCardPrestigeTier(id);
-  const next = utils.nextFusionTier?.(tier) || utils.nextTier?.(tier);
-  const cost = utils.fusionCostForNextTier?.(tier) ?? utils.fusionCostForNext?.(tier);
+  const next = utils.nextEvolutionTier?.(tier) || utils.nextFusionTier?.(tier) || utils.nextTier?.(tier);
+  const cost = utils.evolutionCostForNextTier?.(tier) ?? utils.fusionCostForNextTier?.(tier) ?? utils.fusionCostForNext?.(tier);
   if (!next || cost == null) {
-    window.StarlightUI?.toast?.('This card is already Mega.', 'info');
+    window.StarlightUI?.toast?.('This card is already at Starlight Burst.', 'info');
     return;
   }
-  if (!(utils.canFuse?.(qty, tier))) {
-    window.StarlightUI?.toast?.(`Need ${cost} duplicates to fuse.`, 'error');
+  if (!(utils.canEvolve?.(qty, tier) ?? utils.canFuse?.(qty, tier))) {
+    window.StarlightUI?.toast?.(`Need ${cost} duplicates to evolve.`, 'error');
     return;
   }
   const nextLabel = utils.prestigeLabel?.(next) || next;
-  const confirmed = await window.StarlightUI?.confirm?.({
-    title: `Fuse to ${nextLabel}?`,
-    message: `This spends ${cost} duplicate${cost === 1 ? '' : 's'} and keeps 1 copy. Your fusion level will become ${nextLabel}.`,
-    warning: 'Fusion cannot be undone.',
-    confirmText: `Fuse (−${cost})`,
+  const confirmed = await confirmAction({
+    title: `Evolve to ${nextLabel}?`,
+    message: `This spends ${cost} duplicate${cost === 1 ? '' : 's'} and keeps 1 copy. Your Starlight Evolution will become ${nextLabel}.`,
+    warning: 'You can Unfuse later for a partial refund.',
+    confirmText: `Evolve (−${cost})`,
     cancelText: 'Cancel',
     danger: true
   });
   if (!confirmed) return;
   try {
-    const result = await window.StarlightFusion?.fuseMyCard?.(id);
-    if (!result) throw new Error('Fusion is unavailable while signed out.');
-    window.StarlightFusion.applyLocalFusionResult?.(id, result);
-    setCardLocalFusion(id, result.quantity, result.fusionTier || result.prestigeTier || next);
-    window.StarlightUI?.toast?.(`Fused to ${result.label || nextLabel}!`, 'success');
+    const api = window.StarlightEvolution || window.StarlightFusion;
+    const result = await (api?.evolveMyCard?.(id) || api?.fuseMyCard?.(id));
+    if (!result) throw new Error('Starlight Evolution is unavailable while signed out.');
+    const card = cards.find(c => c.id === id) || selected;
+    await playEvolutionReveal(card, tier, result.evolutionTier || result.fusionTier || result.prestigeTier || next, cost, result.label || nextLabel);
+    api.applyLocalEvolutionResult?.(id, result);
+    api.applyLocalFusionResult?.(id, result);
+    setCardLocalFusion(id, result.quantity, result.evolutionTier || result.fusionTier || result.prestigeTier || next);
+    window.StarlightUI?.toast?.(`Evolved to ${result.label || nextLabel}!`, 'success');
     playSfx('sparkle');
     renderAll();
     if ($('#cardOverlay')?.classList.contains('open') || cardOverlayModal?.isOpen) renderFullView();
   } catch (error) {
-    const message = error?.message || error?.error_description || 'Fusion failed.';
+    const message = error?.message || error?.error_description || 'Evolution failed.';
     window.StarlightUI?.toast?.(message, 'error');
+  }
+}
+async function unfuseSelectedCard(cardId) {
+  const id = String(cardId || selected?.id || '').trim();
+  if (!id || pageName !== 'collection') return;
+  const utils = prestigeUtils();
+  const tier = getCardPrestigeTier(id);
+  const prev = utils.previousEvolutionTier?.(tier);
+  const refund = utils.evolutionUnfuseRefund?.(tier);
+  if (!prev || refund == null) {
+    window.StarlightUI?.toast?.('This card is already at Stardust.', 'info');
+    return;
+  }
+  const prevLabel = utils.prestigeLabel?.(prev) || prev;
+  const confirmed = await confirmAction({
+    title: `Unfuse to ${prevLabel}?`,
+    message: `This steps Evolution down one level and refunds ${refund} duplicate${refund === 1 ? '' : 's'} (half of the step cost, rounded down).`,
+    confirmText: `Unfuse (+${refund})`,
+    cancelText: 'Cancel',
+    danger: true
+  });
+  if (!confirmed) return;
+  try {
+    const api = window.StarlightEvolution || window.StarlightFusion;
+    const result = await api?.unfuseMyCard?.(id);
+    if (!result) throw new Error('Unfuse is unavailable while signed out.');
+    api.applyLocalEvolutionResult?.(id, result);
+    api.applyLocalFusionResult?.(id, result);
+    setCardLocalFusion(id, result.quantity, result.evolutionTier || result.fusionTier || result.prestigeTier || prev);
+    window.StarlightUI?.toast?.(`Unfused to ${result.label || prevLabel}. +${result.refund ?? refund} copies restored.`, 'success');
+    playSfx('page');
+    renderAll();
+    if ($('#cardOverlay')?.classList.contains('open') || cardOverlayModal?.isOpen) renderFullView();
+  } catch (error) {
+    const message = error?.message || error?.error_description || 'Unfuse failed.';
+    window.StarlightUI?.toast?.(message, 'error');
+  }
+}
+function applyAnalyzerDisplayToggles() {
+  const card = $('#fullCard3d');
+  if (!card) return;
+  card.classList.toggle('is-holo-off', !analyzerHoloEnabled);
+  card.classList.toggle('is-evolution-off', !analyzerEvolutionEnabled);
+  const frontFace = card.querySelector('.face.front');
+  if (!analyzerHoloEnabled) {
+    frontFace?.classList.remove('card-finish-holographic', 'card-finish-sparkle-foil', 'card-finish-gold');
+    window.StarlightUI?.ensureFinishEffectLayer?.(frontFace, '');
+    card.dataset.holographic = 'false';
+  } else if (selected && isCollected(selected.id)) {
+    const finishClass = cardFinishClass(selected, true);
+    card.dataset.finishClass = finishClass;
+    card.dataset.holographic = String(isHolographicCard(selected));
+    frontFace?.classList.remove('card-finish-holographic', 'card-finish-sparkle-foil', 'card-finish-gold');
+    if (finishClass) frontFace?.classList.add(finishClass);
+    window.StarlightUI?.ensureFinishEffectLayer?.(frontFace, finishClass);
   }
 }
 function binderRarityBadgeHtml(card) {
@@ -950,6 +1062,8 @@ function fullViewModal() {
 function openFullView(listMode = 'all') {
   if (!selected) return;
   fullViewListMode = listMode;
+  analyzerHoloEnabled = true;
+  analyzerEvolutionEnabled = true;
   if (listMode === 'favorites') {
     fullViewList = filterCardList(cards.filter(c => isFavorite(c.id)), activeFilters(), { respectOwnership: false });
   } else if (listMode === 'collection') {
@@ -965,6 +1079,7 @@ function openFullView(listMode = 'all') {
   if (!fullViewList.find(c => c.id === selected.id)) fullViewList.unshift(selected);
   selectedIndex = Math.max(0, fullViewList.findIndex(c => c.id === selected.id));
   overlayFlipped = previewFlipped;
+  $('#cardOverlay')?.classList.add('card-analyzer-open');
   renderFullView();
   playSfx('analyze');
   const modal = fullViewModal();
@@ -976,6 +1091,7 @@ function openFullView(listMode = 'all') {
   }
 }
 function closeFullView() {
+  $('#cardOverlay')?.classList.remove('card-analyzer-open');
   if (cardOverlayModal?.isOpen) cardOverlayModal.close(undefined, 'page');
   else {
     $('#cardOverlay')?.classList.remove('open');
@@ -996,32 +1112,34 @@ function stepFullView(dir) {
 }
 function renderFullView() {
   const overlay = $('#cardOverlay'); if (!overlay || !selected) return;
+  overlay.classList.add('card-analyzer-open');
   const got = isCollected(selected.id);
-  const artClass = unownedArtClass(selected, { flipped: overlayFlipped });
+  const artClass = unownedArtClass(selected, { flipped: false });
   const visibleName = getVisibleName(selected);
   const visibleRarity = getVisibleRarity(selected);
   const full = websiteSection('binderFullView');
   const qty = getCardQuantity(selected.id);
-  const prestigeClass = got ? prestigeFrameClass(selected.id) : '';
-  overlay.innerHTML = `<div class="full-card-stage analyzer-full-stage ${rarityClass(selected)}" role="dialog" aria-modal="true" aria-labelledby="fullViewCardTitle" tabindex="-1">
+  const prestigeClass = got && analyzerEvolutionEnabled ? prestigeFrameClass(selected.id) : '';
+  const finishClass = got && analyzerHoloEnabled ? cardFinishClass(selected, true) : '';
+  const holoMarkup = got && analyzerHoloEnabled && !overlayFlipped ? holoSparkMarkup(selected, true) : '';
+  overlay.innerHTML = `<div class="full-card-stage analyzer-full-stage analyzer-split-stage ${rarityClass(selected)}" role="dialog" aria-modal="true" aria-labelledby="fullViewCardTitle" tabindex="-1">
     <div class="analyzer-bg" aria-hidden="true"><span></span><span></span><span></span></div>
     <button class="overlay-close analyzer-close" type="button" aria-label="Close">×</button>
     <button class="overlay-arrow left analyzer-arrow" type="button" aria-label="Previous card">‹</button>
-    <section class="analyzer-screen db2-full-layout v9112-full-view">
+    <section class="analyzer-screen analyzer-split">
       <div class="analyzer-actions">
         <button class="overlay-flip analyzer-flip" type="button">${esc(full.flipCta || '↻ Flip')}</button>
         ${got ? `<button class="overlay-favorite analyzer-favorite" type="button" data-toggle-favorite="${esc(selected.id)}" aria-pressed="${isFavorite(selected.id) ? 'true' : 'false'}">${esc(isFavorite(selected.id) ? (full.favoritedCta || '★ Favorited') : (full.favoriteCta || '♡ Favorite'))}</button>` : ''}
       </div>
-      <div class="analyzer-card-zone">
-        <div class="analyzer-reticle" aria-hidden="true"></div>
-        <div class="full-card-wrap flip-card simple-flip ${overlayFlipped?'show-back showing-card-back':''} ${rarityClass(selected)} ${prestigeClass}" id="fullCard3d" aria-label="${esc(overlayFlipped ? 'Card back' : visibleName)}" data-holographic="${got && isHolographicCard(selected)}" data-finish-class="${esc(got ? cardFinishClass(selected, true) : '')}">
+      <div class="analyzer-card-stage">
+        <div class="full-card-wrap flip-card analyzer-card-3d ${overlayFlipped ? 'show-back showing-card-back' : ''} ${analyzerHoloEnabled ? '' : 'is-holo-off'} ${analyzerEvolutionEnabled ? '' : 'is-evolution-off'} ${rarityClass(selected)} ${prestigeClass}" id="fullCard3d" aria-label="${esc(overlayFlipped ? 'Card back' : visibleName)}" data-holographic="${got && analyzerHoloEnabled && isHolographicCard(selected)}" data-finish-class="${esc(finishClass)}">
           <span class="full-inner">
-            <span class="face front ${cardFinishClass(selected, got && !overlayFlipped)}"><img class="${artClass}" src="${esc(overlayFlipped ? CARD_BACK_URL : getVisibleImage(selected))}" alt="${esc(overlayFlipped ? 'Card back' : visibleName)}" onerror="this.src='${CARD_BACK_URL}'" draggable="false">${holoSparkMarkup(selected, got && !overlayFlipped)}</span>
+            <span class="face front ${finishClass}"><img class="${artClass}" src="${esc(getVisibleImage(selected))}" alt="${esc(visibleName)}" onerror="this.src='${CARD_BACK_URL}'" draggable="false">${holoMarkup}</span>
             <span class="face back"><img src="${CARD_BACK_URL}" alt="Card back" draggable="false"></span>
           </span>
         </div>
       </div>
-      <div class="analyzer-info-card db2-full-info">
+      <aside class="analyzer-info-panel analyzer-info-card db2-full-info">
         <div class="analyzer-title-row"><div><p class="eyebrow">${esc(full.scanEyebrow || 'Card Scan Complete')}</p><h2 id="fullViewCardTitle">${esc(visibleName)}</h2><p class="db2-collector-line">${esc(selected.collectorNumber || selected.number || '???')} · ${esc(selected.series || 'Unknown Series')}</p></div></div>
         <div class="card-meta-chips">${got
           ? cardIdentityChips(selected, { full: true, hidden: false })
@@ -1030,19 +1148,24 @@ function renderFullView() {
             : cardIdentityChips(selected, { full: true, hidden: true }))}</div>
         <div class="analyzer-data-grid"><span><b>${esc(full.seriesLabel || 'Series')}</b>${esc(selected.series || 'Unknown')}</span><span><b>${esc(full.collectorNumberLabel || 'Collector #')}</b>${esc(selected.collectorNumber || selected.number || '???')}</span>${got && selected.artist ? `<span><b>${esc(full.illustratorLabel || 'Illustrator')}</b>${esc(selected.artist)}</span>` : ''}${got ? `<span><b>${esc(full.ownedLabel || 'Owned')}</b>×${qty}</span>` : ''}</div>
         ${got ? prestigeBadgeHtml(selected.id) : ''}
-        ${got ? fusionActionHtml(selected.id) : ''}
+        ${got ? evolutionActionHtml(selected.id) : ''}
         ${got ? `<div class="db2-full-story"><b>${esc(full.storyLabel || 'Card Story')}</b><p>${esc(selected.cardDescription || 'No card story has been added yet.')}</p></div><details class="db2-more"><summary>${esc(full.additionalLabel || 'Additional Information')}</summary><div class="detail-list clean-detail-list">${cardExpandedDetails(selected)}</div></details>` : ''}
         <p class="analyzer-description">${esc(getVisibleDescription(selected))}</p>
         <div data-card-comments-host></div>
-      </div>
+      </aside>
     </section>
     <button class="overlay-arrow right analyzer-arrow" type="button" aria-label="Next card">›</button>
   </div>`;
   $('.overlay-close', overlay).addEventListener('click', closeFullView);
   $('.overlay-arrow.left', overlay).addEventListener('click', () => stepFullView(-1));
   $('.overlay-arrow.right', overlay).addEventListener('click', () => stepFullView(1));
-  $('.overlay-flip', overlay).addEventListener('click', () => { overlayFlipped = !overlayFlipped; flipCardImage($('.full-card-wrap', overlay), getVisibleImage(selected), getVisibleName(selected), overlayFlipped); playSfx('flip'); });
+  $('.overlay-flip', overlay).addEventListener('click', () => {
+    overlayFlipped = !overlayFlipped;
+    flipAnalyzerCard($('#fullCard3d'), overlayFlipped);
+    playSfx('flip');
+  });
   attachFullViewTilt();
+  applyAnalyzerDisplayToggles();
   const commentsHost = overlay.querySelector('[data-card-comments-host]');
   if (commentsHost && selected?.id) {
     import('./card-comments.js?v=1.1.0')
@@ -1236,6 +1359,37 @@ document.addEventListener('click', e => {
     fuseSelectedCard(fuseCard.dataset.fuseCard);
     return;
   }
+  const unfuseCard = e.target.closest('[data-unfuse-card]');
+  if (unfuseCard) {
+    e.preventDefault();
+    e.stopPropagation();
+    unfuseSelectedCard(unfuseCard.dataset.unfuseCard);
+    return;
+  }
+  if (e.target.closest('[data-toggle-analyzer-holo]')) {
+    e.preventDefault();
+    e.stopPropagation();
+    analyzerHoloEnabled = !analyzerHoloEnabled;
+    applyAnalyzerDisplayToggles();
+    const btn = e.target.closest('[data-toggle-analyzer-holo]');
+    if (btn) {
+      btn.setAttribute('aria-pressed', analyzerHoloEnabled ? 'true' : 'false');
+      btn.textContent = analyzerHoloEnabled ? 'Turn Off Holographic' : 'Turn On Holographic';
+    }
+    return;
+  }
+  if (e.target.closest('[data-toggle-analyzer-evolution]')) {
+    e.preventDefault();
+    e.stopPropagation();
+    analyzerEvolutionEnabled = !analyzerEvolutionEnabled;
+    applyAnalyzerDisplayToggles();
+    const btn = e.target.closest('[data-toggle-analyzer-evolution]');
+    if (btn) {
+      btn.setAttribute('aria-pressed', analyzerEvolutionEnabled ? 'true' : 'false');
+      btn.textContent = analyzerEvolutionEnabled ? 'Turn Off Starlight Evolution' : 'Turn On Starlight Evolution';
+    }
+    return;
+  }
   const favoriteToggle = e.target.closest('[data-toggle-favorite]');
   if (favoriteToggle) {
     e.preventDefault();
@@ -1355,6 +1509,12 @@ document.addEventListener('DOMContentLoaded', () => {
 function flipCardImage(cardEl, frontUrl, frontAlt, showBack) {
   if (!cardEl) return;
 
+  // Analyzer uses true dual-face 3D flip; other previews keep mid-spin image swap.
+  if (cardEl.classList.contains('analyzer-card-3d')) {
+    flipAnalyzerCard(cardEl, showBack);
+    return;
+  }
+
   // V79.6: one visible surface + mid-spin image swap.
   // This keeps the official back artwork readable instead of mirrored/reversed during the flip.
   const frontImg = cardEl.querySelector('.face.front img');
@@ -1385,13 +1545,24 @@ function flipCardImage(cardEl, frontUrl, frontAlt, showBack) {
   window.setTimeout(() => cardEl.classList.remove('flip-turning'), 640);
 }
 
+function flipAnalyzerCard(cardEl, showBack) {
+  if (!cardEl) return;
+  cardEl.classList.toggle('show-back', !!showBack);
+  cardEl.classList.toggle('showing-card-back', !!showBack);
+  cardEl.setAttribute('aria-label', showBack ? 'Card back' : (selected ? getVisibleName(selected) : 'Card front'));
+}
+
 function attachFullViewTilt() {
   const card = $('#fullCard3d');
   if (!card) return;
   const frontFace = card.querySelector('.face.front');
   window.StarlightUI?.attachCardDragTilt?.(card, {
     max: 18,
-    getFoil: () => frontFace?.classList.contains('card-finish-holographic') ? frontFace : null,
+    getFoil: () => (
+      analyzerHoloEnabled && frontFace?.classList.contains('card-finish-holographic')
+        ? frontFace
+        : null
+    ),
     shouldIgnore: event => Boolean(event.target?.closest?.('button, a, .overlay-flip'))
   });
 }

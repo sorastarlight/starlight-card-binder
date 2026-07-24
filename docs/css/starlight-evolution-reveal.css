@@ -1,0 +1,218 @@
+/* Starlight Evolution reveal overlay */
+
+body.st-evo-open {
+  overflow: hidden;
+}
+
+.st-evo-root {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+
+.st-evo-root.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.st-evo-root.is-leaving {
+  opacity: 0;
+}
+
+.st-evo-backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255, 248, 220, 0.42), transparent 42%),
+    radial-gradient(circle at 50% 50%, rgba(120, 190, 255, 0.28), rgba(12, 18, 36, 0.88) 70%);
+}
+
+.st-evo-stage {
+  position: relative;
+  z-index: 1;
+  width: min(420px, calc(100vw - 32px));
+  min-height: 360px;
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  padding: 24px 18px 28px;
+  text-align: center;
+}
+
+.st-evo-caption,
+.st-evo-result {
+  margin: 0;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  color: #f7fbff;
+  text-shadow: 0 2px 12px rgba(40, 70, 120, 0.45);
+}
+
+.st-evo-caption {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.st-evo-result {
+  font-size: 1.05rem;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 280ms ease, transform 280ms ease;
+}
+
+.st-evo-root.is-reveal .st-evo-result {
+  opacity: 1;
+  transform: none;
+}
+
+.st-evo-orbit {
+  position: absolute;
+  inset: 18% 12%;
+  pointer-events: none;
+}
+
+.st-evo-mote {
+  --angle: calc((360deg / var(--n, 4)) * var(--i, 0));
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 54px;
+  height: 76px;
+  margin: -38px 0 0 -27px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 8px 18px rgba(20, 40, 80, 0.35);
+  opacity: 0;
+  transform: rotate(var(--angle)) translateY(-110px) scale(0.55);
+}
+
+.st-evo-mote img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.st-evo-root.is-orbit .st-evo-mote {
+  opacity: 0.92;
+  animation: st-evo-orbit 900ms cubic-bezier(0.22, 0.8, 0.28, 1) both;
+}
+
+.st-evo-root.is-merge .st-evo-mote {
+  animation: st-evo-merge 520ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.st-evo-hero {
+  position: relative;
+  width: min(220px, 56vw);
+  aspect-ratio: 5 / 7;
+  border-radius: 16px;
+  transform: scale(0.92);
+  transition: transform 420ms ease;
+  z-index: 2;
+}
+
+.st-evo-root.is-reveal .st-evo-hero {
+  transform: scale(1);
+}
+
+.st-evo-hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  display: block;
+  box-shadow: 0 16px 36px rgba(20, 40, 90, 0.45);
+}
+
+.st-evo-border {
+  position: absolute;
+  inset: -4px;
+  border-radius: 18px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 280ms ease;
+}
+
+.st-evo-root.is-reveal .st-evo-border {
+  opacity: 1;
+}
+
+.st-evo-burst {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff8d8 0%, rgba(160, 220, 255, 0.7) 40%, transparent 70%);
+  opacity: 0;
+  transform: scale(0.2);
+  pointer-events: none;
+}
+
+.st-evo-root.is-burst .st-evo-burst {
+  animation: st-evo-burst 980ms ease-out both;
+}
+
+@keyframes st-evo-orbit {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(-40px) scale(0.3);
+  }
+  35% { opacity: 0.95; }
+  100% {
+    opacity: 0.92;
+    transform: rotate(calc(var(--angle) + 120deg)) translateY(-118px) scale(0.58);
+  }
+}
+
+@keyframes st-evo-merge {
+  to {
+    opacity: 0;
+    transform: rotate(calc(var(--angle) + 160deg)) translateY(0) scale(0.15);
+  }
+}
+
+@keyframes st-evo-burst {
+  0% {
+    opacity: 0.95;
+    transform: scale(0.2);
+  }
+  45% {
+    opacity: 1;
+    transform: scale(18);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(28);
+  }
+}
+
+.st-evo-root.is-reduced .st-evo-mote,
+.st-evo-root.is-reduced .st-evo-burst {
+  display: none;
+}
+
+.st-evo-root.is-reduced .st-evo-hero {
+  transform: scale(1);
+}
+
+.st-evo-root.is-reduced.is-reveal .st-evo-border,
+.st-evo-root.is-reduced.is-reveal .st-evo-result {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .st-evo-root .st-evo-mote,
+  .st-evo-root .st-evo-burst {
+    animation: none !important;
+  }
+}

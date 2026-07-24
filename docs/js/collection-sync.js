@@ -274,7 +274,7 @@ export async function loadCloudCollection() {
 }
 
 /**
- * Fuses duplicate extras into the next fusion level for one owned card.
+ * Evolves a card one Starlight Evolution tier by spending duplicate extras.
  */
 export async function fuseMyCard(cardId) {
     const requestedCardId = String(cardId || '').trim();
@@ -293,7 +293,39 @@ export async function fuseMyCard(cardId) {
     );
 
     if (error) {
-        console.error('Card fusion failed:', error);
+        console.error('Starlight Evolution failed:', error);
+        throw error;
+    }
+
+    return data;
+}
+
+/** Alias for fuseMyCard — product naming. */
+export async function evolveMyCard(cardId) {
+    return fuseMyCard(cardId);
+}
+
+/**
+ * Steps a card one Starlight Evolution tier down and refunds floor(half) extras.
+ */
+export async function unfuseMyCard(cardId) {
+    const requestedCardId = String(cardId || '').trim();
+    if (!requestedCardId) {
+        throw new Error('Card id is required.');
+    }
+
+    const {
+        data,
+        error
+    } = await supabase.rpc(
+        'unfuse_my_card',
+        {
+            requested_card_id: requestedCardId
+        }
+    );
+
+    if (error) {
+        console.error('Starlight Unfuse failed:', error);
         throw error;
     }
 
