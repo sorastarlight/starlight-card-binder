@@ -14,13 +14,13 @@ test('collection cards open the shared full-view modal on click', async () => {
 
 test('user rankings avatars apply equipped frame classes from RPC payload', async () => {
   const page = await read('docs/js/pages/user-rankings-page.js');
-  assert.match(page, /import \{ avatarFrameClassName \} from '\.\.\/avatar-frame-utils\.js'/);
   assert.match(page, /avatarFrameClassName\(entry\.frame/);
+  assert.match(page, /avatarFrameOverlayMarkup/);
 });
 
 test('user rankings page loads avatar frame styles', async () => {
   const html = await read('docs/user-rankings.html');
-  assert.match(html, /css\/avatar-frames\.css/);
+  assert.match(html, /css\/avatar-frames\.css\?v=1\.3\.0/);
 });
 
 test('user rankings actions are ordered profile, follow, wishlist, trade', async () => {
@@ -47,10 +47,10 @@ test('admin twitch reward modals use shared modal controllers only', async () =>
 });
 
 test('rankings RPC migration exposes equipped avatar frames', async () => {
-  const sql = await read('supabase/migrations/20260724120000_rankings_avatar_frames.sql');
+  const sql = await read('supabase/migrations/20260724160000_prestige_avatar_frames.sql');
   assert.match(sql, /collector_avatar_frames/);
   assert.match(sql, /'frame'/);
-  assert.match(sql, /frame_css_preset/);
+  assert.match(sql, /overlayImageUrl/);
 });
 
 test('shell iframe navigation avoids history-pushing src assignment', async () => {

@@ -17,7 +17,7 @@ import {
 } from "../content-studio-service.js?v=1.5";
 import { createAdminBoosterEditors } from "./admin-boosters-editors.js?v=1.5";
 import { starBitAmountHtml } from "../star-bit-icon.js";
-import { avatarFrameClassName } from "../avatar-frame-utils.js";
+import { avatarFrameClassName, avatarFrameOverlayMarkup, avatarFrameOverlayUrl } from "../avatar-frame-utils.js";
 import {
   adminListAvatarFrames,
   adminSaveAvatarFrame,
@@ -316,7 +316,8 @@ function eventsView() {
 
 function framePreviewMarkup(frame) {
   const classes = avatarFrameClassName(frame) || "avatar-frame";
-  return `<span class="avatar-frame-preview ${esc(classes)}" aria-hidden="true"></span>`;
+  const overlayClass = avatarFrameOverlayUrl(frame) ? " avatar-frame-has-overlay" : "";
+  return `<span class="avatar-frame-preview ${esc(classes)}${overlayClass}" aria-hidden="true">${avatarFrameOverlayMarkup(frame, esc)}</span>`;
 }
 
 function framesView() {
@@ -349,14 +350,14 @@ function framesView() {
     )
     .join("") || '<p class="lead">No season tiers.</p>';
 
-  return `<section class="panel"><div class="toolbar"><div><h2>Avatar Frames</h2><p class="lead">CSS-preset profile frames. Edit display names, activity, and sort order. Attach frames as quest or season-pass rewards.</p></div></div><div class="library">${frames
+  return `<section class="panel"><div class="toolbar"><div><h2>Avatar Frames</h2><p class="lead">CSS-preset profile frames with optional transparent overlay art. Edit names, overlay URLs, activity, and sort order. Attach frames as quest or season-pass rewards.</p></div></div><div class="library">${frames
     .map(
       (f) => `<article class="item frame-item">
         <div class="frame-item-preview">${framePreviewMarkup(f)}</div>
         <div class="item-meta"><span>${esc(f.cssPreset)} · ${esc(f.effect)}</span><span>${f.isActive ? "Active" : "Inactive"}</span></div>
         <h3>${esc(f.name)}</h3>
         <p>${esc(f.description || "No description")}</p>
-        <p class="lead">sort ${Number(f.sortOrder || 0)} · id ${esc(f.id)}</p>
+        <p class="lead">sort ${Number(f.sortOrder || 0)} · id ${esc(f.id)}${f.overlayImageUrl ? ` · overlay ${esc(f.overlayImageUrl)}` : ""}</p>
         <button class="btn" data-edit-frame="${esc(f.id)}">Edit Frame</button>
       </article>`,
     )
@@ -377,6 +378,7 @@ function frameEditor(frame) {
       <div class="field"><label>Name</label><input id="frameName" value="${esc(frame.name || "")}"></div>
       <div class="field"><label>Sort order</label><input id="frameSort" type="number" value="${Number(frame.sortOrder || 0)}"></div>
       <div class="field full"><label>Description</label><textarea id="frameDescription">${esc(frame.description || "")}</textarea></div>
+      <div class="field full"><label>Overlay image URL</label><input id="frameOverlayUrl" value="${esc(frame.overlayImageUrl || "")}" placeholder="site_assets/avatar-frames/sovereign-ring.png"><small class="lead">Transparent PNG/SVG ring with a hollow center. Leave blank for CSS-only frames.</small></div>
       <div class="checks full"><label><input id="frameActive" type="checkbox" ${frame.isActive !== false ? "checked" : ""}> Active</label></div>
     </div>
     <div class="editor-actions"><button id="saveFrameBtn" class="btn primary">Save Frame</button></div>`,
@@ -389,6 +391,7 @@ function frameEditor(frame) {
         description: $("#frameDescription").value,
         sortOrder: Number($("#frameSort").value || 0),
         isActive: $("#frameActive").checked,
+        overlayImageUrl: $("#frameOverlayUrl").value.trim(),
       });
       await reload("Avatar frame saved.");
     } catch (err) {
