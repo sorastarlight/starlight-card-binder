@@ -1,5 +1,4 @@
 /* V1.0 shared design tokens, components, feedback, dialogs, loading and accessibility */
-@import url("./theme-dark.css?v=1.0.0");
 :root{
   --st-color-blue:#6bc6f8;--st-color-pink:#ff82c8;--st-color-gold:#fed334;--st-color-ink:#34466f;--st-color-muted:#68738e;--st-color-danger:#b4233f;--st-color-success:#31845f;
   --st-surface:#fff;--st-surface-soft:#f6fbff;--st-line:rgba(107,198,248,.42);

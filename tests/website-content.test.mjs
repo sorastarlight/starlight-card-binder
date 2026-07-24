@@ -352,7 +352,7 @@ test('website editor admin page and public hooks are wired', async () => {
   assert.match(loginPage, /loginCopy/);
   assert.match(loginPage, /loadAndHydrateWebsiteContent/);
   assert.match(binder, /id="seriesHeroTitle"/);
-  assert.match(app, /function renderSeriesHero\(\)/);
+  assert.match(app, /function renderSeriesHero\(/);
   assert.match(daily, /data-content="daily\.title"/);
   assert.match(daily, /data-content="daily\.signInCta"/);
   assert.match(daily, /data-content="daily\.loopStep1"/);

@@ -106,7 +106,10 @@
           entry.target.classList.toggle('starlight-offscreen', !entry.isIntersecting);
         }
       }, { rootMargin: '220px 0px' });
-      document.querySelectorAll('.panel,.side-card,.collection-card,.v61-card-slot,.reward-card,.duplicate-card,.favorite-card,.pack-card,.featured-pack').forEach(el => sectionObserver.observe(el));
+      document.querySelectorAll('.panel,.side-card,.collection-card,.v61-card-slot,.reward-card,.duplicate-card,.favorite-card,.pack-card,.featured-pack').forEach(el => {
+        if (el.closest('.binder-browse-chrome')) return;
+        sectionObserver.observe(el);
+      });
     }
   };
 

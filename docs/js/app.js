@@ -98,17 +98,22 @@ function syncBinderSeriesMode(browse) {
   const filters = activeFilters();
   const searching = Boolean(filters.q);
   const onLanding = Boolean(browse?.showLanding) && !searching;
-  const browsing = !onLanding;
   document.body.classList.toggle('series-select', onLanding);
-  document.body.classList.toggle('binder-browsing', browsing);
   const chrome = $('.binder-browse-chrome');
-  if (!chrome) return;
-  if (browsing) {
-    chrome.hidden = false;
+  if (chrome) {
     chrome.removeAttribute('hidden');
-  } else {
-    chrome.hidden = true;
+    chrome.hidden = false;
   }
+}
+
+function ensureBinderFilterPanel() {
+  if (pageName !== 'binder') return;
+  const host = document.querySelector('[data-card-filter-context="binder"]');
+  if (!host) return;
+  if (host.querySelector('.card-filter-fields')) return;
+  delete host.dataset.filterControlsReady;
+  renderFilterControls();
+  hydrateFilters();
 }
 
 function hasWebsiteCopy(value) {
@@ -1027,15 +1032,16 @@ window.addEventListener('starlight-website-content-hydrated', (event) => {
   }
 });
 
-function renderSeriesHero() {
+function renderSeriesHero(browse = resolveBinderBrowse()) {
   const f = activeFilters();
+  const searching = Boolean(f.q);
+  const inSeriesSelect = Boolean(browse?.showLanding) && !searching;
   const title = $('#seriesHeroTitle');
   const desc = $('#seriesHeroDescription');
   const eyebrow = $('.series-hero .eyebrow');
   const stats = $('#seriesHeroStats');
   const toolbar = $('#seriesHeroToolbar');
   if (!title || !desc) return;
-  const inSeriesSelect = document.body.classList.contains('series-select');
   const list = f.series === 'All Series' ? cards : cards.filter(c => c.series === f.series);
   const got = list.filter(c => isCollected(c.id)).length;
   const landing = websiteBinderLanding || window.__starlightWebsiteContent?.binderLanding || websiteSection('binderLanding');
@@ -1536,7 +1542,6 @@ function startPackOpen(series) {
   selectedIndex = selected ? cards.findIndex(c => c.id === selected.id) : 0;
   previewFlipped = false;
   playSfx('charge');
-  document.body.classList.remove('series-select');
   renderAll();
 }
 
@@ -1624,7 +1629,6 @@ document.addEventListener('click', e => {
     return;
   }
   if (e.target.closest('#backToSeries')) {
-    document.body.classList.add('series-select');
     $('#globalSearch') && ($('#globalSearch').value = '');
     $('[data-series]') && ($('[data-series]').value = 'All Series');
     $('[data-rarity]') && ($('[data-rarity]').value = 'All Rarities');
@@ -1641,9 +1645,6 @@ document.addEventListener('click', e => {
 });
 function applyCardFilterChange() {
   page = 1;
-  const filters = activeFilters();
-  if (filters.q || filters.series !== 'All Series') document.body.classList.remove('series-select');
-  else document.body.classList.add('series-select');
   renderAll();
   updateRaritySelectClass();
   window.dispatchEvent(new CustomEvent('starlight-card-filters-changed'));
@@ -1662,7 +1663,6 @@ document.addEventListener('click', e => {
   $('#sortSelect') && ($('#sortSelect').value = 'numberAsc');
   const allCards = $('[name="viewFilter"][value="all"]');
   if (allCards) allCards.checked = true;
-  if (pageName === 'binder') document.body.classList.add('series-select');
   applyCardFilterChange();
 });
 document.addEventListener('keydown', e => {
@@ -1686,7 +1686,6 @@ document.addEventListener('keydown', e => {
 });
 document.addEventListener('DOMContentLoaded', () => {
   renderFilterControls();
-  if (pageName === 'binder') document.body.classList.add('series-select');
   if (pageName === 'binder') {
     ensureWebsiteBinderLanding().then(() => {
       refreshBinderFiltersForDisplay();
@@ -1759,8 +1758,9 @@ function renderBinder() {
   const browse = applyFilters();
   const searching = Boolean(activeFilters().q);
   syncBinderSeriesMode(browse);
-  renderSeriesHero();
-  const inSeriesSelect = document.body.classList.contains('series-select') && browse.showLanding && !searching;
+  ensureBinderFilterPanel();
+  renderSeriesHero(browse);
+  const inSeriesSelect = Boolean(browse.showLanding) && !searching;
   if (browse.showLanding && browse.summary) {
     $$('[data-filter-summary]').forEach(element => {
       element.textContent = browse.summary;
@@ -1956,7 +1956,6 @@ document.addEventListener('click', e => {
   if (pack) {
     e.preventDefault(); e.stopPropagation();
     const select = $('[data-series]'); if (select) select.value = pack.dataset.v61Pack;
-    document.body.classList.remove('series-select');
     page = 1;
     const nextSeriesCards = cards.filter(c => c.series === pack.dataset.v61Pack);
     selected = nextSeriesCards[0] || null;

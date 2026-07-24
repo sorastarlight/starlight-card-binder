@@ -1,8 +1,3 @@
-import { applyTheme, listenForShellThemeMessages } from './theme-mode.js';
-
-applyTheme();
-listenForShellThemeMessages();
-
 const params = new URLSearchParams(location.search);
 const routes = {
   'binder.html':'binder','index.html':'binder','home.html':'home','collection.html':'collection','checklist.html':'checklist','daily-booster.html':'daily',

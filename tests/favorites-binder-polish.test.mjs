@@ -36,19 +36,19 @@ test('binder filter panel stays hidden on series landing until a pack is selecte
   assert.match(app, /const showSearch = true/);
   assert.match(app, /id="globalSearch"/);
   assert.match(app, /role="status" aria-live="polite"/);
-  assert.match(app, /if \(filters\.q \|\| filters\.series !== 'All Series'\) document\.body\.classList\.remove\('series-select'\)/);
   assert.match(app, /function syncBinderSeriesMode\(browse\)/);
-  assert.match(app, /document\.body\.classList\.toggle\('binder-browsing', browsing\)/);
+  assert.match(app, /function ensureBinderFilterPanel\(/);
+  assert.match(app, /document\.body\.classList\.toggle\('series-select', onLanding\)/);
   assert.match(app, /chrome\.removeAttribute\('hidden'\)/);
   assert.match(css, /Hide binder browse chrome on the series landing until a pack is selected/);
-  assert.match(css, /binder-browsing \.binder-browse-chrome/);
-  assert.match(css, /series-select \.binder-browse-chrome,\s*body\[data-page="binder"\]\.series-select \.card-filter-panel \{\s*display: none;/);
+  assert.match(css, /:not\(\.series-select\) \.binder-browse-chrome \{/);
+  assert.match(css, /series-select \.binder-browse-chrome,\s*body\[data-page="binder"\]\.series-select \.binder-browse-chrome \.series-hero/);
   assert.doesNotMatch(
     css,
     /series-select \.card-filter-panel,\s*body\[data-page="binder"\]\.series-select \.binder-browser-layout \{\s*display: none;/
   );
   assert.match(binder, /id="v62Showcase"/);
-  assert.match(binder, /binder\.css\?v=1\.7\.3/);
+  assert.match(binder, /binder\.css\?v=1\.7\.5/);
   assert.match(app, /renderV62Showcase/);
   assert.match(app, /data-toggle-preview-holo/);
   assert.match(binder, /cloud-collection\.js\?v=1\.3\.5/);

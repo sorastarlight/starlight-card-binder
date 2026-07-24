@@ -8,7 +8,7 @@ body[data-page="binder"] .binder-browser-layout {
 .binder-browse-chrome {
   display: grid;
   gap: 0;
-  overflow: hidden;
+  overflow: visible;
   border: 1px solid rgba(255, 255, 255, .95);
   border-radius: 28px;
   background: linear-gradient(145deg, rgba(255, 255, 255, .94), rgba(242, 250, 255, .9) 52%, rgba(255, 241, 250, .9));
@@ -115,47 +115,38 @@ body[data-page="binder"].series-select .binder-browser-layout {
 
 /* Hide binder browse chrome on the series landing until a pack is selected. */
 body[data-page="binder"].series-select .binder-browse-chrome,
+body[data-page="binder"].series-select .binder-browse-chrome .series-hero,
+body[data-page="binder"].series-select .binder-browse-chrome .v61-hero,
+body[data-page="binder"].series-select .binder-browse-chrome .card-filter-panel,
 body[data-page="binder"].series-select .card-filter-panel {
-  display: none;
+  display: none !important;
 }
 
-/* Keep series hero + filters visible while browsing even if legacy hide rules linger. */
-body[data-page="binder"].binder-browsing .binder-browse-chrome {
+/* Keep series hero + filters visible while browsing a selected pack. */
+body[data-page="binder"]:not(.series-select) .binder-browse-chrome {
   display: grid !important;
+  visibility: visible !important;
 }
 
-body[data-page="binder"].binder-browsing .binder-browse-chrome .series-hero,
-body[data-page="binder"].binder-browsing .binder-browse-chrome .card-filter-panel,
-body[data-page="binder"].binder-browsing .card-filter-panel {
-  display: grid !important;
-}
-
-body[data-page="binder"].binder-browsing .binder-browser-layout {
-  display: grid;
-}
-
-/* Keep hero + filters visible while browsing even if series-select lingers. */
-body[data-page="binder"].binder-browsing .series-hero,
-body[data-page="binder"].binder-browsing .v61-hero,
-body[data-page="binder"].binder-browsing .binder-browse-chrome .series-hero,
-body[data-page="binder"].binder-browsing .binder-browse-chrome .v61-hero {
+body[data-page="binder"]:not(.series-select) .binder-browse-chrome .series-hero,
+body[data-page="binder"]:not(.series-select) .binder-browse-chrome .v61-hero {
   display: block !important;
   visibility: visible !important;
 }
 
-body[data-page="binder"].binder-browsing .binder-browse-chrome {
+body[data-page="binder"]:not(.series-select) .binder-browse-chrome .card-filter-panel,
+body[data-page="binder"]:not(.series-select) .card-filter-panel {
   display: grid !important;
   visibility: visible !important;
 }
 
-body[data-page="binder"].binder-browsing .binder-browse-chrome[hidden] {
+body[data-page="binder"]:not(.series-select) .binder-browser-layout {
   display: grid !important;
 }
 
-body[data-page="binder"].binder-browsing .binder-browse-chrome .card-filter-panel,
-body[data-page="binder"].binder-browsing .card-filter-panel {
-  display: grid !important;
-  visibility: visible !important;
+body[data-page="binder"] .binder-browse-chrome .panel {
+  content-visibility: visible !important;
+  contain: none !important;
 }
 
 .binder-browser-layout {
@@ -294,5 +285,4 @@ body[data-page="binder"] .v62-preview-card img.is-unowned-dull,
 body[data-page="binder"] #cardOverlay img.is-unowned-dull {
   filter: grayscale(0.72) saturate(0.35) brightness(0.88);
 }
-
 
