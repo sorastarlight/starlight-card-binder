@@ -50,7 +50,7 @@ const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
     if (content && data.achievements?.length) {
       const section = document.createElement('section');
       section.className = 'collector-section';
-      section.innerHTML = `<h2>🏅 Achievements</h2><div class="public-achievement-grid">${data.achievements.map(achievement => (
+      section.innerHTML = `<h2>🏅 Starlight Memories</h2><div class="public-achievement-grid">${data.achievements.map(achievement => (
         `<article><span>${esc(achievement.icon)}</span><div><strong>${esc(achievement.name)}</strong><small>${esc(achievement.description)}</small></div></article>`
       )).join('')}</div>`;
       content.append(section);

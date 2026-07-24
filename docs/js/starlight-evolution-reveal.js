@@ -1,10 +1,11 @@
 /**
  * Starlight Evolution reveal: orbit duplicates → merge → burst → tier border.
  * Prefer CSS / Web Animations; prefers-reduced-motion uses a short fade.
+ * Uses embed-anchoring so the reveal stays centered in the visible viewport.
  */
 
 const STYLESHEET_ID = 'starlight-evolution-reveal-css';
-const STYLESHEET_HREF = '../css/starlight-evolution-reveal.css?v=1.0.0';
+const STYLESHEET_HREF = '../css/starlight-evolution-reveal.css?v=1.0.1';
 
 function preferReducedMotion() {
   try {
@@ -29,6 +30,32 @@ function wait(ms) {
 
 function tierCssToken(tier) {
   return String(tier || 'stardust').trim().toLowerCase().replace(/_/g, '-');
+}
+
+function getUiApi() {
+  return window.StarlightUI || null;
+}
+
+function anchorReveal(root) {
+  const api = getUiApi();
+  if (api?.anchorOverlayToVisibleViewport) {
+    api.anchorOverlayToVisibleViewport(root);
+    return;
+  }
+  root.classList.add('is-embed-anchored');
+}
+
+function clearRevealAnchor(root) {
+  const api = getUiApi();
+  if (api?.clearOverlayViewportAnchor) {
+    api.clearOverlayViewportAnchor(root);
+    return;
+  }
+  root.classList.remove('is-embed-anchored');
+  root.style.removeProperty('--st-embed-overlay-top');
+  root.style.removeProperty('--st-embed-overlay-height');
+  ['position', 'inset', 'top', 'left', 'right', 'bottom', 'width', 'height', 'max-height', 'max-width']
+    .forEach((property) => root.style.removeProperty(property));
 }
 
 /**
@@ -85,8 +112,16 @@ export async function playStarlightEvolutionReveal(options = {}) {
 
   document.body.appendChild(root);
   document.body.classList.add('st-evo-open');
+  anchorReveal(root);
   void root.offsetWidth;
   root.classList.add('is-open');
+
+  const onViewportChange = () => anchorReveal(root);
+  try {
+    window.addEventListener('resize', onViewportChange);
+    window.parent?.addEventListener?.('scroll', onViewportChange, { passive: true });
+    window.parent?.addEventListener?.('resize', onViewportChange);
+  } catch {}
 
   try {
     if (reduced) {
@@ -102,8 +137,14 @@ export async function playStarlightEvolutionReveal(options = {}) {
     root.classList.add('is-burst', 'is-reveal');
     await wait(980);
   } finally {
+    try {
+      window.removeEventListener('resize', onViewportChange);
+      window.parent?.removeEventListener?.('scroll', onViewportChange);
+      window.parent?.removeEventListener?.('resize', onViewportChange);
+    } catch {}
     root.classList.add('is-leaving');
     await wait(220);
+    clearRevealAnchor(root);
     root.remove();
     document.body.classList.remove('st-evo-open');
   }

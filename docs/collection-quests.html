@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
-<title>Collection Quests | Starlight Card Binder</title>
+<title>Starlight Missions | Starlight Card Binder</title>
 <link href="css/style.css?v=1.0.3" rel="stylesheet"/>
-<link rel="stylesheet" href="css/shared-ui.css?v=1.6.18"/>
-<link rel="stylesheet" href="css/pages/collection-quests.css?v=1.1"/>
-<link rel="stylesheet" href="css/qol-ui.css?v=94.2.9"/>
+<link rel="stylesheet" href="css/shared-ui.css?v=1.6.19"/>
+<link rel="stylesheet" href="css/pages/collection-quests.css?v=1.2"/>
+<link rel="stylesheet" href="css/qol-ui.css?v=94.2.10"/>
 <script src="js/browser-performance.js?v=1.0.0" defer></script>
 </head>
 <body data-page="quests">
@@ -16,17 +16,23 @@
 <main class="quests-page">
   <section class="quests-hero panel">
     <p class="eyebrow" data-content="quests.eyebrow">My Stuff</p>
-    <h1 data-content="quests.title">Collection Quests</h1>
-    <p data-content="quests.lead">Complete collector goals to earn Star Bits and titles. Progress syncs from your collection, trades, gifts, and booster opens.</p>
+    <h1 data-content="quests.title">Starlight Missions</h1>
+    <p data-content="quests.lead">Complete Daily and Weekly Missions to earn Star Bits and titles. Daily resets at 00:00 UTC. Weekly resets Monday 00:00 UTC.</p>
   </section>
   <div class="quests-toolbar">
-    <strong id="quests-summary" aria-live="polite">Loading quests…</strong>
+    <strong id="quests-summary" aria-live="polite">Loading missions…</strong>
     <button class="btn secondary" id="quests-refresh" type="button" data-content="quests.refreshCta">Refresh</button>
   </div>
+  <div class="quests-tabs" role="tablist" aria-label="Mission cadence">
+    <button class="quests-tab active" type="button" role="tab" aria-selected="true" data-cadence-tab="daily" id="tab-daily">🌞 Daily</button>
+    <button class="quests-tab" type="button" role="tab" aria-selected="false" data-cadence-tab="weekly" id="tab-weekly">🌙 Weekly</button>
+    <button class="quests-tab" type="button" role="tab" aria-selected="false" data-cadence-tab="legacy" id="tab-legacy" hidden>Once</button>
+  </div>
+  <p id="quests-reset-note" class="quests-reset-note" aria-live="polite"></p>
   <section class="quests-list" id="quests-list" aria-live="polite"></section>
 </main>
 <script type="module" src="js/pages/website-content-hydrate-page.js?v=1.3"></script>
-<script type="module" src="js/pages/collection-quests-page.js?v=1.6"></script>
+<script type="module" src="js/pages/collection-quests-page.js?v=1.7"></script>
 <script src="js/shared-ui.js?v=1.6.15"></script>
 <script src="js/qol-ui.js?v=94.2.9" defer></script>
 </body>

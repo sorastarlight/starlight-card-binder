@@ -13,12 +13,12 @@ test('keeps the requested collection navigation labels in the shared shell', asy
     'The Starlight Card Series Binder',
     'Redeem A Code',
     'My Stuff',
-    'My Card Collection &amp; Favorites',
-    'My Checklist'
+    'My Starlight Album',
+    'Star Registry'
   ]) assert.match(binder, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
 
-  assert.match(shell, /collection:\{title:'My Card Collection & Favorites'/);
-  assert.match(shell, /checklist:\{title:'My Checklist'/);
+  assert.match(shell, /collection:\{title:'My Starlight Album'/);
+  assert.match(shell, /checklist:\{title:'Star Registry'/);
 });
 
 test('places shared card filters in the binder and collection content areas', async () => {

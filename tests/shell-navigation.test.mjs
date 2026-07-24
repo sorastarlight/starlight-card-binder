@@ -13,14 +13,65 @@ test('default shell navigation includes core destinations and staff section', ()
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'offers'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'rankings'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'feed' && entry.label === 'LIVE Feed'));
+  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'collection' && entry.label === 'My Starlight Album'));
+  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'daily' && entry.label === 'Daily Wish'));
+  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'shop' && entry.label === 'Card Boutique'));
+  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'checklist' && entry.label === 'Star Registry'));
+  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'quests' && entry.label === 'Starlight Missions'));
+  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'trades' && entry.label === 'Card Exchange'));
+  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'profile' && entry.label === 'My Journal'));
   assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'rankings'));
   assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'feed' && item.label === 'LIVE Feed'));
+  assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'quests' && item.label === 'Starlight Missions'));
   assert.equal(nav.pageTitles.feed, 'LIVE Feed');
+  assert.equal(nav.pageTitles.collection, 'My Starlight Album');
+  assert.equal(nav.pageTitles.daily, 'Daily Wish');
   assert.equal(nav.topBar.quickLinks.length, 4);
   assert.ok(nav.accountMenu.signedIn.some(item => (item.features || []).includes('notificationBadge')));
   assert.ok(nav.accountMenu.signedIn.some(item => (item.features || []).includes('receivedGiftBadge')));
   assert.ok(nav.accountMenu.signedIn.some(item => (item.features || []).includes('tradeOfferBadge')));
   assert.ok(nav.accountMenu.signedOut.some(item => (item.features || []).includes('signIn')));
+});
+
+test('sanitizeShellNavigation overwrites legacy product labels with new defaults', () => {
+  const renamed = sanitizeShellNavigation({
+    ...cloneDefaultShellNavigation(),
+    pageTitles: {
+      ...cloneDefaultShellNavigation().pageTitles,
+      collection: 'My Card Collection & Favorites',
+      daily: 'Free Daily Booster',
+      shop: 'Starlight Card Shop',
+      checklist: 'My Checklist',
+      quests: 'Collection Quests',
+      trades: 'Wishlist & Trades',
+      profile: 'Profile & Settings',
+      feed: 'Pull Feed'
+    },
+    sidebar: {
+      sections: [{
+        id: 'my-stuff',
+        label: 'My Stuff',
+        icon: { type: 'emoji', value: '♡' },
+        staffOnly: false,
+        items: [
+          { id: 'collection', label: 'My Card Collection & Favorites', destination: 'collection', enabled: true, features: [] },
+          { id: 'daily', label: 'Free Daily Booster', destination: 'daily', enabled: true, features: [] },
+          { id: 'feed', label: 'Pull Feed', destination: 'feed', enabled: true, features: [] }
+        ]
+      }]
+    }
+  });
+  assert.equal(renamed.pageTitles.collection, 'My Starlight Album');
+  assert.equal(renamed.pageTitles.daily, 'Daily Wish');
+  assert.equal(renamed.pageTitles.shop, 'Card Boutique');
+  assert.equal(renamed.pageTitles.checklist, 'Star Registry');
+  assert.equal(renamed.pageTitles.quests, 'Starlight Missions');
+  assert.equal(renamed.pageTitles.trades, 'Card Exchange');
+  assert.equal(renamed.pageTitles.profile, 'My Journal');
+  assert.equal(renamed.pageTitles.feed, 'LIVE Feed');
+  assert.equal(renamed.sidebar.sections[0].items[0].label, 'My Starlight Album');
+  assert.equal(renamed.sidebar.sections[0].items[1].label, 'Daily Wish');
+  assert.equal(renamed.sidebar.sections[0].items[2].label, 'LIVE Feed');
 });
 
 test('sanitizeShellNavigation rejects unknown destinations and merges empty remote', () => {

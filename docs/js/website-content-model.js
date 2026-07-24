@@ -97,6 +97,38 @@ function sanitizeEnum(value, allowed, fallback) {
   return allowed.includes(next) ? next : fallback;
 }
 
+/** Overwrite known legacy page titles with the current product defaults. */
+const WEBSITE_TITLE_REWRITES = Object.freeze({
+  'Daily Free Booster Pack': 'Daily Wish',
+  'Starlight Card Shop': 'Card Boutique',
+  'My Card Collection & Favorites': 'My Starlight Album',
+  'My Checklist': 'Star Registry',
+  'Collection Quests': 'Starlight Missions',
+  '💫 Wishlist & Trade Binder': '💫 Card Exchange',
+  'Wishlist & Trade Binder': 'Card Exchange',
+  'Event Achievements': 'Starlight Memories',
+  'Edit Profile': 'My Journal',
+  'Open Daily Booster': 'Open Daily Wish',
+  '✨ Open Daily Booster': '✨ Open Daily Wish',
+  'Visit Card Shop': 'Visit Card Boutique',
+  'Open My Collection': 'Open My Starlight Album',
+  '💫 Wishlist & Trade List': '💫 Card Exchange'
+});
+
+function rewriteLegacyWebsiteText(value) {
+  const current = String(value ?? '').trim();
+  if (!current) return current;
+  return WEBSITE_TITLE_REWRITES[current] || current;
+}
+
+function applyWebsiteTitleRewrites(section = {}) {
+  const out = { ...section };
+  for (const [key, value] of Object.entries(out)) {
+    if (typeof value === 'string') out[key] = rewriteLegacyWebsiteText(value);
+  }
+  return out;
+}
+
 function sanitizeBinderDisplay(source = {}, defaults = {}) {
   return {
     sidePanel: sanitizeEnum(source.sidePanel, ['on', 'off'], defaults.sidePanel),
@@ -142,30 +174,44 @@ export function sanitizeWebsiteContent(input) {
     shop: sanitizeStringMap(source.shop || {}, defaults.shop),
     events: sanitizeStringMap(source.events || {}, defaults.events),
     redeem: sanitizeStringMap(source.redeem || {}, defaults.redeem),
-    collection: sanitizeStringMap(source.collection || {}, defaults.collection),
-    starBits: sanitizeStringMap(source.starBits || {}, defaults.starBits),
-    checklist: sanitizeStringMap(source.checklist || {}, defaults.checklist),
-    quests: sanitizeStringMap(source.quests || {}, defaults.quests),
-    seasonPass: sanitizeStringMap(source.seasonPass || {}, defaults.seasonPass),
-    trades: sanitizeStringMap(source.trades || {}, defaults.trades),
-    offers: sanitizeStringMap(source.offers || {}, defaults.offers),
-    notifications: sanitizeStringMap(source.notifications || {}, defaults.notifications),
-    rewards: sanitizeStringMap(source.rewards || {}, defaults.rewards),
-    profile: sanitizeStringMap(source.profile || {}, defaults.profile),
-    collector: sanitizeStringMap(source.collector || {}, defaults.collector),
-    rankings: sanitizeStringMap(source.rankings || {}, defaults.rankings),
-    about: sanitizeStringMap(source.about || {}, defaults.about),
+    collection: applyWebsiteTitleRewrites(sanitizeStringMap(source.collection || {}, defaults.collection)),
+    starBits: applyWebsiteTitleRewrites(sanitizeStringMap(source.starBits || {}, defaults.starBits)),
+    starlightEvolution: applyWebsiteTitleRewrites(
+      sanitizeStringMap(source.starlightEvolution || {}, defaults.starlightEvolution || {})
+    ),
+    checklist: applyWebsiteTitleRewrites(sanitizeStringMap(source.checklist || {}, defaults.checklist)),
+    quests: applyWebsiteTitleRewrites(sanitizeStringMap(source.quests || {}, defaults.quests)),
+    seasonPass: applyWebsiteTitleRewrites(sanitizeStringMap(source.seasonPass || {}, defaults.seasonPass)),
+    trades: applyWebsiteTitleRewrites(sanitizeStringMap(source.trades || {}, defaults.trades)),
+    offers: applyWebsiteTitleRewrites(sanitizeStringMap(source.offers || {}, defaults.offers)),
+    notifications: applyWebsiteTitleRewrites(sanitizeStringMap(source.notifications || {}, defaults.notifications)),
+    rewards: applyWebsiteTitleRewrites(sanitizeStringMap(source.rewards || {}, defaults.rewards)),
+    profile: applyWebsiteTitleRewrites(sanitizeStringMap(source.profile || {}, defaults.profile)),
+    collector: applyWebsiteTitleRewrites(sanitizeStringMap(source.collector || {}, defaults.collector)),
+    rankings: applyWebsiteTitleRewrites(sanitizeStringMap(source.rankings || {}, defaults.rankings)),
+    about: applyWebsiteTitleRewrites(sanitizeStringMap(source.about || {}, defaults.about)),
     socials: {
-      ...sanitizeStringMap(source.socials || {}, {
+      ...applyWebsiteTitleRewrites(sanitizeStringMap(source.socials || {}, {
         eyebrow: defaults.socials.eyebrow,
         title: defaults.socials.title,
         lead: defaults.socials.lead
-      }),
+      })),
       links: sanitizeSocialLinks(source.socials?.links, defaults.socials.links)
     },
-    login: sanitizeStringMap(source.login || {}, defaults.login),
-    shared: sanitizeStringMap(source.shared || {}, defaults.shared)
+    login: applyWebsiteTitleRewrites(sanitizeStringMap(source.login || {}, defaults.login)),
+    shared: applyWebsiteTitleRewrites(sanitizeStringMap(source.shared || {}, defaults.shared))
   };
+
+  result.home = {
+    ...applyWebsiteTitleRewrites(result.home),
+    quickLinks: (result.home.quickLinks || []).map(link => ({
+      ...link,
+      label: rewriteLegacyWebsiteText(link.label)
+    }))
+  };
+  result.daily = applyWebsiteTitleRewrites(result.daily);
+  result.shop = applyWebsiteTitleRewrites(result.shop);
+  result.events = applyWebsiteTitleRewrites(result.events);
 
   return result;
 }

@@ -78,6 +78,7 @@ test('default website content includes editable page groups', () => {
       'redeem',
       'collection',
       'starBits',
+      'starlightEvolution',
       'checklist',
       'quests',
       'seasonPass',

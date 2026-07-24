@@ -196,14 +196,14 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
 .st-r3-reveal-scene.is-revealed .st-r3-card-actor.st-card-drag-tilt.is-dragging{
   transition:none;
 }
-.st-toast-region{position:fixed;right:18px;bottom:18px;z-index:100001;display:grid;gap:10px;width:min(380px,calc(100vw - 28px));pointer-events:none}
+.st-toast-region{position:fixed;right:18px;bottom:18px;z-index:100200;display:grid;gap:10px;width:min(380px,calc(100vw - 28px));pointer-events:none}
 .st-toast{pointer-events:auto;padding:13px 16px;border:1px solid rgba(107,198,248,.48);border-radius:16px;background:rgba(255,255,255,.97);box-shadow:0 15px 38px rgba(45,62,105,.22);color:var(--st-ui-ink);font-weight:800;line-height:1.45;animation:stToastIn .22s ease-out}
 .st-toast.success{border-color:rgba(70,176,127,.5)}.st-toast.error{border-color:rgba(180,35,63,.5);color:var(--st-ui-danger)}.st-toast.info{border-color:rgba(255,130,200,.5)}
 @keyframes stToastIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
-.st-dialog-overlay{position:fixed;inset:0;z-index:31000;display:flex;align-items:safe center;justify-content:safe center;padding:max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:rgba(37,48,82,.56);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);opacity:0;transition:opacity var(--st-motion-normal)}.st-dialog-overlay.is-open{opacity:1}.st-dialog-overlay.hidden,.st-dialog-overlay[hidden]{display:none!important}
+.st-dialog-overlay{position:fixed;inset:0;z-index:100100;display:flex;align-items:safe center;justify-content:safe center;padding:max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:rgba(37,48,82,.56);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);opacity:0;transition:opacity var(--st-motion-normal)}.st-dialog-overlay.is-open{opacity:1}.st-dialog-overlay.hidden,.st-dialog-overlay[hidden]{display:none!important}
 /* Shell iframe contract: pin overlays to the visible parent viewport slice. shared-ui.js sets --st-embed-* and inline !important. */
-:is(.st-dialog-overlay,.st-r3-overlay,.editor,.rule-modal,.test-modal,.receipt,.profile-crop-modal).is-embed-anchored:not(.hidden):not([hidden]),
-:is(.st-dialog-overlay,.st-r3-overlay,.editor,.rule-modal,.test-modal,.receipt,.profile-crop-modal).is-embed-anchored.is-open{
+:is(.st-dialog-overlay,.st-r3-overlay,.st-evo-root,.editor,.rule-modal,.test-modal,.receipt,.profile-crop-modal).is-embed-anchored:not(.hidden):not([hidden]),
+:is(.st-dialog-overlay,.st-r3-overlay,.st-evo-root,.editor,.rule-modal,.test-modal,.receipt,.profile-crop-modal).is-embed-anchored.is-open{
   --st-embed-overlay-top:0px;--st-embed-overlay-height:100dvh;
   position:absolute!important;inset:auto!important;top:var(--st-embed-overlay-top)!important;left:0!important;right:0!important;bottom:auto!important;width:100%!important;max-width:100%!important;height:var(--st-embed-overlay-height)!important;max-height:var(--st-embed-overlay-height)!important
 }

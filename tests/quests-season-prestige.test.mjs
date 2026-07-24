@@ -74,8 +74,10 @@ test('quests and season pass pages wire services and claim UI', async () => {
   assert.match(seasonPage, /claimSeasonPassTier/);
   assert.match(questsHtml, /collection-quests-page\.js/);
   assert.match(seasonHtml, /season-pass-page\.js/);
-  assert.match(shell, /quests:\{title:'Collection Quests',src:'collection-quests\.html'\}/);
+  assert.match(shell, /quests:\{title:'Starlight Missions',src:'collection-quests\.html'\}/);
   assert.match(shell, /'season-pass':\{title:'Seasonal Collection Pass',src:'season-pass\.html'\}/);
+  assert.match(questsPage, /data-cadence-tab|activeCadence/);
+  assert.match(questsHtml, /Daily Missions|data-cadence-tab="daily"/);
 });
 
 test('binder and collection load Starlight Evolution frame styles and helpers', async () => {
@@ -121,6 +123,19 @@ test('wave-2 collection quest seeds cover Soaring Skies and Epic goals', async (
   assert.match(migration, /own_one_epic/);
   assert.match(migration, /own_five_characters/);
   assert.match(migration, /quest_soaring_skies/);
+});
+
+test('Starlight Missions migration adds cadence and period progress', async () => {
+  const migration = await read('supabase/migrations/20260723220000_starlight_missions_period_resets.sql');
+  assert.match(migration, /cadence text not null default 'legacy'/);
+  assert.match(migration, /user_quest_period_progress/);
+  assert.match(migration, /quest_period_bounds/);
+  assert.match(migration, /'periodKey'/);
+  assert.match(migration, /'resetsAt'/);
+  assert.match(migration, /daily_open_booster/);
+  assert.match(migration, /weekly_visit_five/);
+  assert.match(migration, /cadence = 'daily'/);
+  assert.match(migration, /cadence = 'weekly'/);
 });
 
 test('quests and season pass pages wire website content hooks', async () => {

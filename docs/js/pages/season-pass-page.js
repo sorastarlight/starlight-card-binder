@@ -240,7 +240,7 @@ function render(data) {
         try {
           const result = await claimSeasonPassTier(tier.id);
           const bits = Number(result?.rewardStarBits) || 0;
-          toast(bits > 0 ? `Claimed ${bits} Star Bits!` : 'Season reward claimed!', 'success');
+          toast(bits > 0 ? `You discovered ${bits} Star Bits!` : 'Season reward claimed!', 'success');
           if (bits > 0) notifyShellEconomyChanged({ source: 'season-claim', rewardStarBits: bits });
           await load();
         } catch (error) {

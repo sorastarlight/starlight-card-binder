@@ -674,7 +674,7 @@ export const WEBSITE_PAGE_META = Object.freeze({
     ]
   },
   quests: {
-    description: 'Collection Quests hero and claim states.',
+    description: 'Starlight Missions hero, cadence tabs, and claim states.',
     previewUrl: 'collection-quests.html',
     groups: [
       {
@@ -685,6 +685,23 @@ export const WEBSITE_PAGE_META = Object.freeze({
           { key: 'eyebrow', preview: 'eyebrow' },
           { key: 'title', preview: 'title' },
           { key: 'lead', multiline: true, preview: 'lead' }
+        ]
+      },
+      {
+        id: 'sections',
+        label: 'Cadence sections',
+        fields: [
+          { key: 'dailyTabLabel' },
+          { key: 'weeklyTabLabel' },
+          { key: 'legacyTabLabel' },
+          { key: 'dailySectionTitle' },
+          { key: 'weeklySectionTitle' },
+          { key: 'legacySectionTitle' },
+          { key: 'dailyResetNote' },
+          { key: 'weeklyResetNote' },
+          { key: 'dailyResetFallback' },
+          { key: 'weeklyResetFallback' },
+          { key: 'legacyResetNote' }
         ]
       },
       {

@@ -70,8 +70,8 @@ form.addEventListener('submit', async event => {
 
     if (starBits > 0) {
       const formattedAmount = starBits.toLocaleString();
-      showReward(label, `${formattedAmount} Star Bits were added directly to your balance.`);
-      showStatus(`Code accepted! ${formattedAmount} Star Bits added.`, 'success');
+      showReward(label, `You discovered ${formattedAmount} Star Bits!`);
+      showStatus(`You discovered ${formattedAmount} Star Bits!`, 'success');
       notifyShellEconomyChanged({ source: 'redeem-code', starBits });
       return;
     }

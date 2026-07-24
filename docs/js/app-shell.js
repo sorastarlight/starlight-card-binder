@@ -17,23 +17,23 @@ import { initLiveFeedWidget } from './live-feed-widget.js';
 import { applyAvatarFrameClass } from './avatar-frame-utils.js';
 import { getMyProfileExtras } from './profile-extras-service.js';
 
-const SHELL_BUILD = '94.3.6';
+const SHELL_BUILD = '94.3.7';
 const VIEW_READY_TIMEOUT_MS = 6500;
 const MAX_VIEW_RETRIES = 1;
 
 const routes = {
   home:{title:'Home',src:'home.html'},
-  binder:{title:'The Starlight Card Series Binder',src:null}, collection:{title:'My Card Collection & Favorites',src:'collection.html'},
-  daily:{title:'Daily Free Booster Pack',src:'daily-booster.html'}, shop:{title:'Starlight Card Shop',src:'booster-shop.html'}, events:{title:'Starlight Events',src:'events.html'}, redeem:{title:'Redeem A Code',src:'redeem.html'},
+  binder:{title:'The Starlight Card Series Binder',src:null}, collection:{title:'My Starlight Album',src:'collection.html'},
+  daily:{title:'Daily Wish',src:'daily-booster.html'}, shop:{title:'Card Boutique',src:'booster-shop.html'}, events:{title:'Starlight Events',src:'events.html'}, redeem:{title:'Redeem A Code',src:'redeem.html'},
   'star-bits':{title:'Star Bits Exchange',src:'star-bits.html'},
   'starlight-evolution':{title:'Starlight Card Evolution',src:'starlight-evolution.html'},
-  checklist:{title:'My Checklist',src:'checklist.html'},
-  quests:{title:'Collection Quests',src:'collection-quests.html'},
+  checklist:{title:'Star Registry',src:'checklist.html'},
+  quests:{title:'Starlight Missions',src:'collection-quests.html'},
   'season-pass':{title:'Seasonal Collection Pass',src:'season-pass.html'},
-  trades:{title:'Wishlist & Trades',src:'trade-lists.html'}, offers:{title:'Trade Offers',src:'trade-offers.html'},
+  trades:{title:'Card Exchange',src:'trade-lists.html'}, offers:{title:'Trade Offers',src:'trade-offers.html'},
   rankings:{title:'User Rankings',src:'user-rankings.html'},
   feed:{title:'LIVE Feed',src:'pull-feed.html'},
-  notifications:{title:'Notifications',src:'notifications.html'}, rewards:{title:'Received Gifts',src:'received-rewards.html'}, profile:{title:'Profile Settings',src:'profile-settings.html'}, collector:{title:'Collector Profile',src:'collector.html'},
+  notifications:{title:'Notifications',src:'notifications.html'}, rewards:{title:'Received Gifts',src:'received-rewards.html'}, profile:{title:'My Journal',src:'profile-settings.html'}, collector:{title:'Collector Profile',src:'collector.html'},
   report:{title:'Report Profile',src:'report-profile.html'}, about:{title:'About',src:'about.html'}, socials:{title:'Socials',src:'socials.html'},
   admin:{title:'Administration Hub',src:'admin-hub.html'}, 'admin-codes':{title:'Reward Code Console',src:'admin-codes.html'},
   'admin-staff':{title:'Staff Management',src:'admin-staff.html'}, 'admin-audit':{title:'Audit Log',src:'admin-audit.html'},

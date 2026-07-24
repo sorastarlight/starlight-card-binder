@@ -1,7 +1,23 @@
-import { cloneDefaultShellNavigation, PUBLIC_SHELL_DESTINATIONS } from './shell-navigation-defaults.js';
+import {
+  cloneDefaultShellNavigation,
+  PUBLIC_SHELL_DESTINATIONS,
+  SHELL_LABEL_REWRITES
+} from './shell-navigation-defaults.js';
 import { isKnownShellRoute } from './shell-route-utils.js';
 
 const ALLOWED_DESTINATIONS = new Set(PUBLIC_SHELL_DESTINATIONS.map(entry => entry.value));
+const DEFAULT_DESTINATION_LABELS = Object.fromEntries(
+  PUBLIC_SHELL_DESTINATIONS.map(entry => [entry.value, entry.label])
+);
+
+function rewriteLegacyLabel(destination, label, fallback) {
+  const current = String(label || '').trim();
+  if (!current) return fallback;
+  const legacy = SHELL_LABEL_REWRITES[destination];
+  if (!legacy?.length) return current;
+  const matched = legacy.some(entry => entry.toLowerCase() === current.toLowerCase());
+  return matched ? (DEFAULT_DESTINATION_LABELS[destination] || fallback || current) : current;
+}
 
 function asIcon(icon) {
   if (!icon || typeof icon !== 'object') return { type: 'emoji', value: '' };
@@ -35,9 +51,13 @@ function sanitizeItem(item = {}, index = 0) {
   ) {
     throw new Error(`Unsupported navigation destination: ${destination}`);
   }
+  const rawLabel = String(item.label || (isSeparator ? '' : 'Untitled')).trim().slice(0, 80)
+    || (isSeparator ? '' : 'Untitled');
   return {
     id: String(item.id || `item-${index}`).slice(0, 64),
-    label: String(item.label || (isSeparator ? '' : 'Untitled')).trim().slice(0, 80) || (isSeparator ? '' : 'Untitled'),
+    label: isLabel || isSeparator
+      ? rawLabel
+      : rewriteLegacyLabel(destination, rawLabel, rawLabel),
     icon: asIcon(item.icon),
     destination,
     enabled: item.enabled !== false,
@@ -69,7 +89,8 @@ export function sanitizeShellNavigation(input) {
   if (source.pageTitles && typeof source.pageTitles === 'object') {
     for (const [key, value] of Object.entries(source.pageTitles)) {
       if (!isKnownShellRoute(key)) continue;
-      pageTitles[key] = String(value || '').trim().slice(0, 80) || defaults.pageTitles[key] || key;
+      const next = String(value || '').trim().slice(0, 80) || defaults.pageTitles[key] || key;
+      pageTitles[key] = rewriteLegacyLabel(key, next, defaults.pageTitles[key] || key);
     }
   }
 
@@ -79,9 +100,10 @@ export function sanitizeShellNavigation(input) {
       if (!ALLOWED_DESTINATIONS.has(destination)) {
         throw new Error(`Unsupported top-bar destination: ${destination || '(empty)'}`);
       }
+      const rawLabel = String(link.label || destination).trim().slice(0, 40) || destination;
       return {
         id: String(link.id || `top-${index}`).slice(0, 64),
-        label: String(link.label || destination).trim().slice(0, 40) || destination,
+        label: rewriteLegacyLabel(destination, rawLabel, destination).slice(0, 40),
         destination,
         enabled: link.enabled !== false
       };
@@ -94,16 +116,15 @@ export function sanitizeShellNavigation(input) {
 
   if (!sections.length) throw new Error('At least one sidebar section is required.');
 
-  // Keep LIVE Feed naming in sync when older saves still say "Pull Feed".
+  // Overwrite legacy product labels with the current defaults.
+  for (const key of Object.keys(pageTitles)) {
+    pageTitles[key] = rewriteLegacyLabel(key, pageTitles[key], defaults.pageTitles[key] || key);
+  }
   for (const section of sections) {
     for (const item of section.items || []) {
-      if (item.destination === 'feed' && /^pull feed$/i.test(String(item.label || '').trim())) {
-        item.label = 'LIVE Feed';
-      }
+      if (!item.destination) continue;
+      item.label = rewriteLegacyLabel(item.destination, item.label, item.label);
     }
-  }
-  if (/^pull feed$/i.test(String(pageTitles.feed || '').trim())) {
-    pageTitles.feed = 'LIVE Feed';
   }
 
   const accountMenuSource = source.accountMenu && typeof source.accountMenu === 'object'
@@ -116,9 +137,8 @@ export function sanitizeShellNavigation(input) {
   };
   for (const list of [accountMenu.signedIn, accountMenu.signedOut]) {
     for (const item of list) {
-      if (item.destination === 'feed' && /^pull feed$/i.test(String(item.label || '').trim())) {
-        item.label = 'LIVE Feed';
-      }
+      if (!item.destination) continue;
+      item.label = rewriteLegacyLabel(item.destination, item.label, item.label);
     }
   }
 
