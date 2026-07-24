@@ -1,6 +1,5 @@
 /**
- * Starlight Evolution reveal — Digimon-inspired digital evolution sequence.
- * Duplicate data fragments spiral inward, rupture in a burst, and the card emerges evolved.
+ * Starlight Evolution reveal — light-themed duplicate carousel fusing into the evolved card.
  */
 
 import {
@@ -10,22 +9,22 @@ import {
 } from './prestige-utils.js?v=1.5.0';
 
 const STYLESHEET_ID = 'starlight-evolution-reveal-css';
-const STYLESHEET_HREF = '../css/starlight-evolution-reveal.css?v=2.0.0';
+const STYLESHEET_HREF = '../css/starlight-evolution-reveal.css?v=2.1.0';
 
 const TIMING = Object.freeze({
-  boot: 420,
-  scan: 1300,
-  charge: 2400,
-  rupture: 920,
-  break: 680,
-  complete: 1900,
-  leave: 280
+  boot: 340,
+  charge: 2900,
+  fuse: 1100,
+  complete: 1800,
+  leave: 260
 });
 
 const REDUCED_TIMING = Object.freeze({
-  complete: 1100,
+  complete: 1000,
   leave: 220
 });
+
+const evoViewportLocks = new WeakMap();
 
 function preferReducedMotion() {
   try {
@@ -84,66 +83,132 @@ function orbiterCountForCost(cost) {
   return Math.min(14, spent);
 }
 
-function getUiApi() {
-  return window.StarlightUI || null;
+function getEmbedVisibleFrame(view = window) {
+  try {
+    if (!view || view.parent === view) return null;
+    const frameEl = view.frameElement;
+    if (!frameEl) return null;
+    const parentWin = view.parent;
+    const parentDoc = parentWin.document;
+    const main = parentDoc.querySelector('.main');
+    const frameRect = frameEl.getBoundingClientRect();
+    const viewportHeight = parentWin.innerHeight || parentDoc.documentElement.clientHeight || 0;
+    const intersectTop = Math.max(frameRect.top, 0);
+    const intersectBottom = Math.min(frameRect.bottom, viewportHeight);
+    const visibleHeight = Math.max(240, intersectBottom - intersectTop);
+    const topWithinIframe = Math.max(0, intersectTop - frameRect.top);
+    return {
+      top: topWithinIframe,
+      height: visibleHeight,
+      parentMain: main instanceof parentWin.HTMLElement ? main : null,
+      parentWin
+    };
+  } catch {
+    return null;
+  }
 }
 
 function anchorReveal(root) {
-  const api = getUiApi();
-  if (api?.anchorOverlayToVisibleViewport) {
-    api.anchorOverlayToVisibleViewport(root);
-    return;
-  }
+  const frame = getEmbedVisibleFrame();
+  if (!frame) return;
   root.classList.add('is-embed-anchored');
+  root.style.setProperty('--st-embed-overlay-top', `${Math.round(frame.top)}px`);
+  root.style.setProperty('--st-embed-overlay-height', `${Math.round(frame.height)}px`);
 }
 
 function clearRevealAnchor(root) {
-  const api = getUiApi();
-  if (api?.clearOverlayViewportAnchor) {
-    api.clearOverlayViewportAnchor(root);
-    return;
-  }
+  if (!root) return;
   root.classList.remove('is-embed-anchored');
   root.style.removeProperty('--st-embed-overlay-top');
   root.style.removeProperty('--st-embed-overlay-height');
-  ['position', 'inset', 'top', 'left', 'right', 'bottom', 'width', 'height', 'max-height', 'max-width']
-    .forEach((property) => root.style.removeProperty(property));
+}
+
+function acquireViewportLock(doc = document) {
+  const existing = evoViewportLocks.get(doc);
+  if (existing) {
+    existing.count += 1;
+    return () => {
+      existing.count -= 1;
+      if (existing.count === 0) existing.restore();
+    };
+  }
+
+  const root = doc.documentElement;
+  const body = doc.body;
+  const properties = ['overflow', 'overflow-x', 'overflow-y', 'overscroll-behavior'];
+  const snapshots = [root, body].map((element) => ({
+    element,
+    values: properties.map((property) => ({
+      property,
+      value: element.style.getPropertyValue(property),
+      priority: element.style.getPropertyPriority(property)
+    }))
+  }));
+  const hadClass = root.classList.contains('st-evo-open');
+  const lock = { count: 1, restore: null };
+
+  root.classList.add('st-evo-open');
+  [root, body].forEach((element) => {
+    element.style.setProperty('overflow', 'hidden', 'important');
+    element.style.setProperty('overflow-x', 'hidden', 'important');
+    element.style.setProperty('overflow-y', 'hidden', 'important');
+    element.style.setProperty('overscroll-behavior', 'none', 'important');
+  });
+
+  lock.restore = () => {
+    snapshots.forEach(({ element, values }) => {
+      values.forEach(({ property, value, priority }) => {
+        if (value) element.style.setProperty(property, value, priority);
+        else element.style.removeProperty(property);
+      });
+    });
+    if (!hadClass) root.classList.remove('st-evo-open');
+    body?.classList.remove('st-evo-open');
+    evoViewportLocks.delete(doc);
+  };
+  evoViewportLocks.set(doc, lock);
+
+  return () => {
+    lock.count -= 1;
+    if (lock.count === 0) lock.restore();
+  };
+}
+
+function documentHeight() {
+  const body = document.body;
+  const root = document.documentElement;
+  return Math.max(
+    body?.scrollHeight || 0,
+    body?.offsetHeight || 0,
+    root?.scrollHeight || 0,
+    root?.offsetHeight || 0,
+    root?.clientHeight || 0
+  );
 }
 
 function notifyEmbedHeight() {
   try {
     window.parent?.postMessage?.({
       type: 'starlight-view-height',
-      height: Math.max(
-        document.documentElement?.scrollHeight || 0,
-        document.body?.scrollHeight || 0
-      )
+      height: documentHeight()
     }, window.location.origin);
   } catch {}
 }
 
-function releaseRevealDocumentState() {
-  try {
-    document.documentElement.classList.remove('st-evo-open');
-    document.documentElement.style.removeProperty('overflow');
-    document.documentElement.style.removeProperty('overflow-x');
-    document.documentElement.style.removeProperty('overflow-y');
-    document.body?.classList.remove('st-evo-open');
-    document.body?.style.removeProperty('overflow');
-    document.body?.style.removeProperty('overflow-x');
-    document.body?.style.removeProperty('overflow-y');
-  } catch {}
+function captureEmbedScroll() {
+  const frame = getEmbedVisibleFrame();
+  if (!frame?.parentMain) return null;
+  return {
+    parentMain: frame.parentMain,
+    scrollTop: frame.parentMain.scrollTop
+  };
 }
 
-function buildDigicodeRows(count = 6) {
-  const glyphs = '01★◆◇▲▼✦✧';
-  return Array.from({ length: count }, (_, row) => {
-    let line = '';
-    for (let i = 0; i < 18; i += 1) {
-      line += glyphs[(row + i) % glyphs.length];
-    }
-    return `<span class="st-evo-digicode-row" style="--row:${row}">${esc(line)}</span>`;
-  }).join('');
+function restoreEmbedScroll(snapshot) {
+  if (!snapshot?.parentMain) return;
+  try {
+    snapshot.parentMain.scrollTop = snapshot.scrollTop;
+  } catch {}
 }
 
 /**
@@ -153,7 +218,7 @@ function buildDigicodeRows(count = 6) {
  * @param {string} options.fromTier
  * @param {string} options.toTier
  * @param {string} [options.label]
- * @param {number} [options.cost] duplicates spent — drives fragment count
+ * @param {number} [options.cost] duplicates spent — drives carousel count
  * @returns {Promise<void>}
  */
 export async function playStarlightEvolutionReveal(options = {}) {
@@ -174,6 +239,7 @@ export async function playStarlightEvolutionReveal(options = {}) {
   const safeName = esc(cardName);
   const safeLabel = esc(label);
   const safeStars = esc(starsMarkup(starRank));
+  const embedScrollSnapshot = captureEmbedScroll();
 
   const root = document.createElement('div');
   root.className = `st-evo-root${reduced ? ' is-reduced' : ''}`;
@@ -184,31 +250,27 @@ export async function playStarlightEvolutionReveal(options = {}) {
   root.setAttribute('aria-label', `Evolving to ${label}`);
   root.innerHTML = `
     <div class="st-evo-backdrop" aria-hidden="true">
-      <div class="st-evo-scanlines"></div>
-      <div class="st-evo-matrix"></div>
+      <div class="st-evo-shimmer" aria-hidden="true"></div>
     </div>
     <div class="st-evo-stage prestige-${toToken}" data-intensity="${intensity}">
       <p class="st-evo-caption">Starlight Evolution</p>
-      <p class="st-evo-phase-label" aria-live="polite">Initializing…</p>
-      <div class="st-evo-ring-system" aria-hidden="true">
-        <span class="st-evo-ring st-evo-ring-outer"></span>
-        <span class="st-evo-ring st-evo-ring-inner"></span>
-        <span class="st-evo-ring st-evo-ring-core"></span>
-      </div>
-      <div class="st-evo-digicode" aria-hidden="true">${buildDigicodeRows()}</div>
+      <p class="st-evo-phase-label" aria-live="polite">Gathering duplicate energy…</p>
       <div class="st-evo-arena">
-        <div class="st-evo-orbit-rig" aria-hidden="true">
-          <div class="st-evo-orbit"></div>
-        </div>
         <div class="st-evo-hero-wrap">
-          <span class="st-evo-silhouette" aria-hidden="true"></span>
+          <span class="st-evo-hero-glow" aria-hidden="true"></span>
           <div class="st-evo-hero prestige-frame prestige-${fromToken}" data-from-tier="${esc(fromToken)}" data-to-tier="${esc(toToken)}">
             <span class="st-evo-hero-halo" aria-hidden="true"></span>
             <img src="${safeImg}" alt="${safeName}" draggable="false">
             <span class="st-evo-border prestige-frame prestige-${fromToken}" aria-hidden="true"></span>
           </div>
         </div>
-        <div class="st-evo-data-burst" aria-hidden="true"></div>
+        <div class="st-evo-orbit-rig" aria-hidden="true">
+          <div class="st-evo-orbit"></div>
+        </div>
+        <div class="st-evo-ring-system" aria-hidden="true">
+          <span class="st-evo-ring st-evo-ring-outer"></span>
+          <span class="st-evo-ring st-evo-ring-inner"></span>
+        </div>
         <div class="st-evo-flash" aria-hidden="true"></div>
         <div class="st-evo-sparks" aria-hidden="true"></div>
       </div>
@@ -236,10 +298,9 @@ export async function playStarlightEvolutionReveal(options = {}) {
   const phaseLabel = root.querySelector('.st-evo-phase-label');
   const hero = root.querySelector('.st-evo-hero');
   const border = root.querySelector('.st-evo-border');
+  const releaseViewportLock = acquireViewportLock(document);
 
   document.body.appendChild(root);
-  document.body.classList.add('st-evo-open');
-  document.documentElement.classList.add('st-evo-open');
   anchorReveal(root);
   void root.offsetWidth;
   root.classList.add('is-open');
@@ -265,27 +326,22 @@ export async function playStarlightEvolutionReveal(options = {}) {
       return;
     }
 
-    setPhaseLabel('Scanning card data…');
     root.classList.add('is-boot');
     await wait(TIMING.boot);
 
-    root.classList.add('is-scan');
-    setPhaseLabel('Uploading Starlight energy…');
-    await wait(TIMING.scan);
-
     root.classList.add('is-charge');
-    setPhaseLabel('Infusing duplicate fragments…');
+    setPhaseLabel('Duplicates spinning in…');
     await wait(TIMING.charge);
 
-    root.classList.add('is-rupture');
-    setPhaseLabel('Radiance rupture!');
-    await wait(Math.round(TIMING.rupture * 0.58));
+    root.classList.add('is-fuse');
+    setPhaseLabel('Infusing Radiance!');
+    await wait(Math.round(TIMING.fuse * 0.62));
 
-    root.classList.add('is-break');
     if (hero) hero.className = `st-evo-hero prestige-frame prestige-${toToken} is-evolved`;
     if (border) border.className = `st-evo-border prestige-frame prestige-${toToken}`;
+    root.classList.add('is-break');
     setPhaseLabel('Evolution complete!');
-    await wait(Math.round(TIMING.rupture * 0.42) + TIMING.break);
+    await wait(Math.round(TIMING.fuse * 0.38));
 
     root.classList.add('is-complete');
     await wait(TIMING.complete);
@@ -299,9 +355,14 @@ export async function playStarlightEvolutionReveal(options = {}) {
     await wait(reduced ? REDUCED_TIMING.leave : TIMING.leave);
     clearRevealAnchor(root);
     root.remove();
-    releaseRevealDocumentState();
+    releaseViewportLock();
+    restoreEmbedScroll(embedScrollSnapshot);
     notifyEmbedHeight();
-    window.requestAnimationFrame(() => notifyEmbedHeight());
+    window.requestAnimationFrame(() => {
+      notifyEmbedHeight();
+      window.requestAnimationFrame(notifyEmbedHeight);
+    });
+    window.setTimeout(notifyEmbedHeight, 120);
   }
 }
 
