@@ -108,6 +108,12 @@ const WEBSITE_TITLE_REWRITES = Object.freeze({
   'Wishlist & Trade Binder': 'Card Exchange',
   'Event Achievements': 'Starlight Memories',
   'My Journal': 'Profile',
+  'Limited-time cards, boosters, achievements, and titles live here.':
+    'Limited-time cards, boosters, Starlight Memories, and titles live here.',
+  'Trade updates, event announcements, achievements, rewards, and other Starlight news all live here.':
+    'Trade updates, event announcements, Starlight Memories, rewards, and other Starlight news all live here.',
+  'See how your profile, showcase, achievements, and trade lists appear.':
+    'See how your profile, showcase, Starlight Memories, and trade lists appear.',
   'Open Daily Booster': 'Open Daily Wish',
   '✨ Open Daily Booster': '✨ Open Daily Wish',
   'Visit Card Shop': 'Visit Card Boutique',

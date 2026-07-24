@@ -560,7 +560,7 @@ setBannerPreview('');
                         </article>
                     `)
                     .join('')
-                : '<p class="profile-help">Open packs and grow your collection to unlock achievements.</p>';
+                : '<p class="profile-help">Open packs and grow your collection to unlock Starlight Memories.</p>';
         }
     } catch (error) {
         status(error.message || 'Could not load profile extras.', 'error');

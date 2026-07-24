@@ -58,6 +58,10 @@ test('default website content includes editable page groups', () => {
   assert.ok(content.collector.followCta);
   assert.ok(content.rankings.title);
   assert.ok(content.rankings.sortLevel);
+  assert.equal(content.events.achievementsHeading, 'Starlight Memories');
+  assert.match(content.events.lead, /Starlight Memories/);
+  assert.match(content.notifications.lead, /Starlight Memories/);
+  assert.match(content.profile.publicCardLead, /Starlight Memories/);
   assert.ok(content.shared.infoStripCopyright);
   assert.deepEqual(
     content.home.quickLinks.map((link) => link.id),
@@ -117,6 +121,14 @@ test('sanitizeWebsiteContent keeps quick-link ids and rejects bad social urls', 
 
   assert.equal(sanitized.version, 5);
   assert.equal(sanitized.home.title, 'Fresh Home Title');
+  const legacyEvents = sanitizeWebsiteContent({
+    events: {
+      lead: 'Limited-time cards, boosters, achievements, and titles live here.',
+      achievementsHeading: 'Event Achievements'
+    }
+  });
+  assert.match(legacyEvents.events.lead, /Starlight Memories/);
+  assert.equal(legacyEvents.events.achievementsHeading, 'Starlight Memories');
   assert.deepEqual(
     sanitized.home.quickLinks.map((link) => link.id),
     [...HOME_QUICK_LINK_IDS]
