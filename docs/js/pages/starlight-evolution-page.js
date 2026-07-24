@@ -17,9 +17,9 @@ import {
   previousEvolutionTier
 } from '../prestige-utils.js?v=1.5.0';
 import { playStarlightEvolutionReveal } from '../starlight-evolution-reveal.js?v=2.1.0';
-import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
+import { getCachedWebsiteContent, loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
 
-await loadAndHydrateWebsiteContent();
+await (getCachedWebsiteContent() ? Promise.resolve(getCachedWebsiteContent()) : loadAndHydrateWebsiteContent());
 
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
   '&': '&amp;',

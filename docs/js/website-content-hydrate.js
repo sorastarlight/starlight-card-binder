@@ -146,22 +146,38 @@ function installStudioPreviewListener() {
   });
 }
 
+let hydratePromise = null;
+
 export async function loadAndHydrateWebsiteContent() {
-  if (isStudioPreview()) {
-    installStudioPreviewListener();
-    document.documentElement.classList.add('starlight-studio-preview');
-    const draft = window.__starlightWebsiteContentDraft || null;
-    const payload = hydrateWebsiteContent(draft);
-    announceStudioPreviewReady();
-    return payload;
+  if (window.__starlightWebsiteContent) {
+    return window.__starlightWebsiteContent;
   }
+  if (hydratePromise) return hydratePromise;
+
+  hydratePromise = (async () => {
+    if (isStudioPreview()) {
+      installStudioPreviewListener();
+      document.documentElement.classList.add('starlight-studio-preview');
+      const draft = window.__starlightWebsiteContentDraft || null;
+      const payload = hydrateWebsiteContent(draft);
+      announceStudioPreviewReady();
+      return payload;
+    }
+
+    try {
+      const content = await getWebsiteContent();
+      return hydrateWebsiteContent(content);
+    } catch (error) {
+      console.warn('[Starlight] Website content hydrate failed', error);
+      return hydrateWebsiteContent(null);
+    }
+  })();
 
   try {
-    const content = await getWebsiteContent();
-    return hydrateWebsiteContent(content);
+    return await hydratePromise;
   } catch (error) {
-    console.warn('[Starlight] Website content hydrate failed', error);
-    return hydrateWebsiteContent(null);
+    hydratePromise = null;
+    throw error;
   }
 }
 

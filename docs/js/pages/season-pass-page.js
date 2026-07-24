@@ -5,11 +5,15 @@ import {
   getMySeasonPass
 } from '../season-pass-service.js';
 import { beginTwitchLink, callTwitchWorker, getMyTwitchConnection } from '../twitch-service.js';
-import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
+import { getCachedWebsiteContent, loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
 import { starBitAmountHtml } from '../star-bit-icon.js';
 
-const siteCopy = await loadAndHydrateWebsiteContent();
+const siteCopy = getCachedWebsiteContent() || await loadAndHydrateWebsiteContent();
 const seasonCopy = siteCopy?.seasonPass || {};
+
+const SUB_CHECK_STORAGE_KEY = 'starlight-season-sub-check-at';
+const SUB_CHECK_TTL_MS = 30 * 60 * 1000;
+const TWITCH_WORKER_TIMEOUT_MS = 8000;
 
 const titleEl = document.getElementById('season-title');
 const leadEl = document.getElementById('season-lead');
@@ -310,6 +314,7 @@ function render(data) {
   startSeasonCountdown();
 
   trackEl.replaceChildren();
+  const fragment = document.createDocumentFragment();
   for (const tier of tiers) {
     const article = document.createElement('article');
     const state = tier.claimed ? 'claimed' : (tier.unlocked ? 'ready' : 'locked');
@@ -353,29 +358,95 @@ function render(data) {
       status.textContent = seasonCopy.lockedLabel || 'Locked';
       actions.append(status);
     }
-    trackEl.append(article);
+    fragment.append(article);
+  }
+  trackEl.append(fragment);
+}
+
+function shouldSkipSubscriptionCheck() {
+  try {
+    const lastCheck = Number(sessionStorage.getItem(SUB_CHECK_STORAGE_KEY) || 0);
+    return Number.isFinite(lastCheck) && Date.now() - lastCheck < SUB_CHECK_TTL_MS;
+  } catch {
+    return false;
   }
 }
 
-async function maybeSyncActiveSubscription() {
+function markSubscriptionChecked() {
   try {
-    const connection = await getMyTwitchConnection();
-    twitchProfile = connection || { linked: false };
-    if (!connection?.linked) return;
-    await claimPendingTwitchUnlocks();
-    // Optional Worker Helix check for already-active subscribers (graceful if unsupported).
-    await callTwitchWorker('/viewer/subscription-check', { seasonId: 'season_2026_starlight_dawn' });
+    sessionStorage.setItem(SUB_CHECK_STORAGE_KEY, String(Date.now()));
+  } catch {}
+}
+
+async function callTwitchWorkerWithTimeout(path, body = {}, timeoutMs = TWITCH_WORKER_TIMEOUT_MS) {
+  let timer;
+  try {
+    return await Promise.race([
+      callTwitchWorker(path, body),
+      new Promise((_, reject) => {
+        timer = window.setTimeout(() => reject(new Error('Twitch sync timed out.')), timeoutMs);
+      })
+    ]);
+  } finally {
+    if (timer) window.clearTimeout(timer);
+  }
+}
+
+async function maybeSyncActiveSubscription({ skipRecentCheck = true } = {}) {
+  if (!twitchProfile?.linked) return false;
+  let changed = false;
+  try {
+    const pending = await claimPendingTwitchUnlocks();
+    if (Number(pending?.claimed) > 0) changed = true;
+  } catch (_) {}
+
+  if (skipRecentCheck && shouldSkipSubscriptionCheck()) {
+    return changed;
+  }
+
+  try {
+    await callTwitchWorkerWithTimeout('/viewer/subscription-check', {
+      seasonId: 'season_2026_starlight_dawn'
+    });
+    markSubscriptionChecked();
+    changed = true;
   } catch (_) {
     // Worker may not expose this endpoint yet; EventSub gifts + pending unlocks still work.
   }
+  return changed;
 }
 
-async function load() {
+async function refreshSeasonPassData() {
+  const data = await getMySeasonPass();
+  render(data);
+  return data;
+}
+
+async function runBackgroundTwitchSync() {
+  try {
+    const shouldRefresh = await maybeSyncActiveSubscription();
+    if (shouldRefresh) await refreshSeasonPassData();
+  } catch (_) {}
+}
+
+async function load(options = {}) {
+  const { backgroundSync = true } = options;
   try {
     stopSeasonCountdown();
-    summaryEl.innerHTML = `<p>${esc(seasonCopy.loadingLead || 'Loading season progress…')}</p>`;
-    await maybeSyncActiveSubscription();
-    render(await getMySeasonPass());
+    if (summaryEl) {
+      summaryEl.innerHTML = `<p>${esc(seasonCopy.loadingLead || 'Loading season progress…')}</p>`;
+    }
+
+    const [data, connection] = await Promise.all([
+      getMySeasonPass(),
+      getMyTwitchConnection().catch(() => ({ linked: false }))
+    ]);
+    twitchProfile = connection || { linked: false };
+    render(data);
+
+    if (backgroundSync) {
+      void runBackgroundTwitchSync();
+    }
   } catch (error) {
     stopSeasonCountdown();
     summaryEl.innerHTML = `<p>Unable to load the season pass. ${esc(error.message || 'Sign in required.')}</p>`;
@@ -384,6 +455,10 @@ async function load() {
 }
 
 applyExclusivePromoCopy();
+if (titleEl && seasonCopy.title) {
+  titleEl.textContent = seasonCopy.title;
+}
+renderBenefits({});
 promoHelpEl?.addEventListener('click', () => {
   const message = String(seasonCopy.exclusivePromoHelp || '').trim()
     || 'This exclusive Starlight card cannot be pulled from regular boosters. Subscribe on Twitch during the season to unlock it through your Season Pass rewards.';
