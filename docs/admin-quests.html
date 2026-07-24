@@ -19,7 +19,7 @@
         <div>
           <p class="eyebrow">Administration Hub</p>
           <h1>Quests &amp; Season Pass</h1>
-          <p>Manage Collection Quests, Seasonal Collection Pass seasons and tiers, and collector titles used as rewards.</p>
+          <p>Manage Starlight Missions, Seasonal Collection Pass seasons and tiers, and collector titles used as rewards.</p>
         </div>
       </div>
 
@@ -34,8 +34,8 @@
       <div class="view active" data-view="quests">
         <div class="actions actions-spread-bottom">
           <div>
-            <h2 class="heading-flush">Collection Quests</h2>
-            <p class="muted">Create and edit NPC-style objectives, requirement targets, and rewards.</p>
+            <h2 class="heading-flush">Starlight Missions</h2>
+            <p class="muted">Create and edit daily, weekly, and one-time missions with requirement targets and rewards.</p>
           </div>
           <button class="btn" id="newQuest" type="button">＋ New Quest</button>
         </div>
@@ -74,6 +74,13 @@
         <label class="full">Id<input id="questId" maxlength="80" placeholder="own_one_legendary"></label>
         <label>Icon<input id="questIcon" maxlength="8" value="✦"></label>
         <label>Sort order<input id="questSort" type="number" value="100"></label>
+        <label>Cadence
+          <select id="questCadence">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="legacy">Legacy (once)</option>
+          </select>
+        </label>
         <label class="full">Title<input id="questTitle" maxlength="160"></label>
         <label class="full">Description<textarea id="questDescription" rows="3"></textarea></label>
         <label>Requirement type
@@ -181,7 +188,7 @@
     </section>
   </div>
 
-  <script type="module" src="js/pages/admin-quests-page.js?v=1.0.1"></script>
+  <script type="module" src="js/pages/admin-quests-page.js?v=1.1.0"></script>
   <script src="js/qol-ui.js?v=94.2.4" defer></script>
 </body>
 </html>

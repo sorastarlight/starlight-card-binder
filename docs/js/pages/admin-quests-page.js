@@ -92,10 +92,16 @@ function syncQuestTargetOptions(selected) {
     || '<option value="">No targets available</option>';
 }
 
+function cadenceLabel(cadence) {
+  if (cadence === 'daily') return 'Daily';
+  if (cadence === 'weekly') return 'Weekly';
+  return 'Legacy';
+}
+
 function renderQuests() {
   const list = byId('questList');
   if (!quests.length) {
-    list.innerHTML = '<div class="empty">No quests yet. Create the first Collection Quest.</div>';
+    list.innerHTML = '<div class="empty">No missions yet. Create the first Starlight Mission.</div>';
     return;
   }
   list.innerHTML = quests.map((q) => `
@@ -105,6 +111,7 @@ function renderQuests() {
         <p>${escapeHtml(q.description || '')}</p>
         <div class="meta">
           <span class="meta-badge ${q.isActive ? 'ok' : 'inactive'}">${q.isActive ? 'Active' : 'Inactive'}</span>
+          <span class="meta-badge">${escapeHtml(cadenceLabel(q.cadence))}</span>
           <span class="meta-badge">${escapeHtml(formatRequirementSummary(q, pickers))}</span>
           <span class="meta-badge">${Number(q.rewardStarBits || 0)} Star Bits</span>
           ${q.rewardTitleName ? `<span class="meta-badge">${escapeHtml(q.rewardTitleName)}</span>` : ''}
@@ -206,11 +213,12 @@ async function load() {
 
 function openQuestEditor(quest = null) {
   editingQuest = quest;
-  byId('questEditorTitle').textContent = quest ? 'Edit Quest' : 'New Quest';
+  byId('questEditorTitle').textContent = quest ? 'Edit Mission' : 'New Mission';
   byId('questId').value = quest?.id || '';
   byId('questId').disabled = Boolean(quest);
   byId('questIcon').value = quest?.icon || '✦';
   byId('questSort').value = Number(quest?.sortOrder ?? 100);
+  byId('questCadence').value = quest?.cadence || 'legacy';
   byId('questTitle').value = quest?.title || '';
   byId('questDescription').value = quest?.description || '';
   byId('questReqType').value = quest?.requirementType || 'own_unique';
@@ -353,6 +361,7 @@ byId('saveQuest').addEventListener('click', async () => {
       title: byId('questTitle').value.trim(),
       description: byId('questDescription').value.trim(),
       icon: byId('questIcon').value.trim() || '✦',
+      cadence: byId('questCadence').value || 'legacy',
       requirementType: type,
       requirementTarget: requirementNeedsTarget(type) ? byId('questReqTarget').value : null,
       requirementCount: Number(byId('questReqCount').value || 1),
@@ -378,6 +387,7 @@ byId('deactivateQuest').addEventListener('click', async () => {
       title: editingQuest.title,
       description: editingQuest.description,
       icon: editingQuest.icon || '✦',
+      cadence: editingQuest.cadence || 'legacy',
       requirementType: editingQuest.requirementType,
       requirementTarget: editingQuest.requirementTarget,
       requirementCount: editingQuest.requirementCount,

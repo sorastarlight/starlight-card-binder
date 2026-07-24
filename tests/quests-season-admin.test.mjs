@@ -64,11 +64,14 @@ test('admin quests page is wired into hub and shell', async () => {
     read('docs/js/app-shell.js'),
     read('docs/css/pages/admin-quests.css')
   ]);
-  assert.match(html, /admin-quests-page\.js\?v=1\.0/);
+  assert.match(html, /admin-quests-page\.js\?v=1\./);
   assert.match(html, /admin-quests\.css\?v=1\.0/);
   assert.match(html, /data-tab="quests"/);
   assert.match(html, /data-tab="seasons"/);
   assert.match(html, /data-tab="titles"/);
+  assert.match(html, /id="questCadence"/);
+  assert.match(page, /questCadence/);
+  assert.match(page, /cadenceLabel/);
   assert.match(page, /getQuestsSeasonAdmin/);
   assert.match(page, /saveCollectionQuest/);
   assert.match(page, /saveSeason/);
