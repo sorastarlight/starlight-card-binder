@@ -2,6 +2,22 @@ import { cloneDefaultWebsiteContent, HOME_QUICK_LINK_IDS } from './website-conte
 
 const QUICK_LINK_SET = new Set(HOME_QUICK_LINK_IDS);
 const MAX_STRING = 500;
+const LEGACY_COLLECTION_PRESTIGE_KEYS = Object.freeze([
+  'prestigeLegendEyebrow',
+  'prestigeLegendTitle',
+  'prestigeLegendLead',
+  'prestigeStardust',
+  'prestigeStarBit',
+  'prestigeProtostar',
+  'prestigeStarlight',
+  'prestigeSuperStarlight',
+  'prestigeStarlightBurst',
+  'prestigeRookie',
+  'prestigeChampion',
+  'prestigeUltimate',
+  'prestigeMega'
+]);
+const LEGACY_STARLIGHT_EVOLUTION_KEYS = Object.freeze(['tiersTitle']);
 
 function text(value, fallback = '', max = MAX_STRING) {
   const next = String(value ?? '').trim();
@@ -145,8 +161,16 @@ const WEBSITE_TITLE_REWRITES = Object.freeze({
   '45 duplicates → ★★★★ Star': '45 duplicates → ⭐⭐⭐ Radiance III',
   '100 duplicates → ★★★★★ Super Star': '100 duplicates → ⭐⭐⭐⭐ Radiance IV',
   '220 duplicates → ★★★★★★ Super Starlight': '220 duplicates → ⭐⭐⭐⭐⭐ Radiance V',
-  'Cards you have raised above Stardust appear here. Tap a card to view details and Evolve in place.':
-    'Cards evolved to Radiance I or higher appear here. Tap a card to view details and Evolve in place.'
+  'Starlight Card Evolution': 'Evolve My Cards',
+  'Evolution tiers': 'Radiance tiers',
+  'Card Fusion': 'Radiance tiers',
+  'Fusion levels': 'Radiance tiers',
+  'Tap an evolved card below to open details and Evolve when you have enough duplicate extras. Each step spends extras and keeps one protected copy.':
+    'Gather duplicate extras, pick a card below, and confirm Evolve. Duplicates orbit, burst, and reveal a richer Radiance frame.',
+  'Cards evolved to Radiance I or higher appear here. Tap a card to view details and Evolve in place.':
+    'Cards at Radiance I or higher live here. Open one to Evolve again or Unfuse extras.',
+  'No evolved cards yet. Gather duplicates, then Evolve from Collection.':
+    'No evolved cards yet. When a card is ready below, Evolve it to see its Radiance frame here.'
 });
 
 function rewriteLegacyWebsiteText(value) {
@@ -160,6 +184,41 @@ function applyWebsiteTitleRewrites(section = {}) {
   for (const [key, value] of Object.entries(out)) {
     if (typeof value === 'string') out[key] = rewriteLegacyWebsiteText(value);
   }
+  return out;
+}
+
+/** Move album prestige legend + older evolution keys onto the Evolve My Cards page. */
+function normalizeLegacyStarlightEvolution(starlightEvolution = {}, collection = {}) {
+  const evo = { ...starlightEvolution };
+  const coll = collection && typeof collection === 'object' ? collection : {};
+
+  if (!String(evo.tiersLegendTitle || '').trim() && String(evo.tiersTitle || '').trim()) {
+    evo.tiersLegendTitle = evo.tiersTitle;
+  }
+
+  const prestigeMap = [
+    ['prestigeLegendEyebrow', 'tiersLegendEyebrow'],
+    ['prestigeLegendTitle', 'tiersLegendTitle'],
+    ['prestigeLegendLead', 'tiersLegendLead'],
+    ['prestigeStarBit', 'prestigeStarBit'],
+    ['prestigeProtostar', 'prestigeProtostar'],
+    ['prestigeStarlight', 'prestigeStarlight'],
+    ['prestigeSuperStarlight', 'prestigeSuperStarlight'],
+    ['prestigeStarlightBurst', 'prestigeStarlightBurst']
+  ];
+
+  for (const [fromKey, toKey] of prestigeMap) {
+    if (String(evo[toKey] || '').trim()) continue;
+    const migrated = coll[fromKey] || evo[fromKey];
+    if (String(migrated || '').trim()) evo[toKey] = migrated;
+  }
+
+  return evo;
+}
+
+function stripLegacyKeys(section = {}, keys = []) {
+  const out = { ...section };
+  for (const key of keys) delete out[key];
   return out;
 }
 
@@ -208,10 +267,19 @@ export function sanitizeWebsiteContent(input) {
     shop: sanitizeStringMap(source.shop || {}, defaults.shop),
     events: sanitizeStringMap(source.events || {}, defaults.events),
     redeem: sanitizeStringMap(source.redeem || {}, defaults.redeem),
-    collection: applyWebsiteTitleRewrites(sanitizeStringMap(source.collection || {}, defaults.collection)),
+    collection: stripLegacyKeys(
+      applyWebsiteTitleRewrites(sanitizeStringMap(source.collection || {}, defaults.collection)),
+      LEGACY_COLLECTION_PRESTIGE_KEYS
+    ),
     starBits: applyWebsiteTitleRewrites(sanitizeStringMap(source.starBits || {}, defaults.starBits)),
-    starlightEvolution: applyWebsiteTitleRewrites(
-      sanitizeStringMap(source.starlightEvolution || {}, defaults.starlightEvolution || {})
+    starlightEvolution: stripLegacyKeys(
+      applyWebsiteTitleRewrites(
+        sanitizeStringMap(
+          normalizeLegacyStarlightEvolution(source.starlightEvolution || {}, source.collection || {}),
+          defaults.starlightEvolution || {}
+        )
+      ),
+      LEGACY_STARLIGHT_EVOLUTION_KEYS
     ),
     checklist: applyWebsiteTitleRewrites(sanitizeStringMap(source.checklist || {}, defaults.checklist)),
     quests: applyWebsiteTitleRewrites(sanitizeStringMap(source.quests || {}, defaults.quests)),

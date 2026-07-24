@@ -116,15 +116,17 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.match(reveal, /prefers-reduced-motion|preferReducedMotion/);
   assert.match(css, /Border-only frames — no inner rainbow holo wash/);
   assert.match(evoPage, /st-evo-ready-grid/);
+  assert.match(evoPage, /st-evo-tier-showcase/);
   assert.match(evoPage, /starlight-evolution-page\.js\?v=1\.3\.0/);
+  assert.match(evoPage, /starlight-evolution\.css\?v=1\.3\.0/);
   assert.match(analyzerCss, /Beat qol-ui/);
-  assert.match(collection, /Infuse duplicate cards with Starlight Energy/);
   assert.match(collection, /card-analyzer\.css/);
   assert.match(collection, /qol-ui\.css[\s\S]*card-analyzer\.css/s);
   assert.match(binder, /qol-ui\.css[\s\S]*card-analyzer\.css/s);
   assert.match(binder, /starlight-evolution/);
-  assert.match(evoPage, /Starlight Card Evolution/);
+  assert.match(evoPage, /Evolve My Cards/);
   assert.match(evoPage, /Infuse duplicate cards with Starlight Energy/);
+  assert.match(evoPage, /binder\.html\?view=collection/);
   assert.match(shellDefaults, /starlight-evolution/);
   assert.match(shellRoutes, /starlight-evolution/);
   assert.match(appShell, /starlight-evolution\.html/);
@@ -136,7 +138,6 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.doesNotMatch(evoPageJs, /data-shell-view=["']collection["']/);
   assert.match(evoPageJs, /normalizeReadyRows/);
   assert.match(evoPageJs, /st-evo-ready-grid/);
-  assert.doesNotMatch(evoPageJs, /binder\.html\?view=collection/);
   assert.match(evoPageJs, /adoptModal/);
   assert.doesNotMatch(evoPageJs, /dialogEl\?\.classList\.(add|remove)\(['"]hidden['"]\)/);
   assert.match(evoPage, /st-evo-card-modal/);

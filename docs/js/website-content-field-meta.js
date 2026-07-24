@@ -563,26 +563,11 @@ export const WEBSITE_PAGE_META = Object.freeze({
           { key: 'favoritesShowcaseEmptyLead', multiline: true },
           { key: 'favoritesShowcaseCta' }
         ]
-      },
-      {
-        id: 'prestige',
-        label: 'Starlight Evolution legend',
-        fields: [
-          { key: 'prestigeLegendEyebrow' },
-          { key: 'prestigeLegendTitle' },
-          { key: 'prestigeLegendLead', multiline: true },
-          { key: 'prestigeStardust' },
-          { key: 'prestigeStarBit' },
-          { key: 'prestigeProtostar' },
-          { key: 'prestigeStarlight' },
-          { key: 'prestigeSuperStarlight' },
-          { key: 'prestigeStarlightBurst' }
-        ]
       }
     ]
   },
   starlightEvolution: {
-    description: 'Starlight Card Evolution explainer page.',
+    description: 'Evolve My Cards — Radiance tier legend, workbench copy, and how-it-works guide.',
     previewUrl: 'starlight-evolution.html',
     groups: [
       {
@@ -597,15 +582,37 @@ export const WEBSITE_PAGE_META = Object.freeze({
         ]
       },
       {
+        id: 'prestige',
+        label: 'Radiance tier legend',
+        fields: [
+          { key: 'tiersLegendEyebrow' },
+          { key: 'tiersLegendTitle' },
+          { key: 'tiersLegendLead', multiline: true },
+          { key: 'prestigeStarBit' },
+          { key: 'prestigeProtostar' },
+          { key: 'prestigeStarlight' },
+          { key: 'prestigeSuperStarlight' },
+          { key: 'prestigeStarlightBurst' }
+        ]
+      },
+      {
+        id: 'workbench',
+        label: 'Evolution workbench',
+        fields: [
+          { key: 'readyTitle' },
+          { key: 'readyLead', multiline: true },
+          { key: 'readyEmpty', multiline: true },
+          { key: 'ownedTitle' },
+          { key: 'ownedLead', multiline: true },
+          { key: 'ownedEmpty', multiline: true }
+        ]
+      },
+      {
         id: 'copy',
         label: 'How it works',
         fields: [
           { key: 'howTitle' },
           { key: 'howLead', multiline: true },
-          { key: 'tiersTitle' },
-          { key: 'ownedTitle' },
-          { key: 'ownedLead', multiline: true },
-          { key: 'ownedEmpty', multiline: true },
           { key: 'starBit' },
           { key: 'protostar' },
           { key: 'star' },

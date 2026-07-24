@@ -81,14 +81,15 @@ test('quests and season pass pages wire services and claim UI', async () => {
 });
 
 test('binder and collection load Starlight Evolution frame styles and helpers', async () => {
-  const [app, binder, collection, css, reveal, migration, evolutionMigration] = await Promise.all([
+  const [app, binder, collection, css, reveal, migration, evolutionMigration, evoPage] = await Promise.all([
     read('docs/js/app.js'),
     read('docs/binder.html'),
     read('docs/collection.html'),
     read('docs/css/prestige-frames.css'),
     read('docs/js/reward-reveal.js'),
     read('supabase/migrations/20260723190000_card_fusion_leveling.sql'),
-    read('supabase/migrations/20260723200000_starlight_evolution.sql')
+    read('supabase/migrations/20260723200000_starlight_evolution.sql'),
+    read('docs/starlight-evolution.html')
   ]);
   assert.match(app, /function getCardPrestigeTier/);
   assert.match(app, /prestigeFrameClass/);
@@ -104,9 +105,10 @@ test('binder and collection load Starlight Evolution frame styles and helpers', 
   assert.match(css, /--radiance-emboss/);
   assert.match(css, /\.st-r3-card-actor\.prestige-frame/);
   assert.match(css, /\.prestige-legend/);
-  assert.match(collection, /prestige-legend/);
-  assert.match(collection, /data-content="collection\.prestigeLegendTitle"/);
-  assert.match(collection, /prestige-star-bit/);
+  assert.match(evoPage, /prestige-legend/);
+  assert.match(evoPage, /data-content="starlightEvolution\.tiersLegendTitle"/);
+  assert.doesNotMatch(collection, /prestige-legend/);
+  assert.match(evoPage, /prestige-star-bit/);
   assert.match(reveal, /prestigeRevealBadge/);
   assert.match(reveal, /ensurePrestigeStyles/);
   assert.match(reveal, /prestigeTier/);

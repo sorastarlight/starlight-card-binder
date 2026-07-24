@@ -149,6 +149,32 @@ test('mergeWebsiteContent falls back to defaults for empty remote', () => {
   assert.equal(merged.version, 5);
 });
 
+test('sanitizeWebsiteContent migrates album prestige legend into Evolve My Cards defaults', () => {
+  const sanitized = sanitizeWebsiteContent({
+    collection: {
+      prestigeLegendTitle: 'Custom Radiance tiers',
+      prestigeStarBit: '8 duplicates → custom Radiance I'
+    },
+    starlightEvolution: {
+      title: 'Starlight Card Evolution'
+    }
+  });
+  assert.equal(sanitized.starlightEvolution.title, 'Evolve My Cards');
+  assert.equal(sanitized.starlightEvolution.tiersLegendTitle, 'Custom Radiance tiers');
+  assert.equal(sanitized.starlightEvolution.prestigeStarBit, '8 duplicates → custom Radiance I');
+  assert.equal(sanitized.collection.prestigeLegendTitle, undefined);
+});
+
+test('website editor tabs and field groups match Evolve My Cards layout', async () => {
+  const { WEBSITE_EDITOR_TABS } = await import('../docs/js/website-content-defaults.js');
+  const { listedFieldKeys } = await import('../docs/js/website-content-field-meta.js');
+  const tab = WEBSITE_EDITOR_TABS.find((entry) => entry.id === 'starlightEvolution');
+  assert.equal(tab?.label, 'Evolve My Cards');
+  assert.ok(listedFieldKeys('starlightEvolution').includes('readyTitle'));
+  assert.ok(listedFieldKeys('starlightEvolution').includes('readyEmpty'));
+  assert.equal(listedFieldKeys('collection').includes('prestigeLegendTitle'), false);
+});
+
 test('sanitizeWebsiteContent clamps binderDisplay enums to defaults', () => {
   const sanitized = sanitizeWebsiteContent({
     binderDisplay: {
@@ -209,7 +235,7 @@ test('website editor field meta covers binder splash and admin visual chrome', a
   assert.equal(WEBSITE_PAGE_META.rankings.previewUrl, 'user-rankings.html');
   assert.ok(listedFieldKeys('rankings').includes('title'));
   assert.ok(listedFieldKeys('rankings').includes('wishlistCta'));
-  assert.ok(listedFieldKeys('collection').includes('prestigeLegendTitle'));
+  assert.ok(listedFieldKeys('starlightEvolution').includes('tiersLegendTitle'));
   assert.ok(WEBSITE_PAGE_META.quests);
   assert.equal(WEBSITE_PAGE_META.quests.previewUrl, 'collection-quests.html');
   assert.ok(listedFieldKeys('quests').includes('claimCta'));

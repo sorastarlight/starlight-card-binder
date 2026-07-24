@@ -155,7 +155,7 @@ function renderGrid(evolved) {
     gridEl.hidden = true;
     gridEl.innerHTML = '';
     setStatus(document.querySelector('[data-content="starlightEvolution.ownedEmpty"]')?.textContent
-      || 'No evolved cards yet. Gather duplicates, then Evolve from Collection.');
+      || 'No evolved cards yet. When a card is ready below, Evolve it to see its Radiance frame here.');
     return;
   }
 
@@ -172,8 +172,9 @@ function renderReadyGrid(ready) {
     readyGridEl.hidden = true;
     readyGridEl.innerHTML = '';
     if (readyStatusEl) {
-      readyStatusEl.hidden = true;
-      readyStatusEl.textContent = '';
+      readyStatusEl.hidden = false;
+      readyStatusEl.textContent = document.querySelector('[data-content="starlightEvolution.readyEmpty"]')?.textContent
+        || 'No cards are ready right now. Gather more duplicate extras in your album, then check back here.';
     }
     return;
   }
