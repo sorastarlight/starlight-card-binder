@@ -99,6 +99,8 @@ test('binder and collection load Starlight Evolution frame styles and helpers', 
   assert.match(collection, /prestige-frames\.css/);
   assert.match(css, /\.prestige-starlight-burst/);
   assert.match(css, /\.prestige-star-bit/);
+  assert.match(css, /mask-composite: exclude/);
+  assert.match(css, /radiance-v-holo-border/);
   assert.match(css, /\.st-r3-card-actor\.prestige-frame/);
   assert.match(css, /\.prestige-legend/);
   assert.match(collection, /prestige-legend/);

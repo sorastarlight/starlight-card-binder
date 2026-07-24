@@ -1737,6 +1737,10 @@ document.addEventListener('DOMContentLoaded', () => {
 function flipCardImage(cardEl, frontUrl, frontAlt, showBack) {
   if (!cardEl) return;
 
+  const isAnalyzer = cardEl.classList.contains('analyzer-card-shell');
+  const swapMs = isAnalyzer ? 420 : 280;
+  const cleanupMs = isAnalyzer ? 960 : 640;
+
   // Final readable flip guard: one visible image surface, no mirrored back face, simple spin swap.
   const frontImg = cardEl.querySelector('.face.front img');
   const frontFace = cardEl.querySelector('.face.front');
@@ -1761,9 +1765,9 @@ function flipCardImage(cardEl, frontUrl, frontAlt, showBack) {
     frontFace?.classList.remove('card-finish-holographic', 'card-finish-sparkle-foil', 'card-finish-gold');
     if (finishClass) frontFace?.classList.add(finishClass);
     window.StarlightUI?.ensureFinishEffectLayer?.(frontFace, finishClass);
-  }, 280);
+  }, swapMs);
 
-  window.setTimeout(() => cardEl.classList.remove('flip-turning'), 640);
+  window.setTimeout(() => cardEl.classList.remove('flip-turning'), cleanupMs);
 }
 
 function attachFullViewTilt() {

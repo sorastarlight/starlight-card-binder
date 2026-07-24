@@ -67,7 +67,8 @@ export const SHELL_LABEL_REWRITES = Object.freeze({
   profile: Object.freeze([
     'Profile & Settings',
     'Profile Settings',
-    'My Journal'
+    'My Journal',
+    'Journal'
   ]),
   feed: Object.freeze([
     'Pull Feed'

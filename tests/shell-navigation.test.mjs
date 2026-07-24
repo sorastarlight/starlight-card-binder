@@ -74,6 +74,33 @@ test('sanitizeShellNavigation overwrites legacy product labels with new defaults
   assert.equal(renamed.sidebar.sections[0].items[2].label, 'LIVE Feed');
 });
 
+test('sanitizeShellNavigation rewrites Journal profile labels to Profile', () => {
+  const renamed = sanitizeShellNavigation({
+    ...cloneDefaultShellNavigation(),
+    pageTitles: { ...cloneDefaultShellNavigation().pageTitles, profile: 'Journal' },
+    sidebar: {
+      sections: [{
+        id: 'account',
+        label: 'Account',
+        icon: { type: 'emoji', value: '' },
+        staffOnly: false,
+        items: [
+          { id: 'profile', label: 'Journal', destination: 'profile', enabled: true, features: [] }
+        ]
+      }]
+    },
+    accountMenu: {
+      signedIn: [
+        { id: 'profile-settings', label: 'Journal', destination: 'profile', enabled: true, features: [] }
+      ],
+      signedOut: cloneDefaultShellNavigation().accountMenu.signedOut
+    }
+  });
+  assert.equal(renamed.pageTitles.profile, 'Profile');
+  assert.equal(renamed.sidebar.sections[0].items[0].label, 'Profile');
+  assert.equal(renamed.accountMenu.signedIn[0].label, 'Profile');
+});
+
 test('sanitizeShellNavigation rejects unknown destinations and merges empty remote', () => {
   const merged = mergeShellNavigation({});
   assert.equal(merged.brandRibbon, 'Card Binder');

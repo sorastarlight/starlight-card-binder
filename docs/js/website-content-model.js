@@ -111,6 +111,7 @@ const WEBSITE_TITLE_REWRITES = Object.freeze({
   'Event Achievements': 'Achievements',
   'Starlight Memories': 'Achievements',
   'My Journal': 'Profile',
+  'Journal': 'Profile',
   'Limited-time cards, boosters, achievements, and titles live here.':
     'Limited-time cards, boosters, Achievements, and titles live here.',
   'Limited-time cards, boosters, Starlight Memories, and titles live here.':

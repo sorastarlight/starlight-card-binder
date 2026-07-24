@@ -14,6 +14,12 @@
   --radiance-v-b: #9ad8ff;
   --radiance-v-c: #ffb0e8;
   --radiance-v-d: #ffe27a;
+  --radiance-holo-a: #ff5ec8;
+  --radiance-holo-b: #ff8a4a;
+  --radiance-holo-c: #ffd84a;
+  --radiance-holo-d: #5dff9a;
+  --radiance-holo-e: #4ab8ff;
+  --radiance-holo-f: #b06bff;
 }
 
 /* Card art hosts that receive the visible frame ring */
@@ -170,15 +176,6 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
-.prestige-protostar .v61-card-btn::before,
-.prestige-protostar .collection-image::before,
-.prestige-protostar.full-card-wrap::before,
-.prestige-protostar.preview-card::before, .v62-preview-card::before,
-.prestige-protostar::before {
-  opacity: 0.55;
-  background: radial-gradient(circle at 50% 50%, rgba(255, 214, 120, 0.22), transparent 68%);
-}
-
 /* ⭐⭐⭐ Radiance III — aurora gradient ring */
 .prestige-starlight .v61-card-btn::after,
 .prestige-starlight .collection-image::after,
@@ -189,24 +186,16 @@
 .prestige-starlight.st-evo-border::after,
 .prestige-starlight::after {
   inset: -4px;
-  border: 2px solid transparent;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04)) padding-box,
-    linear-gradient(135deg, var(--radiance-iii-a), var(--radiance-iii-b), var(--radiance-iii-c), var(--radiance-iii-a)) border-box;
+  padding: 2px;
+  border: 0;
+  background: linear-gradient(135deg, var(--radiance-iii-a), var(--radiance-iii-b), var(--radiance-iii-c), var(--radiance-iii-a));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.65),
-    0 0 20px rgba(127, 208, 255, 0.38),
-    0 0 28px rgba(255, 154, 213, 0.24),
-    0 10px 22px rgba(90, 120, 180, 0.2);
-}
-
-.prestige-starlight .v61-card-btn::before,
-.prestige-starlight .collection-image::before,
-.prestige-starlight.full-card-wrap::before,
-.prestige-starlight.preview-card::before, .v62-preview-card::before,
-.prestige-starlight::before {
-  opacity: 0.7;
-  background: radial-gradient(circle at 50% 42%, rgba(127, 208, 255, 0.28), rgba(255, 154, 213, 0.12) 52%, transparent 72%);
+    0 0 18px rgba(127, 208, 255, 0.32),
+    0 0 24px rgba(255, 154, 213, 0.2);
 }
 
 /* ⭐⭐⭐⭐ Radiance IV — sapphire neon halo */
@@ -223,22 +212,7 @@
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.82),
     0 0 18px var(--radiance-iv-glow),
-    0 0 32px rgba(170, 120, 255, 0.34),
-    0 12px 26px rgba(70, 90, 180, 0.28),
-    inset 0 0 14px rgba(180, 210, 255, 0.22);
-}
-
-.prestige-super-starlight .v61-card-btn::before,
-.prestige-super-starlight .collection-image::before,
-.prestige-super-starlight.full-card-wrap::before,
-.prestige-super-starlight.preview-card::before, .v62-preview-card::before,
-.prestige-super-starlight::before {
-  opacity: 0.85;
-  inset: -10px;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(118, 156, 255, 0.34), transparent 62%),
-    radial-gradient(circle at 18% 22%, rgba(255, 154, 213, 0.18), transparent 42%),
-    radial-gradient(circle at 82% 78%, rgba(154, 216, 255, 0.16), transparent 40%);
+    0 0 28px rgba(170, 120, 255, 0.28);
 }
 
 /* ⭐⭐⭐⭐⭐ Radiance V — prismatic crown frame */
@@ -251,17 +225,25 @@
 .prestige-starlight-burst.st-evo-border::after,
 .prestige-starlight-burst::after {
   inset: -6px;
-  border: 3px solid transparent;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.04)) padding-box,
-    conic-gradient(from 210deg, var(--radiance-v-a), var(--radiance-v-b), var(--radiance-v-c), var(--radiance-v-d), var(--radiance-v-a)) border-box;
+  padding: 3px;
+  border: 0;
+  background: conic-gradient(
+    from 210deg,
+    var(--radiance-holo-a),
+    var(--radiance-holo-b),
+    var(--radiance-holo-c),
+    var(--radiance-holo-d),
+    var(--radiance-holo-e),
+    var(--radiance-holo-f),
+    var(--radiance-holo-a)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.92),
-    0 0 24px rgba(255, 220, 140, 0.55),
-    0 0 38px rgba(140, 190, 255, 0.42),
-    0 0 48px rgba(255, 130, 200, 0.28),
-    0 16px 34px rgba(90, 70, 170, 0.32),
-    inset 0 0 18px rgba(255, 255, 255, 0.28);
+    0 0 22px rgba(255, 130, 200, 0.42),
+    0 0 34px rgba(120, 190, 255, 0.36);
 }
 
 .prestige-starlight-burst .v61-card-btn::before,
@@ -392,12 +374,7 @@
   .prestige-super-starlight .collection-image::after,
   .prestige-super-starlight.full-card-wrap::after,
   .prestige-super-starlight.preview-card::after, .v62-preview-card::after,
-  .prestige-super-starlight::after,
-  .prestige-super-starlight .v61-card-btn::before,
-  .prestige-super-starlight .collection-image::before,
-  .prestige-super-starlight.full-card-wrap::before,
-  .prestige-super-starlight.preview-card::before, .v62-preview-card::before,
-  .prestige-super-starlight::before {
+  .prestige-super-starlight::after {
     animation: radiance-iv-glow 3.8s ease-in-out infinite;
   }
 
@@ -406,15 +383,7 @@
   .prestige-starlight-burst.full-card-wrap::after,
   .prestige-starlight-burst.preview-card::after, .v62-preview-card::after,
   .prestige-starlight-burst::after {
-    animation: radiance-v-spin 7s linear infinite;
-  }
-
-  .prestige-starlight-burst .v61-card-btn::before,
-  .prestige-starlight-burst .collection-image::before,
-  .prestige-starlight-burst.full-card-wrap::before,
-  .prestige-starlight-burst.preview-card::before, .v62-preview-card::before,
-  .prestige-starlight-burst::before {
-    animation: radiance-v-aura 4.5s ease-in-out infinite;
+    animation: radiance-v-holo-border 5s linear infinite;
   }
 }
 
@@ -433,13 +402,8 @@
   50% { opacity: 1; }
 }
 
-@keyframes radiance-v-spin {
+@keyframes radiance-v-holo-border {
   to { filter: hue-rotate(360deg); }
-}
-
-@keyframes radiance-v-aura {
-  0%, 100% { transform: scale(1); opacity: 0.88; }
-  50% { transform: scale(1.04); opacity: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -458,21 +422,11 @@
   .prestige-super-starlight.full-card-wrap::after,
   .prestige-super-starlight.preview-card::after, .v62-preview-card::after,
   .prestige-super-starlight::after,
-  .prestige-super-starlight .v61-card-btn::before,
-  .prestige-super-starlight .collection-image::before,
-  .prestige-super-starlight.full-card-wrap::before,
-  .prestige-super-starlight.preview-card::before, .v62-preview-card::before,
-  .prestige-super-starlight::before,
   .prestige-starlight-burst .v61-card-btn::after,
   .prestige-starlight-burst .collection-image::after,
   .prestige-starlight-burst.full-card-wrap::after,
   .prestige-starlight-burst.preview-card::after, .v62-preview-card::after,
-  .prestige-starlight-burst::after,
-  .prestige-starlight-burst .v61-card-btn::before,
-  .prestige-starlight-burst .collection-image::before,
-  .prestige-starlight-burst.full-card-wrap::before,
-  .prestige-starlight-burst.preview-card::before, .v62-preview-card::before,
-  .prestige-starlight-burst::before {
+  .prestige-starlight-burst::after {
     animation: none;
   }
 }
@@ -485,8 +439,6 @@
 :is(.firefox-performance-mode, .starlight-performance-lite, .starlight-page-hidden) .prestige-starlight .collection-image::after,
 :is(.firefox-performance-mode, .starlight-performance-lite, .starlight-page-hidden) .prestige-super-starlight .collection-image::after,
 :is(.firefox-performance-mode, .starlight-performance-lite, .starlight-page-hidden) .prestige-starlight-burst .collection-image::after,
-:is(.firefox-performance-mode, .starlight-performance-lite, .starlight-page-hidden) .prestige-super-starlight .v61-card-btn::before,
-:is(.firefox-performance-mode, .starlight-performance-lite, .starlight-page-hidden) .prestige-starlight-burst .v61-card-btn::before,
 :is(.firefox-performance-mode, .starlight-performance-lite, .starlight-page-hidden) .prestige-starlight-burst .v61-card-btn::after {
   animation: none;
 }
