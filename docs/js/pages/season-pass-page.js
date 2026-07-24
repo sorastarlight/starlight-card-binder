@@ -16,6 +16,7 @@ const leadEl = document.getElementById('season-lead');
 const summaryEl = document.getElementById('season-summary');
 const trackEl = document.getElementById('season-track');
 const benefitsEl = document.getElementById('season-benefits');
+const benefitsBodyEl = document.getElementById('season-benefits-body');
 const activationBannerEl = document.getElementById('season-activation-banner');
 
 let seasonCountdownTimer = null;
@@ -83,28 +84,38 @@ function seasonScheduleHtml(season = {}) {
 }
 
 function parseSeasonBenefits(season = {}) {
-  const raw = String(season.description || '').trim();
   const cmsList = String(seasonCopy.benefitsList || '').trim();
-  if (raw.includes('*')) {
-    return raw.split(/\s*\*\s*/).map((item) => item.trim()).filter(Boolean);
-  }
   if (cmsList) {
     return cmsList.split(/\r?\n+/).map((item) => item.trim()).filter(Boolean);
+  }
+  const raw = String(season.description || '').trim();
+  if (raw.includes('*')) {
+    return raw.split(/\s*\*\s*/).map((item) => item.trim()).filter(Boolean);
   }
   if (raw) return [raw];
   return [];
 }
 
+function applyExclusivePromoCopy() {
+  const link = document.querySelector('.season-pass-promo-link');
+  if (!link) return;
+  const url = String(seasonCopy.exclusivePromoUrl || link.getAttribute('href') || '').trim();
+  if (url) link.href = url;
+}
+
 function renderBenefits(season = {}) {
   if (!benefitsEl) return;
   const benefits = parseSeasonBenefits(season);
+  benefitsEl.hidden = false;
+  applyExclusivePromoCopy();
+
+  if (!benefitsBodyEl) return;
   if (!benefits.length) {
-    benefitsEl.replaceChildren();
-    benefitsEl.hidden = true;
+    benefitsBodyEl.replaceChildren();
     return;
   }
-  benefitsEl.hidden = false;
-  benefitsEl.innerHTML = `
+
+  benefitsBodyEl.innerHTML = `
     <h2 class="season-benefits-title">${esc(seasonCopy.benefitsTitle || 'Included with your Twitch subscription')}</h2>
     <ul class="season-benefits-list">
       ${benefits.map((benefit) => `<li>${esc(benefit.replace(/^🎁\s*/, ''))}</li>`).join('')}
@@ -358,5 +369,11 @@ async function load() {
     trackEl.replaceChildren();
   }
 }
+
+applyExclusivePromoCopy();
+window.addEventListener('starlight-website-content-hydrated', (event) => {
+  Object.assign(seasonCopy, event.detail?.seasonPass || {});
+  applyExclusivePromoCopy();
+});
 
 await load();

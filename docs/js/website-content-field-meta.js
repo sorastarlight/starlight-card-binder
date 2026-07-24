@@ -743,9 +743,23 @@ export const WEBSITE_PAGE_META = Object.freeze({
         fields: [
           { key: 'eyebrow', preview: 'eyebrow' },
           { key: 'title', preview: 'title' },
-          { key: 'lead', multiline: true, preview: 'lead' },
+          { key: 'lead', multiline: true, preview: 'lead' }
+        ]
+      },
+      {
+        id: 'benefits',
+        label: 'Included rewards',
+        open: true,
+        fields: [
           { key: 'benefitsTitle' },
-          { key: 'benefitsList', multiline: true }
+          {
+            key: 'benefitsList',
+            multiline: true,
+            hint: 'One included reward per line. Website Editor copy overrides the season database description.'
+          },
+          { key: 'exclusivePromoTitle' },
+          { key: 'exclusivePromoLink' },
+          { key: 'exclusivePromoUrl', hint: 'Full https URL for the Twitch subscribe link.' }
         ]
       },
       {

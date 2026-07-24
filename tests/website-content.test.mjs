@@ -242,6 +242,8 @@ test('website editor field meta covers binder splash and admin visual chrome', a
   assert.ok(WEBSITE_PAGE_META.seasonPass);
   assert.equal(WEBSITE_PAGE_META.seasonPass.previewUrl, 'season-pass.html');
   assert.ok(listedFieldKeys('seasonPass').includes('lockedLabel'));
+  assert.ok(listedFieldKeys('seasonPass').includes('benefitsList'));
+  assert.ok(listedFieldKeys('seasonPass').includes('exclusivePromoTitle'));
   const html = await read('docs/admin-website.html');
   const page = await read('docs/js/pages/admin-website-page.js');
   assert.match(html, /fieldSearch/);

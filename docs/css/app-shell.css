@@ -447,7 +447,9 @@ body.unified-shell{padding-left:env(safe-area-inset-left);padding-right:env(safe
 /* Floating LIVE FEED widget */
 .shell-live-feed{
   position:fixed;
-  right:max(14px, env(safe-area-inset-right));
+  left:max(14px, env(safe-area-inset-left));
+  top:auto;
+  right:auto;
   bottom:max(14px, env(safe-area-inset-bottom));
   z-index:1400;
   width:min(340px, calc(100vw - 28px));
@@ -457,6 +459,14 @@ body.unified-shell{padding-left:env(safe-area-inset-left);padding-right:env(safe
   box-shadow:0 18px 42px rgba(45,60,105,.22);
   overflow:hidden;
   backdrop-filter:blur(10px);
+  touch-action:none;
+}
+.shell-live-feed.is-positioned{
+  bottom:auto;
+}
+.shell-live-feed.is-dragging{
+  box-shadow:0 22px 48px rgba(45,60,105,.28);
+  z-index:1450;
 }
 .shell-live-feed-head{
   display:flex;
@@ -466,6 +476,30 @@ body.unified-shell{padding-left:env(safe-area-inset-left);padding-right:env(safe
   padding:10px 12px;
   background:linear-gradient(135deg,rgba(235,247,255,.98),rgba(255,240,249,.96));
   border-bottom:1px solid rgba(107,198,248,.28);
+  cursor:grab;
+  user-select:none;
+  touch-action:none;
+}
+.shell-live-feed.is-dragging .shell-live-feed-head{cursor:grabbing}
+.shell-live-feed-controls{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  cursor:default;
+  touch-action:auto;
+}
+.shell-live-feed-open,.shell-live-feed-toggle{
+  min-height:30px;
+  padding:4px 10px;
+  border:1px solid rgba(107,198,248,.35);
+  border-radius:999px;
+  background:#fff;
+  color:#405fa1;
+  font:inherit;
+  font-size:.78rem;
+  font-weight:850;
+  text-decoration:none;
+  cursor:pointer;
 }
 .shell-live-feed-title{
   display:flex;
@@ -489,20 +523,6 @@ body.unified-shell{padding-left:env(safe-area-inset-left);padding-right:env(safe
   background:#ff5eaa;
   box-shadow:0 0 0 0 rgba(255,94,170,.55);
   animation:shellLivePulse 1.6s ease-out infinite;
-}
-.shell-live-feed-controls{display:flex;align-items:center;gap:6px}
-.shell-live-feed-open,.shell-live-feed-toggle{
-  min-height:30px;
-  padding:4px 10px;
-  border:1px solid rgba(107,198,248,.35);
-  border-radius:999px;
-  background:#fff;
-  color:#405fa1;
-  font:inherit;
-  font-size:.78rem;
-  font-weight:850;
-  text-decoration:none;
-  cursor:pointer;
 }
 .shell-live-feed-body{max-height:280px;overflow:hidden}
 .shell-live-feed-list{
@@ -583,8 +603,6 @@ body.unified-shell{padding-left:env(safe-area-inset-left);padding-right:env(safe
 }
 @media (max-width:760px){
   .shell-live-feed{
-    right:max(10px, env(safe-area-inset-right));
-    bottom:max(10px, env(safe-area-inset-bottom));
     width:min(300px, calc(100vw - 20px));
   }
   .shell-live-feed-body,.shell-live-feed-list{max-height:210px}

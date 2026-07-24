@@ -1,55 +1,444 @@
-.season-pass-page{width:min(100%,980px);margin:auto;padding:18px 16px 56px}
-.season-pass-hero{padding:24px 26px;border:2px solid rgba(107,198,248,.48);border-radius:26px;background:linear-gradient(135deg,rgba(255,255,255,.98),rgba(244,250,255,.96) 48%,rgba(255,242,250,.96));box-shadow:0 18px 45px rgba(61,83,132,.14);display:grid;gap:16px}
-.season-pass-hero-head{display:grid;gap:12px}
-.season-pass-hero h1{margin:0;color:#405fa1;font-size:clamp(1.55rem,2.8vw,2.35rem);line-height:1.08}
-.season-pass-intro{margin:0;color:#52679b;line-height:1.5}
-.season-activation-banner{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:16px 18px;border-radius:18px;border:2px solid rgba(107,198,248,.35);background:rgba(255,255,255,.82);box-shadow:0 10px 24px rgba(61,83,132,.1)}
-.season-activation-banner.is-active{border-color:rgba(36,170,96,.62);background:linear-gradient(135deg,rgba(223,255,236,.96),rgba(255,244,250,.94));box-shadow:0 0 0 4px rgba(36,170,96,.12),0 14px 30px rgba(36,170,96,.14)}
-.season-activation-banner.is-pending{border-color:rgba(255,176,84,.72);background:linear-gradient(135deg,rgba(255,248,232,.96),rgba(255,240,250,.92))}
-.season-activation-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;font-size:1.25rem;font-weight:950;flex:0 0 auto}
-.season-activation-banner.is-active .season-activation-icon{color:#fff;background:linear-gradient(135deg,#39c977,#1f9d57);box-shadow:0 0 0 4px rgba(57,201,119,.18),0 0 18px rgba(57,201,119,.35)}
-.season-activation-banner.is-pending .season-activation-icon{color:#fff;background:linear-gradient(135deg,#ffb347,#ff7a18)}
-.season-activation-copy{display:grid;gap:4px;min-width:0;flex:1 1 240px}
-.season-activation-copy strong{color:#1f5f3f;font-size:1.05rem;line-height:1.25}
-.season-activation-banner.is-pending .season-activation-copy strong{color:#8a4d00}
-.season-activation-copy span{color:#52679b;font-weight:700;line-height:1.4}
-.season-activation-login{color:#405fa1!important;font-weight:850!important}
-.season-activation-badge{margin-left:auto;padding:8px 14px;border-radius:999px;background:linear-gradient(135deg,#39c977,#1f9d57);color:#fff;font-size:.78rem;font-weight:950;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 0 0 3px rgba(255,255,255,.72),0 8px 18px rgba(31,157,87,.28);animation:seasonActivePulse 2.4s ease-in-out infinite}
-@keyframes seasonActivePulse{0%,100%{transform:scale(1);box-shadow:0 0 0 3px rgba(255,255,255,.72),0 8px 18px rgba(31,157,87,.28)}50%{transform:scale(1.04);box-shadow:0 0 0 5px rgba(57,201,119,.18),0 10px 22px rgba(31,157,87,.34)}}
-.season-benefits{display:grid;gap:12px}
-.season-benefits-title{margin:0;color:#405fa1;font-size:1rem;letter-spacing:.01em}
-.season-benefits-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
-.season-benefits-list li{display:flex;gap:10px;align-items:flex-start;padding:11px 13px;border-radius:14px;background:rgba(255,255,255,.78);border:1px solid rgba(107,198,248,.28);color:#405fa1;font-weight:750;line-height:1.35}
-.season-benefits-list li::before{content:"✦";color:#ff82c8;font-weight:950;flex:0 0 auto}
-.season-pass-summary{margin:18px 0;padding:18px;border:1px solid rgba(107,198,248,.35);border-radius:18px;background:rgba(255,255,255,.94);display:grid;gap:16px}
-.season-points span{display:block;color:#626a82;font-weight:700}
-.season-points strong{font-size:1.8rem;color:#405fa1}
-.season-progress{margin:10px 0;height:12px;border-radius:999px;background:#e8f2fb;overflow:hidden}
-.season-progress span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#6bc6f8,#ff82c8)}
-.season-schedule{display:grid;gap:4px;margin-top:8px}
-.season-started,.season-countdown{margin:0;color:#626a82;font-weight:700;font-size:.95rem;line-height:1.35}
-.season-countdown{color:#405fa1;font-variant-numeric:tabular-nums}
-.season-countdown.is-ended{color:#8990a4}
-.season-locked .season-schedule{margin:12px 0 0;padding-top:10px;border-top:1px solid rgba(107,198,248,.28)}
-.season-pass-track{display:grid;gap:12px}
-.season-tier{display:grid;grid-template-columns:52px 1fr auto;gap:14px;align-items:center;padding:17px;border:1px solid rgba(107,198,248,.35);border-radius:18px;background:rgba(255,255,255,.96);box-shadow:0 8px 22px rgba(61,83,132,.09)}
-.season-tier.season-ready{border-color:rgba(255,130,200,.62);background:linear-gradient(135deg,#fff,#fff5fb)}
-.season-tier.season-locked{opacity:.8}
-.season-tier-index{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#eaf7ff,#ffe8f5);color:#405fa1;font-weight:900}
-.season-tier-copy h2{margin:0 0 4px;color:#405fa1;font-size:1.04rem}
-.season-tier-copy p{margin:0;color:#626a82}
-.reward-frame-chip{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:linear-gradient(135deg,rgba(107,198,248,.18),rgba(255,130,200,.16));color:#405fa1;font-weight:800}
-.season-status{font-weight:850;color:#405fa1}
-.season-status.muted{color:#8990a4}
-.season-locked{padding:8px 2px}
-.season-locked h2{margin:.2rem 0 .5rem;color:#405fa1}
-.season-locked-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px}
-@media (prefers-reduced-motion:reduce){.season-activation-badge{animation:none!important}}
-@media(max-width:620px){
-  .season-pass-hero{padding:18px 16px}
-  .season-activation-banner{align-items:flex-start}
-  .season-activation-badge{margin-left:0}
-  .season-benefits-list{grid-template-columns:1fr}
-  .season-tier{grid-template-columns:42px 1fr}
-  .season-tier-actions{grid-column:1/-1}
+.season-pass-page {
+  width: min(100%, 920px);
+  margin: auto;
+  padding: 14px 14px 48px;
+}
+
+.season-pass-hero {
+  padding: 18px 20px;
+  border: 2px solid rgba(107, 198, 248, 0.42);
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(244, 250, 255, 0.96) 48%, rgba(255, 242, 250, 0.96));
+  box-shadow: 0 14px 34px rgba(61, 83, 132, 0.12);
+  display: grid;
+  gap: 12px;
+}
+
+.season-pass-hero-head {
+  display: grid;
+  gap: 10px;
+}
+
+.season-pass-hero h1 {
+  margin: 0;
+  color: #405fa1;
+  font-size: clamp(1.28rem, 2.2vw, 1.82rem);
+  line-height: 1.12;
+}
+
+.season-pass-intro {
+  margin: 0;
+  color: #52679b;
+  line-height: 1.45;
+  font-size: 0.92rem;
+}
+
+.season-activation-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 2px solid rgba(107, 198, 248, 0.35);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 8px 18px rgba(61, 83, 132, 0.08);
+}
+
+.season-activation-banner.is-active {
+  border-color: rgba(36, 170, 96, 0.62);
+  background: linear-gradient(135deg, rgba(223, 255, 236, 0.96), rgba(255, 244, 250, 0.94));
+  box-shadow: 0 0 0 3px rgba(36, 170, 96, 0.1), 0 10px 22px rgba(36, 170, 96, 0.12);
+}
+
+.season-activation-banner.is-pending {
+  border-color: rgba(255, 176, 84, 0.72);
+  background: linear-gradient(135deg, rgba(255, 248, 232, 0.96), rgba(255, 240, 250, 0.92));
+}
+
+.season-activation-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 1.05rem;
+  font-weight: 950;
+  flex: 0 0 auto;
+}
+
+.season-activation-banner.is-active .season-activation-icon {
+  color: #fff;
+  background: linear-gradient(135deg, #39c977, #1f9d57);
+  box-shadow: 0 0 0 3px rgba(57, 201, 119, 0.16), 0 0 14px rgba(57, 201, 119, 0.3);
+}
+
+.season-activation-banner.is-pending .season-activation-icon {
+  color: #fff;
+  background: linear-gradient(135deg, #ffb347, #ff7a18);
+}
+
+.season-activation-copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  flex: 1 1 220px;
+}
+
+.season-activation-copy strong {
+  color: #1f5f3f;
+  font-size: 0.94rem;
+  line-height: 1.25;
+}
+
+.season-activation-banner.is-pending .season-activation-copy strong {
+  color: #8a4d00;
+}
+
+.season-activation-copy span {
+  color: #52679b;
+  font-weight: 700;
+  line-height: 1.35;
+  font-size: 0.86rem;
+}
+
+.season-activation-login {
+  color: #405fa1 !important;
+  font-weight: 850 !important;
+}
+
+.season-activation-badge {
+  margin-left: auto;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #39c977, #1f9d57);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.72), 0 6px 14px rgba(31, 157, 87, 0.24);
+  animation: seasonActivePulse 2.4s ease-in-out infinite;
+}
+
+@keyframes seasonActivePulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.72), 0 6px 14px rgba(31, 157, 87, 0.24);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow: 0 0 0 4px rgba(57, 201, 119, 0.16), 0 8px 18px rgba(31, 157, 87, 0.3);
+  }
+}
+
+.season-benefits {
+  display: grid;
+  grid-template-columns: minmax(128px, 168px) minmax(0, 1fr);
+  gap: 14px 16px;
+  align-items: start;
+}
+
+.season-pass-promo {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  text-align: center;
+}
+
+.season-pass-promo-card-wrap {
+  width: min(100%, 118px);
+  aspect-ratio: 5 / 7;
+  perspective: 900px;
+}
+
+.season-pass-promo-card {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow:
+    0 10px 22px rgba(40, 56, 96, 0.22),
+    0 0 0 1px rgba(255, 255, 255, 0.65);
+  animation: seasonPromoFloat 4.8s ease-in-out infinite;
+}
+
+@keyframes seasonPromoFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+}
+
+.season-pass-promo-copy {
+  margin: 0;
+  display: grid;
+  gap: 4px;
+  color: #405fa1;
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.season-pass-promo-copy strong {
+  display: block;
+  font-size: 0.82rem;
+  line-height: 1.3;
+}
+
+.season-pass-promo-link {
+  color: #9146ff;
+  font-weight: 850;
+  text-decoration: none;
+  word-break: break-word;
+}
+
+.season-pass-promo-link:hover,
+.season-pass-promo-link:focus-visible {
+  text-decoration: underline;
+}
+
+.season-benefits-title {
+  margin: 0 0 8px;
+  color: #405fa1;
+  font-size: 0.92rem;
+  letter-spacing: 0.01em;
+}
+
+.season-benefits-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 8px;
+}
+
+.season-benefits-list li {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(107, 198, 248, 0.26);
+  color: #405fa1;
+  font-weight: 700;
+  font-size: 0.82rem;
+  line-height: 1.32;
+}
+
+.season-benefits-list li::before {
+  content: "✦";
+  color: #ff82c8;
+  font-weight: 950;
+  flex: 0 0 auto;
+}
+
+.season-pass-summary {
+  margin: 14px 0;
+  padding: 14px 16px;
+  border: 1px solid rgba(107, 198, 248, 0.35);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.94);
+  display: grid;
+  gap: 12px;
+}
+
+.season-points span {
+  display: block;
+  color: #626a82;
+  font-weight: 700;
+  font-size: 0.86rem;
+}
+
+.season-points strong {
+  font-size: 1.45rem;
+  color: #405fa1;
+}
+
+.season-progress {
+  margin: 8px 0;
+  height: 10px;
+  border-radius: 999px;
+  background: #e8f2fb;
+  overflow: hidden;
+}
+
+.season-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #6bc6f8, #ff82c8);
+}
+
+.season-schedule {
+  display: grid;
+  gap: 3px;
+  margin-top: 6px;
+}
+
+.season-started,
+.season-countdown {
+  margin: 0;
+  color: #626a82;
+  font-weight: 700;
+  font-size: 0.86rem;
+  line-height: 1.35;
+}
+
+.season-countdown {
+  color: #405fa1;
+  font-variant-numeric: tabular-nums;
+}
+
+.season-countdown.is-ended {
+  color: #8990a4;
+}
+
+.season-locked .season-schedule {
+  margin: 10px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid rgba(107, 198, 248, 0.28);
+}
+
+.season-pass-track {
+  display: grid;
+  gap: 10px;
+}
+
+.season-tier {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border: 1px solid rgba(107, 198, 248, 0.35);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 6px 16px rgba(61, 83, 132, 0.07);
+}
+
+.season-tier.season-ready {
+  border-color: rgba(255, 130, 200, 0.62);
+  background: linear-gradient(135deg, #fff, #fff5fb);
+}
+
+.season-tier.season-locked {
+  opacity: 0.8;
+}
+
+.season-tier-index {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #eaf7ff, #ffe8f5);
+  color: #405fa1;
+  font-weight: 900;
+  font-size: 0.92rem;
+}
+
+.season-tier-copy h2 {
+  margin: 0 0 3px;
+  color: #405fa1;
+  font-size: 0.94rem;
+}
+
+.season-tier-copy p {
+  margin: 0;
+  color: #626a82;
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.reward-frame-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(107, 198, 248, 0.18), rgba(255, 130, 200, 0.16));
+  color: #405fa1;
+  font-weight: 800;
+}
+
+.season-status {
+  font-weight: 850;
+  color: #405fa1;
+  font-size: 0.86rem;
+}
+
+.season-status.muted {
+  color: #8990a4;
+}
+
+.season-locked {
+  padding: 6px 2px;
+}
+
+.season-locked h2 {
+  margin: 0.15rem 0 0.4rem;
+  color: #405fa1;
+  font-size: 1.05rem;
+}
+
+.season-locked-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .season-activation-badge,
+  .season-pass-promo-card {
+    animation: none !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .season-benefits {
+    grid-template-columns: 1fr;
+  }
+
+  .season-pass-promo {
+    grid-template-columns: minmax(96px, 118px) minmax(0, 1fr);
+    grid-auto-flow: column;
+    text-align: left;
+    align-items: center;
+  }
+
+  .season-pass-promo-copy {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 620px) {
+  .season-pass-hero {
+    padding: 16px 14px;
+  }
+
+  .season-activation-banner {
+    align-items: flex-start;
+  }
+
+  .season-activation-badge {
+    margin-left: 0;
+  }
+
+  .season-benefits-list {
+    grid-template-columns: 1fr;
+  }
+
+  .season-tier {
+    grid-template-columns: 38px 1fr;
+  }
+
+  .season-tier-actions {
+    grid-column: 1 / -1;
+  }
 }

@@ -324,15 +324,18 @@ export function createDefaultWebsiteContent() {
       title: 'Seasonal Collection Pass',
       lead: 'Earn points from boosters, trades, gifts, favorites, and visits — then claim Star Bits and titles along the track.',
       benefitsTitle: 'Included with your Twitch subscription',
-      benefitsList: `Monthly Season Pass reward track
-Exclusive Season Pass card
-5 Season Pass booster packs
+      benefitsList: `Monthly Season Pass Rewards
+Exclusive Season Pass Card (cannot be obtained elsewhere until the season ends)
+5 Season Pass Booster Packs
 500 Star Bits
-1 booster voucher (any standard booster)
-Exclusive profile flair and badge
-Exclusive profile background
-Exclusive chat emote on your card site
-Season Pass name color (pink/gold gradient)`,
+1 Booster Voucher (redeemable for any standard booster)
+Exclusive Profile Flair/Badge for that season
+Exclusive Profile Background
+Exclusive Chat Emote/Icon on your card site
+Season Pass Name Color (pink/gold gradient)`,
+      exclusivePromoTitle: 'Exclusive to the Twitch Seasonal Pass!',
+      exclusivePromoLink: 'Subscribe on Twitch.tv/sorastarlight',
+      exclusivePromoUrl: 'https://twitch.tv/sorastarlight',
       activatedTitle: 'Twitch subscriber · Season Pass active',
       activatedLead: 'Your pass is unlocked for this season. Keep collecting to earn every tier reward.',
       activatedBadge: 'Active now',

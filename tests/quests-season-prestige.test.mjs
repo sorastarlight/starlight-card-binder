@@ -154,8 +154,13 @@ test('quests and season pass pages wire website content hooks', async () => {
   ]);
   assert.match(questsHtml, /data-content="quests\.title"/);
   assert.match(seasonHtml, /data-content="seasonPass\.title"/);
+  assert.match(seasonHtml, /data-content="seasonPass\.exclusivePromoTitle"/);
+  assert.match(seasonHtml, /season-pass-promo-card/);
+  assert.match(seasonHtml, /season-benefits-body/);
   assert.match(questsPage, /loadAndHydrateWebsiteContent/);
   assert.match(seasonPage, /loadAndHydrateWebsiteContent/);
+  assert.match(seasonPage, /seasonCopy\.benefitsList/);
+  assert.match(seasonPage, /season-benefits-body/);
 });
 
 test('season pass gates to Twitch subscribers and supports unlock gifts', async () => {

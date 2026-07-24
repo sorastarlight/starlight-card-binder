@@ -4,6 +4,8 @@ import { supabase } from './supabase-client.js';
 const POLL_MS = 12000;
 const MAX_ITEMS = 10;
 const STORAGE_KEY = 'starlight-live-feed-collapsed';
+const POSITION_KEY = 'starlight-live-feed-position';
+const DRAG_MARGIN = 10;
 
 function esc(value) {
   return String(value ?? '')
@@ -44,6 +46,132 @@ function writeCollapsed(collapsed) {
   }
 }
 
+function readPosition() {
+  try {
+    const raw = localStorage.getItem(POSITION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (Number.isFinite(parsed?.x) && Number.isFinite(parsed?.y)) {
+      return { x: parsed.x, y: parsed.y };
+    }
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
+
+function writePosition(point) {
+  try {
+    localStorage.setItem(POSITION_KEY, JSON.stringify({ x: point.x, y: point.y }));
+  } catch {
+    /* ignore */
+  }
+}
+
+function clampPosition(x, y, root) {
+  const rect = root.getBoundingClientRect();
+  const width = rect.width || root.offsetWidth || 0;
+  const height = rect.height || root.offsetHeight || 0;
+  const maxX = Math.max(DRAG_MARGIN, window.innerWidth - width - DRAG_MARGIN);
+  const maxY = Math.max(DRAG_MARGIN, window.innerHeight - height - DRAG_MARGIN);
+  return {
+    x: Math.min(Math.max(DRAG_MARGIN, x), maxX),
+    y: Math.min(Math.max(DRAG_MARGIN, y), maxY)
+  };
+}
+
+function applyPosition(root, x, y, { persist = false } = {}) {
+  const next = clampPosition(x, y, root);
+  root.style.right = 'auto';
+  root.style.bottom = 'auto';
+  root.style.left = `${next.x}px`;
+  root.style.top = `${next.y}px`;
+  root.classList.add('is-positioned');
+  if (persist) writePosition(next);
+  return next;
+}
+
+function defaultPosition(root) {
+  const rect = root.getBoundingClientRect();
+  const styles = window.getComputedStyle(root);
+  const left = Number.parseFloat(styles.left);
+  const bottom = Number.parseFloat(styles.bottom);
+  const safeLeft = Number.isFinite(left) ? left : DRAG_MARGIN;
+  const safeBottom = Number.isFinite(bottom) ? bottom : DRAG_MARGIN;
+  return {
+    x: safeLeft,
+    y: window.innerHeight - rect.height - safeBottom
+  };
+}
+
+function initLiveFeedPosition(root) {
+  const saved = readPosition();
+  if (saved) {
+    applyPosition(root, saved.x, saved.y);
+    return;
+  }
+  const fallback = defaultPosition(root);
+  applyPosition(root, fallback.x, fallback.y);
+}
+
+function bindLiveFeedDrag(root) {
+  const handle = root.querySelector('.shell-live-feed-head');
+  if (!handle) return () => {};
+
+  let drag = null;
+
+  const finishDrag = (event) => {
+    if (!drag || event.pointerId !== drag.pointerId) return;
+    handle.releasePointerCapture?.(event.pointerId);
+    root.classList.remove('is-dragging');
+    handle.removeAttribute('aria-grabbed');
+    if (drag.moved) {
+      const rect = root.getBoundingClientRect();
+      applyPosition(root, rect.left, rect.top, { persist: true });
+    }
+    drag = null;
+  };
+
+  handle.addEventListener('pointerdown', (event) => {
+    if (event.button !== 0) return;
+    if (event.target.closest('.shell-live-feed-controls')) return;
+
+    const rect = root.getBoundingClientRect();
+    drag = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      originX: rect.left,
+      originY: rect.top,
+      moved: false
+    };
+    handle.setPointerCapture(event.pointerId);
+    root.classList.add('is-dragging');
+    handle.setAttribute('aria-grabbed', 'true');
+    event.preventDefault();
+  });
+
+  handle.addEventListener('pointermove', (event) => {
+    if (!drag || event.pointerId !== drag.pointerId) return;
+    const dx = event.clientX - drag.startX;
+    const dy = event.clientY - drag.startY;
+    if (Math.abs(dx) + Math.abs(dy) > 3) drag.moved = true;
+    applyPosition(root, drag.originX + dx, drag.originY + dy);
+    event.preventDefault();
+  });
+
+  handle.addEventListener('pointerup', finishDrag);
+  handle.addEventListener('pointercancel', finishDrag);
+
+  const onResize = () => {
+    const rect = root.getBoundingClientRect();
+    applyPosition(root, rect.left, rect.top, { persist: true });
+  };
+  window.addEventListener('resize', onResize);
+
+  return () => window.removeEventListener('resize', onResize);
+}
+
 export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
   const root = document.getElementById('shellLiveFeed');
   if (!root) return;
@@ -53,6 +181,7 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
   const toggle = root.querySelector('[data-live-feed-toggle]');
   const openFull = root.querySelector('[data-live-feed-open]');
   const body = root.querySelector('[data-live-feed-body]');
+  const head = root.querySelector('.shell-live-feed-head');
 
   let items = [];
   let knownIds = new Set();
@@ -68,6 +197,10 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
       toggle.setAttribute('aria-label', collapsed ? 'Expand live feed' : 'Collapse live feed');
     }
     writeCollapsed(collapsed);
+    window.requestAnimationFrame(() => {
+      const rect = root.getBoundingClientRect();
+      applyPosition(root, rect.left, rect.top, { persist: true });
+    });
   }
 
   function render() {
@@ -170,6 +303,9 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
   });
 
   setCollapsed(readCollapsed());
+  initLiveFeedPosition(root);
+  const unbindDrag = bindLiveFeedDrag(root);
+  if (head) head.title = 'Drag to move LIVE Feed';
   start();
 
   return {
@@ -182,6 +318,7 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
     },
     destroy() {
       window.clearInterval(timer);
+      unbindDrag?.();
     }
   };
 }
