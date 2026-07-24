@@ -107,7 +107,7 @@ const WEBSITE_TITLE_REWRITES = Object.freeze({
   '💫 Wishlist & Trade Binder': '💫 Card Exchange',
   'Wishlist & Trade Binder': 'Card Exchange',
   'Event Achievements': 'Starlight Memories',
-  'Edit Profile': 'My Journal',
+  'My Journal': 'Profile',
   'Open Daily Booster': 'Open Daily Wish',
   '✨ Open Daily Booster': '✨ Open Daily Wish',
   'Visit Card Shop': 'Visit Card Boutique',

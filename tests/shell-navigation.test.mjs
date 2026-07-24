@@ -19,7 +19,7 @@ test('default shell navigation includes core destinations and staff section', ()
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'checklist' && entry.label === 'Star Registry'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'quests' && entry.label === 'Starlight Missions'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'trades' && entry.label === 'Card Exchange'));
-  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'profile' && entry.label === 'My Journal'));
+  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'profile' && entry.label === 'Profile'));
   assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'rankings'));
   assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'feed' && item.label === 'LIVE Feed'));
   assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'quests' && item.label === 'Starlight Missions'));
@@ -67,7 +67,7 @@ test('sanitizeShellNavigation overwrites legacy product labels with new defaults
   assert.equal(renamed.pageTitles.checklist, 'Star Registry');
   assert.equal(renamed.pageTitles.quests, 'Starlight Missions');
   assert.equal(renamed.pageTitles.trades, 'Card Exchange');
-  assert.equal(renamed.pageTitles.profile, 'My Journal');
+  assert.equal(renamed.pageTitles.profile, 'Profile');
   assert.equal(renamed.pageTitles.feed, 'LIVE Feed');
   assert.equal(renamed.sidebar.sections[0].items[0].label, 'My Starlight Album');
   assert.equal(renamed.sidebar.sections[0].items[1].label, 'Daily Wish');

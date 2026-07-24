@@ -21,7 +21,7 @@ export const WEBSITE_EDITOR_TABS = Object.freeze([
   { id: 'offers', label: 'Trade Offers' },
   { id: 'notifications', label: 'Notifications' },
   { id: 'rewards', label: 'Received Gifts' },
-  { id: 'profile', label: 'My Journal' },
+  { id: 'profile', label: 'Profile' },
   { id: 'collector', label: 'Public Profile' },
   { id: 'rankings', label: 'User Rankings' },
   { id: 'about', label: 'About' },

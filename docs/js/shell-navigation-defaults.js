@@ -21,7 +21,7 @@ export const PUBLIC_SHELL_DESTINATIONS = Object.freeze([
   { value: 'feed', label: 'LIVE Feed' },
   { value: 'notifications', label: 'Notifications' },
   { value: 'rewards', label: 'Received Gifts' },
-  { value: 'profile', label: 'My Journal' },
+  { value: 'profile', label: 'Profile' },
   { value: 'about', label: 'About' },
   { value: 'socials', label: 'Socials' },
   { value: 'admin', label: 'Administration Hub' }
@@ -66,7 +66,7 @@ export const SHELL_LABEL_REWRITES = Object.freeze({
   profile: Object.freeze([
     'Profile & Settings',
     'Profile Settings',
-    'Profile'
+    'My Journal'
   ]),
   feed: Object.freeze([
     'Pull Feed'
@@ -96,7 +96,7 @@ export function createDefaultShellNavigation() {
       feed: 'LIVE Feed',
       notifications: 'Notifications',
       rewards: 'Received Gifts',
-      profile: 'My Journal',
+      profile: 'Profile',
       about: 'About',
       socials: 'Socials',
       admin: 'Administration Hub'
@@ -144,7 +144,7 @@ export function createDefaultShellNavigation() {
           items: [
             { id: 'notifications', label: 'Notifications', icon: { type: 'emoji', value: '🔔' }, destination: 'notifications', enabled: true, features: ['notificationBadge'] },
             { id: 'rewards', label: 'Received Gifts', icon: { type: 'emoji', value: '🎁' }, destination: 'rewards', enabled: true, features: ['receivedGiftBadge'] },
-            { id: 'profile', label: 'My Journal', icon: { type: 'emoji', value: '👤' }, destination: 'profile', enabled: true, features: [] }
+            { id: 'profile', label: 'Profile', icon: { type: 'emoji', value: '👤' }, destination: 'profile', enabled: true, features: [] }
           ]
         },
         {
@@ -169,7 +169,7 @@ export function createDefaultShellNavigation() {
     accountMenu: {
       signedIn: [
         { id: 'view-profile', label: 'View My Profile', destination: 'collector', enabled: true, features: ['profileLink'] },
-        { id: 'profile-settings', label: 'My Journal', destination: 'profile', enabled: true, features: [] },
+        { id: 'profile-settings', label: 'Profile', destination: 'profile', enabled: true, features: [] },
         { id: 'notifications', label: 'View My Notifications', destination: 'notifications', enabled: true, features: ['notificationBadge'] },
         { id: 'rewards', label: 'Received Gifts', destination: 'rewards', enabled: true, features: ['receivedGiftBadge'] },
         { id: 'offers', label: 'Trade Offers', destination: 'offers', enabled: true, features: ['tradeOfferBadge'] },
