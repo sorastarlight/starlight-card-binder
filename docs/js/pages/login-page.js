@@ -6,7 +6,7 @@ import { supabase } from "../supabase-client.js";
             signInWithTwitch
         } from "../auth.js";
 
-        import { loadAndHydrateWebsiteContent } from "../website-content-hydrate.js";
+        import { getCachedWebsiteContent } from "../website-content-hydrate.js";
         import { cloneDefaultWebsiteContent } from "../website-content-defaults.js";
 
         const form =
@@ -349,22 +349,24 @@ import { supabase } from "../supabase-client.js";
                 .replace(/[^a-z0-9_]/g, "");
         });
 
-        const requestedMode = new URLSearchParams(window.location.search).get("mode");
-
-        (async () => {
-            try {
-                const content = await loadAndHydrateWebsiteContent();
-                if (content?.login) {
-                    loginCopy = {
-                        ...loginCopy,
-                        ...content.login
-                    };
-                }
-            } catch {
-                // Keep defaults when remote content is unavailable.
+        function applyLoginCopy(content) {
+            if (content?.login) {
+                loginCopy = {
+                    ...loginCopy,
+                    ...content.login
+                };
             }
-            setMode(requestedMode === "signup" ? "signup" : "signin");
-        })();
+        }
+
+        applyLoginCopy(getCachedWebsiteContent());
+
+        const requestedMode = new URLSearchParams(window.location.search).get("mode");
+        setMode(requestedMode === "signup" ? "signup" : "signin");
+
+        window.addEventListener("starlight-website-content-hydrated", (event) => {
+            applyLoginCopy(event.detail);
+            setMode(currentMode);
+        });
 
         form.addEventListener(
             "submit",

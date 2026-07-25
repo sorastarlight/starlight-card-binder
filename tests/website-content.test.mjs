@@ -377,8 +377,10 @@ test('website editor admin page and public hooks are wired', async () => {
   assert.match(socials, /class="[^"]*social-links/);
   assert.match(login, /data-content="login\.brandTitle"/);
   assert.match(login, /data-content="login\.returnCta"/);
+  assert.match(login, /website-content-hydrate-page\.js\?v=1\.4/);
   assert.match(loginPage, /loginCopy/);
-  assert.match(loginPage, /loadAndHydrateWebsiteContent/);
+  assert.match(loginPage, /getCachedWebsiteContent/);
+  assert.match(loginPage, /starlight-website-content-hydrated/);
   assert.match(binder, /id="seriesHeroTitle"/);
   assert.match(app, /function renderSeriesHero\(/);
   assert.match(daily, /data-content="daily\.title"/);
