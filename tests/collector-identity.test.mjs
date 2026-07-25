@@ -69,11 +69,13 @@ test('login signup collects username and display name fields', async () => {
   assert.match(loginHtml, /id="signup-display-name"/);
   assert.match(loginHtml, /login\.css\?v=1\.3/);
   assert.match(loginHtml, /website-content-hydrate-page\.js\?v=1\.4/);
-  assert.match(loginHtml, /login-page\.js\?v=1\.6/);
+  assert.match(loginHtml, /embed-mode\.js/);
+  assert.match(loginHtml, /login-page\.js\?v=1\.7/);
 
   assert.match(loginPage, /signupIdentityGroup/);
   assert.match(loginPage, /getCachedWebsiteContent/);
   assert.match(loginPage, /loginCopy\.submitSignUp/);
+  assert.match(loginPage, /goToBinder/);
   assert.match(loginPage, /\^\[a-z0-9_\]\{3,24\}\$/);
   assert.match(loginPage, /signupDisplayName/);
   assert.match(loginPage, /claim_twitch_collector_identity/);

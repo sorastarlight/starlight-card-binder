@@ -293,3 +293,13 @@
             }
         }
 
+        html.starlight-embedded.login-page,
+        html.starlight-embedded .login-page {
+            background: transparent !important;
+        }
+
+        html.starlight-embedded .login-panel {
+            box-shadow: none;
+            border: 1px solid rgba(107, 198, 248, 0.22);
+        }
+

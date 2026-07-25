@@ -246,6 +246,21 @@ import { supabase } from "../supabase-client.js";
             }
         }
 
+        function goToBinder(view = 'home') {
+            if (document.documentElement.classList.contains('starlight-embedded')) {
+                parent.postMessage({
+                    type: 'starlight-navigate',
+                    view,
+                    params: {}
+                }, location.origin);
+                return;
+            }
+
+            window.location.href = view === 'binder'
+                ? './binder.html'
+                : `./binder.html?view=${encodeURIComponent(view)}`;
+        }
+
         async function handleAuthenticationReturn() {
             const urlParameters =
                 new URLSearchParams(
@@ -313,8 +328,7 @@ import { supabase } from "../supabase-client.js";
                 );
 
                 window.setTimeout(() => {
-                    window.location.href =
-                        "./binder.html";
+                    goToBinder('home');
                 }, 1800);
             }
         }
@@ -478,8 +492,7 @@ import { supabase } from "../supabase-client.js";
                             );
 
                             window.setTimeout(() => {
-                                window.location.href =
-                                    "./binder.html";
+                                goToBinder('home');
                             }, 1500);
 
                             return;
@@ -511,8 +524,7 @@ import { supabase } from "../supabase-client.js";
                     );
 
                     window.setTimeout(() => {
-                        window.location.href =
-                            "./binder.html";
+                        goToBinder('home');
                     }, 1000);
                 } catch (error) {
                     console.error(

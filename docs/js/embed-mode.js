@@ -2,7 +2,7 @@ const params = new URLSearchParams(location.search);
 const routes = {
   'binder.html':'binder','index.html':'binder','home.html':'home','collection.html':'collection','checklist.html':'checklist','daily-booster.html':'daily',
   'booster-shop.html':'shop','events.html':'events','star-bits.html':'star-bits','redeem.html':'redeem','notifications.html':'notifications','received-rewards.html':'rewards','profile-settings.html':'profile',
-  'season-pass.html':'season-pass','collection-quests.html':'quests','starlight-evolution.html':'starlight-evolution',
+  'season-pass.html':'season-pass','collection-quests.html':'quests','starlight-evolution.html':'starlight-evolution','login.html':'login',
   'trade-lists.html':'trades','trade-offers.html':'offers','user-rankings.html':'rankings','pull-feed.html':'feed','collector.html':'collector','report-profile.html':'report',
   'about.html':'about','socials.html':'socials','admin-hub.html':'admin','admin-codes.html':'admin-codes',
   'admin-staff.html':'admin-staff','admin-audit.html':'admin-audit','admin-moderation.html':'admin-moderation',
@@ -110,7 +110,7 @@ if (!embedded && currentRoute && file !== 'binder.html' && file !== 'index.html'
     html.starlight-embedded .main{width:100%!important;max-width:none!important;margin:0!important;padding:14px!important;min-height:0!important;overflow:visible!important}
     html.starlight-embedded .daily-page,html.starlight-embedded .bits-page,html.starlight-embedded .collector-page,
     html.starlight-embedded .profile-settings-page,html.starlight-embedded .admin-page,html.starlight-embedded .redeem-page,
-    html.starlight-embedded .trade-offers-page,html.starlight-embedded .shop-page{width:100%!important;max-width:none!important;margin:0!important;padding:14px!important;min-height:0!important}
+    html.starlight-embedded .trade-offers-page,html.starlight-embedded .shop-page,html.starlight-embedded .login-page{width:100%!important;max-width:none!important;margin:0!important;padding:14px!important;min-height:0!important}
     html.starlight-embedded .page-head:first-child{margin-top:0!important}
     html.starlight-embedded .embedded-filter-panel{margin:0 0 14px!important}
     html.starlight-embedded .page-status:not(.error),html.starlight-embedded .status.success{display:none!important}

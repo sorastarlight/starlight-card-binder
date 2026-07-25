@@ -33,7 +33,7 @@ const routes = {
   trades:{title:'Card Exchange',src:'trade-lists.html'}, offers:{title:'Trade Offers',src:'trade-offers.html'},
   rankings:{title:'User Rankings',src:'user-rankings.html'},
   feed:{title:'LIVE Feed',src:'pull-feed.html'},
-  notifications:{title:'Notifications',src:'notifications.html'}, rewards:{title:'Received Gifts',src:'received-rewards.html'}, profile:{title:'Profile',src:'profile-settings.html'}, collector:{title:'Collector Profile',src:'collector.html'},
+  notifications:{title:'Notifications',src:'notifications.html'}, rewards:{title:'Received Gifts',src:'received-rewards.html'}, profile:{title:'Profile',src:'profile-settings.html'}, login:{title:'Sign In',src:'login'}, collector:{title:'Collector Profile',src:'collector.html'},
   report:{title:'Report Profile',src:'report-profile.html'}, about:{title:'About',src:'about.html'}, socials:{title:'Socials',src:'socials.html'},
   admin:{title:'Administration Hub',src:'admin-hub.html'}, 'admin-codes':{title:'Reward Code Console',src:'admin-codes.html'},
   'admin-staff':{title:'Staff Management',src:'admin-staff.html'}, 'admin-audit':{title:'Audit Log',src:'admin-audit.html'},
@@ -487,7 +487,7 @@ accountMenu?.addEventListener('click',async e=>{
     e.preventDefault();
     closeAccountMenu();
     const mode=authLink.dataset.shellAuth==='signup'?'signup':'signin';
-    location.href=`login.html?mode=${mode}`;
+    navigate('login',{extra:{mode}});
     return;
   }
   const profileLink=e.target.closest('[data-shell-profile-link]');
