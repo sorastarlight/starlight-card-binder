@@ -1,3 +1,4 @@
+import { loginShellHref } from './shell-route-utils.js';
 import { deleteCardComment, getCardComments, postCardComment } from './social-service.js';
 import { supabase } from './supabase-client.js';
 
@@ -47,7 +48,7 @@ export async function mountCardComments(host, cardId) {
   const { data: auth } = await supabase.auth.getUser();
   const signedIn = Boolean(auth?.user);
   if (!signedIn) {
-    form.innerHTML = `<p class="card-comments-signin"><a href="login.html?mode=signin" target="_top" data-shell-view="login">Sign in</a> to join the conversation.</p>`;
+    form.innerHTML = `<p class="card-comments-signin"><a href="${loginShellHref('signin')}" target="_top" data-shell-view="login">Sign in</a> to join the conversation.</p>`;
   }
 
   async function refresh() {

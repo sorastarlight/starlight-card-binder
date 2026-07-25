@@ -4,6 +4,7 @@ import {
   aliasShellRoute,
   extractShellRouteKey,
   normalizeNotificationParams,
+  loginShellHref,
   resolveNotificationRoute,
   shellNotificationUrl
 } from '../docs/js/shell-route-utils.js';
@@ -48,7 +49,12 @@ test('notification params normalize gift and event aliases', () => {
   }), { giftId: 'abc', event: 'evt-1', rewardId: 'abc', eventId: 'evt-1' });
   assert.equal(
     shellNotificationUrl({ route: 'rewards', route_params: { rewardId: 'rr-1' } }),
-    'binder.html?rewardId=rr-1&view=rewards'
+    'binder?rewardId=rr-1&view=rewards'
   );
   assert.equal(extractShellRouteKey('/docs/binder.html?view=collection'), 'collection');
+});
+
+test('loginShellHref builds shell login routes', () => {
+  assert.equal(loginShellHref('signin'), 'binder?view=login&mode=signin');
+  assert.equal(loginShellHref('signup'), 'binder?view=login&mode=signup');
 });

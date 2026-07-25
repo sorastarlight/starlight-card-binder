@@ -5,6 +5,7 @@ import {
             setProfileFavoriteCard,
             updateCollectorProfile
         } from "../profile-service.js";
+        import { redirectToLogin } from "../shell-route-utils.js";
         import { setProfileShowcase } from "../social-service.js";
         import { getMyTwitchConnection } from "../twitch-service.js";
         import { supabase } from "../supabase-client.js";
@@ -425,10 +426,7 @@ import {
                     "error"
                 );
 
-                window.setTimeout(() => {
-                    window.location.href =
-                        "./login.html";
-                }, 1500);
+                redirectToLogin('signin', { delayMs: 1500 });
 
                 return;
             }

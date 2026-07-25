@@ -76,6 +76,7 @@ test('login signup collects username and display name fields', async () => {
   assert.match(loginPage, /getCachedWebsiteContent/);
   assert.match(loginPage, /loginCopy\.submitSignUp/);
   assert.match(loginPage, /goToBinder/);
+  assert.match(loginPage, /\.\/binder\?view=/);
   assert.match(loginPage, /\^\[a-z0-9_\]\{3,24\}\$/);
   assert.match(loginPage, /signupDisplayName/);
   assert.match(loginPage, /claim_twitch_collector_identity/);

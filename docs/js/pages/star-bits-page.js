@@ -1,3 +1,4 @@
+import { redirectToLogin } from '../shell-route-utils.js';
 import { supabase } from '../supabase-client.js';
 import {
   convertSelectedDuplicatesToStarBits,
@@ -327,7 +328,7 @@ async function initializePage() {
   const { data, error } = await supabase.auth.getUser();
   if (error || !data.user) {
     displayStatus('Please sign in to use the Star Bits Exchange.', 'error');
-    window.setTimeout(() => { window.location.href = './login.html'; }, 1400);
+    redirectToLogin('signin', { delayMs: 1400 });
     return;
   }
   await loadPreview();

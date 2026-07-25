@@ -265,8 +265,8 @@ import { supabase } from "../supabase-client.js";
             }
 
             window.location.href = view === 'binder'
-                ? './binder.html'
-                : `./binder.html?view=${encodeURIComponent(view)}`;
+                ? './binder?view=home'
+                : `./binder?view=${encodeURIComponent(view)}`;
         }
 
         async function handleAuthenticationReturn() {

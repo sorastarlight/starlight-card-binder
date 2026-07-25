@@ -215,5 +215,29 @@ export function shellNotificationUrl(notice = {}) {
   const route = resolveNotificationRoute(notice.route, notice);
   const params = new URLSearchParams(normalizeNotificationParams(notice));
   params.set('view', route);
-  return `binder.html?${params.toString()}`;
+  return `binder?${params.toString()}`;
+}
+
+export function loginShellHref(mode = 'signin') {
+  const params = new URLSearchParams({
+    view: 'login',
+    mode: mode === 'signup' ? 'signup' : 'signin'
+  });
+  return `binder?${params.toString()}`;
+}
+
+export function redirectToLogin(mode = 'signin', { delayMs = 0 } = {}) {
+  const navigate = () => {
+    if (document.documentElement.classList.contains('starlight-embedded')) {
+      window.parent.postMessage({
+        type: 'starlight-navigate',
+        view: 'login',
+        params: { mode: mode === 'signup' ? 'signup' : 'signin' }
+      }, window.location.origin);
+      return;
+    }
+    window.location.href = loginShellHref(mode);
+  };
+  if (delayMs > 0) window.setTimeout(navigate, delayMs);
+  else navigate();
 }

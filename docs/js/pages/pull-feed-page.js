@@ -1,3 +1,4 @@
+import { loginShellHref } from '../shell-route-utils.js';
 import { supabase } from '../supabase-client.js';
 import { getPullFeed } from '../social-service.js';
 
@@ -83,7 +84,7 @@ async function loadFeed({ append = false } = {}) {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth?.user) {
       statusEl.textContent = 'Sign in to browse the LIVE Feed.';
-      listEl.innerHTML = `<div class="pull-feed-empty"><a href="login.html?mode=signin">Sign in</a> to see Everyone, Following, or Just You.</div>`;
+      listEl.innerHTML = `<div class="pull-feed-empty"><a href="${loginShellHref('signin')}" target="_top" data-shell-view="login">Sign in</a> to see Everyone, Following, or Just You.</div>`;
       moreBtn.hidden = true;
       return;
     }

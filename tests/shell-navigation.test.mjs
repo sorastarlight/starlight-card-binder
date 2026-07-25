@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { cloneDefaultShellNavigation, PUBLIC_SHELL_DESTINATIONS } from '../docs/js/shell-navigation-defaults.js';
 import { mergeShellNavigation, sanitizeShellNavigation } from '../docs/js/shell-navigation-model.js';
+import { loginShellHref } from '../docs/js/shell-route-utils.js';
 import { readFile } from 'node:fs/promises';
 
 const read = relativePath => readFile(new URL(`../${relativePath}`, import.meta.url), 'utf8');
@@ -177,4 +178,34 @@ test('shell refreshes Star Bits totals when wallet or rewards change', async () 
   assert.match(shop, /notifyShellEconomyChanged/);
   assert.match(redeem, /notifyShellEconomyChanged/);
   assert.match(bits, /notifyShellEconomyChanged/);
+});
+
+test('loginShellHref routes signed-out CTAs through the shell login view', () => {
+  assert.equal(loginShellHref('signin'), 'binder?view=login&mode=signin');
+  assert.equal(loginShellHref('signup'), 'binder?view=login&mode=signup');
+  assert.equal(loginShellHref(), 'binder?view=login&mode=signin');
+});
+
+test('signed-out CTAs avoid standalone login.html links', async () => {
+  const [shop, feed, comments, redeem, bits, profile, daily, collector, importPage] = await Promise.all([
+    read('docs/js/pages/booster-shop-page.js'),
+    read('docs/js/pages/pull-feed-page.js'),
+    read('docs/js/card-comments.js'),
+    read('docs/js/pages/redeem-page.js'),
+    read('docs/js/pages/star-bits-page.js'),
+    read('docs/js/pages/profile-settings-page.js'),
+    read('docs/daily-booster.html'),
+    read('docs/collector.html'),
+    read('docs/import-collection.html')
+  ]);
+
+  for (const source of [shop, feed, comments, redeem, bits, profile]) {
+    assert.doesNotMatch(source, /login\.html/);
+  }
+  assert.match(shop, /loginShellHref/);
+  assert.match(comments, /loginShellHref/);
+  assert.match(profile, /redirectToLogin/);
+  assert.match(daily, /binder\?view=login/);
+  assert.match(collector, /binder\?view=login/);
+  assert.match(importPage, /binder\?view=login/);
 });

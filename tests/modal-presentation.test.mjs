@@ -21,26 +21,33 @@ test('keeps modal overlays centered without turning dialog cards into overlays',
 });
 
 test('keeps every administrative popup on the shared modal controller', async () => {
-  const [boosters, news, twitch, gifts, profile] = await Promise.all([
+  const [boosters, news, twitch, gifts, profile, moderation] = await Promise.all([
     read('docs/js/pages/admin-boosters-page.js'),
     read('docs/js/pages/admin-news-page.js'),
     read('docs/js/pages/admin-twitch-page.js'),
     read('docs/js/pages/admin-gifts-page.js'),
-    read('docs/js/profile-extras.js')
+    read('docs/js/profile-extras.js'),
+    read('docs/js/pages/admin-moderation-page.js')
   ]);
 
-  for (const source of [boosters, news, twitch, gifts, profile]) {
+  for (const source of [boosters, news, twitch, gifts, profile, moderation]) {
     assert.match(source, /(?:StarlightUI|ui)\.adoptModal/);
   }
   assert.match(profile, /querySelector\(['"]\.st-dialog['"]\)/);
   assert.match(profile, /whenStarlightUI/);
+  assert.doesNotMatch(moderation, /\bprompt\s*\(/);
 });
 
 test('profile crop dialog uses the shared st-dialog contract', async () => {
-  const html = await read('docs/profile-settings.html');
+  const [html, moderationHtml] = await Promise.all([
+    read('docs/profile-settings.html'),
+    read('docs/admin-moderation.html')
+  ]);
   assert.match(html, /st-dialog-overlay profile-crop-modal/);
   assert.match(html, /st-dialog profile-crop-dialog/);
   assert.match(html, /st-dialog-close/);
+  assert.match(moderationHtml, /id="hide-profile-modal"/);
+  assert.match(moderationHtml, /st-dialog-close/);
 });
 
 test('collector, shop, evolution, and quest dialogs use the shared modal controller', async () => {

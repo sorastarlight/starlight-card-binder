@@ -56,7 +56,7 @@ function shellHref(route, u){
   const out = new URLSearchParams();
   out.set('view', route);
   if (u) for (const [k,v] of u.searchParams) if (!SHELL_PARAM_SKIP.has(k) && k !== 'view') out.set(k, v);
-  return `binder.html?${out.toString()}`;
+  return `binder?${out.toString()}`;
 }
 
 function parentNavigate(route, u){
@@ -111,7 +111,7 @@ if (!embedded && shouldRedirectToShell()) {
   const out = new URLSearchParams();
   out.set('view', currentRoute);
   for (const [k,v] of params) if (!SHELL_PARAM_SKIP.has(k)) out.set(k, v);
-  location.replace(`binder.html?${out.toString()}`);
+  location.replace(`binder?${out.toString()}`);
 } else if (embedded) {
   document.documentElement.classList.add('starlight-embedded');
   const style = document.createElement('style');

@@ -1,3 +1,4 @@
+import { redirectToLogin } from '../shell-route-utils.js';
 import { supabase } from '../supabase-client.js';
 import { redeemRewardCode } from '../redemption-service.js';
 import { revealRewardSequence } from '../reward-reveal.js?v=1.5.14';
@@ -30,7 +31,7 @@ const { data: authData } = await supabase.auth.getUser();
 if (!authData.user) {
   showStatus('Please sign in before redeeming a code.', 'error');
   button.disabled = true;
-  window.setTimeout(() => { location.href = 'login.html'; }, 1400);
+  redirectToLogin('signin', { delayMs: 1400 });
 }
 
 form.addEventListener('submit', async event => {

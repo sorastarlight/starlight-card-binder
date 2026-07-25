@@ -1,3 +1,4 @@
+import { loginShellHref } from '../shell-route-utils.js';
 import { supabase } from '../supabase-client.js';
 import { getStarBitsExchangePreview } from '../star-bits-service.js';
 import { openStarBitsBoosterById } from '../daily-booster-service.js';
@@ -95,7 +96,7 @@ function render(){
     const title=escapeHTML(shopCopy.signedOutTitle||'Sign in to visit the shop ✨');
     const lead=escapeHTML(shopCopy.signedOutLead||'Your purchases and new cards need a Starlight account so they can be saved safely.');
     const cta=escapeHTML(shopCopy.signedOutCta||'Log In or Create Account');
-    packsEl.innerHTML=`<div class="signed-out"><h2>${title}</h2><p>${lead}</p><a class="gallery-link" href="login.html" target="_top">${cta}</a></div>`;
+    packsEl.innerHTML=`<div class="signed-out"><h2>${title}</h2><p>${lead}</p><a class="gallery-link" href="${loginShellHref('signin')}" target="_top" data-shell-view="login">${cta}</a></div>`;
     return;
   }
   const list=sortedBoosters();
