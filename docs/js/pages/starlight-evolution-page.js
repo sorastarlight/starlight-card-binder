@@ -17,9 +17,6 @@ import {
   previousEvolutionTier
 } from '../prestige-utils.js?v=1.5.0';
 import { playStarlightEvolutionReveal } from '../starlight-evolution-reveal.js?v=2.1.0';
-import { getCachedWebsiteContent, loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
-
-await (getCachedWebsiteContent() ? Promise.resolve(getCachedWebsiteContent()) : loadAndHydrateWebsiteContent());
 
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
   '&': '&amp;',
@@ -408,4 +405,4 @@ dialogBodyEl?.addEventListener('click', (event) => {
   }
 });
 
-renderOwned();
+void renderOwned();

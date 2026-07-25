@@ -5,11 +5,10 @@ import {
   getMySeasonPass
 } from '../season-pass-service.js';
 import { beginTwitchLink, callTwitchWorker, getMyTwitchConnection } from '../twitch-service.js';
-import { getCachedWebsiteContent, loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
+import { getCachedWebsiteContent } from '../website-content-hydrate.js';
 import { starBitAmountHtml } from '../star-bit-icon.js';
 
-const siteCopy = getCachedWebsiteContent() || await loadAndHydrateWebsiteContent();
-const seasonCopy = siteCopy?.seasonPass || {};
+const seasonCopy = { ...(getCachedWebsiteContent()?.seasonPass || {}) };
 
 const SUB_CHECK_STORAGE_KEY = 'starlight-season-sub-check-at';
 const SUB_CHECK_TTL_MS = 30 * 60 * 1000;

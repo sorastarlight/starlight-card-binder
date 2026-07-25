@@ -352,6 +352,20 @@ import {
             renderFavoriteCardPreview();
         }
 
+        async function loadVisibleSeries() {
+            try {
+                const { data } = await supabase
+                    .from("card_series")
+                    .select("id,name,sort_order")
+                    .eq("is_visible", true)
+                    .order("sort_order", { ascending: true });
+                return data || [];
+            } catch (seriesError) {
+                console.warn("Unable to load series list", seriesError);
+                return [];
+            }
+        }
+
         async function refreshTwitchLinkedBadge() {
             try {
                 const [identity, connection] = await Promise.all([
@@ -388,10 +402,12 @@ import {
 
             const [
                 profileResult,
-                cardsResult
+                cardsResult,
+                seriesRows
             ] = await Promise.all([
                 loadOwnProfile(),
-                loadOwnedProfileCards()
+                loadOwnedProfileCards(),
+                loadVisibleSeries()
             ]);
 
             if (
@@ -441,28 +457,19 @@ import {
                     })
                     .join("");
 
-            try {
-                const { data: seriesRows } = await supabase
-                    .from("card_series")
-                    .select("id,name,sort_order")
-                    .eq("is_visible", true)
-                    .order("sort_order", { ascending: true });
-                if (favoriteSeriesSelect) {
-                    favoriteSeriesSelect.innerHTML =
-                        `<option value="">No favorite series selected</option>` +
-                        (seriesRows || []).map((series) =>
-                            `<option value="${escapeHtml(series.id)}">${escapeHtml(series.name)}</option>`
-                        ).join("");
-                }
-            } catch (seriesError) {
-                console.warn("Unable to load series list", seriesError);
+            if (favoriteSeriesSelect) {
+                favoriteSeriesSelect.innerHTML =
+                    `<option value="">No favorite series selected</option>` +
+                    seriesRows.map((series) =>
+                        `<option value="${escapeHtml(series.id)}">${escapeHtml(series.name)}</option>`
+                    ).join("");
             }
 
             fillProfileForm(
                 existingProfile
             );
 
-            await refreshTwitchLinkedBadge();
+            void refreshTwitchLinkedBadge();
 
             displayStatus(
                 existingProfile.onboarding_complete
