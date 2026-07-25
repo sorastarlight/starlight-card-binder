@@ -12,10 +12,9 @@ import {
   resolveNotificationRoute,
   shellNotificationUrl
 } from '../shell-route-utils.js';
-import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
+import { getCachedWebsiteContent } from '../website-content-hydrate.js';
 
-const siteCopy = await loadAndHydrateWebsiteContent();
-const notificationsCopy = siteCopy?.notifications || {};
+let notificationsCopy = getCachedWebsiteContent()?.notifications || {};
 
 const list = document.getElementById('list');
 const summary = document.getElementById('summary');
@@ -129,4 +128,8 @@ document.getElementById('clearRead').onclick = async () => {
   await load();
 };
 
-await Promise.all([load(), loadPreferences()]);
+window.addEventListener('starlight-website-content-hydrated', (event) => {
+  notificationsCopy = event.detail?.notifications || notificationsCopy;
+});
+
+void Promise.all([load(), loadPreferences()]);

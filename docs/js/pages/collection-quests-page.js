@@ -3,11 +3,10 @@ import {
   claimCollectionQuest,
   getMyCollectionQuests
 } from '../collection-quests-service.js';
-import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
+import { getCachedWebsiteContent } from '../website-content-hydrate.js';
 import { starBitAmountHtml } from '../star-bit-icon.js';
 
-const siteCopy = await loadAndHydrateWebsiteContent();
-const questsCopy = siteCopy?.quests || {};
+let questsCopy = getCachedWebsiteContent()?.quests || {};
 
 const list = document.getElementById('quests-list');
 const summary = document.getElementById('quests-summary');
@@ -222,7 +221,11 @@ for (const button of tabButtons) {
 }
 
 refreshButton?.addEventListener('click', () => {
-  load();
+  void load();
 });
 
-await load();
+window.addEventListener('starlight-website-content-hydrated', (event) => {
+  questsCopy = event.detail?.quests || questsCopy;
+});
+
+void load();

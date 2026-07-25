@@ -3,11 +3,8 @@ import {
   convertSelectedDuplicatesToStarBits,
   getStarBitsExchangePreview
 } from '../star-bits-service.js';
-import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
 import { notifyShellEconomyChanged } from '../shell-economy.js';
 import { starBitAmountHtml, starBitIconHtml } from '../star-bit-icon.js';
-
-await loadAndHydrateWebsiteContent();
 
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
   '&': '&amp;',

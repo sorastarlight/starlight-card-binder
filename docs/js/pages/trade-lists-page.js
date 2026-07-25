@@ -1,10 +1,9 @@
 import { bindTablistKeyboard } from '../tablist-a11y.js';
 import { getMyTradeLists, setCardTradePreference, setTradeListVisibility } from '../trade-list-service.js';
 import { buildTradeSearchHaystack } from '../card-filter-utils.js';
-import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
+import { getCachedWebsiteContent } from '../website-content-hydrate.js';
 
-const siteCopy = await loadAndHydrateWebsiteContent();
-const tradesCopy = siteCopy?.trades || {};
+let tradesCopy = getCachedWebsiteContent()?.trades || {};
 
 const grid = document.querySelector('#tradeGrid');
 const search = document.querySelector('#tradeSearch');
@@ -168,13 +167,19 @@ publicToggle?.addEventListener('change', async () => {
 grid.innerHTML = '<div class="trade-empty"><h2>Loading trade lists…</h2><p>Gathering your wishlist and trade binder.</p></div>';
 status.textContent = 'Loading…';
 
-try {
-  const result = await getMyTradeLists();
-  data = (result.cards || []).map(normalizeCard);
-  if (publicToggle) publicToggle.checked = result.publicLists !== false;
-  setActiveTab('wishlist');
-  status.textContent = 'Wishlist and trade binder loaded.';
-} catch (error) {
-  grid.innerHTML = `<div class="trade-empty"><h2>Could not load trade lists</h2><p>${esc(error.message || 'Please sign in.')}</p></div>`;
-  status.textContent = error.message || 'Please sign in.';
-}
+window.addEventListener('starlight-website-content-hydrated', (event) => {
+  tradesCopy = event.detail?.trades || tradesCopy;
+});
+
+void (async () => {
+  try {
+    const result = await getMyTradeLists();
+    data = (result.cards || []).map(normalizeCard);
+    if (publicToggle) publicToggle.checked = result.publicLists !== false;
+    setActiveTab('wishlist');
+    status.textContent = 'Wishlist and trade binder loaded.';
+  } catch (error) {
+    grid.innerHTML = `<div class="trade-empty"><h2>Could not load trade lists</h2><p>${esc(error.message || 'Please sign in.')}</p></div>`;
+    status.textContent = error.message || 'Please sign in.';
+  }
+})();

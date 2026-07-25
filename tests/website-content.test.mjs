@@ -413,11 +413,14 @@ test('website editor admin page and public hooks are wired', async () => {
   assert.match(rankingsPage, /data-content="rankings\.title"/);
   assert.match(rankingsPage, /data-content="rankings\.lead"/);
   assert.match(rankingsPage, /website-content-hydrate-page\.js\?v=1\.3/);
-  assert.match(tradeListsPage, /loadAndHydrateWebsiteContent/);
+  assert.match(tradeListsPage, /getCachedWebsiteContent/);
   assert.match(tradeListsPage, /emptyWishlist/);
+  assert.match(tradeOffersPage, /getCachedWebsiteContent/);
   assert.match(tradeOffersPage, /emptyIncoming/);
+  assert.match(boosterShopPage, /getCachedWebsiteContent/);
   assert.match(boosterShopPage, /signedOutTitle/);
   assert.match(boosterShopPage, /featuredKicker/);
+  assert.match(eventsPage, /getCachedWebsiteContent/);
   assert.match(eventsPage, /emptyTitle/);
   assert.match(eventsPage, /boostersHeading/);
   assert.match(app, /ensureWebsiteBinderLanding|getWebsiteContent/);

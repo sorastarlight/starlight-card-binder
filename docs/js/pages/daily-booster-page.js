@@ -2,11 +2,10 @@ import { supabase } from "../supabase-client.js";
 import { getDailyBoosterStatus, openDailyBooster } from "../daily-booster-service.js";
 import { revealRewardSequence } from "../reward-reveal.js?v=1.5.14";
 import { getPublicBoosterConfig } from "../booster-config-service.js";
-import { loadAndHydrateWebsiteContent } from "../website-content-hydrate.js";
+import { getCachedWebsiteContent } from "../website-content-hydrate.js";
 import { maybeCelebrateSeriesCompletions } from "../series-complete-celebration.js?v=1.0.0";
 
-const siteCopy = await loadAndHydrateWebsiteContent();
-const dailyCopy = siteCopy?.daily || {};
+let dailyCopy = getCachedWebsiteContent()?.daily || {};
 
 const packImage=document.getElementById('daily-pack-image'),portal=document.getElementById('portal-zone'),pack=document.getElementById('pack-trigger'),packLabel=document.getElementById('pack-ready-label'),signIn=document.getElementById('sign-in-link'),heading=document.getElementById('daily-status-heading'),description=document.getElementById('daily-status-description'),countdown=document.getElementById('countdown'),rewardSection=document.getElementById('reward-section'),rewardGrid=document.getElementById('reward-grid'),rewardTitle=document.getElementById('reward-title'),statusText=document.getElementById('page-status');
 let timer=null,isBusy=false;
@@ -21,4 +20,7 @@ function setPortalClaimed(data){portal.classList.add('is-locked');pack.disabled=
 async function playOpening(cards,title){await revealRewardSequence(cards,{title:'Daily Free Booster Pack',packImageUrl:packImage.currentSrc||packImage.src,autoOpen:true});await maybeCelebrateSeriesCompletions(cards);render(cards,title)}
 async function initialize(){status('');try{const cfg=await getPublicBoosterConfig('free_daily');if(cfg?.pack_image_url)packImage.src=cfg.pack_image_url}catch{}const {data,error}=await supabase.auth.getUser();if(error||!data.user){portal.classList.add('is-locked');pack.disabled=true;packLabel.textContent=dailyCopy.signInCta||'Sign In to Open';heading.textContent=dailyCopy.signInTitle||'Sign In to Claim Your Free Booster';description.textContent=dailyCopy.signInLead||'Daily and Star Bits boosters are saved to your Starlight account.';signIn.classList.remove('hidden');return}signIn.classList.add('hidden');const {status:daily,error:dailyError}=await getDailyBoosterStatus();if(dailyError||!daily){status(dailyError?.message||'Could not check the free daily booster.','error');packLabel.textContent=READY_PACK_LABEL;return}daily.disabled?setPortalDisabled():(daily.available?setPortalReady():setPortalClaimed(daily))}
 pack.addEventListener('click',async()=>{if(isBusy||pack.disabled)return;isBusy=true;pack.disabled=true;packLabel.textContent=READY_PACK_LABEL;try{const result=await openDailyBooster();if(result.alreadyClaimed){await initialize();return}const cards=result.cards||[];if(!cards.length)throw new Error('No cards were returned from this booster.');await playOpening(cards,dailyCopy.resultsTitle||'Here Are Today’s Daily Free Booster Pack Results');setPortalClaimed({nextClaimAt:result.nextClaimAt,cardsAwarded:cards});window.parent?.postMessage({type:'starlight-view-ready',view:'daily',claimed:true},location.origin)}catch(error){status(error.message||'The free booster could not be opened.','error');await initialize()}finally{isBusy=false}});
+window.addEventListener('starlight-website-content-hydrated', (event) => {
+  dailyCopy = event.detail?.daily || dailyCopy;
+});
 initialize();

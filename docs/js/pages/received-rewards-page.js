@@ -1,12 +1,11 @@
 import { getReceivedRewards, claimReceivedReward, dismissReceivedReward } from '../received-rewards-service.js';
 import { revealRewardSequence } from '../reward-reveal.js?v=1.5.14';
-import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
+import { getCachedWebsiteContent } from '../website-content-hydrate.js';
 import { maybeCelebrateSeriesCompletions } from '../series-complete-celebration.js?v=1.0.0';
 import { notifyShellEconomyChanged } from '../shell-economy.js';
 import { starBitAmountHtml } from '../star-bit-icon.js';
 
-const siteCopy = await loadAndHydrateWebsiteContent();
-const rewardsCopy = siteCopy?.rewards || {};
+let rewardsCopy = getCachedWebsiteContent()?.rewards || {};
 
 const list = document.getElementById('list');
 const status = document.getElementById('status');
@@ -131,4 +130,7 @@ document.querySelectorAll('.tab').forEach(b => {
     render();
   };
 });
-load();
+window.addEventListener('starlight-website-content-hydrated', (event) => {
+  rewardsCopy = event.detail?.rewards || rewardsCopy;
+});
+void load();

@@ -476,4 +476,4 @@ window.addEventListener('starlight-website-content-hydrated', (event) => {
   applyExclusivePromoCopy();
 });
 
-await load();
+void load();

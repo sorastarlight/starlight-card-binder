@@ -1,10 +1,9 @@
 import { getTradeOfferContext, createTradeOffer, getMyTradeOffers, respondToTradeOffer, searchTradeCollectors } from '../trade-offer-service.js';
 import { buildTradeSearchHaystack } from '../card-filter-utils.js';
-import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
+import { getCachedWebsiteContent } from '../website-content-hydrate.js';
 import { bindTablistKeyboard, syncTabSelection } from '../tablist-a11y.js';
 
-const siteCopy = await loadAndHydrateWebsiteContent();
-const offersCopy = siteCopy?.offers || {};
+let offersCopy = getCachedWebsiteContent()?.offers || {};
 
 const params = new URLSearchParams(location.search);
 let username = params.get('username') || '';
@@ -546,5 +545,7 @@ if (offerTablist) {
 
 if (recipientInput && username) recipientInput.value = username;
 setActiveOfferTab(initialOfferTab());
-await Promise.all([initCompose(), loadOffers()]);
-focusHighlightedOffer();
+window.addEventListener('starlight-website-content-hydrated', (event) => {
+  offersCopy = event.detail?.offers || offersCopy;
+});
+void Promise.all([initCompose(), loadOffers()]).then(() => focusHighlightedOffer());

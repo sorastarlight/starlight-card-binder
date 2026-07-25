@@ -2,13 +2,12 @@ import { supabase } from '../supabase-client.js';
 import { getStarBitsExchangePreview } from '../star-bits-service.js';
 import { openStarBitsBoosterById } from '../daily-booster-service.js';
 import { revealRewardSequence } from '../reward-reveal.js?v=1.5.14';
-import { loadAndHydrateWebsiteContent } from '../website-content-hydrate.js';
+import { getCachedWebsiteContent } from '../website-content-hydrate.js';
 import { maybeCelebrateSeriesCompletions } from '../series-complete-celebration.js?v=1.0.0';
 import { notifyShellEconomyChanged } from '../shell-economy.js';
 import { starBitAmountHtml, starBitIconHtml } from '../star-bit-icon.js';
 
-const siteCopy = await loadAndHydrateWebsiteContent();
-const shopCopy = siteCopy?.shop || {};
+let shopCopy = getCachedWebsiteContent()?.shop || {};
 
 const packsEl = document.getElementById('packs');
 const balanceEl = document.getElementById('balance');
@@ -393,4 +392,7 @@ sortEl.addEventListener('change',render);
 purchaseCancel.addEventListener('click',closePurchaseModal);
 purchaseConfirm.addEventListener('click',confirmPurchase);
 modalClose.addEventListener('click',closeDetails);
-load();
+window.addEventListener('starlight-website-content-hydrated', (event) => {
+  shopCopy = event.detail?.shop || shopCopy;
+});
+void load();
