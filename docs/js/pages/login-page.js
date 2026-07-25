@@ -257,6 +257,9 @@ import { supabase } from "../supabase-client.js";
         function goToBinder(view = 'home') {
             if (document.documentElement.classList.contains('starlight-embedded')) {
                 parent.postMessage({
+                    type: 'starlight-auth-changed'
+                }, location.origin);
+                parent.postMessage({
                     type: 'starlight-navigate',
                     view,
                     params: {}

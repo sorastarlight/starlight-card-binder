@@ -70,9 +70,10 @@ test('login signup collects username and display name fields', async () => {
   assert.match(loginHtml, /login\.css\?v=1\.3/);
   assert.match(loginHtml, /website-content-hydrate-page\.js\?v=1\.4/);
   assert.match(loginHtml, /embed-mode\.js/);
-  assert.match(loginHtml, /login-page\.js\?v=1\.8/);
+  assert.match(loginHtml, /login-page\.js\?v=1\.9/);
 
   assert.match(loginPage, /signupIdentityGroup/);
+  assert.match(loginPage, /starlight-auth-changed/);
   assert.match(loginPage, /getCachedWebsiteContent/);
   assert.match(loginPage, /loginCopy\.submitSignUp/);
   assert.match(loginPage, /goToBinder/);

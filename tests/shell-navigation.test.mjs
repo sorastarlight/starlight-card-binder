@@ -223,3 +223,15 @@ test('shell navigation render and static shell HTML use extensionless binder hre
   assert.match(homeHtml, /href="binder\?view=daily"/);
   assert.doesNotMatch(homeHtml, /binder\.html/);
 });
+
+test('shell refreshes account chrome after embedded login', async () => {
+  const [shell, loginPage] = await Promise.all([
+    read('docs/js/app-shell.js'),
+    read('docs/js/pages/login-page.js')
+  ]);
+
+  assert.match(shell, /onAuthStateChange/);
+  assert.match(shell, /starlight-auth-changed[\s\S]*hydrateAccount/);
+  assert.match(shell, /previousRoute==='login'[\s\S]*hydrateAccount/);
+  assert.match(loginPage, /starlight-auth-changed/);
+});

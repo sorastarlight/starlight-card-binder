@@ -163,6 +163,7 @@ function navigate(route,{push=true,extra={}}={}){
     console.warn('[Starlight] Unknown shell route ignored:', route);
     return;
   }
+  const previousRoute = currentRoute;
   route = resolved;
   currentRoute=route;
   retryCount=0;
@@ -184,6 +185,7 @@ function navigate(route,{push=true,extra={}}={}){
     if(frame)setFrameLocation('about:blank');
     document.title='The Starlight Card Series Binder | Starlight Card Binder';
     window.renderAll?.();
+    if(previousRoute==='login')hydrateAccount();
     return;
   }
   nativeView?.classList.add('hidden');
@@ -191,6 +193,7 @@ function navigate(route,{push=true,extra={}}={}){
   document.title=`${routes[route].title} | Starlight Card Binder`;
   loadEmbeddedView(route,{force:true,resetRetry:true});
   window.scrollTo({top:0,left:0,behavior:'auto'});
+  if(previousRoute==='login')hydrateAccount();
 }
 
 function markViewReady(data={}){
@@ -516,6 +519,7 @@ window.addEventListener('message',e=>{
   if(e.origin!==location.origin)return;
   const data=e.data||{};
   if(data.type==='starlight-close-notifications')closeNotificationPopover();
+  if(data.type==='starlight-auth-changed')hydrateAccount();
   if(data.type==='starlight-navigate'){
     const route = aliasShellRoute(data.view) || (isKnownShellRoute(data.view) ? data.view : '');
     if(route) navigate(route,{extra:data.params||{}});
@@ -556,6 +560,9 @@ window.addEventListener('pageshow',event=>{
 const initial=aliasShellRoute(new URLSearchParams(location.search).get('view')||'home')||'home';
 navigate(initial,{push:false});
 hydrateAccount().then(ensureNotificationPopover);
+supabase.auth.onAuthStateChange((event)=>{
+  if(event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='USER_UPDATED')hydrateAccount();
+});
 hydrateTradeOfferBadge();
 hydrateNotificationBadge();
 hydrateReceivedGiftBadge();
