@@ -194,8 +194,8 @@ import { supabase } from "../supabase-client.js";
 
             submitButton.textContent =
                 isSignUp
-                    ? "Create Account"
-                    : "Sign In";
+                    ? (loginCopy.submitSignUp || "Create Account")
+                    : (loginCopy.submitSignIn || "Sign In");
 
             displayStatus("");
 
