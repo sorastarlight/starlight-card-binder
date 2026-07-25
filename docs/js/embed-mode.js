@@ -10,6 +10,22 @@ const routes = {
 };
 const SHELL_PARAM_SKIP = new Set(['embed','view','shellBuild','shellLoad','shellRetry']);
 
+function hasAuthReturnParams() {
+  for (const key of params.keys()) {
+    if (key === 'oauth' || key === 'code' || key === 'error' || key === 'error_description') {
+      return true;
+    }
+  }
+  const hash = String(location.hash || '');
+  return Boolean(hash && /access_token|refresh_token|error/i.test(hash));
+}
+
+function shouldRedirectToShell() {
+  if (!currentRoute || file === 'binder.html' || file === 'index.html') return false;
+  if (currentRoute === 'login' && hasAuthReturnParams()) return false;
+  return true;
+}
+
 function normalizePageName(value){
   const raw = String(value || '').split('/').pop().toLowerCase().split('?')[0].split('#')[0];
   if (!raw || raw === '/') return 'index.html';
@@ -91,7 +107,7 @@ function announceReady(){
   send('starlight-view-ready', {height: documentHeight(), loadToken: params.get('shellLoad') || ''});
 }
 
-if (!embedded && currentRoute && file !== 'binder.html' && file !== 'index.html') {
+if (!embedded && shouldRedirectToShell()) {
   const out = new URLSearchParams();
   out.set('view', currentRoute);
   for (const [k,v] of params) if (!SHELL_PARAM_SKIP.has(k)) out.set(k, v);

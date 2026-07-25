@@ -84,8 +84,16 @@ import { supabase } from "../supabase-client.js";
             try {
                 twitchAuthButton.disabled = true;
                 twitchAuthButton.textContent = "Opening Twitch...";
-                const { error } = await signInWithTwitch({ intent: currentMode === 'signup' ? 'signup' : 'signin' });
+                const embedded = document.documentElement.classList.contains("starlight-embedded");
+                const { data, error } = await signInWithTwitch({
+                    intent: currentMode === 'signup' ? 'signup' : 'signin',
+                    skipBrowserRedirect: embedded
+                });
                 if (error) throw error;
+                if (embedded && data?.url) {
+                    window.top.location.href = data.url;
+                    return;
+                }
             } catch (error) {
                 displayStatus(error.message || "Unable to continue with Twitch.", "error");
                 twitchAuthButton.disabled = false;

@@ -11,7 +11,7 @@ function getAuthRedirectUrl() {
         window.location.hostname === "127.0.0.1";
 
     if (isLocal) {
-        return `${window.location.origin}/login.html`;
+        return `${window.location.origin}/login`;
     }
 
     return "https://cards.sorastarlight.net/login.html";
@@ -65,7 +65,8 @@ export async function signInWithTwitch(options = {}) {
         provider: 'twitch',
         options: {
             redirectTo: redirect.toString(),
-            queryParams: { force_verify: 'true' }
+            queryParams: { force_verify: 'true' },
+            skipBrowserRedirect: Boolean(options.skipBrowserRedirect)
         }
     });
 }

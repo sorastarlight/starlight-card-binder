@@ -70,7 +70,7 @@ test('login signup collects username and display name fields', async () => {
   assert.match(loginHtml, /login\.css\?v=1\.3/);
   assert.match(loginHtml, /website-content-hydrate-page\.js\?v=1\.4/);
   assert.match(loginHtml, /embed-mode\.js/);
-  assert.match(loginHtml, /login-page\.js\?v=1\.7/);
+  assert.match(loginHtml, /login-page\.js\?v=1\.8/);
 
   assert.match(loginPage, /signupIdentityGroup/);
   assert.match(loginPage, /getCachedWebsiteContent/);
@@ -83,6 +83,10 @@ test('login signup collects username and display name fields', async () => {
 
   assert.match(authJs, /export async function signUp\(email, password, profile = \{\}\)/);
   assert.match(authJs, /data\.username = username/);
+  assert.match(authJs, /origin\}\/login`/);
+  assert.match(authJs, /login\.html/);
+  assert.match(authJs, /skipBrowserRedirect/);
+  assert.match(loginPage, /skipBrowserRedirect: embedded/);
   assert.match(authJs, /data\.display_name = displayName/);
 });
 

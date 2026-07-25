@@ -147,6 +147,8 @@ test('website UI admin page and migration are wired', async () => {
   assert.match(migration, /admin_save_shell_navigation/);
   assert.match(embed, /'admin-ui\.html':'admin-ui'/);
   assert.match(embed, /'login\.html':'login'/);
+  assert.match(embed, /hasAuthReturnParams/);
+  assert.match(embed, /currentRoute === 'login' && hasAuthReturnParams\(\)/);
   assert.match(shell, /login:\{title:'Sign In',src:'login'\}/);
   assert.match(shell, /navigate\('login',\{extra:\{mode\}\}\)/);
   assert.match(shell, /admin-ui/);
