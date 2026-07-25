@@ -5,7 +5,7 @@ import {
             setProfileFavoriteCard,
             updateCollectorProfile
         } from "../profile-service.js";
-        import { redirectToLogin } from "../shell-route-utils.js";
+        import { redirectToLogin, shellHref } from "../shell-route-utils.js";
         import { setProfileShowcase } from "../social-service.js";
         import { getMyTwitchConnection } from "../twitch-service.js";
         import { supabase } from "../supabase-client.js";
@@ -161,10 +161,7 @@ import {
         }
 
         function shellCollectorHref(username) {
-            const params = new URLSearchParams();
-            params.set("view", "collector");
-            if (username) params.set("username", username);
-            return `binder.html?${params.toString()}`;
+            return shellHref('collector', username ? { username } : {});
         }
 
         function displayStatus(
@@ -222,7 +219,7 @@ import {
             if (viewPublicProfileCard) {
                 viewPublicProfileCard.href = username
                     ? href
-                    : "binder.html?view=profile";
+                    : shellHref('profile');
                 if (username) {
                     viewPublicProfileCard.dataset.shellView = "collector";
                 } else {

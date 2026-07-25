@@ -3,6 +3,7 @@ import {
             loadOwnedProfileCards,
             loadPublicCollectorProfile
         } from "../profile-service.js";
+        import { shellHref } from "../shell-route-utils.js";
         import {
             followCollector,
             getPublicCollectorSocial,
@@ -699,7 +700,7 @@ import {
                     proposeTradeButton.removeAttribute('href');
                 } else {
                     proposeTradeButton.hidden = false;
-                    const tradeUrl = `binder.html?view=offers&username=${encodeURIComponent(profile.username)}`;
+                    const tradeUrl = shellHref('offers', { username: profile.username });
                     proposeTradeButton.href = tradeUrl;
                     proposeTradeButton.onclick = event => {
                         if (window.parent !== window) {
@@ -719,7 +720,7 @@ import {
                     reportProfileButton.hidden = true;
                 } else {
                     reportProfileButton.hidden = false;
-                    const reportUrl = `binder.html?view=report&username=${encodeURIComponent(profile.username)}`;
+                    const reportUrl = shellHref('report', { username: profile.username });
                     reportProfileButton.href = reportUrl;
                     reportProfileButton.onclick = event => {
                         if (window.parent !== window) {

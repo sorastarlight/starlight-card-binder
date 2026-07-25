@@ -1,4 +1,4 @@
-import { loginShellHref } from '../shell-route-utils.js';
+import { loginShellHref, shellHref } from '../shell-route-utils.js';
 import { supabase } from '../supabase-client.js';
 import { getPullFeed } from '../social-service.js';
 
@@ -51,7 +51,7 @@ function renderItems() {
     const highlight = item.payload?.highlight || null;
     const name = actor.displayName || actor.username || 'Collector';
     const profileHref = actor.username
-      ? `binder.html?view=collector&username=${encodeURIComponent(actor.username)}`
+      ? shellHref('collector', { username: actor.username })
       : '#';
     const isSeriesComplete = item.type === 'series_complete';
     const seriesName = item.payload?.seriesName || '';

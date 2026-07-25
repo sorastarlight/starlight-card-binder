@@ -1,4 +1,5 @@
-import {submitProfileReport} from '../moderation-service.js';
+import { submitProfileReport} from '../moderation-service.js';
+import { shellHref } from '../shell-route-utils.js';
 const params=new URLSearchParams(location.search);
 const username=document.getElementById('username');
 const status=document.getElementById('status');
@@ -8,8 +9,8 @@ const reported=params.get('username')||'';
 username.value=reported;
 if(cancel){
   cancel.href=reported
-    ?`binder.html?view=collector&username=${encodeURIComponent(reported)}`
-    :'binder.html?view=home';
+    ? shellHref('collector', { username: reported })
+    : shellHref('home');
   cancel.setAttribute('target','_top');
   cancel.setAttribute('data-shell-view', reported ? 'collector' : 'home');
 }

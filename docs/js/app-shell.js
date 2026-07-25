@@ -8,7 +8,8 @@ import {
   aliasShellRoute,
   isKnownShellRoute,
   normalizeNotificationParams,
-  resolveNotificationRoute
+  resolveNotificationRoute,
+  shellHref
 } from './shell-route-utils.js';
 import { getShellNavigation } from './shell-navigation-service.js';
 import { applyShellNavigationToDom, applyShellPageTitles } from './shell-navigation-render.js';
@@ -275,7 +276,7 @@ function ensureNotificationPopover(){
   const pop=document.createElement('div');
   pop.className='shell-notification-popover';
   pop.hidden=true;
-  pop.innerHTML='<div class="shell-popover-head"><strong>Notifications</strong><a href="binder.html?view=notifications" data-shell-view="notifications">View all</a></div><div class="shell-popover-list">Loading…</div>';
+  pop.innerHTML=`<div class="shell-popover-head"><strong>Notifications</strong><a href="${shellHref('notifications')}" data-shell-view="notifications">View all</a></div><div class="shell-popover-list">Loading…</div>`;
   button.parentElement?.appendChild(pop);
   button.addEventListener('click',async e=>{
     e.preventDefault();
@@ -365,8 +366,8 @@ async function hydrateAccount(){
     const link=document.querySelector('[data-shell-profile-link]');
     if(!link)return;
     link.href=profileUsername
-      ? `binder.html?view=collector&username=${encodeURIComponent(profileUsername)}`
-      : 'binder.html?view=profile';
+      ? shellHref('collector', { username: profileUsername })
+      : shellHref('profile');
   };
   let access = null;
   try{
@@ -479,7 +480,7 @@ accountMenu?.addEventListener('click',async e=>{
     }catch(err){
       console.warn('[Starlight] Sign out failed',err);
     }
-    location.href='binder.html?view=home';
+    location.href=shellHref('home');
     return;
   }
   const authLink=e.target.closest('[data-shell-auth]');

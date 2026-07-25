@@ -1,3 +1,4 @@
+import { shellHref } from '../shell-route-utils.js';
 import { notifyShellEconomyChanged } from '../shell-economy.js';
 import {
   claimPendingTwitchUnlocks,
@@ -252,7 +253,7 @@ function renderLocked(data) {
       <div class="season-locked-actions">
         ${linked
           ? `<p class="season-status">Linked as @${esc(data.twitchLogin || 'twitch')}</p>
-             <a class="btn primary" data-shell-view="rewards" href="binder.html?view=rewards">${esc(seasonCopy.openGiftsCta || 'Open Received Gifts')}</a>`
+             <a class="btn primary" data-shell-view="rewards" href="${shellHref('rewards')}">${esc(seasonCopy.openGiftsCta || 'Open Received Gifts')}</a>`
           : `<button class="btn primary" type="button" id="season-link-twitch">${esc(seasonCopy.linkTwitchCta || 'Link Twitch')}</button>`}
       </div>
     </div>

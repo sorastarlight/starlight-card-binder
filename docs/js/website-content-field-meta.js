@@ -56,7 +56,7 @@ export const WEBSITE_PAGE_META = Object.freeze({
   },
   binderLanding: {
     description: 'Binder hero, series splash, grid chrome, filters, and empty states.',
-    previewUrl: 'binder.html?view=binder',
+    previewUrl: 'binder?view=binder',
     groups: [
       {
         id: 'hero',
@@ -138,7 +138,7 @@ export const WEBSITE_PAGE_META = Object.freeze({
   },
   reveal: {
     description: 'Shared card-pull reveal overlay: pack prompts, pile, results, and badges.',
-    previewUrl: 'binder.html?view=binder',
+    previewUrl: 'binder?view=binder',
     groups: [
       {
         id: 'hero',
@@ -197,7 +197,7 @@ export const WEBSITE_PAGE_META = Object.freeze({
   },
   binderSidePanel: {
     description: 'Binder right-side card info panel actions and labels.',
-    previewUrl: 'binder.html?view=binder',
+    previewUrl: 'binder?view=binder',
     groups: [
       {
         id: 'actions',
@@ -233,7 +233,7 @@ export const WEBSITE_PAGE_META = Object.freeze({
   },
   binderFullView: {
     description: 'Card full-view analyzer overlay actions and labels.',
-    previewUrl: 'binder.html?view=binder',
+    previewUrl: 'binder?view=binder',
     groups: [
       {
         id: 'actions',
@@ -270,7 +270,7 @@ export const WEBSITE_PAGE_META = Object.freeze({
   },
   binderDisplay: {
     description: 'Binder layout and unowned-card display behavior.',
-    previewUrl: 'binder.html?view=binder',
+    previewUrl: 'binder?view=binder',
     groups: [
       {
         id: 'layout',

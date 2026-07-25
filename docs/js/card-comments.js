@@ -1,4 +1,4 @@
-import { loginShellHref } from './shell-route-utils.js';
+import { loginShellHref, shellHref } from './shell-route-utils.js';
 import { deleteCardComment, getCardComments, postCardComment } from './social-service.js';
 import { supabase } from './supabase-client.js';
 
@@ -63,7 +63,7 @@ export async function mountCardComments(host, cardId) {
           const author = comment.author || {};
           const name = author.displayName || author.username || 'Collector';
           const profile = author.username
-            ? `binder.html?view=collector&username=${encodeURIComponent(author.username)}`
+            ? shellHref('collector', { username: author.username })
             : '';
           const authorMarkup = profile
             ? `<a href="${esc(profile)}" target="_top" data-shell-view="collector"><strong>${esc(name)}</strong></a>`

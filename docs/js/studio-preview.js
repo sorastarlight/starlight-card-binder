@@ -14,7 +14,7 @@ export function isStudioPreview(search = typeof location !== 'undefined' ? locat
 
 /**
  * Build a relative preview URL for an embedded public page.
- * Preserves existing query params (e.g. binder.html?view=binder).
+ * Preserves existing query params (e.g. binder?view=binder).
  */
 export function buildContentStudioPreviewUrl(previewUrl) {
   const raw = String(previewUrl || 'home.html').trim() || 'home.html';
@@ -30,5 +30,5 @@ export function buildShellStudioPreviewUrl(view = 'home') {
   const params = new URLSearchParams();
   params.set('view', view || 'home');
   params.set(STUDIO_PREVIEW_PARAM, '1');
-  return `binder.html?${params.toString()}`;
+  return `binder?${params.toString()}`;
 }

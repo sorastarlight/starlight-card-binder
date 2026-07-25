@@ -128,7 +128,7 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.match(binder, /starlight-evolution/);
   assert.match(evoPage, /Evolve My Cards/);
   assert.match(evoPage, /Infuse duplicate cards with Starlight Energy/);
-  assert.match(evoPage, /binder\.html\?view=collection/);
+  assert.match(evoPage, /binder\?view=collection/);
   assert.match(shellDefaults, /starlight-evolution/);
   assert.match(shellRoutes, /starlight-evolution/);
   assert.match(appShell, /starlight-evolution\.html/);

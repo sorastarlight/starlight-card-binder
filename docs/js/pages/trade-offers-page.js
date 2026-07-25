@@ -1,5 +1,6 @@
 import { getTradeOfferContext, createTradeOffer, getMyTradeOffers, respondToTradeOffer, searchTradeCollectors } from '../trade-offer-service.js';
 import { buildTradeSearchHaystack } from '../card-filter-utils.js';
+import { shellHref } from '../shell-route-utils.js';
 import { getCachedWebsiteContent } from '../website-content-hydrate.js';
 import { bindTablistKeyboard, syncTabSelection } from '../tablist-a11y.js';
 
@@ -175,7 +176,7 @@ function resetComposerSelections() {
 function profileHref(name) {
   const handle = String(name || '').trim().replace(/^@/, '');
   if (!handle) return '';
-  return `binder.html?view=collector&username=${encodeURIComponent(handle)}`;
+  return shellHref('collector', { username: handle });
 }
 
 function collectorLink(displayName, handle) {

@@ -14,7 +14,7 @@ const params=new URLSearchParams(location.search);
           return;
         }
       }catch(_){ }
-      location.replace('binder.html?view='+(params.get('flow')==='broadcaster'?'admin-twitch':'profile'));
+      location.replace('binder?view='+(params.get('flow')==='broadcaster'?'admin-twitch':'profile'));
     }
     document.getElementById('closeButton').addEventListener('click',finish);
     setTimeout(finish,900);

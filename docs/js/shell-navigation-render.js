@@ -1,5 +1,6 @@
 import { mergeShellNavigation } from './shell-navigation-model.js';
 import { cloneDefaultShellNavigation } from './shell-navigation-defaults.js';
+import { loginShellHref, shellHref } from './shell-route-utils.js';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
   '&': '&amp;',
@@ -45,16 +46,16 @@ function renderAccountMenuItem(item) {
     return `<button role="menuitem" type="button" class="shell-signout-button" data-shell-signout>${esc(item.label || 'Sign Out')}</button>`;
   }
   if (features.includes('signIn')) {
-    return `<a role="menuitem" data-shell-auth="signin" href="binder.html?view=login&amp;mode=signin">${esc(item.label || 'Sign In')}</a>`;
+    return `<a role="menuitem" data-shell-auth="signin" href="${loginShellHref('signin')}">${esc(item.label || 'Sign In')}</a>`;
   }
   if (features.includes('signUp')) {
-    return `<a role="menuitem" data-shell-auth="signup" href="binder.html?view=login&amp;mode=signup">${esc(item.label || 'Register')}</a>`;
+    return `<a role="menuitem" data-shell-auth="signup" href="${loginShellHref('signup')}">${esc(item.label || 'Register')}</a>`;
   }
   if (features.includes('profileLink')) {
-    return `<a role="menuitem" class="shell-profile-link" data-shell-profile-link="" href="binder.html?view=profile">${esc(item.label || 'View My Profile')}${itemBadge(features)}</a>`;
+    return `<a role="menuitem" class="shell-profile-link" data-shell-profile-link="" href="${shellHref('profile')}">${esc(item.label || 'View My Profile')}${itemBadge(features)}</a>`;
   }
   const destination = item.destination || 'home';
-  return `<a role="menuitem" data-shell-view="${esc(destination)}" href="binder.html?view=${esc(destination)}">${esc(item.label || destination)}${itemBadge(features)}</a>`;
+  return `<a role="menuitem" data-shell-view="${esc(destination)}" href="${shellHref(destination)}">${esc(item.label || destination)}${itemBadge(features)}</a>`;
 }
 
 function renderSidebarItem(item) {
@@ -66,7 +67,7 @@ function renderSidebarItem(item) {
   const destination = item.destination || 'home';
   const classes = ['shell-nav-item', item.className || ''].filter(Boolean).join(' ');
   const staffClass = features.includes('staffOnly') ? ' staff-link' : '';
-  return `<a class="${esc(classes)}${staffClass}" data-shell-view="${esc(destination)}" href="binder.html?view=${esc(destination)}">${renderIcon(item.icon)} <span>${esc(item.label)}</span>${itemBadge(features)}</a>`;
+  return `<a class="${esc(classes)}${staffClass}" data-shell-view="${esc(destination)}" href="${shellHref(destination)}">${renderIcon(item.icon)} <span>${esc(item.label)}</span>${itemBadge(features)}</a>`;
 }
 
 function renderSidebarSection(section) {
@@ -89,7 +90,7 @@ export function applyShellNavigationToDom(navigation, { isStaff = false } = {}) 
   if (top) {
     top.innerHTML = (config.topBar.quickLinks || [])
       .filter(link => link.enabled !== false)
-      .map(link => `<a data-shell-view="${esc(link.destination)}" href="binder.html?view=${esc(link.destination)}">${esc(link.label)}</a>`)
+      .map(link => `<a data-shell-view="${esc(link.destination)}" href="${shellHref(link.destination)}">${esc(link.label)}</a>`)
       .join('');
   }
 

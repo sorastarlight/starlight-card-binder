@@ -209,3 +209,17 @@ test('signed-out CTAs avoid standalone login.html links', async () => {
   assert.match(collector, /binder\?view=login/);
   assert.match(importPage, /binder\?view=login/);
 });
+
+test('shell navigation render and static shell HTML use extensionless binder hrefs', async () => {
+  const [render, binderHtml, homeHtml] = await Promise.all([
+    read('docs/js/shell-navigation-render.js'),
+    read('docs/binder.html'),
+    read('docs/home.html')
+  ]);
+
+  assert.match(render, /shellHref\(/);
+  assert.doesNotMatch(render, /binder\.html\?/);
+  assert.match(binderHtml, /href="binder\?view=home"/);
+  assert.match(homeHtml, /href="binder\?view=daily"/);
+  assert.doesNotMatch(homeHtml, /binder\.html/);
+});

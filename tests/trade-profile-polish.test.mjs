@@ -43,7 +43,7 @@ test('trade offer composer keeps selections outside the pick grid DOM', async ()
   assert.match(offersPage, /setActiveOfferTab\('outgoing'\)/);
   assert.match(offersPage, /initialOfferTab/);
   assert.match(offersPage, /Decline this trade\?/);
-  assert.match(offersPage, /view=collector&username=/);
+  assert.match(offersPage, /shellHref\('collector'/);
   assert.match(offersPage, /target="_top"/);
   assert.match(offersPage, /data-shell-view="collector"/);
 });

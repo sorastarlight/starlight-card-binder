@@ -133,8 +133,8 @@ export function extractShellRouteKey(value) {
   const viewMatch = raw.match(/(?:^|[/?&#])view=([a-z0-9_-]+)/i);
   if (viewMatch) return viewMatch[1].toLowerCase();
 
-  const binderMatch = raw.match(/binder\.html$/i);
-  if (binderMatch) return 'binder';
+  const binderMatch = raw.match(/binder(?:\.html)?(?:[?#]|$)/i);
+  if (binderMatch && !viewMatch) return 'binder';
 
   raw = raw.replace(/^\/+/, '');
   const segments = raw.split(/[/?&#]/).filter(Boolean);
@@ -211,19 +211,22 @@ export function resolveNotificationRoute(value, notice = {}) {
   return 'notifications';
 }
 
-export function shellNotificationUrl(notice = {}) {
-  const route = resolveNotificationRoute(notice.route, notice);
-  const params = new URLSearchParams(normalizeNotificationParams(notice));
-  params.set('view', route);
+export function shellHref(view, extraParams = {}) {
+  const params = new URLSearchParams();
+  if (view) params.set('view', view);
+  Object.entries(extraParams).forEach(([key, value]) => {
+    if (value != null && value !== '') params.set(key, String(value));
+  });
   return `binder?${params.toString()}`;
 }
 
+export function shellNotificationUrl(notice = {}) {
+  const route = resolveNotificationRoute(notice.route, notice);
+  return shellHref(route, normalizeNotificationParams(notice));
+}
+
 export function loginShellHref(mode = 'signin') {
-  const params = new URLSearchParams({
-    view: 'login',
-    mode: mode === 'signup' ? 'signup' : 'signin'
-  });
-  return `binder?${params.toString()}`;
+  return shellHref('login', { mode: mode === 'signup' ? 'signup' : 'signin' });
 }
 
 export function redirectToLogin(mode = 'signin', { delayMs = 0 } = {}) {

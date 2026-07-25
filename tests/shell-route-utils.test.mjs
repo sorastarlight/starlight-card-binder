@@ -6,6 +6,7 @@ import {
   normalizeNotificationParams,
   loginShellHref,
   resolveNotificationRoute,
+  shellHref,
   shellNotificationUrl
 } from '../docs/js/shell-route-utils.js';
 
@@ -14,7 +15,7 @@ test('aliasShellRoute trusts known keys and path-prefixed binder links', () => {
   assert.equal(aliasShellRoute('received-gifts'), 'rewards');
   assert.equal(aliasShellRoute('user-rankings'), 'rankings');
   assert.equal(aliasShellRoute('binder.html?view=rankings'), 'rankings');
-  assert.equal(aliasShellRoute('binder.html?view=offers'), 'offers');
+  assert.equal(aliasShellRoute('binder?view=offers'), 'offers');
   assert.equal(aliasShellRoute('starlight-card-binder/binder.html?view=rewards'), 'rewards');
   assert.equal(aliasShellRoute('https://example.com/binder.html?view=shop'), 'shop');
   assert.equal(aliasShellRoute('not-a-real-route'), '');
@@ -47,11 +48,17 @@ test('notification params normalize gift and event aliases', () => {
     route_params: { giftId: 'abc', event: 'evt-1' },
     source_key: 'received:ignored'
   }), { giftId: 'abc', event: 'evt-1', rewardId: 'abc', eventId: 'evt-1' });
-  assert.equal(
-    shellNotificationUrl({ route: 'rewards', route_params: { rewardId: 'rr-1' } }),
-    'binder?rewardId=rr-1&view=rewards'
-  );
+  const rewardsUrl = new URL(shellNotificationUrl({ route: 'rewards', route_params: { rewardId: 'rr-1' } }), 'https://starlight.local/');
+  assert.equal(rewardsUrl.searchParams.get('view'), 'rewards');
+  assert.equal(rewardsUrl.searchParams.get('rewardId'), 'rr-1');
   assert.equal(extractShellRouteKey('/docs/binder.html?view=collection'), 'collection');
+  assert.equal(extractShellRouteKey('/docs/binder?view=shop'), 'shop');
+  assert.equal(extractShellRouteKey('/docs/binder'), 'binder');
+});
+
+test('shellHref builds extensionless binder routes with extra params', () => {
+  assert.equal(shellHref('home'), 'binder?view=home');
+  assert.equal(shellHref('collector', { username: 'sora' }), 'binder?view=collector&username=sora');
 });
 
 test('loginShellHref builds shell login routes', () => {

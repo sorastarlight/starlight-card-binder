@@ -12,7 +12,7 @@ test('studio preview helpers build relative preview URLs', () => {
   assert.match(buildContentStudioPreviewUrl('home.html'), /home\.html\?/);
   assert.match(buildContentStudioPreviewUrl('home.html'), /studioPreview=1/);
   assert.match(buildContentStudioPreviewUrl('home.html'), /embed=1/);
-  assert.match(buildContentStudioPreviewUrl('binder.html?view=binder'), /view=binder/);
-  assert.match(buildShellStudioPreviewUrl('home'), /binder\.html\?view=home/);
+  assert.match(buildContentStudioPreviewUrl('binder?view=binder'), /view=binder/);
+  assert.match(buildShellStudioPreviewUrl('home'), /binder\?view=home/);
   assert.match(buildShellStudioPreviewUrl('home'), /studioPreview=1/);
 });

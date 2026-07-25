@@ -1,3 +1,4 @@
+import { shellHref } from '../shell-route-utils.js';
 import { avatarFrameClassName, avatarFrameOverlayMarkup, avatarFrameOverlayUrl } from '../avatar-frame-utils.js';
 import { listPublicCollectorRankings } from '../collector-rankings-service.js';
 import { levelFromPoints } from '../collector-level.js';
@@ -46,11 +47,11 @@ function setLive(message) {
 }
 
 function profileHref(username) {
-  return `binder.html?view=collector&username=${encodeURIComponent(username)}`;
+  return shellHref('collector', { username });
 }
 
 function tradeHref(username) {
-  return `binder.html?view=offers&username=${encodeURIComponent(username)}`;
+  return shellHref('offers', { username });
 }
 
 function avatarMarkup(entry) {

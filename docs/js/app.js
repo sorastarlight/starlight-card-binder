@@ -1451,7 +1451,7 @@ function renderGridPage(target, mode) {
       : (collectionCopy.emptyAllLead || 'Earn cards from Daily Boosters, redemption codes, and special rewards to fill this collection.'));
   const emptyAction = baseList.length
     ? `<button class="btn primary" type="button" data-reset-card-filters>${esc(collectionCopy.emptyFiltersCta || 'Reset Filters')}</button>`
-    : `<a class="btn primary" href="binder.html">${esc(mode === 'favorites' ? (collectionCopy.emptyFavoritesCta || 'Open Binder') : (collectionCopy.emptyAllCta || 'Open Binder'))}</a>`;
+    : `<a class="btn primary" href="binder?view=binder">${esc(mode === 'favorites' ? (collectionCopy.emptyFavoritesCta || 'Open Binder') : (collectionCopy.emptyAllCta || 'Open Binder'))}</a>`;
   wrap.innerHTML = list.length ? list.map(c => {
     const got = isCollected(c.id); const hidden = !got;
     const quantity = getCardQuantity(c.id);
@@ -1476,7 +1476,7 @@ function renderFavoritesShowcase() {
       : (collectionCopy.favoritesShowcaseEmptyLead || 'Star a card to put it on the Starlight stage. Your favorites will scroll here like a tiny idol parade.');
     const action = allFavorites.length
       ? `<button class="btn primary" type="button" data-reset-card-filters>${esc(collectionCopy.emptyFiltersCta || 'Reset Filters')}</button>`
-      : `<a class="btn primary" href="binder.html">${esc(collectionCopy.favoritesShowcaseCta || 'Find Favorites')}</a>`;
+      : `<a class="btn primary" href="binder?view=binder">${esc(collectionCopy.favoritesShowcaseCta || 'Find Favorites')}</a>`;
     showcase.innerHTML = `<div class="empty-state trophy-empty"><h2>${esc(title)}</h2><p>${esc(lead)}</p>${action}</div>`;
     return;
   }
