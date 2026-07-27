@@ -231,7 +231,11 @@ test('shell refreshes account chrome after embedded login', async () => {
   ]);
 
   assert.match(shell, /onAuthStateChange/);
-  assert.match(shell, /starlight-auth-changed[\s\S]*hydrateAccount/);
-  assert.match(shell, /previousRoute==='login'[\s\S]*hydrateAccount/);
-  assert.match(loginPage, /starlight-auth-changed/);
+  assert.match(shell, /INITIAL_SESSION/);
+  assert.match(shell, /syncShellSessionFromMessage/);
+  assert.match(shell, /scheduleHydrateAccount/);
+  assert.match(shell, /applyAccountChrome/);
+  assert.match(shell, /starlight-auth-changed[\s\S]*syncShellSessionFromMessage/);
+  assert.match(shell, /previousRoute==='login'[\s\S]*scheduleHydrateAccount/);
+  assert.match(loginPage, /starlight-auth-changed[\s\S]*access_token/);
 });

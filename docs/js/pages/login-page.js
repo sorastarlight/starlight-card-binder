@@ -254,10 +254,15 @@ import { supabase } from "../supabase-client.js";
             }
         }
 
-        function goToBinder(view = 'home') {
+        async function goToBinder(view = 'home') {
             if (document.documentElement.classList.contains('starlight-embedded')) {
+                const { data: { session } } = await supabase.auth.getSession();
                 parent.postMessage({
-                    type: 'starlight-auth-changed'
+                    type: 'starlight-auth-changed',
+                    session: session ? {
+                        access_token: session.access_token,
+                        refresh_token: session.refresh_token
+                    } : null
                 }, location.origin);
                 parent.postMessage({
                     type: 'starlight-navigate',

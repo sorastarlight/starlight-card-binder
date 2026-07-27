@@ -185,7 +185,7 @@ function navigate(route,{push=true,extra={}}={}){
     if(frame)setFrameLocation('about:blank');
     document.title='The Starlight Card Series Binder | Starlight Card Binder';
     window.renderAll?.();
-    if(previousRoute==='login')hydrateAccount();
+    if(previousRoute==='login')scheduleHydrateAccount();
     return;
   }
   nativeView?.classList.add('hidden');
@@ -193,7 +193,7 @@ function navigate(route,{push=true,extra={}}={}){
   document.title=`${routes[route].title} | Starlight Card Binder`;
   loadEmbeddedView(route,{force:true,resetRetry:true});
   window.scrollTo({top:0,left:0,behavior:'auto'});
-  if(previousRoute==='login')hydrateAccount();
+  if(previousRoute==='login')scheduleHydrateAccount();
 }
 
 function markViewReady(data={}){
@@ -354,17 +354,49 @@ function refreshShellBadges(){
   hydrateReceivedGiftBadge();
 }
 
+function applyAccountChrome(isSignedIn){
+  document.querySelectorAll('[data-shell-signed-out]').forEach(node=>{
+    if(isSignedIn)node.setAttribute('hidden','');
+    else node.removeAttribute('hidden');
+  });
+  document.querySelectorAll('[data-shell-signed-in]').forEach(node=>{
+    if(isSignedIn)node.removeAttribute('hidden');
+    else node.setAttribute('hidden','');
+  });
+}
+
+async function resolveShellUser(){
+  const { data: { session } } = await supabase.auth.getSession();
+  if(session?.user)return session.user;
+  const { data } = await supabase.auth.getUser();
+  return data?.user ?? null;
+}
+
+async function syncShellSessionFromMessage(sessionPayload){
+  if(!sessionPayload?.access_token||!sessionPayload?.refresh_token)return false;
+  try{
+    const { error } = await supabase.auth.setSession({
+      access_token: sessionPayload.access_token,
+      refresh_token: sessionPayload.refresh_token
+    });
+    if(error)throw error;
+    return true;
+  }catch(error){
+    console.warn('[Starlight] Shell session sync failed', error);
+    return false;
+  }
+}
+
+let hydrateAccountQueue = Promise.resolve();
+
+function scheduleHydrateAccount(){
+  hydrateAccountQueue = hydrateAccountQueue
+    .then(() => hydrateAccount())
+    .catch(error => console.warn('[Starlight] Shell account hydration failed', error));
+  return hydrateAccountQueue;
+}
+
 async function hydrateAccount(){
-  const signedOutNodes=[...document.querySelectorAll('[data-shell-signed-out]')];
-  const signedInNodes=[...document.querySelectorAll('[data-shell-signed-in]')];
-  const showSignedOut=()=>{
-    signedOutNodes.forEach(node=>node.removeAttribute('hidden'));
-    signedInNodes.forEach(node=>node.setAttribute('hidden',''));
-  };
-  const showSignedIn=()=>{
-    signedOutNodes.forEach(node=>node.setAttribute('hidden',''));
-    signedInNodes.forEach(node=>node.removeAttribute('hidden'));
-  };
   const applyProfileLink=()=>{
     const link=document.querySelector('[data-shell-profile-link]');
     if(!link)return;
@@ -373,16 +405,16 @@ async function hydrateAccount(){
       : shellHref('profile');
   };
   let access = null;
+  let signedIn = false;
   try{
-    const {data}=await supabase.auth.getUser();const user=data?.user;
+    const user = await resolveShellUser();
+    signedIn = Boolean(user);
     if(!user){
-      showSignedOut();
       setShellAvatar('');
       document.querySelector('[data-shell-account-name]').textContent='Welcome to Starlight Cards';
       document.querySelector('[data-shell-account-sub]').textContent='Sign in or register to collect cards';
       profileUsername='';
     } else {
-      showSignedIn();
       const {data:profile}=await supabase.from('profiles').select('username,display_name,onboarding_complete,username_locked,username_source,avatar_url,selected_title_id').eq('id',user.id).maybeSingle();
       profileUsername=profile?.username||'';
       const name=profile?.display_name||profile?.username||user.email||'Collector';
@@ -410,10 +442,14 @@ async function hydrateAccount(){
     }
   }catch(e){
     console.warn('[Starlight] Shell account hydration failed',e);
-    showSignedOut();
+    signedIn = false;
     setShellAvatar('');
     profileUsername='';
+    document.querySelector('[data-shell-account-name]').textContent='Welcome to Starlight Cards';
+    document.querySelector('[data-shell-account-sub]').textContent='Sign in or register to collect cards';
   }
+
+  applyAccountChrome(signedIn);
 
   try{
     let navigation = await getShellNavigation();
@@ -441,6 +477,7 @@ async function hydrateAccount(){
           applyProfileLink();
           refreshShellBadges();
           setActive(currentRoute);
+          applyAccountChrome(signedIn);
         });
       }
       try{
@@ -454,9 +491,15 @@ async function hydrateAccount(){
     refreshShellBadges();
   }
 
+  applyAccountChrome(signedIn);
+
   if(access?.isStaff)document.querySelector('.unified-nav')?.classList.add('has-staff-access');
   document.querySelectorAll('.staff-link').forEach(el=>el.classList.toggle('visible',Boolean(access?.isStaff)));
   document.querySelector('.staff-only-menu')?.toggleAttribute('hidden',!access?.isStaff);
+
+  if(signedIn){
+    window.dispatchEvent(new CustomEvent('starlight-dashboard-refresh',{detail:{source:'shell-account'}}));
+  }
 }
 
 document.addEventListener('click',e=>{
@@ -515,11 +558,14 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape')closeAccountMenu();
 });
 window.addEventListener('popstate',()=>navigate(new URLSearchParams(location.search).get('view')||'home',{push:false}));
-window.addEventListener('message',e=>{
+window.addEventListener('message',async e=>{
   if(e.origin!==location.origin)return;
   const data=e.data||{};
   if(data.type==='starlight-close-notifications')closeNotificationPopover();
-  if(data.type==='starlight-auth-changed')hydrateAccount();
+  if(data.type==='starlight-auth-changed'){
+    await syncShellSessionFromMessage(data.session);
+    scheduleHydrateAccount();
+  }
   if(data.type==='starlight-navigate'){
     const route = aliasShellRoute(data.view) || (isKnownShellRoute(data.view) ? data.view : '');
     if(route) navigate(route,{extra:data.params||{}});
@@ -559,10 +605,12 @@ window.addEventListener('pageshow',event=>{
 
 const initial=aliasShellRoute(new URLSearchParams(location.search).get('view')||'home')||'home';
 navigate(initial,{push:false});
-hydrateAccount().then(ensureNotificationPopover);
 supabase.auth.onAuthStateChange((event)=>{
-  if(event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='USER_UPDATED')hydrateAccount();
+  if(event==='INITIAL_SESSION'||event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='USER_UPDATED'||event==='TOKEN_REFRESHED'){
+    scheduleHydrateAccount();
+  }
 });
+scheduleHydrateAccount().then(ensureNotificationPopover);
 hydrateTradeOfferBadge();
 hydrateNotificationBadge();
 hydrateReceivedGiftBadge();
