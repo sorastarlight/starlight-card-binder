@@ -34,6 +34,8 @@ const dialogBodyEl = document.getElementById('st-evo-card-body');
 const dialogTitleEl = document.getElementById('st-evo-card-title');
 const dialogCloseEl = document.getElementById('st-evo-card-close');
 const resultModalEl = document.getElementById('st-evo-result-modal');
+const resultStageEl = document.getElementById('st-evo-flair-stage');
+const resultTitleEl = document.getElementById('st-evo-result-title');
 const resultArtEl = document.getElementById('st-evo-result-art');
 const resultTierEl = document.getElementById('st-evo-result-tier');
 const resultNameEl = document.getElementById('st-evo-result-name');
@@ -77,21 +79,73 @@ function preferReducedMotion() {
   }
 }
 
-function showEvolutionResult({ cardName, imageUrl, toTier, label }) {
-  const frame = prestigeClassName(toTier);
+function wait(ms) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function resetFlairStage() {
+  if (!resultStageEl) return;
+  resultStageEl.classList.remove('is-intro', 'is-charge', 'is-burst', 'is-reveal', 'is-complete');
+}
+
+function setResultCardArt(imageUrl, cardName, tier) {
+  if (!resultArtEl) return;
+  const frame = prestigeClassName(tier);
+  resultArtEl.className = `st-evo-result-art ${frame}`;
+  resultArtEl.innerHTML = imageUrl
+    ? `<span class="collection-image"><img src="${esc(imageUrl)}" alt="${esc(cardName)}" draggable="false"></span>`
+    : '';
+}
+
+function applyResultMeta({ cardName, toTier, label }, visible = true) {
   const tierToken = String(toTier).replace(/_/g, '-');
   const safeLabel = label || prestigeLabel(toTier);
-
-  if (resultArtEl) {
-    resultArtEl.className = `st-evo-result-art ${frame}`;
-    resultArtEl.innerHTML = imageUrl
-      ? `<img src="${esc(imageUrl)}" alt="${esc(cardName)}" draggable="false">`
-      : '';
-  }
   if (resultTierEl) {
+    resultTierEl.hidden = !visible;
     resultTierEl.innerHTML = `<span class="prestige-badge prestige-${esc(tierToken)}">${esc(safeLabel)}</span>`;
   }
-  if (resultNameEl) resultNameEl.textContent = cardName;
+  if (resultNameEl) {
+    resultNameEl.hidden = !visible;
+    resultNameEl.textContent = cardName;
+  }
+  if (resultTitleEl && visible) {
+    resultTitleEl.textContent = 'Evolved!';
+  }
+}
+
+async function playFlairSequence({ cardName, imageUrl, fromTier, toTier, label }) {
+  const reduced = preferReducedMotion();
+  resetFlairStage();
+  applyResultMeta({ cardName, toTier, label }, false);
+  if (resultTitleEl) resultTitleEl.textContent = reduced ? 'Evolution complete!' : '';
+  setResultCardArt(imageUrl, cardName, fromTier || toTier);
+
+  if (reduced) {
+    setResultCardArt(imageUrl, cardName, toTier);
+    applyResultMeta({ cardName, toTier, label }, true);
+    resultStageEl?.classList.add('is-complete');
+    return;
+  }
+
+  resultStageEl?.classList.add('is-intro');
+  await wait(520);
+  resultStageEl?.classList.remove('is-intro');
+  resultStageEl?.classList.add('is-charge');
+  await wait(1500);
+  resultStageEl?.classList.remove('is-charge');
+  resultStageEl?.classList.add('is-burst');
+  setResultCardArt(imageUrl, cardName, toTier);
+  if (resultTitleEl) resultTitleEl.textContent = 'Evolved!';
+  await wait(680);
+  resultStageEl?.classList.remove('is-burst');
+  resultStageEl?.classList.add('is-reveal');
+  applyResultMeta({ cardName, toTier, label }, true);
+  await wait(260);
+  resultStageEl?.classList.add('is-complete');
+}
+
+function showEvolutionResult({ cardName, imageUrl, fromTier, toTier, label }) {
+  const safeLabel = label || prestigeLabel(toTier);
 
   if (!resultModal) {
     toast(`${cardName} evolved to ${safeLabel}!`, 'success');
@@ -99,16 +153,21 @@ function showEvolutionResult({ cardName, imageUrl, toTier, label }) {
   }
 
   return new Promise((resolve) => {
+    let autoCloseTimer = 0;
     const finish = () => {
-      resultArtEl?.classList.remove('is-celebrating');
+      if (autoCloseTimer) window.clearTimeout(autoCloseTimer);
+      resetFlairStage();
       resolve();
     };
+
     resultModalEl?.addEventListener('starlight:modal-close', finish, { once: true });
     resultModal.open({ initialFocus: resultDoneEl || resultCloseEl });
-    resultArtEl?.classList.add('is-celebrating');
-    if (!preferReducedMotion()) {
-      window.setTimeout(() => resultModal.close(), 2600);
-    }
+
+    playFlairSequence({ cardName, imageUrl, fromTier, toTier, label }).then(() => {
+      if (!preferReducedMotion()) {
+        autoCloseTimer = window.setTimeout(() => resultModal.close(), 2800);
+      }
+    });
   });
 }
 
@@ -348,6 +407,7 @@ async function handleEvolve(cardId) {
     await showEvolutionResult({
       imageUrl: card.imageUrl,
       cardName: card.name,
+      fromTier: card.tier,
       toTier,
       label: nextLabel
     });
