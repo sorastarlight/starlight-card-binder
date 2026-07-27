@@ -22,14 +22,25 @@
 }
 
 .prestige-frame-overlay {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: fill !important;
   pointer-events: none;
   user-select: none;
   z-index: 5;
+}
+
+.collection-image > img:not(.prestige-frame-overlay),
+.v61-card-art > img:not(.prestige-frame-overlay),
+.face.front > img:not(.prestige-frame-overlay),
+.st-r3-result-art > img:not(.prestige-frame-overlay),
+.st-r3-card-front > img:not(.prestige-frame-overlay),
+.st-evo-result-art > img:not(.prestige-frame-overlay),
+.st-evo-tier-preview > img:not(.prestige-frame-overlay) {
+  position: relative;
+  z-index: 1;
 }
 
 .full-card-wrap.prestige-frame .face.front,

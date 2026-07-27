@@ -36,6 +36,9 @@ export const EVOLUTION_LABELS = Object.freeze({
 /** @deprecated Prefer EVOLUTION_LABELS */
 export const FUSION_LABELS = EVOLUTION_LABELS;
 
+/** Bump when Radiance PNG assets change (cache bust). */
+export const PRESTIGE_FRAME_ASSET_VERSION = '2.9';
+
 const LEGACY_TIER_MAP = Object.freeze({
   standard: 'stardust',
   rookie: 'stardust',
@@ -149,7 +152,8 @@ export const PRESTIGE_FRAME_IMAGES = Object.freeze({
 
 /** Returns the Radiance PNG path for an evolution tier, or empty string for Standard. */
 export function prestigeFrameImageUrl(tier) {
-  return PRESTIGE_FRAME_IMAGES[normalizeEvolutionTier(tier)] || '';
+  const path = PRESTIGE_FRAME_IMAGES[normalizeEvolutionTier(tier)] || '';
+  return path ? `${path}?v=${PRESTIGE_FRAME_ASSET_VERSION}` : '';
 }
 
 /** Overlay markup placed above card art on enhanced/evolved cards. */

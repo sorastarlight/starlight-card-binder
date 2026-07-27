@@ -278,7 +278,7 @@
   border-radius: 12px;
 }
 
-.st-evo-owned-card .collection-image img {
+.st-evo-owned-card .collection-image img:not(.prestige-frame-overlay) {
   width: 100%;
   aspect-ratio: 5 / 7;
   object-fit: cover;

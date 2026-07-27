@@ -3,7 +3,7 @@
  * The Evolve My Cards page uses its own in-page result modal instead.
  */
 
-import { prestigeLabel } from './prestige-utils.js?v=1.6.0';
+import { prestigeLabel } from './prestige-utils.js?v=1.6.1';
 
 /**
  * @param {object} options

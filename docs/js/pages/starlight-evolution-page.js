@@ -16,7 +16,7 @@ import {
   prestigeFrameOverlayHtml,
   prestigeLabel,
   previousEvolutionTier
-} from '../prestige-utils.js?v=1.6.0';
+} from '../prestige-utils.js?v=1.6.1';
 
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
   '&': '&amp;',
