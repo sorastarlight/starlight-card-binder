@@ -1,7 +1,7 @@
 /* Starlight Evolution frames — Radiance I–V progressive card borders. */
 
 :root {
-  /* Radiance I–IV — Starlight Sapphire, Astral Amethyst, Celestial Ruby, Prismatic Obsidian */
+  /* Radiance I–IV — Starlight Sapphire, Astral Amethyst, Celestial Ruby, Magenta */
   --radiance-i-color: #2E73FF;
   --radiance-i-light: #7AABFF;
   --radiance-i-dark: #1A52CC;
@@ -18,14 +18,11 @@
   --radiance-iii-a: #FF7A96;
   --radiance-iii-b: #E53A5F;
   --radiance-iii-c: #C42A4F;
-  --radiance-iv-color: #22242B;
-  --radiance-iv-light: #52556A;
-  --radiance-iv-dark: #121318;
-  --radiance-iv-border: #22242B;
-  --radiance-iv-glow: rgba(34, 36, 43, 0.55);
-  --radiance-iv-prism-a: #2E73FF;
-  --radiance-iv-prism-b: #8A3DFF;
-  --radiance-iv-prism-c: #E53A5F;
+  --radiance-iv-color: #D946EF;
+  --radiance-iv-light: #F0ABFC;
+  --radiance-iv-dark: #A21CAF;
+  --radiance-iv-border: #D946EF;
+  --radiance-iv-glow: rgba(217, 70, 239, 0.42);
   --radiance-v-a: #fff4b8;
   --radiance-v-b: #9ad8ff;
   --radiance-v-c: #ffb0e8;
@@ -103,22 +100,20 @@
     0 0 48px rgba(229, 58, 95, 0.58),
     0 0 68px rgba(229, 58, 95, 0.42);
   --radiance-3d-iv-shadow:
-    inset 0 2px 0 rgba(130, 134, 152, 0.82),
-    inset 0 -5px 11px rgba(0, 0, 0, 0.62),
-    0 2px 0 rgba(82, 85, 106, 0.72),
-    0 8px 18px rgba(0, 0, 0, 0.48),
+    inset 0 2px 0 rgba(255, 220, 252, 0.88),
+    inset 0 -5px 11px rgba(162, 28, 175, 0.48),
+    0 2px 0 rgba(240, 171, 252, 0.62),
+    0 8px 18px rgba(162, 28, 175, 0.34),
     0 0 16px var(--radiance-iv-glow),
-    0 0 24px rgba(46, 115, 255, 0.22),
-    0 0 32px rgba(138, 61, 255, 0.18),
-    0 0 40px rgba(229, 58, 95, 0.14);
+    0 0 26px rgba(217, 70, 239, 0.44);
   --radiance-3d-iv-peak-shadow:
-    inset 0 4px 0 rgba(150, 154, 172, 0.92),
-    inset 0 -7px 14px rgba(0, 0, 0, 0.72),
-    0 4px 0 rgba(100, 104, 122, 0.85),
-    0 14px 28px rgba(0, 0, 0, 0.54),
-    0 0 30px rgba(46, 115, 255, 0.52),
-    0 0 48px rgba(138, 61, 255, 0.44),
-    0 0 68px rgba(229, 58, 95, 0.36);
+    inset 0 4px 0 rgba(255, 230, 252, 0.98),
+    inset 0 -7px 14px rgba(162, 28, 175, 0.58),
+    0 4px 0 rgba(240, 171, 252, 0.88),
+    0 14px 28px rgba(162, 28, 175, 0.46),
+    0 0 30px rgba(217, 70, 239, 0.72),
+    0 0 48px rgba(217, 70, 239, 0.58),
+    0 0 68px rgba(217, 70, 239, 0.42);
   --radiance-3d-v-shadow:
     inset 0 3px 0 rgba(255, 255, 255, 0.95),
     inset 0 -6px 12px rgba(48, 36, 92, 0.46),
@@ -292,6 +287,7 @@
   --radiance-3d-shadow: var(--radiance-3d-i-shadow);
   --radiance-3d-peak-shadow: var(--radiance-3d-i-peak-shadow);
   background: linear-gradient(155deg, var(--radiance-i-light) 0%, var(--radiance-i-color) 38%, var(--radiance-i-dark) 62%, var(--radiance-i-light) 100%);
+  background-size: 220% 220%;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -336,6 +332,7 @@
   --radiance-3d-shadow: var(--radiance-3d-ii-shadow);
   --radiance-3d-peak-shadow: var(--radiance-3d-ii-peak-shadow);
   background: linear-gradient(150deg, var(--radiance-ii-light) 0%, var(--radiance-ii-color) 34%, var(--radiance-ii-dark) 58%, var(--radiance-ii-light) 100%);
+  background-size: 220% 220%;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -408,7 +405,7 @@
   opacity: 0.88;
 }
 
-/* ⭐⭐⭐⭐ Radiance IV — Prismatic Obsidian */
+/* ⭐⭐⭐⭐ Radiance IV — Magenta */
 .prestige-super-starlight .v61-card-btn::after,
 .prestige-super-starlight .collection-image::after,
 .prestige-super-starlight.full-card-wrap::after,
@@ -425,6 +422,7 @@
   --radiance-3d-shadow: var(--radiance-3d-iv-shadow);
   --radiance-3d-peak-shadow: var(--radiance-3d-iv-peak-shadow);
   background: linear-gradient(145deg, var(--radiance-iv-light) 0%, var(--radiance-iv-color) 34%, var(--radiance-iv-dark) 58%, var(--radiance-iv-light) 100%);
+  background-size: 220% 220%;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -446,12 +444,11 @@
   content: "" !important;
   inset: 2px;
   padding: 2px;
-  border: 1px solid rgba(130, 134, 152, 0.72);
+  border: 1px solid rgba(240, 171, 252, 0.72);
   box-shadow:
-    inset 0 0 10px rgba(46, 115, 255, 0.16),
-    inset 0 0 14px rgba(138, 61, 255, 0.12),
-    inset 0 2px 4px rgba(180, 184, 200, 0.55),
-    inset 0 -3px 6px rgba(0, 0, 0, 0.42);
+    inset 0 0 10px rgba(217, 70, 239, 0.28),
+    inset 0 2px 4px rgba(255, 220, 252, 0.72),
+    inset 0 -3px 6px rgba(162, 28, 175, 0.32);
   opacity: 0.94;
 }
 
@@ -555,12 +552,11 @@
   box-shadow: inset 0 0 0 1px rgba(229, 58, 95, 0.38);
 }
 .prestige-badge.prestige-super-starlight {
-  background: linear-gradient(135deg, #52556a, #22242b);
-  color: #e8eaf0;
+  background: linear-gradient(135deg, #fce8ff, #f5c8ff);
+  color: #a21caf;
   box-shadow:
-    0 0 10px rgba(46, 115, 255, 0.18),
-    0 0 14px rgba(138, 61, 255, 0.14),
-    inset 0 0 0 1px rgba(130, 134, 152, 0.55);
+    0 0 10px rgba(217, 70, 239, 0.28),
+    inset 0 0 0 1px rgba(217, 70, 239, 0.42);
 }
 .prestige-badge.prestige-starlight-burst {
   background: linear-gradient(135deg, #fff8df, #e8f4ff, #ffe8f5, #fff4c8);
@@ -650,7 +646,10 @@
   .prestige-super-starlight.st-evo-border::after,
   .prestige-super-starlight.st-evo-result-art::after,
   .prestige-super-starlight.st-evo-tier-preview::after,
-  .prestige-super-starlight::after,
+  .prestige-super-starlight::after {
+    animation: radiance-tier-glow-pulse var(--radiance-holo-cycle) ease-in-out infinite;
+  }
+
   .prestige-starlight-burst .v61-card-btn::after,
   .prestige-starlight-burst .collection-image::after,
   .prestige-starlight-burst.full-card-wrap::after,
@@ -662,6 +661,19 @@
   .prestige-starlight-burst.st-evo-tier-preview::after,
   .prestige-starlight-burst::after {
     animation: radiance-holo-pulse var(--radiance-holo-cycle) linear infinite;
+  }
+}
+
+@keyframes radiance-tier-glow-pulse {
+  0%, 100% {
+    filter: brightness(1) saturate(1.05);
+    background-position: 0% 50%;
+    box-shadow: var(--radiance-3d-shadow);
+  }
+  50% {
+    filter: brightness(1.18) saturate(1.28);
+    background-position: 100% 50%;
+    box-shadow: var(--radiance-3d-peak-shadow);
   }
 }
 
