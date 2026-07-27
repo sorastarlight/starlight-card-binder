@@ -52,6 +52,11 @@ function tickerLabel(item) {
   return actorDisplayName(item);
 }
 
+function setFeedStatus(statusEl, value) {
+  if (!statusEl) return;
+  statusEl.textContent = value;
+}
+
 function estimateTickerItemWidth(label) {
   return Math.min(Math.max(label.length * 6.8 + 18, 72), 220);
 }
@@ -144,12 +149,12 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
     if (!list) return;
     if (!signedIn) {
       list.innerHTML = `<div class="shell-live-feed-empty">Sign in to watch live collector activity.</div>`;
-      if (status) status.textContent = 'Offline';
+      setFeedStatus(status, 'Offline');
       return;
     }
     if (!items.length) {
       list.innerHTML = `<div class="shell-live-feed-empty">Waiting for the next pull…</div>`;
-      if (status) status.textContent = 'Listening';
+      setFeedStatus(status, 'Listening');
       return;
     }
 
@@ -173,7 +178,7 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
       </article>`;
     }).join('');
 
-    if (status) status.textContent = 'Live';
+    setFeedStatus(status, '');
   }
 
   function setExpanded(expanded) {
@@ -203,7 +208,7 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
         knownIds = new Set();
         lastTickerKey = '';
         render();
-        if (status) status.textContent = 'Offline';
+        setFeedStatus(status, 'Offline');
         return;
       }
 
@@ -223,7 +228,7 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
         render();
       }, 2200);
     } catch (error) {
-      if (status) status.textContent = 'Paused';
+      setFeedStatus(status, 'Paused');
       if (ticker && !items.length) {
         ticker.innerHTML = `<div class="shell-live-feed-ticker-track is-static"><span>${esc(error.message || 'Feed unavailable')}</span></div>`;
       }
