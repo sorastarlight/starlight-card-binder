@@ -88,10 +88,16 @@ export function applyShellNavigationToDom(navigation, { isStaff = false } = {}) 
 
   const top = document.querySelector('.shell-primary-links');
   if (top) {
-    top.innerHTML = (config.topBar.quickLinks || [])
-      .filter(link => link.enabled !== false)
-      .map(link => `<a data-shell-view="${esc(link.destination)}" href="${shellHref(link.destination)}">${esc(link.label)}</a>`)
-      .join('');
+    const links = (config.topBar.quickLinks || []).filter(link => link.enabled !== false);
+    if (links.length) {
+      top.hidden = false;
+      top.innerHTML = links
+        .map(link => `<a data-shell-view="${esc(link.destination)}" href="${shellHref(link.destination)}">${esc(link.label)}</a>`)
+        .join('');
+    } else {
+      top.innerHTML = '';
+      top.hidden = true;
+    }
   }
 
   const signedInMenu = document.querySelector('.shell-account-menu-signed-in');

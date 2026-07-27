@@ -161,12 +161,7 @@ export function createDefaultShellNavigation() {
       ]
     },
     topBar: {
-      quickLinks: [
-        { id: 'top-home', label: 'News & Updates', destination: 'home', enabled: true },
-        { id: 'top-binder', label: 'Starlight Card Binder', destination: 'binder', enabled: true },
-        { id: 'top-collection', label: 'My Starlight Album', destination: 'collection', enabled: true },
-        { id: 'top-shop', label: 'Card Boutique', destination: 'shop', enabled: true }
-      ]
+      quickLinks: []
     },
     accountMenu: {
       signedIn: [

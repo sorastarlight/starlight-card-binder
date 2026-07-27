@@ -27,7 +27,7 @@ test('default shell navigation includes core destinations and staff section', ()
   assert.equal(nav.pageTitles.feed, 'LIVE Feed');
   assert.equal(nav.pageTitles.collection, 'My Starlight Album');
   assert.equal(nav.pageTitles.daily, 'Daily Free Booster Pack');
-  assert.equal(nav.topBar.quickLinks.length, 4);
+  assert.equal(nav.topBar.quickLinks.length, 0);
   assert.ok(nav.accountMenu.signedIn.some(item => (item.features || []).includes('notificationBadge')));
   assert.ok(nav.accountMenu.signedIn.some(item => (item.features || []).includes('receivedGiftBadge')));
   assert.ok(nav.accountMenu.signedIn.some(item => (item.features || []).includes('tradeOfferBadge')));

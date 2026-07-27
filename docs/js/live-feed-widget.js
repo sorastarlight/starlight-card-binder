@@ -1,11 +1,9 @@
 import { getPullFeed } from './social-service.js';
 import { supabase } from './supabase-client.js';
 
-const POLL_MS = 12000;
-const MAX_ITEMS = 10;
-const STORAGE_KEY = 'starlight-live-feed-collapsed';
-const POSITION_KEY = 'starlight-live-feed-position';
-const DRAG_MARGIN = 10;
+const POLL_MS = 8000;
+const MAX_ITEMS = 12;
+const STORAGE_KEY = 'starlight-live-feed-expanded';
 
 function esc(value) {
   return String(value ?? '')
@@ -27,149 +25,27 @@ function relativeTime(value) {
   return `${Math.floor(hours / 24)}d`;
 }
 
-function readCollapsed() {
+function readExpanded() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    // Default collapsed so the chip does not cover binder showcase copy.
-    if (raw === null) return true;
-    return raw === '1';
+    return localStorage.getItem(STORAGE_KEY) === '1';
   } catch {
-    return true;
+    return false;
   }
 }
 
-function writeCollapsed(collapsed) {
+function writeExpanded(expanded) {
   try {
-    localStorage.setItem(STORAGE_KEY, collapsed ? '1' : '0');
+    localStorage.setItem(STORAGE_KEY, expanded ? '1' : '0');
   } catch {
     /* ignore */
   }
 }
 
-function readPosition() {
-  try {
-    const raw = localStorage.getItem(POSITION_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (Number.isFinite(parsed?.x) && Number.isFinite(parsed?.y)) {
-      return { x: parsed.x, y: parsed.y };
-    }
-  } catch {
-    /* ignore */
-  }
-  return null;
-}
-
-function writePosition(point) {
-  try {
-    localStorage.setItem(POSITION_KEY, JSON.stringify({ x: point.x, y: point.y }));
-  } catch {
-    /* ignore */
-  }
-}
-
-function clampPosition(x, y, root) {
-  const rect = root.getBoundingClientRect();
-  const width = rect.width || root.offsetWidth || 0;
-  const height = rect.height || root.offsetHeight || 0;
-  const maxX = Math.max(DRAG_MARGIN, window.innerWidth - width - DRAG_MARGIN);
-  const maxY = Math.max(DRAG_MARGIN, window.innerHeight - height - DRAG_MARGIN);
-  return {
-    x: Math.min(Math.max(DRAG_MARGIN, x), maxX),
-    y: Math.min(Math.max(DRAG_MARGIN, y), maxY)
-  };
-}
-
-function applyPosition(root, x, y, { persist = false } = {}) {
-  const next = clampPosition(x, y, root);
-  root.style.right = 'auto';
-  root.style.bottom = 'auto';
-  root.style.left = `${next.x}px`;
-  root.style.top = `${next.y}px`;
-  root.classList.add('is-positioned');
-  if (persist) writePosition(next);
-  return next;
-}
-
-function defaultPosition(root) {
-  const rect = root.getBoundingClientRect();
-  const styles = window.getComputedStyle(root);
-  const left = Number.parseFloat(styles.left);
-  const bottom = Number.parseFloat(styles.bottom);
-  const safeLeft = Number.isFinite(left) ? left : DRAG_MARGIN;
-  const safeBottom = Number.isFinite(bottom) ? bottom : DRAG_MARGIN;
-  return {
-    x: safeLeft,
-    y: window.innerHeight - rect.height - safeBottom
-  };
-}
-
-function initLiveFeedPosition(root) {
-  const saved = readPosition();
-  if (saved) {
-    applyPosition(root, saved.x, saved.y);
-    return;
-  }
-  const fallback = defaultPosition(root);
-  applyPosition(root, fallback.x, fallback.y);
-}
-
-function bindLiveFeedDrag(root) {
-  const handle = root.querySelector('.shell-live-feed-head');
-  if (!handle) return () => {};
-
-  let drag = null;
-
-  const finishDrag = (event) => {
-    if (!drag || event.pointerId !== drag.pointerId) return;
-    handle.releasePointerCapture?.(event.pointerId);
-    root.classList.remove('is-dragging');
-    handle.removeAttribute('aria-grabbed');
-    if (drag.moved) {
-      const rect = root.getBoundingClientRect();
-      applyPosition(root, rect.left, rect.top, { persist: true });
-    }
-    drag = null;
-  };
-
-  handle.addEventListener('pointerdown', (event) => {
-    if (event.button !== 0) return;
-    if (event.target.closest('.shell-live-feed-controls')) return;
-
-    const rect = root.getBoundingClientRect();
-    drag = {
-      pointerId: event.pointerId,
-      startX: event.clientX,
-      startY: event.clientY,
-      originX: rect.left,
-      originY: rect.top,
-      moved: false
-    };
-    handle.setPointerCapture(event.pointerId);
-    root.classList.add('is-dragging');
-    handle.setAttribute('aria-grabbed', 'true');
-    event.preventDefault();
-  });
-
-  handle.addEventListener('pointermove', (event) => {
-    if (!drag || event.pointerId !== drag.pointerId) return;
-    const dx = event.clientX - drag.startX;
-    const dy = event.clientY - drag.startY;
-    if (Math.abs(dx) + Math.abs(dy) > 3) drag.moved = true;
-    applyPosition(root, drag.originX + dx, drag.originY + dy);
-    event.preventDefault();
-  });
-
-  handle.addEventListener('pointerup', finishDrag);
-  handle.addEventListener('pointercancel', finishDrag);
-
-  const onResize = () => {
-    const rect = root.getBoundingClientRect();
-    applyPosition(root, rect.left, rect.top, { persist: true });
-  };
-  window.addEventListener('resize', onResize);
-
-  return () => window.removeEventListener('resize', onResize);
+function tickerLabel(item) {
+  const actor = item.actor || {};
+  const handle = actor.username ? `@${actor.username}` : (actor.displayName || 'Collector');
+  const summary = String(item.summary || 'New activity').replace(/\s+/g, ' ').trim();
+  return `${handle} · ${summary} · ${relativeTime(item.createdAt)}`;
 }
 
 export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
@@ -177,10 +53,10 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
   if (!root) return;
 
   const list = root.querySelector('[data-live-feed-list]');
+  const ticker = root.querySelector('[data-live-feed-ticker]');
   const status = root.querySelector('[data-live-feed-status]');
   const toggle = root.querySelector('[data-live-feed-toggle]');
   const openFull = root.querySelector('[data-live-feed-open]');
-  const body = root.querySelector('[data-live-feed-body]');
   const head = root.querySelector('.shell-live-feed-head');
 
   let items = [];
@@ -189,21 +65,34 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
   let loading = false;
   let signedIn = false;
 
-  function setCollapsed(collapsed) {
-    root.classList.toggle('is-collapsed', collapsed);
+  function setExpanded(expanded) {
+    root.classList.toggle('is-expanded', expanded);
+    root.classList.toggle('is-collapsed', !expanded);
     if (toggle) {
-      toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-      toggle.textContent = collapsed ? '▴' : '▾';
-      toggle.setAttribute('aria-label', collapsed ? 'Expand live feed' : 'Collapse live feed');
+      toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+      toggle.textContent = expanded ? '▴' : '▾';
+      toggle.setAttribute('aria-label', expanded ? 'Collapse live feed' : 'Expand live feed');
     }
-    writeCollapsed(collapsed);
-    window.requestAnimationFrame(() => {
-      const rect = root.getBoundingClientRect();
-      applyPosition(root, rect.left, rect.top, { persist: true });
-    });
+    writeExpanded(expanded);
   }
 
-  function render() {
+  function renderTicker() {
+    if (!ticker) return;
+    if (!signedIn) {
+      ticker.innerHTML = `<div class="shell-live-feed-ticker-track is-static"><span>Sign in to watch live collector activity</span></div>`;
+      return;
+    }
+    if (!items.length) {
+      ticker.innerHTML = `<div class="shell-live-feed-ticker-track is-static"><span>Listening for the next pull…</span></div>`;
+      return;
+    }
+
+    const labels = items.map((item) => `<span class="shell-live-feed-ticker-item${item.__isNew ? ' is-new' : ''}">${esc(tickerLabel(item))}</span>`);
+    const loop = labels.join('<span class="shell-live-feed-ticker-sep" aria-hidden="true">✦</span>');
+    ticker.innerHTML = `<div class="shell-live-feed-ticker-track" aria-hidden="true">${loop}<span class="shell-live-feed-ticker-sep" aria-hidden="true">✦</span>${loop}</div>`;
+  }
+
+  function renderList() {
     if (!list) return;
     if (!signedIn) {
       list.innerHTML = `<div class="shell-live-feed-empty">Sign in to watch live collector activity.</div>`;
@@ -239,6 +128,11 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
     if (status) status.textContent = 'Live';
   }
 
+  function render() {
+    renderTicker();
+    renderList();
+  }
+
   async function refresh() {
     if (loading) return;
     loading = true;
@@ -249,27 +143,29 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
         items = [];
         knownIds = new Set();
         render();
+        if (status) status.textContent = 'Offline';
         return;
       }
 
       const data = await getPullFeed({ filter: 'everyone', limit: MAX_ITEMS });
       const next = data?.items || [];
       const nextIds = new Set(next.map((item) => String(item.id)));
-      const enriched = next.map((item) => ({
+      items = next.map((item) => ({
         ...item,
         __isNew: knownIds.size > 0 && !knownIds.has(String(item.id))
       }));
-      items = enriched;
       knownIds = nextIds;
       render();
 
-      // Clear "new" highlight after the entrance animation window.
       window.setTimeout(() => {
         items = items.map((item) => ({ ...item, __isNew: false }));
         render();
       }, 2200);
     } catch (error) {
       if (status) status.textContent = 'Paused';
+      if (ticker && !items.length) {
+        ticker.innerHTML = `<div class="shell-live-feed-ticker-track is-static"><span>${esc(error.message || 'Feed unavailable')}</span></div>`;
+      }
       if (list && !items.length) {
         list.innerHTML = `<div class="shell-live-feed-empty">${esc(error.message || 'Feed unavailable')}</div>`;
       }
@@ -286,11 +182,18 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
 
   toggle?.addEventListener('click', (event) => {
     event.preventDefault();
-    setCollapsed(!root.classList.contains('is-collapsed'));
+    event.stopPropagation();
+    setExpanded(!root.classList.contains('is-expanded'));
+  });
+
+  head?.addEventListener('click', (event) => {
+    if (event.target.closest('.shell-live-feed-controls')) return;
+    setExpanded(!root.classList.contains('is-expanded'));
   });
 
   openFull?.addEventListener('click', (event) => {
     event.preventDefault();
+    event.stopPropagation();
     if (typeof onOpenFullFeed === 'function') onOpenFullFeed();
   });
 
@@ -302,10 +205,19 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
     }
   });
 
-  setCollapsed(readCollapsed());
-  initLiveFeedPosition(root);
-  const unbindDrag = bindLiveFeedDrag(root);
-  if (head) head.title = 'Drag to move LIVE Feed';
+  document.addEventListener('click', (event) => {
+    if (!root.classList.contains('is-expanded')) return;
+    if (root.contains(event.target)) return;
+    setExpanded(false);
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && root.classList.contains('is-expanded')) {
+      setExpanded(false);
+    }
+  });
+
+  setExpanded(readExpanded());
   start();
 
   return {
@@ -318,7 +230,6 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
     },
     destroy() {
       window.clearInterval(timer);
-      unbindDrag?.();
     }
   };
 }
