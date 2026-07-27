@@ -35,7 +35,7 @@ const dialogTitleEl = document.getElementById('st-evo-card-title');
 const dialogCloseEl = document.getElementById('st-evo-card-close');
 const resultModalEl = document.getElementById('st-evo-result-modal');
 const resultStageEl = document.getElementById('st-evo-flair-stage');
-const resultImmersiveBgEl = document.getElementById('st-evo-immersive-bg');
+const resultStackEl = document.getElementById('st-evo-stack-layers');
 const resultTitleEl = document.getElementById('st-evo-result-title');
 const resultArtEl = document.getElementById('st-evo-result-art');
 const resultTierEl = document.getElementById('st-evo-result-tier');
@@ -84,25 +84,28 @@ function wait(ms) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
 
+const STACK_LAYER_COUNT = 8;
+const STACK_LAYER_DELAY_MS = 68;
+
 function resetFlairStage() {
   if (!resultStageEl) return;
-  resultStageEl.classList.remove('is-intro', 'is-immerse', 'is-charge', 'is-peak', 'is-reveal', 'is-complete');
+  resultStageEl.classList.remove('is-ready', 'is-stacking', 'is-charging', 'is-evolved', 'is-reveal', 'is-complete');
+  clearStackLayers();
 }
 
-function setImmersiveBackground(imageUrl) {
-  if (!resultImmersiveBgEl) return;
-  const safeUrl = String(imageUrl || '').trim();
-  if (!safeUrl) {
-    resultImmersiveBgEl.style.removeProperty('background-image');
-    return;
-  }
-  resultImmersiveBgEl.style.backgroundImage = `url("${safeUrl.replace(/"/g, '\\"')}")`;
+function clearStackLayers() {
+  if (resultStackEl) resultStackEl.innerHTML = '';
+}
+
+function buildStackLayerMarkup(imageUrl, cardName, tier, index) {
+  const frame = prestigeClassName(tier);
+  return `<div class="st-evo-stack-layer st-evo-stack-card ${frame}" style="--stack-i:${index}" aria-hidden="true"><span class="collection-image"><img src="${esc(imageUrl)}" alt="" draggable="false"></span></div>`;
 }
 
 function setResultCardArt(imageUrl, cardName, tier) {
   if (!resultArtEl) return;
   const frame = prestigeClassName(tier);
-  resultArtEl.className = `st-evo-result-art ${frame}`;
+  resultArtEl.className = `st-evo-stack-card st-evo-stack-base ${frame}`;
   resultArtEl.innerHTML = imageUrl
     ? `<span class="collection-image"><img src="${esc(imageUrl)}" alt="${esc(cardName)}" draggable="false"></span>`
     : '';
@@ -128,8 +131,7 @@ async function playFlairSequence({ cardName, imageUrl, fromTier, toTier, label }
   const reduced = preferReducedMotion();
   resetFlairStage();
   applyResultMeta({ cardName, toTier, label }, false);
-  if (resultTitleEl) resultTitleEl.textContent = reduced ? 'Evolution complete!' : '';
-  setImmersiveBackground(imageUrl);
+  if (resultTitleEl) resultTitleEl.textContent = reduced ? 'Evolution complete!' : 'Infusing duplicates…';
   setResultCardArt(imageUrl, cardName, fromTier || toTier);
 
   if (reduced) {
@@ -139,23 +141,30 @@ async function playFlairSequence({ cardName, imageUrl, fromTier, toTier, label }
     return;
   }
 
-  resultStageEl?.classList.add('is-intro');
-  await wait(420);
-  resultStageEl?.classList.remove('is-intro');
-  resultStageEl?.classList.add('is-immerse');
-  await wait(980);
-  resultStageEl?.classList.remove('is-immerse');
-  resultStageEl?.classList.add('is-charge');
-  await wait(1500);
-  resultStageEl?.classList.remove('is-charge');
-  resultStageEl?.classList.add('is-peak');
+  resultStageEl?.classList.add('is-ready');
+  await wait(360);
+  resultStageEl?.classList.add('is-stacking');
+
+  for (let index = 0; index < STACK_LAYER_COUNT; index += 1) {
+    resultStackEl?.insertAdjacentHTML('beforeend', buildStackLayerMarkup(imageUrl, cardName, fromTier || toTier, index));
+    await wait(STACK_LAYER_DELAY_MS);
+  }
+
+  await wait(240);
+  resultStageEl?.classList.remove('is-stacking');
+  resultStageEl?.classList.add('is-charging');
+  if (resultTitleEl) resultTitleEl.textContent = 'Starlight surging…';
+  await wait(1300);
+  resultStageEl?.classList.remove('is-charging');
+  resultStageEl?.classList.add('is-evolved');
+  clearStackLayers();
   setResultCardArt(imageUrl, cardName, toTier);
   if (resultTitleEl) resultTitleEl.textContent = 'Evolved!';
-  await wait(720);
-  resultStageEl?.classList.remove('is-peak');
+  await wait(680);
+  resultStageEl?.classList.remove('is-evolved');
   resultStageEl?.classList.add('is-reveal');
   applyResultMeta({ cardName, toTier, label }, true);
-  await wait(320);
+  await wait(280);
   resultStageEl?.classList.add('is-complete');
 }
 
@@ -180,7 +189,7 @@ function showEvolutionResult({ cardName, imageUrl, fromTier, toTier, label }) {
 
     playFlairSequence({ cardName, imageUrl, fromTier, toTier, label }).then(() => {
       if (!preferReducedMotion()) {
-        autoCloseTimer = window.setTimeout(() => resultModal.close(), 3200);
+        autoCloseTimer = window.setTimeout(() => resultModal.close(), 3400);
       }
     });
   });
