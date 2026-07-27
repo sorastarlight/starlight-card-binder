@@ -102,14 +102,13 @@ test('binder and collection load Starlight Evolution frame styles and helpers', 
   assert.match(app, /data-fuse-card/);
   assert.match(app, /fuseSelectedCard/);
   assert.match(app, /full-card-wrap[\s\S]*\$\{prestigeClass\}/);
+  assert.match(app, /prestigeFrameOverlayHtml/);
   assert.match(binder, /prestige-frames\.css/);
   assert.match(collection, /prestige-frames\.css/);
-  assert.match(css, /\.prestige-starlight-burst/);
-  assert.match(css, /\.prestige-star-bit/);
-  assert.match(css, /mask-composite: exclude/);
-  assert.match(css, /radiance-v-holo-border/);
-  assert.match(css, /--radiance-emboss/);
-  assert.match(css, /radiance-i-glimmer/);
+  assert.match(css, /\.prestige-badge\.prestige-starlight-burst/);
+  assert.match(css, /\.prestige-badge\.prestige-star-bit/);
+  assert.match(css, /prestige-frame-overlay/);
+  assert.match(evoPage, /Radiance1\.png/);
   assert.match(css, /st-evo-tier-preview/);
   assert.match(css, /\.st-r3-card-actor\.prestige-frame/);
   assert.match(css, /\.prestige-legend/);
@@ -118,6 +117,7 @@ test('binder and collection load Starlight Evolution frame styles and helpers', 
   assert.doesNotMatch(collection, /prestige-legend/);
   assert.match(evoPage, /prestige-star-bit/);
   assert.match(reveal, /prestigeRevealBadge/);
+  assert.match(reveal, /prestigeFrameOverlayElement/);
   assert.match(reveal, /ensurePrestigeStyles/);
   assert.match(reveal, /prestigeTier/);
   assert.match(reveal, /normalizeFusionTier/);

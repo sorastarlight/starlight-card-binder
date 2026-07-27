@@ -10,6 +10,8 @@ import {
   evolutionUnfuseRefund,
   nextEvolutionTier,
   prestigeClassName,
+  prestigeFrameImageUrl,
+  prestigeFrameOverlayHtml,
   prestigeLabel,
   previousEvolutionTier
 } from '../docs/js/prestige-utils.js';
@@ -54,6 +56,14 @@ test('Starlight Evolution costs and refunds match the locked ladder', () => {
   assert.equal(prestigeClassName('star_bit'), 'prestige-frame prestige-star-bit');
   assert.equal(prestigeClassName('starlight_burst'), 'prestige-frame prestige-starlight-burst');
   assert.equal(prestigeClassName('stardust'), '');
+  assert.equal(prestigeFrameImageUrl('star_bit'), 'site_assets/Radiance1.png');
+  assert.equal(prestigeFrameImageUrl('protostar'), 'site_assets/Radiance2.png');
+  assert.equal(prestigeFrameImageUrl('starlight'), 'site_assets/Radiance3.png');
+  assert.equal(prestigeFrameImageUrl('super_starlight'), 'site_assets/Radiance4.png');
+  assert.equal(prestigeFrameImageUrl('starlight_burst'), 'site_assets/Radiance5.png');
+  assert.equal(prestigeFrameImageUrl('stardust'), '');
+  assert.match(prestigeFrameOverlayHtml('star_bit'), /prestige-frame-overlay/);
+  assert.match(prestigeFrameOverlayHtml('star_bit'), /Radiance1\.png/);
 });
 
 test('Starlight Evolution migration and client wiring are present', async () => {
@@ -103,7 +113,9 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.match(labelMigration, /already at Radiance V/);
   assert.match(utils, /canEvolve/);
   assert.match(utils, /canUnfuse/);
-  assert.match(utils, /Radiance III/);
+  assert.match(evoPage, /Radiance1\.png/);
+  assert.match(utils, /prestigeFrameOverlayHtml/);
+  assert.match(utils, /Radiance1\.png/);
   assert.match(sync, /export async function evolveMyCard/);
   assert.match(sync, /export async function unfuseMyCard/);
   assert.match(cloud, /unfuseMyCard/);
@@ -120,7 +132,8 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.match(reveal, /StarlightUI\?\.alert|embed-safe alert/);
   assert.doesNotMatch(reveal, /st-evo-root|anchorOverlayToVisibleViewport|notifyEmbedReset/);
   assert.match(evoCss, /st-evo-result-showcase|st-evo-result-aura/);
-  assert.match(css, /st-evo-result-art\.prestige-frame|--radiance-3d-i-shadow|No holo wash over card art/);
+  assert.match(css, /prestige-frame-overlay|Radiance1\.png/);
+  assert.match(css, /\.prestige-badge\.prestige-star-bit/);
   assert.match(evoPage, /st-evo-result-modal/);
   assert.match(evoPage, /st-evo-result-art/);
   assert.match(evoPage, /st-evo-result-showcase/);
@@ -146,7 +159,7 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   const evoPageJs = await read('docs/js/pages/starlight-evolution-page.js');
   assert.match(evoPageJs, /data-evo-open-card/);
   assert.match(evoPageJs, /evolveMyCard/);
-  assert.match(evoPageJs, /showEvolutionResult|setResultAura/);
+  assert.match(evoPageJs, /prestigeFrameOverlayHtml/);
   assert.match(evoPageJs, /collection-image \$\{esc\(frame\)\}/);
   assert.doesNotMatch(evoPageJs, /playAscendSequence|playEnhanceSequence|st-evo-ascend-stage/);
   assert.doesNotMatch(evoPageJs, /playStarlightEvolutionReveal/);

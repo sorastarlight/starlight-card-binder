@@ -1,6 +1,7 @@
 import {
   normalizeFusionTier,
   prestigeClassName,
+  prestigeFrameImageUrl,
   prestigeLabel
 } from './prestige-utils.js';
 
@@ -145,6 +146,15 @@ function prestigeActorClass(card) {
   return prestigeClassName(normalizeFusionTier(card?.prestigeTier));
 }
 
+function prestigeFrameOverlayElement(card, doc) {
+  const src = prestigeFrameImageUrl(normalizeFusionTier(card?.prestigeTier));
+  if (!src) return null;
+  const overlay = createImage(doc, src, '', '', 'prestige-frame-overlay', { loading: 'lazy' });
+  overlay.setAttribute('aria-hidden', 'true');
+  overlay.draggable = false;
+  return overlay;
+}
+
 function attachHoloSpark(element, card) {
   const finish = cardFinishClass(card);
   window.StarlightUI?.ensureFinishEffectLayer?.(element, finish);
@@ -275,7 +285,7 @@ const REVEAL_STYLESHEET_URL = new URL(
 ).href;
 const PRESTIGE_STYLESHEET_ID = 'starlight-prestige-frames';
 const PRESTIGE_STYLESHEET_URL = new URL(
-  '../css/prestige-frames.css?v=2.7',
+  '../css/prestige-frames.css?v=2.8',
   import.meta.url
 ).href;
 const stylesheetLoads = new WeakMap();
@@ -759,6 +769,8 @@ export async function revealRewardSequence(cards = [], options = {}) {
         copy.append(name, detail, badges);
         art.append(image);
         attachHoloSpark(art, card);
+        const resultOverlay = prestigeFrameOverlayElement(card, doc);
+        if (resultOverlay) art.append(resultOverlay);
         item.append(art, copy);
         fragment.append(item);
       });
@@ -776,8 +788,10 @@ export async function revealRewardSequence(cards = [], options = {}) {
         { defer: true }
       );
       cardFront.replaceChildren(currentFrontImage);
-      cardFront.className = `st-r3-card-face st-r3-card-front ${cardFinishClass(card)}`.trim();
+      cardFront.className = `st-r3-card-face st-r3-card-front ${cardFinishClass(card)} ${prestigeActorClass(card)}`.trim();
       attachHoloSpark(cardFront, card);
+      const revealOverlay = prestigeFrameOverlayElement(card, doc);
+      if (revealOverlay) cardFront.append(revealOverlay);
       actor.className = `st-r3-card-actor rarity-${card.rarity} ${prestigeActorClass(card)}`.trim();
       actor.setAttribute('aria-label', `Reveal ${card.name}`);
       revealScene.dataset.rarity = card.rarity;

@@ -197,6 +197,11 @@ function prestigeFrameClass(cardId) {
   if (!tier || tier === 'stardust') return '';
   return `prestige-frame prestige-${tierCssToken(tier)}`;
 }
+function prestigeFrameOverlayHtml(cardId) {
+  const utils = prestigeUtils();
+  const tier = getCardPrestigeTier(cardId);
+  return utils.prestigeFrameOverlayHtml?.(tier) || '';
+}
 function prestigeBadgeHtml(cardId) {
   const utils = prestigeUtils();
   const tier = getCardPrestigeTier(cardId);
@@ -1135,7 +1140,7 @@ function renderDetail() {
   </div>
   <button class="preview-card flip-card simple-flip ${previewFlipped ? 'show-back showing-card-back' : ''} ${rarityClass(selected)} ${previewPrestige}" id="previewCard" type="button" aria-label="Open full card view" data-finish-class="${esc(got ? cardFinishClass(selected, true) : '')}" data-holographic="${got && isHolographicCard(selected)}">
     <span class="preview-inner">
-      <span class="face front ${cardFinishClass(selected, got && !previewFlipped)}"><img class="${artClass}" src="${esc(previewFlipped ? CARD_BACK_URL : getVisibleImage(selected))}" alt="${esc(previewFlipped ? 'Card back' : getVisibleName(selected))}" onerror="this.src='${CARD_BACK_URL}'">${holoSparkMarkup(selected, got && !previewFlipped)}</span>
+      <span class="face front ${cardFinishClass(selected, got && !previewFlipped)}"><img class="${artClass}" src="${esc(previewFlipped ? CARD_BACK_URL : getVisibleImage(selected))}" alt="${esc(previewFlipped ? 'Card back' : getVisibleName(selected))}" onerror="this.src='${CARD_BACK_URL}'">${holoSparkMarkup(selected, got && !previewFlipped)}${got ? prestigeFrameOverlayHtml(selected.id) : ''}</span>
       <span class="face back"><img src="${CARD_BACK_URL}" alt="Card back"></span>
     </span>
   </button>
@@ -1328,7 +1333,7 @@ function renderFullView() {
                 <button class="overlay-arrow right analyzer-arrow" type="button" aria-label="Next card">›</button>
                 <div class="full-card-wrap simple-flip analyzer-card-shell analyzer-card-3d ${overlayFlipped ? 'show-back showing-card-back' : ''} ${analyzerHoloEnabled ? '' : 'is-holo-off'} ${analyzerEvolutionEnabled ? '' : 'is-evolution-off'} ${rarityClass(selected)} ${prestigeClass}" id="fullCard3d" aria-label="${esc(overlayFlipped ? 'Card back' : visibleName)}" data-holographic="${got && analyzerHoloEnabled && isHolographicCard(selected)}" data-finish-class="${esc(finishClass)}">
                   <span class="full-inner">
-                    <span class="face front ${finishClass}"><img class="${artClass}" src="${esc(getVisibleImage(selected))}" alt="${esc(visibleName)}" onerror="this.src='${CARD_BACK_URL}'" draggable="false">${!overlayFlipped ? holoMarkup : ''}</span>
+                    <span class="face front ${finishClass}"><img class="${artClass}" src="${esc(getVisibleImage(selected))}" alt="${esc(visibleName)}" onerror="this.src='${CARD_BACK_URL}'" draggable="false">${!overlayFlipped ? holoMarkup : ''}${prestigeClass ? prestigeFrameOverlayHtml(selected.id) : ''}</span>
                     <span class="face back"><img src="${esc(CARD_BACK_URL)}" alt="Card back" draggable="false"></span>
                   </span>
                 </div>
@@ -1456,7 +1461,7 @@ function renderGridPage(target, mode) {
     const got = isCollected(c.id); const hidden = !got;
     const quantity = getCardQuantity(c.id);
     const favorited = isFavorite(c.id);
-    return `<article class="collection-card ${rarityClass(c)} ${got ? prestigeFrameClass(c.id) : ''}" data-id="${esc(c.id)}" data-open-collection-card="${esc(c.id)}" role="button" tabindex="0" aria-label="Open ${esc(getVisibleName(c))} full view"><div class="collection-image"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'"></div><h3>${esc(getVisibleName(c))}</h3><p class="collection-card-number">${esc(c.collectorNumber || c.number)} • ${esc(c.series)}</p><div class="card-meta-chips compact">${cardIdentityChips(c,{hidden})}</div>${got ? prestigeBadgeHtml(c.id) : ''}${mode === 'duplicates' ? `<p class="duplicate-copy-summary"><strong>${quantity}</strong> total copies · <strong>${quantity - 1}</strong> exchangeable</p>` : ''}<div class="card-buttons"><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${quantity}` : 'Not Collected'}</span>${got ? `<button class="icon-btn" type="button" data-toggle-favorite="${esc(c.id)}" aria-label="${favorited ? 'Remove from favorites' : 'Add to favorites'}" aria-pressed="${favorited ? 'true' : 'false'}">${favorited ? '★' : '☆'}</button>` : ''}</div></article>`;
+    return `<article class="collection-card ${rarityClass(c)} ${got ? prestigeFrameClass(c.id) : ''}" data-id="${esc(c.id)}" data-open-collection-card="${esc(c.id)}" role="button" tabindex="0" aria-label="Open ${esc(getVisibleName(c))} full view"><div class="collection-image"><img class="${hidden?'obscured':''}" src="${esc(getVisibleImage(c))}" alt="${esc(getVisibleName(c))}" onerror="this.src='${CARD_BACK_URL}'">${got ? prestigeFrameOverlayHtml(c.id) : ''}</div><h3>${esc(getVisibleName(c))}</h3><p class="collection-card-number">${esc(c.collectorNumber || c.number)} • ${esc(c.series)}</p><div class="card-meta-chips compact">${cardIdentityChips(c,{hidden})}</div>${got ? prestigeBadgeHtml(c.id) : ''}${mode === 'duplicates' ? `<p class="duplicate-copy-summary"><strong>${quantity}</strong> total copies · <strong>${quantity - 1}</strong> exchangeable</p>` : ''}<div class="card-buttons"><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${quantity}` : 'Not Collected'}</span>${got ? `<button class="icon-btn" type="button" data-toggle-favorite="${esc(c.id)}" aria-label="${favorited ? 'Remove from favorites' : 'Add to favorites'}" aria-pressed="${favorited ? 'true' : 'false'}">${favorited ? '★' : '☆'}</button>` : ''}</div></article>`;
   }).join('') : `<div class="empty-state"><h2>${esc(emptyTitle)}</h2><p>${esc(emptyLead)}</p>${emptyAction}</div>`;
   attachTileTilts();
   attachBinderHoverSfx();
@@ -1876,7 +1881,7 @@ function renderV61Card(card, i) {
   const prestigeClass = got ? prestigeFrameClass(card.id) : '';
   return `<article class="v61-card-slot ${rarityClass(card)} ${got ? 'is-collected' : 'is-hidden'} ${prestigeClass}" style="--i:${i}">
     <button class="v61-card-btn" type="button" data-v61-card="${esc(card.id)}" aria-label="View ${esc(getVisibleName(card))}">
-      <span class="v61-card-art"><img class="${artClass}" src="${esc(img)}" alt="${esc(getVisibleName(card))}" loading="lazy" onerror="this.src='${CARD_BACK_URL}'"></span>
+      <span class="v61-card-art"><img class="${artClass}" src="${esc(img)}" alt="${esc(getVisibleName(card))}" loading="lazy" onerror="this.src='${CARD_BACK_URL}'">${got ? prestigeFrameOverlayHtml(card.id) : ''}</span>
       <span class="badge">${esc(numberLabel)}</span>
     </button>
     <span class="v61-ownership ${got ? 'owned' : 'locked'}">
@@ -1958,7 +1963,7 @@ function renderV62Showcase(inSeriesSelect = false, browse = resolveBinderBrowse(
     ${previewDisplayTogglesHtml(card, got)}
     <button class="v62-preview-card flip-card simple-flip ${previewFlipped ? 'show-back showing-card-back' : ''} ${previewPrestige} ${previewHoloEnabled ? '' : 'is-holo-off'} ${previewEvolutionEnabled ? '' : 'is-evolution-off'}" id="v62PreviewCard" type="button" aria-label="Open full view for ${esc(visibleName)}" data-finish-class="${esc(finishClass)}" data-holographic="${got && previewHoloEnabled && isHolographicCard(card)}">
       <span class="preview-inner">
-        <span class="face front ${finishClass}"><img class="${artClass}" src="${esc(previewFlipped ? CARD_BACK_URL : visibleImage)}" alt="${esc(previewFlipped ? 'Card back' : visibleName)}" onerror="this.src='${CARD_BACK_URL}'">${previewFlipped || !previewHoloEnabled ? '' : holoSparkMarkup(card, got)}</span>
+        <span class="face front ${finishClass}"><img class="${artClass}" src="${esc(previewFlipped ? CARD_BACK_URL : visibleImage)}" alt="${esc(previewFlipped ? 'Card back' : visibleName)}" onerror="this.src='${CARD_BACK_URL}'">${previewFlipped || !previewHoloEnabled ? '' : holoSparkMarkup(card, got)}${previewPrestige ? prestigeFrameOverlayHtml(card.id) : ''}</span>
         <span class="face back"><img src="${CARD_BACK_URL}" alt="Starlight card back"></span>
       </span>
     </button>

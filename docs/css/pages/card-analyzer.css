@@ -607,21 +607,19 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
   opacity: 0 !important;
 }
 
-#cardOverlay .analyzer-sekai-stage .analyzer-card-shell.is-evolution-off.prestige-frame::after,
-#cardOverlay .analyzer-sekai-stage .analyzer-card-shell.is-evolution-off .prestige-frame::after,
-#cardOverlay .analyzer-sekai-stage .analyzer-card-shell.is-evolution-off::after {
+#cardOverlay .analyzer-sekai-stage .analyzer-card-shell.is-evolution-off .prestige-frame-overlay,
+#cardOverlay .analyzer-sekai-stage .analyzer-card-shell.is-evolution-off .face.front .prestige-frame-overlay {
   display: none !important;
   opacity: 0 !important;
 }
 
-#cardOverlay .analyzer-sekai-stage .analyzer-card-shell.prestige-frame::after,
-#cardOverlay .analyzer-sekai-stage #fullCard3d.prestige-frame::after {
+#cardOverlay .analyzer-sekai-stage .prestige-frame-overlay {
   z-index: 6;
 }
 
 #cardOverlay .analyzer-sekai-stage .analyzer-card-shell.prestige-frame,
 #cardOverlay .analyzer-sekai-stage #fullCard3d.prestige-frame {
-  box-shadow: 0 14px 28px rgba(30, 50, 90, 0.22) !important;
+  box-shadow: none !important;
 }
 
 #cardOverlay .analyzer-sekai-stage .analyzer-card-shell.prestige-frame .face.front,

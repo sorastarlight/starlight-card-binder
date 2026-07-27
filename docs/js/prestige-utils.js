@@ -138,6 +138,27 @@ function tierCssToken(tier) {
   return normalizeEvolutionTier(tier).replace(/_/g, '-');
 }
 
+/** Transparent PNG frame overlays — Radiance I–V. */
+export const PRESTIGE_FRAME_IMAGES = Object.freeze({
+  star_bit: 'site_assets/Radiance1.png',
+  protostar: 'site_assets/Radiance2.png',
+  starlight: 'site_assets/Radiance3.png',
+  super_starlight: 'site_assets/Radiance4.png',
+  starlight_burst: 'site_assets/Radiance5.png'
+});
+
+/** Returns the Radiance PNG path for an evolution tier, or empty string for Standard. */
+export function prestigeFrameImageUrl(tier) {
+  return PRESTIGE_FRAME_IMAGES[normalizeEvolutionTier(tier)] || '';
+}
+
+/** Overlay markup placed above card art on enhanced/evolved cards. */
+export function prestigeFrameOverlayHtml(tier) {
+  const src = prestigeFrameImageUrl(tier);
+  if (!src) return '';
+  return `<img class="prestige-frame-overlay" src="${src}" alt="" aria-hidden="true" draggable="false" loading="lazy">`;
+}
+
 /** Returns CSS class string for non-base evolution frames. */
 export function prestigeClassName(tierOrQuantity) {
   const tier = typeof tierOrQuantity === 'string'

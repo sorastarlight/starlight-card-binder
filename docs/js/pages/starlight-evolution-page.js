@@ -13,9 +13,10 @@ import {
   nextEvolutionTier,
   normalizeEvolutionTier,
   prestigeClassName,
+  prestigeFrameOverlayHtml,
   prestigeLabel,
   previousEvolutionTier
-} from '../prestige-utils.js?v=1.5.0';
+} from '../prestige-utils.js?v=1.6.0';
 
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
   '&': '&amp;',
@@ -71,24 +72,14 @@ const resultModal = resultModalEl && window.StarlightUI?.adoptModal
     })
   : null;
 
-function setResultAura(imageUrl) {
-  if (!resultAuraEl) return;
-  const safeUrl = String(imageUrl || '').trim();
-  if (!safeUrl) {
-    resultAuraEl.style.removeProperty('background-image');
-    return;
-  }
-  resultAuraEl.style.backgroundImage = `url("${safeUrl.replace(/"/g, '\\"')}")`;
-}
-
 function setResultCardArt(imageUrl, cardName, tier) {
   if (!resultArtEl) return;
   const frame = prestigeClassName(tier);
   resultArtEl.className = `st-evo-result-art collection-image ${frame}`.trim();
+  const overlay = prestigeFrameOverlayHtml(tier);
   resultArtEl.innerHTML = imageUrl
-    ? `<img src="${esc(imageUrl)}" alt="${esc(cardName)}" draggable="false">`
+    ? `<img src="${esc(imageUrl)}" alt="${esc(cardName)}" draggable="false">${overlay}`
     : '';
-  setResultAura(imageUrl);
 }
 
 function applyResultMeta({ cardName, toTier, label }) {
@@ -203,7 +194,7 @@ function renderOwnedCardButton(card, { readyFirstEvolution = false } = {}) {
     ? `<span class="st-evo-ready-chip">Evolve to ${esc(nextLabel)}</span>`
     : (ready ? '<span class="st-evo-ready-chip">Ready to evolve</span>' : '');
   return `<button type="button" class="st-evo-owned-card${ready ? ' is-ready' : ''}" data-evo-open-card="${esc(card.id)}" aria-label="Open ${esc(card.name)} evolution details">
-      <span class="collection-image ${esc(frame)}"><img src="${esc(card.imageUrl)}" alt="" loading="lazy" onerror="this.style.opacity='0.35'"></span>
+      <span class="collection-image ${esc(frame)}"><img src="${esc(card.imageUrl)}" alt="" loading="lazy" onerror="this.style.opacity='0.35'">${prestigeFrameOverlayHtml(card.tier)}</span>
       <strong>${esc(card.name)}</strong>
       <div class="st-evo-owned-meta">
         ${card.tier !== 'stardust' ? `<span class="prestige-badge prestige-${esc(tierToken)}">${esc(label)}</span>` : '<span class="prestige-badge">Standard</span>'}
@@ -291,7 +282,7 @@ function renderCardDetail(card) {
   dialogBodyEl.innerHTML = `
     <div class="st-evo-detail-layout">
       <div class="st-evo-detail-art">
-        <span class="collection-image ${esc(frame)}"><img src="${esc(card.imageUrl)}" alt="${esc(card.name)}" onerror="this.style.opacity='0.35'"></span>
+        <span class="collection-image ${esc(frame)}"><img src="${esc(card.imageUrl)}" alt="${esc(card.name)}" onerror="this.style.opacity='0.35'">${prestigeFrameOverlayHtml(card.tier)}</span>
       </div>
       <div class="st-evo-detail-copy">
         <p class="st-evo-detail-meta">

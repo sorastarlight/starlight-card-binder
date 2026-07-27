@@ -397,7 +397,7 @@ async function loadBinderApplication() {
 
     window.StarlightCardFilters = await import('./card-filter-utils.js?v=1.1.0');
     window.StarlightFavoriteUtils = await import('./favorite-utils.js?v=1.0.0');
-    window.StarlightPrestigeUtils = await import('./prestige-utils.js?v=1.5.0');
+    window.StarlightPrestigeUtils = await import('./prestige-utils.js?v=1.6.0');
     const applyLocalEvolutionResult = (cardId, result) => {
         const id = String(cardId || '').trim();
         if (!id || !result) return;

@@ -91,7 +91,7 @@
   isolation: isolate;
 }
 
-.starlight-evolution-page .prestige-legend-tiers .st-evo-tier-preview img {
+.starlight-evolution-page .prestige-legend-tiers .st-evo-tier-preview > img:not(.prestige-frame-overlay) {
   display: block;
   width: 100%;
   height: 100%;
