@@ -49,7 +49,9 @@ function actorDisplayName(item) {
 }
 
 function tickerLabel(item) {
-  return actorDisplayName(item);
+  const summary = String(item.summary || '').replace(/\s+/g, ' ').trim();
+  if (summary) return summary;
+  return `${actorDisplayName(item)} opened a pack`;
 }
 
 function setFeedStatus(statusEl, value) {
@@ -58,7 +60,7 @@ function setFeedStatus(statusEl, value) {
 }
 
 function estimateTickerItemWidth(label) {
-  return Math.min(Math.max(label.length * 6.8 + 18, 72), 220);
+  return Math.min(Math.max(label.length * 6.4 + 18, 120), 360);
 }
 
 function measureTickerCapacity(sourceItems, availableWidth) {
