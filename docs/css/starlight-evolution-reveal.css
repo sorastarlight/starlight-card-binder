@@ -39,24 +39,6 @@
   opacity: 0;
 }
 
-/* Fixed (not absolute) so embed overlays never inflate iframe document height. */
-.st-evo-root.is-embed-anchored,
-.st-evo-root.is-embed-anchored.is-open {
-  position: fixed !important;
-  inset: auto !important;
-  top: var(--st-embed-overlay-top, 0px) !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: auto !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  height: var(--st-embed-overlay-height, 100dvh) !important;
-  max-height: var(--st-embed-overlay-height, 100dvh) !important;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-}
-
 .st-evo-backdrop {
   position: absolute;
   inset: 0;

@@ -16,7 +16,7 @@ import {
   prestigeLabel,
   previousEvolutionTier
 } from '../prestige-utils.js?v=1.5.0';
-import { playStarlightEvolutionReveal } from '../starlight-evolution-reveal.js?v=2.1.0';
+import { playStarlightEvolutionReveal } from '../starlight-evolution-reveal.js?v=2.2.0';
 
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
   '&': '&amp;',

@@ -9,7 +9,7 @@ import {
 } from './prestige-utils.js?v=1.5.0';
 
 const STYLESHEET_ID = 'starlight-evolution-reveal-css';
-const STYLESHEET_HREF = '../css/starlight-evolution-reveal.css?v=2.1.0';
+const STYLESHEET_HREF = '../css/starlight-evolution-reveal.css?v=2.2.0';
 
 const TIMING = Object.freeze({
   boot: 340,
@@ -85,6 +85,11 @@ function orbiterCountForCost(cost) {
 
 function getEmbedVisibleFrame(view = window) {
   try {
+    if (window.StarlightUI?.getEmbedVisibleFrame) {
+      return window.StarlightUI.getEmbedVisibleFrame(view);
+    }
+  } catch {}
+  try {
     if (!view || view.parent === view) return null;
     const frameEl = view.frameElement;
     if (!frameEl) return null;
@@ -109,18 +114,43 @@ function getEmbedVisibleFrame(view = window) {
 }
 
 function anchorReveal(root) {
+  try {
+    if (window.StarlightUI?.anchorOverlayToVisibleViewport) {
+      window.StarlightUI.anchorOverlayToVisibleViewport(root);
+      return;
+    }
+  } catch {}
   const frame = getEmbedVisibleFrame();
   if (!frame) return;
+  const top = `${Math.round(frame.top)}px`;
+  const height = `${Math.round(frame.height)}px`;
   root.classList.add('is-embed-anchored');
-  root.style.setProperty('--st-embed-overlay-top', `${Math.round(frame.top)}px`);
-  root.style.setProperty('--st-embed-overlay-height', `${Math.round(frame.height)}px`);
+  root.style.setProperty('--st-embed-overlay-top', top);
+  root.style.setProperty('--st-embed-overlay-height', height);
+  root.style.setProperty('position', 'absolute', 'important');
+  root.style.setProperty('inset', 'auto', 'important');
+  root.style.setProperty('top', top, 'important');
+  root.style.setProperty('left', '0', 'important');
+  root.style.setProperty('right', '0', 'important');
+  root.style.setProperty('bottom', 'auto', 'important');
+  root.style.setProperty('width', '100%', 'important');
+  root.style.setProperty('max-width', '100%', 'important');
+  root.style.setProperty('height', height, 'important');
+  root.style.setProperty('max-height', height, 'important');
 }
 
 function clearRevealAnchor(root) {
   if (!root) return;
+  try {
+    window.StarlightUI?.clearOverlayViewportAnchor?.(root);
+  } catch {}
   root.classList.remove('is-embed-anchored');
   root.style.removeProperty('--st-embed-overlay-top');
   root.style.removeProperty('--st-embed-overlay-height');
+  [
+    'position', 'inset', 'top', 'left', 'right', 'bottom',
+    'width', 'height', 'max-height', 'max-width'
+  ].forEach((property) => root.style.removeProperty(property));
 }
 
 function acquireViewportLock(doc = document) {
@@ -174,16 +204,42 @@ function acquireViewportLock(doc = document) {
   };
 }
 
+function measureEmbedContentHeight(doc = document) {
+  const root = doc.documentElement;
+  const scrollTop = root.scrollTop || doc.body?.scrollTop || 0;
+  const blocks = [
+    doc.querySelector('.starlight-evolution-page'),
+    doc.querySelector('main'),
+    doc.querySelector('.main'),
+    doc.body
+  ].filter(Boolean);
+  let height = 0;
+  for (const block of blocks) {
+    const rect = block.getBoundingClientRect();
+    height = Math.max(height, scrollTop + rect.bottom);
+  }
+  return Math.max(320, Math.ceil(height + 24));
+}
+
 function documentHeight() {
-  const body = document.body;
-  const root = document.documentElement;
-  return Math.max(
-    body?.scrollHeight || 0,
-    body?.offsetHeight || 0,
-    root?.scrollHeight || 0,
-    root?.offsetHeight || 0,
-    root?.clientHeight || 0
-  );
+  return measureEmbedContentHeight();
+}
+
+function resetEmbeddedDocumentScroll(doc = document) {
+  try {
+    doc.documentElement.scrollTop = 0;
+    doc.body.scrollTop = 0;
+    doc.documentElement.classList.remove('st-evo-open');
+    doc.body?.classList.remove('st-evo-open');
+    doc.documentElement.style.removeProperty('overflow');
+    doc.documentElement.style.removeProperty('overflow-x');
+    doc.documentElement.style.removeProperty('overflow-y');
+    doc.documentElement.style.removeProperty('overscroll-behavior');
+    doc.body?.style.removeProperty('overflow');
+    doc.body?.style.removeProperty('overflow-x');
+    doc.body?.style.removeProperty('overflow-y');
+    doc.body?.style.removeProperty('overscroll-behavior');
+  } catch {}
 }
 
 function notifyEmbedHeight() {
@@ -356,13 +412,16 @@ export async function playStarlightEvolutionReveal(options = {}) {
     clearRevealAnchor(root);
     root.remove();
     releaseViewportLock();
+    resetEmbeddedDocumentScroll(document);
     restoreEmbedScroll(embedScrollSnapshot);
     notifyEmbedHeight();
     window.requestAnimationFrame(() => {
+      resetEmbeddedDocumentScroll(document);
       notifyEmbedHeight();
       window.requestAnimationFrame(notifyEmbedHeight);
     });
     window.setTimeout(notifyEmbedHeight, 120);
+    window.setTimeout(notifyEmbedHeight, 320);
   }
 }
 
