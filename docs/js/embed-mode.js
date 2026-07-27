@@ -94,15 +94,21 @@ function measureContentHeight() {
     || body;
   if (!main) return 320;
   const rect = main.getBoundingClientRect();
-  const measured = Math.max(320, Math.ceil(scrollTop + rect.bottom + 24));
+  const contentOnly = Math.max(320, Math.ceil(scrollTop + rect.bottom + 24));
+  if (
+    docEl.classList.contains('st-evo-open')
+    || docEl.classList.contains('st-r3-reveal-open')
+  ) {
+    return contentOnly;
+  }
   const scrollHeight = Math.max(
     body?.scrollHeight || 0,
     body?.offsetHeight || 0,
     docEl?.scrollHeight || 0,
     docEl?.offsetHeight || 0
   );
-  if (scrollHeight > measured + 120) return measured;
-  return Math.max(measured, scrollHeight);
+  if (scrollHeight > contentOnly + 120) return contentOnly;
+  return Math.max(contentOnly, scrollHeight);
 }
 
 function documentHeight(){
