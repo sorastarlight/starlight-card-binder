@@ -67,6 +67,7 @@ test('Starlight Evolution migration and client wiring are present', async () => 
     reveal,
     revealCss,
     css,
+    evoCss,
     analyzerCss,
     collection,
     binder,
@@ -84,6 +85,7 @@ test('Starlight Evolution migration and client wiring are present', async () => 
     read('docs/js/starlight-evolution-reveal.js'),
     read('docs/css/starlight-evolution-reveal.css'),
     read('docs/css/prestige-frames.css'),
+    read('docs/css/pages/starlight-evolution.css'),
     read('docs/css/pages/card-analyzer.css'),
     read('docs/collection.html'),
     read('docs/binder.html'),
@@ -115,16 +117,15 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.doesNotMatch(app, /full-card-wrap flip-card analyzer-card-3d/);
   assert.match(app, /Holo On|Turn Off Holographic/);
   assert.match(app, /Evolution On|Turn Off Starlight Evolution/);
-  assert.match(reveal, /prefers-reduced-motion|preferReducedMotion/);
-  assert.match(reveal, /anchorOverlayToVisibleViewport|notifyEmbedReset|starlight-view-reset/);
-  assert.match(reveal, /starlight-evolution-reveal\.css\?v=2\.5\.0/);
-  assert.doesNotMatch(revealCss, /is-embed-viewport/);
-  assert.doesNotMatch(revealCss, /is-embed-anchored[\s\S]*position:\s*fixed/s);
+  assert.match(reveal, /StarlightUI\?\.alert|embed-safe alert/);
+  assert.doesNotMatch(reveal, /st-evo-root|anchorOverlayToVisibleViewport|notifyEmbedReset/);
+  assert.match(evoCss, /st-evo-result-art|stEvoResultPulse/);
   assert.match(css, /Border-only frames — no inner rainbow holo wash/);
+  assert.match(evoPage, /st-evo-result-modal/);
   assert.match(evoPage, /st-evo-ready-grid/);
   assert.match(evoPage, /st-evo-tier-showcase/);
-  assert.match(evoPage, /starlight-evolution-page\.js\?v=1\.3\.4/);
-  assert.match(evoPage, /starlight-evolution\.css\?v=1\.4\.0/);
+  assert.match(evoPage, /starlight-evolution-page\.js\?v=1\.4\.0/);
+  assert.match(evoPage, /starlight-evolution\.css\?v=1\.5\.0/);
   assert.match(evoPage, /StarlightCard_Back_NewLogo\.png/);
   assert.match(evoPage, /st-evo-tier-preview prestige-frame prestige-star-bit/);
   assert.match(analyzerCss, /Beat qol-ui/);
@@ -143,12 +144,13 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   const evoPageJs = await read('docs/js/pages/starlight-evolution-page.js');
   assert.match(evoPageJs, /data-evo-open-card/);
   assert.match(evoPageJs, /evolveMyCard/);
-  assert.match(evoPageJs, /playStarlightEvolutionReveal/);
+  assert.match(evoPageJs, /showEvolutionResult/);
+  assert.doesNotMatch(evoPageJs, /playStarlightEvolutionReveal/);
   assert.doesNotMatch(evoPageJs, /data-shell-view=["']collection["']/);
   assert.match(evoPageJs, /normalizeReadyRows/);
   assert.match(evoPageJs, /st-evo-ready-grid/);
   assert.match(evoPageJs, /adoptModal/);
   assert.doesNotMatch(evoPageJs, /dialogEl\?\.classList\.(add|remove)\(['"]hidden['"]\)/);
   assert.match(evoPage, /st-evo-card-modal/);
-  assert.match(evoPage, /starlight-evolution-page\.js\?v=1\.3\.4/);
+  assert.match(evoPage, /starlight-evolution-page\.js\?v=1\.4\.0/);
 });

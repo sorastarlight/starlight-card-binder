@@ -16,7 +16,6 @@ import {
   prestigeLabel,
   previousEvolutionTier
 } from '../prestige-utils.js?v=1.5.0';
-import { playStarlightEvolutionReveal } from '../starlight-evolution-reveal.js?v=2.5.0';
 
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
   '&': '&amp;',
@@ -34,6 +33,12 @@ const dialogEl = document.getElementById('st-evo-card-modal');
 const dialogBodyEl = document.getElementById('st-evo-card-body');
 const dialogTitleEl = document.getElementById('st-evo-card-title');
 const dialogCloseEl = document.getElementById('st-evo-card-close');
+const resultModalEl = document.getElementById('st-evo-result-modal');
+const resultArtEl = document.getElementById('st-evo-result-art');
+const resultTierEl = document.getElementById('st-evo-result-tier');
+const resultNameEl = document.getElementById('st-evo-result-name');
+const resultDoneEl = document.getElementById('st-evo-result-done');
+const resultCloseEl = document.getElementById('st-evo-result-close');
 
 /** @type {Map<string, object>} */
 let ownedById = new Map();
@@ -53,6 +58,59 @@ const cardModal = dialogEl && window.StarlightUI?.adoptModal
       }
     })
   : null;
+
+const resultModal = resultModalEl && window.StarlightUI?.adoptModal
+  ? window.StarlightUI.adoptModal(resultModalEl, {
+      dialog: resultModalEl.querySelector('.st-dialog'),
+      labelledBy: 'st-evo-result-title',
+      describedBy: 'st-evo-result-body',
+      initialFocus: resultDoneEl,
+      closeOnBackdrop: true
+    })
+  : null;
+
+function preferReducedMotion() {
+  try {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  } catch {
+    return false;
+  }
+}
+
+function showEvolutionResult({ cardName, imageUrl, toTier, label }) {
+  const frame = prestigeClassName(toTier);
+  const tierToken = String(toTier).replace(/_/g, '-');
+  const safeLabel = label || prestigeLabel(toTier);
+
+  if (resultArtEl) {
+    resultArtEl.className = `st-evo-result-art ${frame}`;
+    resultArtEl.innerHTML = imageUrl
+      ? `<img src="${esc(imageUrl)}" alt="${esc(cardName)}" draggable="false">`
+      : '';
+  }
+  if (resultTierEl) {
+    resultTierEl.innerHTML = `<span class="prestige-badge prestige-${esc(tierToken)}">${esc(safeLabel)}</span>`;
+  }
+  if (resultNameEl) resultNameEl.textContent = cardName;
+
+  if (!resultModal) {
+    toast(`${cardName} evolved to ${safeLabel}!`, 'success');
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve) => {
+    const finish = () => {
+      resultArtEl?.classList.remove('is-celebrating');
+      resolve();
+    };
+    resultModalEl?.addEventListener('starlight:modal-close', finish, { once: true });
+    resultModal.open({ initialFocus: resultDoneEl || resultCloseEl });
+    resultArtEl?.classList.add('is-celebrating');
+    if (!preferReducedMotion()) {
+      window.setTimeout(() => resultModal.close(), 2600);
+    }
+  });
+}
 
 function setStatus(message, type = '') {
   if (!statusEl) return;
@@ -287,17 +345,13 @@ async function handleEvolve(cardId) {
     const nextLabel = result.label || prestigeLabel(toTier);
     const cost = evolutionCostForNextTier(card.tier);
     closeCardDetail();
-    await playStarlightEvolutionReveal({
+    await showEvolutionResult({
       imageUrl: card.imageUrl,
       cardName: card.name,
-      fromTier: card.tier,
       toTier,
-      label: nextLabel,
-      cost
+      label: nextLabel
     });
-    toast(`Evolved to ${nextLabel}!`, 'success');
     await renderOwned();
-    window.__starlightEmbedResetLayout?.();
   } catch (error) {
     toast(error?.message || error?.error_description || 'Evolution failed.', 'error');
   } finally {
