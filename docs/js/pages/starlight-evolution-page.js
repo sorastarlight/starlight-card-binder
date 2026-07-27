@@ -34,8 +34,6 @@ const dialogBodyEl = document.getElementById('st-evo-card-body');
 const dialogTitleEl = document.getElementById('st-evo-card-title');
 const dialogCloseEl = document.getElementById('st-evo-card-close');
 const resultModalEl = document.getElementById('st-evo-result-modal');
-const resultStageEl = document.getElementById('st-evo-flair-stage');
-const resultStackEl = document.getElementById('st-evo-stack-layers');
 const resultTitleEl = document.getElementById('st-evo-result-title');
 const resultArtEl = document.getElementById('st-evo-result-art');
 const resultTierEl = document.getElementById('st-evo-result-tier');
@@ -72,103 +70,32 @@ const resultModal = resultModalEl && window.StarlightUI?.adoptModal
     })
   : null;
 
-function preferReducedMotion() {
-  try {
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  } catch {
-    return false;
-  }
-}
-
-function wait(ms) {
-  return new Promise((resolve) => window.setTimeout(resolve, ms));
-}
-
-const STACK_LAYER_COUNT = 8;
-const STACK_LAYER_DELAY_MS = 68;
-
-function resetFlairStage() {
-  if (!resultStageEl) return;
-  resultStageEl.classList.remove('is-ready', 'is-stacking', 'is-charging', 'is-evolved', 'is-reveal', 'is-complete');
-  clearStackLayers();
-}
-
-function clearStackLayers() {
-  if (resultStackEl) resultStackEl.innerHTML = '';
-}
-
-function buildStackLayerMarkup(imageUrl, cardName, tier, index) {
-  const frame = prestigeClassName(tier);
-  return `<div class="st-evo-stack-layer st-evo-stack-card ${frame}" style="--stack-i:${index}" aria-hidden="true"><span class="collection-image"><img src="${esc(imageUrl)}" alt="" draggable="false"></span></div>`;
-}
-
 function setResultCardArt(imageUrl, cardName, tier) {
   if (!resultArtEl) return;
   const frame = prestigeClassName(tier);
-  resultArtEl.className = `st-evo-stack-card st-evo-stack-base ${frame}`;
+  resultArtEl.className = `st-evo-result-art ${frame}`;
   resultArtEl.innerHTML = imageUrl
     ? `<span class="collection-image"><img src="${esc(imageUrl)}" alt="${esc(cardName)}" draggable="false"></span>`
     : '';
 }
 
-function applyResultMeta({ cardName, toTier, label }, visible = true) {
+function applyResultMeta({ cardName, toTier, label }) {
   const tierToken = String(toTier).replace(/_/g, '-');
   const safeLabel = label || prestigeLabel(toTier);
   if (resultTierEl) {
-    resultTierEl.hidden = !visible;
+    resultTierEl.hidden = false;
     resultTierEl.innerHTML = `<span class="prestige-badge prestige-${esc(tierToken)}">${esc(safeLabel)}</span>`;
   }
   if (resultNameEl) {
-    resultNameEl.hidden = !visible;
+    resultNameEl.hidden = false;
     resultNameEl.textContent = cardName;
   }
-  if (resultTitleEl && visible) {
-    resultTitleEl.textContent = 'Evolved!';
+  if (resultTitleEl) {
+    resultTitleEl.textContent = 'Evolution complete!';
   }
 }
 
-async function playFlairSequence({ cardName, imageUrl, fromTier, toTier, label }) {
-  const reduced = preferReducedMotion();
-  resetFlairStage();
-  applyResultMeta({ cardName, toTier, label }, false);
-  if (resultTitleEl) resultTitleEl.textContent = reduced ? 'Evolution complete!' : 'Infusing duplicates…';
-  setResultCardArt(imageUrl, cardName, fromTier || toTier);
-
-  if (reduced) {
-    setResultCardArt(imageUrl, cardName, toTier);
-    applyResultMeta({ cardName, toTier, label }, true);
-    resultStageEl?.classList.add('is-complete');
-    return;
-  }
-
-  resultStageEl?.classList.add('is-ready');
-  await wait(360);
-  resultStageEl?.classList.add('is-stacking');
-
-  for (let index = 0; index < STACK_LAYER_COUNT; index += 1) {
-    resultStackEl?.insertAdjacentHTML('beforeend', buildStackLayerMarkup(imageUrl, cardName, fromTier || toTier, index));
-    await wait(STACK_LAYER_DELAY_MS);
-  }
-
-  await wait(240);
-  resultStageEl?.classList.remove('is-stacking');
-  resultStageEl?.classList.add('is-charging');
-  if (resultTitleEl) resultTitleEl.textContent = 'Starlight surging…';
-  await wait(1300);
-  resultStageEl?.classList.remove('is-charging');
-  resultStageEl?.classList.add('is-evolved');
-  clearStackLayers();
-  setResultCardArt(imageUrl, cardName, toTier);
-  if (resultTitleEl) resultTitleEl.textContent = 'Evolved!';
-  await wait(680);
-  resultStageEl?.classList.remove('is-evolved');
-  resultStageEl?.classList.add('is-reveal');
-  applyResultMeta({ cardName, toTier, label }, true);
-  await wait(280);
-  resultStageEl?.classList.add('is-complete');
-}
-
-function showEvolutionResult({ cardName, imageUrl, fromTier, toTier, label }) {
+function showEvolutionResult({ cardName, imageUrl, toTier, label }) {
   const safeLabel = label || prestigeLabel(toTier);
 
   if (!resultModal) {
@@ -177,21 +104,10 @@ function showEvolutionResult({ cardName, imageUrl, fromTier, toTier, label }) {
   }
 
   return new Promise((resolve) => {
-    let autoCloseTimer = 0;
-    const finish = () => {
-      if (autoCloseTimer) window.clearTimeout(autoCloseTimer);
-      resetFlairStage();
-      resolve();
-    };
-
-    resultModalEl?.addEventListener('starlight:modal-close', finish, { once: true });
+    resultModalEl?.addEventListener('starlight:modal-close', () => resolve(), { once: true });
+    setResultCardArt(imageUrl, cardName, toTier);
+    applyResultMeta({ cardName, toTier, label });
     resultModal.open({ initialFocus: resultDoneEl || resultCloseEl });
-
-    playFlairSequence({ cardName, imageUrl, fromTier, toTier, label }).then(() => {
-      if (!preferReducedMotion()) {
-        autoCloseTimer = window.setTimeout(() => resultModal.close(), 3400);
-      }
-    });
   });
 }
 
