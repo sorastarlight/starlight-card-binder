@@ -212,7 +212,12 @@ function markViewReady(data={}){
 function resizeEmbeddedView(value){
   if(!frame)return;
   const height=Math.max(560,Math.min(20000,Math.ceil(value||0)+8));
+  const previous=parseFloat(frame.style.height)||0;
   frame.style.height=`${height}px`;
+  if(previous>height+200){
+    mainContent?.scrollTo({top:0,left:0,behavior:'auto'});
+    window.scrollTo({top:0,left:0,behavior:'auto'});
+  }
 }
 
 

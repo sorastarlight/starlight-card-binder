@@ -9,7 +9,7 @@ import {
 } from './prestige-utils.js?v=1.5.0';
 
 const STYLESHEET_ID = 'starlight-evolution-reveal-css';
-const STYLESHEET_HREF = '../css/starlight-evolution-reveal.css?v=2.2.0';
+const STYLESHEET_HREF = '../css/starlight-evolution-reveal.css?v=2.3.0';
 
 const TIMING = Object.freeze({
   boot: 340,
@@ -114,43 +114,32 @@ function getEmbedVisibleFrame(view = window) {
 }
 
 function anchorReveal(root) {
-  try {
-    if (window.StarlightUI?.anchorOverlayToVisibleViewport) {
-      window.StarlightUI.anchorOverlayToVisibleViewport(root);
-      return;
-    }
-  } catch {}
-  const frame = getEmbedVisibleFrame();
-  if (!frame) return;
-  const top = `${Math.round(frame.top)}px`;
-  const height = `${Math.round(frame.height)}px`;
-  root.classList.add('is-embed-anchored');
-  root.style.setProperty('--st-embed-overlay-top', top);
-  root.style.setProperty('--st-embed-overlay-height', height);
-  root.style.setProperty('position', 'absolute', 'important');
-  root.style.setProperty('inset', 'auto', 'important');
-  root.style.setProperty('top', top, 'important');
-  root.style.setProperty('left', '0', 'important');
-  root.style.setProperty('right', '0', 'important');
-  root.style.setProperty('bottom', 'auto', 'important');
-  root.style.setProperty('width', '100%', 'important');
-  root.style.setProperty('max-width', '100%', 'important');
-  root.style.setProperty('height', height, 'important');
-  root.style.setProperty('max-height', height, 'important');
+  if (window.parent === window) return;
+  root.classList.add('is-embed-viewport');
 }
 
 function clearRevealAnchor(root) {
   if (!root) return;
-  try {
-    window.StarlightUI?.clearOverlayViewportAnchor?.(root);
-  } catch {}
-  root.classList.remove('is-embed-anchored');
+  root.classList.remove('is-embed-viewport', 'is-embed-anchored');
   root.style.removeProperty('--st-embed-overlay-top');
   root.style.removeProperty('--st-embed-overlay-height');
   [
     'position', 'inset', 'top', 'left', 'right', 'bottom',
     'width', 'height', 'max-height', 'max-width'
   ].forEach((property) => root.style.removeProperty(property));
+}
+
+function resetParentShellScroll() {
+  try {
+    const frame = window.frameElement;
+    const parentMain = window.parent?.document?.querySelector('.main');
+    if (!(frame instanceof HTMLElement) || !(parentMain instanceof HTMLElement)) return;
+    const mainRect = parentMain.getBoundingClientRect();
+    const frameRect = frame.getBoundingClientRect();
+    const target = Math.max(0, Math.floor(frameRect.top - mainRect.top + parentMain.scrollTop - 4));
+    parentMain.scrollTop = target;
+    window.parent.scrollTo?.({ top: 0, left: 0, behavior: 'auto' });
+  } catch {}
 }
 
 function acquireViewportLock(doc = document) {
@@ -207,18 +196,13 @@ function acquireViewportLock(doc = document) {
 function measureEmbedContentHeight(doc = document) {
   const root = doc.documentElement;
   const scrollTop = root.scrollTop || doc.body?.scrollTop || 0;
-  const blocks = [
-    doc.querySelector('.starlight-evolution-page'),
-    doc.querySelector('main'),
-    doc.querySelector('.main'),
-    doc.body
-  ].filter(Boolean);
-  let height = 0;
-  for (const block of blocks) {
-    const rect = block.getBoundingClientRect();
-    height = Math.max(height, scrollTop + rect.bottom);
-  }
-  return Math.max(320, Math.ceil(height + 24));
+  const main = doc.querySelector('body > main')
+    || doc.querySelector('.site > .main')
+    || doc.querySelector('main')
+    || doc.body;
+  if (!main) return 320;
+  const rect = main.getBoundingClientRect();
+  return Math.max(320, Math.ceil(scrollTop + rect.bottom + 24));
 }
 
 function documentHeight() {
@@ -414,14 +398,28 @@ export async function playStarlightEvolutionReveal(options = {}) {
     releaseViewportLock();
     resetEmbeddedDocumentScroll(document);
     restoreEmbedScroll(embedScrollSnapshot);
+    resetParentShellScroll();
     notifyEmbedHeight();
+    window.__starlightEmbedReportHeight?.();
     window.requestAnimationFrame(() => {
       resetEmbeddedDocumentScroll(document);
+      resetParentShellScroll();
       notifyEmbedHeight();
-      window.requestAnimationFrame(notifyEmbedHeight);
+      window.__starlightEmbedReportHeight?.();
+      window.requestAnimationFrame(() => {
+        notifyEmbedHeight();
+        window.__starlightEmbedReportHeight?.();
+      });
     });
-    window.setTimeout(notifyEmbedHeight, 120);
-    window.setTimeout(notifyEmbedHeight, 320);
+    window.setTimeout(() => {
+      resetParentShellScroll();
+      notifyEmbedHeight();
+      window.__starlightEmbedReportHeight?.();
+    }, 120);
+    window.setTimeout(() => {
+      notifyEmbedHeight();
+      window.__starlightEmbedReportHeight?.();
+    }, 320);
   }
 }
 

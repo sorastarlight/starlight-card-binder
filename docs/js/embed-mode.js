@@ -84,9 +84,29 @@ function send(type, extra = {}){
   parent.postMessage({type, view: currentRoute || file, ...extra}, location.origin);
 }
 
+function measureContentHeight() {
+  const docEl = document.documentElement;
+  const body = document.body;
+  const scrollTop = docEl.scrollTop || body?.scrollTop || 0;
+  const main = document.querySelector('body > main')
+    || document.querySelector('.site > .main')
+    || document.querySelector('main')
+    || body;
+  if (!main) return 320;
+  const rect = main.getBoundingClientRect();
+  const measured = Math.max(320, Math.ceil(scrollTop + rect.bottom + 24));
+  const scrollHeight = Math.max(
+    body?.scrollHeight || 0,
+    body?.offsetHeight || 0,
+    docEl?.scrollHeight || 0,
+    docEl?.offsetHeight || 0
+  );
+  if (scrollHeight > measured + 120) return measured;
+  return Math.max(measured, scrollHeight);
+}
+
 function documentHeight(){
-  const b = document.body, d = document.documentElement;
-  return Math.max(b?.scrollHeight || 0, b?.offsetHeight || 0, d?.scrollHeight || 0, d?.offsetHeight || 0, d?.clientHeight || 0);
+  return measureContentHeight();
 }
 
 let lastHeight = 0;
@@ -173,4 +193,5 @@ if (!embedded && shouldRedirectToShell()) {
   });
   window.addEventListener('load', () => { announceReady(); setTimeout(announceReady, 120); });
   window.addEventListener('pageshow', () => { announceReady(); setTimeout(announceReady, 80); });
+  window.__starlightEmbedReportHeight = reportHeight;
 }

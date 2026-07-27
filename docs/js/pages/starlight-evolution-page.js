@@ -16,7 +16,7 @@ import {
   prestigeLabel,
   previousEvolutionTier
 } from '../prestige-utils.js?v=1.5.0';
-import { playStarlightEvolutionReveal } from '../starlight-evolution-reveal.js?v=2.2.0';
+import { playStarlightEvolutionReveal } from '../starlight-evolution-reveal.js?v=2.3.0';
 
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
   '&': '&amp;',
@@ -297,6 +297,7 @@ async function handleEvolve(cardId) {
     });
     toast(`Evolved to ${nextLabel}!`, 'success');
     await renderOwned();
+    window.__starlightEmbedReportHeight?.();
   } catch (error) {
     toast(error?.message || error?.error_description || 'Evolution failed.', 'error');
   } finally {

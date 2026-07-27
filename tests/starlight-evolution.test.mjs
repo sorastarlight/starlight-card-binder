@@ -116,13 +116,14 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.match(app, /Holo On|Turn Off Holographic/);
   assert.match(app, /Evolution On|Turn Off Starlight Evolution/);
   assert.match(reveal, /prefers-reduced-motion|preferReducedMotion/);
-  assert.match(reveal, /anchorOverlayToVisibleViewport|measureEmbedContentHeight/);
-  assert.match(reveal, /starlight-evolution-reveal\.css\?v=2\.2\.0/);
+  assert.match(reveal, /is-embed-viewport|resetParentShellScroll/);
+  assert.match(reveal, /starlight-evolution-reveal\.css\?v=2\.3\.0/);
+  assert.match(revealCss, /\.st-evo-root\.is-embed-viewport/);
   assert.doesNotMatch(revealCss, /is-embed-anchored[\s\S]*position:\s*fixed/s);
   assert.match(css, /Border-only frames — no inner rainbow holo wash/);
   assert.match(evoPage, /st-evo-ready-grid/);
   assert.match(evoPage, /st-evo-tier-showcase/);
-  assert.match(evoPage, /starlight-evolution-page\.js\?v=1\.3\.1/);
+  assert.match(evoPage, /starlight-evolution-page\.js\?v=1\.3\.2/);
   assert.match(evoPage, /starlight-evolution\.css\?v=1\.4\.0/);
   assert.match(evoPage, /StarlightCard_Back_NewLogo\.png/);
   assert.match(evoPage, /st-evo-tier-preview prestige-frame prestige-star-bit/);
@@ -148,5 +149,5 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.match(evoPageJs, /adoptModal/);
   assert.doesNotMatch(evoPageJs, /dialogEl\?\.classList\.(add|remove)\(['"]hidden['"]\)/);
   assert.match(evoPage, /st-evo-card-modal/);
-  assert.match(evoPage, /starlight-evolution-page\.js\?v=1\.3\.1/);
+  assert.match(evoPage, /starlight-evolution-page\.js\?v=1\.3\.2/);
 });
