@@ -34,6 +34,8 @@ const dialogBodyEl = document.getElementById('st-evo-card-body');
 const dialogTitleEl = document.getElementById('st-evo-card-title');
 const dialogCloseEl = document.getElementById('st-evo-card-close');
 const resultModalEl = document.getElementById('st-evo-result-modal');
+const resultStageEl = document.getElementById('st-evo-enhance-stage');
+const resultLayersEl = document.getElementById('st-evo-enhance-layers');
 const resultTitleEl = document.getElementById('st-evo-result-title');
 const resultArtEl = document.getElementById('st-evo-result-art');
 const resultTierEl = document.getElementById('st-evo-result-tier');
@@ -70,32 +72,104 @@ const resultModal = resultModalEl && window.StarlightUI?.adoptModal
     })
   : null;
 
+const ENHANCE_LAYER_COUNT = 8;
+const ENHANCE_LAYER_DELAY_MS = 62;
+
+function preferReducedMotion() {
+  try {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  } catch {
+    return false;
+  }
+}
+
+function wait(ms) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function resetEnhanceStage() {
+  if (!resultStageEl) return;
+  resultStageEl.classList.remove('is-appear', 'is-stack', 'is-charge', 'is-burst', 'is-reveal', 'is-complete');
+  clearEnhanceLayers();
+}
+
+function clearEnhanceLayers() {
+  if (resultLayersEl) resultLayersEl.innerHTML = '';
+}
+
+function buildEnhanceLayerMarkup(imageUrl, tier, index) {
+  const frame = prestigeClassName(tier);
+  return `<div class="st-evo-enhance-layer st-evo-enhance-card ${frame}" style="--layer-i:${index}" aria-hidden="true"><span class="collection-image"><img src="${esc(imageUrl)}" alt="" draggable="false"></span></div>`;
+}
+
 function setResultCardArt(imageUrl, cardName, tier) {
   if (!resultArtEl) return;
   const frame = prestigeClassName(tier);
-  resultArtEl.className = `st-evo-result-art ${frame}`;
+  resultArtEl.className = `st-evo-enhance-card st-evo-enhance-base ${frame}`;
   resultArtEl.innerHTML = imageUrl
     ? `<span class="collection-image"><img src="${esc(imageUrl)}" alt="${esc(cardName)}" draggable="false"></span>`
     : '';
 }
 
-function applyResultMeta({ cardName, toTier, label }) {
+function applyResultMeta({ cardName, toTier, label }, visible = true) {
   const tierToken = String(toTier).replace(/_/g, '-');
   const safeLabel = label || prestigeLabel(toTier);
   if (resultTierEl) {
-    resultTierEl.hidden = false;
+    resultTierEl.hidden = !visible;
     resultTierEl.innerHTML = `<span class="prestige-badge prestige-${esc(tierToken)}">${esc(safeLabel)}</span>`;
   }
   if (resultNameEl) {
-    resultNameEl.hidden = false;
+    resultNameEl.hidden = !visible;
     resultNameEl.textContent = cardName;
   }
-  if (resultTitleEl) {
+  if (resultTitleEl && visible) {
     resultTitleEl.textContent = 'Evolution complete!';
   }
 }
 
-function showEvolutionResult({ cardName, imageUrl, toTier, label }) {
+async function playEnhanceSequence({ cardName, imageUrl, fromTier, toTier, label }) {
+  const sourceTier = fromTier || toTier;
+  resetEnhanceStage();
+  applyResultMeta({ cardName, toTier, label }, false);
+  setResultCardArt(imageUrl, cardName, sourceTier);
+
+  if (preferReducedMotion()) {
+    if (resultTitleEl) resultTitleEl.textContent = 'Evolution complete!';
+    setResultCardArt(imageUrl, cardName, toTier);
+    applyResultMeta({ cardName, toTier, label }, true);
+    resultStageEl?.classList.add('is-complete');
+    return;
+  }
+
+  if (resultTitleEl) resultTitleEl.textContent = 'Enhancing…';
+  resultStageEl?.classList.add('is-appear');
+  await wait(520);
+  resultStageEl?.classList.add('is-stack');
+  if (resultTitleEl) resultTitleEl.textContent = 'Infusing duplicates…';
+
+  for (let index = 0; index < ENHANCE_LAYER_COUNT; index += 1) {
+    resultLayersEl?.insertAdjacentHTML('beforeend', buildEnhanceLayerMarkup(imageUrl, sourceTier, index));
+    await wait(ENHANCE_LAYER_DELAY_MS);
+  }
+
+  await wait(180);
+  resultStageEl?.classList.remove('is-stack');
+  resultStageEl?.classList.add('is-charge');
+  if (resultTitleEl) resultTitleEl.textContent = 'Starlight surging…';
+  await wait(1250);
+  resultStageEl?.classList.remove('is-charge');
+  resultStageEl?.classList.add('is-burst');
+  clearEnhanceLayers();
+  setResultCardArt(imageUrl, cardName, toTier);
+  await wait(720);
+  resultStageEl?.classList.remove('is-burst');
+  resultStageEl?.classList.add('is-reveal');
+  applyResultMeta({ cardName, toTier, label }, true);
+  await wait(280);
+  resultStageEl?.classList.add('is-complete');
+}
+
+function showEvolutionResult({ cardName, imageUrl, fromTier, toTier, label }) {
   const safeLabel = label || prestigeLabel(toTier);
 
   if (!resultModal) {
@@ -104,10 +178,14 @@ function showEvolutionResult({ cardName, imageUrl, toTier, label }) {
   }
 
   return new Promise((resolve) => {
-    resultModalEl?.addEventListener('starlight:modal-close', () => resolve(), { once: true });
-    setResultCardArt(imageUrl, cardName, toTier);
-    applyResultMeta({ cardName, toTier, label });
+    const finish = () => {
+      resetEnhanceStage();
+      resolve();
+    };
+
+    resultModalEl?.addEventListener('starlight:modal-close', finish, { once: true });
     resultModal.open({ initialFocus: resultDoneEl || resultCloseEl });
+    playEnhanceSequence({ cardName, imageUrl, fromTier, toTier, label });
   });
 }
 
