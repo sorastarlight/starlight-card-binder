@@ -506,28 +506,35 @@ body.unified-shell{padding-left:env(safe-area-inset-left);padding-right:env(safe
 .shell-live-feed-ticker-wrap{
   overflow:hidden;
   min-width:0;
-  mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
 }
 .shell-live-feed.is-expanded .shell-live-feed-ticker-wrap{display:none}
 .shell-live-feed-ticker-track{
   display:inline-flex;
   align-items:center;
   gap:18px;
+  max-width:100%;
   white-space:nowrap;
-  animation:shellLiveFeedMarquee 36s linear infinite;
 }
 .shell-live-feed-ticker-track.is-static{
-  animation:none;
-  max-width:100%;
   overflow:hidden;
   text-overflow:ellipsis;
 }
+.shell-live-feed-ticker-track.is-advancing{
+  animation:shellLiveFeedTickerAdvance .65s ease;
+}
 .shell-live-feed-ticker-item{
+  flex:0 1 auto;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
   font-size:.78rem;
   font-weight:800;
   color:#4f628f;
 }
-.shell-live-feed-ticker-item.is-new{color:#8a4b75}
+.shell-live-feed-ticker-item.is-entering{
+  animation:shellLiveFeedTickerEnter .65s ease;
+  color:#8a4b75;
+}
 .shell-live-feed-ticker-sep{
   color:rgba(107,198,248,.75);
   font-size:.72rem;
@@ -624,9 +631,13 @@ body.unified-shell{padding-left:env(safe-area-inset-left);padding-right:env(safe
 }
 .shell-live-feed.is-suppressed,
 .shell-live-feed[hidden]{display:none!important}
-@keyframes shellLiveFeedMarquee{
-  from{transform:translateX(0)}
-  to{transform:translateX(-50%)}
+@keyframes shellLiveFeedTickerAdvance{
+  0%{transform:translateX(18px);opacity:.72}
+  100%{transform:none;opacity:1}
+}
+@keyframes shellLiveFeedTickerEnter{
+  0%{transform:translateX(100%);opacity:0}
+  100%{transform:none;opacity:1}
 }
 @keyframes shellLiveFeedPop{
   0%{transform:scale(.98);opacity:.65}
@@ -641,5 +652,5 @@ body.unified-shell{padding-left:env(safe-area-inset-left);padding-right:env(safe
   to{opacity:1;transform:none}
 }
 @media(prefers-reduced-motion:reduce){
-  .shell-live-feed-pulse,.shell-live-feed-ticker-track,.shell-live-feed-item{animation:none!important}
+  .shell-live-feed-pulse,.shell-live-feed-ticker-track,.shell-live-feed-ticker-item,.shell-live-feed-item{animation:none!important}
 }

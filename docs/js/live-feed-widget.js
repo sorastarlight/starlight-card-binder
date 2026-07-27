@@ -3,6 +3,7 @@ import { supabase } from './supabase-client.js';
 
 const POLL_MS = 8000;
 const MAX_ITEMS = 12;
+const MAX_TICKER_ITEMS = 3;
 const STORAGE_KEY = 'starlight-live-feed-expanded';
 
 function esc(value) {
@@ -48,6 +49,30 @@ function tickerLabel(item) {
   return `${handle} · ${summary} · ${relativeTime(item.createdAt)}`;
 }
 
+function estimateTickerItemWidth(label) {
+  return Math.min(Math.max(label.length * 6.8 + 18, 96), 320);
+}
+
+function measureTickerCapacity(sourceItems, availableWidth) {
+  if (!sourceItems.length || availableWidth <= 0) return 1;
+  const widths = sourceItems.slice(0, MAX_TICKER_ITEMS).map((item) => estimateTickerItemWidth(tickerLabel(item)));
+  const sepWidth = 22;
+  for (let count = Math.min(MAX_TICKER_ITEMS, widths.length); count >= 1; count -= 1) {
+    const total = widths.slice(0, count).reduce((sum, width) => sum + width, 0) + Math.max(0, count - 1) * sepWidth;
+    if (total <= availableWidth) return count;
+  }
+  return 1;
+}
+
+function buildTickerMarkup(sourceItems, { animateNew = false } = {}) {
+  const labels = sourceItems.map((item) => {
+    const classes = ['shell-live-feed-ticker-item'];
+    if (item.__isNew && animateNew) classes.push('is-entering');
+    return `<span class="${classes.join(' ')}">${esc(tickerLabel(item))}</span>`;
+  });
+  return labels.join('<span class="shell-live-feed-ticker-sep" aria-hidden="true">✦</span>');
+}
+
 export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
   const root = document.getElementById('shellLiveFeed');
   if (!root) return;
@@ -61,35 +86,55 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
 
   let items = [];
   let knownIds = new Set();
+  let tickerCapacity = 2;
+  let lastTickerKey = '';
+  let resizeObserver = null;
   let timer = 0;
   let loading = false;
   let signedIn = false;
 
-  function setExpanded(expanded) {
-    root.classList.toggle('is-expanded', expanded);
-    root.classList.toggle('is-collapsed', !expanded);
-    if (toggle) {
-      toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-      toggle.textContent = expanded ? '▴' : '▾';
-      toggle.setAttribute('aria-label', expanded ? 'Collapse live feed' : 'Expand live feed');
-    }
-    writeExpanded(expanded);
+  function getTickerWrap() {
+    return ticker?.closest('.shell-live-feed-ticker-wrap') || ticker;
   }
 
-  function renderTicker() {
+  function syncTickerCapacity() {
+    const wrap = getTickerWrap();
+    tickerCapacity = measureTickerCapacity(items, wrap?.clientWidth || 0);
+  }
+
+  function getVisibleTickerItems() {
+    syncTickerCapacity();
+    return items.slice(0, tickerCapacity);
+  }
+
+  function renderTicker({ animateNew = false } = {}) {
     if (!ticker) return;
     if (!signedIn) {
+      lastTickerKey = '';
       ticker.innerHTML = `<div class="shell-live-feed-ticker-track is-static"><span>Sign in to watch live collector activity</span></div>`;
       return;
     }
     if (!items.length) {
+      lastTickerKey = '';
       ticker.innerHTML = `<div class="shell-live-feed-ticker-track is-static"><span>Listening for the next pull…</span></div>`;
       return;
     }
 
-    const labels = items.map((item) => `<span class="shell-live-feed-ticker-item${item.__isNew ? ' is-new' : ''}">${esc(tickerLabel(item))}</span>`);
-    const loop = labels.join('<span class="shell-live-feed-ticker-sep" aria-hidden="true">✦</span>');
-    ticker.innerHTML = `<div class="shell-live-feed-ticker-track" aria-hidden="true">${loop}<span class="shell-live-feed-ticker-sep" aria-hidden="true">✦</span>${loop}</div>`;
+    const visible = getVisibleTickerItems();
+    const nextKey = visible.map((item) => String(item.id)).join('|');
+    const shouldAnimate = animateNew && visible.some((item) => item.__isNew) && nextKey !== lastTickerKey;
+    ticker.innerHTML = `<div class="shell-live-feed-ticker-track is-static${shouldAnimate ? ' is-advancing' : ''}">${buildTickerMarkup(visible, { animateNew: shouldAnimate })}</div>`;
+    lastTickerKey = nextKey;
+
+    if (shouldAnimate) {
+      const track = ticker.querySelector('.shell-live-feed-ticker-track');
+      track?.addEventListener('animationend', () => {
+        track.classList.remove('is-advancing');
+        track.querySelectorAll('.shell-live-feed-ticker-item.is-entering').forEach((node) => {
+          node.classList.remove('is-entering');
+        });
+      }, { once: true });
+    }
   }
 
   function renderList() {
@@ -128,8 +173,19 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
     if (status) status.textContent = 'Live';
   }
 
-  function render() {
-    renderTicker();
+  function setExpanded(expanded) {
+    root.classList.toggle('is-expanded', expanded);
+    root.classList.toggle('is-collapsed', !expanded);
+    if (toggle) {
+      toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+      toggle.textContent = expanded ? '▴' : '▾';
+      toggle.setAttribute('aria-label', expanded ? 'Collapse live feed' : 'Expand live feed');
+    }
+    writeExpanded(expanded);
+  }
+
+  function render({ animateTicker = false } = {}) {
+    renderTicker({ animateNew: animateTicker });
     renderList();
   }
 
@@ -142,6 +198,7 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
       if (!signedIn) {
         items = [];
         knownIds = new Set();
+        lastTickerKey = '';
         render();
         if (status) status.textContent = 'Offline';
         return;
@@ -150,12 +207,13 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
       const data = await getPullFeed({ filter: 'everyone', limit: MAX_ITEMS });
       const next = data?.items || [];
       const nextIds = new Set(next.map((item) => String(item.id)));
+      const hasNewEvents = knownIds.size > 0 && next.some((item) => !knownIds.has(String(item.id)));
       items = next.map((item) => ({
         ...item,
         __isNew: knownIds.size > 0 && !knownIds.has(String(item.id))
       }));
       knownIds = nextIds;
-      render();
+      render({ animateTicker: hasNewEvents });
 
       window.setTimeout(() => {
         items = items.map((item) => ({ ...item, __isNew: false }));
@@ -217,6 +275,20 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
     }
   });
 
+  const tickerWrap = getTickerWrap();
+  if (tickerWrap && typeof ResizeObserver !== 'undefined') {
+    resizeObserver = new ResizeObserver(() => {
+      if (root.classList.contains('is-expanded')) return;
+      renderTicker();
+    });
+    resizeObserver.observe(tickerWrap);
+  } else {
+    window.addEventListener('resize', () => {
+      if (root.classList.contains('is-expanded')) return;
+      renderTicker();
+    });
+  }
+
   setExpanded(readExpanded());
   start();
 
@@ -230,6 +302,7 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
     },
     destroy() {
       window.clearInterval(timer);
+      resizeObserver?.disconnect();
     }
   };
 }
