@@ -34,8 +34,8 @@ const dialogBodyEl = document.getElementById('st-evo-card-body');
 const dialogTitleEl = document.getElementById('st-evo-card-title');
 const dialogCloseEl = document.getElementById('st-evo-card-close');
 const resultModalEl = document.getElementById('st-evo-result-modal');
-const resultStageEl = document.getElementById('st-evo-enhance-stage');
-const resultLayersEl = document.getElementById('st-evo-enhance-layers');
+const resultStageEl = document.getElementById('st-evo-ascend-stage');
+const resultAuraEl = document.getElementById('st-evo-ascend-aura');
 const resultTitleEl = document.getElementById('st-evo-result-title');
 const resultArtEl = document.getElementById('st-evo-result-art');
 const resultTierEl = document.getElementById('st-evo-result-tier');
@@ -72,40 +72,38 @@ const resultModal = resultModalEl && window.StarlightUI?.adoptModal
     })
   : null;
 
-const ENHANCE_LAYER_COUNT = 8;
-const ENHANCE_LAYER_DELAY_MS = 62;
-
-function preferReducedMotion() {
-  try {
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  } catch {
-    return false;
-  }
-}
-
-function wait(ms) {
-  return new Promise((resolve) => window.setTimeout(resolve, ms));
-}
-
-function resetEnhanceStage() {
+function resetAscendStage() {
   if (!resultStageEl) return;
-  resultStageEl.classList.remove('is-appear', 'is-stack', 'is-charge', 'is-burst', 'is-reveal', 'is-complete');
-  clearEnhanceLayers();
+  resultStageEl.classList.remove('is-summon', 'is-channel', 'is-ascend', 'is-transcend', 'is-crown', 'is-reveal', 'is-complete');
+  resultStageEl.removeAttribute('data-tier');
+  clearAscendAura();
 }
 
-function clearEnhanceLayers() {
-  if (resultLayersEl) resultLayersEl.innerHTML = '';
+function clearAscendAura() {
+  if (!resultAuraEl) return;
+  resultAuraEl.style.removeProperty('background-image');
 }
 
-function buildEnhanceLayerMarkup(imageUrl, tier, index) {
-  const frame = prestigeClassName(tier);
-  return `<div class="st-evo-enhance-layer st-evo-enhance-card ${frame}" style="--layer-i:${index}" aria-hidden="true"><span class="collection-image"><img src="${esc(imageUrl)}" alt="" draggable="false"></span></div>`;
+function setAscendAura(imageUrl) {
+  if (!resultAuraEl) return;
+  const safeUrl = String(imageUrl || '').trim();
+  if (!safeUrl) {
+    clearAscendAura();
+    return;
+  }
+  resultAuraEl.style.backgroundImage = `url("${safeUrl.replace(/"/g, '\\"')}")`;
+}
+
+function setAscendTierAccent(tier) {
+  if (!resultStageEl) return;
+  const token = String(tier || '').replace(/_/g, '-');
+  if (token) resultStageEl.setAttribute('data-tier', token);
 }
 
 function setResultCardArt(imageUrl, cardName, tier) {
   if (!resultArtEl) return;
   const frame = prestigeClassName(tier);
-  resultArtEl.className = `st-evo-enhance-card st-evo-enhance-base ${frame}`;
+  resultArtEl.className = `st-evo-ascend-card ${frame}`.trim();
   resultArtEl.innerHTML = imageUrl
     ? `<span class="collection-image"><img src="${esc(imageUrl)}" alt="${esc(cardName)}" draggable="false"></span>`
     : '';
@@ -127,14 +125,16 @@ function applyResultMeta({ cardName, toTier, label }, visible = true) {
   }
 }
 
-async function playEnhanceSequence({ cardName, imageUrl, fromTier, toTier, label }) {
+async function playAscendSequence({ cardName, imageUrl, fromTier, toTier, label }) {
   const sourceTier = fromTier || toTier;
-  resetEnhanceStage();
+  resetAscendStage();
   applyResultMeta({ cardName, toTier, label }, false);
+  setAscendAura(imageUrl);
   setResultCardArt(imageUrl, cardName, sourceTier);
 
   if (preferReducedMotion()) {
     if (resultTitleEl) resultTitleEl.textContent = 'Evolution complete!';
+    setAscendTierAccent(toTier);
     setResultCardArt(imageUrl, cardName, toTier);
     applyResultMeta({ cardName, toTier, label }, true);
     resultStageEl?.classList.add('is-complete');
@@ -142,31 +142,40 @@ async function playEnhanceSequence({ cardName, imageUrl, fromTier, toTier, label
   }
 
   if (resultTitleEl) resultTitleEl.textContent = 'Enhancing…';
-  resultStageEl?.classList.add('is-appear');
-  await wait(520);
-  resultStageEl?.classList.add('is-stack');
-  if (resultTitleEl) resultTitleEl.textContent = 'Infusing duplicates…';
-
-  for (let index = 0; index < ENHANCE_LAYER_COUNT; index += 1) {
-    resultLayersEl?.insertAdjacentHTML('beforeend', buildEnhanceLayerMarkup(imageUrl, sourceTier, index));
-    await wait(ENHANCE_LAYER_DELAY_MS);
-  }
-
-  await wait(180);
-  resultStageEl?.classList.remove('is-stack');
-  resultStageEl?.classList.add('is-charge');
-  if (resultTitleEl) resultTitleEl.textContent = 'Starlight surging…';
-  await wait(1250);
-  resultStageEl?.classList.remove('is-charge');
-  resultStageEl?.classList.add('is-burst');
-  clearEnhanceLayers();
+  resultStageEl?.classList.add('is-summon');
+  await wait(580);
+  resultStageEl?.classList.remove('is-summon');
+  resultStageEl?.classList.add('is-channel');
+  if (resultTitleEl) resultTitleEl.textContent = 'Channeling Starlight…';
+  await wait(1180);
+  resultStageEl?.classList.remove('is-channel');
+  resultStageEl?.classList.add('is-ascend');
+  if (resultTitleEl) resultTitleEl.textContent = 'Ascending…';
+  await wait(980);
+  resultStageEl?.classList.remove('is-ascend');
+  resultStageEl?.classList.add('is-transcend');
+  setAscendTierAccent(toTier);
   setResultCardArt(imageUrl, cardName, toTier);
-  await wait(720);
-  resultStageEl?.classList.remove('is-burst');
+  await wait(820);
+  resultStageEl?.classList.remove('is-transcend');
+  resultStageEl?.classList.add('is-crown');
+  await wait(420);
   resultStageEl?.classList.add('is-reveal');
   applyResultMeta({ cardName, toTier, label }, true);
-  await wait(280);
+  await wait(300);
   resultStageEl?.classList.add('is-complete');
+}
+
+function preferReducedMotion() {
+  try {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  } catch {
+    return false;
+  }
+}
+
+function wait(ms) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
 
 function showEvolutionResult({ cardName, imageUrl, fromTier, toTier, label }) {
@@ -179,13 +188,13 @@ function showEvolutionResult({ cardName, imageUrl, fromTier, toTier, label }) {
 
   return new Promise((resolve) => {
     const finish = () => {
-      resetEnhanceStage();
+      resetAscendStage();
       resolve();
     };
 
     resultModalEl?.addEventListener('starlight:modal-close', finish, { once: true });
     resultModal.open({ initialFocus: resultDoneEl || resultCloseEl });
-    playEnhanceSequence({ cardName, imageUrl, fromTier, toTier, label });
+    playAscendSequence({ cardName, imageUrl, fromTier, toTier, label });
   });
 }
 
