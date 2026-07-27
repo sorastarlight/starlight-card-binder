@@ -42,15 +42,18 @@ function writeExpanded(expanded) {
   }
 }
 
+function actorDisplayName(item) {
+  const actor = item?.actor || {};
+  const name = String(actor.displayName || actor.display_name || '').trim();
+  return name || 'Collector';
+}
+
 function tickerLabel(item) {
-  const actor = item.actor || {};
-  const handle = actor.username ? `@${actor.username}` : (actor.displayName || 'Collector');
-  const summary = String(item.summary || 'New activity').replace(/\s+/g, ' ').trim();
-  return `${handle} · ${summary} · ${relativeTime(item.createdAt)}`;
+  return actorDisplayName(item);
 }
 
 function estimateTickerItemWidth(label) {
-  return Math.min(Math.max(label.length * 6.8 + 18, 96), 320);
+  return Math.min(Math.max(label.length * 6.8 + 18, 72), 220);
 }
 
 function measureTickerCapacity(sourceItems, availableWidth) {
