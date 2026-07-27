@@ -297,7 +297,7 @@
 }
 
 .st-evo-result-dialog {
-  width: min(500px, 100%);
+  width: min(480px, 100%);
   text-align: center;
   overflow: hidden;
 }
@@ -308,7 +308,6 @@
   color: #405fa1;
   font-size: clamp(1.35rem, 4vw, 1.75rem);
   letter-spacing: 0.01em;
-  transition: opacity 280ms ease;
 }
 
 .st-evo-result-body {
@@ -317,155 +316,15 @@
   justify-items: center;
 }
 
-.st-evo-ascend-stage {
-  --ascend-card-w: min(228px, 70vw);
-  --ascend-a: #9ad8ff;
-  --ascend-b: #ffb0e8;
-  --ascend-c: #ffe27a;
-  position: relative;
-  width: min(100%, 380px);
-  min-height: calc(var(--ascend-card-w) * 1.46 + 52px);
+.st-evo-result-art {
+  width: min(220px, 68vw);
   margin: 0 auto;
-  overflow: hidden;
-  isolation: isolate;
-  border-radius: 22px;
-  background:
-    radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.42), transparent 58%),
-    linear-gradient(180deg, rgba(232, 244, 255, 0.55), rgba(255, 244, 252, 0.38));
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55);
-}
-
-.st-evo-ascend-stage[data-tier="radiance-i"] { --ascend-a: #c4d2e8; --ascend-b: #8eb4ff; --ascend-c: #ffffff; }
-.st-evo-ascend-stage[data-tier="radiance-ii"] { --ascend-a: #ffd84a; --ascend-b: #e4b258; --ascend-c: #fff4d6; }
-.st-evo-ascend-stage[data-tier="radiance-iii"] { --ascend-a: #7fd0ff; --ascend-b: #ff9ad5; --ascend-c: #b8f0a8; }
-.st-evo-ascend-stage[data-tier="radiance-iv"] { --ascend-a: #769cff; --ascend-b: #b06bff; --ascend-c: #9ad8ff; }
-.st-evo-ascend-stage[data-tier="radiance-v"] { --ascend-a: #fff4b8; --ascend-b: #ffb0e8; --ascend-c: #9ad8ff; }
-
-.st-evo-ascend-aura,
-.st-evo-ascend-grid,
-.st-evo-ascend-orbit,
-.st-evo-ascend-pillars,
-.st-evo-ascend-shards,
-.st-evo-ascend-sheen,
-.st-evo-ascend-rings,
-.st-evo-ascend-flare {
-  position: absolute;
-  pointer-events: none;
-}
-
-.st-evo-ascend-aura {
-  inset: -24%;
-  opacity: 0;
-  z-index: 0;
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-  filter: blur(36px) saturate(1.35) brightness(1.05);
-  transform: scale(1.2);
-  transition: opacity 700ms ease, transform 1200ms ease;
-}
-
-.st-evo-ascend-grid {
-  inset: 0;
-  z-index: 1;
-  opacity: 0;
-  background:
-    linear-gradient(rgba(154, 216, 255, 0.14) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(154, 216, 255, 0.14) 1px, transparent 1px);
-  background-size: 18px 18px;
-  mask: radial-gradient(circle at 50% 56%, #000 0 42%, transparent 78%);
-}
-
-.st-evo-ascend-orbit {
-  inset: 0;
-  z-index: 2;
-  opacity: 0;
-}
-
-.st-evo-ascend-orbit span {
-  position: absolute;
-  left: 50%;
-  top: 54%;
-  width: 8px;
-  height: 8px;
-  margin: -4px 0 0 -4px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #fff 0 35%, var(--ascend-a) 36% 100%);
-  box-shadow: 0 0 14px var(--ascend-a), 0 0 24px rgba(255, 255, 255, 0.55);
-  transform: rotate(calc(var(--orbit-i, 0) * 60deg)) translateX(calc(var(--ascend-card-w) * 0.52)) rotate(calc(var(--orbit-i, 0) * -60deg));
-}
-
-.st-evo-ascend-orbit span:nth-child(1) { --orbit-i: 0; }
-.st-evo-ascend-orbit span:nth-child(2) { --orbit-i: 1; }
-.st-evo-ascend-orbit span:nth-child(3) { --orbit-i: 2; }
-.st-evo-ascend-orbit span:nth-child(4) { --orbit-i: 3; }
-.st-evo-ascend-orbit span:nth-child(5) { --orbit-i: 4; }
-.st-evo-ascend-orbit span:nth-child(6) { --orbit-i: 5; }
-
-.st-evo-ascend-pillars {
-  inset: 0;
-  z-index: 2;
-  opacity: 0;
-}
-
-.st-evo-ascend-pillars span {
-  position: absolute;
-  bottom: 12%;
-  width: 28%;
-  height: 72%;
-  background: linear-gradient(180deg, transparent 0 18%, color-mix(in srgb, var(--ascend-a) 72%, transparent) 42%, transparent 100%);
-  filter: blur(1px);
-  opacity: 0.75;
-}
-
-.st-evo-ascend-pillars span:nth-child(1) { left: 16%; animation-delay: 0ms; }
-.st-evo-ascend-pillars span:nth-child(2) { left: 50%; transform: translateX(-50%); animation-delay: 120ms; }
-.st-evo-ascend-pillars span:nth-child(3) { right: 16%; animation-delay: 240ms; }
-
-.st-evo-ascend-shards {
-  inset: 0;
-  z-index: 2;
-  opacity: 0;
-}
-
-.st-evo-ascend-shards span {
-  position: absolute;
-  width: 10px;
-  height: 3px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.95), transparent);
-  opacity: 0;
-}
-
-.st-evo-ascend-shards span:nth-child(1) { left: 14%; top: 22%; --shard-r: -24deg; }
-.st-evo-ascend-shards span:nth-child(2) { left: 78%; top: 28%; --shard-r: 18deg; }
-.st-evo-ascend-shards span:nth-child(3) { left: 22%; top: 68%; --shard-r: 12deg; }
-.st-evo-ascend-shards span:nth-child(4) { left: 72%; top: 72%; --shard-r: -16deg; }
-.st-evo-ascend-shards span:nth-child(5) { left: 48%; top: 14%; --shard-r: 4deg; }
-.st-evo-ascend-shards span:nth-child(6) { left: 8%; top: 48%; --shard-r: -8deg; }
-.st-evo-ascend-shards span:nth-child(7) { left: 86%; top: 52%; --shard-r: 22deg; }
-.st-evo-ascend-shards span:nth-child(8) { left: 52%; top: 82%; --shard-r: -12deg; }
-
-.st-evo-ascend-portal {
-  position: relative;
-  z-index: 3;
-  width: var(--ascend-card-w);
-  margin: 18px auto 0;
-  transform-origin: 50% 78%;
-}
-
-.st-evo-ascend-card {
-  position: relative;
-  z-index: 2;
-  width: 100%;
   border-radius: 16px;
-  box-shadow: 0 16px 34px rgba(36, 54, 94, 0.24);
-  transform: translateY(8px) scale(0.88);
-  opacity: 0;
+  box-shadow: 0 14px 28px rgba(36, 54, 94, 0.22);
 }
 
-.st-evo-ascend-card .collection-image,
-.st-evo-ascend-card img {
+.st-evo-result-art .collection-image,
+.st-evo-result-art img {
   width: 100%;
   aspect-ratio: 5 / 7;
   object-fit: cover;
@@ -474,267 +333,20 @@
   background: #e8f2fb;
 }
 
-.st-evo-ascend-card .collection-image {
+.st-evo-result-art .collection-image {
   display: block;
   border-radius: 14px;
-}
-
-.st-evo-ascend-sheen {
-  inset: 8% 6% 10%;
-  z-index: 4;
-  border-radius: 14px;
-  opacity: 0;
-  background: linear-gradient(
-    118deg,
-    transparent 0 38%,
-    rgba(255, 255, 255, 0.18) 44%,
-    rgba(255, 255, 255, 0.82) 50%,
-    rgba(255, 255, 255, 0.18) 56%,
-    transparent 62% 100%
-  );
-  mix-blend-mode: screen;
-  transform: translateX(-120%);
-}
-
-.st-evo-ascend-rings {
-  inset: -8% -6%;
-  z-index: 1;
-}
-
-.st-evo-ascend-rings span {
-  position: absolute;
-  inset: 0;
-  border-radius: 20px;
-  border: 2px solid color-mix(in srgb, var(--ascend-a) 82%, white);
-  opacity: 0;
-  transform: scale(0.82);
-}
-
-.st-evo-ascend-rings span:nth-child(2) { inset: -6% -4%; }
-.st-evo-ascend-rings span:nth-child(3) { inset: -12% -8%; }
-
-.st-evo-ascend-flare {
-  inset: 0;
-  z-index: 5;
-  opacity: 0;
-  background:
-    radial-gradient(circle at 50% 54%, rgba(255, 255, 255, 0.98) 0 12%, rgba(255, 232, 168, 0.72) 26%, rgba(186, 228, 255, 0.28) 44%, transparent 68%);
 }
 
 .st-evo-result-tier,
 .st-evo-result-name {
   margin: 0;
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 360ms ease, transform 360ms ease;
 }
 
 .st-evo-result-name {
   color: var(--evo-ink);
   font-size: 1.05rem;
   font-weight: 850;
-}
-
-.st-evo-ascend-stage.is-summon .st-evo-ascend-aura,
-.st-evo-ascend-stage.is-channel .st-evo-ascend-aura,
-.st-evo-ascend-stage.is-ascend .st-evo-ascend-aura,
-.st-evo-ascend-stage.is-transcend .st-evo-ascend-aura,
-.st-evo-ascend-stage.is-crown .st-evo-ascend-aura,
-.st-evo-ascend-stage.is-reveal .st-evo-ascend-aura,
-.st-evo-ascend-stage.is-complete .st-evo-ascend-aura {
-  opacity: 0.88;
-  transform: scale(1.06);
-}
-
-.st-evo-ascend-stage.is-summon .st-evo-ascend-grid,
-.st-evo-ascend-stage.is-channel .st-evo-ascend-grid,
-.st-evo-ascend-stage.is-ascend .st-evo-ascend-grid,
-.st-evo-ascend-stage.is-transcend .st-evo-ascend-grid,
-.st-evo-ascend-stage.is-crown .st-evo-ascend-grid,
-.st-evo-ascend-stage.is-reveal .st-evo-ascend-grid,
-.st-evo-ascend-stage.is-complete .st-evo-ascend-grid {
-  opacity: 0.55;
-}
-
-.st-evo-ascend-stage.is-summon .st-evo-ascend-card {
-  animation: stEvoAscendSummon 580ms cubic-bezier(0.22, 1, 0.32, 1) forwards;
-}
-
-.st-evo-ascend-stage.is-channel .st-evo-ascend-orbit {
-  opacity: 1;
-  animation: stEvoAscendOrbitSpin 2.4s linear infinite;
-}
-
-.st-evo-ascend-stage.is-channel .st-evo-ascend-card {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  animation: stEvoAscendHover 2.6s ease-in-out infinite;
-}
-
-.st-evo-ascend-stage.is-ascend .st-evo-ascend-orbit {
-  opacity: 1;
-  animation: stEvoAscendOrbitSpin 1.2s linear infinite;
-}
-
-.st-evo-ascend-stage.is-ascend .st-evo-ascend-pillars {
-  opacity: 1;
-}
-
-.st-evo-ascend-stage.is-ascend .st-evo-ascend-pillars span {
-  animation: stEvoAscendPillar 680ms ease-in-out infinite;
-}
-
-.st-evo-ascend-stage.is-ascend .st-evo-ascend-shards {
-  opacity: 1;
-}
-
-.st-evo-ascend-stage.is-ascend .st-evo-ascend-shards span {
-  animation: stEvoAscendShard 920ms ease-in-out infinite;
-}
-
-.st-evo-ascend-stage.is-ascend .st-evo-ascend-sheen {
-  opacity: 1;
-  animation: stEvoAscendSheen 980ms ease-in-out forwards;
-}
-
-.st-evo-ascend-stage.is-ascend .st-evo-ascend-card {
-  opacity: 1;
-  animation: stEvoAscendLift 980ms cubic-bezier(0.22, 1, 0.32, 1) forwards;
-  filter: brightness(1.08) saturate(1.12);
-}
-
-.st-evo-ascend-stage.is-transcend .st-evo-ascend-flare {
-  animation: stEvoAscendFlare 820ms ease-out forwards;
-}
-
-.st-evo-ascend-stage.is-transcend .st-evo-ascend-rings span {
-  animation: stEvoAscendRing 820ms cubic-bezier(0.22, 1, 0.32, 1) forwards;
-}
-
-.st-evo-ascend-stage.is-transcend .st-evo-ascend-rings span:nth-child(2) { animation-delay: 80ms; }
-.st-evo-ascend-stage.is-transcend .st-evo-ascend-rings span:nth-child(3) { animation-delay: 160ms; }
-
-.st-evo-ascend-stage.is-transcend .st-evo-ascend-card,
-.st-evo-ascend-stage.is-crown .st-evo-ascend-card,
-.st-evo-ascend-stage.is-reveal .st-evo-ascend-card,
-.st-evo-ascend-stage.is-complete .st-evo-ascend-card {
-  opacity: 1;
-  animation: stEvoAscendCrown 820ms cubic-bezier(0.22, 1, 0.32, 1) forwards;
-}
-
-.st-evo-ascend-stage.is-crown .st-evo-ascend-sheen,
-.st-evo-ascend-stage.is-reveal .st-evo-ascend-sheen,
-.st-evo-ascend-stage.is-complete .st-evo-ascend-sheen {
-  opacity: 0.72;
-  animation: stEvoAscendHoloIdle 3.6s ease-in-out infinite;
-}
-
-.st-evo-ascend-stage.is-crown .st-evo-ascend-card,
-.st-evo-ascend-stage.is-reveal .st-evo-ascend-card,
-.st-evo-ascend-stage.is-complete .st-evo-ascend-card {
-  animation: stEvoAscendIdleFloat 4.2s ease-in-out infinite;
-  box-shadow:
-    0 22px 44px rgba(36, 54, 94, 0.28),
-    0 0 36px color-mix(in srgb, var(--ascend-a) 42%, transparent);
-}
-
-.st-evo-result-body:has(.st-evo-ascend-stage.is-reveal) .st-evo-result-tier,
-.st-evo-result-body:has(.st-evo-ascend-stage.is-reveal) .st-evo-result-name,
-.st-evo-result-body:has(.st-evo-ascend-stage.is-complete) .st-evo-result-tier,
-.st-evo-result-body:has(.st-evo-ascend-stage.is-complete) .st-evo-result-name {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-@keyframes stEvoAscendSummon {
-  0% { opacity: 0; transform: translateY(20px) scale(0.82); filter: brightness(1.4); }
-  100% { opacity: 1; transform: translateY(0) scale(1); filter: none; }
-}
-
-@keyframes stEvoAscendHover {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-4px) scale(1.01); }
-}
-
-@keyframes stEvoAscendOrbitSpin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-@keyframes stEvoAscendPillar {
-  0%, 100% { opacity: 0.35; transform: scaleY(0.82); }
-  50% { opacity: 0.95; transform: scaleY(1); }
-}
-
-@keyframes stEvoAscendShard {
-  0%, 100% { opacity: 0; transform: translateY(0) rotate(var(--shard-r, 0deg)) scale(0.8); }
-  45% { opacity: 1; transform: translateY(-10px) rotate(var(--shard-r, 0deg)) scale(1); }
-}
-
-@keyframes stEvoAscendSheen {
-  0% { transform: translateX(-120%); opacity: 0; }
-  20% { opacity: 0.85; }
-  100% { transform: translateX(120%); opacity: 0; }
-}
-
-@keyframes stEvoAscendLift {
-  0% { transform: translateY(0) scale(1); }
-  100% { transform: translateY(-8px) scale(1.04); }
-}
-
-@keyframes stEvoAscendFlare {
-  0% { opacity: 0; }
-  22% { opacity: 0.98; }
-  100% { opacity: 0; }
-}
-
-@keyframes stEvoAscendRing {
-  0% { opacity: 0; transform: scale(0.78); }
-  35% { opacity: 0.85; }
-  100% { opacity: 0; transform: scale(1.18); }
-}
-
-@keyframes stEvoAscendCrown {
-  0% { opacity: 0; transform: scale(0.76); filter: brightness(2.6) saturate(1.45); }
-  55% { opacity: 1; transform: scale(1.06); filter: brightness(1.15) saturate(1.1); }
-  100% { opacity: 1; transform: scale(1); filter: none; }
-}
-
-@keyframes stEvoAscendHoloIdle {
-  0% { transform: translateX(-110%) skewX(-8deg); opacity: 0; }
-  18% { opacity: 0.75; }
-  100% { transform: translateX(110%) skewX(-8deg); opacity: 0; }
-}
-
-@keyframes stEvoAscendIdleFloat {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-3px) scale(1.008); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .st-evo-ascend-stage.is-complete .st-evo-ascend-card {
-    transform: none;
-    filter: none;
-    animation: none;
-  }
-
-  .st-evo-ascend-aura { opacity: 0.45; transform: none; }
-
-  .st-evo-ascend-grid,
-  .st-evo-ascend-orbit,
-  .st-evo-ascend-pillars,
-  .st-evo-ascend-shards,
-  .st-evo-ascend-sheen,
-  .st-evo-ascend-rings,
-  .st-evo-ascend-flare {
-    display: none;
-  }
-
-  .st-evo-result-tier,
-  .st-evo-result-name {
-    opacity: 1;
-    transform: none;
-  }
 }
 
 .st-evo-ready-grid {
