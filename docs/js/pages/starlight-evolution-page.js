@@ -35,6 +35,7 @@ const dialogTitleEl = document.getElementById('st-evo-card-title');
 const dialogCloseEl = document.getElementById('st-evo-card-close');
 const resultModalEl = document.getElementById('st-evo-result-modal');
 const resultStageEl = document.getElementById('st-evo-flair-stage');
+const resultImmersiveBgEl = document.getElementById('st-evo-immersive-bg');
 const resultTitleEl = document.getElementById('st-evo-result-title');
 const resultArtEl = document.getElementById('st-evo-result-art');
 const resultTierEl = document.getElementById('st-evo-result-tier');
@@ -85,7 +86,17 @@ function wait(ms) {
 
 function resetFlairStage() {
   if (!resultStageEl) return;
-  resultStageEl.classList.remove('is-intro', 'is-charge', 'is-burst', 'is-reveal', 'is-complete');
+  resultStageEl.classList.remove('is-intro', 'is-immerse', 'is-charge', 'is-peak', 'is-reveal', 'is-complete');
+}
+
+function setImmersiveBackground(imageUrl) {
+  if (!resultImmersiveBgEl) return;
+  const safeUrl = String(imageUrl || '').trim();
+  if (!safeUrl) {
+    resultImmersiveBgEl.style.removeProperty('background-image');
+    return;
+  }
+  resultImmersiveBgEl.style.backgroundImage = `url("${safeUrl.replace(/"/g, '\\"')}")`;
 }
 
 function setResultCardArt(imageUrl, cardName, tier) {
@@ -118,6 +129,7 @@ async function playFlairSequence({ cardName, imageUrl, fromTier, toTier, label }
   resetFlairStage();
   applyResultMeta({ cardName, toTier, label }, false);
   if (resultTitleEl) resultTitleEl.textContent = reduced ? 'Evolution complete!' : '';
+  setImmersiveBackground(imageUrl);
   setResultCardArt(imageUrl, cardName, fromTier || toTier);
 
   if (reduced) {
@@ -128,19 +140,22 @@ async function playFlairSequence({ cardName, imageUrl, fromTier, toTier, label }
   }
 
   resultStageEl?.classList.add('is-intro');
-  await wait(520);
+  await wait(420);
   resultStageEl?.classList.remove('is-intro');
+  resultStageEl?.classList.add('is-immerse');
+  await wait(980);
+  resultStageEl?.classList.remove('is-immerse');
   resultStageEl?.classList.add('is-charge');
   await wait(1500);
   resultStageEl?.classList.remove('is-charge');
-  resultStageEl?.classList.add('is-burst');
+  resultStageEl?.classList.add('is-peak');
   setResultCardArt(imageUrl, cardName, toTier);
   if (resultTitleEl) resultTitleEl.textContent = 'Evolved!';
-  await wait(680);
-  resultStageEl?.classList.remove('is-burst');
+  await wait(720);
+  resultStageEl?.classList.remove('is-peak');
   resultStageEl?.classList.add('is-reveal');
   applyResultMeta({ cardName, toTier, label }, true);
-  await wait(260);
+  await wait(320);
   resultStageEl?.classList.add('is-complete');
 }
 
@@ -165,7 +180,7 @@ function showEvolutionResult({ cardName, imageUrl, fromTier, toTier, label }) {
 
     playFlairSequence({ cardName, imageUrl, fromTier, toTier, label }).then(() => {
       if (!preferReducedMotion()) {
-        autoCloseTimer = window.setTimeout(() => resultModal.close(), 2800);
+        autoCloseTimer = window.setTimeout(() => resultModal.close(), 3200);
       }
     });
   });
