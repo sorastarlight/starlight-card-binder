@@ -39,6 +39,8 @@
 .st-r3-result-art.prestige-frame,
 .st-r3-result-card.prestige-frame,
 .st-evo-border.prestige-frame,
+.st-evo-result-art.prestige-frame,
+.st-evo-detail-art .collection-image,
 .st-evo-tier-preview.prestige-frame,
 .prestige-legend-tiers .prestige-frame {
   position: relative;
@@ -61,6 +63,10 @@
 .st-r3-result-card.prestige-frame::after,
 .st-evo-border.prestige-frame::before,
 .st-evo-border.prestige-frame::after,
+.st-evo-result-art.prestige-frame::before,
+.st-evo-result-art.prestige-frame::after,
+.st-evo-detail-art .collection-image::before,
+.st-evo-detail-art .collection-image::after,
 .st-evo-tier-preview.prestige-frame::before,
 .st-evo-tier-preview.prestige-frame::after,
 .prestige-legend-tiers .prestige-frame::before,
@@ -80,6 +86,8 @@
 .st-r3-result-art.prestige-frame::after,
 .st-r3-result-card.prestige-frame::after,
 .st-evo-border.prestige-frame::after,
+.st-evo-result-art.prestige-frame::after,
+.st-evo-detail-art .collection-image::after,
 .st-evo-tier-preview.prestige-frame::after,
 .prestige-legend-tiers .prestige-frame::after {
   inset: -9px;
@@ -94,6 +102,8 @@
 .st-r3-result-art.prestige-frame::before,
 .st-r3-result-card.prestige-frame::before,
 .st-evo-border.prestige-frame::before,
+.st-evo-result-art.prestige-frame::before,
+.st-evo-detail-art .collection-image::before,
 .st-evo-tier-preview.prestige-frame::before,
 .prestige-legend-tiers .prestige-frame::before {
   inset: -10px;
@@ -110,6 +120,8 @@
 .st-r3-result-art.prestige-frame::before,
 .st-r3-result-card.prestige-frame::before,
 .st-evo-border.prestige-frame::before,
+.st-evo-result-art.prestige-frame::before,
+.st-evo-detail-art .collection-image::before,
 .st-evo-owned-card::before,
 .st-evo-detail-art::before,
 .prestige-legend-tiers .prestige-frame::before,
@@ -161,6 +173,7 @@
 .prestige-star-bit.st-r3-card-actor::after,
 .prestige-star-bit.st-r3-result-art::after,
 .prestige-star-bit.st-evo-border::after,
+.prestige-star-bit.st-evo-result-art::after,
 .prestige-star-bit.st-evo-tier-preview::after,
 .prestige-star-bit::after {
   inset: -10px;
@@ -181,6 +194,7 @@
 .prestige-protostar.st-r3-card-actor::after,
 .prestige-protostar.st-r3-result-art::after,
 .prestige-protostar.st-evo-border::after,
+.prestige-protostar.st-evo-result-art::after,
 .prestige-protostar.st-evo-tier-preview::after,
 .prestige-protostar::after {
   inset: -11px;
@@ -202,6 +216,7 @@
 .prestige-starlight.st-r3-card-actor::after,
 .prestige-starlight.st-r3-result-art::after,
 .prestige-starlight.st-evo-border::after,
+.prestige-starlight.st-evo-result-art::after,
 .prestige-starlight.st-evo-tier-preview::after,
 .prestige-starlight::after {
   inset: -12px;
@@ -227,6 +242,7 @@
 .prestige-super-starlight.st-r3-card-actor::after,
 .prestige-super-starlight.st-r3-result-art::after,
 .prestige-super-starlight.st-evo-border::after,
+.prestige-super-starlight.st-evo-result-art::after,
 .prestige-super-starlight.st-evo-tier-preview::after,
 .prestige-super-starlight::after {
   inset: -12px;
@@ -247,6 +263,7 @@
 .prestige-starlight-burst.st-r3-card-actor::after,
 .prestige-starlight-burst.st-r3-result-art::after,
 .prestige-starlight-burst.st-evo-border::after,
+.prestige-starlight-burst.st-evo-result-art::after,
 .prestige-starlight-burst.st-evo-tier-preview::after,
 .prestige-starlight-burst::after {
   inset: -14px;

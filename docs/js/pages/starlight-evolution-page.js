@@ -34,6 +34,7 @@ const dialogBodyEl = document.getElementById('st-evo-card-body');
 const dialogTitleEl = document.getElementById('st-evo-card-title');
 const dialogCloseEl = document.getElementById('st-evo-card-close');
 const resultModalEl = document.getElementById('st-evo-result-modal');
+const resultAuraEl = document.getElementById('st-evo-result-aura');
 const resultTitleEl = document.getElementById('st-evo-result-title');
 const resultArtEl = document.getElementById('st-evo-result-art');
 const resultTierEl = document.getElementById('st-evo-result-tier');
@@ -70,13 +71,24 @@ const resultModal = resultModalEl && window.StarlightUI?.adoptModal
     })
   : null;
 
+function setResultAura(imageUrl) {
+  if (!resultAuraEl) return;
+  const safeUrl = String(imageUrl || '').trim();
+  if (!safeUrl) {
+    resultAuraEl.style.removeProperty('background-image');
+    return;
+  }
+  resultAuraEl.style.backgroundImage = `url("${safeUrl.replace(/"/g, '\\"')}")`;
+}
+
 function setResultCardArt(imageUrl, cardName, tier) {
   if (!resultArtEl) return;
   const frame = prestigeClassName(tier);
-  resultArtEl.className = `st-evo-result-art ${frame}`.trim();
+  resultArtEl.className = `st-evo-result-art collection-image ${frame}`.trim();
   resultArtEl.innerHTML = imageUrl
-    ? `<span class="collection-image"><img src="${esc(imageUrl)}" alt="${esc(cardName)}" draggable="false"></span>`
+    ? `<img src="${esc(imageUrl)}" alt="${esc(cardName)}" draggable="false">`
     : '';
+  setResultAura(imageUrl);
 }
 
 function applyResultMeta({ cardName, toTier, label }) {
@@ -278,8 +290,8 @@ function renderCardDetail(card) {
   dialogTitleEl.textContent = card.name;
   dialogBodyEl.innerHTML = `
     <div class="st-evo-detail-layout">
-      <div class="st-evo-detail-art ${esc(frame)}">
-        <img src="${esc(card.imageUrl)}" alt="${esc(card.name)}" onerror="this.style.opacity='0.35'">
+      <div class="st-evo-detail-art">
+        <span class="collection-image ${esc(frame)}"><img src="${esc(card.imageUrl)}" alt="${esc(card.name)}" onerror="this.style.opacity='0.35'"></span>
       </div>
       <div class="st-evo-detail-copy">
         <p class="st-evo-detail-meta">

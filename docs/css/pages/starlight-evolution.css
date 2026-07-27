@@ -252,15 +252,6 @@
   align-items: start;
 }
 
-.st-evo-detail-art img {
-  width: 100%;
-  aspect-ratio: 5 / 7;
-  object-fit: cover;
-  border-radius: 14px;
-  display: block;
-  background: #e8f2fb;
-}
-
 .st-evo-detail-meta {
   display: flex;
   flex-wrap: wrap;
@@ -299,7 +290,7 @@
 .st-evo-result-dialog {
   width: min(480px, 100%);
   text-align: center;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .st-evo-result-title {
@@ -314,16 +305,42 @@
   display: grid;
   gap: 14px;
   justify-items: center;
+  overflow: visible;
+}
+
+.st-evo-result-showcase {
+  position: relative;
+  width: min(248px, 74vw);
+  margin: 0 auto;
+  padding: 18px;
+}
+
+.st-evo-result-aura {
+  position: absolute;
+  inset: 8px;
+  border-radius: 18px;
+  opacity: 0;
+  z-index: 0;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  filter: blur(26px) saturate(1.35) brightness(1.04);
+  transform: scale(1.08);
+  transition: opacity 420ms ease;
+}
+
+.st-evo-result-showcase:has(.prestige-frame) .st-evo-result-aura {
+  opacity: 0.72;
 }
 
 .st-evo-result-art {
-  width: min(220px, 68vw);
-  margin: 0 auto;
-  border-radius: 16px;
-  box-shadow: 0 14px 28px rgba(36, 54, 94, 0.22);
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  border-radius: 14px;
 }
 
-.st-evo-result-art .collection-image,
 .st-evo-result-art img {
   width: 100%;
   aspect-ratio: 5 / 7;
@@ -333,9 +350,23 @@
   background: #e8f2fb;
 }
 
-.st-evo-result-art .collection-image {
+.st-evo-detail-art {
+  position: relative;
+}
+
+.st-evo-detail-art .collection-image {
   display: block;
+  width: 100%;
   border-radius: 14px;
+}
+
+.st-evo-detail-art img {
+  width: 100%;
+  aspect-ratio: 5 / 7;
+  object-fit: cover;
+  border-radius: 14px;
+  display: block;
+  background: #e8f2fb;
 }
 
 .st-evo-result-tier,
