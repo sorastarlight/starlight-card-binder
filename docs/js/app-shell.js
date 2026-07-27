@@ -209,12 +209,20 @@ function markViewReady(data={}){
   });
 }
 
+function resetEmbeddedViewLayout(height){
+  if(!frame)return;
+  if(Number.isFinite(height)&&height>0)resizeEmbeddedView(height);
+  mainContent?.scrollTo({top:0,left:0,behavior:'auto'});
+  window.scrollTo({top:0,left:0,behavior:'auto'});
+  frameWrap?.scrollIntoView?.({block:'start',behavior:'auto'});
+}
+
 function resizeEmbeddedView(value){
   if(!frame)return;
   const height=Math.max(560,Math.min(20000,Math.ceil(value||0)+8));
   const previous=parseFloat(frame.style.height)||0;
   frame.style.height=`${height}px`;
-  if(previous>height+200){
+  if(previous>height+120){
     mainContent?.scrollTo({top:0,left:0,behavior:'auto'});
     window.scrollTo({top:0,left:0,behavior:'auto'});
   }
@@ -590,6 +598,9 @@ window.addEventListener('message',async e=>{
     markViewReady(data);
   }
   if(data.type==='starlight-view-height')resizeEmbeddedView(Number(data.height));
+  if(data.type==='starlight-view-reset'){
+    if(!data.view||data.view===currentRoute)resetEmbeddedViewLayout(Number(data.height));
+  }
   if(data.type==='starlight-shell-chrome'){
     liveFeedWidget?.setSuppressed?.(Boolean(data.hideLiveFeed));
   }

@@ -84,17 +84,28 @@ function send(type, extra = {}){
   parent.postMessage({type, view: currentRoute || file, ...extra}, location.origin);
 }
 
-function measureContentHeight() {
+function resetEmbedDocumentScroll() {
   const docEl = document.documentElement;
   const body = document.body;
-  const scrollTop = docEl.scrollTop || body?.scrollTop || 0;
+  if (docEl) docEl.scrollTop = 0;
+  if (body) body.scrollTop = 0;
+}
+
+function measureContentHeight() {
+  resetEmbedDocumentScroll();
+  const docEl = document.documentElement;
+  const body = document.body;
   const main = document.querySelector('body > main')
     || document.querySelector('.site > .main')
     || document.querySelector('main')
     || body;
   if (!main) return 320;
-  const rect = main.getBoundingClientRect();
-  const contentOnly = Math.max(320, Math.ceil(scrollTop + rect.bottom + 24));
+  const layoutHeight = Math.max(
+    main.scrollHeight || 0,
+    main.offsetHeight || 0,
+    Math.ceil(main.getBoundingClientRect().height || 0)
+  );
+  const contentOnly = Math.max(320, layoutHeight + 24);
   if (
     docEl.classList.contains('st-evo-open')
     || docEl.classList.contains('st-r3-reveal-open')
@@ -200,4 +211,8 @@ if (!embedded && shouldRedirectToShell()) {
   window.addEventListener('load', () => { announceReady(); setTimeout(announceReady, 120); });
   window.addEventListener('pageshow', () => { announceReady(); setTimeout(announceReady, 80); });
   window.__starlightEmbedReportHeight = reportHeight;
+  window.__starlightEmbedResetLayout = () => {
+    reportHeight();
+    send('starlight-view-reset', { height: documentHeight() });
+  };
 }
