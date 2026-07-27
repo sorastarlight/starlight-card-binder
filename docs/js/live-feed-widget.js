@@ -54,13 +54,24 @@ function tickerLabel(item) {
   return `${actorDisplayName(item)} opened a pack`;
 }
 
+function tickerAvatarMarkup(item) {
+  const actor = item?.actor || {};
+  const name = actorDisplayName(item);
+  const avatarUrl = String(actor.avatarUrl || actor.avatar_url || '').trim();
+  if (avatarUrl) {
+    return `<img class="shell-live-feed-ticker-avatar" src="${esc(avatarUrl)}" alt="" width="22" height="22" decoding="async">`;
+  }
+  const initial = name.charAt(0).toUpperCase() || '✦';
+  return `<span class="shell-live-feed-ticker-avatar is-placeholder" aria-hidden="true">${esc(initial)}</span>`;
+}
+
 function setFeedStatus(statusEl, value) {
   if (!statusEl) return;
   statusEl.textContent = value;
 }
 
 function estimateTickerItemWidth(label) {
-  return Math.min(Math.max(label.length * 6.4 + 18, 120), 360);
+  return Math.min(Math.max(label.length * 6.4 + 48, 150), 390);
 }
 
 function measureTickerCapacity(sourceItems, availableWidth) {
@@ -78,7 +89,7 @@ function buildTickerMarkup(sourceItems, { animateNew = false } = {}) {
   const labels = sourceItems.map((item) => {
     const classes = ['shell-live-feed-ticker-item'];
     if (item.__isNew && animateNew) classes.push('is-entering');
-    return `<span class="${classes.join(' ')}">${esc(tickerLabel(item))}</span>`;
+    return `<span class="${classes.join(' ')}">${tickerAvatarMarkup(item)}<span class="shell-live-feed-ticker-copy">${esc(tickerLabel(item))}</span></span>`;
   });
   return labels.join('<span class="shell-live-feed-ticker-sep" aria-hidden="true">✦</span>');
 }
