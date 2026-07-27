@@ -330,7 +330,8 @@
 }
 
 .st-evo-result-showcase:has(.prestige-frame) .st-evo-result-aura {
-  opacity: 0.82;
+  opacity: 0.88;
+  filter: blur(14px) saturate(1.55) brightness(1.1);
 }
 
 .st-evo-result-art {
