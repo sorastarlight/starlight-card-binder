@@ -127,7 +127,7 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.match(evoPage, /st-evo-ready-grid/);
   assert.match(evoPage, /st-evo-tier-showcase/);
   assert.match(evoPage, /starlight-evolution-page\.js\?v=2\.2\.0/);
-  assert.match(evoPage, /starlight-evolution\.css\?v=2\.3\.0/);
+  assert.match(evoPage, /starlight-evolution\.css\?v=2\.4\.0/);
   assert.match(evoPage, /StarlightCard_Back_NewLogo\.png/);
   assert.match(evoPage, /st-evo-tier-preview prestige-frame prestige-star-bit/);
   assert.match(analyzerCss, /Beat qol-ui/);

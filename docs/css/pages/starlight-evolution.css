@@ -312,25 +312,25 @@
   position: relative;
   width: min(248px, 74vw);
   margin: 0 auto;
-  padding: 18px;
+  padding: 10px;
 }
 
 .st-evo-result-aura {
   position: absolute;
-  inset: 8px;
-  border-radius: 18px;
+  inset: 10px;
+  border-radius: 14px;
   opacity: 0;
   z-index: 0;
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
-  filter: blur(26px) saturate(1.35) brightness(1.04);
-  transform: scale(1.08);
+  filter: blur(16px) saturate(1.45) brightness(1.06);
+  transform: scale(1);
   transition: opacity 420ms ease;
 }
 
 .st-evo-result-showcase:has(.prestige-frame) .st-evo-result-aura {
-  opacity: 0.72;
+  opacity: 0.82;
 }
 
 .st-evo-result-art {
