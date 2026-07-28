@@ -108,8 +108,8 @@ test('binder and collection load Starlight Evolution frame styles and helpers', 
   assert.match(css, /\.prestige-badge\.prestige-starlight-burst/);
   assert.match(css, /\.prestige-badge\.prestige-star-bit/);
   assert.match(css, /prestige-frame-overlay/);
-  assert.match(evoPage, /Radiance1\.png/);
-  assert.match(css, /st-evo-tier-preview/);
+  assert.match(evoPage, /st-evo-radiance-carousel/);
+  assert.match(css, /st-evo-tier-preview|st-evo-radiance-card/);
   assert.match(css, /\.st-r3-card-actor\.prestige-frame/);
   assert.match(css, /\.prestige-legend/);
   assert.match(evoPage, /prestige-legend/);

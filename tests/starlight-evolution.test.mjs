@@ -113,7 +113,7 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.match(labelMigration, /already at Radiance V/);
   assert.match(utils, /canEvolve/);
   assert.match(utils, /canUnfuse/);
-  assert.match(evoPage, /Radiance1\.png/);
+  assert.match(evoPage, /st-evo-radiance-carousel/);
   assert.match(utils, /prestigeFrameOverlayHtml/);
   assert.match(utils, /Radiance1\.png/);
   assert.match(sync, /export async function evolveMyCard/);
@@ -139,10 +139,10 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.match(evoPage, /st-evo-result-showcase/);
   assert.match(evoPage, /st-evo-ready-grid/);
   assert.match(evoPage, /st-evo-tier-showcase/);
-  assert.match(evoPage, /starlight-evolution-page\.js\?v=2\.2\.0/);
-  assert.match(evoPage, /starlight-evolution\.css\?v=2\.4\.1/);
-  assert.match(evoPage, /StarlightCard_Back_NewLogo\.png/);
-  assert.match(evoPage, /st-evo-tier-preview prestige-frame prestige-star-bit/);
+  assert.match(evoPage, /st-evo-radiance-carousel/);
+  assert.match(evoPage, /starlight-evolution-page\.js\?v=2\.3\.0/);
+  assert.match(evoPage, /starlight-evolution\.css\?v=2\.5\.0/);
+  assert.match(evoCss, /st-evo-radiance-carousel|stEvoRadianceFloat/);
   assert.match(analyzerCss, /Beat qol-ui/);
   assert.match(collection, /card-analyzer\.css/);
   assert.match(collection, /qol-ui\.css[\s\S]*card-analyzer\.css/s);
@@ -166,8 +166,14 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.doesNotMatch(evoPageJs, /data-shell-view=["']collection["']/);
   assert.match(evoPageJs, /normalizeReadyRows/);
   assert.match(evoPageJs, /st-evo-ready-grid/);
+  assert.match(evoPageJs, /initRadianceCarousel/);
   assert.match(evoPageJs, /adoptModal/);
   assert.doesNotMatch(evoPageJs, /dialogEl\?\.classList\.(add|remove)\(['"]hidden['"]\)/);
   assert.match(evoPage, /st-evo-card-modal/);
-  assert.match(evoPage, /starlight-evolution-page\.js\?v=2\.2\.0/);
+  assert.match(evoPage, /starlight-evolution-page\.js\?v=2\.3\.0/);
+
+  const evoCarouselJs = await read('docs/js/pages/st-evo-radiance-carousel.js');
+  assert.match(evoCarouselJs, /prestigeFrameImageUrl/);
+  assert.match(evoCarouselJs, /StarlightCard_Back_NewLogo\.png/);
+  assert.match(evoCarouselJs, /initRadianceCarousel/);
 });

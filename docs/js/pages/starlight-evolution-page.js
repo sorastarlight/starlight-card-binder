@@ -17,6 +17,7 @@ import {
   prestigeLabel,
   previousEvolutionTier
 } from '../prestige-utils.js?v=1.6.1';
+import { initRadianceCarousel } from './st-evo-radiance-carousel.js?v=1.0.0';
 
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
   '&': '&amp;',
@@ -464,3 +465,5 @@ dialogBodyEl?.addEventListener('click', (event) => {
 });
 
 void renderOwned();
+
+initRadianceCarousel(document.getElementById('st-evo-radiance-carousel'));
