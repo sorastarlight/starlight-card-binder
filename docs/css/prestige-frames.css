@@ -1,5 +1,9 @@
 /* Starlight Evolution frames — Radiance I–V transparent PNG overlays. */
 
+:root {
+  --prestige-art-scale: 1.045;
+}
+
 .prestige-frame .v61-card-btn,
 .prestige-frame .v61-card-art,
 .prestige-frame .collection-image,
@@ -19,6 +23,7 @@
 .collection-card.prestige-frame .collection-image {
   position: relative;
   isolation: isolate;
+  overflow: visible !important;
 }
 
 .prestige-frame-overlay {
@@ -26,7 +31,7 @@
   inset: 0 !important;
   width: 100% !important;
   height: 100% !important;
-  object-fit: fill !important;
+  object-fit: contain !important;
   pointer-events: none;
   user-select: none;
   z-index: 5;
@@ -41,6 +46,47 @@
 .st-evo-tier-preview > img:not(.prestige-frame-overlay) {
   position: relative;
   z-index: 1;
+}
+
+/* Let the Radiance PNG define corners; show a hair more card art under the frame window. */
+.collection-card.prestige-frame .collection-image,
+.collection-card.prestige-frame .collection-image > img:not(.prestige-frame-overlay),
+.prestige-frame .collection-image,
+.prestige-frame .collection-image > img:not(.prestige-frame-overlay),
+.prestige-frame .v61-card-art,
+.prestige-frame .v61-card-art > img:not(.prestige-frame-overlay),
+.full-card-wrap.prestige-frame .face.front,
+.full-card-wrap.prestige-frame .face.front > img:not(.prestige-frame-overlay),
+.preview-card.prestige-frame .face.front,
+.preview-card.prestige-frame .face.front > img:not(.prestige-frame-overlay),
+.v62-preview-card.prestige-frame .face.front,
+.v62-preview-card.prestige-frame .face.front > img:not(.prestige-frame-overlay),
+.st-r3-result-art.prestige-frame,
+.st-r3-result-art.prestige-frame > img:not(.prestige-frame-overlay),
+.st-r3-card-front.prestige-frame > img:not(.prestige-frame-overlay),
+.st-evo-result-art.prestige-frame,
+.st-evo-result-art.prestige-frame > img:not(.prestige-frame-overlay),
+.st-evo-detail-art .collection-image,
+.st-evo-detail-art .collection-image > img:not(.prestige-frame-overlay),
+.st-evo-owned-card .collection-image,
+.st-evo-owned-card .collection-image > img:not(.prestige-frame-overlay) {
+  border-radius: 0 !important;
+  overflow: visible !important;
+}
+
+.collection-card.prestige-frame .collection-image > img:not(.prestige-frame-overlay),
+.prestige-frame .collection-image > img:not(.prestige-frame-overlay),
+.prestige-frame .v61-card-art > img:not(.prestige-frame-overlay),
+.full-card-wrap.prestige-frame .face.front > img:not(.prestige-frame-overlay),
+.preview-card.prestige-frame .face.front > img:not(.prestige-frame-overlay),
+.v62-preview-card.prestige-frame .face.front > img:not(.prestige-frame-overlay),
+.st-r3-result-art.prestige-frame > img:not(.prestige-frame-overlay),
+.st-r3-card-front.prestige-frame > img:not(.prestige-frame-overlay),
+.st-evo-result-art.prestige-frame > img:not(.prestige-frame-overlay),
+.st-evo-detail-art .collection-image > img:not(.prestige-frame-overlay),
+.st-evo-owned-card .collection-image > img:not(.prestige-frame-overlay) {
+  transform: scale(var(--prestige-art-scale));
+  transform-origin: center center;
 }
 
 .full-card-wrap.prestige-frame .face.front,
