@@ -647,16 +647,6 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
   pointer-events: none !important;
 }
 
-#cardOverlay .analyzer-sekai-stage .analyzer-card-shell.prestige-frame,
-#cardOverlay .analyzer-sekai-stage #fullCard3d.prestige-frame {
-  box-shadow: none !important;
-}
-
-#cardOverlay .analyzer-sekai-stage .analyzer-card-shell.prestige-frame .face.front,
-#cardOverlay .analyzer-sekai-stage #fullCard3d.prestige-frame .face.front {
-  box-shadow: none !important;
-}
-
 #cardOverlay .analyzer-sekai-stage .analyzer-soft-note {
   margin: 0;
   padding: 0 4px;
