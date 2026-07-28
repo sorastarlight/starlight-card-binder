@@ -56,11 +56,11 @@ test('Starlight Evolution costs and refunds match the locked ladder', () => {
   assert.equal(prestigeClassName('star_bit'), 'prestige-frame prestige-star-bit');
   assert.equal(prestigeClassName('starlight_burst'), 'prestige-frame prestige-starlight-burst');
   assert.equal(prestigeClassName('stardust'), '');
-  assert.equal(prestigeFrameImageUrl('star_bit'), 'site_assets/Radiance1.png?v=3.1');
-  assert.equal(prestigeFrameImageUrl('protostar'), 'site_assets/Radiance2.png?v=3.1');
-  assert.equal(prestigeFrameImageUrl('starlight'), 'site_assets/Radiance3.png?v=3.1');
-  assert.equal(prestigeFrameImageUrl('super_starlight'), 'site_assets/Radiance4.png?v=3.1');
-  assert.equal(prestigeFrameImageUrl('starlight_burst'), 'site_assets/Radiance5.png?v=3.1');
+  assert.equal(prestigeFrameImageUrl('star_bit'), 'site_assets/Radiance1.png?v=3.2');
+  assert.equal(prestigeFrameImageUrl('protostar'), 'site_assets/Radiance2.png?v=3.2');
+  assert.equal(prestigeFrameImageUrl('starlight'), 'site_assets/Radiance3.png?v=3.2');
+  assert.equal(prestigeFrameImageUrl('super_starlight'), 'site_assets/Radiance4.png?v=3.2');
+  assert.equal(prestigeFrameImageUrl('starlight_burst'), 'site_assets/Radiance5.png?v=3.2');
   assert.equal(prestigeFrameImageUrl('stardust'), '');
   assert.match(prestigeFrameOverlayHtml('star_bit'), /prestige-frame-overlay/);
   assert.match(prestigeFrameOverlayHtml('star_bit'), /Radiance1\.png/);

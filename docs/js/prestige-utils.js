@@ -37,7 +37,7 @@ export const EVOLUTION_LABELS = Object.freeze({
 export const FUSION_LABELS = EVOLUTION_LABELS;
 
 /** Bump when Radiance PNG assets change (cache bust). */
-export const PRESTIGE_FRAME_ASSET_VERSION = '3.1';
+export const PRESTIGE_FRAME_ASSET_VERSION = '3.2';
 
 const LEGACY_TIER_MAP = Object.freeze({
   standard: 'stardust',
