@@ -285,7 +285,7 @@ const REVEAL_STYLESHEET_URL = new URL(
 ).href;
 const PRESTIGE_STYLESHEET_ID = 'starlight-prestige-frames';
 const PRESTIGE_STYLESHEET_URL = new URL(
-  '../css/prestige-frames.css?v=3.0',
+  '../css/prestige-frames.css?v=3.1',
   import.meta.url
 ).href;
 const stylesheetLoads = new WeakMap();

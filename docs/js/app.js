@@ -399,11 +399,30 @@ function applyAnalyzerDisplayToggles() {
   card.classList.toggle('is-holo-off', !analyzerHoloEnabled);
   card.classList.toggle('is-evolution-off', !analyzerEvolutionEnabled);
   const frontFace = card.querySelector('.face.front');
+  const got = selected && isCollected(selected.id);
+  const prestigeTokens = ['prestige-frame', 'prestige-star-bit', 'prestige-protostar', 'prestige-starlight', 'prestige-super-starlight', 'prestige-starlight-burst'];
+  prestigeTokens.forEach((token) => card.classList.remove(token));
+  if (got && analyzerEvolutionEnabled) {
+    prestigeFrameClass(selected.id).split(/\s+/).filter(Boolean).forEach((token) => card.classList.add(token));
+    const overlayMarkup = prestigeFrameOverlayHtml(selected.id);
+    let overlay = frontFace?.querySelector('.prestige-frame-overlay');
+    if (overlayMarkup && !overlay) {
+      frontFace?.insertAdjacentHTML('beforeend', overlayMarkup);
+      overlay = frontFace?.querySelector('.prestige-frame-overlay');
+    }
+    if (overlay) {
+      overlay.hidden = false;
+      overlay.style.removeProperty('visibility');
+      overlay.style.removeProperty('opacity');
+    }
+  } else {
+    frontFace?.querySelector('.prestige-frame-overlay')?.remove();
+  }
   if (!analyzerHoloEnabled) {
     frontFace?.classList.remove('card-finish-holographic', 'card-finish-sparkle-foil', 'card-finish-gold');
     window.StarlightUI?.ensureFinishEffectLayer?.(frontFace, '');
     card.dataset.holographic = 'false';
-  } else if (selected && isCollected(selected.id)) {
+  } else if (got) {
     const finishClass = cardFinishClass(selected, true);
     card.dataset.finishClass = finishClass;
     card.dataset.holographic = String(isHolographicCard(selected));

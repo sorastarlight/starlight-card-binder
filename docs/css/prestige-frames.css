@@ -89,6 +89,10 @@
   transform-origin: center center;
 }
 
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front > img:not(.prestige-frame-overlay) {
+  transform: none !important;
+}
+
 .full-card-wrap.prestige-frame .face.front,
 .preview-card.prestige-frame .face.front,
 .v62-preview-card.prestige-frame .face.front,

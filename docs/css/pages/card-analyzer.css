@@ -567,6 +567,7 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
 #cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front {
   transform: rotateY(0deg) translateZ(1px) !important;
   z-index: 2;
+  overflow: hidden !important;
 }
 
 #cardOverlay .analyzer-sekai-stage .analyzer-card-shell .face.back,
@@ -574,6 +575,18 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
   display: block !important;
   transform: rotateY(180deg) translateZ(1px) !important;
   z-index: 1;
+}
+
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front > img:not(.prestige-frame-overlay),
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front > .prestige-frame-overlay,
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front > .st-holo-spark {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  transform: none !important;
+  display: block !important;
 }
 
 #cardOverlay .analyzer-sekai-stage .analyzer-card-shell .face.front img,
@@ -600,6 +613,21 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
   opacity: 1 !important;
 }
 
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front > img:not(.prestige-frame-overlay) {
+  object-fit: cover !important;
+  z-index: 1 !important;
+}
+
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front > .st-holo-spark {
+  z-index: 4 !important;
+  pointer-events: none !important;
+}
+
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front.card-finish-holographic > img {
+  position: absolute !important;
+  inset: 0 !important;
+}
+
 #cardOverlay .analyzer-sekai-stage .analyzer-card-shell.is-holo-off .card-finish-effect,
 #cardOverlay .analyzer-sekai-stage .analyzer-card-shell.is-holo-off .holo-spark,
 #cardOverlay .analyzer-sekai-stage .analyzer-card-shell.is-holo-off .finish-effect {
@@ -614,7 +642,9 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
 }
 
 #cardOverlay .analyzer-sekai-stage .prestige-frame-overlay {
-  z-index: 6;
+  z-index: 6 !important;
+  object-fit: contain !important;
+  pointer-events: none !important;
 }
 
 #cardOverlay .analyzer-sekai-stage .analyzer-card-shell.prestige-frame,
