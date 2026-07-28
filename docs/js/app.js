@@ -1850,7 +1850,23 @@ function renderBinder() {
   if (landing) landing.innerHTML = inSeriesSelect ? renderV61SeriesLandingHtml() : '';
   if (grid) grid.innerHTML = inSeriesSelect ? '' : renderV61CardGridHtml(browse);
   renderV62Showcase(inSeriesSelect, browse);
+  if (inSeriesSelect) initBinderSeriesCarouselLanding();
   attachV61HoverSfx();
+}
+function renderV61PackSlide(group, i) {
+  const list = group.cards;
+  const got = list.filter(c => isCollected(c.id)).length;
+  const label = group.seriesName || group.series;
+  const seriesIdLabel = group.seriesId ? `Series ${String(group.seriesId).padStart(2, "0")}` : 'Series Booster';
+  const collectedTemplate = (websiteBinderLanding || websiteSection('binderLanding')).packCollectedLabel || '{owned} / {total} Collected';
+  const collectedLabel = fillWebsiteTokens(collectedTemplate, { owned: got, total: list.length });
+  const openLabel = `Open ${label}`;
+  return `<article class="binder-series-slide" data-slide-index="${i}" role="group" aria-roledescription="slide" aria-label="${esc(openLabel)}" aria-hidden="true">
+    <button class="v61-pack v78-pack binder-series-pack" style="--i:${i}" type="button" data-v61-pack="${esc(group.series)}" aria-label="${esc(openLabel)}">
+      <img src="${esc(group.boosterImageUrl || BOOSTER_PACK_URL)}" alt="${esc(label)} booster pack" loading="eager" onerror="this.src='${BOOSTER_PACK_URL}'">
+      <span class="v61-pack-label"><small class="v79-pack-title-line">${esc(seriesIdLabel)} — ${esc(label)}</small><small>${esc(collectedLabel)}</small></span>
+    </button>
+  </article>`;
 }
 function renderV61SeriesLandingHtml() {
   const groups = getSeriesGroups();
@@ -1858,24 +1874,34 @@ function renderV61SeriesLandingHtml() {
   const splashTitle = Object.prototype.hasOwnProperty.call(copy, 'splashTitle')
     ? copy.splashTitle
     : 'Choose A Series Booster Pack Below And Start Collecting!';
-  const collectedTemplate = copy.packCollectedLabel || '{owned} / {total} Collected';
   const splashHeading = hasWebsiteCopy(splashTitle)
     ? `<div class="v61-splash-title"><h2>${esc(splashTitle)}</h2></div>`
     : '';
   return `<div class="v61-splash-inner v78-splash-inner">
     ${splashHeading}
-    <div class="v61-pack-row v78-pack-grid">${groups.map((group,i)=>{
-      const list = group.cards;
-      const got = list.filter(c => isCollected(c.id)).length;
-      const label = group.seriesName || group.series;
-      const seriesIdLabel = group.seriesId ? `Series ${String(group.seriesId).padStart(2, "0")}` : 'Series Booster';
-      const collectedLabel = fillWebsiteTokens(collectedTemplate, { owned: got, total: list.length });
-      return `<button class="v61-pack v78-pack" style="--i:${i}" type="button" data-v61-pack="${esc(group.series)}" aria-label="Open ${esc(group.series)}">
-        <img src="${esc(group.boosterImageUrl || BOOSTER_PACK_URL)}" alt="${esc(group.series)} booster pack" loading="eager" onerror="this.src='${BOOSTER_PACK_URL}'">
-        <span class="v61-pack-label"><small class="v79-pack-title-line">${esc(seriesIdLabel)} — ${esc(label)}</small><small>${esc(collectedLabel)}</small></span>
-      </button>`;
-    }).join('')}</div>
+    <div
+      class="binder-series-carousel"
+      id="binderSeriesCarousel"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Choose a series booster pack"
+      tabindex="0"
+    >
+      <div class="binder-series-viewport">
+        <div class="binder-series-stage" aria-live="polite">${groups.map(renderV61PackSlide).join('')}</div>
+        <div class="binder-series-floor" aria-hidden="true"></div>
+      </div>
+      <div class="binder-series-controls">
+        <button type="button" class="binder-series-nav binder-series-prev" aria-label="Previous series booster pack">‹</button>
+        <div class="binder-series-dots" role="tablist" aria-label="Series booster packs"></div>
+        <button type="button" class="binder-series-nav binder-series-next" aria-label="Next series booster pack">›</button>
+      </div>
+    </div>
   </div>`;
+}
+function initBinderSeriesCarouselLanding() {
+  const root = document.getElementById('binderSeriesCarousel');
+  if (root) window.StarlightBinderSeriesCarousel?.init(root);
 }
 function renderV61CardGridHtml(browse = resolveBinderBrowse()) {
   const list = browse.list || [];

@@ -286,3 +286,253 @@ body[data-page="binder"] #cardOverlay img.is-unowned-dull {
   filter: grayscale(0.72) saturate(0.35) brightness(0.88);
 }
 
+/* Series landing — 3D booster pack fan carousel */
+body[data-page="binder"].series-select .binder-series-carousel {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: 18px;
+  width: min(100%, 980px);
+  margin: 0 auto;
+  outline: none;
+}
+
+body[data-page="binder"].series-select .binder-series-viewport {
+  position: relative;
+  min-height: clamp(380px, 52vw, 520px);
+  perspective: 1400px;
+  perspective-origin: 50% 38%;
+  overflow: visible;
+}
+
+body[data-page="binder"].series-select .binder-series-stage {
+  position: relative;
+  width: min(100%, 860px);
+  height: clamp(380px, 52vw, 520px);
+  margin: 0 auto;
+  transform-style: preserve-3d;
+}
+
+body[data-page="binder"].series-select .binder-series-floor {
+  position: absolute;
+  left: 50%;
+  bottom: 6%;
+  width: min(78%, 620px);
+  height: 34px;
+  margin-left: calc(min(78%, 620px) / -2);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255, 120, 200, 0.28), rgba(64, 95, 161, 0.12) 52%, transparent 74%);
+  filter: blur(10px);
+  transform: rotateX(82deg) translateZ(-48px);
+  pointer-events: none;
+}
+
+body[data-page="binder"].series-select .binder-series-slide {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: clamp(245px, 24vw, 330px);
+  margin-left: calc(clamp(245px, 24vw, 330px) / -2);
+  margin-top: calc(clamp(355px, 39vw, 445px) / -2);
+  transform-style: preserve-3d;
+  transition:
+    transform 0.64s cubic-bezier(0.22, 0.9, 0.28, 1),
+    opacity 0.46s ease,
+    filter 0.46s ease;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+body[data-page="binder"].series-select .binder-series-slide.is-active {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 6;
+  animation: binderSeriesPackFloat 5.2s ease-in-out infinite;
+}
+
+body[data-page="binder"].series-select .binder-series-slide.is-left-1,
+body[data-page="binder"].series-select .binder-series-slide.is-right-1 {
+  opacity: 0.88;
+  z-index: 4;
+  pointer-events: auto;
+}
+
+body[data-page="binder"].series-select .binder-series-slide.is-left-2,
+body[data-page="binder"].series-select .binder-series-slide.is-right-2 {
+  opacity: 0.42;
+  z-index: 3;
+}
+
+body[data-page="binder"].series-select .binder-series-slide.is-hidden {
+  opacity: 0;
+  z-index: 0;
+}
+
+body[data-page="binder"].series-select .binder-series-slide.is-active {
+  transform: translate3d(0, 0, 150px) rotateY(0deg) scale(1.08);
+}
+
+body[data-page="binder"].series-select .binder-series-slide.is-left-1 {
+  transform: translate3d(-46%, 2%, -10px) rotateY(34deg) scale(0.86);
+}
+
+body[data-page="binder"].series-select .binder-series-slide.is-right-1 {
+  transform: translate3d(46%, 2%, -10px) rotateY(-34deg) scale(0.86);
+}
+
+body[data-page="binder"].series-select .binder-series-slide.is-left-2 {
+  transform: translate3d(-68%, 6%, -90px) rotateY(48deg) scale(0.72);
+}
+
+body[data-page="binder"].series-select .binder-series-slide.is-right-2 {
+  transform: translate3d(68%, 6%, -90px) rotateY(-48deg) scale(0.72);
+}
+
+body[data-page="binder"].series-select .binder-series-slide.is-hidden {
+  transform: translate3d(0, 8%, -160px) rotateY(0deg) scale(0.58);
+}
+
+body[data-page="binder"].series-select .binder-series-pack.v61-pack.v78-pack {
+  width: 100% !important;
+  min-height: clamp(355px, 39vw, 445px) !important;
+  transform: none !important;
+}
+
+body[data-page="binder"].series-select .binder-series-slide.is-active .binder-series-pack.v61-pack.v78-pack {
+  box-shadow:
+    0 0 0 3px rgba(255, 155, 220, 0.24),
+    0 30px 72px rgba(51, 48, 154, 0.28),
+    0 0 42px rgba(255, 83, 177, 0.18),
+    inset 0 0 38px rgba(255, 255, 255, 0.22) !important;
+}
+
+body[data-page="binder"].series-select .binder-series-slide:not(.is-active) .binder-series-pack.v61-pack.v78-pack:hover,
+body[data-page="binder"].series-select .binder-series-slide:not(.is-active) .binder-series-pack.v61-pack.v78-pack:focus-visible {
+  transform: none !important;
+}
+
+body[data-page="binder"].series-select .binder-series-slide.is-active .binder-series-pack.v61-pack.v78-pack:hover,
+body[data-page="binder"].series-select .binder-series-slide.is-active .binder-series-pack.v61-pack.v78-pack:focus-visible {
+  transform: translateY(-6px) scale(1.02) !important;
+}
+
+body[data-page="binder"].series-select .binder-series-slide:not(.is-active) .v61-pack-label {
+  opacity: 0.92;
+}
+
+body[data-page="binder"].series-select .binder-series-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+body[data-page="binder"].series-select .binder-series-carousel.is-single .binder-series-controls {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+body[data-page="binder"].series-select .binder-series-nav {
+  width: 44px;
+  height: 44px;
+  border: 2px solid rgba(255, 255, 255, 0.72);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 226, 244, 0.82));
+  color: #ce348d;
+  font-size: 1.65rem;
+  line-height: 1;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(210, 35, 132, 0.18);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+body[data-page="binder"].series-select .binder-series-nav:hover:not(:disabled),
+body[data-page="binder"].series-select .binder-series-nav:focus-visible:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(210, 35, 132, 0.24);
+  outline: none;
+}
+
+body[data-page="binder"].series-select .binder-series-nav:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+body[data-page="binder"].series-select .binder-series-dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+body[data-page="binder"].series-select .binder-series-dot {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.42);
+  box-shadow: inset 0 0 0 1px rgba(206, 52, 141, 0.28);
+  cursor: pointer;
+  transition: transform 0.18s ease, width 0.18s ease, background 0.18s ease;
+}
+
+body[data-page="binder"].series-select .binder-series-dot.is-active {
+  width: 28px;
+  background: linear-gradient(135deg, #ff91cc, #6bc6f8);
+}
+
+body[data-page="binder"].series-select .binder-series-dot:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+@keyframes binderSeriesPackFloat {
+  0%, 100% {
+    transform: translate3d(0, 0, 150px) rotateY(0deg) scale(1.08);
+  }
+  50% {
+    transform: translate3d(0, -12px, 162px) rotateY(0deg) scale(1.085);
+  }
+}
+
+@media (max-width: 920px) {
+  body[data-page="binder"].series-select .binder-series-slide.is-left-2,
+  body[data-page="binder"].series-select .binder-series-slide.is-right-2 {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  body[data-page="binder"].series-select .binder-series-slide.is-left-1 {
+    transform: translate3d(-50%, 4%, -10px) rotateY(38deg) scale(0.82);
+  }
+
+  body[data-page="binder"].series-select .binder-series-slide.is-right-1 {
+    transform: translate3d(50%, 4%, -10px) rotateY(-38deg) scale(0.82);
+  }
+}
+
+@media (max-width: 620px) {
+  body[data-page="binder"].series-select .binder-series-slide {
+    width: min(88vw, 280px);
+    margin-left: calc(min(88vw, 280px) / -2);
+    margin-top: calc(min(338px, 72vw) / -2);
+  }
+
+  body[data-page="binder"].series-select .binder-series-pack.v61-pack.v78-pack {
+    min-height: 338px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-page="binder"].series-select .binder-series-slide {
+    transition: opacity 0.2s ease;
+  }
+
+  body[data-page="binder"].series-select .binder-series-slide.is-active {
+    animation: none;
+    transform: translate3d(0, 0, 150px) rotateY(0deg) scale(1.08);
+  }
+}
+
