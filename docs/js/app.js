@@ -1862,10 +1862,12 @@ function renderV61PackSlide(group, i) {
   const collectedLabel = fillWebsiteTokens(collectedTemplate, { owned: got, total: list.length });
   const openLabel = `Open ${label}`;
   return `<article class="binder-series-slide" data-slide-index="${i}" role="group" aria-roledescription="slide" aria-label="${esc(openLabel)}" aria-hidden="true">
-    <button class="v61-pack v78-pack binder-series-pack" style="--i:${i}" type="button" data-v61-pack="${esc(group.series)}" aria-label="${esc(openLabel)}">
-      <img src="${esc(group.boosterImageUrl || BOOSTER_PACK_URL)}" alt="${esc(label)} booster pack" loading="eager" onerror="this.src='${BOOSTER_PACK_URL}'">
-      <span class="v61-pack-label"><small class="v79-pack-title-line">${esc(seriesIdLabel)} — ${esc(label)}</small><small>${esc(collectedLabel)}</small></span>
-    </button>
+    <div class="binder-series-slide-shell">
+      <button class="v61-pack v78-pack binder-series-pack" style="--i:${i}" type="button" data-v61-pack="${esc(group.series)}" aria-label="${esc(openLabel)}">
+        <img src="${esc(group.boosterImageUrl || BOOSTER_PACK_URL)}" alt="${esc(label)} booster pack" loading="eager" onerror="this.src='${BOOSTER_PACK_URL}'">
+        <span class="v61-pack-label"><small class="v79-pack-title-line">${esc(seriesIdLabel)} — ${esc(label)}</small><small>${esc(collectedLabel)}</small></span>
+      </button>
+    </div>
   </article>`;
 }
 function renderV61SeriesLandingHtml() {

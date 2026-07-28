@@ -1,19 +1,67 @@
 const AUTO_ROTATE_MS = 6000;
 
-function offsetClass(offset) {
-  if (offset === 0) return 'is-active';
-  if (offset === -1) return 'is-left-1';
-  if (offset === 1) return 'is-right-1';
-  if (offset === -2) return 'is-left-2';
-  if (offset === 2) return 'is-right-2';
-  return 'is-hidden';
-}
-
 function wrapOffset(index, activeIndex, total) {
   let offset = index - activeIndex;
   if (offset > total / 2) offset -= total;
   if (offset < -total / 2) offset += total;
   return offset;
+}
+
+function visibleRadius(total, viewportWidth) {
+  if (total <= 1) return 0;
+  if (viewportWidth < 620) return 1;
+  if (viewportWidth < 920) return 2;
+  return Math.min(Math.ceil(total / 2), Math.max(2, Math.min(5, total - 1)));
+}
+
+function stepSpreadPercent(total, viewportWidth) {
+  let step = viewportWidth < 620 ? 64 : viewportWidth < 920 ? 78 : 92;
+  const radius = visibleRadius(total, viewportWidth);
+  const maxFan = viewportWidth < 620 ? 108 : viewportWidth < 920 ? 132 : 156;
+  if (radius > 0 && step * radius > maxFan) {
+    step = maxFan / radius;
+  }
+  return step;
+}
+
+function layoutForOffset(offset, total, viewportWidth) {
+  const abs = Math.abs(offset);
+  const radius = visibleRadius(total, viewportWidth);
+  if (abs > radius) {
+    return { hidden: true };
+  }
+
+  const stepX = stepSpreadPercent(total, viewportWidth);
+  const x = offset * stepX;
+  const rotY = offset * -15;
+  const z = offset === 0 ? 168 : Math.max(-130, 118 - abs * 54);
+  const y = abs * 2.2;
+  const scale = offset === 0 ? 1.1 : Math.max(0.62, 0.94 - abs * 0.075);
+  const opacity = offset === 0 ? 1 : Math.max(0.3, 0.97 - abs * 0.1);
+  const zIndex = 12 - abs;
+
+  return { hidden: false, x, y, z, rotY, scale, opacity, zIndex };
+}
+
+function applySlideLayout(slide, layout, offset) {
+  slide.classList.toggle('is-active', offset === 0);
+  slide.classList.toggle('is-visible', !layout.hidden);
+
+  if (layout.hidden) {
+    slide.style.opacity = '0';
+    slide.style.pointerEvents = 'none';
+    slide.style.zIndex = '0';
+    slide.style.transform = 'translate3d(0, 10%, -180px) rotateY(0deg) scale(0.55)';
+    slide.setAttribute('aria-hidden', 'true');
+    return;
+  }
+
+  slide.style.opacity = String(layout.opacity);
+  slide.style.pointerEvents = 'auto';
+  slide.style.zIndex = String(layout.zIndex);
+  slide.style.transform =
+    `translate3d(${layout.x}%, ${layout.y}%, ${layout.z}px) rotateY(${layout.rotY}deg) scale(${layout.scale})`;
+  slide.setAttribute('aria-hidden', offset === 0 ? 'false' : 'true');
 }
 
 export function initBinderSeriesCarousel(root) {
@@ -42,17 +90,19 @@ export function initBinderSeriesCarousel(root) {
   let activeIndex = 0;
   let autoTimer = null;
   let paused = false;
+  let resizeTimer = null;
   const multi = slides.length > 1;
 
+  root.dataset.packCount = String(slides.length);
   root.classList.toggle('is-single', !multi);
   prevBtn.disabled = !multi;
   nextBtn.disabled = !multi;
 
   const paint = () => {
+    const viewportWidth = window.innerWidth || 1200;
     slides.forEach((slide, index) => {
       const offset = wrapOffset(index, activeIndex, slides.length);
-      slide.className = `binder-series-slide ${offsetClass(offset)}`.trim();
-      slide.setAttribute('aria-hidden', offset === 0 ? 'false' : 'true');
+      applySlideLayout(slide, layoutForOffset(offset, slides.length, viewportWidth), offset);
     });
     dots.forEach((dot, index) => {
       const selected = index === activeIndex;
@@ -120,6 +170,10 @@ export function initBinderSeriesCarousel(root) {
       startAuto();
     }
   };
+  const onResize = () => {
+    window.clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(paint, 120);
+  };
 
   prevBtn.addEventListener('click', onPrev);
   nextBtn.addEventListener('click', onNext);
@@ -128,6 +182,7 @@ export function initBinderSeriesCarousel(root) {
   root.addEventListener('pointerleave', onPointerLeave);
   root.addEventListener('focusin', onFocusIn);
   root.addEventListener('focusout', onFocusOut);
+  window.addEventListener('resize', onResize);
 
   dots.forEach((dot) => {
     dot.addEventListener('click', () => {
@@ -156,6 +211,7 @@ export function initBinderSeriesCarousel(root) {
 
   root._binderCarouselCleanup = () => {
     stopAuto();
+    window.clearTimeout(resizeTimer);
     prevBtn.removeEventListener('click', onPrev);
     nextBtn.removeEventListener('click', onNext);
     root.removeEventListener('keydown', onKeydown);
@@ -165,6 +221,7 @@ export function initBinderSeriesCarousel(root) {
     root.removeEventListener('focusout', onFocusOut);
     root.removeEventListener('touchstart', onTouchStart);
     root.removeEventListener('touchend', onTouchEnd);
+    window.removeEventListener('resize', onResize);
   };
 }
 
