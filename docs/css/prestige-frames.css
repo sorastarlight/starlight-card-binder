@@ -29,6 +29,8 @@
 .st-evo-result-art.prestige-frame,
 .st-evo-detail-art .collection-image,
 .st-evo-tier-preview.prestige-frame,
+.st-evo-tier-preview.prestige-hero-preview,
+.prestige-hero-preview,
 .prestige-legend-tiers .prestige-frame,
 .collection-card.prestige-frame .collection-image {
   position: relative;
@@ -50,8 +52,38 @@
 .preview-card.prestige-frame .face.front > .prestige-particles,
 .v62-preview-card.prestige-frame .face.front > .prestige-particles,
 .st-evo-result-art.prestige-frame > .prestige-particles,
-.st-evo-radiance-card .prestige-particles {
+.st-evo-radiance-card .prestige-particles,
+.prestige-hero-preview > .prestige-particles {
   border-radius: 14px;
+}
+
+.prestige-hero-preview {
+  display: block;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 5 / 7;
+  border-radius: 14px;
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow: var(--prestige-card-shadow);
+}
+
+.prestige-hero-preview > .prestige-preview-back,
+.prestige-hero-preview > .prestige-preview-front,
+.prestige-hero-preview > .prestige-preview-art {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(var(--prestige-art-scale));
+  transform-origin: center center;
+  border-radius: inherit;
+}
+
+.prestige-hero-preview > .prestige-preview-front {
+  z-index: 2;
 }
 
 /* Keep the same rounded art window and depth as standard cards; overlay sits above art. */

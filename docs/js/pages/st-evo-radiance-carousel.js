@@ -1,11 +1,9 @@
 import {
   EVOLUTION_COSTS,
   prestigeClassName,
-  prestigeFrameEffectsHtml,
+  prestigeHeroPreviewHtml,
   prestigeLabel
 } from '../prestige-utils.js?v=1.6.2';
-
-const SHOWCASE_ART = 'site_assets/StarlightCard_Back_NewLogo.png';
 
 const SHOWCASE_TIERS = Object.freeze([
   { tier: 'star_bit', costKey: 'prestigeStarBit' },
@@ -54,10 +52,11 @@ function buildSlideMarkup(entry, index) {
       aria-label="${label}"
       aria-hidden="true"
     >
-      <div class="st-evo-radiance-card st-evo-tier-preview prestige-frame ${frameClass.split(' ').slice(1).join(' ')}">
-        <img src="${SHOWCASE_ART}" alt="" width="220" height="308" decoding="async" draggable="false">
-        ${prestigeFrameEffectsHtml(entry.tier)}
-      </div>
+      ${prestigeHeroPreviewHtml({
+        tier: entry.tier,
+        alt: label,
+        extraClass: 'st-evo-radiance-card st-evo-tier-preview'
+      })}
     </article>
   `;
 }

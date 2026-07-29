@@ -13,8 +13,8 @@ import {
   nextEvolutionTier,
   normalizeEvolutionTier,
   prestigeClassName,
-  prestigeFrameEffectsHtml,
   prestigeFrameOverlayHtml,
+  prestigeHeroPreviewHtml,
   prestigeLabel,
   previousEvolutionTier
 } from '../prestige-utils.js?v=1.6.2';
@@ -77,11 +77,13 @@ const resultModal = resultModalEl && window.StarlightUI?.adoptModal
 function setResultCardArt(imageUrl, cardName, tier) {
   if (!resultArtEl) return;
   const frame = prestigeClassName(tier);
-  resultArtEl.className = `st-evo-result-art collection-image ${frame}`.trim();
-  const overlay = prestigeFrameEffectsHtml(tier);
-  resultArtEl.innerHTML = imageUrl
-    ? `<img src="${esc(imageUrl)}" alt="${esc(cardName)}" draggable="false">${overlay}`
-    : '';
+  resultArtEl.className = `st-evo-result-art ${frame}`.trim();
+  resultArtEl.innerHTML = prestigeHeroPreviewHtml({
+    tier,
+    imageUrl,
+    alt: cardName,
+    extraClass: 'st-evo-result-preview'
+  });
 }
 
 function applyResultMeta({ cardName, toTier, label }) {
@@ -277,14 +279,18 @@ function detailActionMarkup(card) {
 
 function renderCardDetail(card) {
   if (!dialogBodyEl || !dialogTitleEl || !card) return;
-  const frame = prestigeClassName(card.tier);
   const label = prestigeLabel(card.tier);
   const tierToken = String(card.tier).replace(/_/g, '-');
   dialogTitleEl.textContent = card.name;
   dialogBodyEl.innerHTML = `
     <div class="st-evo-detail-layout">
       <div class="st-evo-detail-art">
-        <span class="collection-image ${esc(frame)}"><img src="${esc(card.imageUrl)}" alt="${esc(card.name)}" onerror="this.style.opacity='0.35'">${prestigeFrameOverlayHtml(card.tier)}</span>
+        ${prestigeHeroPreviewHtml({
+          tier: card.tier,
+          imageUrl: card.imageUrl,
+          alt: card.name,
+          extraClass: 'st-evo-detail-preview'
+        })}
       </div>
       <div class="st-evo-detail-copy">
         <p class="st-evo-detail-meta">

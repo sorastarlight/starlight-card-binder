@@ -163,13 +163,26 @@ export function prestigeFrameOverlayHtml(tier) {
   return `<img class="prestige-frame-overlay" src="${src}" alt="" aria-hidden="true" draggable="false" loading="lazy">`;
 }
 
+/** Official card back used beneath Radiance hero previews. */
+export const PRESTIGE_PREVIEW_BACK_URL = 'site_assets/StarlightCard_Back_NewLogo.png';
+
 const PRESTIGE_PARTICLE_COUNTS = Object.freeze({
-  star_bit: 10,
-  protostar: 12,
-  starlight: 12,
-  super_starlight: 14,
-  starlight_burst: 16
+  star_bit: 14,
+  protostar: 18,
+  starlight: 22,
+  super_starlight: 28,
+  starlight_burst: 32
 });
+
+function escPrestigeAttr(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[char]);
+}
 
 /** Tier particles rendered above art and below the frame overlay. */
 export function prestigeParticlesHtml(tier) {
@@ -177,15 +190,54 @@ export function prestigeParticlesHtml(tier) {
   if (normalized === 'stardust') return '';
   const token = tierCssToken(normalized);
   const count = PRESTIGE_PARTICLE_COUNTS[normalized] || 10;
-  const particles = Array.from({ length: count }, (_, index) => (
-    `<span class="prestige-particle" style="--p:${index}"></span>`
-  )).join('');
+  const particles = Array.from({ length: count }, (_, index) => {
+    let extra = '';
+    if (normalized === 'star_bit' && index % 4 === 0) extra = ' prestige-particle-spark';
+    if (normalized === 'protostar') {
+      if (index % 5 === 0) extra = ' prestige-particle-streak';
+      else if (index % 6 === 2) extra = ' prestige-particle-orb-sm';
+    }
+    if (normalized === 'starlight') {
+      if (index % 3 === 1) extra = ' prestige-particle-petal';
+      else if (index % 5 === 0) extra = ' prestige-particle-spark';
+    }
+    if (normalized === 'super_starlight') {
+      if (index % 4 === 0) extra = ' prestige-particle-orb';
+      else if (index % 5 === 2) extra = ' prestige-particle-star-sm';
+      else if (index % 6 === 1) extra = ' prestige-particle-wisp';
+    }
+    if (normalized === 'starlight_burst') {
+      if (index % 2 === 0) extra = ' prestige-particle-star';
+      else if (index % 3 === 1) extra = ' prestige-particle-shard';
+      else if (index % 5 === 0) extra = ' prestige-particle-comet';
+    }
+    return `<span class="prestige-particle${extra}" style="--p:${index}"></span>`;
+  }).join('');
   return `<span class="prestige-particles prestige-particles-${token}" aria-hidden="true">${particles}</span>`;
 }
 
 /** Particles + frame overlay for hero Radiance previews (full view, carousel, evolution result). */
 export function prestigeFrameEffectsHtml(tier) {
   return `${prestigeParticlesHtml(tier)}${prestigeFrameOverlayHtml(tier)}`;
+}
+
+/**
+ * Hero Radiance preview shell: card back art, optional front art, particles, and frame.
+ * Card back always renders so previews never show an empty window.
+ */
+export function prestigeHeroPreviewHtml({ tier, imageUrl = '', alt = '', extraClass = '' } = {}) {
+  const normalized = normalizeEvolutionTier(tier);
+  if (normalized === 'stardust') return '';
+  const frame = prestigeClassName(tier);
+  const back = PRESTIGE_PREVIEW_BACK_URL;
+  const front = String(imageUrl || '').trim();
+  const safeAlt = escPrestigeAttr(alt);
+  const classes = ['prestige-hero-preview', frame, extraClass].filter(Boolean).join(' ');
+  const frontMarkup = front && front !== back
+    ? `<img class="prestige-preview-front" src="${escPrestigeAttr(front)}" alt="${safeAlt}" draggable="false" decoding="async" onerror="this.remove()">`
+    : '';
+  const art = `<img class="prestige-preview-back" src="${back}" alt="${frontMarkup ? '' : safeAlt}" ${frontMarkup ? 'aria-hidden="true"' : ''} draggable="false" decoding="async">${frontMarkup}`;
+  return `<div class="${classes}">${art}${prestigeFrameEffectsHtml(tier)}</div>`;
 }
 
 /** Returns CSS class string for non-base evolution frames. */
