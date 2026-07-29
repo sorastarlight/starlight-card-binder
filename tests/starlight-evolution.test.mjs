@@ -10,8 +10,10 @@ import {
   evolutionUnfuseRefund,
   nextEvolutionTier,
   prestigeClassName,
+  prestigeFrameEffectsHtml,
   prestigeFrameImageUrl,
   prestigeFrameOverlayHtml,
+  prestigeParticlesHtml,
   prestigeLabel,
   previousEvolutionTier
 } from '../docs/js/prestige-utils.js';
@@ -64,6 +66,9 @@ test('Starlight Evolution costs and refunds match the locked ladder', () => {
   assert.equal(prestigeFrameImageUrl('stardust'), '');
   assert.match(prestigeFrameOverlayHtml('star_bit'), /prestige-frame-overlay/);
   assert.match(prestigeFrameOverlayHtml('star_bit'), /Radiance1\.png/);
+  assert.match(prestigeParticlesHtml('star_bit'), /prestige-particles-star-bit/);
+  assert.match(prestigeFrameEffectsHtml('star_bit'), /prestige-particles-star-bit/);
+  assert.match(prestigeFrameEffectsHtml('star_bit'), /prestige-frame-overlay/);
 });
 
 test('Starlight Evolution migration and client wiring are present', async () => {
@@ -115,6 +120,8 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.match(utils, /canUnfuse/);
   assert.match(evoPage, /st-evo-radiance-carousel/);
   assert.match(utils, /prestigeFrameOverlayHtml/);
+  assert.match(utils, /prestigeFrameEffectsHtml/);
+  assert.match(utils, /prestigeParticlesHtml/);
   assert.match(utils, /Radiance1\.png/);
   assert.match(sync, /export async function evolveMyCard/);
   assert.match(sync, /export async function unfuseMyCard/);
@@ -125,6 +132,7 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.doesNotMatch(app, /window\.confirm/);
   assert.match(app, /playStarlightEvolutionReveal|starlight-evolution-reveal/);
   assert.match(app, /data-unfuse-card/);
+  assert.match(app, /prestigeFrameEffectsHtml/);
   assert.match(app, /analyzer-display-toggles|data-toggle-analyzer-evolution/);
   assert.doesNotMatch(app, /full-card-wrap flip-card analyzer-card-3d/);
   assert.match(app, /Holo On|Turn Off Holographic/);
@@ -133,6 +141,7 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.doesNotMatch(reveal, /st-evo-root|anchorOverlayToVisibleViewport|notifyEmbedReset/);
   assert.match(evoCss, /st-evo-result-showcase|st-evo-result-aura/);
   assert.match(css, /prestige-frame-overlay|Radiance1\.png/);
+  assert.match(css, /prestige-particles\.css/);
   assert.match(css, /\.prestige-badge\.prestige-star-bit/);
   assert.match(evoPage, /st-evo-result-modal/);
   assert.match(evoPage, /st-evo-result-art/);
@@ -143,6 +152,7 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.match(evoPage, /starlight-evolution-page\.js\?v=2\.3\.0/);
   assert.match(evoPage, /starlight-evolution\.css\?v=2\.5\.0/);
   assert.match(evoCss, /st-evo-radiance-carousel|stEvoRadianceFloat/);
+  assert.match(analyzerCss, /prestige-particles/);
   assert.match(analyzerCss, /Beat qol-ui/);
   assert.match(collection, /card-analyzer\.css/);
   assert.match(collection, /qol-ui\.css[\s\S]*card-analyzer\.css/s);
@@ -159,6 +169,7 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   const evoPageJs = await read('docs/js/pages/starlight-evolution-page.js');
   assert.match(evoPageJs, /data-evo-open-card/);
   assert.match(evoPageJs, /evolveMyCard/);
+  assert.match(evoPageJs, /prestigeFrameEffectsHtml/);
   assert.match(evoPageJs, /prestigeFrameOverlayHtml/);
   assert.match(evoPageJs, /collection-image \$\{esc\(frame\)\}/);
   assert.doesNotMatch(evoPageJs, /playAscendSequence|playEnhanceSequence|st-evo-ascend-stage/);
@@ -173,7 +184,9 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.match(evoPage, /starlight-evolution-page\.js\?v=2\.3\.0/);
 
   const evoCarouselJs = await read('docs/js/pages/st-evo-radiance-carousel.js');
-  assert.match(evoCarouselJs, /prestigeFrameImageUrl/);
+  assert.match(utils, /prestigeFrameEffectsHtml/);
+  assert.match(utils, /prestigeParticlesHtml/);
+  assert.match(evoCarouselJs, /prestigeFrameEffectsHtml/);
   assert.match(evoCarouselJs, /StarlightCard_Back_NewLogo\.png/);
   assert.match(evoCarouselJs, /initRadianceCarousel/);
 });

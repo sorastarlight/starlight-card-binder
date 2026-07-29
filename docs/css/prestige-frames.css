@@ -1,4 +1,5 @@
 /* Starlight Evolution frames — Radiance I–V transparent PNG overlays. */
+@import url("./prestige-particles.css");
 
 :root {
   --prestige-art-scale: 1.045;
@@ -43,6 +44,14 @@
   pointer-events: none;
   user-select: none;
   z-index: 5;
+}
+
+.full-card-wrap.prestige-frame .face.front > .prestige-particles,
+.preview-card.prestige-frame .face.front > .prestige-particles,
+.v62-preview-card.prestige-frame .face.front > .prestige-particles,
+.st-evo-result-art.prestige-frame > .prestige-particles,
+.st-evo-radiance-card .prestige-particles {
+  border-radius: 14px;
 }
 
 /* Keep the same rounded art window and depth as standard cards; overlay sits above art. */

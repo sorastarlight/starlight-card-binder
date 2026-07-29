@@ -202,6 +202,11 @@ function prestigeFrameOverlayHtml(cardId) {
   const tier = getCardPrestigeTier(cardId);
   return utils.prestigeFrameOverlayHtml?.(tier) || '';
 }
+function prestigeFrameEffectsHtml(cardId) {
+  const utils = prestigeUtils();
+  const tier = getCardPrestigeTier(cardId);
+  return utils.prestigeFrameEffectsHtml?.(tier) || prestigeFrameOverlayHtml(cardId);
+}
 function prestigeBadgeHtml(cardId) {
   const utils = prestigeUtils();
   const tier = getCardPrestigeTier(cardId);
@@ -404,18 +409,14 @@ function applyAnalyzerDisplayToggles() {
   prestigeTokens.forEach((token) => card.classList.remove(token));
   if (got && analyzerEvolutionEnabled) {
     prestigeFrameClass(selected.id).split(/\s+/).filter(Boolean).forEach((token) => card.classList.add(token));
-    const overlayMarkup = prestigeFrameOverlayHtml(selected.id);
-    let overlay = frontFace?.querySelector('.prestige-frame-overlay');
-    if (overlayMarkup && !overlay) {
-      frontFace?.insertAdjacentHTML('beforeend', overlayMarkup);
-      overlay = frontFace?.querySelector('.prestige-frame-overlay');
-    }
-    if (overlay) {
-      overlay.hidden = false;
-      overlay.style.removeProperty('visibility');
-      overlay.style.removeProperty('opacity');
+    frontFace?.querySelector('.prestige-particles')?.remove();
+    frontFace?.querySelector('.prestige-frame-overlay')?.remove();
+    const effectsMarkup = prestigeFrameEffectsHtml(selected.id);
+    if (effectsMarkup) {
+      frontFace?.insertAdjacentHTML('beforeend', effectsMarkup);
     }
   } else {
+    frontFace?.querySelector('.prestige-particles')?.remove();
     frontFace?.querySelector('.prestige-frame-overlay')?.remove();
   }
   if (!analyzerHoloEnabled) {
@@ -1352,7 +1353,7 @@ function renderFullView() {
                 <button class="overlay-arrow right analyzer-arrow" type="button" aria-label="Next card">›</button>
                 <div class="full-card-wrap simple-flip analyzer-card-shell analyzer-card-3d ${overlayFlipped ? 'show-back showing-card-back' : ''} ${analyzerHoloEnabled ? '' : 'is-holo-off'} ${analyzerEvolutionEnabled ? '' : 'is-evolution-off'} ${rarityClass(selected)} ${prestigeClass}" id="fullCard3d" aria-label="${esc(overlayFlipped ? 'Card back' : visibleName)}" data-holographic="${got && analyzerHoloEnabled && isHolographicCard(selected)}" data-finish-class="${esc(finishClass)}">
                   <span class="full-inner">
-                    <span class="face front ${finishClass}"><img class="${artClass}" src="${esc(getVisibleImage(selected))}" alt="${esc(visibleName)}" onerror="this.src='${CARD_BACK_URL}'" draggable="false">${!overlayFlipped ? holoMarkup : ''}${prestigeClass ? prestigeFrameOverlayHtml(selected.id) : ''}</span>
+                    <span class="face front ${finishClass}"><img class="${artClass}" src="${esc(getVisibleImage(selected))}" alt="${esc(visibleName)}" onerror="this.src='${CARD_BACK_URL}'" draggable="false">${!overlayFlipped ? holoMarkup : ''}${prestigeClass ? prestigeFrameEffectsHtml(selected.id) : ''}</span>
                     <span class="face back"><img src="${esc(CARD_BACK_URL)}" alt="Card back" draggable="false"></span>
                   </span>
                 </div>

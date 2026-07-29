@@ -163,6 +163,31 @@ export function prestigeFrameOverlayHtml(tier) {
   return `<img class="prestige-frame-overlay" src="${src}" alt="" aria-hidden="true" draggable="false" loading="lazy">`;
 }
 
+const PRESTIGE_PARTICLE_COUNTS = Object.freeze({
+  star_bit: 10,
+  protostar: 12,
+  starlight: 12,
+  super_starlight: 14,
+  starlight_burst: 16
+});
+
+/** Tier particles rendered above art and below the frame overlay. */
+export function prestigeParticlesHtml(tier) {
+  const normalized = normalizeEvolutionTier(tier);
+  if (normalized === 'stardust') return '';
+  const token = tierCssToken(normalized);
+  const count = PRESTIGE_PARTICLE_COUNTS[normalized] || 10;
+  const particles = Array.from({ length: count }, (_, index) => (
+    `<span class="prestige-particle" style="--p:${index}"></span>`
+  )).join('');
+  return `<span class="prestige-particles prestige-particles-${token}" aria-hidden="true">${particles}</span>`;
+}
+
+/** Particles + frame overlay for hero Radiance previews (full view, carousel, evolution result). */
+export function prestigeFrameEffectsHtml(tier) {
+  return `${prestigeParticlesHtml(tier)}${prestigeFrameOverlayHtml(tier)}`;
+}
+
 /** Returns CSS class string for non-base evolution frames. */
 export function prestigeClassName(tierOrQuantity) {
   const tier = typeof tierOrQuantity === 'string'

@@ -1,9 +1,9 @@
 import {
   EVOLUTION_COSTS,
   prestigeClassName,
-  prestigeFrameImageUrl,
+  prestigeFrameEffectsHtml,
   prestigeLabel
-} from '../prestige-utils.js?v=1.6.1';
+} from '../prestige-utils.js?v=1.6.2';
 
 const SHOWCASE_ART = 'site_assets/StarlightCard_Back_NewLogo.png';
 
@@ -43,7 +43,6 @@ function badgeClassForTier(tier) {
 
 function buildSlideMarkup(entry, index) {
   const frameClass = prestigeClassName(entry.tier);
-  const overlaySrc = prestigeFrameImageUrl(entry.tier);
   const label = prestigeLabel(entry.tier);
   return `
     <article
@@ -57,7 +56,7 @@ function buildSlideMarkup(entry, index) {
     >
       <div class="st-evo-radiance-card st-evo-tier-preview prestige-frame ${frameClass.split(' ').slice(1).join(' ')}">
         <img src="${SHOWCASE_ART}" alt="" width="220" height="308" decoding="async" draggable="false">
-        <img class="prestige-frame-overlay" src="${overlaySrc}" alt="" aria-hidden="true" draggable="false">
+        ${prestigeFrameEffectsHtml(entry.tier)}
       </div>
     </article>
   `;

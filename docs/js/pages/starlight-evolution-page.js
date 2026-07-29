@@ -13,10 +13,11 @@ import {
   nextEvolutionTier,
   normalizeEvolutionTier,
   prestigeClassName,
+  prestigeFrameEffectsHtml,
   prestigeFrameOverlayHtml,
   prestigeLabel,
   previousEvolutionTier
-} from '../prestige-utils.js?v=1.6.1';
+} from '../prestige-utils.js?v=1.6.2';
 import { initRadianceCarousel } from './st-evo-radiance-carousel.js?v=1.0.0';
 
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
@@ -77,7 +78,7 @@ function setResultCardArt(imageUrl, cardName, tier) {
   if (!resultArtEl) return;
   const frame = prestigeClassName(tier);
   resultArtEl.className = `st-evo-result-art collection-image ${frame}`.trim();
-  const overlay = prestigeFrameOverlayHtml(tier);
+  const overlay = prestigeFrameEffectsHtml(tier);
   resultArtEl.innerHTML = imageUrl
     ? `<img src="${esc(imageUrl)}" alt="${esc(cardName)}" draggable="false">${overlay}`
     : '';
