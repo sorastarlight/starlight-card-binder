@@ -66,8 +66,10 @@
   overflow: hidden;
   isolation: isolate;
   box-shadow: var(--prestige-card-shadow);
+  background: #12082a;
 }
 
+/* Match full-view analyzer layering: art (cover) → particles → overlay (contain). */
 .prestige-hero-preview > .prestige-preview-back,
 .prestige-hero-preview > .prestige-preview-front,
 .prestige-hero-preview > .prestige-preview-art {
@@ -76,14 +78,28 @@
   z-index: 1;
   width: 100%;
   height: 100%;
+  margin: 0;
   object-fit: cover;
-  transform: scale(var(--prestige-art-scale));
+  transform: none;
   transform-origin: center center;
   border-radius: inherit;
+  box-shadow: none;
 }
 
 .prestige-hero-preview > .prestige-preview-front {
   z-index: 2;
+}
+
+.prestige-hero-preview > .prestige-particles {
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  mix-blend-mode: screen;
+}
+
+.prestige-hero-preview > .prestige-frame-overlay {
+  z-index: 5;
+  object-fit: contain !important;
 }
 
 /* Keep the same rounded art window and depth as standard cards; overlay sits above art. */

@@ -190,11 +190,17 @@
   width: 100%;
   aspect-ratio: 5 / 7;
   border-radius: 16px;
-  overflow: visible;
+  overflow: hidden;
   isolation: isolate;
   box-shadow:
     0 18px 36px rgba(40, 56, 96, 0.24),
     0 0 0 1px rgba(255, 255, 255, 0.55);
+}
+
+/* Keep particle blend scoped to the card face inside 3D carousel slides. */
+.st-evo-radiance-slide .prestige-hero-preview {
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .st-evo-radiance-slide.is-active .st-evo-radiance-card.st-evo-tier-preview,
