@@ -530,22 +530,7 @@
 }
 
 .st-evo-result-aura {
-  position: absolute;
-  inset: 10px;
-  border-radius: 14px;
-  opacity: 0;
-  z-index: 0;
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-  filter: blur(16px) saturate(1.45) brightness(1.06);
-  transform: scale(1);
-  transition: opacity 420ms ease;
-}
-
-.st-evo-result-showcase:has(.prestige-frame) .st-evo-result-aura {
-  opacity: 0.88;
-  filter: blur(14px) saturate(1.55) brightness(1.1);
+  display: none !important;
 }
 
 .st-evo-result-tier,

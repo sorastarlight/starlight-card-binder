@@ -627,7 +627,6 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
 #cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front > .prestige-particles {
   z-index: 3 !important;
   pointer-events: none !important;
-  mix-blend-mode: screen;
 }
 
 #cardOverlay .analyzer-sekai-stage .analyzer-card-shell.is-evolution-off .prestige-particles,

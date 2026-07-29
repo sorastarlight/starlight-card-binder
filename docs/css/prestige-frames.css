@@ -94,7 +94,6 @@
   inset: 0;
   z-index: 3;
   border-radius: inherit;
-  mix-blend-mode: screen;
 }
 
 .prestige-hero-preview > .prestige-frame-overlay {

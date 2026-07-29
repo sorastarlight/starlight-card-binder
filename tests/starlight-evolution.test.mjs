@@ -156,7 +156,7 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.match(evoPage, /st-evo-tier-showcase/);
   assert.match(evoPage, /st-evo-radiance-carousel/);
   assert.match(evoPage, /starlight-evolution-page\.js\?v=2\.3\.1/);
-  assert.match(evoPage, /starlight-evolution\.css\?v=2\.5\.0/);
+  assert.match(evoPage, /starlight-evolution\.css\?v=2\.5\.1/);
   assert.match(evoCss, /st-evo-radiance-carousel|stEvoRadianceFloat/);
   assert.match(analyzerCss, /prestige-particles/);
   assert.match(analyzerCss, /Beat qol-ui/);
