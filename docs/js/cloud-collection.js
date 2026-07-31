@@ -1,6 +1,7 @@
 import { supabase } from "./supabase-client.js";
 import "./card-catalog-service.js";
 
+import { applyAwardedCardsToLocalStore } from "./collection-local-store.js";
 import {
     evolveMyCard,
     fuseMyCard,
@@ -27,6 +28,74 @@ let currentUser = null;
 let favoriteMonitorTimer = null;
 let previousFavoriteStore = {};
 let favoriteSyncQueue = Promise.resolve();
+let collectionRefreshQueue = Promise.resolve();
+let collectionRefreshTimer = null;
+
+const COLLECTION_REFRESH_DEBOUNCE_MS = 350;
+
+function shouldRefreshCollectionFromDetail(detail = {}) {
+    const type = String(detail.type || "").trim();
+    const source = String(detail.source || "").trim().toLowerCase();
+
+    if (type === "starlight-wallet-changed" || type === "starlight-rewards-changed") {
+        return true;
+    }
+
+    return /shop|daily|booster|gift|redeem|reward|received|duplicate-convert|quest|season|peer-gift/.test(source);
+}
+
+function scheduleCollectionRefresh(detail = {}) {
+    if (!currentUser) return;
+
+    const awardedCards = Array.isArray(detail.cards) ? detail.cards : [];
+    if (awardedCards.length) {
+        applyAwardedCardsToLocalStore(awardedCards);
+        if (typeof window.renderAll === "function") {
+            window.renderAll();
+        }
+    }
+
+    if (collectionRefreshTimer) {
+        window.clearTimeout(collectionRefreshTimer);
+    }
+
+    collectionRefreshTimer = window.setTimeout(() => {
+        collectionRefreshTimer = null;
+        collectionRefreshQueue = collectionRefreshQueue
+            .then(async () => {
+                await synchronizeCloudCollection();
+                if (typeof window.renderAll === "function") {
+                    window.renderAll();
+                }
+            })
+            .catch(error => {
+                console.error(
+                    "[Starlight] Collection refresh failed:",
+                    error
+                );
+            });
+    }, COLLECTION_REFRESH_DEBOUNCE_MS);
+}
+
+function startCollectionRefreshListener() {
+    window.addEventListener("starlight-dashboard-refresh", event => {
+        const detail = event.detail || {};
+        if (!shouldRefreshCollectionFromDetail(detail)) return;
+        scheduleCollectionRefresh(detail);
+    });
+
+    window.addEventListener("message", event => {
+        if (event.origin !== window.location.origin) return;
+        const detail = event.data || {};
+        if (!shouldRefreshCollectionFromDetail(detail)) return;
+        scheduleCollectionRefresh(detail);
+    });
+
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden || !currentUser) return;
+        scheduleCollectionRefresh({ source: "visibility" });
+    });
+}
 
 /**
  * Safely reads one of the Binder's object-based localStorage values.
@@ -425,7 +494,7 @@ async function loadBinderApplication() {
         const script =
             document.createElement("script");
 
-        script.src = "./js/app.js?v=1.9.4";
+        script.src = "./js/app.js?v=1.9.5";
         script.async = false;
         script.dataset.starlightApp = "true";
 
@@ -503,6 +572,7 @@ async function initializeStarlightBinder() {
         startBinderApplication();
 
         startFavoriteMonitor();
+        startCollectionRefreshListener();
     } catch (error) {
         console.error(
             "[Starlight] Binder startup failed:",

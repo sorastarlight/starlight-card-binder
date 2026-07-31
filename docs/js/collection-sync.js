@@ -3,6 +3,30 @@ import { supabase } from "./supabase-client.js";
 const LOCAL_COLLECTION_KEY =
     "sora-starlight-card-binder-v5-collected";
 
+export { applyAwardedCardsToLocalStore } from "./collection-local-store.js";
+
+function compareOwnedCardRows(a, b) {
+    const aCard = a?.cards || {};
+    const bCard = b?.cards || {};
+    const aSeries = aCard.card_series || {};
+    const bSeries = bCard.card_series || {};
+    const seriesSortDiff =
+        Number(aSeries.sort_order ?? aSeries.sortOrder ?? 0)
+        - Number(bSeries.sort_order ?? bSeries.sortOrder ?? 0);
+    if (seriesSortDiff !== 0) return seriesSortDiff;
+
+    const sortDiff =
+        Number(aCard.sort_order ?? aCard.sortOrder ?? 0)
+        - Number(bCard.sort_order ?? bCard.sortOrder ?? 0);
+    if (sortDiff !== 0) return sortDiff;
+
+    return String(a?.card_id || "").localeCompare(
+        String(b?.card_id || ""),
+        undefined,
+        { numeric: true }
+    );
+}
+
 /**
  * Reads the old V79.9 collection from localStorage.
  *
@@ -248,10 +272,14 @@ export async function loadCloudCollection() {
                 rarity,
                 thumbnail_url,
                 image_url,
-                series_id
+                series_id,
+                sort_order,
+                card_series (
+                    sort_order
+                )
             )
         `)
-        .order("first_obtained_at", {
+        .order("card_id", {
             ascending: true
         });
 
@@ -267,8 +295,10 @@ export async function loadCloudCollection() {
         };
     }
 
+    const cards = Array.isArray(data) ? [...data].sort(compareOwnedCardRows) : [];
+
     return {
-        cards: data || [],
+        cards,
         error: null
     };
 }

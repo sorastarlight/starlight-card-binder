@@ -619,6 +619,7 @@ function normalize(row, i) {
     finishId: String(row.finishId || row.finish_id || "").trim(),
     finishName: String(row.finishName || row.finish_name || "").trim(),
     collectorNumber: String(row.collectorNumber || row.collector_number || number).trim(),
+    sortOrder: Number(row.sortOrder ?? row.sort_order ?? i + 1) || (i + 1),
     distributionType: String(row.distributionType || row.distribution_type || "booster_pull").trim(),
     publishStatus: String(row.publishStatus || row.publish_status || "published").trim(),
     tags: Array.isArray(row.tags) ? row.tags : [],
@@ -762,12 +763,26 @@ window.addEventListener("starlight-card-catalog-updated", () => {
   refreshCardCatalog();
 });
 
+function compareCatalogCardOrder(a, b) {
+  const seriesDiff = Number(a.seriesSort || 0) - Number(b.seriesSort || 0);
+  if (seriesDiff !== 0) return seriesDiff;
+  const sortDiff = Number(a.sortOrder || 0) - Number(b.sortOrder || 0);
+  if (sortDiff !== 0) return sortDiff;
+  return a.number.localeCompare(b.number, undefined, { numeric: true });
+}
+
 function sortCards(list, mode) {
   list.sort((a, b) => {
-    if (mode === "numberDesc") return b.number.localeCompare(a.number, undefined, { numeric: true });
-    if (mode === "nameAsc") return a.name.localeCompare(b.name);
-    if (mode === "rarityDesc") return (RARITY_SCORE[b.rarity] || 0) - (RARITY_SCORE[a.rarity] || 0) || a.number.localeCompare(b.number, undefined, { numeric: true });
-    return a.number.localeCompare(b.number, undefined, { numeric: true });
+    if (mode === "numberDesc") {
+      const cmp = compareCatalogCardOrder(a, b);
+      return cmp ? -cmp : 0;
+    }
+    if (mode === "nameAsc") return a.name.localeCompare(b.name) || compareCatalogCardOrder(a, b);
+    if (mode === "rarityDesc") {
+      return (RARITY_SCORE[b.rarity] || 0) - (RARITY_SCORE[a.rarity] || 0)
+        || compareCatalogCardOrder(a, b);
+    }
+    return compareCatalogCardOrder(a, b);
   });
 }
 
@@ -803,6 +818,17 @@ function hydrateFilters(preserved = activeFilters()) {
     select.innerHTML = series.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join("");
     if (previous && series.includes(previous)) select.value = previous;
   });
+  const sortSelect = $('#sortSelect');
+  if (sortSelect && preserved?.sort) {
+    sortSelect.value = preserved.sort;
+  }
+  const viewFilter = preserved?.view || 'all';
+  const viewInput = $(`[name="viewFilter"][value="${viewFilter}"]`);
+  if (viewInput) viewInput.checked = true;
+  const searchInput = $('#globalSearch');
+  if (searchInput && preserved?.q) searchInput.value = preserved.q;
+  const raritySelect = $('[data-rarity]');
+  if (raritySelect && preserved?.rarity) raritySelect.value = preserved.rarity;
 }
 
 function renderFilterControls() {

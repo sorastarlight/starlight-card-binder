@@ -3,6 +3,7 @@ import { revealRewardSequence } from '../reward-reveal.js?v=1.5.14';
 import { getCachedWebsiteContent } from '../website-content-hydrate.js';
 import { maybeCelebrateSeriesCompletions } from '../series-complete-celebration.js?v=1.0.0';
 import { notifyShellEconomyChanged } from '../shell-economy.js';
+import { applyAwardedCardsToLocalStore } from '../collection-local-store.js';
 import { starBitAmountHtml } from '../star-bit-icon.js';
 
 let rewardsCopy = getCachedWebsiteContent()?.rewards || {};
@@ -75,6 +76,12 @@ async function claim(id) {
         cardBackUrl: payload.cardBackUrl || payload.card_back_url || snapshot.cardBackUrl || snapshot.card_back_url || undefined
       });
       await maybeCelebrateSeriesCompletions(cards);
+      applyAwardedCardsToLocalStore(cards);
+      notifyShellEconomyChanged({
+        source: 'received-gift',
+        rewardType: out?.rewardType || reward?.rewardType,
+        cards
+      });
     } else if (out?.rewardType === 'season_pass_unlock' || reward?.rewardType === 'season_pass_unlock') {
       status.textContent = 'Season Pass unlocked! Open Seasonal Collection Pass to play the track.';
       window.parent?.postMessage({ type: 'starlight-navigate', view: 'season-pass' }, location.origin);

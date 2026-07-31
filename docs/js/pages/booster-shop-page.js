@@ -2,6 +2,7 @@ import { loginShellHref } from '../shell-route-utils.js';
 import { supabase } from '../supabase-client.js';
 import { getStarBitsExchangePreview } from '../star-bits-service.js';
 import { openStarBitsBoosterById } from '../daily-booster-service.js';
+import { applyAwardedCardsToLocalStore } from '../collection-local-store.js';
 import { revealRewardSequence } from '../reward-reveal.js?v=1.5.14';
 import { getCachedWebsiteContent } from '../website-content-hydrate.js';
 import { maybeCelebrateSeriesCompletions } from '../series-complete-celebration.js?v=1.0.0';
@@ -334,8 +335,9 @@ async function confirmPurchase(){
     const awardedCards = result.cards || [];
     await revealRewardSequence(awardedCards,{title:booster.name,packImageUrl:booster.pack_image_url||FALLBACK_PACK,cardBackUrl:booster.card_back_url||button.dataset.back||undefined,autoOpen:true});
     await maybeCelebrateSeriesCompletions(awardedCards);
+    applyAwardedCardsToLocalStore(awardedCards);
     pendingPurchase=null;
-    notifyShellEconomyChanged({ source: 'shop-purchase', boosterId: booster.id });
+    notifyShellEconomyChanged({ source: 'shop-purchase', boosterId: booster.id, cards: awardedCards });
     await load();
   }catch(error){
     say(error?.message||'This booster could not be opened.',true);
