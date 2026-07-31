@@ -1199,13 +1199,26 @@ function notifyShellChrome({ hideLiveFeed = false } = {}) {
 }
 
 let cardOverlayModal = null;
+function bindFullViewBackdropClose(overlay) {
+  if (!overlay || overlay.dataset.fullViewBackdropBound === 'true') return;
+  overlay.dataset.fullViewBackdropBound = 'true';
+  overlay.addEventListener('click', (event) => {
+    if (!overlay.classList.contains('open')) return;
+    const dialog = overlay.querySelector('.analyzer-modal') || overlay.querySelector('.full-card-stage');
+    if (!dialog) return;
+    const clickedBackdrop = event.target === overlay
+      || (overlay.contains(event.target) && !dialog.contains(event.target));
+    if (clickedBackdrop) closeFullView();
+  });
+}
 function fullViewModal() {
   const overlay = $('#cardOverlay');
   if (!overlay || !window.StarlightUI) return null;
   if (!cardOverlayModal) {
     cardOverlayModal = window.StarlightUI.adoptModal(overlay, {
-      dialog: element => element.querySelector('.full-card-stage'),
+      dialog: element => element.querySelector('.analyzer-modal') || element.querySelector('.full-card-stage'),
       labelledBy: 'fullViewCardTitle',
+      closeOnBackdrop: true,
       onOpen: () => {
         overlay.classList.add('open');
         document.body.classList.add('modal-open');
@@ -1248,6 +1261,7 @@ function openFullView(listMode = 'all') {
   const modal = fullViewModal();
   if (modal) modal.open({ initialFocus: '.overlay-close' });
   else {
+    bindFullViewBackdropClose($('#cardOverlay'));
     $('#cardOverlay')?.classList.add('open');
     document.body.classList.add('modal-open');
     notifyShellChrome({ hideLiveFeed: true });

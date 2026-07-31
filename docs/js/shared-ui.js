@@ -464,7 +464,15 @@ function adoptModal(element, options = {}) {
   };
 
   function onClick(event) {
-    if (event.target === element && options.closeOnBackdrop !== false) controller.close(undefined, 'backdrop');
+    if (options.closeOnBackdrop !== false) {
+      const dialog = controller.dialog;
+      const clickedBackdrop = event.target === element
+        || (dialog && element.contains(event.target) && !dialog.contains(event.target));
+      if (clickedBackdrop) {
+        controller.close(undefined, 'backdrop');
+        return;
+      }
+    }
     const closeButton = event.target.closest?.('[data-st-modal-close]');
     if (closeButton && element.contains(closeButton)) controller.close(closeButton.dataset.stModalValue, 'button');
   }
