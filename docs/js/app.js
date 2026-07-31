@@ -1977,7 +1977,6 @@ function renderV61Card(card, i) {
         ? fillWebsiteTokens((websiteBinderLanding || websiteSection('binderLanding')).ownedLabel || 'Owned ×{qty}', { qty })
         : ((websiteBinderLanding || websiteSection('binderLanding')).notCollectedLabel || 'Not Collected'))}</span>
       ${binderRarityBadgeHtml(card)}
-      ${got ? prestigeBadgeHtml(card.id) : ''}
     </span>
   </article>`;
 }
