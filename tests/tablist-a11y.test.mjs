@@ -31,6 +31,6 @@ test('collection and trade pages import shared tablist keyboard helpers', async 
   assert.match(offers, /bindTablistKeyboard/);
   assert.match(offers, /syncTabSelection/);
   assert.match(collectionHtml, /collection-redesign\.js\?v=1\.3\.0/);
-  assert.match(listsHtml, /trade-hub-page\.js\?v=1\.0\.0/);
+  assert.match(listsHtml, /trade-hub-page\.js\?v=1\.1\.0/);
   assert.match(offersHtml, /trade-offers-page\.js\?v=1\.4\.1/);
 });

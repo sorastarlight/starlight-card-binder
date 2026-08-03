@@ -813,16 +813,18 @@ export const WEBSITE_PAGE_META = Object.freeze({
         label: 'Hub tabs',
         fields: [
           { key: 'hubTabCollectors', preview: 'chip' },
-          { key: 'hubTabMyLists', preview: 'chip' }
-        ]
-      },
-      {
-        id: 'tabs',
-        label: 'My list tabs',
-        fields: [
           { key: 'tabWishlist', preview: 'chip' },
           { key: 'tabTrade', preview: 'chip' },
           { key: 'tabAll', preview: 'chip' }
+        ]
+      },
+      {
+        id: 'list-leads',
+        label: 'List panel intros',
+        fields: [
+          { key: 'listsLeadWishlist', multiline: true, preview: 'lead' },
+          { key: 'listsLeadTrade', multiline: true, preview: 'lead' },
+          { key: 'listsLeadAll', multiline: true, preview: 'lead' }
         ]
       },
       {

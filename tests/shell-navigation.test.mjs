@@ -101,6 +101,30 @@ test('sanitizeShellNavigation rewrites Journal profile labels to Profile', () =>
   assert.equal(renamed.accountMenu.signedIn[0].label, 'Profile');
 });
 
+test('sanitizeShellNavigation merges duplicate trading hub sidebar links', () => {
+  const merged = sanitizeShellNavigation({
+    ...cloneDefaultShellNavigation(),
+    sidebar: {
+      sections: [{
+        id: 'my-stuff',
+        label: 'My Stuff',
+        icon: { type: 'emoji', value: '♡' },
+        staffOnly: false,
+        items: [
+          { id: 'wishlist', label: 'My Wishlist', destination: 'trades', enabled: true, features: [] },
+          { id: 'rankings', label: 'Trade With Others', destination: 'rankings', enabled: true, features: [] },
+          { id: 'offers', label: 'Trade Offers', destination: 'offers', enabled: true, features: [] }
+        ]
+      }]
+    }
+  });
+
+  const tradingItems = merged.sidebar.sections[0].items.filter(item => item.destination === 'trades');
+  assert.equal(tradingItems.length, 1);
+  assert.equal(tradingItems[0].label, 'Trade With Others');
+  assert.ok(merged.sidebar.sections[0].items.some(item => item.destination === 'offers'));
+});
+
 test('sanitizeShellNavigation rejects unknown destinations and merges empty remote', () => {
   const merged = mergeShellNavigation({});
   assert.equal(merged.brandRibbon, 'Card Binder');

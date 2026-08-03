@@ -71,6 +71,42 @@ function sanitizeAccountMenuItems(items, fallback) {
   return source.map(sanitizeItem).slice(0, 16);
 }
 
+function consolidateTradingNavItems(items = []) {
+  const result = [];
+  let tradingHubSeen = false;
+
+  for (const item of items) {
+    if (!item || typeof item !== 'object') continue;
+    const features = Array.isArray(item.features) ? item.features : [];
+    if (features.includes('sectionLabel') || features.includes('separator')) {
+      result.push(item);
+      continue;
+    }
+
+    let destination = String(item.destination || '').trim();
+    if (destination === 'rankings') destination = 'trades';
+
+    const label = String(item.label || '').trim();
+    const isTradingEntry = destination === 'trades'
+      || /wishlist|trade with others|card exchange|trading hub|user rankings/i.test(label);
+
+    if (!isTradingEntry) {
+      result.push(item);
+      continue;
+    }
+
+    if (tradingHubSeen) continue;
+    tradingHubSeen = true;
+    result.push({
+      ...item,
+      destination: 'trades',
+      label: DEFAULT_DESTINATION_LABELS.trades || 'Trade With Others'
+    });
+  }
+
+  return result;
+}
+
 function sanitizeSection(section = {}, index = 0) {
   const items = Array.isArray(section.items) ? section.items.map(sanitizeItem).slice(0, 24) : [];
   return {
@@ -78,7 +114,7 @@ function sanitizeSection(section = {}, index = 0) {
     label: String(section.label || 'Section').trim().slice(0, 80) || 'Section',
     icon: asIcon(section.icon),
     staffOnly: Boolean(section.staffOnly),
-    items
+    items: consolidateTradingNavItems(items)
   };
 }
 

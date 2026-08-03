@@ -35,6 +35,7 @@ export function initTradeLists(container = document) {
   let tab = 'wishlist';
   let query = '';
   let started = false;
+  let activeTab = 'wishlist';
 
   function filtered() {
     return data.filter(card => {
@@ -86,6 +87,7 @@ export function initTradeLists(container = document) {
 
   function setActiveTab(nextTab) {
     tab = nextTab;
+    activeTab = nextTab;
     tabs.forEach((button) => {
       const active = button.dataset.tab === tab;
       const name = button.dataset.tab;
@@ -157,7 +159,7 @@ export function initTradeLists(container = document) {
     button.addEventListener('click', () => setActiveTab(button.dataset.tab));
   });
 
-  if (tablist) {
+  if (tablist && tabs.length) {
     tablist.setAttribute('role', 'tablist');
     bindTablistKeyboard(tablist, tabs, {
       onActivate: (button) => setActiveTab(button.dataset.tab)
@@ -197,6 +199,8 @@ export function initTradeLists(container = document) {
 
   return {
     refresh: loadLists,
+    setTab: setActiveTab,
+    getTab: () => activeTab,
     destroy() {
       window.removeEventListener('starlight-website-content-hydrated', onContentHydrated);
     }
