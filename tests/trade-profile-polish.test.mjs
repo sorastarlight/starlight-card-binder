@@ -50,7 +50,10 @@ test('my trade cards module renders listed and album sections', async () => {
   const myTradePage = await read('docs/js/pages/my-trade-cards.js');
   assert.match(myTradePage, /listedForTradeGrid/);
   assert.match(myTradePage, /tradeAlbumGrid/);
-  assert.match(myTradePage, /showWishlist: true/);
+  assert.match(myTradePage, /trade-qty-stepper/);
+  assert.match(myTradePage, /clampTradeQty/);
+  assert.match(myTradePage, /listedCardHtml/);
+  assert.doesNotMatch(myTradePage, /showWishlist: true/);
 });
 
 test('trade recipient typeahead searches username display name and exact email', async () => {

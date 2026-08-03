@@ -173,7 +173,7 @@ function navigate(route,{push=true,extra={}}={}){
     route = 'trades';
     const tab = String(extra?.tab || '').toLowerCase();
     extra = {
-      section: extra?.section || (extra?.username ? 'propose' : 'progress'),
+      section: extra?.section || (extra?.username ? 'collectors' : 'progress'),
       ...(tab === 'incoming' || tab === 'outgoing' ? { sub: tab } : {}),
       ...(extra || {})
     };

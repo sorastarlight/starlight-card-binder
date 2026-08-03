@@ -22,7 +22,7 @@ function normalizeCard(card = {}) {
 function profileHref(name) {
   const handle = String(name || '').trim().replace(/^@/, '');
   if (!handle) return '';
-  return shellHref('trades', { section: 'propose', username: handle });
+  return shellHref('trades', { section: 'collectors', username: handle });
 }
 
 function collectorLink(displayName, handle) {

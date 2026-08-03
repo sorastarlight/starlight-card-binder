@@ -19,28 +19,42 @@ function normalizeCard(card = {}) {
   };
 }
 
-function cardTileHtml(card, { showWishlist = false } = {}) {
-  const number = card.collectorNumber || card.cardNumber;
-  const tradeOptions = Array.from(
-    { length: card.duplicateQuantity + 1 },
-    (_, index) => `<option value="${index}"${index === card.tradeQuantity ? ' selected' : ''}>${index === 0 ? 'None' : `×${index}`}</option>`
-  ).join('');
+function clampTradeQty(card, value) {
+  const max = Number(card.duplicateQuantity) || 0;
+  return Math.max(0, Math.min(max, Math.floor(Number(value) || 0)));
+}
 
-  return `<article class="trade-card${card.tradeQuantity > 0 ? ' is-listed' : ''}">
+function listedCardHtml(card) {
+  const number = card.collectorNumber || card.cardNumber;
+  return `<article class="trade-card is-listed">
     <div class="trade-card-art">
       <img src="${esc(card.thumbnailUrl || card.imageUrl)}" alt="${esc(card.name)} card artwork" loading="lazy">
-      ${card.tradeQuantity > 0 ? `<span class="trade-card-badge">For trade ×${card.tradeQuantity}</span>` : ''}
     </div>
     <h3>#${esc(number)} ${esc(card.name)}</h3>
     <p class="trade-card-meta">${esc(card.rarity)} • ${esc(card.seriesName)}</p>
-    <p class="trade-card-owned">Owned ${card.ownedQuantity} • Extras ${card.duplicateQuantity}</p>
-    <div class="trade-actions">
-      ${showWishlist ? `<label class="trade-wish-label"><input type="checkbox" data-wish="${esc(card.id)}" ${card.wishlisted ? 'checked' : ''}> Want list</label>` : ''}
-      <label class="trade-qty-label">
-        <span>For trade</span>
-        <select data-trade="${esc(card.id)}" aria-label="Trade quantity for ${esc(card.name)}"${card.duplicateQuantity < 1 ? ' disabled' : ''}>${tradeOptions}</select>
-      </label>
+    <p class="trade-card-listed-qty">Listed ×${card.tradeQuantity}</p>
+  </article>`;
+}
+
+function albumCardHtml(card) {
+  const number = card.collectorNumber || card.cardNumber;
+  const max = Number(card.duplicateQuantity) || 0;
+  const qty = Number(card.tradeQuantity) || 0;
+  const disabled = max < 1;
+
+  return `<article class="trade-card${qty > 0 ? ' is-listed' : ''}" data-card-id="${esc(card.id)}">
+    <div class="trade-card-art">
+      <img src="${esc(card.thumbnailUrl || card.imageUrl)}" alt="${esc(card.name)} card artwork" loading="lazy">
     </div>
+    <h3>#${esc(number)} ${esc(card.name)}</h3>
+    <p class="trade-card-meta">${esc(card.rarity)} • ${esc(card.seriesName)}</p>
+    <p class="trade-card-owned">Owned ${card.ownedQuantity} • Extras ${max}</p>
+    <div class="trade-qty-stepper"${disabled ? ' data-disabled' : ''}>
+      <button type="button" class="trade-qty-btn" data-trade-step="down" aria-label="Offer one fewer ${esc(card.name)}"${disabled || qty <= 0 ? ' disabled' : ''}>−</button>
+      <input type="number" class="trade-qty-input" data-trade-input="${esc(card.id)}" min="0" max="${max}" step="1" value="${qty}" inputmode="numeric" aria-label="Copies of ${esc(card.name)} for trade"${disabled ? ' disabled' : ''}>
+      <button type="button" class="trade-qty-btn" data-trade-step="up" aria-label="Offer one more ${esc(card.name)}"${disabled || qty >= max ? ' disabled' : ''}>+</button>
+    </div>
+    <p class="trade-qty-hint">${disabled ? 'No extras to trade' : `Up to ${max} duplicate${max === 1 ? '' : 's'}`}</p>
   </article>`;
 }
 
@@ -77,7 +91,7 @@ export function initMyTradeCards(container) {
       );
       return;
     }
-    listedGrid.innerHTML = listed.map(card => cardTileHtml(card)).join('');
+    listedGrid.innerHTML = listed.map(card => listedCardHtml(card)).join('');
   }
 
   function renderAlbum(list) {
@@ -92,7 +106,7 @@ export function initMyTradeCards(container) {
       );
       return;
     }
-    albumGrid.innerHTML = album.map(card => cardTileHtml(card, { showWishlist: true })).join('');
+    albumGrid.innerHTML = album.map(card => albumCardHtml(card)).join('');
   }
 
   function render() {
@@ -101,9 +115,10 @@ export function initMyTradeCards(container) {
     renderAlbum(list);
   }
 
-  async function save(id) {
+  async function save(id, nextQty) {
     const card = data.find(entry => entry.id === id);
     if (!card || !status) return;
+    card.tradeQuantity = clampTradeQty(card, nextQty);
     status.textContent = 'Saving…';
     try {
       const result = await setCardTradePreference(id, card.wishlisted, card.tradeQuantity);
@@ -112,7 +127,20 @@ export function initMyTradeCards(container) {
       render();
     } catch (error) {
       status.textContent = error.message || 'Could not save.';
+      render();
     }
+  }
+
+  function applyStep(cardId, delta) {
+    const card = data.find(entry => entry.id === cardId);
+    if (!card) return;
+    save(cardId, clampTradeQty(card, card.tradeQuantity + delta));
+  }
+
+  function applyInput(cardId, rawValue) {
+    const card = data.find(entry => entry.id === cardId);
+    if (!card) return;
+    save(cardId, clampTradeQty(card, rawValue));
   }
 
   async function loadLists() {
@@ -133,20 +161,26 @@ export function initMyTradeCards(container) {
     }
   }
 
-  container.addEventListener('change', event => {
-    if (event.target.matches('[data-wish]')) {
-      const card = data.find(entry => entry.id === event.target.dataset.wish);
-      if (!card) return;
-      card.wishlisted = event.target.checked;
-      save(card.id);
-    }
-    if (event.target.matches('[data-trade]')) {
-      const card = data.find(entry => entry.id === event.target.dataset.trade);
-      if (!card) return;
-      card.tradeQuantity = Number(event.target.value);
-      save(card.id);
-    }
+  container.addEventListener('click', event => {
+    const stepButton = event.target.closest('[data-trade-step]');
+    if (!stepButton || stepButton.disabled) return;
+    const article = stepButton.closest('[data-card-id]');
+    const cardId = article?.dataset.cardId;
+    if (!cardId) return;
+    applyStep(cardId, stepButton.dataset.tradeStep === 'up' ? 1 : -1);
   });
+
+  container.addEventListener('change', event => {
+    const input = event.target.closest('[data-trade-input]');
+    if (!input) return;
+    applyInput(input.dataset.tradeInput, input.value);
+  });
+
+  container.addEventListener('blur', event => {
+    const input = event.target.closest('[data-trade-input]');
+    if (!input) return;
+    applyInput(input.dataset.tradeInput, input.value);
+  }, true);
 
   search?.addEventListener('input', () => {
     query = search.value.trim().toLowerCase();

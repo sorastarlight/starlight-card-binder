@@ -399,7 +399,7 @@ test('website editor admin page and public hooks are wired', async () => {
   assert.match(trades, /data-content="trades\.title"/);
   assert.match(trades, /data-content="trades\.hubTabCollectors"/);
   assert.match(trades, /data-hub-view="my-trade"/);
-  assert.match(trades, /trade-hub-page\.js\?v=1\.2\.1/);
+  assert.match(trades, /trade-hub-page\.js\?v=1\.3\.0/);
   assert.match(trades, /data-content="offers\.composeEmpty"/);
   assert.match(notifications, /data-content="notifications\.preferencesTitle"/);
   assert.match(notifications, /data-content="notifications\.markAllReadCta"/);
@@ -415,7 +415,7 @@ test('website editor admin page and public hooks are wired', async () => {
   assert.doesNotMatch(collector, /collector-twitch-handle/);
   assert.match(collector, /collector-role|collector-flair/);
   assert.match(collector, /collection-level-card|collector-level/);
-  assert.match(rankingsPage, /section: 'propose'/);
+  assert.match(rankingsPage, /section: 'collectors'/);
   assert.match(myTradePage, /initMyTradeCards/);
   assert.match(myTradePage, /listedEmptyTitle/);
   assert.match(tradeOffersHub, /getCachedWebsiteContent/);

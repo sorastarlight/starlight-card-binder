@@ -331,6 +331,250 @@
   font: inherit;
 }
 
+.trade-card-listed-qty {
+  margin: 6px 0 0;
+  color: #405fa1;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.trade-qty-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.trade-qty-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid rgba(107, 198, 248, 0.55);
+  background: #fff;
+  color: #405fa1;
+  font-size: 1.25rem;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.trade-qty-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.trade-qty-input {
+  width: 3.5rem;
+  padding: 8px 6px;
+  border-radius: 10px;
+  border: 1px solid rgba(107, 198, 248, 0.45);
+  text-align: center;
+  font: inherit;
+  font-weight: 800;
+  color: #405fa1;
+}
+
+.trade-qty-input::-webkit-outer-spin-button,
+.trade-qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.trade-qty-input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.trade-qty-hint {
+  margin: 6px 0 0;
+  color: #6b7089;
+  font-size: 0.78rem;
+}
+
+.trade-hub-panel-collectors.is-proposing > :not(.trade-propose-sheet) {
+  display: none !important;
+}
+
+.trade-propose-sheet[hidden] {
+  display: none !important;
+}
+
+.trade-propose-sheet:not([hidden]) {
+  display: block;
+}
+
+.trade-propose-back {
+  margin-bottom: 10px;
+}
+
+.trade-propose-sheet .composer .empty {
+  max-width: 560px;
+  margin-inline: auto;
+}
+
+.trade-propose-sheet .collector-head {
+  justify-content: center;
+  text-align: center;
+}
+
+.trade-propose-sheet .collector-head > div {
+  text-align: center;
+}
+
+.trade-hub-panel-open-trades {
+  max-width: 980px;
+  margin-inline: auto;
+}
+
+.open-trades-toolbar {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.open-trades-search {
+  display: grid;
+  gap: 6px;
+  font-weight: 800;
+  color: #405fa1;
+}
+
+.open-trades-search input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(107, 198, 248, 0.45);
+  font: inherit;
+}
+
+.open-trades-meta {
+  margin: 0;
+  color: #6b7089;
+  font-size: 0.9rem;
+}
+
+.open-trades-list {
+  display: grid;
+  gap: 18px;
+}
+
+.open-trades-collector {
+  background: #fff;
+  border: 1px solid rgba(255, 130, 200, 0.28);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 8px 20px rgba(61, 83, 132, 0.08);
+}
+
+.open-trades-collector-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.open-trades-collector-copy {
+  flex: 1;
+  min-width: 180px;
+  display: grid;
+  gap: 2px;
+}
+
+.open-trades-collector-copy a {
+  color: #405fa1;
+  text-decoration: none;
+}
+
+.open-trades-collector-copy span {
+  color: #6b7089;
+  font-size: 0.9rem;
+}
+
+.open-trades-count {
+  font-weight: 800;
+  color: #405fa1;
+}
+
+.open-trades-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #6bc6f8, #ff82c8);
+  color: #fff;
+  font-weight: 900;
+  overflow: hidden;
+}
+
+.open-trades-avatar.has-photo {
+  background-size: cover;
+  background-position: center;
+}
+
+.open-trades-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.open-trades-card {
+  background: rgba(107, 198, 248, 0.08);
+  border-radius: 14px;
+  padding: 10px;
+  display: grid;
+  gap: 8px;
+}
+
+.open-trades-card img {
+  width: 100%;
+  aspect-ratio: 5 / 7;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.open-trades-card-copy {
+  display: grid;
+  gap: 4px;
+  font-size: 0.82rem;
+}
+
+.open-trades-card-copy strong {
+  color: #405fa1;
+  line-height: 1.25;
+}
+
+.open-trades-card-copy span {
+  color: #6b7089;
+}
+
+.open-trades-qty {
+  font-weight: 800;
+  color: #405fa1;
+}
+
+.open-trades-match {
+  color: #167048;
+  font-weight: 800;
+}
+
+.open-trades-card-fallback,
+.open-trades-loading,
+.open-trades-empty {
+  text-align: center;
+  padding: 28px 16px;
+  color: #6b7089;
+}
+
+.open-trades-pager {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
 .trade-empty {
   text-align: center;
   padding: 42px 20px;
@@ -363,20 +607,6 @@
 }
 
 /* Propose / progress panels — center composer blocks inside hub */
-.trade-hub-panel-propose .composer .empty {
-  max-width: 560px;
-  margin-inline: auto;
-}
-
-.trade-hub-panel-propose .collector-head {
-  justify-content: center;
-  text-align: center;
-}
-
-.trade-hub-panel-propose .collector-head > div {
-  text-align: center;
-}
-
 .trade-hub-panel-progress .offer-list {
   max-width: 920px;
   margin-inline: auto;
