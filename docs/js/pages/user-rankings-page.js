@@ -24,6 +24,7 @@ function profileHref(username) {
   return shellHref('collector', { username });
 }
 
+function avatarMarkup(entry) {
   const initial = (entry.displayName || entry.username || '?').trim().charAt(0).toUpperCase() || '✦';
   const frameClass = avatarFrameClassName(entry.frame || null);
   const frameSuffix = frameClass ? ` ${frameClass}` : '';
