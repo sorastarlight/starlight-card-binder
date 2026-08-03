@@ -1,7 +1,7 @@
 import { redirectToLogin } from '../shell-route-utils.js';
 import { supabase } from '../supabase-client.js';
 import { redeemRewardCode } from '../redemption-service.js';
-import { revealRewardSequence } from '../reward-reveal.js?v=1.5.15';
+import { revealRewardSequence } from '../reward-reveal.js?v=1.5.16';
 import { maybeCelebrateSeriesCompletions } from '../series-complete-celebration.js?v=1.0.0';
 import { notifyShellEconomyChanged } from '../shell-economy.js';
 import { applyAwardedCardsToLocalStore } from '../collection-local-store.js';

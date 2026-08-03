@@ -2,7 +2,7 @@ import { supabase } from "../supabase-client.js";
 import { getDailyBoosterStatus, openDailyBooster } from "../daily-booster-service.js";
 import { applyAwardedCardsToLocalStore } from "../collection-local-store.js";
 import { notifyShellEconomyChanged } from "../shell-economy.js";
-import { revealRewardSequence } from "../reward-reveal.js?v=1.5.15";
+import { revealRewardSequence } from "../reward-reveal.js?v=1.5.16";
 import { getPublicBoosterConfig } from "../booster-config-service.js";
 import { getCachedWebsiteContent } from "../website-content-hydrate.js";
 import { maybeCelebrateSeriesCompletions } from "../series-complete-celebration.js?v=1.0.0";

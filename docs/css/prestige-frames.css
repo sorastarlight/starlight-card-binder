@@ -170,7 +170,7 @@
 .preview-card.prestige-frame .face.front > img:not(.prestige-frame-overlay),
 .v62-preview-card.prestige-frame .face.front > img:not(.prestige-frame-overlay),
 .st-r3-result-art.prestige-frame > img:not(.prestige-frame-overlay),
-.st-r3-card-front > img:not(.prestige-frame-overlay),
+.st-r3-card-actor.prestige-frame .st-r3-card-front > img:not(.prestige-frame-overlay),
 .st-evo-result-art.prestige-frame > img:not(.prestige-frame-overlay),
 .st-evo-detail-art .collection-image > img:not(.prestige-frame-overlay),
 .st-evo-owned-card .collection-image > img:not(.prestige-frame-overlay) {

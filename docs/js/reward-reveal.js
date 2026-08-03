@@ -276,7 +276,7 @@ function acquireRevealViewportLock(doc) {
   };
 }
 
-export const REVEAL_PRESENTATION_VERSION = '1.5.15';
+export const REVEAL_PRESENTATION_VERSION = '1.5.16';
 
 const REVEAL_STYLESHEET_ID = `starlight-reveal-v${REVEAL_PRESENTATION_VERSION.replace(/\./g, '')}`;
 const REVEAL_STYLESHEET_URL = new URL(
@@ -285,7 +285,7 @@ const REVEAL_STYLESHEET_URL = new URL(
 ).href;
 const PRESTIGE_STYLESHEET_ID = 'starlight-prestige-frames';
 const PRESTIGE_STYLESHEET_URL = new URL(
-  '../css/prestige-frames.css?v=3.7',
+  '../css/prestige-frames.css?v=3.8',
   import.meta.url
 ).href;
 const stylesheetLoads = new WeakMap();
