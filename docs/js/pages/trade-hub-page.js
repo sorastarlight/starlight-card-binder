@@ -1,17 +1,29 @@
-import { bindTablistKeyboard } from '../tablist-a11y.js';
+import { bindTablistKeyboard, syncTabSelection } from '../tablist-a11y.js';
 import { initMyTradeCards } from './my-trade-cards.js';
 import { initUserRankings } from './user-rankings-page.js';
 import { initProposeTrade, initTradesInProgress } from './trade-offers-hub.js';
 import { getCachedWebsiteContent } from '../website-content-hydrate.js';
 
 const HUB_VIEWS = new Set(['collectors', 'my-trade', 'propose', 'progress']);
-const hubTabs = [...document.querySelectorAll('[data-hub-view]')];
+const hubTabs = [...document.querySelectorAll('.trade-hub-tabs [data-hub-view]')];
 const hubTablist = document.querySelector('.trade-hub-tabs');
 const panels = Object.fromEntries(
   [...document.querySelectorAll('[data-hub-panel]')].map(panel => [panel.dataset.hubPanel, panel])
 );
+const hubPanelList = ['collectors', 'my-trade', 'propose', 'progress']
+  .map(name => panels[name])
+  .filter(Boolean);
+const hubMain = document.querySelector('.trade-hub-page');
+
 const progressBadge = document.querySelector('[data-hub-progress-badge]');
 
+function resetHubScroll() {
+  window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+  hubMain?.scrollIntoView({ block: 'start', behavior: 'auto' });
+  window.__starlightEmbedReportHeight?.();
+}
 let rankingsReady = false;
 let myTradeReady = false;
 let proposeReady = false;
@@ -113,18 +125,12 @@ function ensureProgress(initialSub) {
   progressReady = true;
 }
 
-function setHubView(view, { updateUrl = true, username, progressSub } = {}) {
+function setHubView(view, { updateUrl = true, username, progressSub, scroll = true } = {}) {
   const nextView = normalizeView(view);
 
-  hubTabs.forEach((button) => {
-    const active = button.dataset.hubView === nextView;
-    button.classList.toggle('active', active);
-    button.setAttribute('aria-selected', String(active));
-    button.setAttribute('tabindex', active ? '0' : '-1');
-  });
-
-  Object.entries(panels).forEach(([name, panel]) => {
-    panel?.toggleAttribute('hidden', name !== nextView);
+  syncTabSelection(hubTabs, hubPanelList, nextView, {
+    nameFromTab: (button) => button.dataset.hubView,
+    nameFromPanel: (panel) => panel.dataset.hubPanel
   });
 
   if (nextView === 'collectors') ensureRankings();
@@ -139,6 +145,8 @@ function setHubView(view, { updateUrl = true, username, progressSub } = {}) {
     ensureProgress(progressSub);
     if (progressSub && progressController?.setProgressSub) {
       progressController.setProgressSub(progressSub);
+    } else {
+      progressController?.refresh?.();
     }
   }
 
@@ -148,6 +156,8 @@ function setHubView(view, { updateUrl = true, username, progressSub } = {}) {
       sub: nextView === 'progress' ? (progressSub || readInitialProgressSub()) : undefined
     });
   }
+
+  if (scroll) resetHubScroll();
 }
 
 hubTabs.forEach((button) => {
