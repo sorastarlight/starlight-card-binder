@@ -1,4 +1,5 @@
 import { getPullFeed } from './social-service.js';
+import { shellHref } from './shell-route-utils.js';
 import { supabase } from './supabase-client.js';
 
 const POLL_MS = 8000;
@@ -54,15 +55,32 @@ function tickerLabel(item) {
   return `${actorDisplayName(item)} opened a pack`;
 }
 
-function tickerAvatarMarkup(item) {
+function feedAvatarMarkup(item, { variant = 'ticker' } = {}) {
   const actor = item?.actor || {};
   const name = actorDisplayName(item);
   const avatarUrl = String(actor.avatarUrl || actor.avatar_url || '').trim();
+  const username = String(actor.username || '').trim();
+  const initial = name.charAt(0).toUpperCase() || '✦';
+
+  if (variant === 'list') {
+    const profileHref = username ? shellHref('collector', { username }) : '';
+    const inner = avatarUrl
+      ? `<img class="shell-live-feed-avatar-image" src="${esc(avatarUrl)}" alt="" width="34" height="34" decoding="async">`
+      : `<span class="shell-live-feed-avatar-placeholder" aria-hidden="true">${esc(initial)}</span>`;
+    if (profileHref) {
+      return `<a class="shell-live-feed-avatar" href="${esc(profileHref)}" data-shell-view="collector" aria-label="${esc(name)}">${inner}</a>`;
+    }
+    return `<span class="shell-live-feed-avatar" aria-hidden="true">${inner}</span>`;
+  }
+
   if (avatarUrl) {
     return `<img class="shell-live-feed-ticker-avatar" src="${esc(avatarUrl)}" alt="" width="22" height="22" decoding="async">`;
   }
-  const initial = name.charAt(0).toUpperCase() || '✦';
   return `<span class="shell-live-feed-ticker-avatar is-placeholder" aria-hidden="true">${esc(initial)}</span>`;
+}
+
+function tickerAvatarMarkup(item) {
+  return feedAvatarMarkup(item, { variant: 'ticker' });
 }
 
 function setFeedStatus(statusEl, value) {
@@ -181,13 +199,14 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
         ? `<span class="shell-live-feed-badge" aria-hidden="true">🏆</span>`
         : (thumb
           ? `<img class="shell-live-feed-thumb" src="${esc(thumb)}" alt="">`
-          : `<span class="shell-live-feed-dot" aria-hidden="true"></span>`);
+          : '');
       return `<article class="shell-live-feed-item${isNew ? ' is-new' : ''}${isSeriesComplete ? ' is-series-complete' : ''}" style="--i:${index}">
-        ${media}
+        ${feedAvatarMarkup(item, { variant: 'list' })}
         <div class="shell-live-feed-copy">
           <strong>${esc(item.summary || '')}</strong>
           <span>${esc(relativeTime(item.createdAt))}${actor.username ? ` · @${esc(actor.username)}` : ''}</span>
         </div>
+        ${media}
       </article>`;
     }).join('');
 

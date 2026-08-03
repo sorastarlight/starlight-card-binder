@@ -591,7 +591,7 @@ body.unified-shell{padding-left:env(safe-area-inset-left);padding-right:env(safe
 }
 .shell-live-feed-item{
   display:grid;
-  grid-template-columns:auto 1fr;
+  grid-template-columns:34px 1fr auto;
   gap:10px;
   align-items:center;
   padding:8px 10px;
@@ -600,6 +600,29 @@ body.unified-shell{padding-left:env(safe-area-inset-left);padding-right:env(safe
   border:1px solid rgba(107,198,248,.18);
   animation:shellLiveItemIn .35s ease both;
   animation-delay:calc(var(--i, 0) * 28ms);
+}
+.shell-live-feed-avatar{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  flex-shrink:0;
+  background:linear-gradient(135deg,#d7e7f7,#ffe8f4);
+  color:#7a8aaa;
+  font-weight:950;
+  font-size:.82rem;
+  text-decoration:none;
+}
+.shell-live-feed-avatar-image{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.shell-live-feed-avatar-placeholder{
+  line-height:1;
 }
 .shell-live-feed-item.is-new{
   animation:shellLiveFeedPop .65s ease;
