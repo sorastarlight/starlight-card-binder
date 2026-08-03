@@ -15,8 +15,8 @@ export const PUBLIC_SHELL_DESTINATIONS = Object.freeze([
   { value: 'checklist', label: 'Star Registry' },
   { value: 'quests', label: 'Starlight Missions' },
   { value: 'season-pass', label: 'Seasonal Collection Pass' },
-  { value: 'trades', label: 'Trading Hub' },
-  { value: 'offers', label: 'Trading Hub' },
+  { value: 'trades', label: 'Trade With Others' },
+  { value: 'offers', label: 'Trade With Others' },
   { value: 'feed', label: 'LIVE Feed' },
   { value: 'notifications', label: 'Notifications' },
   { value: 'rewards', label: 'Received Gifts' },
@@ -64,7 +64,8 @@ export const SHELL_LABEL_REWRITES = Object.freeze({
     'Card Exchange',
     'Wishlist & Trades',
     'Trading',
-    'User Rankings'
+    'User Rankings',
+    'Trading Hub'
   ]),
   profile: Object.freeze([
     'Profile & Settings',
@@ -94,8 +95,8 @@ export function createDefaultShellNavigation() {
       checklist: 'Star Registry',
       quests: 'Starlight Missions',
       'season-pass': 'Seasonal Collection Pass',
-      trades: 'Trading Hub',
-      offers: 'Trading Hub',
+      trades: 'Trade With Others',
+      offers: 'Trade With Others',
       feed: 'LIVE Feed',
       notifications: 'Notifications',
       rewards: 'Received Gifts',
@@ -133,7 +134,7 @@ export function createDefaultShellNavigation() {
             { id: 'quests', label: 'Starlight Missions', icon: { type: 'emoji', value: '🧭' }, destination: 'quests', enabled: true, features: [] },
             { id: 'season-pass', label: 'Seasonal Collection Pass', icon: { type: 'emoji', value: '🌌' }, destination: 'season-pass', enabled: true, features: [] },
             { id: 'trading-label', label: 'Community', icon: { type: 'emoji', value: '🤝' }, destination: '', enabled: true, features: ['sectionLabel'] },
-            { id: 'trades', label: 'Trading Hub', icon: { type: 'emoji', value: '🤝' }, destination: 'trades', enabled: true, features: ['tradeOfferBadge'] },
+            { id: 'trades', label: 'Trade With Others', icon: { type: 'emoji', value: '🤝' }, destination: 'trades', enabled: true, features: ['tradeOfferBadge'] },
             { id: 'feed', label: 'LIVE Feed', icon: { type: 'emoji', value: '📡' }, destination: 'feed', enabled: true, features: [] }
           ]
         },
@@ -168,7 +169,7 @@ export function createDefaultShellNavigation() {
         { id: 'profile-settings', label: 'Profile', destination: 'profile', enabled: true, features: [] },
         { id: 'notifications', label: 'View My Notifications', destination: 'notifications', enabled: true, features: ['notificationBadge'] },
         { id: 'rewards', label: 'Received Gifts', destination: 'rewards', enabled: true, features: ['receivedGiftBadge'] },
-        { id: 'trades', label: 'Trading Hub', destination: 'trades', enabled: true, features: ['tradeOfferBadge'] },
+        { id: 'trades', label: 'Trade With Others', destination: 'trades', enabled: true, features: ['tradeOfferBadge'] },
         { id: 'redeem', label: 'Redeem A Code', destination: 'redeem', enabled: true, features: [] },
         { id: 'sep-1', label: '', destination: '', enabled: true, features: ['separator'] },
         { id: 'sign-out', label: 'Sign Out', destination: '', enabled: true, features: ['signOut'] }

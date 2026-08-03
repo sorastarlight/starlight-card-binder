@@ -128,6 +128,8 @@ const WEBSITE_TITLE_REWRITES = Object.freeze({
   'Card Exchange': 'Trade With Others',
   'My Wishlist': 'My Wishlist',
   'User Rankings': 'Trade With Others',
+  'Trading Hub': 'Trade With Others',
+  '🤝 Trading Hub': '🤝 Trade With Others',
   'Event Achievements': 'Achievements',
   'Starlight Memories': 'Achievements',
   'My Journal': 'Profile',

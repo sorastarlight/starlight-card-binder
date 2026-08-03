@@ -99,7 +99,7 @@ function consolidateTradingNavItems(items = []) {
       tradingHubItem = {
         ...item,
         destination: 'trades',
-        label: DEFAULT_DESTINATION_LABELS.trades || 'Trading Hub',
+        label: DEFAULT_DESTINATION_LABELS.trades || 'Trade With Others',
         features: [...features]
       };
       result.push(tradingHubItem);

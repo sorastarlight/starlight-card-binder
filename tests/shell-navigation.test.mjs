@@ -18,9 +18,9 @@ test('default shell navigation includes core destinations and staff section', ()
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'shop' && entry.label === 'Card Boutique'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'checklist' && entry.label === 'Star Registry'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'quests' && entry.label === 'Starlight Missions'));
-  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'trades' && entry.label === 'Trading Hub'));
+  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'trades' && entry.label === 'Trade With Others'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'profile' && entry.label === 'Profile'));
-  assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'trades' && item.label === 'Trading Hub'));
+  assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'trades' && item.label === 'Trade With Others'));
   assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'feed' && item.label === 'LIVE Feed'));
   assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'quests' && item.label === 'Starlight Missions'));
   assert.equal(nav.pageTitles.feed, 'LIVE Feed');
@@ -66,7 +66,7 @@ test('sanitizeShellNavigation overwrites legacy product labels with new defaults
   assert.equal(renamed.pageTitles.shop, 'Card Boutique');
   assert.equal(renamed.pageTitles.checklist, 'Star Registry');
   assert.equal(renamed.pageTitles.quests, 'Starlight Missions');
-  assert.equal(renamed.pageTitles.trades, 'Trading Hub');
+  assert.equal(renamed.pageTitles.trades, 'Trade With Others');
   assert.equal(renamed.pageTitles.profile, 'Profile');
   assert.equal(renamed.pageTitles.feed, 'LIVE Feed');
   assert.equal(renamed.sidebar.sections[0].items[0].label, 'My Starlight Album');
@@ -121,7 +121,7 @@ test('sanitizeShellNavigation merges duplicate trading hub sidebar links', () =>
 
   const tradingItems = merged.sidebar.sections[0].items.filter(item => item.destination === 'trades');
   assert.equal(tradingItems.length, 1);
-  assert.equal(tradingItems[0].label, 'Trading Hub');
+  assert.equal(tradingItems[0].label, 'Trade With Others');
   assert.ok(tradingItems[0].features.includes('tradeOfferBadge'));
   assert.ok(!merged.sidebar.sections[0].items.some(item => item.destination === 'offers'));
 });

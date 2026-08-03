@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Trading Hub | Starlight Card Binder</title>
+  <title>Trade With Others | Starlight Card Binder</title>
   <link rel="stylesheet" href="css/style.css?v=1.0.2">
   <link rel="stylesheet" href="css/app-shell.css?v=1.2.1">
   <link rel="stylesheet" href="css/shared-ui.css?v=1.6.15">
-  <link rel="stylesheet" href="css/pages/trade-lists.css?v=1.5.1">
+  <link rel="stylesheet" href="css/pages/trade-lists.css?v=1.6.0">
   <link rel="stylesheet" href="css/pages/trade-offers.css?v=1.4">
   <link rel="stylesheet" href="css/pages/user-rankings.css?v=1.2.0">
   <link rel="stylesheet" href="css/avatar-frames.css?v=1.3.0">
@@ -19,12 +19,12 @@
   <div class="sky"></div>
   <main class="trade-page trade-hub-page">
     <section class="trade-head">
-      <p class="eyebrow" data-content="trades.eyebrow">Trading Hub</p>
-      <h1 data-content="trades.title">🤝 Trading Hub</h1>
-      <p data-content="trades.lead">Browse collectors, list your duplicates, propose trades, and track offers — like a TCG trade binder in one place.</p>
+      <p class="eyebrow" data-content="trades.eyebrow">Collector Exchange</p>
+      <h1 data-content="trades.title">🤝 Trade With Others</h1>
+      <p data-content="trades.lead">Find collectors, list duplicates for trade, propose exchanges, and track your offers — all in one place.</p>
     </section>
 
-    <div class="trade-hub-tabs" role="tablist" aria-label="Trading hub views">
+    <nav class="trade-hub-tabs" role="tablist" aria-label="Trade With Others views">
       <button type="button" class="active" data-hub-view="collectors" aria-selected="true" data-content="trades.hubTabCollectors">Find Collectors</button>
       <button type="button" data-hub-view="my-trade" aria-selected="false" data-content="trades.hubTabMyTrade">My Cards For Trade</button>
       <button type="button" data-hub-view="propose" aria-selected="false" data-content="trades.hubTabPropose">Propose A Trade</button>
@@ -32,7 +32,7 @@
         Trades In-Progress
         <span class="trade-hub-tab-badge" data-hub-progress-badge hidden aria-label="Pending incoming offers">0</span>
       </button>
-    </div>
+    </nav>
 
     <section class="trade-hub-panel trade-hub-panel-collectors rankings-page" data-hub-panel="collectors">
       <section class="rankings-toolbar" aria-label="Collector search">
