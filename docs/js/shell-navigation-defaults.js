@@ -15,9 +15,8 @@ export const PUBLIC_SHELL_DESTINATIONS = Object.freeze([
   { value: 'checklist', label: 'Star Registry' },
   { value: 'quests', label: 'Starlight Missions' },
   { value: 'season-pass', label: 'Seasonal Collection Pass' },
-  { value: 'trades', label: 'Card Exchange' },
+  { value: 'trades', label: 'Trade With Others' },
   { value: 'offers', label: 'Trade Offers' },
-  { value: 'rankings', label: 'User Rankings' },
   { value: 'feed', label: 'LIVE Feed' },
   { value: 'notifications', label: 'Notifications' },
   { value: 'rewards', label: 'Received Gifts' },
@@ -61,8 +60,11 @@ export const SHELL_LABEL_REWRITES = Object.freeze({
     'Collection Quests'
   ]),
   trades: Object.freeze([
+    'My Wishlist',
+    'Card Exchange',
     'Wishlist & Trades',
-    'Trading'
+    'Trading',
+    'User Rankings'
   ]),
   profile: Object.freeze([
     'Profile & Settings',
@@ -92,9 +94,8 @@ export function createDefaultShellNavigation() {
       checklist: 'Star Registry',
       quests: 'Starlight Missions',
       'season-pass': 'Seasonal Collection Pass',
-      trades: 'Card Exchange',
+      trades: 'Trade With Others',
       offers: 'Trade Offers',
-      rankings: 'User Rankings',
       feed: 'LIVE Feed',
       notifications: 'Notifications',
       rewards: 'Received Gifts',
@@ -132,9 +133,8 @@ export function createDefaultShellNavigation() {
             { id: 'quests', label: 'Starlight Missions', icon: { type: 'emoji', value: '🧭' }, destination: 'quests', enabled: true, features: [] },
             { id: 'season-pass', label: 'Seasonal Collection Pass', icon: { type: 'emoji', value: '🌌' }, destination: 'season-pass', enabled: true, features: [] },
             { id: 'trading-label', label: 'Community', icon: { type: 'emoji', value: '🤝' }, destination: '', enabled: true, features: ['sectionLabel'] },
-            { id: 'trades', label: 'Card Exchange', icon: { type: 'emoji', value: '💫' }, destination: 'trades', enabled: true, features: [] },
+            { id: 'trades', label: 'Trade With Others', icon: { type: 'emoji', value: '🤝' }, destination: 'trades', enabled: true, features: [] },
             { id: 'offers', label: 'Trade Offers', icon: { type: 'emoji', value: '🤝' }, destination: 'offers', enabled: true, features: ['tradeOfferBadge'] },
-            { id: 'rankings', label: 'User Rankings', icon: { type: 'emoji', value: '👤' }, destination: 'rankings', enabled: true, features: [] },
             { id: 'feed', label: 'LIVE Feed', icon: { type: 'emoji', value: '📡' }, destination: 'feed', enabled: true, features: [] }
           ]
         },

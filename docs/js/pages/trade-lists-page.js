@@ -5,18 +5,6 @@ import { getCachedWebsiteContent } from '../website-content-hydrate.js';
 
 let tradesCopy = getCachedWebsiteContent()?.trades || {};
 
-const grid = document.querySelector('#tradeGrid');
-const search = document.querySelector('#tradeSearch');
-const status = document.querySelector('#tradeStatus');
-const publicToggle = document.querySelector('#publicLists');
-const tabs = [...document.querySelectorAll('[data-tab]')];
-const tablist = document.querySelector('.trade-tabs');
-const panel = document.querySelector('.trade-panel');
-
-let data = [];
-let tab = 'wishlist';
-let query = '';
-
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
   '&': '&amp;',
   '<': '&lt;',
@@ -32,154 +20,185 @@ function normalizeCard(card = {}) {
   };
 }
 
-function filtered() {
-  return data.filter(card => {
-    const match = !query || buildTradeSearchHaystack(card).includes(query);
-    if (!match) return false;
-    if (tab === 'wishlist') return card.wishlisted;
-    if (tab === 'trade') return card.tradeQuantity > 0;
-    return true;
-  });
-}
+export function initTradeLists(container = document) {
+  if (!container) return null;
 
-function emptyCopy(listLength) {
-  if (query && !listLength) return 'No cards matched your search.';
-  if (tab === 'wishlist') {
-    return tradesCopy.emptyWishlist || 'Browse All Cards and add the ones you are searching for.';
+  const grid = container.querySelector('#tradeGrid');
+  const search = container.querySelector('#tradeSearch');
+  const status = container.querySelector('#tradeStatus');
+  const publicToggle = container.querySelector('#publicLists');
+  const tabs = [...container.querySelectorAll('[data-tab]')];
+  const tablist = container.querySelector('.trade-tabs');
+  const panel = container.querySelector('.trade-panel');
+
+  let data = [];
+  let tab = 'wishlist';
+  let query = '';
+  let started = false;
+
+  function filtered() {
+    return data.filter(card => {
+      const match = !query || buildTradeSearchHaystack(card).includes(query);
+      if (!match) return false;
+      if (tab === 'wishlist') return card.wishlisted;
+      if (tab === 'trade') return card.tradeQuantity > 0;
+      return true;
+    });
   }
-  if (tab === 'trade') {
-    return tradesCopy.emptyTrade || 'Only duplicate copies can be offered for trade.';
-  }
-  return 'No cards matched your search.';
-}
 
-function emptyActions() {
-  if (query) return '';
-  const actionLabel = esc(tradesCopy.emptyAction || 'Browse All Cards');
-  if (tab === 'wishlist' || tab === 'trade') {
-    return `<p><button type="button" class="trade-empty-action" data-open-tab="all">${actionLabel}</button></p>`;
-  }
-  return '';
-}
-
-function render() {
-  const list = filtered();
-  const emptyTitle = esc(tradesCopy.emptyTitle || 'Nothing here yet');
-  grid.innerHTML = list.length
-    ? list.map(card => `<article class="trade-card">
-        <img src="${esc(card.thumbnailUrl || card.imageUrl)}" alt="${esc(card.name)} card artwork">
-        <h3>#${esc(card.collectorNumber || card.cardNumber)} ${esc(card.name)}</h3>
-        <p>${esc(card.rarity)} • ${esc(card.seriesName)}</p>
-        <p>Owned: ${card.ownedQuantity} • Extras: ${card.duplicateQuantity}</p>
-        <div class="trade-actions">
-          <label><input type="checkbox" data-wish="${esc(card.id)}" ${card.wishlisted ? 'checked' : ''}> Add to Wishlist</label>
-          <label>For Trade <select data-trade="${esc(card.id)}" aria-label="Trade quantity for ${esc(card.name)}">${Array.from({ length: card.duplicateQuantity + 1 }, (_, index) => `<option value="${index}" ${index === card.tradeQuantity ? 'selected' : ''}>${index}</option>`).join('')}</select></label>
-        </div>
-      </article>`).join('')
-    : `<div class="trade-empty"><h2>${emptyTitle}</h2><p>${esc(emptyCopy(list.length))}</p>${emptyActions()}</div>`;
-}
-
-function setActiveTab(nextTab) {
-  tab = nextTab;
-  tabs.forEach((button) => {
-    const active = button.dataset.tab === tab;
-    const name = button.dataset.tab;
-    button.id = button.id || `trade-tab-${name}`;
-    button.setAttribute('role', 'tab');
-    button.setAttribute('aria-selected', String(active));
-    button.setAttribute('tabindex', active ? '0' : '-1');
-    if (panel) {
-      if (!panel.id) panel.id = 'tradePanel';
-      button.setAttribute('aria-controls', panel.id);
+  function emptyCopy(listLength) {
+    if (query && !listLength) return 'No cards matched your search.';
+    if (tab === 'wishlist') {
+      return tradesCopy.emptyWishlist || 'Browse All Cards and add the ones you are searching for.';
     }
-    button.classList.toggle('active', active);
-  });
-  if (panel) {
-    panel.setAttribute('role', 'tabpanel');
-    panel.hidden = false;
-    const activeTab = tabs.find((button) => button.dataset.tab === tab);
-    if (activeTab?.id) panel.setAttribute('aria-labelledby', activeTab.id);
+    if (tab === 'trade') {
+      return tradesCopy.emptyTrade || 'Only duplicate copies can be offered for trade.';
+    }
+    return 'No cards matched your search.';
   }
-  render();
-}
 
-async function save(id) {
-  const card = data.find(entry => entry.id === id);
-  if (!card) return;
-  status.textContent = 'Saving…';
-  try {
-    const result = await setCardTradePreference(id, card.wishlisted, card.tradeQuantity);
-    card.tradeQuantity = result.tradeQuantity;
-    status.textContent = 'Trade lists saved ✨';
+  function emptyActions() {
+    if (query) return '';
+    const actionLabel = esc(tradesCopy.emptyAction || 'Browse All Cards');
+    if (tab === 'wishlist' || tab === 'trade') {
+      return `<p><button type="button" class="trade-empty-action" data-open-tab="all">${actionLabel}</button></p>`;
+    }
+    return '';
+  }
+
+  function render() {
+    const list = filtered();
+    const emptyTitle = esc(tradesCopy.emptyTitle || 'Nothing here yet');
+    if (!grid) return;
+    grid.innerHTML = list.length
+      ? list.map(card => `<article class="trade-card">
+          <img src="${esc(card.thumbnailUrl || card.imageUrl)}" alt="${esc(card.name)} card artwork">
+          <h3>#${esc(card.collectorNumber || card.cardNumber)} ${esc(card.name)}</h3>
+          <p>${esc(card.rarity)} • ${esc(card.seriesName)}</p>
+          <p>Owned: ${card.ownedQuantity} • Extras: ${card.duplicateQuantity}</p>
+          <div class="trade-actions">
+            <label><input type="checkbox" data-wish="${esc(card.id)}" ${card.wishlisted ? 'checked' : ''}> Add to Wishlist</label>
+            <label>For Trade <select data-trade="${esc(card.id)}" aria-label="Trade quantity for ${esc(card.name)}">${Array.from({ length: card.duplicateQuantity + 1 }, (_, index) => `<option value="${index}" ${index === card.tradeQuantity ? 'selected' : ''}>${index}</option>`).join('')}</select></label>
+          </div>
+        </article>`).join('')
+      : `<div class="trade-empty"><h2>${emptyTitle}</h2><p>${esc(emptyCopy(list.length))}</p>${emptyActions()}</div>`;
+  }
+
+  function setActiveTab(nextTab) {
+    tab = nextTab;
+    tabs.forEach((button) => {
+      const active = button.dataset.tab === tab;
+      const name = button.dataset.tab;
+      button.id = button.id || `trade-tab-${name}`;
+      button.setAttribute('role', 'tab');
+      button.setAttribute('aria-selected', String(active));
+      button.setAttribute('tabindex', active ? '0' : '-1');
+      if (panel) {
+        if (!panel.id) panel.id = 'tradePanel';
+        button.setAttribute('aria-controls', panel.id);
+      }
+      button.classList.toggle('active', active);
+    });
+    if (panel) {
+      panel.setAttribute('role', 'tabpanel');
+      panel.hidden = false;
+      const activeTab = tabs.find((button) => button.dataset.tab === tab);
+      if (activeTab?.id) panel.setAttribute('aria-labelledby', activeTab.id);
+    }
     render();
-  } catch (error) {
-    status.textContent = error.message || 'Could not save.';
   }
-}
 
-document.addEventListener('change', event => {
-  if (event.target.matches('[data-wish]')) {
-    const card = data.find(entry => entry.id === event.target.dataset.wish);
-    if (!card) return;
-    card.wishlisted = event.target.checked;
-    save(card.id);
+  async function save(id) {
+    const card = data.find(entry => entry.id === id);
+    if (!card || !status) return;
+    status.textContent = 'Saving…';
+    try {
+      const result = await setCardTradePreference(id, card.wishlisted, card.tradeQuantity);
+      card.tradeQuantity = result.tradeQuantity;
+      status.textContent = 'Trade lists saved ✨';
+      render();
+    } catch (error) {
+      status.textContent = error.message || 'Could not save.';
+    }
   }
-  if (event.target.matches('[data-trade]')) {
-    const card = data.find(entry => entry.id === event.target.dataset.trade);
-    if (!card) return;
-    card.tradeQuantity = Number(event.target.value);
-    save(card.id);
+
+  async function loadLists() {
+    if (!grid || !status) return;
+    grid.innerHTML = '<div class="trade-empty"><h2>Loading trade lists…</h2><p>Gathering your wishlist and trade binder.</p></div>';
+    status.textContent = 'Loading…';
+    try {
+      const result = await getMyTradeLists();
+      data = (result.cards || []).map(normalizeCard);
+      if (publicToggle) publicToggle.checked = result.publicLists !== false;
+      setActiveTab('wishlist');
+      status.textContent = 'Wishlist and trade binder loaded.';
+    } catch (error) {
+      grid.innerHTML = `<div class="trade-empty"><h2>Could not load trade lists</h2><p>${esc(error.message || 'Please sign in.')}</p></div>`;
+      status.textContent = error.message || 'Please sign in.';
+    }
   }
-});
 
-tabs.forEach(button => {
-  button.addEventListener('click', () => setActiveTab(button.dataset.tab));
-});
-
-if (tablist) {
-  tablist.setAttribute('role', 'tablist');
-  bindTablistKeyboard(tablist, tabs, {
-    onActivate: (button) => setActiveTab(button.dataset.tab)
+  container.addEventListener('change', event => {
+    if (event.target.matches('[data-wish]')) {
+      const card = data.find(entry => entry.id === event.target.dataset.wish);
+      if (!card) return;
+      card.wishlisted = event.target.checked;
+      save(card.id);
+    }
+    if (event.target.matches('[data-trade]')) {
+      const card = data.find(entry => entry.id === event.target.dataset.trade);
+      if (!card) return;
+      card.tradeQuantity = Number(event.target.value);
+      save(card.id);
+    }
   });
+
+  tabs.forEach(button => {
+    button.addEventListener('click', () => setActiveTab(button.dataset.tab));
+  });
+
+  if (tablist) {
+    tablist.setAttribute('role', 'tablist');
+    bindTablistKeyboard(tablist, tabs, {
+      onActivate: (button) => setActiveTab(button.dataset.tab)
+    });
+  }
+
+  grid?.addEventListener('click', event => {
+    const button = event.target.closest('[data-open-tab]');
+    if (!button) return;
+    setActiveTab(button.dataset.openTab);
+  });
+
+  search?.addEventListener('input', () => {
+    query = search.value.trim().toLowerCase();
+    render();
+  });
+
+  publicToggle?.addEventListener('change', async () => {
+    const previous = !publicToggle.checked;
+    try {
+      await setTradeListVisibility(publicToggle.checked);
+      if (status) status.textContent = 'Profile visibility updated.';
+    } catch (error) {
+      publicToggle.checked = previous;
+      if (status) status.textContent = error.message || 'Could not update visibility.';
+    }
+  });
+
+  const onContentHydrated = () => {
+    tradesCopy = getCachedWebsiteContent()?.trades || tradesCopy;
+    if (started) render();
+  };
+  window.addEventListener('starlight-website-content-hydrated', onContentHydrated);
+
+  started = true;
+  void loadLists();
+
+  return {
+    refresh: loadLists,
+    destroy() {
+      window.removeEventListener('starlight-website-content-hydrated', onContentHydrated);
+    }
+  };
 }
-grid?.addEventListener('click', event => {
-  const button = event.target.closest('[data-open-tab]');
-  if (!button) return;
-  setActiveTab(button.dataset.openTab);
-});
-
-search?.addEventListener('input', () => {
-  query = search.value.trim().toLowerCase();
-  render();
-});
-
-publicToggle?.addEventListener('change', async () => {
-  const previous = !publicToggle.checked;
-  try {
-    await setTradeListVisibility(publicToggle.checked);
-    status.textContent = 'Profile visibility updated.';
-  } catch (error) {
-    publicToggle.checked = previous;
-    status.textContent = error.message || 'Could not update visibility.';
-  }
-});
-
-grid.innerHTML = '<div class="trade-empty"><h2>Loading trade lists…</h2><p>Gathering your wishlist and trade binder.</p></div>';
-status.textContent = 'Loading…';
-
-window.addEventListener('starlight-website-content-hydrated', (event) => {
-  tradesCopy = event.detail?.trades || tradesCopy;
-});
-
-void (async () => {
-  try {
-    const result = await getMyTradeLists();
-    data = (result.cards || []).map(normalizeCard);
-    if (publicToggle) publicToggle.checked = result.publicLists !== false;
-    setActiveTab('wishlist');
-    status.textContent = 'Wishlist and trade binder loaded.';
-  } catch (error) {
-    grid.innerHTML = `<div class="trade-empty"><h2>Could not load trade lists</h2><p>${esc(error.message || 'Please sign in.')}</p></div>`;
-    status.textContent = error.message || 'Please sign in.';
-  }
-})();

@@ -19,7 +19,7 @@ test('user rankings avatars apply equipped frame classes from RPC payload', asyn
 });
 
 test('user rankings page loads avatar frame styles', async () => {
-  const html = await read('docs/user-rankings.html');
+  const html = await read('docs/trade-lists.html');
   assert.match(html, /css\/avatar-frames\.css\?v=1\.3\.0/);
 });
 

@@ -31,8 +31,8 @@ const routes = {
   checklist:{title:'Star Registry',src:'checklist.html'},
   quests:{title:'Starlight Missions',src:'collection-quests.html'},
   'season-pass':{title:'Seasonal Collection Pass',src:'season-pass.html'},
-  trades:{title:'Card Exchange',src:'trade-lists.html'}, offers:{title:'Trade Offers',src:'trade-offers.html'},
-  rankings:{title:'User Rankings',src:'user-rankings.html'},
+  trades:{title:'Trade With Others',src:'trade-lists.html'}, offers:{title:'Trade Offers',src:'trade-offers.html'},
+  rankings:{title:'Trade With Others',src:'trade-lists.html'},
   feed:{title:'LIVE Feed',src:'pull-feed.html'},
   notifications:{title:'Notifications',src:'notifications.html'}, rewards:{title:'Received Gifts',src:'received-rewards.html'}, profile:{title:'Profile',src:'profile-settings.html'}, login:{title:'Sign In',src:'login'}, collector:{title:'Collector Profile',src:'collector.html'},
   report:{title:'Report Profile',src:'report-profile.html'}, about:{title:'About',src:'about.html'}, socials:{title:'Socials',src:'socials.html'},
@@ -165,6 +165,10 @@ function navigate(route,{push=true,extra={}}={}){
   }
   const previousRoute = currentRoute;
   route = resolved;
+  if (route === 'rankings') {
+    route = 'trades';
+    extra = { section: 'collectors', ...(extra || {}) };
+  }
   currentRoute=route;
   retryCount=0;
   const url=new URL(location.href);

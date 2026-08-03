@@ -12,16 +12,15 @@ test('default shell navigation includes core destinations and staff section', ()
   assert.equal(nav.sidebar.sections[0].label, 'Explore The Starlight Card Series');
   assert.ok(nav.sidebar.sections.some(section => section.staffOnly));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'offers'));
-  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'rankings'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'feed' && entry.label === 'LIVE Feed'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'collection' && entry.label === 'My Starlight Album'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'daily' && entry.label === 'Free Daily Booster'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'shop' && entry.label === 'Card Boutique'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'checklist' && entry.label === 'Star Registry'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'quests' && entry.label === 'Starlight Missions'));
-  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'trades' && entry.label === 'Card Exchange'));
+  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'trades' && entry.label === 'Trade With Others'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'profile' && entry.label === 'Profile'));
-  assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'rankings'));
+  assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'trades' && item.label === 'Trade With Others'));
   assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'feed' && item.label === 'LIVE Feed'));
   assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'quests' && item.label === 'Starlight Missions'));
   assert.equal(nav.pageTitles.feed, 'LIVE Feed');
@@ -67,7 +66,7 @@ test('sanitizeShellNavigation overwrites legacy product labels with new defaults
   assert.equal(renamed.pageTitles.shop, 'Card Boutique');
   assert.equal(renamed.pageTitles.checklist, 'Star Registry');
   assert.equal(renamed.pageTitles.quests, 'Starlight Missions');
-  assert.equal(renamed.pageTitles.trades, 'Card Exchange');
+  assert.equal(renamed.pageTitles.trades, 'Trade With Others');
   assert.equal(renamed.pageTitles.profile, 'Profile');
   assert.equal(renamed.pageTitles.feed, 'LIVE Feed');
   assert.equal(renamed.sidebar.sections[0].items[0].label, 'My Starlight Album');

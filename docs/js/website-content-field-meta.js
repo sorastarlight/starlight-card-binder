@@ -795,7 +795,7 @@ export const WEBSITE_PAGE_META = Object.freeze({
     ]
   },
   trades: {
-    description: 'Wishlist & trade list tabs and empty states.',
+    description: 'Trade hub hero, hub tabs, wishlist/trade list tabs, and empty states.',
     previewUrl: 'trade-lists.html',
     groups: [
       {
@@ -809,8 +809,16 @@ export const WEBSITE_PAGE_META = Object.freeze({
         ]
       },
       {
+        id: 'hub-tabs',
+        label: 'Hub tabs',
+        fields: [
+          { key: 'hubTabCollectors', preview: 'chip' },
+          { key: 'hubTabMyLists', preview: 'chip' }
+        ]
+      },
+      {
         id: 'tabs',
-        label: 'Tabs',
+        label: 'My list tabs',
         fields: [
           { key: 'tabWishlist', preview: 'chip' },
           { key: 'tabTrade', preview: 'chip' },

@@ -397,6 +397,9 @@ test('website editor admin page and public hooks are wired', async () => {
   assert.match(checklist, /data-content="checklist\.title"/);
   assert.match(checklist, /shared\.infoStripCopyright/);
   assert.match(trades, /data-content="trades\.title"/);
+  assert.match(trades, /data-content="trades\.hubTabMyLists"/);
+  assert.match(trades, /data-content="rankings\.searchLabel"/);
+  assert.match(trades, /trade-hub-page\.js\?v=1\.0\.0/);
   assert.match(offers, /data-content="offers\.composeEmpty"/);
   assert.match(notifications, /data-content="notifications\.preferencesTitle"/);
   assert.match(notifications, /data-content="notifications\.markAllReadCta"/);
@@ -412,10 +415,8 @@ test('website editor admin page and public hooks are wired', async () => {
   assert.doesNotMatch(collector, /collector-twitch-handle/);
   assert.match(collector, /collector-role|collector-flair/);
   assert.match(collector, /collection-level-card|collector-level/);
-  assert.match(rankingsPage, /data-content="rankings\.title"/);
-  assert.match(rankingsPage, /data-content="rankings\.lead"/);
-  assert.match(rankingsPage, /website-content-hydrate-page\.js\?v=1\.3/);
-  assert.match(tradeListsPage, /getCachedWebsiteContent/);
+  assert.match(rankingsPage, /trade-lists\.html\?section=collectors/);
+  assert.match(tradeListsPage, /export function initTradeLists/);
   assert.match(tradeListsPage, /emptyWishlist/);
   assert.match(tradeOffersPage, /getCachedWebsiteContent/);
   assert.match(tradeOffersPage, /emptyIncoming/);
