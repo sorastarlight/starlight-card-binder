@@ -276,7 +276,7 @@ function acquireRevealViewportLock(doc) {
   };
 }
 
-export const REVEAL_PRESENTATION_VERSION = '1.5.14';
+export const REVEAL_PRESENTATION_VERSION = '1.5.15';
 
 const REVEAL_STYLESHEET_ID = `starlight-reveal-v${REVEAL_PRESENTATION_VERSION.replace(/\./g, '')}`;
 const REVEAL_STYLESHEET_URL = new URL(

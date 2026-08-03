@@ -1,5 +1,5 @@
 /*
- * Approved reveal presentation baseline: v1.5.14.
+ * Approved reveal presentation baseline: v1.5.15.
  * Keep its motion contract intact unless this version and its regression test
  * are intentionally advanced together.
  */
@@ -599,7 +599,7 @@
 
 .st-r3-pile-image {
   border-radius: inherit;
-  object-fit: cover;
+  object-fit: contain;
   user-select: none;
   pointer-events: none;
 }
@@ -726,7 +726,8 @@
 
 .st-r3-card-image {
   border-radius: inherit;
-  object-fit: cover;
+  object-fit: contain;
+  background: #120f22;
   user-select: none;
   pointer-events: none;
 }
@@ -1127,7 +1128,7 @@
   width: 100%;
   height: 100%;
   aspect-ratio: 2.5 / 3.5;
-  object-fit: cover;
+  object-fit: contain;
   background: #eae8f4;
 }
 
