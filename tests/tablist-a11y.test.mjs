@@ -15,10 +15,10 @@ test('tablist-a11y helper exposes keyboard and selection sync APIs', async () =>
 });
 
 test('collection and trade pages import shared tablist keyboard helpers', async () => {
-  const [collection, lists, offers, hub, collectionHtml, listsHtml, offersHtml] = await Promise.all([
+  const [collection, myTrade, offersHub, hub, collectionHtml, listsHtml, offersHtml] = await Promise.all([
     read('docs/js/collection-redesign.js'),
-    read('docs/js/pages/trade-lists-page.js'),
-    read('docs/js/pages/trade-offers-page.js'),
+    read('docs/js/pages/my-trade-cards.js'),
+    read('docs/js/pages/trade-offers-hub.js'),
     read('docs/js/pages/trade-hub-page.js'),
     read('docs/collection.html'),
     read('docs/trade-lists.html'),
@@ -26,11 +26,11 @@ test('collection and trade pages import shared tablist keyboard helpers', async 
   ]);
   assert.match(collection, /bindTablistKeyboard/);
   assert.match(collection, /syncTabSelection/);
-  assert.match(lists, /bindTablistKeyboard/);
   assert.match(hub, /bindTablistKeyboard/);
-  assert.match(offers, /bindTablistKeyboard/);
-  assert.match(offers, /syncTabSelection/);
+  assert.match(offersHub, /bindTablistKeyboard/);
+  assert.match(offersHub, /syncTabSelection/);
   assert.match(collectionHtml, /collection-redesign\.js\?v=1\.3\.0/);
-  assert.match(listsHtml, /trade-hub-page\.js\?v=1\.1\.0/);
-  assert.match(offersHtml, /trade-offers-page\.js\?v=1\.4\.1/);
+  assert.match(listsHtml, /trade-hub-page\.js\?v=1\.2\.0/);
+  assert.match(listsHtml, /data-hub-view="propose"/);
+  assert.match(offersHtml, /trade-lists\.html\?/);
 });

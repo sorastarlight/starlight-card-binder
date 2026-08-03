@@ -307,8 +307,8 @@ test('website editor admin page and public hooks are wired', async () => {
     collector,
     rankingsPage,
     loginPage,
-    tradeListsPage,
-    tradeOffersPage,
+    myTradePage,
+    tradeOffersHub,
     boosterShopPage,
     eventsPage,
     app,
@@ -339,10 +339,10 @@ test('website editor admin page and public hooks are wired', async () => {
     read('docs/received-rewards.html'),
     read('docs/profile-settings.html'),
     read('docs/collector.html'),
-    read('docs/user-rankings.html'),
+    read('docs/js/pages/user-rankings-page.js'),
     read('docs/js/pages/login-page.js'),
-    read('docs/js/pages/trade-lists-page.js'),
-    read('docs/js/pages/trade-offers-page.js'),
+    read('docs/js/pages/my-trade-cards.js'),
+    read('docs/js/pages/trade-offers-hub.js'),
     read('docs/js/pages/booster-shop-page.js'),
     read('docs/js/pages/events-page.js'),
     read('docs/js/app.js'),
@@ -398,9 +398,9 @@ test('website editor admin page and public hooks are wired', async () => {
   assert.match(checklist, /shared\.infoStripCopyright/);
   assert.match(trades, /data-content="trades\.title"/);
   assert.match(trades, /data-content="trades\.hubTabCollectors"/);
-  assert.match(trades, /data-hub-view="wishlist"/);
-  assert.match(trades, /trade-hub-page\.js\?v=1\.1\.0/);
-  assert.match(offers, /data-content="offers\.composeEmpty"/);
+  assert.match(trades, /data-hub-view="my-trade"/);
+  assert.match(trades, /trade-hub-page\.js\?v=1\.2\.0/);
+  assert.match(trades, /data-content="offers\.composeEmpty"/);
   assert.match(notifications, /data-content="notifications\.preferencesTitle"/);
   assert.match(notifications, /data-content="notifications\.markAllReadCta"/);
   assert.match(rewards, /data-content="rewards\.tabPending"/);
@@ -415,11 +415,11 @@ test('website editor admin page and public hooks are wired', async () => {
   assert.doesNotMatch(collector, /collector-twitch-handle/);
   assert.match(collector, /collector-role|collector-flair/);
   assert.match(collector, /collection-level-card|collector-level/);
-  assert.match(rankingsPage, /trade-lists\.html\?section=collectors/);
-  assert.match(tradeListsPage, /setTab: setActiveTab/);
-  assert.match(tradeListsPage, /emptyWishlist/);
-  assert.match(tradeOffersPage, /getCachedWebsiteContent/);
-  assert.match(tradeOffersPage, /emptyIncoming/);
+  assert.match(rankingsPage, /section: 'propose'/);
+  assert.match(myTradePage, /initMyTradeCards/);
+  assert.match(myTradePage, /listedEmptyTitle/);
+  assert.match(tradeOffersHub, /getCachedWebsiteContent/);
+  assert.match(tradeOffersHub, /emptyIncoming/);
   assert.match(boosterShopPage, /getCachedWebsiteContent/);
   assert.match(boosterShopPage, /signedOutTitle/);
   assert.match(boosterShopPage, /featuredKicker/);

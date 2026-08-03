@@ -60,13 +60,14 @@ test('binder filter panel stays hidden on series landing until a pack is selecte
 });
 
 test('shell-safe profile links avoid binder-in-binder nesting', async () => {
-  const [offers, comments, report, rankings] = await Promise.all([
-    read('docs/js/pages/trade-offers-page.js'),
+  const [offersHub, comments, report, rankings] = await Promise.all([
+    read('docs/js/pages/trade-offers-hub.js'),
     read('docs/js/card-comments.js'),
     read('docs/js/pages/report-profile-page.js'),
     read('docs/js/pages/user-rankings-page.js')
   ]);
-  assert.match(offers, /target="_top" data-shell-view="collector"/);
+  assert.match(offersHub, /target="_top"/);
+  assert.match(offersHub, /data-shell-view="collector"/);
   assert.match(comments, /target="_top" data-shell-view="collector"/);
   assert.match(comments, /target="_top" data-shell-view="login"/);
   assert.match(report, /setAttribute\('target','_top'\)/);

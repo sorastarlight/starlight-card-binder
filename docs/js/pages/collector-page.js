@@ -700,15 +700,15 @@ import {
                     proposeTradeButton.removeAttribute('href');
                 } else {
                     proposeTradeButton.hidden = false;
-                    const tradeUrl = shellHref('offers', { username: profile.username });
+                    const tradeUrl = shellHref('trades', { section: 'propose', username: profile.username });
                     proposeTradeButton.href = tradeUrl;
                     proposeTradeButton.onclick = event => {
                         if (window.parent !== window) {
                             event.preventDefault();
                             window.parent.postMessage({
                                 type: 'starlight-navigate',
-                                view: 'offers',
-                                params: { username: profile.username }
+                                view: 'trades',
+                                params: { section: 'propose', username: profile.username }
                             }, window.location.origin);
                         }
                     };

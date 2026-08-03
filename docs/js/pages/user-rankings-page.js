@@ -25,7 +25,7 @@ function profileHref(username) {
 }
 
 function tradeHref(username) {
-  return shellHref('offers', { username });
+  return shellHref('trades', { section: 'propose', username });
 }
 
 function avatarMarkup(entry) {
@@ -167,7 +167,7 @@ export function initUserRankings(container = document) {
           <span class="rankings-follow-label">${esc(copy('followCta', 'Follow'))}</span>
         </button>
         <button type="button" class="st-button" data-wishlist-toggle aria-expanded="false">${esc(copy('wishlistCta', 'Cards they want'))}</button>
-        <a class="st-button primary" href="${esc(tradeHref(entry.username))}" target="_top" data-shell-view="offers">${esc(copy('proposeTradeCta', 'Propose trade'))}</a>
+        <a class="st-button primary" href="${esc(tradeHref(entry.username))}" target="_top" data-shell-view="trades">${esc(copy('proposeTradeCta', 'Propose trade'))}</a>
       </div>
       <div class="rankings-wishlist" hidden>
         <div class="rankings-wishlist-status">Loading wishlist…</div>

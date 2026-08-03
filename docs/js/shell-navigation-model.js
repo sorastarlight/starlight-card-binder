@@ -73,7 +73,7 @@ function sanitizeAccountMenuItems(items, fallback) {
 
 function consolidateTradingNavItems(items = []) {
   const result = [];
-  let tradingHubSeen = false;
+  let tradingHubItem = null;
 
   for (const item of items) {
     if (!item || typeof item !== 'object') continue;
@@ -84,24 +84,31 @@ function consolidateTradingNavItems(items = []) {
     }
 
     let destination = String(item.destination || '').trim();
-    if (destination === 'rankings') destination = 'trades';
+    if (destination === 'rankings' || destination === 'offers') destination = 'trades';
 
     const label = String(item.label || '').trim();
     const isTradingEntry = destination === 'trades'
-      || /wishlist|trade with others|card exchange|trading hub|user rankings/i.test(label);
+      || /wishlist|trade with others|trade offers|card exchange|trading hub|user rankings/i.test(label);
 
     if (!isTradingEntry) {
       result.push(item);
       continue;
     }
 
-    if (tradingHubSeen) continue;
-    tradingHubSeen = true;
-    result.push({
-      ...item,
-      destination: 'trades',
-      label: DEFAULT_DESTINATION_LABELS.trades || 'Trade With Others'
-    });
+    if (!tradingHubItem) {
+      tradingHubItem = {
+        ...item,
+        destination: 'trades',
+        label: DEFAULT_DESTINATION_LABELS.trades || 'Trading Hub',
+        features: [...features]
+      };
+      result.push(tradingHubItem);
+      continue;
+    }
+
+    if (features.includes('tradeOfferBadge') && !tradingHubItem.features.includes('tradeOfferBadge')) {
+      tradingHubItem.features = [...tradingHubItem.features, 'tradeOfferBadge'];
+    }
   }
 
   return result;

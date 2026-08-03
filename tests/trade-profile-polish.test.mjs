@@ -19,46 +19,45 @@ test('trade list migration exposes collectorNumber in RPC payloads', async () =>
 });
 
 test('trade pages wire collector-number search helpers and a11y labels', async () => {
-  const [listsPage, offersPage, listsHtml, offersHtml] = await Promise.all([
-    read('docs/js/pages/trade-lists-page.js'),
-    read('docs/js/pages/trade-offers-page.js'),
-    read('docs/trade-lists.html'),
-    read('docs/trade-offers.html')
+  const [myTradePage, offersHub, listsHtml] = await Promise.all([
+    read('docs/js/pages/my-trade-cards.js'),
+    read('docs/js/pages/trade-offers-hub.js'),
+    read('docs/trade-lists.html')
   ]);
-  assert.match(listsPage, /buildTradeSearchHaystack/);
-  assert.match(offersPage, /buildTradeSearchHaystack/);
+  assert.match(myTradePage, /buildTradeSearchHaystack/);
+  assert.match(offersHub, /buildTradeSearchHaystack/);
   assert.match(listsHtml, /aria-label="Search cards"/);
-  assert.match(offersHtml, /aria-label="Search collectors by username, display name, or email"/);
-  assert.match(offersHtml, /id="myCardsSearch"/);
-  assert.match(offersHtml, /id="offerSummary"/);
-  assert.match(offersHtml, /id="recipientResults"/);
+  assert.match(listsHtml, /aria-label="Search collectors by username, display name, or email"/);
+  assert.match(listsHtml, /data-propose-my-search/);
+  assert.match(listsHtml, /data-propose-summary/);
+  assert.match(listsHtml, /data-propose-results/);
 });
 
 test('trade offer composer keeps selections outside the pick grid DOM', async () => {
-  const offersPage = await read('docs/js/pages/trade-offers-page.js');
-  assert.match(offersPage, /const offeredQty = new Map\(\)/);
-  assert.match(offersPage, /const requestedQty = new Map\(\)/);
-  assert.match(offersPage, /function chosen\(side\) \{\s*return \[\.\.\.selectionMap\(side\)\.entries\(\)\]/s);
-  assert.match(offersPage, /function sortPickCards/);
-  assert.match(offersPage, /setActiveOfferTab\('outgoing'\)/);
-  assert.match(offersPage, /initialOfferTab/);
-  assert.match(offersPage, /Decline this trade\?/);
-  assert.match(offersPage, /shellHref\('collector'/);
-  assert.match(offersPage, /target="_top"/);
-  assert.match(offersPage, /data-shell-view="collector"/);
+  const offersHub = await read('docs/js/pages/trade-offers-hub.js');
+  assert.match(offersHub, /const offeredQty = new Map\(\)/);
+  assert.match(offersHub, /const requestedQty = new Map\(\)/);
+  assert.match(offersHub, /function chosen\(side\) \{\s*return \[\.\.\.selectionMap\(side\)\.entries\(\)\]/s);
+  assert.match(offersHub, /function sortPickCards/);
+  assert.match(offersHub, /options\.onSent/);
+  assert.match(offersHub, /Decline this trade\?/);
+  assert.match(offersHub, /shellHref\('collector'/);
+  assert.match(offersHub, /target="_top"/);
+  assert.match(offersHub, /data-shell-view="collector"/);
 });
 
-test('wishlist empty state can open the All Cards tab', async () => {
-  const listsPage = await read('docs/js/pages/trade-lists-page.js');
-  assert.match(listsPage, /data-open-tab="all"/);
-  assert.match(listsPage, /dataset\.openTab/);
+test('my trade cards module renders listed and album sections', async () => {
+  const myTradePage = await read('docs/js/pages/my-trade-cards.js');
+  assert.match(myTradePage, /listedForTradeGrid/);
+  assert.match(myTradePage, /tradeAlbumGrid/);
+  assert.match(myTradePage, /showWishlist: true/);
 });
 
 test('trade recipient typeahead searches username display name and exact email', async () => {
-  const [migration, service, offersPage] = await Promise.all([
+  const [migration, service, offersHub] = await Promise.all([
     read('supabase/migrations/20260722030000_search_trade_collectors.sql'),
     read('docs/js/trade-offer-service.js'),
-    read('docs/js/pages/trade-offers-page.js')
+    read('docs/js/pages/trade-offers-hub.js')
   ]);
   assert.match(migration, /create or replace function public\.search_trade_collectors/i);
   assert.match(migration, /from auth\.users u/);
@@ -67,7 +66,7 @@ test('trade recipient typeahead searches username display name and exact email',
   assert.match(migration, /grant execute on function public\.search_trade_collectors\(text, integer\) to authenticated, service_role/);
   assert.match(migration, /revoke all on function public\.search_trade_collectors\(text, integer\) from public, anon/);
   assert.match(service, /export async function searchTradeCollectors/);
-  assert.match(offersPage, /scheduleCollectorSearch/);
-  assert.match(offersPage, /searchTradeCollectors/);
-  assert.match(offersPage, /data-action="change-recipient"/);
+  assert.match(offersHub, /scheduleCollectorSearch/);
+  assert.match(offersHub, /searchTradeCollectors/);
+  assert.match(offersHub, /data-action="change-recipient"/);
 });

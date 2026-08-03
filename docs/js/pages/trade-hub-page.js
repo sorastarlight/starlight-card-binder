@@ -1,17 +1,24 @@
 import { bindTablistKeyboard } from '../tablist-a11y.js';
-import { initTradeLists } from './trade-lists-page.js';
+import { initMyTradeCards } from './my-trade-cards.js';
 import { initUserRankings } from './user-rankings-page.js';
+import { initProposeTrade, initTradesInProgress } from './trade-offers-hub.js';
 import { getCachedWebsiteContent } from '../website-content-hydrate.js';
 
-const LIST_VIEWS = new Set(['wishlist', 'trade', 'all']);
+const HUB_VIEWS = new Set(['collectors', 'my-trade', 'propose', 'progress']);
 const hubTabs = [...document.querySelectorAll('[data-hub-view]')];
 const hubTablist = document.querySelector('.trade-hub-tabs');
-const collectorsPanel = document.querySelector('[data-hub-panel="collectors"]');
-const listsPanel = document.querySelector('[data-hub-panel="lists"]');
-const panelLead = document.querySelector('[data-hub-panel-lead]');
+const panels = Object.fromEntries(
+  [...document.querySelectorAll('[data-hub-panel]')].map(panel => [panel.dataset.hubPanel, panel])
+);
+const progressBadge = document.querySelector('[data-hub-progress-badge]');
 
 let rankingsReady = false;
-let listsController = null;
+let myTradeReady = false;
+let proposeReady = false;
+let progressReady = false;
+let myTradeController = null;
+let proposeController = null;
+let progressController = null;
 
 function tradesCopy() {
   return getCachedWebsiteContent()?.trades || {};
@@ -24,50 +31,90 @@ function copy(key, fallback) {
 
 function normalizeView(raw) {
   const value = String(raw || '').trim().toLowerCase();
-  if (value === 'lists') return 'wishlist';
-  if (value === 'collectors' || value === 'rankings') return 'collectors';
-  if (LIST_VIEWS.has(value)) return value;
+  if (value === 'lists' || value === 'wishlist' || value === 'trade' || value === 'all') return 'my-trade';
+  if (value === 'rankings') return 'collectors';
+  if (value === 'in-progress' || value === 'incoming' || value === 'outgoing') return 'progress';
+  if (value === 'compose' || value === 'offers') return 'propose';
+  if (HUB_VIEWS.has(value)) return value;
   return 'collectors';
 }
 
 function readInitialView() {
-  return normalizeView(new URLSearchParams(location.search).get('section'));
+  const params = new URLSearchParams(location.search);
+  const section = params.get('section');
+  const tab = params.get('tab');
+  if (tab === 'incoming' || tab === 'outgoing') return 'progress';
+  if (tab === 'compose') return 'propose';
+  return normalizeView(section);
 }
 
-function syncHubUrl(view) {
+function readInitialProgressSub() {
+  const params = new URLSearchParams(location.search);
+  const sub = params.get('sub') || params.get('tab') || 'incoming';
+  return sub === 'outgoing' ? 'outgoing' : 'incoming';
+}
+
+function syncHubUrl(view, extra = {}) {
   const next = new URLSearchParams(location.search);
-  if (view === 'collectors') next.delete('section');
-  else next.set('section', view);
+  ['section', 'sub', 'username', 'tab'].forEach(key => next.delete(key));
+  if (view !== 'collectors') next.set('section', view);
+  if (view === 'progress' && extra.sub === 'outgoing') next.set('sub', 'outgoing');
+  if (view === 'propose' && extra.username) next.set('username', extra.username);
+  if (extra.offerId) next.set('offerId', extra.offerId);
   const query = next.toString();
   history.replaceState({ tradeHubView: view }, '', query ? `${location.pathname}?${query}` : location.pathname);
 }
 
-function updatePanelLead(view) {
-  if (!panelLead) return;
-  const leads = {
-    wishlist: copy('listsLeadWishlist', 'Mark cards you are searching for. Other collectors can see this list when you allow public trade lists on your profile.'),
-    trade: copy('listsLeadTrade', 'Offer only duplicate copies for trade. Your permanent first copy of each card stays protected.'),
-    all: copy('listsLeadAll', 'Browse every card to add items to your wishlist or for-trade list.')
-  };
-  const text = leads[view] || '';
-  panelLead.textContent = text;
-  panelLead.hidden = !text;
+function updateProgressBadge(count) {
+  if (!progressBadge) return;
+  const pending = Number(count) || 0;
+  progressBadge.textContent = pending > 99 ? '99+' : String(pending);
+  progressBadge.hidden = pending <= 0;
 }
 
 function ensureRankings() {
-  if (rankingsReady || !collectorsPanel) return;
-  initUserRankings(collectorsPanel);
+  if (rankingsReady || !panels.collectors) return;
+  initUserRankings(panels.collectors);
   rankingsReady = true;
 }
 
-function ensureLists() {
-  if (listsController || !listsPanel) return;
-  listsController = initTradeLists(listsPanel);
+function ensureMyTrade() {
+  if (myTradeReady || !panels['my-trade']) return;
+  myTradeController = initMyTradeCards(panels['my-trade']);
+  myTradeReady = true;
 }
 
-function setHubView(view, { updateUrl = true } = {}) {
+function ensurePropose(initialUsername) {
+  if (proposeReady || !panels.propose) return;
+  const params = new URLSearchParams(location.search);
+  proposeController = initProposeTrade(panels.propose, {
+    username: initialUsername || params.get('username') || '',
+    syncUrl({ username }) {
+      syncHubUrl('propose', { username: username || undefined });
+    },
+    onSent() {
+      ensureProgress();
+      progressController?.refresh?.();
+      setHubView('progress', { updateUrl: true, progressSub: 'outgoing' });
+    }
+  });
+  proposeReady = true;
+}
+
+function ensureProgress(initialSub) {
+  if (progressReady || !panels.progress) return;
+  progressController = initTradesInProgress(panels.progress, {
+    initialSub: initialSub || readInitialProgressSub(),
+    syncUrl({ sub }) {
+      syncHubUrl('progress', { sub });
+    },
+    onPendingCount: updateProgressBadge
+  });
+  progressReady = true;
+}
+
+function setHubView(view, { updateUrl = true, username, progressSub } = {}) {
   const nextView = normalizeView(view);
-  const onLists = LIST_VIEWS.has(nextView);
 
   hubTabs.forEach((button) => {
     const active = button.dataset.hubView === nextView;
@@ -76,18 +123,31 @@ function setHubView(view, { updateUrl = true } = {}) {
     button.setAttribute('tabindex', active ? '0' : '-1');
   });
 
-  collectorsPanel?.toggleAttribute('hidden', onLists);
-  listsPanel?.toggleAttribute('hidden', !onLists);
+  Object.entries(panels).forEach(([name, panel]) => {
+    panel?.toggleAttribute('hidden', name !== nextView);
+  });
 
-  if (onLists) {
-    ensureLists();
-    listsController?.setTab(nextView);
-    updatePanelLead(nextView);
-  } else {
-    ensureRankings();
+  if (nextView === 'collectors') ensureRankings();
+  if (nextView === 'my-trade') ensureMyTrade();
+  if (nextView === 'propose') {
+    ensurePropose(username);
+    if (username && proposeController?.loadRecipient) {
+      proposeController.loadRecipient(username);
+    }
+  }
+  if (nextView === 'progress') {
+    ensureProgress(progressSub);
+    if (progressSub && progressController?.setProgressSub) {
+      progressController.setProgressSub(progressSub);
+    }
   }
 
-  if (updateUrl) syncHubUrl(nextView);
+  if (updateUrl) {
+    syncHubUrl(nextView, {
+      username: nextView === 'propose' ? (username || new URLSearchParams(location.search).get('username') || undefined) : undefined,
+      sub: nextView === 'progress' ? (progressSub || readInitialProgressSub()) : undefined
+    });
+  }
 }
 
 hubTabs.forEach((button) => {
@@ -101,11 +161,24 @@ if (hubTablist) {
   });
 }
 
-window.addEventListener('starlight-website-content-hydrated', () => {
-  const active = hubTabs.find((button) => button.classList.contains('active'));
-  if (active && LIST_VIEWS.has(active.dataset.hubView || '')) {
-    updatePanelLead(active.dataset.hubView);
-  }
+const initialView = readInitialView();
+const initialParams = new URLSearchParams(location.search);
+setHubView(initialView, {
+  updateUrl: false,
+  username: initialParams.get('username') || undefined,
+  progressSub: initialView === 'progress' ? readInitialProgressSub() : undefined
 });
 
-setHubView(readInitialView(), { updateUrl: false });
+if (initialView !== 'progress') {
+  ensureProgress();
+  progressController?.refresh?.().then?.(() => {
+    updateProgressBadge(progressController?.getPendingIncomingCount?.() || 0);
+  });
+}
+
+window.addEventListener('starlight-trades-changed', () => {
+  progressController?.refresh?.();
+  myTradeController?.refresh?.();
+});
+
+export { setHubView };
