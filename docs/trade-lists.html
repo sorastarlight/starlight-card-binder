@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="css/style.css?v=1.0.2">
   <link rel="stylesheet" href="css/app-shell.css?v=1.2.1">
   <link rel="stylesheet" href="css/shared-ui.css?v=1.6.15">
-  <link rel="stylesheet" href="css/pages/trade-lists.css?v=1.9.1">
+  <link rel="stylesheet" href="css/pages/trade-lists.css?v=2.0.0">
   <link rel="stylesheet" href="css/pages/trade-offers.css?v=1.4.3">
   <link rel="stylesheet" href="css/pages/user-rankings.css?v=1.2.0">
   <link rel="stylesheet" href="css/avatar-frames.css?v=1.3.0">
@@ -116,38 +116,80 @@
     </section>
 
     <section class="trade-hub-panel trade-hub-panel-my-trade" data-hub-panel="my-trade" hidden>
+      <header class="trade-manage-head trading-section-head">
+        <h2 data-content="trades.manageTitle">Cards Available for Trade</h2>
+        <p data-content="trades.manageLead">Manage the cards you currently have available and choose duplicates from your collection to offer for trade.</p>
+      </header>
+
       <section class="trade-panel trade-panel-listed">
-        <header class="trading-section-head">
-          <h2 data-content="trades.listedTitle">Listed For Trade</h2>
+        <header class="trading-section-head trading-section-head-compact">
+          <h3 data-content="trades.listedTitle">Available for Trade</h3>
           <p data-content="trades.listedLead">These duplicate copies are visible to other collectors browsing your profile.</p>
           <p class="trade-listed-count" data-listed-count aria-live="polite">Nothing listed yet</p>
         </header>
-        <div id="listedForTradeGrid" class="trade-listed-rows" aria-live="polite"></div>
+        <div class="trade-section-toolbar">
+          <div data-listed-view-toggle></div>
+        </div>
+        <div id="listedForTradeGrid" class="trade-listed-grid" data-view="list" aria-live="polite"></div>
       </section>
 
-      <section class="trade-panel trade-panel-album">
-        <header class="trading-section-head">
-          <h2 data-content="trades.albumTitle">Your Collection</h2>
-          <p data-content="trades.albumLead">Use the Offer for trade switch on any duplicate, then set how many copies to list. Your first copy of each card stays protected.</p>
+      <section class="trade-panel trade-panel-collection">
+        <header class="trading-section-head trading-section-head-compact">
+          <h3 data-content="trades.albumTitle">Add Cards from My Collection</h3>
+          <p data-content="trades.albumLead">Select cards you own, choose how many duplicate copies to list, then save your trade list.</p>
         </header>
-        <div class="trade-tools">
+        <div class="trade-collection-tools">
           <label class="trade-search-label" for="tradeSearch">
             <span class="visually-hidden">Search cards</span>
-            <input id="tradeSearch" type="search" placeholder="Search names, numbers…" aria-label="Search cards">
+            <input id="tradeSearch" type="search" placeholder="Search names or numbers…" aria-label="Search cards">
           </label>
-          <div class="trade-album-filters" role="tablist" aria-label="Filter duplicates">
-            <button type="button" class="active" data-album-filter="all" aria-selected="true">All duplicates</button>
-            <button type="button" data-album-filter="listed" aria-selected="false">Listed</button>
-            <button type="button" data-album-filter="available" aria-selected="false">Not listed</button>
-          </div>
+          <label class="trade-filter-label" for="tradeSeriesFilter">
+            <span>Series</span>
+            <select id="tradeSeriesFilter" aria-label="Filter by series">
+              <option value="">All Series</option>
+            </select>
+          </label>
+          <label class="trade-filter-label" for="tradeRarityFilter">
+            <span>Rarity</span>
+            <select id="tradeRarityFilter" aria-label="Filter by rarity">
+              <option value="">All Rarities</option>
+            </select>
+          </label>
+          <label class="trade-filter-label" for="tradeSort">
+            <span>Sort</span>
+            <select id="tradeSort" aria-label="Sort cards">
+              <option value="number" selected>Card number</option>
+              <option value="name">Name</option>
+              <option value="rarity">Rarity</option>
+              <option value="quantity">Extra copies</option>
+            </select>
+          </label>
+          <label class="trade-duplicates-toggle">
+            <input id="tradeDuplicatesOnly" type="checkbox">
+            <span>Show only cards with duplicates</span>
+          </label>
+          <div data-collection-view-toggle></div>
           <label class="privacy-toggle">
             <input id="publicLists" type="checkbox" checked>
             Show trade lists on my public profile
           </label>
         </div>
-        <div id="tradeAlbumGrid" class="trade-grid trade-grid-album" aria-live="polite"></div>
-        <p id="myTradeStatus" class="trade-status" role="status"></p>
+        <div id="tradeAlbumGrid" class="trade-collection-grid" data-view="grid" aria-live="polite"></div>
       </section>
+
+      <aside class="trade-batch-bar" data-trade-batch hidden aria-live="polite">
+        <div class="trade-batch-copy">
+          <strong data-batch-card-count>0 cards selected</strong>
+          <span data-batch-copy-count>0 copies to list</span>
+        </div>
+        <div class="trade-batch-actions">
+          <button type="button" class="st-button" data-batch-clear>Clear</button>
+          <button type="button" class="st-button" data-batch-review>Review Trade List</button>
+          <button type="button" class="st-button primary" data-batch-save>Save Trade List</button>
+        </div>
+      </aside>
+
+      <p id="myTradeStatus" class="trade-status" role="status"></p>
     </section>
 
     <section class="trade-hub-panel trade-hub-panel-open-trades" data-hub-panel="open-trades" hidden>

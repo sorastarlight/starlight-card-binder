@@ -76,7 +76,7 @@ export function resolveBinderBrowseList(cards, filters = {}, options = {}) {
 
 /** Preferred on-card number label (collector number when present). */
 export function cardDisplayNumber(card = {}) {
-  const value = String(card.collectorNumber || card.number || '').trim();
+  const value = String(card.collectorNumber || card.cardNumber || card.number || '').trim();
   return value;
 }
 

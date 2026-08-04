@@ -882,6 +882,408 @@
   display: block;
 }
 
+/* Trade Cards manager — My Cards For Trade tab */
+.trade-manage-head {
+  margin-bottom: var(--st-space-3, 18px);
+}
+
+.trade-manage-head h2 {
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
+}
+
+.trading-section-head-compact h3 {
+  margin: 0 0 6px;
+  color: #405fa1;
+  font-size: 1.15rem;
+}
+
+.trade-section-toolbar,
+.trade-collection-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 0 var(--st-space-3, 16px);
+}
+
+.trade-filter-label {
+  display: grid;
+  gap: 4px;
+  font-weight: 800;
+  color: #405fa1;
+  font-size: 0.84rem;
+}
+
+.trade-filter-label select,
+.trade-collection-tools input[type='search'] {
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid rgba(107, 198, 248, 0.45);
+  border-radius: 12px;
+  font: inherit;
+  background: #fff;
+}
+
+.trade-duplicates-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  color: #405fa1;
+  font-size: 0.88rem;
+}
+
+.trade-view-toggle {
+  display: inline-flex;
+  border: 1px solid rgba(107, 198, 248, 0.35);
+  border-radius: 999px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.trade-view-btn {
+  border: 0;
+  padding: 8px 14px;
+  font: inherit;
+  font-weight: 800;
+  color: #405fa1;
+  background: transparent;
+  cursor: pointer;
+}
+
+.trade-view-btn.active {
+  background: linear-gradient(135deg, #6bc6f8, #ff82c8);
+  color: #fff;
+}
+
+.trade-listed-grid,
+.trade-collection-grid {
+  display: grid;
+  gap: 12px;
+  max-width: 980px;
+  margin-inline: auto;
+}
+
+.trade-listed-grid[data-view='grid'],
+.trade-collection-grid[data-view='grid'] {
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+.trade-listed-grid[data-view='list'],
+.trade-collection-grid[data-view='list'],
+.trade-listed-grid.is-list-view,
+.trade-collection-grid.is-list-view {
+  grid-template-columns: 1fr;
+}
+
+.trade-listed-card,
+.trade-collection-card {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(255, 130, 200, 0.28);
+  border-radius: 18px;
+  background: linear-gradient(145deg, #fff, #fff8fd 55%, #f3f9ff);
+  box-shadow: 0 8px 20px rgba(61, 83, 132, 0.08);
+}
+
+.trade-listed-grid[data-view='list'] .trade-listed-card,
+.trade-listed-grid.is-list-view .trade-listed-card {
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+}
+
+.trade-collection-grid[data-view='grid'] .trade-collection-card {
+  text-align: center;
+}
+
+.trade-collection-grid[data-view='list'] .trade-collection-card,
+.trade-collection-grid.is-list-view .trade-collection-card {
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  text-align: left;
+}
+
+.trade-listed-art {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 12px;
+}
+
+.trade-listed-art img,
+.trade-collection-art img,
+.trade-card-fallback {
+  width: 100%;
+  max-width: 88px;
+  aspect-ratio: 5 / 7;
+  object-fit: cover;
+  border-radius: 12px;
+  display: block;
+  box-shadow: 0 4px 12px rgba(61, 83, 132, 0.12);
+}
+
+.trade-card-fallback {
+  display: grid;
+  place-items: center;
+  background: rgba(107, 198, 248, 0.12);
+  color: #405fa1;
+  font-size: 1.4rem;
+}
+
+.trade-listed-copy,
+.trade-collection-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.trade-listed-copy strong,
+.trade-collection-copy strong {
+  color: #405fa1;
+  line-height: 1.25;
+}
+
+.trade-listed-series,
+.trade-listed-rarity,
+.trade-collection-copy span {
+  color: #6b7089;
+  font-size: 0.86rem;
+}
+
+.trade-listed-qty-label {
+  font-weight: 800;
+  color: #405fa1;
+  font-size: 0.88rem;
+}
+
+.trade-listed-actions,
+.trade-collection-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.trade-collection-stats {
+  display: grid;
+  gap: 4px;
+  margin: 6px 0 0;
+  font-size: 0.82rem;
+}
+
+.trade-collection-stats div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: #6b7089;
+}
+
+.trade-collection-stats dt {
+  font-weight: 700;
+}
+
+.trade-collection-stats dd {
+  margin: 0;
+  font-weight: 900;
+  color: #405fa1;
+}
+
+.trade-collection-card {
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.trade-collection-card:focus-visible {
+  outline: 2px solid rgba(107, 198, 248, 0.65);
+  outline-offset: 2px;
+}
+
+.trade-collection-card.is-listed {
+  border-color: rgba(64, 95, 161, 0.45);
+  box-shadow: 0 0 0 2px rgba(107, 198, 248, 0.18);
+}
+
+.trade-collection-card.is-pending {
+  border-color: rgba(255, 130, 200, 0.55);
+  box-shadow: 0 0 0 2px rgba(255, 130, 200, 0.22);
+}
+
+.trade-collection-card.is-locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.trade-view-card-btn,
+.trade-listed-actions .trade-remove-btn {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: 8px 14px;
+  font-size: 0.86rem;
+}
+
+.trade-listed-actions .trade-remove-btn {
+  border: 1px solid rgba(180, 35, 90, 0.25);
+  background: #fff;
+  color: #b4235a;
+  border-radius: 999px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.trade-batch-bar {
+  position: sticky;
+  bottom: 12px;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 14px 16px;
+  border: 2px solid rgba(107, 198, 248, 0.42);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 12px 28px rgba(61, 83, 132, 0.14);
+}
+
+.trade-batch-copy {
+  display: grid;
+  gap: 4px;
+  color: #405fa1;
+}
+
+.trade-batch-copy strong {
+  font-size: 0.95rem;
+}
+
+.trade-batch-copy span {
+  color: #6b7089;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.trade-batch-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.trade-preview-layout,
+.trade-pick-layout {
+  display: grid;
+  grid-template-columns: minmax(120px, 180px) 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.trade-preview-art img,
+.trade-pick-art img {
+  width: 100%;
+  border-radius: 12px;
+  aspect-ratio: 5 / 7;
+  object-fit: cover;
+}
+
+.trade-preview-stats {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0;
+  font-size: 0.9rem;
+}
+
+.trade-preview-stats div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.trade-preview-stats dt {
+  color: #6b7089;
+  font-weight: 700;
+}
+
+.trade-preview-stats dd {
+  margin: 0;
+  color: #405fa1;
+  font-weight: 900;
+}
+
+.trade-pick-qty-label {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+  font-weight: 800;
+  color: #405fa1;
+}
+
+.trade-review-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+  max-height: 360px;
+  overflow: auto;
+}
+
+.trade-review-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid rgba(107, 198, 248, 0.28);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.trade-review-art img {
+  width: 52px;
+  aspect-ratio: 5 / 7;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.trade-review-copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.trade-review-qty {
+  font-weight: 800;
+  color: #405fa1;
+  font-size: 0.88rem;
+}
+
+.trade-review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.trade-empty .st-button {
+  margin-top: 12px;
+}
+
+.rarity-common.trade-listed-card,
+.rarity-common.trade-collection-card { border-color: rgba(107, 198, 248, 0.35); }
+.rarity-uncommon.trade-listed-card,
+.rarity-uncommon.trade-collection-card { border-color: rgba(72, 187, 120, 0.35); }
+.rarity-rare.trade-listed-card,
+.rarity-rare.trade-collection-card { border-color: rgba(99, 102, 241, 0.35); }
+.rarity-epic.trade-listed-card,
+.rarity-epic.trade-collection-card { border-color: rgba(168, 85, 247, 0.35); }
+.rarity-legendary.trade-listed-card,
+.rarity-legendary.trade-collection-card { border-color: rgba(245, 158, 11, 0.4); }
+
 /* Propose / progress panels — center composer blocks inside hub */
 .trade-hub-panel-progress .offer-list {
   max-width: 920px;
@@ -934,5 +1336,25 @@
   .trade-listed-actions {
     grid-column: 1 / -1;
     justify-content: space-between;
+  }
+
+  .trade-listed-grid[data-view='list'] .trade-listed-card,
+  .trade-collection-grid[data-view='list'] .trade-collection-card {
+    grid-template-columns: auto 1fr;
+  }
+
+  .trade-listed-actions,
+  .trade-collection-actions {
+    grid-column: 1 / -1;
+    justify-content: space-between;
+  }
+
+  .trade-batch-bar {
+    bottom: 8px;
+  }
+
+  .trade-preview-layout,
+  .trade-pick-layout {
+    grid-template-columns: 1fr;
   }
 }
