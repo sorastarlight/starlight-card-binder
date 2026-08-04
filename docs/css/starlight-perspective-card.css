@@ -1,0 +1,157 @@
+/* Starlight premium perspective cards — opt-in via effectStyle */
+.starlight-perspective-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  transform-style: preserve-3d;
+  touch-action: manipulation;
+}
+
+.starlight-perspective-card .starlight-card-transformer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+  will-change: transform;
+}
+
+.starlight-perspective-card .starlight-card-front {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  overflow: hidden;
+  backface-visibility: hidden;
+}
+
+.starlight-perspective-card .starlight-card-front img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  border-radius: inherit;
+  pointer-events: none;
+  user-select: none;
+}
+
+.starlight-perspective-card .starlight-card-shine {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+  opacity: 0;
+  mix-blend-mode: screen;
+  transition: opacity 180ms ease;
+  background:
+    linear-gradient(
+      var(--shine-angle, 135deg),
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, var(--shine-opacity, 0.25)) 42%,
+      rgba(255, 255, 255, 0.8) 50%,
+      rgba(255, 255, 255, 0) 62%
+    );
+}
+
+.starlight-perspective-card.is-active {
+  z-index: 2;
+}
+
+.starlight-perspective-card.is-active .starlight-card-transformer {
+  box-shadow:
+    0 16px 34px rgba(107, 198, 248, 0.22),
+    0 8px 18px rgba(255, 130, 200, 0.16);
+}
+
+.starlight-effect-special-art .starlight-card-shine {
+  background:
+    linear-gradient(
+      var(--shine-angle, 135deg),
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 230, 248, calc(var(--shine-opacity, 0.25) * 0.9)) 36%,
+      rgba(214, 240, 255, calc(var(--shine-opacity, 0.35) + 0.08)) 48%,
+      rgba(255, 248, 214, calc(var(--shine-opacity, 0.25) + 0.05)) 56%,
+      rgba(255, 255, 255, 0) 68%
+    );
+}
+
+.starlight-effect-holographic .starlight-card-shine {
+  background:
+    linear-gradient(
+      var(--shine-angle, 135deg),
+      rgba(255, 255, 255, 0) 0%,
+      rgba(196, 244, 255, var(--shine-opacity, 0.28)) 40%,
+      rgba(255, 196, 236, calc(var(--shine-opacity, 0.28) + 0.12)) 50%,
+      rgba(255, 255, 255, 0) 64%
+    );
+}
+
+.starlight-effect-legendary .starlight-card-shine {
+  background:
+    linear-gradient(
+      var(--shine-angle, 135deg),
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 236, 176, var(--shine-opacity, 0.32)) 42%,
+      rgba(255, 255, 255, 0.85) 50%,
+      rgba(255, 210, 120, calc(var(--shine-opacity, 0.22) + 0.05)) 58%,
+      rgba(255, 255, 255, 0) 66%
+    );
+}
+
+.starlight-effect-rainbow .starlight-card-shine {
+  background:
+    linear-gradient(
+      var(--shine-angle, 135deg),
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 182, 226, var(--shine-opacity, 0.24)) 34%,
+      rgba(186, 230, 255, calc(var(--shine-opacity, 0.28) + 0.04)) 46%,
+      rgba(214, 255, 214, calc(var(--shine-opacity, 0.22) + 0.02)) 54%,
+      rgba(255, 230, 176, calc(var(--shine-opacity, 0.24) + 0.02)) 62%,
+      rgba(255, 255, 255, 0) 72%
+    );
+}
+
+.starlight-perspective-card.is-reduced-motion .starlight-card-transformer {
+  transform: none !important;
+  box-shadow: 0 8px 18px rgba(61, 83, 132, 0.12);
+}
+
+.starlight-perspective-card.is-reduced-motion .starlight-card-shine {
+  opacity: 0.2;
+}
+
+.v61-card-art .starlight-perspective-card,
+.collection-image .starlight-perspective-card,
+.check-card .starlight-perspective-card,
+.trade-listed-art .starlight-perspective-card,
+.trade-collection-art .starlight-perspective-card,
+.open-trades-card-art .starlight-perspective-card,
+.pick-card-art .starlight-perspective-card,
+.full-card-wrap .face.front .starlight-perspective-card,
+.v62-preview-card .face.front .starlight-perspective-card,
+.st-r3-card-front .starlight-perspective-card,
+.st-r3-result-art .starlight-perspective-card {
+  aspect-ratio: 5 / 7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .starlight-perspective-card .starlight-card-transformer {
+    transition: none;
+  }
+
+  .starlight-perspective-card:not(.is-reduced-motion) .starlight-card-transformer {
+    transform: none !important;
+  }
+
+  .starlight-perspective-card:not(.is-reduced-motion) .starlight-card-shine {
+    opacity: 0.18;
+  }
+}
+
+:is(.firefox-performance-mode, .starlight-performance-lite) .starlight-perspective-card.is-active .starlight-card-transformer {
+  box-shadow: 0 10px 20px rgba(61, 83, 132, 0.14);
+}

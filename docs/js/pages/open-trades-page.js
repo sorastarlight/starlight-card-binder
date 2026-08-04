@@ -1,5 +1,6 @@
 import { listPublicCollectorRankings } from '../collector-rankings-service.js';
 import { getPublicTradeLists } from '../trade-list-service.js';
+import { enrichCardWithCatalogEffects } from '../card-catalog-service.js';
 import { shellHref } from '../shell-route-utils.js';
 import { supabase } from '../supabase-client.js';
 import { avatarFrameClassName, avatarFrameOverlayMarkup, avatarFrameOverlayUrl } from '../avatar-frame-utils.js';
@@ -37,13 +38,28 @@ function avatarMarkup(entry) {
   return `<span class="open-trades-avatar${frameSuffix}${overlayClass}" aria-hidden="true">${overlayMarkup}${esc(initial)}</span>`;
 }
 
+function tradeCardArtHtml(card) {
+  const enriched = enrichCardWithCatalogEffects(card);
+  const art = enriched.thumbnailUrl || enriched.imageUrl || '';
+  if (!art && !window.StarlightPerspectiveCard?.hasPremiumPerspective?.(enriched)) {
+    return '<div class="open-trades-card-fallback" aria-hidden="true">✦</div>';
+  }
+  if (window.StarlightPerspectiveCard?.cardArtMarkup) {
+    return window.StarlightPerspectiveCard.cardArtMarkup(enriched, {
+      imageUrl: art,
+      alt: enriched.name || 'Card artwork',
+      visible: Boolean(art)
+    });
+  }
+  return `<img src="${esc(art)}" alt="" loading="lazy">`;
+}
+
 function tradeCardHtml(card) {
-  const art = card.thumbnailUrl || card.imageUrl || '';
   const number = card.collectorNumber || card.cardNumber;
   const qty = Number(card.tradeQuantity) || 0;
   return `<article class="open-trades-card">
     <div class="open-trades-card-art">
-      ${art ? `<img src="${esc(art)}" alt="" loading="lazy">` : '<div class="open-trades-card-fallback" aria-hidden="true">✦</div>'}
+      ${tradeCardArtHtml(card)}
     </div>
     <div class="open-trades-card-copy">
       <strong>#${esc(number)} ${esc(card.name)}</strong>
@@ -186,6 +202,7 @@ export function initOpenTrades(container) {
         }
       } else if (listRoot) {
         listRoot.innerHTML = blocks.map(({ entry, forTrade }) => collectorBlock(entry, forTrade)).join('');
+        window.StarlightPerspectiveCard?.scanPerspectiveCards?.(listRoot);
       }
 
       const start = offset + 1;

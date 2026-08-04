@@ -95,6 +95,8 @@ export function normalizeRevealCard(card = {}) {
     subcategoryName: subcategoryOf(card),
     finishId: card.finishId ?? card.finish_id ?? card.finish?.id ?? catalog.finishId ?? '',
     finishName: card.finishName ?? card.finish_name ?? card.finish?.name ?? catalog.finishName ?? '',
+    effectStyle: card.effectStyle ?? catalog.effectStyle ?? '',
+    effectIntensity: card.effectIntensity ?? catalog.effectIntensity,
     isDuplicate: Boolean(card.isDuplicate ?? card.is_duplicate ?? card.duplicate),
     quantity,
     prestigeTier
@@ -112,7 +114,9 @@ function lookupCatalogFinish(cardId) {
     if (!match) return {};
     return {
       finishId: match.finishId || match.finish_id || '',
-      finishName: match.finishName || match.finish_name || ''
+      finishName: match.finishName || match.finish_name || '',
+      effectStyle: match.effectStyle || match.effect_style || '',
+      effectIntensity: match.effectIntensity ?? match.effect_intensity
     };
   } catch (_) {
     return {};
@@ -156,6 +160,7 @@ function prestigeFrameOverlayElement(card, doc) {
 }
 
 function attachHoloSpark(element, card) {
+  if (window.StarlightPerspectiveCard?.hasPremiumPerspective?.(card)) return;
   const finish = cardFinishClass(card);
   window.StarlightUI?.ensureFinishEffectLayer?.(element, finish);
   if (!finish) return;
@@ -351,6 +356,33 @@ function createImage(
     image.dataset.fallbackApplied = 'true';
     image.src = fallback;
   });
+  return image;
+}
+
+function mountCardArt(doc, host, card, { imgClass = 'st-r3-card-image', alt = '', defer = false } = {}) {
+  const perspective = window.StarlightPerspectiveCard;
+  const markup = perspective?.cardArtMarkup?.(card, {
+    imageUrl: card.imageUrl,
+    alt: alt || card.name,
+    imgClass,
+    visible: true
+  });
+  if (markup?.includes?.('data-perspective-card')) {
+    const template = doc.createElement('template');
+    template.innerHTML = markup.trim();
+    const root = template.content.firstElementChild;
+    host.replaceChildren(root);
+    perspective.attachPerspectiveCard?.(root, { maxTilt: 14 });
+    const img = root.querySelector('img');
+    if (img && defer) {
+      img.dataset.source = card.imageUrl || DEFAULT_BACK;
+    } else if (img && card.imageUrl) {
+      img.src = card.imageUrl;
+    }
+    return img || root;
+  }
+  const image = createImage(doc, card.imageUrl, alt || card.name, DEFAULT_BACK, imgClass, { defer });
+  host.replaceChildren(image);
   return image;
 }
 
@@ -741,15 +773,12 @@ export async function revealRewardSequence(cards = [], options = {}) {
       rewards.forEach(card => {
         const prestigeClass = prestigeActorClass(card);
         const item = createElement(doc, 'article', `st-r3-result-card rarity-${card.rarity} ${prestigeClass}`.trim());
-        const image = createImage(
-          doc,
-          card.imageUrl,
-          `${card.name} card artwork`,
-          DEFAULT_BACK,
-          'st-r3-result-image',
-          { loading: 'lazy' }
-        );
         const art = createElement(doc, 'span', `st-r3-result-art ${cardFinishClass(card)} ${prestigeClass}`.trim());
+        mountCardArt(doc, art, card, {
+          imgClass: 'st-r3-result-image',
+          alt: `${card.name} card artwork`,
+          defer: false
+        });
         const copy = createElement(doc, 'div', 'st-r3-result-copy');
         const name = createElement(doc, 'h4', '', card.name);
         const detail = createElement(doc, 'p', '', cardDescription(card) || fallbackMeta);
@@ -767,7 +796,6 @@ export async function revealRewardSequence(cards = [], options = {}) {
         const prestige = prestigeRevealBadge(card, doc);
         badges.append(rarity, ...(finish ? [finish] : []), ...(prestige ? [prestige] : []), status);
         copy.append(name, detail, badges);
-        art.append(image);
         attachHoloSpark(art, card);
         const resultOverlay = prestigeFrameOverlayElement(card, doc);
         if (resultOverlay) art.append(resultOverlay);
@@ -775,20 +803,16 @@ export async function revealRewardSequence(cards = [], options = {}) {
         fragment.append(item);
       });
       resultsGrid.append(fragment);
+      window.StarlightPerspectiveCard?.scanPerspectiveCards?.(resultsGrid);
     };
 
     const prepareCurrentCard = () => {
       const card = rewards[index];
-      currentFrontImage = createImage(
-        doc,
-        card.imageUrl,
-        '',
-        DEFAULT_BACK,
-        'st-r3-card-image',
-        { defer: true }
-      );
-      cardFront.replaceChildren(currentFrontImage);
       cardFront.className = `st-r3-card-face st-r3-card-front ${cardFinishClass(card)} ${prestigeActorClass(card)}`.trim();
+      currentFrontImage = mountCardArt(doc, cardFront, card, {
+        imgClass: 'st-r3-card-image',
+        defer: true
+      });
       attachHoloSpark(cardFront, card);
       const revealOverlay = prestigeFrameOverlayElement(card, doc);
       if (revealOverlay) cardFront.append(revealOverlay);

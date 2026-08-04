@@ -1,4 +1,5 @@
 import { getMyTradeLists, setCardTradePreference, setTradeListVisibility } from '../trade-list-service.js';
+import { enrichCardWithCatalogEffects } from '../card-catalog-service.js';
 import { buildTradeSearchHaystack, cardDisplayNumber } from '../card-filter-utils.js';
 import { shellHref } from '../shell-route-utils.js';
 import { getCachedWebsiteContent } from '../website-content-hydrate.js';
@@ -43,11 +44,23 @@ function rarityToken(card) {
 }
 
 function cardArtHtml(card, altSuffix = '') {
-  const art = card.thumbnailUrl || card.imageUrl;
-  if (!art) {
+  const enriched = enrichCardWithCatalogEffects(normalizeCard(card));
+  const art = enriched.thumbnailUrl || enriched.imageUrl;
+  if (!art && !window.StarlightPerspectiveCard?.hasPremiumPerspective?.(enriched)) {
     return '<div class="trade-card-fallback" aria-hidden="true">✦</div>';
   }
-  return `<img src="${esc(art)}" alt="${esc(card.name)}${altSuffix}" loading="lazy">`;
+  if (window.StarlightPerspectiveCard?.cardArtMarkup) {
+    return window.StarlightPerspectiveCard.cardArtMarkup(enriched, {
+      imageUrl: art,
+      alt: `${enriched.name}${altSuffix}`,
+      visible: Boolean(art)
+    });
+  }
+  return `<img src="${esc(art)}" alt="${esc(enriched.name)}${altSuffix}" loading="lazy">`;
+}
+
+function scanTradePerspective(root) {
+  if (root) window.StarlightPerspectiveCard?.scanPerspectiveCards?.(root);
 }
 
 function qtyStepperHtml(card, qty, { inputPrefix = 'trade' } = {}) {
@@ -284,6 +297,7 @@ export function initMyTradeCards(container) {
     }
     listedGrid.classList.remove('is-empty');
     listedGrid.innerHTML = listed.map(card => listedCardHtml(card)).join('');
+    scanTradePerspective(listedGrid);
   }
 
   function renderCollection() {
@@ -305,6 +319,7 @@ export function initMyTradeCards(container) {
       return;
     }
     albumGrid.innerHTML = owned.map(card => collectionCardHtml(card)).join('');
+    scanTradePerspective(albumGrid);
   }
 
   function render() {
@@ -392,6 +407,7 @@ export function initMyTradeCards(container) {
       onClose: () => previewModal?.destroy?.()
     });
     previewModal.open();
+    scanTradePerspective(document.querySelector('.trade-card-preview-modal'));
   }
 
   function pickModalContent(card, qty) {

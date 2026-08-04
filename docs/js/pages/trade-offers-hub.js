@@ -1,4 +1,5 @@
 import { getTradeOfferContext, createTradeOffer, getMyTradeOffers, respondToTradeOffer, searchTradeCollectors } from '../trade-offer-service.js';
+import { enrichCardWithCatalogEffects } from '../card-catalog-service.js';
 import { buildTradeSearchHaystack } from '../card-filter-utils.js';
 import { shellHref } from '../shell-route-utils.js';
 import { getCachedWebsiteContent } from '../website-content-hydrate.js';
@@ -99,6 +100,19 @@ export function initProposeTrade(root, options = {}) {
     return (list || []).find(card => String(card.id) === String(cardId));
   }
 
+  function pickArtHtml(card) {
+    const enriched = enrichCardWithCatalogEffects(normalizeCard(card));
+    const art = enriched.thumbnailUrl || enriched.imageUrl || '';
+    if (window.StarlightPerspectiveCard?.cardArtMarkup) {
+      return window.StarlightPerspectiveCard.cardArtMarkup(enriched, {
+        imageUrl: art,
+        alt: `${enriched.name} card artwork`,
+        visible: Boolean(art)
+      });
+    }
+    return `<img src="${esc(art)}" alt="${esc(enriched.name)} card artwork" loading="lazy">`;
+  }
+
   function pickHtml(card, side) {
     const number = card.collectorNumber || card.cardNumber;
     const selected = selectionMap(side).get(String(card.id)) || 0;
@@ -106,7 +120,7 @@ export function initProposeTrade(root, options = {}) {
     const clamped = Math.min(selected, max);
     return `<article class="pick-card${clamped ? ' is-selected' : ''}${isMatch(card) ? ' is-match' : ''}">
       <div class="pick-card-art">
-        <img src="${esc(card.thumbnailUrl || card.imageUrl)}" alt="${esc(card.name)} card artwork" loading="lazy">
+        ${pickArtHtml(card)}
       </div>
       <h3>#${esc(number)} ${esc(card.name)}</h3>
       <p>${isMatch(card) ? 'Match • ' : ''}${esc(card.rarity)}</p>
@@ -169,10 +183,12 @@ export function initProposeTrade(root, options = {}) {
     if (myCardsGrid) {
       myCardsGrid.innerHTML = myCards.map(card => pickHtml(card, 'offered')).join('')
         || `<div class="empty">${myQuery ? 'No offered cards matched your search.' : 'You have no duplicate cards listed for trade.'}</div>`;
+      window.StarlightPerspectiveCard?.scanPerspectiveCards?.(myCardsGrid);
     }
     if (theirCardsGrid) {
       theirCardsGrid.innerHTML = theirCards.map(card => pickHtml(card, 'requested')).join('')
         || `<div class="empty">${theirQuery ? 'No requested cards matched your search.' : 'This collector has no duplicate cards listed.'}</div>`;
+      window.StarlightPerspectiveCard?.scanPerspectiveCards?.(theirCardsGrid);
     }
     renderOfferSummary();
   }

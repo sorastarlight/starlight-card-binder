@@ -15,6 +15,35 @@ Card and series information edited in the Administration Hub now updates the Bin
 - Added a manual **Refresh Site Catalog** button to Content Studio.
 - Static JSON remains only as an emergency offline fallback.
 
+## Premium card effects (`effectStyle`)
+
+Optional catalog fields for interactive perspective cards:
+
+| Field | Type | Values |
+| --- | --- | --- |
+| `effectStyle` | string | `none`, `special-art`, `holographic`, `legendary`, `rainbow` |
+| `effectIntensity` | number | `20`–`100` (defaults to `65` when omitted) |
+
+Example JSON / Google Sheets row:
+
+```json
+{
+  "id": "s01-012",
+  "name": "Example Legendary Card",
+  "rarity": "Legendary",
+  "holographic": "Y",
+  "effectStyle": "special-art",
+  "effectIntensity": 75
+}
+```
+
+Notes:
+
+- Cards **without** `effectStyle` render exactly as before.
+- The legacy `holographic` finish field is unchanged and independent of `effectStyle`.
+- Supabase Content Studio and the offline `docs/data/cards.json` fallback both accept these columns.
+- Implementation: `docs/js/starlight-perspective-card.js` + `docs/css/starlight-perspective-card.css`.
+
 ## Install
 
 Run:

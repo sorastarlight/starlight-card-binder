@@ -39,6 +39,11 @@ function normalizeCatalogCard(row, index = 0) {
         variantName: cleanText(row?.variantName ?? row?.variant_name ?? row?.variant?.name),
         finishId: cleanText(row?.finishId ?? row?.finish_id),
         finishName: cleanText(row?.finishName ?? row?.finish_name ?? row?.finish?.name),
+        effectStyle: cleanText(row?.effectStyle ?? row?.effect_style).toLowerCase(),
+        effectIntensity: (() => {
+            const value = Number(row?.effectIntensity ?? row?.effect_intensity);
+            return Number.isFinite(value) ? value : undefined;
+        })(),
         collectorNumber: cleanText(row?.collectorNumber ?? row?.collector_number ?? cardNumber),
         distributionType: cleanText(row?.distributionType ?? row?.distribution_type ?? 'booster_pull'),
         publishStatus: cleanText(row?.publishStatus ?? row?.publish_status ?? 'published'),
@@ -211,9 +216,22 @@ window.addEventListener("message", event => {
     if (event.data?.type === "starlight-card-catalog-changed") receiveChange(event.data);
 });
 
+export function enrichCardWithCatalogEffects(card = {}, catalog = getCachedCardCatalog()) {
+    const id = String(card?.id || "").trim();
+    if (!id) return card;
+    const match = (catalog?.cards || []).find(entry => String(entry?.id) === id);
+    if (!match) return card;
+    return {
+        ...card,
+        effectStyle: card.effectStyle || match.effectStyle || "",
+        effectIntensity: card.effectIntensity ?? match.effectIntensity
+    };
+}
+
 window.StarlightCardCatalog = {
     getCached: getCachedCardCatalog,
     fetchFresh: fetchFreshCardCatalog,
     clear: clearCardCatalogCache,
-    notifyChanged: notifyCardCatalogChanged
+    notifyChanged: notifyCardCatalogChanged,
+    enrichEffects: enrichCardWithCatalogEffects
 };

@@ -491,42 +491,59 @@ async function loadBinderApplication() {
     window.StarlightEvolution = window.StarlightFusion;
 
     return new Promise((resolve, reject) => {
-        const script =
-            document.createElement("script");
+        const perspectiveScript = document.createElement("script");
+        perspectiveScript.src = "./js/starlight-perspective-card.js?v=1.0.0";
+        perspectiveScript.async = false;
 
-        script.src = "./js/app.js?v=1.9.6";
-        script.async = false;
-        script.dataset.starlightApp = "true";
-
-        script.addEventListener(
+        perspectiveScript.addEventListener(
             "load",
             () => {
-                console.log(
-                    "[Starlight] Binder application loaded."
+                const script = document.createElement("script");
+                script.src = "./js/app.js?v=1.9.6";
+                script.async = false;
+                script.dataset.starlightApp = "true";
+
+                script.addEventListener(
+                    "load",
+                    () => {
+                        console.log(
+                            "[Starlight] Binder application loaded."
+                        );
+                        resolve();
+                    },
+                    { once: true }
                 );
 
-                resolve();
+                script.addEventListener(
+                    "error",
+                    () => {
+                        reject(
+                            new Error(
+                                "The Binder application could not be loaded."
+                            )
+                        );
+                    },
+                    { once: true }
+                );
+
+                document.body.appendChild(script);
             },
-            {
-                once: true
-            }
+            { once: true }
         );
 
-        script.addEventListener(
+        perspectiveScript.addEventListener(
             "error",
             () => {
                 reject(
                     new Error(
-                        "The Binder application could not be loaded."
+                        "The premium card effect module could not be loaded."
                     )
                 );
             },
-            {
-                once: true
-            }
+            { once: true }
         );
 
-        document.body.appendChild(script);
+        document.body.appendChild(perspectiveScript);
     });
 }
 
