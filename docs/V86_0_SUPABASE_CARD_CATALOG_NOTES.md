@@ -21,7 +21,7 @@ Optional catalog fields for interactive perspective cards:
 
 | Field | Type | Values |
 | --- | --- | --- |
-| `effectStyle` | string | `none`, `special-art`, `holographic`, `legendary`, `rainbow` |
+| `effectStyle` | string | `none`, `shine`, `special-art`, `holographic`, `legendary`, `rainbow` |
 | `effectIntensity` | number | `20`–`100` (defaults to `65` when omitted) |
 
 Example JSON / Google Sheets row:
@@ -42,8 +42,9 @@ Notes:
 - Cards **without** `effectStyle` render exactly as before.
 - The legacy `holographic` finish field is unchanged and independent of `effectStyle`.
 - Supabase Content Studio and the offline `docs/data/cards.json` fallback both accept these columns.
-- Implementation: `docs/js/starlight-perspective-card.js` + `docs/css/starlight-perspective-card.css`.
-- Apply migration `supabase/migrations/20260724180000_card_premium_effects.sql` on production Supabase before expecting live catalog data.
+- Implementation: `docs/js/starlight-perspective-card.js`, `docs/css/starlight-perspective-card.css`, and `docs/css/starlight-gallery.css`.
+- Apply migrations `20260724180000_card_premium_effects.sql` and `20260724190000_card_effect_shine_gallery.sql` on production Supabase before expecting live catalog data.
+- Premium tilt/shine runs only on **collected** cards; unowned slots use the album-slot presentation without heavy effects.
 
 ## Install
 

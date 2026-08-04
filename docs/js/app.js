@@ -462,7 +462,15 @@ function perspectiveArt(card, { imageUrl, alt = '', imgClass = '', visible = tru
   return `<img class="${imgClass}" src="${esc(src)}" alt="${esc(alt || card?.name || '')}" loading="lazy">`;
 }
 function perspectiveArtVisible(card, collected = false) {
-  return collected || window.StarlightPerspectiveCard?.hasPremiumPerspective?.(card) === true;
+  if (!collected) return false;
+  return window.StarlightPerspectiveCard?.hasPremiumPerspective?.(card) === true;
+}
+function flashGalleryFilterTransition() {
+  document.querySelectorAll('.starlight-gallery-grid, .v61-grid, .grid-page').forEach(el => {
+    el.classList.add('is-filtering');
+    window.clearTimeout(el._starlightFilterFlash);
+    el._starlightFilterFlash = window.setTimeout(() => el.classList.remove('is-filtering'), 240);
+  });
 }
 function scanPerspectiveCardsIn(root = document) {
   window.StarlightPerspectiveCard?.scanPerspectiveCards?.(root);
@@ -1504,6 +1512,7 @@ function renderFullView() {
         console.warn('[Starlight] Card comments failed to load', error);
       });
   }
+  scanPerspectiveCardsIn(overlay);
 }
 
 function renderGridPage(target, mode) {
@@ -1530,6 +1539,7 @@ function renderGridPage(target, mode) {
       });
     }
   }
+  wrap.classList.add('starlight-gallery-grid');
   wrap.classList.toggle('empty-grid', !list.length);
   const collectionCopy = websiteSection('collection');
   const emptyTitle = baseList.length
@@ -1549,10 +1559,15 @@ function renderGridPage(target, mode) {
     const got = isCollected(c.id); const hidden = !got;
     const quantity = getCardQuantity(c.id);
     const favorited = isFavorite(c.id);
-    return `<article class="collection-card ${rarityClass(c)} ${got ? prestigeFrameClass(c.id) : ''}" data-id="${esc(c.id)}" data-open-collection-card="${esc(c.id)}" role="button" tabindex="0" aria-label="Open ${esc(getVisibleName(c))} full view"><div class="collection-image">${perspectiveArt(c, { imageUrl: getVisibleImage(c), alt: getVisibleName(c), imgClass: hidden ? 'obscured' : '', visible: perspectiveArtVisible(c, !hidden) })}${got ? prestigeFrameOverlayHtml(c.id) : ''}</div><h3>${esc(getVisibleName(c))}</h3><p class="collection-card-number">${esc(c.collectorNumber || c.number)} • ${esc(c.series)}</p><div class="card-meta-chips compact">${cardIdentityChips(c,{hidden})}</div>${got ? prestigeBadgeHtml(c.id) : ''}${mode === 'duplicates' ? `<p class="duplicate-copy-summary"><strong>${quantity}</strong> total copies · <strong>${quantity - 1}</strong> exchangeable</p>` : ''}<div class="card-buttons"><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${quantity}` : 'Not Collected'}</span>${got ? `<button class="icon-btn" type="button" data-toggle-favorite="${esc(c.id)}" aria-label="${favorited ? 'Remove from favorites' : 'Add to favorites'}" aria-pressed="${favorited ? 'true' : 'false'}">${favorited ? '★' : '☆'}</button>` : ''}</div></article>`;
+    const premium = window.StarlightPerspectiveCard?.hasPremiumPerspective?.(c);
+    const slotClass = got ? 'is-collected' : 'is-missing-slot';
+    const hintClass = premium && !got ? ' has-premium-hint' : '';
+    const imageWrapClass = got ? 'collection-image' : 'collection-image starlight-album-slot';
+    return `<article class="collection-card starlight-gallery-card ${rarityClass(c)} ${slotClass}${hintClass} ${got ? prestigeFrameClass(c.id) : ''}" data-id="${esc(c.id)}" data-open-collection-card="${esc(c.id)}" role="button" tabindex="0" aria-label="Open ${esc(getVisibleName(c))} full view"><div class="${imageWrapClass}">${perspectiveArt(c, { imageUrl: getVisibleImage(c), alt: getVisibleName(c), imgClass: hidden ? 'obscured' : '', visible: perspectiveArtVisible(c, !hidden) })}${got ? prestigeFrameOverlayHtml(c.id) : ''}</div><h3>${esc(getVisibleName(c))}</h3><p class="collection-card-number">${esc(c.collectorNumber || c.number)} • ${esc(c.series)}</p><div class="card-meta-chips compact">${cardIdentityChips(c,{hidden})}</div>${got ? prestigeBadgeHtml(c.id) : ''}${mode === 'duplicates' ? `<p class="duplicate-copy-summary"><strong>${quantity}</strong> total copies · <strong>${quantity - 1}</strong> exchangeable</p>` : ''}<div class="card-buttons"><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${quantity}` : 'Not Collected'}</span>${got ? `<button class="icon-btn" type="button" data-toggle-favorite="${esc(c.id)}" aria-label="${favorited ? 'Remove from favorites' : 'Add to favorites'}" aria-pressed="${favorited ? 'true' : 'false'}">${favorited ? '★' : '☆'}</button>` : ''}</div></article>`;
   }).join('') : `<div class="empty-state"><h2>${esc(emptyTitle)}</h2><p>${esc(emptyLead)}</p>${emptyAction}</div>`;
   attachTileTilts();
   attachBinderHoverSfx();
+  scanPerspectiveCardsIn(wrap);
 }
 
 function renderFavoritesShowcase() {
@@ -1769,6 +1784,7 @@ document.addEventListener('click', e => {
 });
 function applyCardFilterChange() {
   page = 1;
+  flashGalleryFilterTransition();
   renderAll();
   updateRaritySelectClass();
   window.dispatchEvent(new CustomEvent('starlight-card-filters-changed'));
@@ -1892,7 +1908,7 @@ function attachFullViewTilt() {
   const perspective = card.querySelector('[data-perspective-card]');
   if (perspective) {
     window.StarlightPerspectiveCard?.attachPerspectiveCard?.(perspective, {
-      maxTilt: 16,
+      maxTilt: 12,
       shouldIgnore: event => Boolean(event.target?.closest?.('button, a, .overlay-flip'))
     });
     return;
@@ -1995,7 +2011,7 @@ function renderV61CardGridHtml(browse = resolveBinderBrowse()) {
   const emptyLead = copy.emptyFiltersLead || 'Reset one or more filters to browse this series again.';
   const emptyCta = copy.emptyFiltersCta || copy.filtersResetCta || 'Reset Filters';
   return `<div class="v61-grid-shell">
-    <div class="v61-grid">${list.length ? list.map((card,i)=>renderV61Card(card,i)).join('') : `<div class="empty-state"><h2>${esc(emptyTitle)}</h2><p>${esc(emptyLead)}</p><button class="btn primary" type="button" data-reset-card-filters>${esc(emptyCta)}</button></div>`}</div>
+    <div class="v61-grid starlight-gallery-grid">${list.length ? list.map((card,i)=>renderV61Card(card,i)).join('') : `<div class="empty-state"><h2>${esc(emptyTitle)}</h2><p>${esc(emptyLead)}</p><button class="btn primary" type="button" data-reset-card-filters>${esc(emptyCta)}</button></div>`}</div>
   </div>`;
 }
 function renderV61Card(card, i) {
@@ -2005,7 +2021,10 @@ function renderV61Card(card, i) {
   const numberLabel = window.StarlightCardFilters?.cardDisplayNumber?.(card) || String(card.collectorNumber || card.number || '');
   const qty = getCardQuantity(card.id);
   const prestigeClass = got ? prestigeFrameClass(card.id) : '';
-  return `<article class="v61-card-slot ${rarityClass(card)} ${got ? 'is-collected' : 'is-hidden'} ${prestigeClass}" style="--i:${i}">
+  const premium = window.StarlightPerspectiveCard?.hasPremiumPerspective?.(card);
+  const missingClasses = got ? 'is-collected' : 'is-hidden is-missing-slot';
+  const hintClass = premium && !got ? ' has-premium-hint' : '';
+  return `<article class="v61-card-slot starlight-gallery-card ${rarityClass(card)} ${missingClasses}${hintClass} ${prestigeClass}" style="--i:${i}">
     <button class="v61-card-btn" type="button" data-v61-card="${esc(card.id)}" aria-label="View ${esc(getVisibleName(card))}">
       <span class="v61-card-art">${perspectiveArt(card, { imageUrl: img, alt: getVisibleName(card), imgClass: artClass, visible: perspectiveArtVisible(card, got) })}${got ? prestigeFrameOverlayHtml(card.id) : ''}</span>
       <span class="badge">${esc(numberLabel)}</span>

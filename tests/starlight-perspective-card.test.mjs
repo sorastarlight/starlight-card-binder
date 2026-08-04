@@ -27,6 +27,7 @@ test('perspective card module resolves effect styles and builds opt-in markup', 
 
   assert.equal(api.resolveEffectStyle({}), null);
   assert.equal(api.resolveEffectStyle({ effectStyle: 'none' }), null);
+  assert.equal(api.resolveEffectStyle({ effectStyle: 'shine' }), 'shine');
   assert.equal(api.resolveEffectStyle({ effectStyle: 'special-art' }), 'special-art');
   assert.equal(api.resolveEffectIntensity({}), 65);
   assert.equal(api.resolveEffectIntensity({ effectIntensity: 120 }), 100);
@@ -41,8 +42,19 @@ test('perspective card module resolves effect styles and builds opt-in markup', 
   });
   assert.match(markup, /data-perspective-card/);
   assert.match(markup, /starlight-perspective-card/);
+  assert.match(markup, /starlight-card__transformer/);
   assert.match(markup, /starlight-card-shine/);
+  assert.match(markup, /starlight-card__sparkles/);
   assert.match(markup, /data-effect-intensity="75"/);
+
+  const shineMarkup = api.buildPerspectiveCardMarkup({
+    imageUrl: 'cards/001.png',
+    alt: 'Shine',
+    effectStyle: 'shine',
+    effectIntensity: 50
+  });
+  assert.match(shineMarkup, /starlight-effect-shine/);
+  assert.doesNotMatch(shineMarkup, /starlight-card__sparkles/);
 
   const plain = api.cardArtMarkup({ id: 'x', name: 'Plain' }, { imageUrl: 'cards/001.png', alt: 'Plain' });
   assert.doesNotMatch(plain, /data-perspective-card/);
@@ -50,19 +62,27 @@ test('perspective card module resolves effect styles and builds opt-in markup', 
 });
 
 test('binder and reveal surfaces integrate premium card art helpers', async () => {
-  const [app, reveal, css, cards] = await Promise.all([
+  const [app, reveal, perspectiveCss, galleryCss, styleCss, cards] = await Promise.all([
     read('docs/js/app.js'),
     read('docs/js/reward-reveal.js'),
     read('docs/css/starlight-perspective-card.css'),
+    read('docs/css/starlight-gallery.css'),
+    read('docs/css/style.css'),
     read('docs/data/cards.json')
   ]);
 
   assert.match(app, /function perspectiveArt\(/);
   assert.match(app, /scanPerspectiveCardsIn/);
+  assert.match(app, /starlight-gallery-grid/);
+  assert.match(app, /flashGalleryFilterTransition/);
+  assert.match(app, /starlight-album-slot/);
   assert.match(reveal, /mountCardArt/);
   assert.match(reveal, /effectStyle/);
-  assert.match(css, /prefers-reduced-motion: reduce/);
-  assert.match(css, /\.starlight-card-shine/);
+  assert.match(perspectiveCss, /perspective: 600px/);
+  assert.match(perspectiveCss, /prefers-reduced-motion: reduce/);
+  assert.match(perspectiveCss, /\.starlight-effect-shine/);
+  assert.match(galleryCss, /\.starlight-album-slot/);
+  assert.match(styleCss, /starlight-gallery\.css/);
   assert.match(cards, /"effectStyle": "special-art"/);
 });
 
@@ -81,4 +101,10 @@ test('premium effects migration adds catalog columns and seeds s01-012', async (
   assert.match(migration, /admin_save_card_v90/);
   assert.match(migration, /s01-012/);
   assert.match(migration, /special-art/);
+});
+
+test('shine gallery migration extends effect style constraint', async () => {
+  const migration = await read('supabase/migrations/20260724190000_card_effect_shine_gallery.sql');
+  assert.match(migration, /'shine'/);
+  assert.match(migration, /admin_save_card_v90/);
 });

@@ -3,7 +3,8 @@
  * Opt-in via card.effectStyle; standard cards stay unchanged.
  */
 (function initStarlightPerspectiveCard(global) {
-  const EFFECT_STYLES = new Set(['none', 'special-art', 'holographic', 'legendary', 'rainbow']);
+  const EFFECT_STYLES = new Set(['none', 'shine', 'special-art', 'holographic', 'legendary', 'rainbow']);
+  const SPARKLE_STYLES = new Set(['special-art', 'legendary', 'rainbow']);
   const controllers = new WeakMap();
 
   function motionReduced() {
@@ -39,6 +40,11 @@
     return Boolean(resolveEffectStyle(card));
   }
 
+  function sparklesMarkup(effectStyle) {
+    if (!SPARKLE_STYLES.has(effectStyle)) return '';
+    return '<div class="starlight-card-sparkles starlight-card__sparkles" aria-hidden="true"><i></i><i></i><i></i></div>';
+  }
+
   function buildPerspectiveCardMarkup({
     imageUrl = '',
     alt = '',
@@ -49,12 +55,13 @@
     if (!effectStyle || effectStyle === 'none') {
       return `<img class="${imgClass}" src="${escapeAttr(imageUrl)}" alt="${escapeAttr(alt)}" loading="lazy">`;
     }
-    return `<div class="starlight-perspective-card starlight-effect-${escapeAttr(effectStyle)}" data-effect-style="${escapeAttr(effectStyle)}" data-effect-intensity="${effectIntensity}" data-perspective-card>
-      <div class="starlight-card-transformer">
-        <div class="starlight-card-front">
+    return `<div class="starlight-card starlight-perspective-card starlight-card--interactive starlight-effect-${escapeAttr(effectStyle)}" data-effect-style="${escapeAttr(effectStyle)}" data-effect-intensity="${effectIntensity}" data-perspective-card>
+      <div class="starlight-card__transformer starlight-card-transformer">
+        <div class="starlight-card__front starlight-card-front">
           <img class="${imgClass}" src="${escapeAttr(imageUrl)}" alt="${escapeAttr(alt)}" loading="lazy" draggable="false">
         </div>
-        <div class="starlight-card-shine" aria-hidden="true"></div>
+        <div class="starlight-card__shine starlight-card-shine" aria-hidden="true"></div>
+        ${sparklesMarkup(effectStyle)}
       </div>
     </div>`;
   }
@@ -78,10 +85,10 @@
   class PerspectiveController {
     constructor(root, options = {}) {
       this.root = root;
-      this.transformer = root.querySelector('.starlight-card-transformer');
-      this.shine = root.querySelector('.starlight-card-shine');
+      this.transformer = root.querySelector('.starlight-card-transformer, .starlight-card__transformer');
+      this.shine = root.querySelector('.starlight-card-shine, .starlight-card__shine');
       this.intensity = Number(root.dataset.effectIntensity || 65) / 100;
-      this.maxTilt = (Number(options.maxTilt ?? 14)) * this.intensity;
+      this.maxTilt = (Number(options.maxTilt ?? 10)) * this.intensity;
       this.active = false;
       this.rafId = 0;
       this.pointerX = 0.5;
@@ -159,19 +166,21 @@
       if (!this.transformer) return;
       const tiltY = (x - 0.5) * this.maxTilt * 2;
       const tiltX = (0.5 - y) * this.maxTilt * 2;
-      const scale = reset ? 1 : 1 + 0.018 * this.intensity;
-      const lift = reset ? 0 : -5 * this.intensity;
+      const scale = reset ? 1 : 1 + 0.015 * this.intensity;
+      const lift = reset ? 0 : -4 * this.intensity;
       this.transformer.style.transform = reset
-        ? ''
-        : `perspective(920px) rotateX(${tiltX.toFixed(2)}deg) rotateY(${tiltY.toFixed(2)}deg) translateY(${lift.toFixed(2)}px) scale(${scale.toFixed(3)})`;
+        ? 'rotateX(0deg) rotateY(0deg) translateY(0px) scale(1)'
+        : `rotateX(${tiltX.toFixed(2)}deg) rotateY(${tiltY.toFixed(2)}deg) translateY(${lift.toFixed(2)}px) scale(${scale.toFixed(3)})`;
 
       if (this.shine) {
         const angle = Math.atan2(y - 0.5, x - 0.5) * (180 / Math.PI) + 90;
         const dist = Math.hypot(x - 0.5, y - 0.5);
-        const opacity = reset ? 0 : Math.min(0.62, (0.12 + dist * 0.75) * this.intensity);
+        const style = String(this.root.dataset.effectStyle || '').toLowerCase();
+        const opacityCap = style === 'shine' ? 0.42 : 0.65;
+        const opacity = reset ? 0 : Math.min(opacityCap, (0.15 + dist * 0.72) * this.intensity);
         this.root.style.setProperty('--shine-angle', `${angle.toFixed(1)}deg`);
         this.root.style.setProperty('--shine-opacity', opacity.toFixed(3));
-        this.shine.style.opacity = reset ? '0' : String(Math.min(1, opacity + 0.08));
+        this.shine.style.opacity = reset ? '0' : String(Math.min(1, opacity + 0.06));
       }
     }
 
