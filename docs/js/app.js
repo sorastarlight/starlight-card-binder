@@ -461,6 +461,9 @@ function perspectiveArt(card, { imageUrl, alt = '', imgClass = '', visible = tru
   const src = imageUrl || card?.thumbnailUrl || card?.imageUrl || '';
   return `<img class="${imgClass}" src="${esc(src)}" alt="${esc(alt || card?.name || '')}" loading="lazy">`;
 }
+function perspectiveArtVisible(card, collected = false) {
+  return collected || window.StarlightPerspectiveCard?.hasPremiumPerspective?.(card) === true;
+}
 function scanPerspectiveCardsIn(root = document) {
   window.StarlightPerspectiveCard?.scanPerspectiveCards?.(root);
 }
@@ -1348,7 +1351,7 @@ function renderFullView() {
     imageUrl: getVisibleImage(selected),
     alt: visibleName,
     imgClass: artClass,
-    visible: got && !overlayFlipped
+    visible: perspectiveArtVisible(selected, got && !overlayFlipped)
   });
   const seriesName = selected.series || 'Unknown Series';
   const subtitleRaw = String(selected.seriesDescription || seriesName).trim();
@@ -1546,7 +1549,7 @@ function renderGridPage(target, mode) {
     const got = isCollected(c.id); const hidden = !got;
     const quantity = getCardQuantity(c.id);
     const favorited = isFavorite(c.id);
-    return `<article class="collection-card ${rarityClass(c)} ${got ? prestigeFrameClass(c.id) : ''}" data-id="${esc(c.id)}" data-open-collection-card="${esc(c.id)}" role="button" tabindex="0" aria-label="Open ${esc(getVisibleName(c))} full view"><div class="collection-image">${perspectiveArt(c, { imageUrl: getVisibleImage(c), alt: getVisibleName(c), imgClass: hidden ? 'obscured' : '', visible: !hidden })}${got ? prestigeFrameOverlayHtml(c.id) : ''}</div><h3>${esc(getVisibleName(c))}</h3><p class="collection-card-number">${esc(c.collectorNumber || c.number)} • ${esc(c.series)}</p><div class="card-meta-chips compact">${cardIdentityChips(c,{hidden})}</div>${got ? prestigeBadgeHtml(c.id) : ''}${mode === 'duplicates' ? `<p class="duplicate-copy-summary"><strong>${quantity}</strong> total copies · <strong>${quantity - 1}</strong> exchangeable</p>` : ''}<div class="card-buttons"><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${quantity}` : 'Not Collected'}</span>${got ? `<button class="icon-btn" type="button" data-toggle-favorite="${esc(c.id)}" aria-label="${favorited ? 'Remove from favorites' : 'Add to favorites'}" aria-pressed="${favorited ? 'true' : 'false'}">${favorited ? '★' : '☆'}</button>` : ''}</div></article>`;
+    return `<article class="collection-card ${rarityClass(c)} ${got ? prestigeFrameClass(c.id) : ''}" data-id="${esc(c.id)}" data-open-collection-card="${esc(c.id)}" role="button" tabindex="0" aria-label="Open ${esc(getVisibleName(c))} full view"><div class="collection-image">${perspectiveArt(c, { imageUrl: getVisibleImage(c), alt: getVisibleName(c), imgClass: hidden ? 'obscured' : '', visible: perspectiveArtVisible(c, !hidden) })}${got ? prestigeFrameOverlayHtml(c.id) : ''}</div><h3>${esc(getVisibleName(c))}</h3><p class="collection-card-number">${esc(c.collectorNumber || c.number)} • ${esc(c.series)}</p><div class="card-meta-chips compact">${cardIdentityChips(c,{hidden})}</div>${got ? prestigeBadgeHtml(c.id) : ''}${mode === 'duplicates' ? `<p class="duplicate-copy-summary"><strong>${quantity}</strong> total copies · <strong>${quantity - 1}</strong> exchangeable</p>` : ''}<div class="card-buttons"><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${quantity}` : 'Not Collected'}</span>${got ? `<button class="icon-btn" type="button" data-toggle-favorite="${esc(c.id)}" aria-label="${favorited ? 'Remove from favorites' : 'Add to favorites'}" aria-pressed="${favorited ? 'true' : 'false'}">${favorited ? '★' : '☆'}</button>` : ''}</div></article>`;
   }).join('') : `<div class="empty-state"><h2>${esc(emptyTitle)}</h2><p>${esc(emptyLead)}</p>${emptyAction}</div>`;
   attachTileTilts();
   attachBinderHoverSfx();
@@ -1642,7 +1645,7 @@ function renderChecklist() {
   }
   body.innerHTML = list.map(c => {
     const got = isCollected(c.id); const hidden = !got;
-    return `<tr class="item"><td><div class="check-card">${perspectiveArt(c, { imageUrl: getVisibleImage(c), alt: getVisibleName(c), imgClass: hidden ? 'obscured' : '', visible: !hidden })}<span>${esc(c.collectorNumber || c.number)}</span></div></td><td>${esc(getVisibleName(c))}</td><td>${esc(c.series)}</td><td>${hidden?'—':`<span class="card-meta-chip category">${esc(categoryLabel(c))}</span>${subcategoryLabel(c)?`<br><small>${esc(subcategoryLabel(c))}</small>`:''}`}</td><td><span class="card-meta-chip rarity ${rarityClass(c)}">${esc(getVisibleRarity(c))}</span></td><td><b>×${getCardQuantity(c.id)}</b>${getCardQuantity(c.id)>1?`<br><small>+${getCardQuantity(c.id)-1} extra</small>`:""}</td><td><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? 'Collected' : 'Not Collected'}</span></td><td>${got ? `<button class="icon-btn" type="button" data-toggle-favorite="${esc(c.id)}" aria-label="${isFavorite(c.id) ? 'Remove from favorites' : 'Add to favorites'}" aria-pressed="${isFavorite(c.id) ? 'true' : 'false'}">${isFavorite(c.id)?'★':'☆'}</button>` : '<span class="soft-note">—</span>'}</td></tr>`;
+    return `<tr class="item"><td><div class="check-card">${perspectiveArt(c, { imageUrl: getVisibleImage(c), alt: getVisibleName(c), imgClass: hidden ? 'obscured' : '', visible: perspectiveArtVisible(c, !hidden) })}<span>${esc(c.collectorNumber || c.number)}</span></div></td><td>${esc(getVisibleName(c))}</td><td>${esc(c.series)}</td><td>${hidden?'—':`<span class="card-meta-chip category">${esc(categoryLabel(c))}</span>${subcategoryLabel(c)?`<br><small>${esc(subcategoryLabel(c))}</small>`:''}`}</td><td><span class="card-meta-chip rarity ${rarityClass(c)}">${esc(getVisibleRarity(c))}</span></td><td><b>×${getCardQuantity(c.id)}</b>${getCardQuantity(c.id)>1?`<br><small>+${getCardQuantity(c.id)-1} extra</small>`:""}</td><td><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? 'Collected' : 'Not Collected'}</span></td><td>${got ? `<button class="icon-btn" type="button" data-toggle-favorite="${esc(c.id)}" aria-label="${isFavorite(c.id) ? 'Remove from favorites' : 'Add to favorites'}" aria-pressed="${isFavorite(c.id) ? 'true' : 'false'}">${isFavorite(c.id)?'★':'☆'}</button>` : '<span class="soft-note">—</span>'}</td></tr>`;
   }).join('');
   scanPerspectiveCardsIn(body.closest('table') || body);
 }
@@ -2004,7 +2007,7 @@ function renderV61Card(card, i) {
   const prestigeClass = got ? prestigeFrameClass(card.id) : '';
   return `<article class="v61-card-slot ${rarityClass(card)} ${got ? 'is-collected' : 'is-hidden'} ${prestigeClass}" style="--i:${i}">
     <button class="v61-card-btn" type="button" data-v61-card="${esc(card.id)}" aria-label="View ${esc(getVisibleName(card))}">
-      <span class="v61-card-art">${perspectiveArt(card, { imageUrl: img, alt: getVisibleName(card), imgClass: artClass, visible: got })}${got ? prestigeFrameOverlayHtml(card.id) : ''}</span>
+      <span class="v61-card-art">${perspectiveArt(card, { imageUrl: img, alt: getVisibleName(card), imgClass: artClass, visible: perspectiveArtVisible(card, got) })}${got ? prestigeFrameOverlayHtml(card.id) : ''}</span>
       <span class="badge">${esc(numberLabel)}</span>
     </button>
     <span class="v61-ownership ${got ? 'owned' : 'locked'}">
@@ -2083,7 +2086,7 @@ function renderV62Showcase(inSeriesSelect = false, browse = resolveBinderBrowse(
     imageUrl: previewFlipped ? CARD_BACK_URL : visibleImage,
     alt: previewFlipped ? 'Card back' : visibleName,
     imgClass: artClass,
-    visible: got && !previewFlipped
+    visible: perspectiveArtVisible(card, got && !previewFlipped)
   });
   panel.innerHTML = `<div class="v62-panel-inner ${rarityClass(card)} ${got ? 'is-collected' : 'is-hidden'}">
     <div class="v62-panel-actions">

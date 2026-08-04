@@ -4,9 +4,11 @@ const CACHE_KEY = "sora-starlight-card-binder-v86-supabase-card-catalog";
 const LEGACY_CACHE_KEY = "sora-starlight-card-binder-v66-card-cache";
 const CHANGE_KEY = "sora-starlight-card-binder-card-catalog-change";
 const CHANNEL_NAME = "starlight-card-catalog";
-const CACHE_VERSION = 2;
+const CACHE_VERSION = 3;
+const FALLBACK_JSON_URL = "data/cards.json";
 
 let channel = null;
+let fallbackEffectMapPromise = null;
 try {
     channel = new BroadcastChannel(CHANNEL_NAME);
 } catch (_) {}
@@ -86,6 +88,54 @@ function normalizePayload(payload) {
     };
 }
 
+async function loadFallbackEffectMap() {
+    if (fallbackEffectMapPromise) return fallbackEffectMapPromise;
+    fallbackEffectMapPromise = (async () => {
+        try {
+            const response = await fetch(FALLBACK_JSON_URL, { cache: "no-cache" });
+            if (!response.ok) return new Map();
+            const rows = await response.json();
+            const map = new Map();
+            if (!Array.isArray(rows)) return map;
+            for (const row of rows) {
+                const id = cleanText(row?.id);
+                const style = cleanText(row?.effectStyle ?? row?.effect_style).toLowerCase();
+                if (!id || !style || style === "none") continue;
+                const intensity = Number(row?.effectIntensity ?? row?.effect_intensity);
+                map.set(id, {
+                    effectStyle: style,
+                    effectIntensity: Number.isFinite(intensity) ? intensity : undefined
+                });
+            }
+            return map;
+        } catch (_) {
+            return new Map();
+        }
+    })();
+    return fallbackEffectMapPromise;
+}
+
+function mergeFallbackCardEffects(cards, fallbackMap) {
+    if (!fallbackMap?.size || !Array.isArray(cards)) return cards;
+    return cards.map(card => {
+        if (card.effectStyle) return card;
+        const fallback = fallbackMap.get(card.id);
+        if (!fallback) return card;
+        return {
+            ...card,
+            effectStyle: fallback.effectStyle,
+            effectIntensity: card.effectIntensity ?? fallback.effectIntensity
+        };
+    });
+}
+
+async function applyCatalogFallbackEffects(payload) {
+    const normalized = normalizePayload(payload);
+    const fallbackMap = await loadFallbackEffectMap();
+    normalized.cards = mergeFallbackCardEffects(normalized.cards, fallbackMap);
+    return normalized;
+}
+
 export function getCachedCardCatalog() {
     try {
         const raw = localStorage.getItem(CACHE_KEY);
@@ -133,6 +183,8 @@ async function fetchViaTables() {
             subcategory_id,
             variant_id,
             finish_id,
+            effect_style,
+            effect_intensity,
             collector_number,
             distribution_type,
             publish_status,
@@ -177,7 +229,18 @@ export async function fetchFreshCardCatalog() {
         payload = await fetchViaTables();
     }
 
-    const cached = saveCache(payload);
+    const normalized = await applyCatalogFallbackEffects(payload);
+    const cached = {
+        version: CACHE_VERSION,
+        fetchedAt: Date.now(),
+        generatedAt: normalized.generatedAt,
+        catalogUpdatedAt: normalized.catalogUpdatedAt,
+        cards: normalized.cards
+    };
+    try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify(cached));
+        localStorage.removeItem(LEGACY_CACHE_KEY);
+    } catch (_) {}
     window.dispatchEvent(new CustomEvent("starlight-card-catalog-loaded", {
         detail: { source: "supabase", cardCount: cached.cards.length }
     }));

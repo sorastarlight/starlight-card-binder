@@ -43,6 +43,7 @@ Notes:
 - The legacy `holographic` finish field is unchanged and independent of `effectStyle`.
 - Supabase Content Studio and the offline `docs/data/cards.json` fallback both accept these columns.
 - Implementation: `docs/js/starlight-perspective-card.js` + `docs/css/starlight-perspective-card.css`.
+- Apply migration `supabase/migrations/20260724180000_card_premium_effects.sql` on production Supabase before expecting live catalog data.
 
 ## Install
 

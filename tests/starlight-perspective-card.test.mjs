@@ -65,3 +65,20 @@ test('binder and reveal surfaces integrate premium card art helpers', async () =
   assert.match(css, /\.starlight-card-shine/);
   assert.match(cards, /"effectStyle": "special-art"/);
 });
+
+test('card catalog service exposes premium effect fallback merge hooks', async () => {
+  const source = await read('docs/js/card-catalog-service.js');
+  assert.match(source, /CACHE_VERSION = 3/);
+  assert.match(source, /mergeFallbackCardEffects/);
+  assert.match(source, /effect_style/);
+});
+
+test('premium effects migration adds catalog columns and seeds s01-012', async () => {
+  const migration = await read('supabase/migrations/20260724180000_card_premium_effects.sql');
+  assert.match(migration, /effect_style/);
+  assert.match(migration, /effect_intensity/);
+  assert.match(migration, /get_public_card_catalog_v1/);
+  assert.match(migration, /admin_save_card_v90/);
+  assert.match(migration, /s01-012/);
+  assert.match(migration, /special-art/);
+});
