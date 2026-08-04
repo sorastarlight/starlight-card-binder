@@ -31,10 +31,6 @@ let progressController = null;
 let proposeOpen = false;
 
 function resetHubScroll() {
-  window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-  document.documentElement.scrollTop = 0;
-  document.body.scrollTop = 0;
-  hubMain?.scrollIntoView({ block: 'start', behavior: 'auto' });
   window.__starlightEmbedReportHeight?.();
 }
 
@@ -119,7 +115,7 @@ function setProposeSheetOpen(open, { username, updateUrl = true } = {}) {
 }
 
 function openProposeTrade(username = '') {
-  setHubView('collectors', { updateUrl: true, scroll: true, username });
+  setHubView('collectors', { updateUrl: true, username });
 }
 
 function closeProposeTrade() {
@@ -175,7 +171,7 @@ function ensureProgress(initialSub) {
   progressReady = true;
 }
 
-function setHubView(view, { updateUrl = true, username, progressSub, scroll = true, openPropose = false } = {}) {
+function setHubView(view, { updateUrl = true, username, progressSub, scroll = false, openPropose = false } = {}) {
   const nextView = normalizeView(view);
 
   if (nextView !== 'collectors' && proposeOpen) {

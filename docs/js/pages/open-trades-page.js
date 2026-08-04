@@ -41,7 +41,13 @@ function tradeCardHtml(card) {
   const number = card.collectorNumber || card.cardNumber;
   const qty = Number(card.tradeQuantity) || 0;
   return `<article class="open-trades-card">
-    ${art ? `<img src="${esc(art)}" alt="" loading="lazy">` : '<div class="open-trades-card-fallback" aria-hidden="true">✦</div>'}
+    <div class="open-trades-card-art">
+      <div class="trade-card-stage">
+        <div class="trade-card-tilt">
+          ${art ? `<img src="${esc(art)}" alt="" loading="lazy">` : '<div class="open-trades-card-fallback" aria-hidden="true">✦</div>'}
+        </div>
+      </div>
+    </div>
     <div class="open-trades-card-copy">
       <strong>#${esc(number)} ${esc(card.name)}</strong>
       <span>${esc(card.rarity)} · ${esc(card.seriesName || 'Series')}</span>

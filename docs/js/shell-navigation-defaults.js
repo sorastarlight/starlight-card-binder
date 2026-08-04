@@ -133,7 +133,7 @@ export function createDefaultShellNavigation() {
             { id: 'checklist', label: 'Star Registry', icon: { type: 'emoji', value: '☑' }, destination: 'checklist', enabled: true, features: [] },
             { id: 'quests', label: 'Starlight Missions', icon: { type: 'emoji', value: '🧭' }, destination: 'quests', enabled: true, features: [] },
             { id: 'season-pass', label: 'Seasonal Collection Pass', icon: { type: 'emoji', value: '🌌' }, destination: 'season-pass', enabled: true, features: [] },
-            { id: 'trading-label', label: 'Community', icon: { type: 'emoji', value: '🤝' }, destination: '', enabled: true, features: ['sectionLabel'] },
+            { id: 'trading-label', label: 'THE COMMUNITY', icon: { type: 'emoji', value: '🤝' }, destination: '', enabled: true, features: ['sectionLabel'] },
             { id: 'trades', label: 'Trade With Others', icon: { type: 'emoji', value: '🤝' }, destination: 'trades', enabled: true, features: ['tradeOfferBadge'] },
             { id: 'feed', label: 'LIVE Feed', icon: { type: 'emoji', value: '📡' }, destination: 'feed', enabled: true, features: [] }
           ]

@@ -13,6 +13,7 @@ const DEFAULT_DESTINATION_LABELS = Object.fromEntries(
 function rewriteLegacyLabel(destination, label, fallback) {
   const current = String(label || '').trim();
   if (!current) return fallback;
+  if (/^community(\s+hub)?$/i.test(current)) return 'THE COMMUNITY';
   const legacy = SHELL_LABEL_REWRITES[destination];
   if (!legacy?.length) return current;
   const matched = legacy.some(entry => entry.toLowerCase() === current.toLowerCase());
@@ -56,7 +57,7 @@ function sanitizeItem(item = {}, index = 0) {
   return {
     id: String(item.id || `item-${index}`).slice(0, 64),
     label: isLabel || isSeparator
-      ? rawLabel
+      ? rewriteLegacyLabel('', rawLabel, rawLabel)
       : rewriteLegacyLabel(destination, rawLabel, rawLabel),
     icon: asIcon(item.icon),
     destination,
