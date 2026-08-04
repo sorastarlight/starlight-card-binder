@@ -1,6 +1,7 @@
 import { listPublicCollectorRankings } from '../collector-rankings-service.js';
 import { getPublicTradeLists } from '../trade-list-service.js';
 import { shellHref } from '../shell-route-utils.js';
+import { supabase } from '../supabase-client.js';
 import { avatarFrameClassName, avatarFrameOverlayMarkup, avatarFrameOverlayUrl } from '../avatar-frame-utils.js';
 import { getCachedWebsiteContent } from '../website-content-hydrate.js';
 
@@ -77,6 +78,22 @@ function collectorBlock(entry, forTrade) {
   </article>`;
 }
 
+async function getViewerUsername() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user?.id) return '';
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('username')
+    .eq('id', user.id)
+    .maybeSingle();
+  return String(profile?.username || '').trim().toLowerCase();
+}
+
+function isSelfCollector(entry, viewerUsername) {
+  if (!viewerUsername) return false;
+  return String(entry?.username || '').trim().toLowerCase() === viewerUsername;
+}
+
 async function mapPool(items, limit, worker) {
   let index = 0;
   const runners = Array.from({ length: Math.min(limit, items.length) }, async () => {
@@ -136,11 +153,15 @@ export function initOpenTrades(container) {
       });
       if (token !== requestToken) return;
 
-      const collectors = Array.isArray(data.results) ? data.results : [];
+      const viewerUsername = await getViewerUsername();
+      if (token !== requestToken) return;
+
+      const collectors = (Array.isArray(data.results) ? data.results : [])
+        .filter(entry => !isSelfCollector(entry, viewerUsername));
       const blocks = [];
 
       await mapPool(collectors, FETCH_POOL, async (entry) => {
-        if (token !== requestToken) return;
+        if (token !== requestToken || isSelfCollector(entry, viewerUsername)) return;
         try {
           const result = await getPublicTradeLists(entry.username);
           if (token !== requestToken) return;

@@ -133,6 +133,8 @@ const WEBSITE_TITLE_REWRITES = Object.freeze({
   'User Rankings': 'Trade With Others',
   'Trading Hub': 'Trade With Others',
   '🤝 Trading Hub': '🤝 Trade With Others',
+  'Open Trades': 'Browse Open Trades',
+  'Trades In-Progress': 'My Trades In-Progress',
   'Event Achievements': 'Achievements',
   'Starlight Memories': 'Achievements',
   'My Journal': 'Profile',
