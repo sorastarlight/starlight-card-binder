@@ -106,11 +106,7 @@ export function initProposeTrade(root, options = {}) {
     const clamped = Math.min(selected, max);
     return `<article class="pick-card${clamped ? ' is-selected' : ''}${isMatch(card) ? ' is-match' : ''}">
       <div class="pick-card-art">
-        <div class="trade-card-stage">
-          <div class="trade-card-tilt">
-            <img src="${esc(card.thumbnailUrl || card.imageUrl)}" alt="${esc(card.name)} card artwork" loading="lazy">
-          </div>
-        </div>
+        <img src="${esc(card.thumbnailUrl || card.imageUrl)}" alt="${esc(card.name)} card artwork" loading="lazy">
       </div>
       <h3>#${esc(number)} ${esc(card.name)}</h3>
       <p>${isMatch(card) ? 'Match • ' : ''}${esc(card.rarity)}</p>

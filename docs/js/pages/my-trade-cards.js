@@ -25,11 +25,7 @@ function clampTradeQty(card, value) {
 }
 
 function cardArtHtml(card, altSuffix = '') {
-  return `<div class="trade-card-stage">
-    <div class="trade-card-tilt">
-      <img src="${esc(card.thumbnailUrl || card.imageUrl)}" alt="${esc(card.name)}${altSuffix}" loading="lazy">
-    </div>
-  </div>`;
+  return `<img src="${esc(card.thumbnailUrl || card.imageUrl)}" alt="${esc(card.name)}${altSuffix}" loading="lazy">`;
 }
 
 function qtyStepperHtml(card, qty) {
@@ -42,46 +38,45 @@ function qtyStepperHtml(card, qty) {
   </div>`;
 }
 
-function listedCardHtml(card) {
+function listedRowHtml(card) {
   const number = card.collectorNumber || card.cardNumber;
   const qty = Number(card.tradeQuantity) || 0;
-  return `<article class="trade-card is-listed is-selected" data-card-id="${esc(card.id)}" data-listed-card>
-    <button type="button" class="trade-remove-btn" data-trade-remove aria-label="Remove ${esc(card.name)} from trade">×</button>
-    <div class="trade-card-art">
-      ${cardArtHtml(card, ' card artwork')}
+  const max = Number(card.duplicateQuantity) || 0;
+  return `<article class="trade-listed-row" data-card-id="${esc(card.id)}" data-listed-card>
+    <div class="trade-listed-art">${cardArtHtml(card, ' card artwork')}</div>
+    <div class="trade-listed-copy">
+      <strong>#${esc(number)} ${esc(card.name)}</strong>
+      <span>${esc(card.rarity)} • ${esc(card.seriesName)}</span>
+      <span class="trade-listed-meta">${max} extra${max === 1 ? '' : 's'} available</span>
     </div>
-    <h3>#${esc(number)} ${esc(card.name)}</h3>
-    <p class="trade-card-meta">${esc(card.rarity)} • ${esc(card.seriesName)}</p>
-    ${qtyStepperHtml(card, qty)}
-    <p class="trade-qty-hint">Listed for trade</p>
+    <div class="trade-listed-actions">
+      ${qtyStepperHtml(card, qty)}
+      <button type="button" class="trade-remove-btn" data-trade-remove>Remove</button>
+    </div>
   </article>`;
 }
 
-function albumCardHtml(card, selectedId) {
+function albumCardHtml(card) {
   const number = card.collectorNumber || card.cardNumber;
   const max = Number(card.duplicateQuantity) || 0;
   const qty = Number(card.tradeQuantity) || 0;
   const disabled = max < 1;
-  const selected = selectedId === card.id;
-  const classes = [
-    'trade-card',
-    selected ? 'is-selected' : '',
-    qty > 0 ? 'is-listed' : '',
-    disabled ? 'is-disabled' : 'is-selectable'
-  ].filter(Boolean).join(' ');
+  const listed = qty > 0;
 
-  let hint = disabled ? 'No extras to trade' : 'Click to offer for trade';
-  if (!selected && qty > 0) hint = `Listed ×${qty} — click to edit`;
-  if (selected && !disabled) hint = `Up to ${max} duplicate${max === 1 ? '' : 's'}`;
-
-  return `<article class="${classes}" data-card-id="${esc(card.id)}" data-album-card${selected ? ' data-selected' : ''}${disabled ? ' data-disabled' : ''}>
-    <div class="trade-card-art" data-album-select-trigger>
-      ${cardArtHtml(card, ' card artwork')}
-    </div>
+  return `<article class="trade-card${listed ? ' is-listed' : ''}${disabled ? ' is-disabled' : ''}" data-card-id="${esc(card.id)}" data-album-card>
+    <div class="trade-card-art">${cardArtHtml(card, ' card artwork')}</div>
     <h3>#${esc(number)} ${esc(card.name)}</h3>
     <p class="trade-card-meta">${esc(card.rarity)} • ${esc(card.seriesName)}</p>
     <p class="trade-card-owned">Owned ${card.ownedQuantity} • Extras ${max}</p>
-    ${selected ? qtyStepperHtml(card, qty) : `<p class="trade-qty-hint">${hint}</p>`}
+    <label class="trade-list-toggle">
+      <input type="checkbox" data-trade-toggle${listed ? ' checked' : ''}${disabled ? ' disabled' : ''}>
+      <span class="trade-list-toggle-ui" aria-hidden="true"></span>
+      <span class="trade-list-toggle-label">${listed ? 'Listed for trade' : 'Offer for trade'}</span>
+    </label>
+    <div class="trade-card-controls${listed ? '' : ' is-hidden'}" data-trade-controls>
+      ${qtyStepperHtml(card, listed ? qty : 1)}
+      <p class="trade-qty-hint">Choose 1–${max} duplicate${max === 1 ? '' : 's'}</p>
+    </div>
   </article>`;
 }
 
@@ -93,41 +88,56 @@ export function initMyTradeCards(container) {
   if (!container) return null;
 
   const listedGrid = container.querySelector('#listedForTradeGrid');
+  const listedCount = container.querySelector('[data-listed-count]');
   const albumGrid = container.querySelector('#tradeAlbumGrid');
   const search = container.querySelector('#tradeSearch');
   const status = container.querySelector('#myTradeStatus');
   const publicToggle = container.querySelector('#publicLists');
+  const filterButtons = [...container.querySelectorAll('[data-album-filter]')];
 
   let data = [];
   let query = '';
+  let albumFilter = 'all';
   let started = false;
-  let albumSelectedId = null;
 
   function filteredCards() {
     return data.filter(card => !query || buildTradeSearchHaystack(card).includes(query));
   }
 
+  function albumCards(list) {
+    return list.filter(card => {
+      if (card.duplicateQuantity < 1 && card.tradeQuantity < 1) return false;
+      if (albumFilter === 'listed') return card.tradeQuantity > 0;
+      if (albumFilter === 'available') return card.duplicateQuantity > 0 && card.tradeQuantity <= 0;
+      return card.duplicateQuantity > 0 || card.tradeQuantity > 0;
+    });
+  }
+
   function renderListed(list) {
     if (!listedGrid) return;
     const listed = list.filter(card => card.tradeQuantity > 0);
+    if (listedCount) {
+      listedCount.textContent = listed.length
+        ? `${listed.length} card${listed.length === 1 ? '' : 's'} listed`
+        : 'Nothing listed yet';
+    }
     if (!listed.length) {
       listedGrid.innerHTML = emptyBlock(
         tradesCopy.listedEmptyTitle || 'Nothing listed yet',
         query
           ? 'No listed cards matched your search.'
-          : (tradesCopy.listedEmptyLead || 'Use your collection album below to offer duplicate copies for trade.')
+          : (tradesCopy.listedEmptyLead || 'Turn on “Offer for trade” below to list duplicate copies.')
       );
+      listedGrid.classList.toggle('is-empty', true);
       return;
     }
-    listedGrid.innerHTML = listed.map(card => listedCardHtml(card)).join('');
+    listedGrid.classList.toggle('is-empty', false);
+    listedGrid.innerHTML = listed.map(card => listedRowHtml(card)).join('');
   }
 
   function renderAlbum(list) {
     if (!albumGrid) return;
-    const album = list.filter(card => card.duplicateQuantity > 0 || card.tradeQuantity > 0);
-    if (albumSelectedId && !album.some(card => card.id === albumSelectedId)) {
-      albumSelectedId = null;
-    }
+    const album = albumCards(list);
     if (!album.length) {
       albumGrid.innerHTML = emptyBlock(
         tradesCopy.albumEmptyTitle || 'No duplicates yet',
@@ -137,7 +147,7 @@ export function initMyTradeCards(container) {
       );
       return;
     }
-    albumGrid.innerHTML = album.map(card => albumCardHtml(card, albumSelectedId)).join('');
+    albumGrid.innerHTML = album.map(card => albumCardHtml(card)).join('');
   }
 
   function render() {
@@ -154,10 +164,7 @@ export function initMyTradeCards(container) {
     try {
       const result = await setCardTradePreference(id, card.wishlisted, card.tradeQuantity);
       card.tradeQuantity = result.tradeQuantity;
-      if (card.tradeQuantity <= 0 && albumSelectedId === id) {
-        albumSelectedId = null;
-      }
-      status.textContent = 'Trade list updated ✨';
+      status.textContent = card.tradeQuantity > 0 ? 'Trade list updated ✨' : 'Removed from trade list.';
       render();
     } catch (error) {
       status.textContent = error.message || 'Could not save.';
@@ -177,11 +184,14 @@ export function initMyTradeCards(container) {
     save(cardId, clampTradeQty(card, rawValue));
   }
 
-  function toggleAlbumSelection(cardId) {
+  async function toggleListing(cardId, enabled) {
     const card = data.find(entry => entry.id === cardId);
     if (!card || card.duplicateQuantity < 1) return;
-    albumSelectedId = albumSelectedId === cardId ? null : cardId;
-    render();
+    if (enabled) {
+      await save(cardId, card.tradeQuantity > 0 ? card.tradeQuantity : 1);
+    } else {
+      await save(cardId, 0);
+    }
   }
 
   async function loadLists() {
@@ -192,7 +202,6 @@ export function initMyTradeCards(container) {
     try {
       const result = await getMyTradeLists();
       data = (result.cards || []).map(normalizeCard);
-      albumSelectedId = null;
       if (publicToggle) publicToggle.checked = result.publicLists !== false;
       render();
       status.textContent = 'Trade binder loaded.';
@@ -204,6 +213,18 @@ export function initMyTradeCards(container) {
   }
 
   container.addEventListener('click', event => {
+    const filterButton = event.target.closest('[data-album-filter]');
+    if (filterButton) {
+      albumFilter = filterButton.dataset.albumFilter || 'all';
+      filterButtons.forEach(button => {
+        const active = button === filterButton;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      render();
+      return;
+    }
+
     const removeButton = event.target.closest('[data-trade-remove]');
     if (removeButton) {
       const article = removeButton.closest('[data-card-id]');
@@ -218,18 +239,17 @@ export function initMyTradeCards(container) {
       const cardId = article?.dataset.cardId;
       if (!cardId) return;
       applyStep(cardId, stepButton.dataset.tradeStep === 'up' ? 1 : -1);
-      return;
-    }
-
-    const albumTrigger = event.target.closest('[data-album-select-trigger]');
-    if (albumTrigger) {
-      const article = albumTrigger.closest('[data-album-card]');
-      if (article?.dataset.disabled !== undefined) return;
-      if (article?.dataset.cardId) toggleAlbumSelection(article.dataset.cardId);
     }
   });
 
   container.addEventListener('change', event => {
+    const toggle = event.target.closest('[data-trade-toggle]');
+    if (toggle) {
+      const article = toggle.closest('[data-album-card]');
+      if (article?.dataset.cardId) void toggleListing(article.dataset.cardId, toggle.checked);
+      return;
+    }
+
     const input = event.target.closest('[data-trade-input]');
     if (!input) return;
     applyInput(input.dataset.tradeInput, input.value);

@@ -42,11 +42,7 @@ function tradeCardHtml(card) {
   const qty = Number(card.tradeQuantity) || 0;
   return `<article class="open-trades-card">
     <div class="open-trades-card-art">
-      <div class="trade-card-stage">
-        <div class="trade-card-tilt">
-          ${art ? `<img src="${esc(art)}" alt="" loading="lazy">` : '<div class="open-trades-card-fallback" aria-hidden="true">✦</div>'}
-        </div>
-      </div>
+      ${art ? `<img src="${esc(art)}" alt="" loading="lazy">` : '<div class="open-trades-card-fallback" aria-hidden="true">✦</div>'}
     </div>
     <div class="open-trades-card-copy">
       <strong>#${esc(number)} ${esc(card.name)}</strong>
@@ -61,18 +57,23 @@ function collectorBlock(entry, forTrade) {
   const profileUrl = shellHref('collector', { username: entry.username });
   const count = forTrade.length;
   return `<article class="open-trades-collector" data-username="${esc(entry.username)}">
-    <header class="open-trades-collector-head">
-      <a class="open-trades-avatar-link" href="${esc(profileUrl)}" target="_top" data-shell-view="collector" aria-label="Open ${esc(entry.displayName || entry.username)} profile">
-        ${avatarMarkup(entry)}
-      </a>
-      <div class="open-trades-collector-copy">
-        <a href="${esc(profileUrl)}" target="_top" data-shell-view="collector"><strong>${esc(entry.displayName || entry.username)}</strong></a>
-        <span>@${esc(entry.username)}</span>
-        <span class="open-trades-count">${count} card${count === 1 ? '' : 's'} for trade</span>
+    <details class="open-trades-details" open>
+      <summary class="open-trades-collector-head">
+        <a class="open-trades-avatar-link" href="${esc(profileUrl)}" target="_top" data-shell-view="collector" aria-label="Open ${esc(entry.displayName || entry.username)} profile" onclick="event.stopPropagation()">
+          ${avatarMarkup(entry)}
+        </a>
+        <div class="open-trades-collector-copy">
+          <a href="${esc(profileUrl)}" target="_top" data-shell-view="collector" onclick="event.stopPropagation()"><strong>${esc(entry.displayName || entry.username)}</strong></a>
+          <span>@${esc(entry.username)}</span>
+          <span class="open-trades-count">${count} card${count === 1 ? '' : 's'} for trade</span>
+        </div>
+        <span class="open-trades-expand" aria-hidden="true"></span>
+      </summary>
+      <div class="open-trades-body">
+        <div class="open-trades-grid">${forTrade.map(tradeCardHtml).join('')}</div>
+        <button type="button" class="st-button primary" data-propose-trade data-username="${esc(entry.username)}">${esc(copy('proposeTradeCta', 'Propose trade'))}</button>
       </div>
-      <button type="button" class="st-button primary" data-propose-trade data-username="${esc(entry.username)}">${esc(copy('proposeTradeCta', 'Propose trade'))}</button>
-    </header>
-    <div class="open-trades-grid">${forTrade.map(tradeCardHtml).join('')}</div>
+    </details>
   </article>`;
 }
 

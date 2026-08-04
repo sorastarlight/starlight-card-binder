@@ -13,7 +13,7 @@ const DEFAULT_DESTINATION_LABELS = Object.fromEntries(
 function rewriteLegacyLabel(destination, label, fallback) {
   const current = String(label || '').trim();
   if (!current) return fallback;
-  if (/^community(\s+hub)?$/i.test(current)) return 'THE COMMUNITY';
+  if (/^the community$|^community(\s+hub)?$/i.test(current)) return 'COMMUNITY HUB';
   const legacy = SHELL_LABEL_REWRITES[destination];
   if (!legacy?.length) return current;
   const matched = legacy.some(entry => entry.toLowerCase() === current.toLowerCase());

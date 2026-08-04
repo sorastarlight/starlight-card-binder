@@ -50,11 +50,11 @@ test('my trade cards module renders listed and album sections', async () => {
   const myTradePage = await read('docs/js/pages/my-trade-cards.js');
   assert.match(myTradePage, /listedForTradeGrid/);
   assert.match(myTradePage, /tradeAlbumGrid/);
-  assert.match(myTradePage, /data-trade-remove/);
-  assert.match(myTradePage, /data-album-select-trigger/);
+  assert.match(myTradePage, /data-trade-toggle/);
+  assert.match(myTradePage, /data-album-filter/);
   assert.match(myTradePage, /trade-qty-stepper/);
   assert.match(myTradePage, /clampTradeQty/);
-  assert.match(myTradePage, /listedCardHtml/);
+  assert.match(myTradePage, /listedRowHtml/);
   assert.doesNotMatch(myTradePage, /showWishlist: true/);
 });
 

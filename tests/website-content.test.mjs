@@ -415,7 +415,7 @@ test('website editor admin page and public hooks are wired', async () => {
   assert.doesNotMatch(collector, /collector-twitch-handle/);
   assert.match(collector, /collector-role|collector-flair/);
   assert.match(collector, /collection-level-card|collector-level/);
-  assert.match(rankingsPage, /section: 'collectors'/);
+  assert.match(rankingsPage, /data-propose-trade/);
   assert.match(myTradePage, /initMyTradeCards/);
   assert.match(myTradePage, /listedEmptyTitle/);
   assert.match(tradeOffersHub, /getCachedWebsiteContent/);

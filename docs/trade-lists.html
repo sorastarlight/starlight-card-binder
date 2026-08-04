@@ -7,8 +7,8 @@
   <link rel="stylesheet" href="css/style.css?v=1.0.2">
   <link rel="stylesheet" href="css/app-shell.css?v=1.2.1">
   <link rel="stylesheet" href="css/shared-ui.css?v=1.6.15">
-  <link rel="stylesheet" href="css/pages/trade-lists.css?v=1.8.0">
-  <link rel="stylesheet" href="css/pages/trade-offers.css?v=1.4.1">
+  <link rel="stylesheet" href="css/pages/trade-lists.css?v=1.9.1">
+  <link rel="stylesheet" href="css/pages/trade-offers.css?v=1.4.3">
   <link rel="stylesheet" href="css/pages/user-rankings.css?v=1.2.0">
   <link rel="stylesheet" href="css/avatar-frames.css?v=1.3.0">
   <link rel="stylesheet" href="css/qol-ui.css?v=94.2.8">
@@ -20,7 +20,7 @@
   <main class="trade-page trade-hub-page">
     <section class="trade-head">
       <p class="eyebrow" data-content="trades.eyebrow">Collector Exchange</p>
-      <h1 data-content="trades.title">🤝 Trade Hub</h1>
+      <h1 data-content="trades.title">🤝 Trade With Others</h1>
       <p data-content="trades.lead">Find collectors, list duplicates for trade, propose exchanges, and track your offers — all in one place.</p>
     </section>
 
@@ -120,20 +120,26 @@
         <header class="trading-section-head">
           <h2 data-content="trades.listedTitle">Listed For Trade</h2>
           <p data-content="trades.listedLead">These duplicate copies are visible to other collectors browsing your profile.</p>
+          <p class="trade-listed-count" data-listed-count aria-live="polite">Nothing listed yet</p>
         </header>
-        <div id="listedForTradeGrid" class="trade-grid trade-grid-listed" aria-live="polite"></div>
+        <div id="listedForTradeGrid" class="trade-listed-rows" aria-live="polite"></div>
       </section>
 
       <section class="trade-panel trade-panel-album">
         <header class="trading-section-head">
           <h2 data-content="trades.albumTitle">Your Collection</h2>
-          <p data-content="trades.albumLead">Click a duplicate card to offer it for trade, then set how many copies to list. Your first copy of each card stays protected.</p>
+          <p data-content="trades.albumLead">Use the Offer for trade switch on any duplicate, then set how many copies to list. Your first copy of each card stays protected.</p>
         </header>
         <div class="trade-tools">
           <label class="trade-search-label" for="tradeSearch">
             <span class="visually-hidden">Search cards</span>
             <input id="tradeSearch" type="search" placeholder="Search names, numbers…" aria-label="Search cards">
           </label>
+          <div class="trade-album-filters" role="tablist" aria-label="Filter duplicates">
+            <button type="button" class="active" data-album-filter="all" aria-selected="true">All duplicates</button>
+            <button type="button" data-album-filter="listed" aria-selected="false">Listed</button>
+            <button type="button" data-album-filter="available" aria-selected="false">Not listed</button>
+          </div>
           <label class="privacy-toggle">
             <input id="publicLists" type="checkbox" checked>
             Show trade lists on my public profile
