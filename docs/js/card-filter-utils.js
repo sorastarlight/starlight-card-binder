@@ -45,25 +45,20 @@ export function resolveBinderBrowseList(cards, filters = {}, options = {}) {
   const searching = query.length > 0;
   const series = filters.series || 'All Series';
 
-  if (!searching && series === 'All Series') {
-    return {
-      showLanding: true,
-      list: [],
-      poolSize: catalog.length,
-      heading: 'All Series',
-      summary: `Choose a series to browse ${catalog.length} cards`
-    };
-  }
-
   const pool = series === 'All Series'
     ? catalog
     : catalog.filter(card => card.series === series);
 
   const list = filterCardList(pool, { ...filters, series: 'All Series' }, options);
-  const heading = series === 'All Series' ? 'Search results' : series;
+  const owned = list.filter(card => options.isCollected?.(card.id)).length;
+  const heading = series === 'All Series'
+    ? (searching ? 'Search results' : 'Card Gallery')
+    : series;
   const summary = series === 'All Series'
-    ? `Showing ${list.length} of ${pool.length} cards matching “${query}”`
-    : `Showing ${list.length} of ${pool.length} cards in ${series}`;
+    ? (searching
+      ? `Showing ${list.length} of ${pool.length} cards matching “${query}”`
+      : `Showing ${list.length} of ${pool.length} cards · ${owned} collected`)
+    : `Showing ${list.length} of ${pool.length} cards in ${series} · ${owned} collected`;
 
   return {
     showLanding: false,

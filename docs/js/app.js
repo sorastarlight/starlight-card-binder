@@ -95,10 +95,7 @@ function refreshBinderFiltersForDisplay() {
 
 function syncBinderSeriesMode(browse) {
   if (pageName !== 'binder') return;
-  const filters = activeFilters();
-  const searching = Boolean(filters.q);
-  const onLanding = Boolean(browse?.showLanding) && !searching;
-  document.body.classList.toggle('series-select', onLanding);
+  document.body.classList.remove('series-select');
   const chrome = $('.binder-browse-chrome');
   if (chrome) {
     chrome.removeAttribute('hidden');
@@ -947,7 +944,15 @@ function resolveBinderBrowse() {
   }
   const searching = Boolean(filters.q);
   if (!searching && filters.series === 'All Series') {
-    return { showLanding: true, list: [], poolSize: cards.length, heading: 'All Series', summary: '' };
+    const list = filterCardList(cards, { ...filters, series: 'All Series' });
+    const owned = list.filter(c => isCollected(c.id)).length;
+    return {
+      showLanding: false,
+      list,
+      poolSize: cards.length,
+      heading: 'Card Gallery',
+      summary: `Showing ${list.length} of ${cards.length} cards · ${owned} collected`
+    };
   }
   const pool = filters.series === 'All Series' ? cards : cards.filter(c => c.series === filters.series);
   const list = filterCardList(pool, { ...filters, series: 'All Series' });
@@ -1141,10 +1146,20 @@ window.addEventListener('starlight-website-content-hydrated', (event) => {
   }
 });
 
+function renderGalleryProgress(browse = resolveBinderBrowse()) {
+  const host = $('#tcgGalleryProgress');
+  if (!host) return;
+  const list = browse?.list || [];
+  const poolSize = browse?.poolSize || list.length || cards.length;
+  const owned = list.filter(c => isCollected(c.id)).length;
+  const pct = poolSize ? Math.round((owned / poolSize) * 100) : 0;
+  host.hidden = !poolSize;
+  host.innerHTML = `<div class="tcg-gallery-progress-copy">${owned} / ${poolSize} collected (${pct}%)</div><div class="tcg-gallery-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="${poolSize}" aria-valuenow="${owned}" aria-label="Gallery collection progress"><span style="width:${pct}%"></span></div>`;
+}
+
 function renderSeriesHero(browse = resolveBinderBrowse()) {
   const f = activeFilters();
   const searching = Boolean(f.q);
-  const inSeriesSelect = Boolean(browse?.showLanding) && !searching;
   const title = $('#seriesHeroTitle');
   const desc = $('#seriesHeroDescription');
   const eyebrow = $('.series-hero .eyebrow');
@@ -1154,28 +1169,14 @@ function renderSeriesHero(browse = resolveBinderBrowse()) {
   const list = f.series === 'All Series' ? cards : cards.filter(c => c.series === f.series);
   const got = list.filter(c => isCollected(c.id)).length;
   const landing = websiteBinderLanding || window.__starlightWebsiteContent?.binderLanding || websiteSection('binderLanding');
-  const browsingSeries = !inSeriesSelect && f.series !== 'All Series';
-  if (inSeriesSelect || f.series === 'All Series') {
-    applyOptionalText(title, landing?.title, 'Starlight Card Series Binder 📦');
-    applyOptionalText(desc, landing?.lead, 'Choose a booster pack to enter that series binder.');
-    if (eyebrow) applyOptionalText(eyebrow, landing?.eyebrow, 'Starlight Cards');
-  } else {
-    title.hidden = false;
-    title.classList.remove('is-content-hidden');
-    title.removeAttribute('aria-hidden');
+  const browsingSeries = f.series !== 'All Series';
+  applyOptionalText(title, landing?.title, 'Starlight Card Gallery');
+  applyOptionalText(desc, landing?.lead, 'Browse every card in the series. Uncollected cards stay face-down until you earn them.');
+  if (browsingSeries) {
     title.textContent = `${f.series} ⭐`;
-    desc.hidden = false;
-    desc.classList.remove('is-content-hidden');
-    desc.removeAttribute('aria-hidden');
-    desc.textContent = list.find(c => c.seriesDescription)?.seriesDescription || '';
+    desc.textContent = list.find(c => c.seriesDescription)?.seriesDescription || landing?.gridBrowseLead || 'Browse this set and collect every card.';
   }
-  if (eyebrow) {
-    const hideEyebrow = browsingSeries;
-    eyebrow.hidden = hideEyebrow;
-    eyebrow.classList.toggle('is-content-hidden', hideEyebrow);
-    if (hideEyebrow) eyebrow.setAttribute('aria-hidden', 'true');
-    else eyebrow.removeAttribute('aria-hidden');
-  }
+  if (eyebrow) applyOptionalText(eyebrow, landing?.eyebrow, 'Starlight Cards');
   if (stats) {
     const rarityBits = ['Common','Uncommon','Rare','Epic','Legendary'].map(r => {
       const n = list.filter(c => c.rarity === r).length;
@@ -1183,14 +1184,15 @@ function renderSeriesHero(browse = resolveBinderBrowse()) {
     }).join('');
     const totalPill = fillWebsiteTokens(landing.totalCardsPill || '{count} total cards', { count: cards.length });
     const collectedPill = fillWebsiteTokens(landing.collectedPill || '{owned} / {total} collected', { owned: got, total: list.length });
-    stats.innerHTML = inSeriesSelect
-      ? `<span class="hero-pill progress">${esc(totalPill)}</span>`
-      : `<span class="hero-pill progress">${esc(collectedPill)}</span>${rarityBits}`;
+    stats.innerHTML = browsingSeries
+      ? `<span class="hero-pill progress">${esc(collectedPill)}</span>${rarityBits}`
+      : `<span class="hero-pill progress">${esc(totalPill)}</span><span class="hero-pill progress">${esc(collectedPill)}</span>${rarityBits}`;
   }
+  renderGalleryProgress(browse);
   if (toolbar) {
     if (browsingSeries) {
       toolbar.hidden = false;
-      toolbar.innerHTML = `<button id="backToSeries" class="v61-back-btn" type="button">${esc(landing.backToSeriesCta || '← Back to Series')}</button><p class="series-hero-summary" data-filter-summary role="status" aria-live="polite"></p>`;
+      toolbar.innerHTML = `<button id="backToSeries" class="v61-back-btn" type="button">${esc(landing.backToSeriesCta || '← All Series')}</button><p class="series-hero-summary" data-filter-summary role="status" aria-live="polite"></p>`;
     } else {
       toolbar.hidden = true;
       toolbar.innerHTML = '';
@@ -1515,6 +1517,21 @@ function renderFullView() {
   scanPerspectiveCardsIn(overlay);
 }
 
+function renderAlbumBinderCard(card, i) {
+  const got = isCollected(card.id);
+  const img = card.imageUrl;
+  const numberLabel = window.StarlightCardFilters?.cardDisplayNumber?.(card) || String(card.collectorNumber || card.number || '');
+  const qty = getCardQuantity(card.id);
+  const prestigeClass = prestigeFrameClass(card.id);
+  return `<article class="album-binder-slot ${rarityClass(card)} is-collected ${prestigeClass}" style="--i:${i}">
+    <button class="album-binder-btn" type="button" data-album-card="${esc(card.id)}" aria-label="Open ${esc(displayName(card))} full view">
+      <span class="album-binder-art">${perspectiveArt(card, { imageUrl: img, alt: displayName(card), visible: perspectiveArtVisible(card, got) })}${prestigeFrameOverlayHtml(card.id)}</span>
+      <span class="badge">${esc(numberLabel)}</span>
+    </button>
+    <span class="album-binder-meta"><strong>${esc(displayName(card))}</strong><span class="album-qty">×${qty}</span></span>
+  </article>`;
+}
+
 function renderGridPage(target, mode) {
   const wrap = $(target); if (!wrap) return;
   let baseList = cards;
@@ -1551,10 +1568,18 @@ function renderGridPage(target, mode) {
     ? (collectionCopy.emptyFiltersLead || 'Try resetting one or more filters to see additional cards.')
     : (mode === 'favorites'
       ? (collectionCopy.emptyFavoritesLead || 'Tap the star on your favorite cards and this showcase will sparkle to life.')
-      : (collectionCopy.emptyAllLead || 'Earn cards from Daily Boosters, redemption codes, and special rewards to fill this collection.'));
+      : (collectionCopy.emptyAllLead || 'Earn cards from Daily Boosters, redemption codes, and special rewards to fill your album binder.'));
   const emptyAction = baseList.length
     ? `<button class="btn primary" type="button" data-reset-card-filters>${esc(collectionCopy.emptyFiltersCta || 'Reset Filters')}</button>`
-    : `<a class="btn primary" href="binder?view=binder">${esc(mode === 'favorites' ? (collectionCopy.emptyFavoritesCta || 'Open Binder') : (collectionCopy.emptyAllCta || 'Open Binder'))}</a>`;
+    : `<a class="btn primary" href="binder?view=binder">${esc(mode === 'favorites' ? (collectionCopy.emptyFavoritesCta || 'Open Card Gallery') : (collectionCopy.emptyAllCta || 'Open Card Gallery'))}</a>`;
+  if (mode === 'collection') {
+    wrap.innerHTML = list.length
+      ? list.map((c, i) => renderAlbumBinderCard(c, i)).join('')
+      : `<div class="empty-state"><h2>${esc(emptyTitle)}</h2><p>${esc(emptyLead)}</p>${emptyAction}</div>`;
+    attachAlbumBinderHoverSfx(wrap);
+    scanPerspectiveCardsIn(wrap);
+    return;
+  }
   wrap.innerHTML = list.length ? list.map(c => {
     const got = isCollected(c.id); const hidden = !got;
     const quantity = getCardQuantity(c.id);
@@ -1929,23 +1954,19 @@ function attachFullViewTilt() {
 /* ===== V61: Booster splash + magical grid binder replacement ===== */
 function renderBinder() {
   const browse = applyFilters();
-  const searching = Boolean(activeFilters().q);
   syncBinderSeriesMode(browse);
   ensureBinderFilterPanel();
   renderSeriesHero(browse);
-  const inSeriesSelect = Boolean(browse.showLanding) && !searching;
-  if (browse.showLanding && browse.summary) {
-    $$('[data-filter-summary]').forEach(element => {
-      element.textContent = browse.summary;
-    });
-  }
+  $$('[data-filter-summary]').forEach(element => {
+    element.textContent = browse.summary || '';
+  });
   const landing = $('#seriesLanding');
   const grid = $('#seriesGridStage');
-  if (landing) landing.innerHTML = inSeriesSelect ? renderV61SeriesLandingHtml() : '';
-  if (grid) grid.innerHTML = inSeriesSelect ? '' : renderV61CardGridHtml(browse);
-  if (grid && !inSeriesSelect) scanPerspectiveCardsIn(grid);
-  renderV62Showcase(inSeriesSelect, browse);
-  if (inSeriesSelect) initBinderSeriesCarouselLanding();
+  if (landing) landing.innerHTML = '';
+  if (grid) {
+    grid.innerHTML = renderV61CardGridHtml(browse);
+    scanPerspectiveCardsIn(grid);
+  }
   attachV61HoverSfx();
 }
 function renderV61PackSlide(group, i) {
@@ -2010,7 +2031,7 @@ function renderV61CardGridHtml(browse = resolveBinderBrowse()) {
   const emptyTitle = copy.emptyFiltersTitle || 'No cards match these filters';
   const emptyLead = copy.emptyFiltersLead || 'Reset one or more filters to browse this series again.';
   const emptyCta = copy.emptyFiltersCta || copy.filtersResetCta || 'Reset Filters';
-  return `<div class="v61-grid-shell">
+  return `<div class="v61-grid-shell tcg-gallery-grid">
     <div class="v61-grid starlight-gallery-grid">${list.length ? list.map((card,i)=>renderV61Card(card,i)).join('') : `<div class="empty-state"><h2>${esc(emptyTitle)}</h2><p>${esc(emptyLead)}</p><button class="btn primary" type="button" data-reset-card-filters>${esc(emptyCta)}</button></div>`}</div>
   </div>`;
 }
@@ -2021,10 +2042,8 @@ function renderV61Card(card, i) {
   const numberLabel = window.StarlightCardFilters?.cardDisplayNumber?.(card) || String(card.collectorNumber || card.number || '');
   const qty = getCardQuantity(card.id);
   const prestigeClass = got ? prestigeFrameClass(card.id) : '';
-  const premium = window.StarlightPerspectiveCard?.hasPremiumPerspective?.(card);
-  const missingClasses = got ? 'is-collected' : 'is-hidden is-missing-slot';
-  const hintClass = premium && !got ? ' has-premium-hint' : '';
-  return `<article class="v61-card-slot starlight-gallery-card ${rarityClass(card)} ${missingClasses}${hintClass} ${prestigeClass}" style="--i:${i}">
+  const missingClasses = got ? 'is-collected' : 'is-hidden';
+  return `<article class="v61-card-slot tcg-gallery-card starlight-gallery-card ${rarityClass(card)} ${missingClasses} ${prestigeClass}" style="--i:${i}">
     <button class="v61-card-btn" type="button" data-v61-card="${esc(card.id)}" aria-label="View ${esc(getVisibleName(card))}">
       <span class="v61-card-art">${perspectiveArt(card, { imageUrl: img, alt: getVisibleName(card), imgClass: artClass, visible: perspectiveArtVisible(card, got) })}${got ? prestigeFrameOverlayHtml(card.id) : ''}</span>
       <span class="badge">${esc(numberLabel)}</span>
@@ -2160,6 +2179,14 @@ function attachV61HoverSfx() {
   });
 }
 
+function attachAlbumBinderHoverSfx(root = document) {
+  root.querySelectorAll?.('.album-binder-btn')?.forEach(el => {
+    if (el.dataset.albumHoverReady === '1') return;
+    el.dataset.albumHoverReady = '1';
+    el.addEventListener('mouseenter', () => playSfx('hover', el.dataset.albumCard || 'album'));
+  });
+}
+
 
 document.addEventListener('click', e => {
   const pack = e.target.closest('[data-v61-pack]');
@@ -2181,13 +2208,18 @@ document.addEventListener('click', e => {
     selected = cards.find(c => c.id === cardBtn.dataset.v61Card) || selected;
     selectedIndex = cards.findIndex(c => c.id === cardBtn.dataset.v61Card);
     previewFlipped = false;
-    if (!isBinderSidePanelOn()) {
-      playSfx('analyze');
-      openFullView('filtered');
-    } else {
-      renderV62Showcase(false);
-      playSfx('sparkle');
-    }
+    playSfx('analyze');
+    openFullView('filtered');
+    return;
+  }
+  const albumBtn = e.target.closest('[data-album-card]');
+  if (albumBtn) {
+    e.preventDefault(); e.stopPropagation();
+    selected = cards.find(c => c.id === albumBtn.dataset.albumCard) || selected;
+    selectedIndex = cards.findIndex(c => c.id === albumBtn.dataset.albumCard);
+    previewFlipped = false;
+    playSfx('analyze');
+    openFullView('collection');
     return;
   }
 }, true);

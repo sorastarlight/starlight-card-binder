@@ -10,14 +10,15 @@ test('keeps the requested collection navigation labels in the shared shell', asy
 
   for (const label of [
     'Explore The Starlight Card Series',
-    'The Starlight Card Series Binder',
+    'Starlight Card Gallery',
     'Redeem A Code',
     'My Stuff',
-    'My Starlight Album',
+    'My Card Album Binder',
     'Star Registry'
   ]) assert.match(binder, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
 
-  assert.match(shell, /collection:\{title:'My Starlight Album'/);
+  assert.match(shell, /collection:\{title:'My Card Album Binder'/);
+  assert.match(shell, /binder:\{title:'Starlight Card Gallery'/);
   assert.match(shell, /checklist:\{title:'Star Registry'/);
 });
 
@@ -31,15 +32,17 @@ test('places shared card filters in the binder and collection content areas', as
 
   assert.doesNotMatch(binder, /side-card filters/);
   assert.match(binder, /data-card-filter-context="binder"/);
-  assert.match(binder, /binder-browse-chrome/);
+  assert.match(binder, /tcg-gallery-hub/);
+  assert.match(binder, /tcg-gallery-hub\.css/);
   assert.match(binder, /id="seriesHeroToolbar"/);
   assert.match(collection, /data-card-filter-context="collection"/);
+  assert.match(collection, /album-binder-stage/);
+  assert.match(collection, /album-binder\.css/);
   assert.match(checklist, /data-card-filter-context="checklist"/);
   assert.match(checklist, /css\/card-filters\.css/);
   assert.match(app, /function renderFilterControls\(\)/);
-  assert.match(app, /filterCardList\(baseList, activeFilters\(\)/);
+  assert.match(app, /function renderAlbumBinderCard\(/);
   assert.match(app, /function renderChecklist\(\)/);
-  assert.match(app, /filterCardList\(cards, activeFilters\(\)/);
 });
 
 test('removes daily-booster promotion and floating quantity badges from My Cards', async () => {

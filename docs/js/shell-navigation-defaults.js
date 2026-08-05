@@ -9,7 +9,7 @@ export const PUBLIC_SHELL_DESTINATIONS = Object.freeze([
   { value: 'shop', label: 'Card Boutique' },
   { value: 'events', label: 'Starlight Events' },
   { value: 'redeem', label: 'Redeem A Code' },
-  { value: 'collection', label: 'My Starlight Album' },
+  { value: 'collection', label: 'My Card Album Binder' },
   { value: 'star-bits', label: 'My Star Bits' },
   { value: 'starlight-evolution', label: 'Evolve My Cards' },
   { value: 'checklist', label: 'Star Registry' },
@@ -48,9 +48,14 @@ export const SHELL_LABEL_REWRITES = Object.freeze({
     'Card Shop'
   ]),
   collection: Object.freeze([
+    'My Starlight Album',
     'My Card Collection & Favorites',
     'My Card Collection',
     'My Collection'
+  ]),
+  binder: Object.freeze([
+    'The Starlight Card Series Binder',
+    'Starlight Card Series Binder'
   ]),
   checklist: Object.freeze([
     'My Checklist',
@@ -84,8 +89,8 @@ export function createDefaultShellNavigation() {
     brandRibbon: 'Card Binder',
     pageTitles: {
       home: 'Home',
-      binder: 'The Starlight Card Series Binder',
-      collection: 'My Starlight Album',
+      binder: 'Starlight Card Gallery',
+      collection: 'My Card Album Binder',
       daily: 'Daily Free Booster Pack',
       shop: 'Card Boutique',
       events: 'Starlight Events',
@@ -114,7 +119,7 @@ export function createDefaultShellNavigation() {
           staffOnly: false,
           items: [
             { id: 'home', label: 'Home', icon: { type: 'emoji', value: '🏠' }, destination: 'home', enabled: true, features: [] },
-            { id: 'binder', label: 'The Starlight Card Series Binder', icon: { type: 'emoji', value: '🗂️' }, destination: 'binder', enabled: true, features: [] },
+            { id: 'binder', label: 'Starlight Card Gallery', icon: { type: 'emoji', value: '🃏' }, destination: 'binder', enabled: true, features: [] },
             { id: 'daily', label: 'Free Daily Booster', icon: { type: 'emoji', value: '✨' }, destination: 'daily', enabled: true, features: ['dailyBadge'], className: 'shell-daily-link' },
             { id: 'shop', label: 'Card Boutique', icon: { type: 'emoji', value: '🛍️' }, destination: 'shop', enabled: true, features: [], className: 'shell-shop-link' },
             { id: 'events', label: 'Starlight Events', icon: { type: 'emoji', value: '🎉' }, destination: 'events', enabled: true, features: [] },
@@ -127,7 +132,7 @@ export function createDefaultShellNavigation() {
           icon: { type: 'emoji', value: '♡' },
           staffOnly: false,
           items: [
-            { id: 'collection', label: 'My Starlight Album', icon: { type: 'emoji', value: '♡' }, destination: 'collection', enabled: true, features: [] },
+            { id: 'collection', label: 'My Card Album Binder', icon: { type: 'emoji', value: '📒' }, destination: 'collection', enabled: true, features: [] },
             { id: 'star-bits', label: 'My Star Bits', icon: starBitNavIcon(), destination: 'star-bits', enabled: true, features: [] },
             { id: 'starlight-evolution', label: 'Evolve My Cards', icon: { type: 'emoji', value: '⭐' }, destination: 'starlight-evolution', enabled: true, features: [] },
             { id: 'checklist', label: 'Star Registry', icon: { type: 'emoji', value: '☑' }, destination: 'checklist', enabled: true, features: [] },

@@ -24,7 +24,7 @@ const MAX_VIEW_RETRIES = 1;
 
 const routes = {
   home:{title:'Home',src:'home.html'},
-  binder:{title:'The Starlight Card Series Binder',src:null}, collection:{title:'My Starlight Album',src:'collection.html'},
+  binder:{title:'Starlight Card Gallery',src:null}, collection:{title:'My Card Album Binder',src:'collection.html'},
   daily:{title:'Daily Free Booster Pack',src:'daily-booster.html'}, shop:{title:'Card Boutique',src:'booster-shop.html'}, events:{title:'Starlight Events',src:'events.html'}, redeem:{title:'Redeem A Code',src:'redeem.html'},
   'star-bits':{title:'Star Bits Exchange',src:'star-bits.html'},
   'starlight-evolution':{title:'Starlight Card Evolution',src:'starlight-evolution.html'},
@@ -197,7 +197,7 @@ function navigate(route,{push=true,extra={}}={}){
     nativeView?.classList.remove('hidden');
     frameWrap?.classList.remove('active','is-loading','has-error');
     if(frame)setFrameLocation('about:blank');
-    document.title='The Starlight Card Series Binder | Starlight Card Binder';
+    document.title='Starlight Card Gallery | Starlight Card Binder';
     window.renderAll?.();
     if(previousRoute==='login')scheduleHydrateAccount();
     return;

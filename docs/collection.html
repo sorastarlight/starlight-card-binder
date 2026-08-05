@@ -5,13 +5,14 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
 <title>
-        My Starlight Album | Starlight Card Binder
+        My Card Album Binder | Starlight Card Binder
     </title>
 <link href="css/style.css?v=1.0.3" rel="stylesheet"/>
 <link href="css/v80-8-ui.css" rel="stylesheet"/>
 <link rel="stylesheet" href="css/pages/collection.css?v=1.0">
 <link href="css/card-filters.css?v=1.0" rel="stylesheet"/>
-<link href="css/collection-redesign.css?v=1.3" rel="stylesheet"/><script src="js/browser-performance.js?v=1.0.0" defer></script>
+<link href="css/collection-redesign.css?v=1.3" rel="stylesheet"/>
+<link href="css/pages/album-binder.css?v=1.0.0" rel="stylesheet"/><script src="js/browser-performance.js?v=1.0.0" defer></script>
     <link rel="stylesheet" href="css/shared-ui.css?v=1.6.19">
 <link rel="stylesheet" href="css/prestige-frames.css?v=3.8">
 <link rel="stylesheet" href="css/qol-ui.css?v=94.2.11">
@@ -32,8 +33,8 @@
 <section class="collection-dashboard panel">
 <div class="collection-dashboard-copy">
 <p class="eyebrow" data-content="collection.eyebrow">My Stuff</p>
-<h1 data-content="collection.title">My Starlight Album</h1>
-<p data-content="collection.lead">Celebrate your collection, revisit favorite cards, and understand your progress at a glance.</p>
+<h1 data-content="collection.title">My Card Album Binder</h1>
+<p data-content="collection.lead">Your personal binder of collected Starlight cards. Themes and covers unlock as you level up.</p>
 </div>
 <div aria-label="Collection summary" class="collection-summary-grid">
 <div><strong data-collected="">0</strong><span>Unique Cards</span></div>
@@ -54,14 +55,20 @@
 </div>
 </section>
 <section aria-label="Collection views" class="collection-tabs panel">
-<button class="collection-tab active" data-collection-tab="all" type="button" data-content="collection.tabAll">All Cards</button>
+<button class="collection-tab active" data-collection-tab="all" type="button" data-content="collection.tabAll">Collected Cards</button>
 <button class="collection-tab" data-collection-tab="favorites" type="button" data-content="collection.tabFavorites">Favorites</button>
 <button class="collection-tab" data-collection-tab="duplicates" type="button" data-content="collection.tabDuplicates">Duplicates</button>
 </section>
 <section class="card-filter-panel panel" data-card-filter-context="collection" aria-label="Filter collection cards"></section>
 <section class="collection-tab-panel active" data-collection-panel="all">
-<div class="collection-section-heading"><div><p class="eyebrow" data-content="collection.allEyebrow">Owned Cards</p><h2 data-content="collection.allTitle">All Cards</h2></div><p data-content="collection.allLead">Your complete cloud-synced collection.</p></div>
-<section class="grid-page" id="collectionGrid"></section>
+<div class="collection-section-heading"><div><p class="eyebrow" data-content="collection.allEyebrow">My Binder</p><h2 data-content="collection.allTitle">Collected Cards</h2></div><p data-content="collection.allLead">Cards you own, displayed in your Starlight album binder.</p></div>
+<section class="album-binder-stage" data-binder-theme="classic-starlight" id="albumBinderStage">
+<div class="album-binder-head">
+<div><h2 data-content="collection.binderSpreadTitle">Binder Spread</h2><p data-content="collection.binderSpreadLead">Tap a card for full view, favorites, and trade actions.</p></div>
+<span class="album-binder-theme-note" data-content="collection.binderThemeNote">Classic Starlight theme</span>
+</div>
+<div class="album-binder-grid-shell"><div class="album-binder-grid starlight-gallery-grid" id="collectionGrid"></div></div>
+</section>
 </section>
 <section class="collection-tab-panel" data-collection-panel="favorites" hidden="">
 <div class="collection-section-heading"><div><p class="eyebrow" data-content="collection.favoritesEyebrow">Personal Picks</p><h2 data-content="collection.favoritesTitle">Favorites</h2></div><p data-content="collection.favoritesLead">The cards you have starred for quick access.</p></div>

@@ -57,16 +57,18 @@ test('filterCardList matches collector number queries', () => {
   assert.equal(list[0].id, 'c3');
 });
 
-test('resolveBinderBrowseList shows landing for All Series without query', () => {
+test('resolveBinderBrowseList shows full gallery for All Series without query', () => {
   const browse = resolveBinderBrowseList(catalog, {
     q: '',
     series: 'All Series',
     rarity: 'All Rarities',
     view: 'all'
-  });
-  assert.equal(browse.showLanding, true);
-  assert.deepEqual(browse.list, []);
+  }, { isCollected: () => false });
+  assert.equal(browse.showLanding, false);
+  assert.equal(browse.list.length, 3);
   assert.equal(browse.poolSize, 3);
+  assert.equal(browse.heading, 'Card Gallery');
+  assert.match(browse.summary, /0 collected/);
 });
 
 test('resolveBinderBrowseList searches the full catalog when All Series + query', () => {
