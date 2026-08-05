@@ -36,6 +36,8 @@ test('3D album binder module renders spreads and page turns', async () => {
   assert.match(source, /sortOwnedCards/);
   assert.match(source, /animateTurn/);
   assert.match(source, /bindDragCorners/);
+  assert.match(source, /bindCardActions/);
+  assert.match(source, /onCardOpen/);
   assert.match(source, /album-binder-3d-pocket-grid/);
 });
 
@@ -55,7 +57,8 @@ test('app.js wires cinematic full view and spread preloading', async () => {
   assert.match(app, /data-album-spread/);
   assert.match(app, /preloadAlbumBinderSpreadImages/);
   assert.match(app, /StarlightCardViewTransition/);
-  assert.match(app, /sourceEl/);
+  assert.match(app, /openAlbumBinderCard/);
+  assert.match(app, /onCardOpen/);
 });
 
 test('collection page loads 3D binder modules and styles', async () => {

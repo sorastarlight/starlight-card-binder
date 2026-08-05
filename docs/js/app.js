@@ -966,6 +966,15 @@ function preloadAlbumBinderSpreadImages(list, spreadIndex) {
   });
 }
 
+function openAlbumBinderCard(sourceEl) {
+  const cardId = sourceEl?.dataset?.albumCard;
+  if (!cardId) return;
+  selected = cards.find(card => card.id === cardId) || selected;
+  selectedIndex = Math.max(0, cards.findIndex(card => card.id === cardId));
+  previewFlipped = false;
+  openFullView('collection', { sourceEl });
+}
+
 function renderAlbumBinder3D(wrap, list) {
   const binderApi = window.StarlightAlbumBinder;
   const sceneApi = window.StarlightAlbumBinder3D;
@@ -987,6 +996,8 @@ function renderAlbumBinder3D(wrap, list) {
   window.StarlightBinderThemes?.applyTheme?.(scene, themeId, { updateBadge: true });
   sceneApi.bindScene(scene, {
     onTurn: direction => turnAlbumBinderSpread(direction),
+    onCardOpen: openAlbumBinderCard,
+    playSfx,
     canTurn: direction => {
       if (direction === 'prev') return spreadData.spread > 1;
       if (direction === 'next') return spreadData.spread < spreadData.totalSpreads;
@@ -995,7 +1006,6 @@ function renderAlbumBinder3D(wrap, list) {
   });
   preloadAlbumBinderSpreadImages(sorted, spreadData.spread);
   attachAlbumBinderHoverSfx(wrap);
-  scanPerspectiveCardsIn(wrap);
   return true;
 }
 
@@ -1470,7 +1480,12 @@ function openFullView(listMode = 'all', options = {}) {
 
   const revealModal = () => {
     overlayFlipped = previewFlipped;
-    $('#cardOverlay')?.classList.add('card-analyzer-open');
+    const overlay = $('#cardOverlay');
+    if (overlay) {
+      overlay.hidden = false;
+      overlay.removeAttribute('aria-hidden');
+    }
+    overlay?.classList.add('card-analyzer-open');
     renderFullView();
     playSfx('analyze');
     const modal = fullViewModal();
@@ -2462,10 +2477,7 @@ document.addEventListener('click', e => {
   const albumBtn = e.target.closest('[data-album-card]');
   if (albumBtn) {
     e.preventDefault(); e.stopPropagation();
-    selected = cards.find(c => c.id === albumBtn.dataset.albumCard) || selected;
-    selectedIndex = cards.findIndex(c => c.id === albumBtn.dataset.albumCard);
-    previewFlipped = false;
-    openFullView('collection', { sourceEl: albumBtn });
+    openAlbumBinderCard(albumBtn);
     return;
   }
 }, true);

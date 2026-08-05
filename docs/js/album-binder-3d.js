@@ -179,11 +179,36 @@
     });
   }
 
-  function bindScene(root, { onTurn, onTilt, playSfx, canTurn } = {}) {
+  function bindCardActions(root, { onCardOpen, playSfx } = {}) {
+    if (!root) return;
+    root.querySelectorAll('[data-album-card]').forEach(button => {
+      if (button.dataset.albumCardBound === '1') return;
+      button.dataset.albumCardBound = '1';
+      button.addEventListener('click', event => {
+        if (animating) return;
+        event.preventDefault();
+        event.stopPropagation();
+        playSfx?.('analyze');
+        onCardOpen?.(button);
+      });
+      button.addEventListener('keydown', event => {
+        if (animating) return;
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        playSfx?.('analyze');
+        onCardOpen?.(button);
+      });
+    });
+  }
+
+  function bindScene(root, { onTurn, onTilt, onCardOpen, playSfx, canTurn } = {}) {
     if (!root || root.dataset.binder3dBound === '1') return;
     root.dataset.binder3dBound = '1';
     const stage = root.querySelector('.album-binder-3d-stage');
     const reduced = motionReduced();
+
+    bindCardActions(root, { onCardOpen, playSfx });
+    bindDragCorners(root, { onTurn, canTurn });
 
     root.querySelectorAll('[data-album-spread]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -191,8 +216,6 @@
         onTurn?.(btn.dataset.albumSpread);
       });
     });
-
-    bindDragCorners(root, { onTurn, canTurn });
 
     if (stage && !reduced && global.matchMedia?.('(pointer: fine)').matches) {
       stage.addEventListener('pointermove', event => {
@@ -245,6 +268,7 @@
     sortOwnedCards,
     renderSceneHtml,
     bindScene,
+    bindCardActions,
     bindDragCorners,
     animateTurn,
     isAnimating

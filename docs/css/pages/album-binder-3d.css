@@ -179,6 +179,10 @@
   overflow: hidden;
 }
 
+.album-binder-3d-sleeve:not(.album-binder-3d-sleeve--empty) {
+  cursor: pointer;
+}
+
 .album-binder-3d-sleeve::before {
   content: "";
   position: absolute;
@@ -212,18 +216,22 @@
 }
 
 .album-binder-3d-card {
-  position: relative;
-  z-index: 1;
+  position: absolute;
+  inset: 5px;
+  z-index: 2;
   display: block;
-  width: 100%;
-  height: 100%;
+  width: auto;
+  height: auto;
   padding: 0;
+  margin: 0;
   border: 0;
   background: transparent;
   cursor: pointer;
+  touch-action: manipulation;
   border-radius: 8px;
   transform-style: preserve-3d;
   transition: transform 0.22s ease, box-shadow 0.22s ease;
+  pointer-events: auto;
 }
 
 .album-binder-3d-card:hover,
@@ -234,20 +242,25 @@
 }
 
 .album-binder-3d-card-art {
+  position: absolute;
+  inset: 0;
   display: block;
-  width: 100%;
-  height: 100%;
   border-radius: 8px;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .album-binder-3d-card-art img,
 .album-binder-3d-card-art .starlight-perspective-card,
-.album-binder-3d-card-art .starlight-card {
+.album-binder-3d-card-art .starlight-card,
+.album-binder-3d-card-art .starlight-card-transformer,
+.album-binder-3d-card-art .starlight-card__transformer,
+.album-binder-3d-card-art .prestige-frame-overlay {
   width: 100%;
   height: 100%;
   display: block;
   object-fit: cover;
+  pointer-events: none;
 }
 
 .album-binder-3d-card-number {
@@ -361,7 +374,8 @@
 }
 
 .album-binder-3d-scene.is-turning .album-binder-3d-nav,
-.album-binder-3d-scene.is-turning .album-binder-3d-corner {
+.album-binder-3d-scene.is-turning .album-binder-3d-corner,
+.album-binder-3d-spread.is-dragging-page .album-binder-3d-card {
   pointer-events: none;
 }
 
