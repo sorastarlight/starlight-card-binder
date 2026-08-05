@@ -1,8 +1,9 @@
 /**
- * Album binder spread pagination — two-page spreads (9 pockets × 2 = 18 cards).
+ * My Card Album Binder — two-page spreads, organization, and render helpers.
  */
 (function initStarlightAlbumBinder(global) {
   const STORAGE_KEY = 'sora-starlight-album-page-v1';
+  const ORGANIZE_KEY = 'sora-starlight-binder-organize-v1';
   const POCKETS_PER_PAGE = 9;
   const CARDS_PER_SPREAD = POCKETS_PER_PAGE * 2;
 
@@ -23,19 +24,52 @@
     }
   }
 
-  /** @deprecated Use paginateSpread for two-page binder. */
-  function paginate(list, page = 1, perPage = POCKETS_PER_PAGE) {
-    const total = Array.isArray(list) ? list.length : 0;
-    const totalPages = Math.max(1, Math.ceil(total / perPage) || 1);
-    const safePage = Math.min(Math.max(1, page), totalPages);
-    const start = (safePage - 1) * perPage;
-    return {
-      slice: (list || []).slice(start, start + perPage),
-      page: safePage,
-      totalPages,
-      total,
-      perPage
-    };
+  function readOrganize() {
+    try {
+      return String(global.localStorage?.getItem(ORGANIZE_KEY) || 'numberAsc').trim() || 'numberAsc';
+    } catch {
+      return 'numberAsc';
+    }
+  }
+
+  function writeOrganize(value) {
+    try {
+      if (value) global.localStorage?.setItem(ORGANIZE_KEY, value);
+    } catch {
+      // ignore
+    }
+  }
+
+  function rarityRank(card = {}) {
+    const map = { Legendary: 5, Epic: 4, Rare: 3, Uncommon: 2, Common: 1 };
+    return map[String(card.rarity || 'Common').trim()] || 0;
+  }
+
+  function sortOwnedCards(list, organizeBy = 'numberAsc', helpers = {}) {
+    const source = Array.isArray(list) ? list.slice() : [];
+    const isFavorite = helpers.isFavorite || (() => false);
+    const num = card => String(card?.collectorNumber || card?.number || '').padStart(8, '0');
+
+    switch (organizeBy) {
+      case 'numberDesc':
+        source.sort((a, b) => num(b).localeCompare(num(a)));
+        break;
+      case 'series':
+        source.sort((a, b) => String(a.series || '').localeCompare(String(b.series || '')) || num(a).localeCompare(num(b)));
+        break;
+      case 'rarityDesc':
+        source.sort((a, b) => rarityRank(b) - rarityRank(a) || num(a).localeCompare(num(b)));
+        break;
+      case 'favorites':
+        source.sort((a, b) => Number(isFavorite(b.id)) - Number(isFavorite(a.id)) || num(a).localeCompare(num(b)));
+        break;
+      case 'nameAsc':
+        source.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+        break;
+      default:
+        source.sort((a, b) => num(a).localeCompare(num(b)));
+    }
+    return source;
   }
 
   function padPockets(cards, size = POCKETS_PER_PAGE) {
@@ -74,30 +108,59 @@
     totalPhysicalPages,
     total
   }) {
-    if (total <= CARDS_PER_SPREAD && total > 0) {
-      return `<nav class="album-binder-3d-controls" aria-label="Binder pages">
-        <button class="btn album-binder-3d-nav" type="button" data-album-spread="prev" aria-label="Previous spread" disabled>‹ Prev</button>
-        <span class="album-binder-3d-status" role="status">Pages ${leftPageNum}–${rightPageNum} of ${totalPhysicalPages}</span>
-        <button class="btn album-binder-3d-nav" type="button" data-album-spread="next" aria-label="Next spread" disabled>Next ›</button>
-      </nav>`;
-    }
     if (!total) return '';
-    return `<nav class="album-binder-3d-controls" aria-label="Binder pages">
-      <button class="btn album-binder-3d-nav" type="button" data-album-spread="prev" aria-label="Previous spread"${spread <= 1 ? ' disabled' : ''}>‹ Prev</button>
-      <span class="album-binder-3d-status" role="status">Pages ${leftPageNum}–${rightPageNum} of ${totalPhysicalPages} · spread ${spread} of ${totalSpreads}</span>
-      <button class="btn album-binder-3d-nav" type="button" data-album-spread="next" aria-label="Next spread"${spread >= totalSpreads ? ' disabled' : ''}>Next ›</button>
+    const prevDisabled = spread <= 1 ? ' disabled' : '';
+    const nextDisabled = spread >= totalSpreads ? ' disabled' : '';
+    const status = totalSpreads <= 1
+      ? `Pages ${leftPageNum}–${rightPageNum} of ${totalPhysicalPages}`
+      : `Pages ${leftPageNum}–${rightPageNum} of ${totalPhysicalPages} · spread ${spread} of ${totalSpreads}`;
+    return `<nav class="card-album-pager" aria-label="Binder pages">
+      <button class="btn card-album-page-btn" type="button" data-album-spread="prev" aria-label="Previous spread"${prevDisabled}>‹ Prev</button>
+      <span class="card-album-page-status" role="status">${status}</span>
+      <button class="btn card-album-page-btn" type="button" data-album-spread="next" aria-label="Next spread"${nextDisabled}>Next ›</button>
     </nav>`;
+  }
+
+  function renderPageGrid(cards, ctx, side, pageNum) {
+    const tile = global.StarlightCardTile;
+    const slots = cards.map((card, index) => {
+      if (tile?.renderSpreadSlot) return tile.renderSpreadSlot(ctx, card, index);
+      if (!card) {
+        return `<div class="card-album-slot card-album-slot--empty" data-pocket-slot="${index}"><div class="card-album-empty-pocket" aria-hidden="true"><span>✦</span></div></div>`;
+      }
+      return `<article class="card-album-slot" data-pocket-slot="${index}"><button type="button" class="card-album-btn" data-album-card="${ctx.esc(card.id)}">${ctx.displayName(card)}</button></article>`;
+    }).join('');
+    return `<section class="card-album-page card-album-page--${side}" aria-label="Binder page ${pageNum}">
+      <header class="card-album-page-label">Page ${pageNum}</header>
+      <div class="card-album-page-grid">${slots}</div>
+    </section>`;
+  }
+
+  function renderSpreadHtml({ spreadData, ctx, themeId, pagerHtml = '' }) {
+    const { left, right, leftPageNum, rightPageNum } = spreadData;
+    return `<div class="card-album-binder" data-binder-theme="${themeId || 'starlight-classic'}">
+      <div class="card-album-binder-spread is-ready">
+        ${renderPageGrid(left, ctx, 'left', leftPageNum)}
+        <div class="card-album-binder-rings" aria-hidden="true"><span></span><span></span><span></span></div>
+        ${renderPageGrid(right, ctx, 'right', rightPageNum)}
+      </div>
+      ${pagerHtml}
+    </div>`;
   }
 
   global.StarlightAlbumBinder = {
     STORAGE_KEY,
+    ORGANIZE_KEY,
     POCKETS_PER_PAGE,
     CARDS_PER_SPREAD,
     readPage,
     writePage,
-    paginate,
+    readOrganize,
+    writeOrganize,
+    sortOwnedCards,
     paginateSpread,
     padPockets,
-    renderPagerHtml
+    renderPagerHtml,
+    renderSpreadHtml
   };
 })(typeof window !== 'undefined' ? window : globalThis);

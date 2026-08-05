@@ -896,8 +896,8 @@ function hydrateFilters(preserved = activeFilters()) {
 
 function applyAlbumBinderTheme() {
   if (pageName !== 'collection') return;
-  const scene = $('#collectionGrid .album-binder-3d-scene') || $('#collectionGrid');
-  if (!scene) return;
+  const binder = $('#collectionGrid .card-album-binder') || $('#collectionGrid');
+  if (!binder) return;
   const themes = window.StarlightBinderThemes;
   if (!themes?.applyTheme) return;
   const level = Number($('[data-collector-level]')?.textContent) || 1;
@@ -905,12 +905,12 @@ function applyAlbumBinderTheme() {
     storedId: themes.readStoredThemeId?.(),
     collectorLevel: level
   });
-  themes.applyTheme(scene, themeId);
+  themes.applyTheme(binder, themeId);
 }
 
 function getBinderOrganizeBy() {
   const select = $('[data-binder-organize]');
-  const stored = window.StarlightAlbumBinder3D?.readOrganize?.();
+  const stored = window.StarlightAlbumBinder?.readOrganize?.();
   if (select?.value) return select.value;
   return stored || 'numberAsc';
 }
@@ -918,7 +918,7 @@ function getBinderOrganizeBy() {
 function hydrateBinderOrganize() {
   const select = $('[data-binder-organize]');
   if (!select) return;
-  const value = window.StarlightAlbumBinder3D?.readOrganize?.() || 'numberAsc';
+  const value = window.StarlightAlbumBinder?.readOrganize?.() || 'numberAsc';
   if ([...select.options].some(option => option.value === value)) {
     select.value = value;
   }
@@ -926,28 +926,23 @@ function hydrateBinderOrganize() {
 
 function sortedOwnedBinderCards(list) {
   const organizeBy = getBinderOrganizeBy();
-  return window.StarlightAlbumBinder3D?.sortOwnedCards?.(list, organizeBy, { isFavorite })
+  return window.StarlightAlbumBinder?.sortOwnedCards?.(list, organizeBy, { isFavorite })
     || list.slice();
 }
 
 function turnAlbumBinderSpread(direction) {
-  const sceneApi = window.StarlightAlbumBinder3D;
-  const wrap = $('#collectionGrid');
-  const scene = wrap?.querySelector('.album-binder-3d-scene');
-  if (!scene || sceneApi?.isAnimating?.()) return;
   const binderApi = window.StarlightAlbumBinder;
+  const wrap = $('#collectionGrid');
+  if (!wrap || !binderApi?.paginateSpread) return;
   const baseList = cards.filter(c => isCollected(c.id));
   const list = sortedOwnedBinderCards(filterCardList(baseList, activeFilters(), { respectOwnership: false }));
-  const current = binderApi?.paginateSpread?.(list, albumBinderPage);
-  if (!current) return;
+  const current = binderApi.paginateSpread(list, albumBinderPage);
   if (direction === 'prev' && albumBinderPage <= 1) return;
   if (direction === 'next' && albumBinderPage >= current.totalSpreads) return;
   playSfx('page');
-  sceneApi.animateTurn(scene, direction, () => {
-    albumBinderPage += direction === 'prev' ? -1 : 1;
-    binderApi?.writePage?.(albumBinderPage);
-    renderGridPage('#collectionGrid', 'collection');
-  });
+  albumBinderPage += direction === 'prev' ? -1 : 1;
+  binderApi.writePage(albumBinderPage);
+  renderGridPage('#collectionGrid', 'collection');
 }
 
 function preloadAlbumBinderSpreadImages(list, spreadIndex) {
@@ -1017,10 +1012,9 @@ function openAlbumBinderCard(sourceEl) {
   openFullView('collection');
 }
 
-function renderAlbumBinder3D(wrap, list) {
+function renderAlbumBinderSpread(wrap, list) {
   const binderApi = window.StarlightAlbumBinder;
-  const sceneApi = window.StarlightAlbumBinder3D;
-  if (!wrap || !binderApi?.paginateSpread || !sceneApi?.renderSceneHtml) return false;
+  if (!wrap || !binderApi?.paginateSpread || !binderApi?.renderSpreadHtml) return false;
   const sorted = sortedOwnedBinderCards(list);
   const spreadData = binderApi.paginateSpread(sorted, albumBinderPage);
   albumBinderPage = spreadData.spread;
@@ -1028,26 +1022,18 @@ function renderAlbumBinder3D(wrap, list) {
   const level = Number($('[data-collector-level]')?.textContent) || 1;
   const themeId = window.StarlightBinderThemes?.resolveThemeId?.({ collectorLevel: level }) || 'starlight-classic';
   const pagerHtml = binderApi.renderPagerHtml(spreadData);
-  wrap.innerHTML = sceneApi.renderSceneHtml({
+  wrap.innerHTML = binderApi.renderSpreadHtml({
     spreadData,
     ctx: cardTileContext(),
     themeId,
     pagerHtml
   });
-  const scene = wrap.querySelector('.album-binder-3d-scene');
-  window.StarlightBinderThemes?.applyTheme?.(scene, themeId, { updateBadge: true });
-  sceneApi.bindScene(scene, {
-    onTurn: direction => turnAlbumBinderSpread(direction),
-    onCardOpen: openAlbumBinderCard,
-    playSfx,
-    canTurn: direction => {
-      if (direction === 'prev') return spreadData.spread > 1;
-      if (direction === 'next') return spreadData.spread < spreadData.totalSpreads;
-      return false;
-    }
-  });
+  const binder = wrap.querySelector('.card-album-binder');
+  window.StarlightBinderThemes?.applyTheme?.(binder, themeId, { updateBadge: true });
   preloadAlbumBinderSpreadImages(sorted, spreadData.spread);
   attachAlbumBinderHoverSfx(wrap);
+  scanPerspectiveCardsIn(wrap);
+  notifyEmbedLayoutReady();
   return true;
 }
 
@@ -1805,7 +1791,7 @@ function renderGridPage(target, mode) {
     ? `<button class="btn primary" type="button" data-reset-card-filters>${esc(collectionCopy.emptyFiltersCta || 'Reset Filters')}</button>`
     : `<a class="btn primary" href="binder?view=binder">${esc(mode === 'favorites' ? (collectionCopy.emptyFavoritesCta || 'Open Card Gallery') : (collectionCopy.emptyAllCta || 'Open Card Gallery'))}</a>`;
   if (mode === 'collection') {
-    if (list.length && renderAlbumBinder3D(wrap, list)) return;
+    if (list.length && renderAlbumBinderSpread(wrap, list)) return;
     wrap.innerHTML = `<div class="empty-state"><h2>${esc(emptyTitle)}</h2><p>${esc(emptyLead)}</p>${emptyAction}</div>`;
     return;
   }
@@ -2055,7 +2041,7 @@ document.addEventListener('input', e => { if (e.target.matches('#globalSearch, [
 document.addEventListener('change', e => {
   if (e.target.matches('#globalSearch, [data-series], [data-rarity], [name="viewFilter"], #sortSelect, [data-filter-favorites]')) applyCardFilterChange();
   if (e.target.matches('[data-binder-organize]')) {
-    window.StarlightAlbumBinder3D?.writeOrganize?.(e.target.value);
+    window.StarlightAlbumBinder?.writeOrganize?.(e.target.value);
     albumBinderPage = 1;
     window.StarlightAlbumBinder?.writePage?.(1);
     renderGridPage('#collectionGrid', 'collection');
@@ -2097,7 +2083,7 @@ document.addEventListener('keydown', e => {
   }
   if (pageName === 'collection') {
     const activeTab = document.querySelector('[data-collection-tab].active')?.dataset.collectionTab || 'all';
-    if (activeTab === 'all' && !window.StarlightAlbumBinder3D?.isAnimating?.()) {
+    if (activeTab === 'all') {
       if (e.key === 'ArrowLeft') {
         e.preventDefault();
         turnAlbumBinderSpread('prev');

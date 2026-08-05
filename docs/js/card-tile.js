@@ -31,6 +31,33 @@
   </article>`;
   }
 
+  function renderSpreadSlot(ctx, card, slotIndex) {
+    if (!card) {
+      return `<div class="card-album-slot card-album-slot--empty" data-pocket-slot="${slotIndex}">
+        <div class="card-album-empty-pocket" aria-hidden="true"><span>✦</span></div>
+      </div>`;
+    }
+    const got = ctx.isCollected(card.id);
+    const numberLabel = ctx.cardDisplayNumber?.(card)
+      || String(card.collectorNumber || card.number || '');
+    const favorited = ctx.isFavorite?.(card.id);
+    const prestigeClass = ctx.prestigeFrameClass?.(card.id) || '';
+    const badges = [
+      favorited ? '<span class="card-album-spread-badge card-album-spread-badge--favorite" aria-label="Favorite">★</span>' : '',
+      prestigeClass && !prestigeClass.includes('stardust')
+        ? '<span class="card-album-spread-badge card-album-spread-badge--evolved" aria-label="Evolved">✦</span>' : ''
+    ].join('');
+    return `<article class="card-album-slot ${ctx.rarityClass(card)} ${prestigeClass}${favorited ? ' is-favorite' : ''}" data-pocket-slot="${slotIndex}" style="--pocket-i:${slotIndex}">
+      <button type="button" class="card-album-btn" data-album-card="${ctx.esc(card.id)}" aria-label="Open ${ctx.esc(ctx.displayName(card))} full view">
+        <span class="card-album-sleeve">
+          <span class="card-album-art">${ctx.perspectiveArt(card, { imageUrl: card.imageUrl, alt: ctx.displayName(card), visible: ctx.perspectiveArtVisible(card, got) })}${ctx.prestigeFrameOverlayHtml(card.id)}</span>
+          <span class="card-album-number">${ctx.esc(numberLabel)}</span>
+          ${badges}
+        </span>
+      </button>
+    </article>`;
+  }
+
   function renderAlbumTile(ctx, card, index) {
     const got = ctx.isCollected(card.id);
     const numberLabel = ctx.cardDisplayNumber?.(card)
@@ -104,6 +131,7 @@
   global.StarlightCardTile = {
     renderGalleryTile,
     renderAlbumTile,
+    renderSpreadSlot,
     renderBinderPocket,
     renderListTile,
     wrapGalleryGrid,

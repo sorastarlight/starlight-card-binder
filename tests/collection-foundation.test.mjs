@@ -35,8 +35,8 @@ test('gallery and album pages use rebuilt markup and render hooks', async () => 
   assert.match(collection, /card-album-page/);
   assert.match(collection, /card-album-page\.css/);
   assert.match(collection, /id="collectionGrid"/);
-  assert.match(collection, /album-binder-3d/);
-  assert.match(app, /renderAlbumBinder3D/);
+  assert.match(collection, /card-album-binder-mount/);
+  assert.match(app, /renderAlbumBinderSpread/);
   assert.match(app, /function renderGalleryGridHtml\(/);
 });
 
