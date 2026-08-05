@@ -933,16 +933,24 @@ function sortedOwnedBinderCards(list) {
 function turnAlbumBinderSpread(direction) {
   const binderApi = window.StarlightAlbumBinder;
   const wrap = $('#collectionGrid');
-  if (!wrap || !binderApi?.paginateSpread) return;
+  if (!wrap || !binderApi?.paginateSpread || binderApi.isAnimating?.()) return;
   const baseList = cards.filter(c => isCollected(c.id));
   const list = sortedOwnedBinderCards(filterCardList(baseList, activeFilters(), { respectOwnership: false }));
   const current = binderApi.paginateSpread(list, albumBinderPage);
   if (direction === 'prev' && albumBinderPage <= 1) return;
   if (direction === 'next' && albumBinderPage >= current.totalSpreads) return;
   playSfx('page');
-  albumBinderPage += direction === 'prev' ? -1 : 1;
-  binderApi.writePage(albumBinderPage);
-  renderGridPage('#collectionGrid', 'collection');
+  const binder = wrap.querySelector('.card-album-binder');
+  const advance = () => {
+    albumBinderPage += direction === 'prev' ? -1 : 1;
+    binderApi.writePage(albumBinderPage);
+    renderGridPage('#collectionGrid', 'collection');
+  };
+  if (binder && binderApi.animateSpreadTurn) {
+    binderApi.animateSpreadTurn(binder, direction, advance);
+    return;
+  }
+  advance();
 }
 
 function preloadAlbumBinderSpreadImages(list, spreadIndex) {
@@ -2083,7 +2091,7 @@ document.addEventListener('keydown', e => {
   }
   if (pageName === 'collection') {
     const activeTab = document.querySelector('[data-collection-tab].active')?.dataset.collectionTab || 'all';
-    if (activeTab === 'all') {
+    if (activeTab === 'all' && !window.StarlightAlbumBinder?.isAnimating?.()) {
       if (e.key === 'ArrowLeft') {
         e.preventDefault();
         turnAlbumBinderSpread('prev');

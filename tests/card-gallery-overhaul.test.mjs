@@ -28,7 +28,8 @@ test('album binder module paginates two-page spreads', async () => {
   assert.match(source, /CARDS_PER_SPREAD = POCKETS_PER_PAGE \* 2/);
   assert.match(source, /paginateSpread/);
   assert.match(source, /renderSpreadHtml/);
-  assert.match(source, /card-album-binder-spread/);
+  assert.match(source, /animateSpreadTurn/);
+  assert.match(source, /card-album-binder-stage/);
   assert.match(source, /Pages \$\{leftPageNum\}–\$\{rightPageNum\}/);
 });
 
@@ -42,7 +43,7 @@ test('app.js wires album spread rendering and full view open', async () => {
   assert.match(app, /initCardInteractionDelegation/);
   assert.match(app, /notifyEmbedLayoutReady/);
   assert.match(app, /openAlbumBinderCard/);
-  assert.match(app, /scanPerspectiveCardsIn\(wrap\)/);
+  assert.match(app, /animateSpreadTurn/);
 });
 
 test('collection page loads spread binder modules and styles', async () => {

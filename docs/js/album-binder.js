@@ -131,21 +131,75 @@
       return `<article class="card-album-slot" data-pocket-slot="${index}"><button type="button" class="card-album-btn" data-album-card="${ctx.esc(card.id)}">${ctx.displayName(card)}</button></article>`;
     }).join('');
     return `<section class="card-album-page card-album-page--${side}" aria-label="Binder page ${pageNum}">
-      <header class="card-album-page-label">Page ${pageNum}</header>
-      <div class="card-album-page-grid">${slots}</div>
+      <div class="card-album-page-flip">
+        <div class="card-album-page-face card-album-page-face--front">
+          <header class="card-album-page-label">Page ${pageNum}</header>
+          <div class="card-album-page-grid">${slots}</div>
+        </div>
+        <div class="card-album-page-face card-album-page-face--back" aria-hidden="true"></div>
+      </div>
     </section>`;
   }
 
   function renderSpreadHtml({ spreadData, ctx, themeId, pagerHtml = '' }) {
     const { left, right, leftPageNum, rightPageNum } = spreadData;
     return `<div class="card-album-binder" data-binder-theme="${themeId || 'starlight-classic'}">
-      <div class="card-album-binder-spread is-ready">
-        ${renderPageGrid(left, ctx, 'left', leftPageNum)}
-        <div class="card-album-binder-rings" aria-hidden="true"><span></span><span></span><span></span></div>
-        ${renderPageGrid(right, ctx, 'right', rightPageNum)}
+      <div class="card-album-binder-stage">
+        <div class="card-album-binder-shell">
+          <div class="card-album-binder-cover card-album-binder-cover--back" aria-hidden="true"></div>
+          <div class="card-album-binder-book">
+            <div class="card-album-binder-spine" aria-hidden="true"></div>
+            <div class="card-album-binder-spread is-ready" data-spread-state="idle">
+              ${renderPageGrid(left, ctx, 'left', leftPageNum)}
+              <div class="card-album-binder-rings" aria-hidden="true"><span></span><span></span><span></span></div>
+              ${renderPageGrid(right, ctx, 'right', rightPageNum)}
+            </div>
+          </div>
+          <div class="card-album-binder-cover card-album-binder-cover--front" aria-hidden="true"></div>
+        </div>
       </div>
       ${pagerHtml}
     </div>`;
+  }
+
+  const TURN_MS = 520;
+  let animating = false;
+
+  function motionReduced() {
+    try {
+      return global.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+    } catch {
+      return false;
+    }
+  }
+
+  function animateSpreadTurn(binder, direction, callback) {
+    if (!binder || animating) return callback?.();
+    const spread = binder.querySelector('.card-album-binder-spread');
+    const page = binder.querySelector(direction === 'next' ? '.card-album-page--right' : '.card-album-page--left');
+    if (!spread || !page) return callback?.();
+    if (motionReduced()) return callback?.();
+
+    animating = true;
+    binder.classList.add('is-turning');
+    spread.dataset.spreadState = 'turning';
+    spread.classList.remove('is-ready');
+    spread.classList.add(direction === 'next' ? 'is-turning-forward' : 'is-turning-back');
+    page.classList.add('is-page-flipping');
+
+    global.setTimeout(() => {
+      page.classList.remove('is-page-flipping');
+      spread.classList.remove('is-turning-forward', 'is-turning-back');
+      spread.classList.add('is-ready');
+      spread.dataset.spreadState = 'idle';
+      binder.classList.remove('is-turning');
+      animating = false;
+      callback?.();
+    }, TURN_MS);
+  }
+
+  function isAnimating() {
+    return animating;
   }
 
   global.StarlightAlbumBinder = {
@@ -161,6 +215,8 @@
     paginateSpread,
     padPockets,
     renderPagerHtml,
-    renderSpreadHtml
+    renderSpreadHtml,
+    animateSpreadTurn,
+    isAnimating
   };
 })(typeof window !== 'undefined' ? window : globalThis);

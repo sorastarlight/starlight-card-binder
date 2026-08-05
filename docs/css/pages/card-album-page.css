@@ -119,27 +119,107 @@
 
 .card-album-binder {
   position: relative;
-  padding: clamp(18px, 3vw, 28px) clamp(12px, 2vw, 24px);
-  border-radius: 24px;
-  overflow: hidden;
+  padding: clamp(12px, 2vw, 18px) clamp(8px, 1.4vw, 14px);
+  border-radius: 22px;
+  overflow: visible;
   background:
     radial-gradient(circle at 14% 8%, var(--binder-glow, rgba(255, 186, 228, 0.2)), transparent 36%),
     linear-gradient(160deg, var(--binder-cover-a, rgba(255, 252, 255, 0.98)), var(--binder-page-b, rgba(236, 247, 255, 0.92)) 50%, var(--binder-cover-b, rgba(255, 240, 248, 0.9)));
   border: 1px solid color-mix(in srgb, var(--binder-accent, #6bc6f8) 28%, transparent);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.65), 0 18px 44px rgba(61, 83, 132, 0.1);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.65),
+    inset 0 -18px 36px rgba(61, 83, 132, 0.06),
+    0 22px 48px rgba(61, 83, 132, 0.14);
   color: var(--binder-text, inherit);
 }
 
 .card-album-binder-mount {
   min-width: 0;
+  max-width: min(880px, 100%);
+  margin: 0 auto;
+}
+
+.card-album-binder-stage {
+  perspective: 1400px;
+  perspective-origin: 50% 42%;
+}
+
+.card-album-binder-shell {
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateX(4deg);
+}
+
+.card-album-binder-book {
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.card-album-binder-cover {
+  position: absolute;
+  inset: -6px -10px;
+  border-radius: 20px;
+  pointer-events: none;
+  transform-style: preserve-3d;
+}
+
+.card-album-binder-cover--back {
+  transform: translateZ(-16px);
+  background:
+    linear-gradient(165deg, color-mix(in srgb, var(--binder-cover-a, #eaf6ff) 88%, #fff), var(--binder-cover-b, #ffd9ef)),
+    radial-gradient(circle at 20% 15%, rgba(255, 255, 255, 0.35), transparent 42%);
+  box-shadow:
+    0 28px 56px rgba(61, 83, 132, 0.18),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+  z-index: 0;
+}
+
+.card-album-binder-cover--front {
+  inset: -2px -4px;
+  transform: translateZ(8px);
+  background: linear-gradient(125deg, rgba(255, 255, 255, 0.22), transparent 38%, rgba(255, 255, 255, 0.08));
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  z-index: 3;
+}
+
+.card-album-binder-spine {
+  position: absolute;
+  left: 50%;
+  top: 10px;
+  bottom: 10px;
+  width: 16px;
+  transform: translateX(-50%) translateZ(-6px);
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), var(--binder-spine, #9ed4ff) 18%, color-mix(in srgb, var(--binder-ring-metal, #6bc6f8) 70%, #fff) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.55),
+    -6px 0 16px rgba(61, 83, 132, 0.12),
+    6px 0 16px rgba(61, 83, 132, 0.12);
+  pointer-events: none;
+  z-index: 1;
 }
 
 .card-album-binder-spread {
+  position: relative;
+  z-index: 2;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  gap: clamp(10px, 2vw, 18px);
+  gap: clamp(3px, 0.6vw, 6px);
   align-items: stretch;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
+  transform-style: preserve-3d;
+  transition: opacity 0.28s ease, filter 0.28s ease;
+}
+
+.card-album-binder-spread.is-turning-forward,
+.card-album-binder-spread.is-turning-back {
+  filter: brightness(0.96);
+}
+
+.card-album-binder.is-turning .card-album-page-btn,
+.card-album-binder.is-turning [data-album-card] {
+  pointer-events: none;
 }
 
 .card-album-binder-rings {
@@ -147,41 +227,122 @@
   flex-direction: column;
   justify-content: space-evenly;
   align-items: center;
-  gap: 18px;
-  width: 28px;
-  padding: 28px 0;
+  gap: 14px;
+  width: 22px;
+  padding: 22px 0;
   pointer-events: none;
+  transform: translateZ(10px);
 }
 
 .card-album-binder-rings span {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border-radius: 999px;
-  background: radial-gradient(circle at 35% 30%, #fff, var(--binder-ring, rgba(214, 236, 255, 0.9)) 45%, color-mix(in srgb, var(--binder-ring-metal, #6bc6f8) 55%, transparent) 100%);
+  background:
+    radial-gradient(circle at 32% 28%, #fff 0%, var(--binder-ring, rgba(214, 236, 255, 0.95)) 38%, color-mix(in srgb, var(--binder-ring-metal, #6bc6f8) 65%, transparent) 100%);
   box-shadow:
-    inset 0 0 0 2px rgba(255, 255, 255, 0.65),
+    inset 0 -2px 4px rgba(61, 83, 132, 0.18),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.7),
     0 0 0 1px color-mix(in srgb, var(--binder-accent, #6bc6f8) 35%, transparent),
-    0 4px 10px rgba(61, 83, 132, 0.12);
+    0 5px 10px rgba(61, 83, 132, 0.16);
 }
 
 .card-album-page {
+  position: relative;
   min-width: 0;
-  padding: clamp(12px, 2vw, 18px);
-  border-radius: 18px;
+  padding: clamp(7px, 1vw, 10px);
+  border-radius: 14px;
+  transform-style: preserve-3d;
+  transition: transform 0.28s ease, box-shadow 0.28s ease;
+}
+
+.card-album-page--left {
+  transform: rotateY(5deg);
+  transform-origin: right center;
+}
+
+.card-album-page--right {
+  transform: rotateY(-5deg);
+  transform-origin: left center;
+}
+
+.card-album-page.is-page-flipping {
+  transform: rotateY(0deg);
+  z-index: 5;
+}
+
+.card-album-page-flip {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.52s cubic-bezier(0.22, 0.85, 0.28, 1);
+  min-height: 100%;
+}
+
+.card-album-page--right .card-album-page-flip {
+  transform-origin: left center;
+}
+
+.card-album-page--left .card-album-page-flip {
+  transform-origin: right center;
+}
+
+.card-album-page--right.is-page-flipping .card-album-page-flip {
+  transform: rotateY(-180deg);
+}
+
+.card-album-page--left.is-page-flipping .card-album-page-flip {
+  transform: rotateY(180deg);
+}
+
+.card-album-page-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.card-album-page-face--front {
+  position: relative;
+  padding: clamp(6px, 0.9vw, 9px);
+  border-radius: 12px;
   background:
     linear-gradient(145deg, var(--binder-page-a, rgba(255, 255, 255, 0.94)), var(--binder-page-b, rgba(243, 250, 255, 0.88))),
     radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.65), transparent 38%);
   border: 1px solid color-mix(in srgb, var(--binder-pocket-edge, #6bc6f8) 24%, transparent);
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.55),
-    inset 0 -12px 24px color-mix(in srgb, var(--binder-accent, #6bc6f8) 6%, transparent),
-    0 10px 22px rgba(61, 83, 132, 0.06);
+    inset 0 -10px 20px color-mix(in srgb, var(--binder-accent, #6bc6f8) 7%, transparent),
+    0 10px 22px rgba(61, 83, 132, 0.08);
+}
+
+.card-album-page--left .card-album-page-face--front {
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.55),
+    inset -8px 0 18px rgba(61, 83, 132, 0.05),
+    0 10px 22px rgba(61, 83, 132, 0.08);
+}
+
+.card-album-page--right .card-album-page-face--front {
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.55),
+    inset 8px 0 18px rgba(61, 83, 132, 0.05),
+    0 10px 22px rgba(61, 83, 132, 0.08);
+}
+
+.card-album-page-face--back {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  transform: rotateY(180deg);
+  background:
+    linear-gradient(155deg, var(--binder-page-b, rgba(243, 250, 255, 0.92)), var(--binder-page-a, rgba(255, 255, 255, 0.88))),
+    repeating-linear-gradient(90deg, rgba(107, 198, 248, 0.04) 0 1px, transparent 1px 6px);
+  border: 1px solid color-mix(in srgb, var(--binder-pocket-edge, #6bc6f8) 18%, transparent);
+  box-shadow: inset 0 0 24px rgba(61, 83, 132, 0.06);
 }
 
 .card-album-page-label {
-  margin: 0 0 10px;
+  margin: 0 0 6px;
   color: #7a88ad;
-  font-size: 0.68rem;
+  font-size: 0.62rem;
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -191,7 +352,7 @@
 .card-album-page-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(8px, 1.4vw, 14px);
+  gap: clamp(3px, 0.65vw, 6px);
 }
 
 .card-album-binder:has(.card-album-binder-spread)::before,
@@ -275,6 +436,10 @@
   transform: none;
 }
 
+.card-album-binder-spread.is-ready {
+  opacity: 1;
+}
+
 .card-album-binder-head {
   position: relative;
   z-index: 1;
@@ -332,8 +497,8 @@
   background: transparent;
   cursor: pointer;
   touch-action: manipulation;
-  border-radius: 14px;
-  transition: transform 0.2s ease;
+  border-radius: 10px;
+  transition: transform 0.18s ease;
 }
 
 .card-album-sleeve {
@@ -341,15 +506,25 @@
   display: block;
   width: 100%;
   aspect-ratio: 5 / 7;
-  padding: 5px;
-  border-radius: 14px;
+  padding: 3px;
+  border-radius: 10px;
   background: linear-gradient(145deg, color-mix(in srgb, var(--binder-pocket, rgba(255, 255, 255, 0.55)) 85%, transparent), rgba(255, 255, 255, 0.12));
   border: 1px solid color-mix(in srgb, var(--binder-pocket-edge, #6bc6f8) 28%, transparent);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.65),
-    inset 0 -8px 16px color-mix(in srgb, var(--binder-accent, #6bc6f8) 6%, transparent),
-    0 8px 16px rgba(61, 83, 132, 0.08);
+    inset 0 -6px 12px color-mix(in srgb, var(--binder-accent, #6bc6f8) 6%, transparent),
+    0 6px 12px rgba(61, 83, 132, 0.08);
   overflow: hidden;
+}
+
+.card-album-sleeve::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(125deg, rgba(255, 255, 255, 0.38), transparent 42%, rgba(255, 255, 255, 0.1));
+  pointer-events: none;
+  z-index: 2;
 }
 
 .card-album-slot {
@@ -361,27 +536,27 @@
   place-items: center;
   width: 100%;
   aspect-ratio: 5 / 7;
-  border-radius: 14px;
+  border-radius: 10px;
   border: 1px dashed rgba(107, 198, 248, 0.22);
   background: rgba(255, 255, 255, 0.35);
   color: rgba(107, 198, 248, 0.45);
-  font-size: 1rem;
+  font-size: 0.85rem;
 }
 
 .card-album-spread-badge {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 7px;
+  right: 7px;
   z-index: 3;
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   display: grid;
   place-items: center;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.92);
-  font-size: 0.72rem;
+  font-size: 0.65rem;
   font-weight: 900;
-  box-shadow: 0 4px 10px rgba(61, 83, 132, 0.14);
+  box-shadow: 0 3px 8px rgba(61, 83, 132, 0.14);
   pointer-events: none;
 }
 
@@ -392,16 +567,16 @@
   display: block;
   width: 100%;
   height: 100%;
-  border-radius: 10px;
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 8px 18px rgba(61, 83, 132, 0.1);
+  box-shadow: 0 6px 14px rgba(61, 83, 132, 0.1);
 }
 
 .card-album-page-grid .card-album-btn:hover,
 .card-album-page-grid .card-album-btn:focus-visible {
-  transform: translateY(-4px);
+  transform: translateY(-3px);
   outline: 2px solid rgba(107, 198, 248, 0.85);
-  outline-offset: 3px;
+  outline-offset: 2px;
 }
 
 .card-album-page-grid .card-album-art .starlight-perspective-card,
@@ -411,18 +586,34 @@
 }
 
 @media (max-width: 860px) {
+  .card-album-binder-mount {
+    max-width: none;
+  }
+
+  .card-album-binder-shell {
+    transform: none;
+  }
+
   .card-album-binder-spread {
     grid-template-columns: 1fr;
   }
 
   .card-album-binder-rings,
+  .card-album-binder-spine,
   .card-album-page--right {
     display: none;
+  }
+
+  .card-album-page--left {
+    transform: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .card-album-spread,
+  .card-album-binder-shell,
+  .card-album-binder-spread,
+  .card-album-page,
+  .card-album-page-flip,
   .card-album-btn,
   .card-album-page-grid .card-album-art .starlight-card-transformer,
   .card-album-page-grid .card-album-art .starlight-card__transformer {
@@ -442,14 +633,14 @@
 
 .card-album-number {
   position: absolute;
-  top: 8px;
-  left: 8px;
+  top: 6px;
+  left: 6px;
   z-index: 2;
-  padding: 4px 8px;
+  padding: 2px 6px;
   border-radius: 999px;
   background: rgba(42, 48, 76, 0.78);
   color: #fff;
-  font-size: 0.68rem;
+  font-size: 0.58rem;
   font-weight: 900;
 }
 
