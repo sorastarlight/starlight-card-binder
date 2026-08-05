@@ -117,10 +117,17 @@
   display: none !important;
 }
 
+.card-album-panel[data-collection-panel="all"] {
+  container-type: inline-size;
+  container-name: album-binder-panel;
+  min-width: 0;
+}
+
 .card-album-binder {
   position: relative;
-  padding: clamp(12px, 2vw, 18px) clamp(8px, 1.4vw, 14px);
-  border-radius: 22px;
+  width: 100%;
+  padding: clamp(10px, 1.6cqi, 16px) clamp(6px, 1.1cqi, 12px);
+  border-radius: clamp(16px, 2.2cqi, 22px);
   overflow: visible;
   background:
     radial-gradient(circle at 14% 8%, var(--binder-glow, rgba(255, 186, 228, 0.2)), transparent 36%),
@@ -134,20 +141,24 @@
 }
 
 .card-album-binder-mount {
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
-  max-width: min(880px, 100%);
-  margin: 0 auto;
+  margin: 0;
+  padding: 0 clamp(0px, 1cqi, 10px);
 }
 
 .card-album-binder-stage {
-  perspective: 1400px;
+  perspective: clamp(900px, 115cqi, 1600px);
   perspective-origin: 50% 42%;
+  width: 100%;
 }
 
 .card-album-binder-shell {
   position: relative;
   transform-style: preserve-3d;
-  transform: rotateX(4deg);
+  transform: rotateX(clamp(2deg, 0.35cqi, 4deg));
+  width: 100%;
 }
 
 .card-album-binder-book {
@@ -205,11 +216,12 @@
   z-index: 2;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  gap: clamp(3px, 0.6vw, 6px);
+  gap: clamp(3px, 0.55cqi, 8px);
   align-items: stretch;
-  margin-bottom: 6px;
+  margin-bottom: clamp(4px, 0.8cqi, 8px);
   transform-style: preserve-3d;
   transition: opacity 0.28s ease, filter 0.28s ease;
+  width: 100%;
 }
 
 .card-album-binder-spread.is-turning-forward,
@@ -227,16 +239,16 @@
   flex-direction: column;
   justify-content: space-evenly;
   align-items: center;
-  gap: 14px;
-  width: 22px;
-  padding: 22px 0;
+  gap: clamp(10px, 1.6cqi, 16px);
+  width: clamp(18px, 2.4cqi, 24px);
+  padding: clamp(16px, 2.5cqi, 24px) 0;
   pointer-events: none;
   transform: translateZ(10px);
 }
 
 .card-album-binder-rings span {
-  width: 16px;
-  height: 16px;
+  width: clamp(14px, 1.8cqi, 18px);
+  height: clamp(14px, 1.8cqi, 18px);
   border-radius: 999px;
   background:
     radial-gradient(circle at 32% 28%, #fff 0%, var(--binder-ring, rgba(214, 236, 255, 0.95)) 38%, color-mix(in srgb, var(--binder-ring-metal, #6bc6f8) 65%, transparent) 100%);
@@ -250,8 +262,8 @@
 .card-album-page {
   position: relative;
   min-width: 0;
-  padding: clamp(7px, 1vw, 10px);
-  border-radius: 14px;
+  padding: clamp(5px, 0.85cqi, 10px);
+  border-radius: clamp(10px, 1.5cqi, 14px);
   transform-style: preserve-3d;
   transition: transform 0.28s ease, box-shadow 0.28s ease;
 }
@@ -301,8 +313,8 @@
 
 .card-album-page-face--front {
   position: relative;
-  padding: clamp(6px, 0.9vw, 9px);
-  border-radius: 12px;
+  padding: clamp(5px, 0.85cqi, 10px);
+  border-radius: clamp(8px, 1.2cqi, 12px);
   background:
     linear-gradient(145deg, var(--binder-page-a, rgba(255, 255, 255, 0.94)), var(--binder-page-b, rgba(243, 250, 255, 0.88))),
     radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.65), transparent 38%);
@@ -352,7 +364,27 @@
 .card-album-page-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(3px, 0.65vw, 6px);
+  gap: clamp(3px, 0.7cqi, 9px);
+}
+
+@container album-binder-panel (min-width: 640px) {
+  .card-album-page-grid {
+    gap: clamp(4px, 0.75cqi, 10px);
+  }
+
+  .card-album-sleeve {
+    padding: clamp(3px, 0.45cqi, 5px);
+  }
+}
+
+@container album-binder-panel (min-width: 960px) {
+  .card-album-binder {
+    padding: clamp(12px, 1.4cqi, 18px) clamp(8px, 1cqi, 14px);
+  }
+
+  .card-album-page-grid {
+    gap: clamp(5px, 0.8cqi, 12px);
+  }
 }
 
 .card-album-binder:has(.card-album-binder-spread)::before,
@@ -404,7 +436,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  margin: 12px 24px 0;
+  margin: clamp(8px, 1.2cqi, 12px) clamp(4px, 1cqi, 12px) 0;
   padding-top: 4px;
 }
 
@@ -506,8 +538,8 @@
   display: block;
   width: 100%;
   aspect-ratio: 5 / 7;
-  padding: 3px;
-  border-radius: 10px;
+  padding: clamp(2px, 0.35cqi, 4px);
+  border-radius: clamp(8px, 1.1cqi, 10px);
   background: linear-gradient(145deg, color-mix(in srgb, var(--binder-pocket, rgba(255, 255, 255, 0.55)) 85%, transparent), rgba(255, 255, 255, 0.12));
   border: 1px solid color-mix(in srgb, var(--binder-pocket-edge, #6bc6f8) 28%, transparent);
   box-shadow:
@@ -586,10 +618,6 @@
 }
 
 @media (max-width: 860px) {
-  .card-album-binder-mount {
-    max-width: none;
-  }
-
   .card-album-binder-shell {
     transform: none;
   }
