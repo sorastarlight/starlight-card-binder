@@ -72,14 +72,10 @@ function unownedArtClass(card, { flipped = false } = {}) {
 
 function applyBinderDisplayLayout() {
   if (pageName !== 'binder') return;
-  const layout = $('.binder-browser-layout');
   const panel = $('#v62Showcase');
-  const sideOn = isBinderSidePanelOn();
-  layout?.classList.toggle('is-side-panel-off', !sideOn);
   if (panel) {
-    panel.hidden = !sideOn;
-    if (!sideOn) panel.setAttribute('aria-hidden', 'true');
-    else panel.removeAttribute('aria-hidden');
+    panel.hidden = true;
+    panel.setAttribute('aria-hidden', 'true');
   }
 }
 
@@ -1154,7 +1150,7 @@ function renderGalleryProgress(browse = resolveBinderBrowse()) {
   const owned = list.filter(c => isCollected(c.id)).length;
   const pct = poolSize ? Math.round((owned / poolSize) * 100) : 0;
   host.hidden = !poolSize;
-  host.innerHTML = `<div class="tcg-gallery-progress-copy">${owned} / ${poolSize} collected (${pct}%)</div><div class="tcg-gallery-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="${poolSize}" aria-valuenow="${owned}" aria-label="Gallery collection progress"><span style="width:${pct}%"></span></div>`;
+  host.innerHTML = `<div class="card-gallery-progress-copy">${owned} / ${poolSize} collected (${pct}%)</div><div class="card-gallery-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="${poolSize}" aria-valuenow="${owned}" aria-label="Gallery collection progress"><span style="width:${pct}%"></span></div>`;
 }
 
 function renderSeriesHero(browse = resolveBinderBrowse()) {
@@ -1162,7 +1158,7 @@ function renderSeriesHero(browse = resolveBinderBrowse()) {
   const searching = Boolean(f.q);
   const title = $('#seriesHeroTitle');
   const desc = $('#seriesHeroDescription');
-  const eyebrow = $('.series-hero .eyebrow');
+  const eyebrow = $('.card-gallery-header .eyebrow, .series-hero .eyebrow');
   const stats = $('#seriesHeroStats');
   const toolbar = $('#seriesHeroToolbar');
   if (!title || !desc) return;
@@ -1192,7 +1188,7 @@ function renderSeriesHero(browse = resolveBinderBrowse()) {
   if (toolbar) {
     if (browsingSeries) {
       toolbar.hidden = false;
-      toolbar.innerHTML = `<button id="backToSeries" class="v61-back-btn" type="button">${esc(landing.backToSeriesCta || '← All Series')}</button><p class="series-hero-summary" data-filter-summary role="status" aria-live="polite"></p>`;
+      toolbar.innerHTML = `<button id="backToSeries" class="btn" type="button">${esc(landing.backToSeriesCta || '← All Series')}</button><p class="card-gallery-summary" data-filter-summary role="status" aria-live="polite"></p>`;
     } else {
       toolbar.hidden = true;
       toolbar.innerHTML = '';
@@ -1517,18 +1513,34 @@ function renderFullView() {
   scanPerspectiveCardsIn(overlay);
 }
 
-function renderAlbumBinderCard(card, i) {
+function renderAlbumCard(card, i) {
   const got = isCollected(card.id);
-  const img = card.imageUrl;
   const numberLabel = window.StarlightCardFilters?.cardDisplayNumber?.(card) || String(card.collectorNumber || card.number || '');
   const qty = getCardQuantity(card.id);
   const prestigeClass = prestigeFrameClass(card.id);
-  return `<article class="album-binder-slot ${rarityClass(card)} is-collected ${prestigeClass}" style="--i:${i}">
-    <button class="album-binder-btn" type="button" data-album-card="${esc(card.id)}" aria-label="Open ${esc(displayName(card))} full view">
-      <span class="album-binder-art">${perspectiveArt(card, { imageUrl: img, alt: displayName(card), visible: perspectiveArtVisible(card, got) })}${prestigeFrameOverlayHtml(card.id)}</span>
-      <span class="badge">${esc(numberLabel)}</span>
+  return `<article class="card-album-slot ${rarityClass(card)} ${prestigeClass}" style="--i:${i}">
+    <button class="card-album-btn" type="button" data-album-card="${esc(card.id)}" aria-label="Open ${esc(displayName(card))} full view">
+      <span class="card-album-art">${perspectiveArt(card, { imageUrl: card.imageUrl, alt: displayName(card), visible: perspectiveArtVisible(card, got) })}${prestigeFrameOverlayHtml(card.id)}</span>
+      <span class="card-album-number">${esc(numberLabel)}</span>
     </button>
-    <span class="album-binder-meta"><strong>${esc(displayName(card))}</strong><span class="album-qty">×${qty}</span></span>
+    <span class="card-album-meta"><strong>${esc(displayName(card))}</strong><span class="card-album-qty">×${qty}</span></span>
+  </article>`;
+}
+
+function renderAlbumListCard(c, mode) {
+  const got = isCollected(c.id);
+  const quantity = getCardQuantity(c.id);
+  const favorited = isFavorite(c.id);
+  return `<article class="card-album-list-card ${rarityClass(c)}" data-id="${esc(c.id)}" data-open-collection-card="${esc(c.id)}" role="button" tabindex="0" aria-label="Open ${esc(getVisibleName(c))} full view">
+    <div class="card-album-list-art">${perspectiveArt(c, { imageUrl: getVisibleImage(c), alt: getVisibleName(c), visible: perspectiveArtVisible(c, got) })}${got ? prestigeFrameOverlayHtml(c.id) : ''}</div>
+    <h3>${esc(getVisibleName(c))}</h3>
+    <p class="card-album-list-sub">${esc(c.collectorNumber || c.number)} · ${esc(c.series)}</p>
+    <div class="card-meta-chips compact">${cardIdentityChips(c, { hidden: !got })}</div>
+    ${mode === 'duplicates' ? `<p class="duplicate-copy-summary"><strong>${quantity}</strong> total · <strong>${quantity - 1}</strong> exchangeable</p>` : ''}
+    <div class="card-album-list-actions">
+      <span class="ownership-status owned">×${quantity}</span>
+      ${got ? `<button class="icon-btn" type="button" data-toggle-favorite="${esc(c.id)}" aria-label="${favorited ? 'Remove from favorites' : 'Add to favorites'}" aria-pressed="${favorited ? 'true' : 'false'}">${favorited ? '★' : '☆'}</button>` : ''}
+    </div>
   </article>`;
 }
 
@@ -1556,7 +1568,6 @@ function renderGridPage(target, mode) {
       });
     }
   }
-  wrap.classList.add('starlight-gallery-grid');
   wrap.classList.toggle('empty-grid', !list.length);
   const collectionCopy = websiteSection('collection');
   const emptyTitle = baseList.length
@@ -1574,24 +1585,16 @@ function renderGridPage(target, mode) {
     : `<a class="btn primary" href="binder?view=binder">${esc(mode === 'favorites' ? (collectionCopy.emptyFavoritesCta || 'Open Card Gallery') : (collectionCopy.emptyAllCta || 'Open Card Gallery'))}</a>`;
   if (mode === 'collection') {
     wrap.innerHTML = list.length
-      ? list.map((c, i) => renderAlbumBinderCard(c, i)).join('')
+      ? `<div class="card-album-grid">${list.map((c, i) => renderAlbumCard(c, i)).join('')}</div>`
       : `<div class="empty-state"><h2>${esc(emptyTitle)}</h2><p>${esc(emptyLead)}</p>${emptyAction}</div>`;
     attachAlbumBinderHoverSfx(wrap);
     scanPerspectiveCardsIn(wrap);
     return;
   }
-  wrap.innerHTML = list.length ? list.map(c => {
-    const got = isCollected(c.id); const hidden = !got;
-    const quantity = getCardQuantity(c.id);
-    const favorited = isFavorite(c.id);
-    const premium = window.StarlightPerspectiveCard?.hasPremiumPerspective?.(c);
-    const slotClass = got ? 'is-collected' : 'is-missing-slot';
-    const hintClass = premium && !got ? ' has-premium-hint' : '';
-    const imageWrapClass = got ? 'collection-image' : 'collection-image starlight-album-slot';
-    return `<article class="collection-card starlight-gallery-card ${rarityClass(c)} ${slotClass}${hintClass} ${got ? prestigeFrameClass(c.id) : ''}" data-id="${esc(c.id)}" data-open-collection-card="${esc(c.id)}" role="button" tabindex="0" aria-label="Open ${esc(getVisibleName(c))} full view"><div class="${imageWrapClass}">${perspectiveArt(c, { imageUrl: getVisibleImage(c), alt: getVisibleName(c), imgClass: hidden ? 'obscured' : '', visible: perspectiveArtVisible(c, !hidden) })}${got ? prestigeFrameOverlayHtml(c.id) : ''}</div><h3>${esc(getVisibleName(c))}</h3><p class="collection-card-number">${esc(c.collectorNumber || c.number)} • ${esc(c.series)}</p><div class="card-meta-chips compact">${cardIdentityChips(c,{hidden})}</div>${got ? prestigeBadgeHtml(c.id) : ''}${mode === 'duplicates' ? `<p class="duplicate-copy-summary"><strong>${quantity}</strong> total copies · <strong>${quantity - 1}</strong> exchangeable</p>` : ''}<div class="card-buttons"><span class="ownership-status ${got ? 'owned' : 'locked'}">${got ? `Owned ×${quantity}` : 'Not Collected'}</span>${got ? `<button class="icon-btn" type="button" data-toggle-favorite="${esc(c.id)}" aria-label="${favorited ? 'Remove from favorites' : 'Add to favorites'}" aria-pressed="${favorited ? 'true' : 'false'}">${favorited ? '★' : '☆'}</button>` : ''}</div></article>`;
-  }).join('') : `<div class="empty-state"><h2>${esc(emptyTitle)}</h2><p>${esc(emptyLead)}</p>${emptyAction}</div>`;
+  wrap.innerHTML = list.length
+    ? `<div class="card-album-grid card-album-grid--list">${list.map(c => renderAlbumListCard(c, mode)).join('')}</div>`
+    : `<div class="empty-state"><h2>${esc(emptyTitle)}</h2><p>${esc(emptyLead)}</p>${emptyAction}</div>`;
   attachTileTilts();
-  attachBinderHoverSfx();
   scanPerspectiveCardsIn(wrap);
 }
 
@@ -1960,14 +1963,20 @@ function renderBinder() {
   $$('[data-filter-summary]').forEach(element => {
     element.textContent = browse.summary || '';
   });
-  const landing = $('#seriesLanding');
   const grid = $('#seriesGridStage');
-  if (landing) landing.innerHTML = '';
   if (grid) {
-    grid.innerHTML = renderV61CardGridHtml(browse);
+    grid.innerHTML = renderGalleryGridHtml(browse);
     scanPerspectiveCardsIn(grid);
   }
-  attachV61HoverSfx();
+  attachGalleryHoverSfx();
+}
+
+function attachGalleryHoverSfx() {
+  $$('.card-gallery-btn, .v61-card-btn').forEach(el => {
+    if (el.dataset.galleryHoverReady === '1') return;
+    el.dataset.galleryHoverReady = '1';
+    el.addEventListener('mouseenter', () => playSfx('hover', el.dataset.v61Card || 'gallery'));
+  });
 }
 function renderV61PackSlide(group, i) {
   const list = group.cards;
@@ -2021,7 +2030,25 @@ function initBinderSeriesCarouselLanding() {
   const root = document.getElementById('binderSeriesCarousel');
   if (root) window.StarlightBinderSeriesCarousel?.init(root);
 }
-function renderV61CardGridHtml(browse = resolveBinderBrowse()) {
+function renderGalleryCard(card, i) {
+  const got = isCollected(card.id);
+  const img = got ? card.imageUrl : CARD_BACK_URL;
+  const numberLabel = window.StarlightCardFilters?.cardDisplayNumber?.(card) || String(card.collectorNumber || card.number || '');
+  const qty = getCardQuantity(card.id);
+  const prestigeClass = got ? prestigeFrameClass(card.id) : '';
+  const stateClass = got ? 'is-owned' : 'is-unowned';
+  return `<article class="card-gallery-item ${rarityClass(card)} ${stateClass} ${prestigeClass}" style="--i:${i}">
+    <button class="card-gallery-btn" type="button" data-v61-card="${esc(card.id)}" aria-label="View ${esc(getVisibleName(card))}">
+      <span class="card-gallery-art">${perspectiveArt(card, { imageUrl: img, alt: getVisibleName(card), visible: perspectiveArtVisible(card, got) })}${got ? prestigeFrameOverlayHtml(card.id) : ''}</span>
+      <span class="card-gallery-number">${esc(numberLabel)}</span>
+    </button>
+    <span class="card-gallery-status">${esc(got
+      ? fillWebsiteTokens((websiteBinderLanding || websiteSection('binderLanding')).ownedLabel || 'Owned ×{qty}', { qty })
+      : ((websiteBinderLanding || websiteSection('binderLanding')).notCollectedLabel || 'Not Collected'))}${got ? ` · ${esc(card.rarity || '')}` : ''}</span>
+  </article>`;
+}
+
+function renderGalleryGridHtml(browse = resolveBinderBrowse()) {
   const list = browse.list || [];
   const poolSize = browse.poolSize || list.length;
   $$('[data-filter-summary]').forEach(element => {
@@ -2029,32 +2056,20 @@ function renderV61CardGridHtml(browse = resolveBinderBrowse()) {
   });
   const copy = websiteBinderLanding || websiteSection('binderLanding');
   const emptyTitle = copy.emptyFiltersTitle || 'No cards match these filters';
-  const emptyLead = copy.emptyFiltersLead || 'Reset one or more filters to browse this series again.';
+  const emptyLead = copy.emptyFiltersLead || 'Reset one or more filters to browse again.';
   const emptyCta = copy.emptyFiltersCta || copy.filtersResetCta || 'Reset Filters';
-  return `<div class="v61-grid-shell tcg-gallery-grid">
-    <div class="v61-grid starlight-gallery-grid">${list.length ? list.map((card,i)=>renderV61Card(card,i)).join('') : `<div class="empty-state"><h2>${esc(emptyTitle)}</h2><p>${esc(emptyLead)}</p><button class="btn primary" type="button" data-reset-card-filters>${esc(emptyCta)}</button></div>`}</div>
-  </div>`;
+  if (!list.length) {
+    return `<div class="empty-state"><h2>${esc(emptyTitle)}</h2><p>${esc(emptyLead)}</p><button class="btn primary" type="button" data-reset-card-filters>${esc(emptyCta)}</button></div>`;
+  }
+  return `<div class="card-gallery-grid">${list.map((card, i) => renderGalleryCard(card, i)).join('')}</div>`;
 }
+
+function renderV61CardGridHtml(browse = resolveBinderBrowse()) {
+  return renderGalleryGridHtml(browse);
+}
+
 function renderV61Card(card, i) {
-  const got = isCollected(card.id);
-  const artClass = unownedArtClass(card);
-  const img = getVisibleImage(card);
-  const numberLabel = window.StarlightCardFilters?.cardDisplayNumber?.(card) || String(card.collectorNumber || card.number || '');
-  const qty = getCardQuantity(card.id);
-  const prestigeClass = got ? prestigeFrameClass(card.id) : '';
-  const missingClasses = got ? 'is-collected' : 'is-hidden';
-  return `<article class="v61-card-slot tcg-gallery-card starlight-gallery-card ${rarityClass(card)} ${missingClasses} ${prestigeClass}" style="--i:${i}">
-    <button class="v61-card-btn" type="button" data-v61-card="${esc(card.id)}" aria-label="View ${esc(getVisibleName(card))}">
-      <span class="v61-card-art">${perspectiveArt(card, { imageUrl: img, alt: getVisibleName(card), imgClass: artClass, visible: perspectiveArtVisible(card, got) })}${got ? prestigeFrameOverlayHtml(card.id) : ''}</span>
-      <span class="badge">${esc(numberLabel)}</span>
-    </button>
-    <span class="v61-ownership ${got ? 'owned' : 'locked'}">
-      <span>${esc(got
-        ? fillWebsiteTokens((websiteBinderLanding || websiteSection('binderLanding')).ownedLabel || 'Owned ×{qty}', { qty })
-        : ((websiteBinderLanding || websiteSection('binderLanding')).notCollectedLabel || 'Not Collected'))}</span>
-      ${binderRarityBadgeHtml(card)}
-    </span>
-  </article>`;
+  return renderGalleryCard(card, i);
 }
 
 function applyPreviewSideToggles(cardEl, card, got) {
@@ -2180,7 +2195,7 @@ function attachV61HoverSfx() {
 }
 
 function attachAlbumBinderHoverSfx(root = document) {
-  root.querySelectorAll?.('.album-binder-btn')?.forEach(el => {
+  root.querySelectorAll?.('.card-album-btn, .album-binder-btn')?.forEach(el => {
     if (el.dataset.albumHoverReady === '1') return;
     el.dataset.albumHoverReady = '1';
     el.addEventListener('mouseenter', () => playSfx('hover', el.dataset.albumCard || 'album'));

@@ -29,7 +29,7 @@ test('collection and trade pages import shared tablist keyboard helpers', async 
   assert.match(hub, /bindTablistKeyboard/);
   assert.match(offersHub, /bindTablistKeyboard/);
   assert.match(offersHub, /syncTabSelection/);
-  assert.match(collectionHtml, /collection-redesign\.js\?v=1\.3\.0/);
+  assert.match(collectionHtml, /collection-redesign\.js\?v=1\.4\.0/);
   assert.match(listsHtml, /trade-hub-page\.js\?v=1\.3\.1/);
   assert.match(listsHtml, /data-hub-view="open-trades"/);
   assert.match(offersHtml, /trade-lists\.html\?/);

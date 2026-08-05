@@ -7,7 +7,7 @@ const read = (relativePath) => readFile(new URL(`../${relativePath}`, import.met
 test('favorites polish wires full-view, showcase unstar, and synced grid', async () => {
   const app = await read('docs/js/app.js');
   const collection = await read('docs/collection.html');
-  const css = await read('docs/css/collection-redesign.css');
+  const css = await read('docs/css/pages/card-album-page.css');
 
   assert.match(app, /overlay-favorite/);
   assert.match(app, /data-toggle-favorite/);
@@ -18,7 +18,7 @@ test('favorites polish wires full-view, showcase unstar, and synced grid', async
   assert.match(app, /window\.renderAll = renderAll/);
   assert.match(collection, /id="favoriteShowcase"/);
   assert.match(collection, /id="favoriteGrid"/);
-  assert.match(css, /V1\.1 favorites polish/);
+  assert.match(css, /\.favorite-carousel/);
 });
 
 test('favorite sync failure rolls back UI and notifies the collector', async () => {
@@ -28,35 +28,26 @@ test('favorite sync failure rolls back UI and notifies the collector', async () 
   assert.match(cloud, /StarlightUI\?\.toast/);
 });
 
-test('binder filter panel stays hidden on series landing until a pack is selected', async () => {
+test('gallery page keeps filters visible and uses rebuilt markup', async () => {
   const app = await read('docs/js/app.js');
-  const css = await read('docs/css/pages/binder.css');
+  const css = await read('docs/css/pages/card-gallery-page.css');
   const binder = await read('docs/binder.html');
 
-  assert.match(app, /const showSearch = true/);
-  assert.match(app, /id="globalSearch"/);
-  assert.match(app, /role="status" aria-live="polite"/);
   assert.match(app, /function syncBinderSeriesMode\(browse\)/);
   assert.match(app, /function ensureBinderFilterPanel\(/);
-  assert.match(app, /document\.body\.classList\.toggle\('series-select', onLanding\)/);
-  assert.match(app, /chrome\.removeAttribute\('hidden'\)/);
-  assert.match(css, /Hide binder browse chrome on the series landing until a pack is selected/);
-  assert.match(css, /:not\(\.series-select\) \.binder-browse-chrome \{/);
-  assert.match(css, /series-select \.binder-browse-chrome,\s*body\[data-page="binder"\]\.series-select \.binder-browse-chrome \.series-hero/);
-  assert.doesNotMatch(
-    css,
-    /series-select \.card-filter-panel,\s*body\[data-page="binder"\]\.series-select \.binder-browser-layout \{\s*display: none;/
-  );
-  assert.match(binder, /id="v62Showcase"/);
-  assert.match(binder, /binder\.css\?v=1\.7\.5/);
-  assert.match(app, /renderV62Showcase/);
+  assert.match(app, /document\.body\.classList\.remove\('series-select'\)/);
+  assert.match(app, /renderGalleryGridHtml/);
+  assert.match(app, /#seriesGridStage/);
   assert.match(app, /function cardSupportsHoloToggle\(/);
   assert.match(app, /function previewDisplayTogglesHtml\(/);
-  assert.match(app, /cardSupportsHoloToggle\(card\)/);
-  assert.match(app, /cardHasStarlightEvolution\(card\.id\)/);
-  assert.match(binder, /cloud-collection\.js\?v=1\.3\.5/);
-  assert.match(binder, /card-analyzer\.css\?v=2\.4\.1/);
-  assert.doesNotMatch(binder, /<b data-duplicates="">0<\/b> extras/);
+  assert.match(css, /\.card-gallery-grid/);
+  assert.match(css, /is-unowned.*card-gallery-art img/);
+  assert.match(binder, /card-gallery-page/);
+  assert.match(binder, /card-gallery-page\.css/);
+  assert.match(binder, /id="seriesGridStage"/);
+  assert.match(binder, /data-card-filter-context="binder"/);
+  assert.doesNotMatch(binder, /binder\.css/);
+  assert.doesNotMatch(binder, /id="v62Showcase"/);
 });
 
 test('shell-safe profile links avoid binder-in-binder nesting', async () => {

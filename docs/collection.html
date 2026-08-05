@@ -1,113 +1,100 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
-<title>
-        My Card Album Binder | Starlight Card Binder
-    </title>
+<title>My Card Album Binder | Starlight Card Binder</title>
 <link href="css/style.css?v=1.0.3" rel="stylesheet"/>
 <link href="css/v80-8-ui.css" rel="stylesheet"/>
-<link rel="stylesheet" href="css/pages/collection.css?v=1.0">
 <link href="css/card-filters.css?v=1.0" rel="stylesheet"/>
-<link href="css/collection-redesign.css?v=1.3" rel="stylesheet"/>
-<link href="css/pages/album-binder.css?v=1.0.0" rel="stylesheet"/><script src="js/browser-performance.js?v=1.0.0" defer></script>
-    <link rel="stylesheet" href="css/shared-ui.css?v=1.6.19">
+<link href="css/pages/card-album-page.css?v=2.0.0" rel="stylesheet"/>
+<script src="js/browser-performance.js?v=1.0.0" defer></script>
+<link rel="stylesheet" href="css/shared-ui.css?v=1.6.19">
 <link rel="stylesheet" href="css/prestige-frames.css?v=3.8">
 <link rel="stylesheet" href="css/qol-ui.css?v=94.2.11">
 <link rel="stylesheet" href="css/pages/card-analyzer.css?v=2.4.6">
 </head>
-<body data-page="collection"><script src="js/embed-mode.js?v=1.1.1" type="module"></script>
+<body data-page="collection">
+<script src="js/embed-mode.js?v=1.1.1" type="module"></script>
 <div class="sky"></div>
 <div class="site">
 <aside class="sidebar">
 <div class="brand">
 <img alt="Sora Starlight logo" class="logo" src="site_assets/Sora_Starlight_Logo_Primary.png"/>
-<span class="binder-ribbon">
-                    Card Binder
-                </span>
+<span class="binder-ribbon">Card Binder</span>
 </div>
 </aside>
-<main class="main">
-<section class="collection-dashboard panel">
-<div class="collection-dashboard-copy">
+<main class="main card-album-page">
+<header class="card-album-header panel">
+<div class="card-album-intro">
 <p class="eyebrow" data-content="collection.eyebrow">My Stuff</p>
 <h1 data-content="collection.title">My Card Album Binder</h1>
-<p data-content="collection.lead">Your personal binder of collected Starlight cards. Themes and covers unlock as you level up.</p>
+<p data-content="collection.lead">Your collected cards in a themed binder. Custom covers unlock as you level up.</p>
 </div>
-<div aria-label="Collection summary" class="collection-summary-grid">
-<div><strong data-collected="">0</strong><span>Unique Cards</span></div>
-<div><strong data-total-copies="">0</strong><span>Total Copies</span></div>
+<div class="card-album-stats" aria-label="Collection summary">
+<div><strong data-collected="">0</strong><span>Unique</span></div>
+<div><strong data-total-copies="">0</strong><span>Copies</span></div>
 <div><strong data-favorite-count="">0</strong><span>Favorites</span></div>
-<div><strong data-duplicates="">0</strong><span>Extra Copies</span></div>
+<div><strong data-duplicates="">0</strong><span>Extras</span></div>
 <div><strong data-star-bits="">0</strong><span>Star Bits</span></div>
+<div class="card-album-level"><span>Lv.</span><strong data-collector-level="">1</strong></div>
 </div>
-<div class="collection-level-card">
-<div><span>Collector Level</span><strong>Lv. <span data-collector-level="">1</span></strong></div>
-<div class="collector-progress"><span data-level-progress=""></span></div>
-<small><span data-collector-points="">0</span> / <span data-next-level-points="">25</span> points</small>
+<div class="card-album-progress-row">
+<div class="card-album-progress"><span data-progress=""></span></div>
+<small><span data-collected="">0</span> / <span data-total="">0</span> · <span data-percent="">0%</span></small>
 </div>
-<div class="collection-progress-suite">
-<article class="collection-progress-card"><div><span>Collection Completion</span><strong><span data-collected="">0</span> / <span data-total="">0</span></strong></div><div class="collector-progress"><span data-progress=""></span></div><small><span data-percent="">0%</span> complete</small></article>
-<article class="collection-progress-card collection-highlight-card"><div><span>Collection Spotlight</span><strong data-collection-highlight="">Building your showcase…</strong></div><small data-collection-insight="">Your collection story will appear here.</small><div class="collection-rarity-breakdown" data-rarity-breakdown=""></div></article>
-<article class="collection-progress-card collection-series-progress"><div><span>Series Progress</span><strong>Your sets</strong></div><div class="mini-series" id="miniSeries"></div></article>
-</div>
-</section>
-<section aria-label="Collection views" class="collection-tabs panel">
-<button class="collection-tab active" data-collection-tab="all" type="button" data-content="collection.tabAll">Collected Cards</button>
-<button class="collection-tab" data-collection-tab="favorites" type="button" data-content="collection.tabFavorites">Favorites</button>
-<button class="collection-tab" data-collection-tab="duplicates" type="button" data-content="collection.tabDuplicates">Duplicates</button>
-</section>
+</header>
+
+<nav class="card-album-tabs panel" aria-label="Collection views">
+<button class="card-album-tab active" data-collection-tab="all" type="button" data-content="collection.tabAll">Collected Cards</button>
+<button class="card-album-tab" data-collection-tab="favorites" type="button" data-content="collection.tabFavorites">Favorites</button>
+<button class="card-album-tab" data-collection-tab="duplicates" type="button" data-content="collection.tabDuplicates">Duplicates</button>
+</nav>
+
 <section class="card-filter-panel panel" data-card-filter-context="collection" aria-label="Filter collection cards"></section>
-<section class="collection-tab-panel active" data-collection-panel="all">
-<div class="collection-section-heading"><div><p class="eyebrow" data-content="collection.allEyebrow">My Binder</p><h2 data-content="collection.allTitle">Collected Cards</h2></div><p data-content="collection.allLead">Cards you own, displayed in your Starlight album binder.</p></div>
-<section class="album-binder-stage" data-binder-theme="classic-starlight" id="albumBinderStage">
-<div class="album-binder-head">
-<div><h2 data-content="collection.binderSpreadTitle">Binder Spread</h2><p data-content="collection.binderSpreadLead">Tap a card for full view, favorites, and trade actions.</p></div>
-<span class="album-binder-theme-note" data-content="collection.binderThemeNote">Classic Starlight theme</span>
+
+<section class="card-album-panel active" data-collection-panel="all">
+<div class="card-album-binder" data-binder-theme="classic-starlight" id="albumBinderStage">
+<div class="card-album-binder-head">
+<h2 data-content="collection.binderSpreadTitle">Binder Spread</h2>
+<span class="card-album-theme-badge" data-content="collection.binderThemeNote">Classic Starlight</span>
 </div>
-<div class="album-binder-grid-shell"><div class="album-binder-grid starlight-gallery-grid" id="collectionGrid"></div></div>
+<div id="collectionGrid" aria-label="Collected cards"></div>
+</div>
 </section>
+
+<section class="card-album-panel" data-collection-panel="favorites" hidden>
+<div class="card-album-section-head">
+<h2 data-content="collection.favoritesTitle">Favorites</h2>
+<p data-content="collection.favoritesLead">Cards you have starred for quick access.</p>
+</div>
+<section class="card-album-showcase panel" id="favoriteShowcase"></section>
+<div id="favoriteGrid" aria-label="Favorite cards"></div>
 </section>
-<section class="collection-tab-panel" data-collection-panel="favorites" hidden="">
-<div class="collection-section-heading"><div><p class="eyebrow" data-content="collection.favoritesEyebrow">Personal Picks</p><h2 data-content="collection.favoritesTitle">Favorites</h2></div><p data-content="collection.favoritesLead">The cards you have starred for quick access.</p></div>
-<section class="favorite-showcase panel" id="favoriteShowcase"></section>
-<section class="grid-page favorite-grid-list" id="favoriteGrid" aria-label="Favorite cards list"></section>
-</section>
-<section class="collection-tab-panel" data-collection-panel="duplicates" hidden="">
-<div class="collection-duplicates-card panel">
-<div><p class="eyebrow" data-content="collection.duplicatesEyebrow">Extra Copies</p><h2 data-content="collection.duplicatesTitle">Duplicate Cards</h2><p data-content="collection.duplicatesLead">You currently have <strong data-duplicates="">0</strong> extra copies. Your final copy of every card is always protected.</p></div>
+
+<section class="card-album-panel" data-collection-panel="duplicates" hidden>
+<div class="card-album-duplicates-banner panel">
+<div>
+<h2 data-content="collection.duplicatesTitle">Duplicate Cards</h2>
+<p data-content="collection.duplicatesLead">You have <strong data-duplicates="">0</strong> extra copies. Your last copy of each card is always protected.</p>
+</div>
 <a class="btn primary" data-shell-view="star-bits" href="binder?view=star-bits"><img class="star-bit-icon star-bit-icon--sm" src="site_assets/icons/star-bit.png?v=2" alt="" width="16" height="16" decoding="async"> <span data-content="collection.duplicatesCta">Open Star Bits Exchange</span></a>
 </div>
-<div class="grid-page" id="collectionDuplicateGrid"></div>
+<div id="collectionDuplicateGrid" aria-label="Duplicate cards"></div>
 </section>
 
-
-
-
-
-
 <section class="info-strip">
-<p>
-<b>Collection:</b>
-                    <span data-content="shared.infoStripCollection">Cards are earned through Daily Boosters, reward codes, and special events.</span>
-                </p>
-<p data-content="shared.infoStripCopyright">
-                    © 2026 Sora Starlight
-                </p>
+<p><b>Collection:</b> <span data-content="shared.infoStripCollection">Cards are earned through Daily Boosters, reward codes, and special events.</span></p>
+<p data-content="shared.infoStripCopyright">© 2026 Sora Starlight</p>
 </section>
 </main>
 </div>
 <div aria-hidden="true" aria-live="polite" id="cardOverlay" hidden></div>
-<!--
-        Cloud synchronization finishes before app.js starts.
-    -->
 <script type="module" src="js/pages/website-content-hydrate-page.js?v=1.2"></script>
-<script src="js/cloud-collection.js?v=1.3.6" type="module"></script>
+<script src="js/cloud-collection.js?v=1.3.7" type="module"></script>
 <script src="js/site-dashboard.js" type="module"></script>
 <script src="js/pages/collection-page.js?v=1.0"></script>
-<script src="js/collection-redesign.js?v=1.3.0" type="module"></script>
+<script src="js/collection-redesign.js?v=1.4.0" type="module"></script>
 <script src="js/starlight-perspective-card.js?v=1.0.0"></script>
 <script src="js/shared-ui.js?v=1.6.21"></script>
 <script src="js/qol-ui.js?v=94.2.4" defer></script>

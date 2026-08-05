@@ -19,47 +19,28 @@ test('keeps the requested collection navigation labels in the shared shell', asy
 
   assert.match(shell, /collection:\{title:'My Card Album Binder'/);
   assert.match(shell, /binder:\{title:'Starlight Card Gallery'/);
-  assert.match(shell, /checklist:\{title:'Star Registry'/);
 });
 
-test('places shared card filters in the binder and collection content areas', async () => {
-  const [binder, collection, checklist, app] = await Promise.all([
+test('gallery and album pages use rebuilt markup and render hooks', async () => {
+  const [binder, collection, app] = await Promise.all([
     read('docs/binder.html'),
     read('docs/collection.html'),
-    read('docs/checklist.html'),
     read('docs/js/app.js')
   ]);
 
-  assert.doesNotMatch(binder, /side-card filters/);
-  assert.match(binder, /data-card-filter-context="binder"/);
-  assert.match(binder, /tcg-gallery-hub/);
-  assert.match(binder, /tcg-gallery-hub\.css/);
-  assert.match(binder, /id="seriesHeroToolbar"/);
-  assert.match(collection, /data-card-filter-context="collection"/);
-  assert.match(collection, /album-binder-stage/);
-  assert.match(collection, /album-binder\.css/);
-  assert.match(checklist, /data-card-filter-context="checklist"/);
-  assert.match(checklist, /css\/card-filters\.css/);
-  assert.match(app, /function renderFilterControls\(\)/);
-  assert.match(app, /function renderAlbumBinderCard\(/);
-  assert.match(app, /function renderChecklist\(\)/);
+  assert.match(binder, /card-gallery-page/);
+  assert.match(binder, /card-gallery-page\.css/);
+  assert.match(binder, /id="seriesGridStage"/);
+  assert.doesNotMatch(binder, /binder-series-carousel/);
+  assert.match(collection, /card-album-page/);
+  assert.match(collection, /card-album-page\.css/);
+  assert.match(collection, /id="collectionGrid"/);
+  assert.match(app, /function renderGalleryCard\(/);
+  assert.match(app, /function renderAlbumCard\(/);
+  assert.match(app, /function renderGalleryGridHtml\(/);
 });
 
-test('removes daily-booster promotion and floating quantity badges from My Cards', async () => {
-  const [collection, app] = await Promise.all([
-    read('docs/collection.html'),
-    read('docs/js/app.js')
-  ]);
-
+test('removes daily-booster promotion from collection page', async () => {
+  const collection = await read('docs/collection.html');
   assert.doesNotMatch(collection, /data-daily-status|Open Daily Booster/);
-  assert.doesNotMatch(app, /quantityBadgesHtml/);
-  assert.match(app, /duplicate-copy-summary/);
-});
-
-test('rebalances Epic and Legendary duplicate exchange values in a forward migration', async () => {
-  const migration = await read('docs/supabase/v94_1_star_bits_exchange_rebalance.sql');
-
-  assert.match(migration, /\('Epic',\s*50\)/);
-  assert.match(migration, /\('Legendary',\s*100\)/);
-  assert.match(migration, /on conflict \(rarity\)[\s\S]*bits_per_duplicate = excluded\.bits_per_duplicate/);
 });

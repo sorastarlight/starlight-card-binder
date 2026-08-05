@@ -1,19 +1,16 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
-<title>
-        Starlight Card Gallery | Starlight Card Binder
-    </title>
+<title>Starlight Card Gallery | Starlight Card Binder</title>
 <link href="css/style.css?v=1.0.3" rel="stylesheet"/>
 <link href="css/v80-8-ui.css" rel="stylesheet"/>
 <link href="css/app-shell.css?v=1.3.25" rel="stylesheet"/>
 <link href="css/card-filters.css?v=1.0" rel="stylesheet"/>
-<link href="css/pages/binder.css?v=1.8.1" rel="stylesheet"/>
-<link href="css/pages/tcg-gallery-hub.css?v=1.0.0" rel="stylesheet"/><script src="js/browser-performance.js?v=1.0.0" defer></script>
-    <link rel="stylesheet" href="css/shared-ui.css?v=1.6.19">
+<link href="css/pages/card-gallery-page.css?v=2.0.0" rel="stylesheet"/>
+<script src="js/browser-performance.js?v=1.0.0" defer></script>
+<link rel="stylesheet" href="css/shared-ui.css?v=1.6.19">
 <link rel="stylesheet" href="css/prestige-frames.css?v=3.8">
 <link rel="stylesheet" href="css/qol-ui.css?v=94.2.11">
 <link rel="stylesheet" href="css/pages/card-analyzer.css?v=2.4.6">
@@ -24,10 +21,9 @@
 <aside class="sidebar">
 <a class="brand" href="binder?view=home" data-shell-view="home" aria-label="Go to Home">
 <img alt="Sora Starlight logo" class="logo" src="site_assets/Sora_Starlight_Logo_Primary.png"/>
-<span class="binder-ribbon">
-                    Card Binder
-                </span>
-</a><nav aria-label="Main navigation" class="unified-nav"><div class="shell-nav-section"><p class="shell-nav-label"><span>✦</span> Explore The Starlight Card Series</p><a data-shell-view="home" href="binder?view=home">🏠 <span>Home</span></a><a data-shell-view="binder" href="binder?view=binder">🃏 <span>Starlight Card Gallery</span></a><a class="shell-daily-link" data-shell-view="daily" href="binder?view=daily">✨ <span>Free Daily Booster</span><span class="shell-daily-ready-badge" data-daily-nav-badge="" hidden="">READY</span></a><a class="shell-nav-item shell-shop-link" data-shell-view="shop" href="binder?view=shop">🛍️ <span>Card Boutique</span></a><a data-shell-view="events" href="binder?view=events">🎉 <span>Starlight Events</span></a><a data-shell-view="redeem" href="binder?view=redeem">🎟️ <span>Redeem A Code</span></a></div><div class="shell-nav-section"><p class="shell-nav-label"><span>♡</span> My Stuff</p><a data-shell-view="collection" href="binder?view=collection">📒 <span>My Card Album Binder</span></a><a data-shell-view="star-bits" href="binder?view=star-bits"><img class="shell-nav-icon-img star-bit-icon" src="site_assets/icons/star-bit.png?v=2" alt="" width="18" height="18" decoding="async"> <span>My Star Bits</span></a><a data-shell-view="starlight-evolution" href="binder?view=starlight-evolution">⭐ <span>Starlight Card Evolution</span></a><a data-shell-view="checklist" href="binder?view=checklist">☑ <span>Star Registry</span></a><a data-shell-view="quests" href="binder?view=quests">🧭 <span>Starlight Missions</span></a><p class="shell-nav-label shell-nav-label-sub"><span>🤝</span> COMMUNITY HUB</p><a data-shell-view="trades" href="binder?view=trades">🤝 <span>Trade With Others</span><span class="shell-nav-badge" data-trade-offer-badge="" hidden="">0</span></a><a data-shell-view="feed" href="binder?view=feed">📡 <span>LIVE Feed</span></a></div><div class="shell-nav-section"><p class="shell-nav-label">Account</p><a data-shell-view="notifications" href="binder?view=notifications">🔔 <span>Notifications</span><span class="shell-nav-badge" data-notification-badge hidden>0</span></a><a data-shell-view="rewards" href="binder?view=rewards">🎁 <span>Received Gifts</span><span class="shell-nav-badge" data-received-reward-badge hidden>0</span></a><a data-shell-view="profile" href="binder?view=profile">👤 <span>Profile</span></a></div><div class="shell-nav-section shell-nav-staff"><p class="shell-nav-label"><span>🛠️</span> Administration Hub</p><a class="staff-link" data-shell-view="admin" href="binder?view=admin">🛠️ <span>Open Administration Hub</span></a></div></nav>
+<span class="binder-ribbon">Card Binder</span>
+</a>
+<nav aria-label="Main navigation" class="unified-nav"><div class="shell-nav-section"><p class="shell-nav-label"><span>✦</span> Explore The Starlight Card Series</p><a data-shell-view="home" href="binder?view=home">🏠 <span>Home</span></a><a data-shell-view="binder" href="binder?view=binder">🃏 <span>Starlight Card Gallery</span></a><a class="shell-daily-link" data-shell-view="daily" href="binder?view=daily">✨ <span>Free Daily Booster</span><span class="shell-daily-ready-badge" data-daily-nav-badge="" hidden="">READY</span></a><a class="shell-nav-item shell-shop-link" data-shell-view="shop" href="binder?view=shop">🛍️ <span>Card Boutique</span></a><a data-shell-view="events" href="binder?view=events">🎉 <span>Starlight Events</span></a><a data-shell-view="redeem" href="binder?view=redeem">🎟️ <span>Redeem A Code</span></a></div><div class="shell-nav-section"><p class="shell-nav-label"><span>♡</span> My Stuff</p><a data-shell-view="collection" href="binder?view=collection">📒 <span>My Card Album Binder</span></a><a data-shell-view="star-bits" href="binder?view=star-bits"><img class="shell-nav-icon-img star-bit-icon" src="site_assets/icons/star-bit.png?v=2" alt="" width="18" height="18" decoding="async"> <span>My Star Bits</span></a><a data-shell-view="starlight-evolution" href="binder?view=starlight-evolution">⭐ <span>Starlight Card Evolution</span></a><a data-shell-view="checklist" href="binder?view=checklist">☑ <span>Star Registry</span></a><a data-shell-view="quests" href="binder?view=quests">🧭 <span>Starlight Missions</span></a><p class="shell-nav-label shell-nav-label-sub"><span>🤝</span> COMMUNITY HUB</p><a data-shell-view="trades" href="binder?view=trades">🤝 <span>Trade With Others</span><span class="shell-nav-badge" data-trade-offer-badge="" hidden="">0</span></a><a data-shell-view="feed" href="binder?view=feed">📡 <span>LIVE Feed</span></a></div><div class="shell-nav-section"><p class="shell-nav-label">Account</p><a data-shell-view="notifications" href="binder?view=notifications">🔔 <span>Notifications</span><span class="shell-nav-badge" data-notification-badge hidden>0</span></a><a data-shell-view="rewards" href="binder?view=rewards">🎁 <span>Received Gifts</span><span class="shell-nav-badge" data-received-reward-badge hidden>0</span></a><a data-shell-view="profile" href="binder?view=profile">👤 <span>Profile</span></a></div><div class="shell-nav-section shell-nav-staff"><p class="shell-nav-label"><span>🛠️</span> Administration Hub</p><a class="staff-link" data-shell-view="admin" href="binder?view=admin">🛠️ <span>Open Administration Hub</span></a></div></nav>
 </aside>
 <main class="main">
 <section aria-label="Collector account summary" class="shell-account-bar shell-account-bar-v883">
@@ -82,30 +78,28 @@
 </div>
 </section>
 <section class="shell-event-banner" data-shell-event-banner hidden><div><span class="shell-event-kicker">Current Starlight Event</span><strong data-shell-event-name></strong><span data-shell-event-time></span></div><a data-shell-view="events" href="binder?view=events">View Event ✨</a></section>
-<div class="shell-native-view tcg-gallery-hub" id="binderNativeView"><div class="binder-browse-chrome"><section class="series-hero panel v61-hero tcg-gallery-hero">
-<div class="hero-copy">
-<div class="series-hero-toolbar" id="seriesHeroToolbar" hidden></div>
-<p class="eyebrow">
-                        Starlight Cards
-                    </p>
-<h1 id="seriesHeroTitle">
-                        Starlight Card Gallery
-                    </h1>
-<p id="seriesHeroDescription">
-                        Browse every card in the series. Uncollected cards stay face-down until you earn them.
-                    </p>
-<div class="series-stats" id="seriesHeroStats"></div>
-<div class="tcg-gallery-progress" id="tcgGalleryProgress" hidden></div>
+
+<div class="shell-native-view" id="binderNativeView">
+  <div class="card-gallery-page">
+    <header class="card-gallery-header panel">
+      <div class="card-gallery-toolbar" id="seriesHeroToolbar" hidden></div>
+      <p class="eyebrow">Starlight Cards</p>
+      <h1 id="seriesHeroTitle">Starlight Card Gallery</h1>
+      <p id="seriesHeroDescription">Browse every card in the series. Uncollected cards show the card back until you earn them.</p>
+      <div class="card-gallery-stats" id="seriesHeroStats"></div>
+      <div class="card-gallery-progress" id="tcgGalleryProgress" hidden></div>
+      <p class="card-gallery-summary" data-filter-summary role="status" aria-live="polite"></p>
+    </header>
+    <section class="card-filter-panel panel" data-card-filter-context="binder" aria-label="Filter gallery cards"></section>
+    <section class="card-gallery-stage panel" id="seriesGridStage" aria-label="Starlight card gallery"></section>
+  </div>
 </div>
-</section><section class="card-filter-panel panel" data-card-filter-context="binder" aria-label="Filter gallery cards"></section></div><section aria-label="Choose a series booster pack" class="v61-series-stage" hidden id="seriesLanding"></section><div class="binder-browser-layout tcg-gallery-layout"><section aria-label="Starlight card gallery" class="v61-card-stage tcg-gallery-stage" id="seriesGridStage"></section><aside aria-label="Selected card showcase" class="v62-showcase" hidden id="v62Showcase"></aside></div></div><section aria-live="polite" class="shell-view-frame" id="shellViewFrame"><iframe id="shellViewIframe" title="Starlight Binder view"></iframe></section></main>
+
+<section aria-live="polite" class="shell-view-frame" id="shellViewFrame"><iframe id="shellViewIframe" title="Starlight Binder view"></iframe></section>
+</main>
 </div>
 <div aria-hidden="true" aria-live="polite" id="cardOverlay" hidden></div>
-<!--
-        cloud-collection.js now loads app.js only after the
-        authenticated user's cloud collection has synchronized.
-    -->
 <script src="js/cloud-collection.js?v=1.3.7" type="module"></script>
-<script type="module" src="js/binder-series-carousel.js?v=1.1.0"></script>
 <script src="js/site-dashboard.js?v=1.1" type="module"></script>
 <script src="js/pages/binder-page.js?v=1.0"></script>
 <script src="js/app-shell.js?v=1.3.31" type="module"></script>

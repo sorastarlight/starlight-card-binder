@@ -2,7 +2,7 @@ import { bindTablistKeyboard, syncTabSelection } from './tablist-a11y.js';
 
 const tabs = [...document.querySelectorAll('[data-collection-tab]')];
 const panels = [...document.querySelectorAll('[data-collection-panel]')];
-const tablist = document.querySelector('.collection-tabs');
+const tablist = document.querySelector('.card-album-tabs, .collection-tabs');
 
 function activateCollectionView(name, { focus = false } = {}) {
   syncTabSelection(tabs, panels, name, {

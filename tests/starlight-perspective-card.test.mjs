@@ -62,26 +62,28 @@ test('perspective card module resolves effect styles and builds opt-in markup', 
 });
 
 test('binder and reveal surfaces integrate premium card art helpers', async () => {
-  const [app, reveal, perspectiveCss, galleryCss, styleCss, cards] = await Promise.all([
+  const [app, reveal, perspectiveCss, galleryPageCss, albumPageCss, styleCss, cards] = await Promise.all([
     read('docs/js/app.js'),
     read('docs/js/reward-reveal.js'),
     read('docs/css/starlight-perspective-card.css'),
-    read('docs/css/starlight-gallery.css'),
+    read('docs/css/pages/card-gallery-page.css'),
+    read('docs/css/pages/card-album-page.css'),
     read('docs/css/style.css'),
     read('docs/data/cards.json')
   ]);
 
   assert.match(app, /function perspectiveArt\(/);
   assert.match(app, /scanPerspectiveCardsIn/);
-  assert.match(app, /starlight-gallery-grid/);
+  assert.match(app, /card-gallery-grid/);
   assert.match(app, /flashGalleryFilterTransition/);
-  assert.match(app, /starlight-album-slot/);
+  assert.match(app, /card-album-slot/);
   assert.match(reveal, /mountCardArt/);
   assert.match(reveal, /effectStyle/);
   assert.match(perspectiveCss, /perspective: 600px/);
   assert.match(perspectiveCss, /prefers-reduced-motion: reduce/);
   assert.match(perspectiveCss, /\.starlight-effect-shine/);
-  assert.match(galleryCss, /\.starlight-album-slot/);
+  assert.match(galleryPageCss, /\.card-gallery-grid/);
+  assert.match(albumPageCss, /\.card-album-slot/);
   assert.match(styleCss, /starlight-gallery\.css/);
   assert.match(cards, /"effectStyle": "special-art"/);
 });
