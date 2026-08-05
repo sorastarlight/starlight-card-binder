@@ -499,14 +499,14 @@ async function loadBinderApplication() {
             "load",
             () => {
                 const transitionScript = document.createElement("script");
-                transitionScript.src = "./js/card-view-transition.js?v=1.0.0";
+                transitionScript.src = "./js/card-view-transition.js?v=1.0.1";
                 transitionScript.async = false;
 
                 transitionScript.addEventListener(
                     "load",
                     () => {
                         const script = document.createElement("script");
-                        script.src = "./js/app.js?v=1.9.10";
+                        script.src = "./js/app.js?v=1.9.11";
                         script.async = false;
                         script.dataset.starlightApp = "true";
 

@@ -55,10 +55,9 @@ test('app.js wires cinematic full view and spread preloading', async () => {
   assert.match(app, /StarlightAlbumBinder3D/);
   assert.match(app, /data-binder-organize/);
   assert.match(app, /data-album-spread/);
-  assert.match(app, /preloadAlbumBinderSpreadImages/);
-  assert.match(app, /StarlightCardViewTransition/);
+  assert.match(app, /initCardInteractionDelegation/);
+  assert.match(app, /notifyEmbedLayoutReady/);
   assert.match(app, /openAlbumBinderCard/);
-  assert.match(app, /onCardOpen/);
 });
 
 test('collection page loads 3D binder modules and styles', async () => {

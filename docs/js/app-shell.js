@@ -608,7 +608,7 @@ window.addEventListener('message',async e=>{
   ){
     window.dispatchEvent(new CustomEvent('starlight-dashboard-refresh',{detail:data}));
   }
-  if(data.type==='starlight-view-ready'||data.type==='starlight-content-ready'){
+  if (data.type==='starlight-view-ready'||data.type==='starlight-content-ready'||data.type==='starlight-app-ready'){
     markViewReady(data);
   }
   if(data.type==='starlight-view-height')resizeEmbeddedView(Number(data.height));

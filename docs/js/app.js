@@ -966,13 +966,55 @@ function preloadAlbumBinderSpreadImages(list, spreadIndex) {
   });
 }
 
+function notifyEmbedLayoutReady() {
+  window.__starlightEmbedReportHeight?.();
+  if (pageName === 'collection' && window.parent !== window) {
+    window.__starlightEmbedAnnounceReady?.();
+    window.parent.postMessage({
+      type: 'starlight-app-ready',
+      view: 'collection',
+      height: document.documentElement?.scrollHeight || 0
+    }, location.origin);
+  }
+}
+
+function initCardInteractionDelegation() {
+  const collectionGrid = $('#collectionGrid');
+  if (collectionGrid && collectionGrid.dataset.cardGridBound !== '1') {
+    collectionGrid.dataset.cardGridBound = '1';
+    collectionGrid.addEventListener('click', event => {
+      const btn = event.target.closest('[data-album-card]');
+      if (!btn || pageName !== 'collection') return;
+      event.preventDefault();
+      event.stopPropagation();
+      openAlbumBinderCard(btn);
+    });
+  }
+
+  const galleryGrid = $('#seriesGridStage');
+  if (galleryGrid && galleryGrid.dataset.cardGridBound !== '1') {
+    galleryGrid.dataset.cardGridBound = '1';
+    galleryGrid.addEventListener('click', event => {
+      const btn = event.target.closest('[data-v61-card], .card-gallery-btn');
+      const cardId = btn?.dataset?.v61Card;
+      if (!cardId || pageName !== 'binder') return;
+      event.preventDefault();
+      event.stopPropagation();
+      selected = cards.find(card => card.id === cardId) || selected;
+      selectedIndex = Math.max(0, cards.findIndex(card => card.id === cardId));
+      previewFlipped = false;
+      openFullView('filtered');
+    });
+  }
+}
+
 function openAlbumBinderCard(sourceEl) {
   const cardId = sourceEl?.dataset?.albumCard;
   if (!cardId) return;
   selected = cards.find(card => card.id === cardId) || selected;
   selectedIndex = Math.max(0, cards.findIndex(card => card.id === cardId));
   previewFlipped = false;
-  openFullView('collection', { sourceEl });
+  openFullView('collection');
 }
 
 function renderAlbumBinder3D(wrap, list) {
@@ -1432,15 +1474,6 @@ function fullViewModal() {
       dialog: element => element.querySelector('.analyzer-modal') || element.querySelector('.full-card-stage'),
       labelledBy: 'fullViewCardTitle',
       closeOnBackdrop: true,
-      beforeClose: ({ reason, controller }) => {
-        if (reason === 'flyback-complete' || reason === 'destroy') return true;
-        const transition = window.StarlightCardViewTransition;
-        if (!transition?.getLastSourceSelector?.() || transition.motionReduced?.()) return true;
-        transition.flyBack({
-          onComplete: () => controller.close(undefined, 'flyback-complete')
-        });
-        return false;
-      },
       onOpen: () => {
         overlay.classList.add('open');
         document.body.classList.add('modal-open');
@@ -1456,9 +1489,8 @@ function fullViewModal() {
   return cardOverlayModal;
 }
 
-function openFullView(listMode = 'all', options = {}) {
+function openFullView(listMode = 'all') {
   if (!selected) return;
-  const { sourceEl = null } = options;
   fullViewListMode = listMode;
   analyzerActiveTab = 'details';
   analyzerHoloEnabled = true;
@@ -1498,34 +1530,21 @@ function openFullView(listMode = 'all', options = {}) {
     }
   };
 
-  const transition = window.StarlightCardViewTransition;
-  if (sourceEl && transition?.flyFromElement && !transition.motionReduced?.()) {
-    transition.flyFromElement(sourceEl, {
-      imageUrl: getVisibleImage(selected),
-      alt: getVisibleName(selected),
-      onReveal: revealModal
-    });
-    return;
-  }
   revealModal();
 }
 function closeFullView() {
-  const finalizeClose = () => {
-    $('#cardOverlay')?.classList.remove('card-analyzer-open');
-    $('#cardOverlay')?.classList.remove('open');
+  $('#cardOverlay')?.classList.remove('card-analyzer-open');
+  if (cardOverlayModal?.isOpen) cardOverlayModal.close(undefined, 'page');
+  else {
+    const overlay = $('#cardOverlay');
+    overlay?.classList.remove('open');
+    if (overlay) {
+      overlay.hidden = true;
+      overlay.setAttribute('aria-hidden', 'true');
+    }
     document.body.classList.remove('modal-open');
     notifyShellChrome({ hideLiveFeed: false });
-  };
-  if (cardOverlayModal?.isOpen) {
-    cardOverlayModal.close(undefined, 'page');
-    return;
   }
-  const transition = window.StarlightCardViewTransition;
-  if (transition?.getLastSourceSelector?.() && !transition.motionReduced?.()) {
-    transition.flyBack({ onComplete: finalizeClose });
-    return;
-  }
-  finalizeClose();
 }
 function stepFullView(dir) {
   const list = fullViewList.length ? fullViewList : cards;
@@ -1908,6 +1927,8 @@ function renderAll() {
   renderChecklist();
   renderAbout();
   updateRaritySelectClass();
+  initCardInteractionDelegation();
+  notifyEmbedLayoutReady();
 }
 window.renderAll = renderAll;
 
@@ -2100,6 +2121,7 @@ document.addEventListener('DOMContentLoaded', () => {
   albumBinderPage = window.StarlightAlbumBinder?.readPage?.() || 1;
   hydrateBinderOrganize();
   renderFilterControls();
+  initCardInteractionDelegation();
   if (pageName === 'binder') {
     ensureWebsiteBinderLanding().then(() => {
       refreshBinderFiltersForDisplay();
@@ -2471,7 +2493,7 @@ document.addEventListener('click', e => {
     selected = cards.find(c => c.id === cardBtn.dataset.v61Card) || selected;
     selectedIndex = cards.findIndex(c => c.id === cardBtn.dataset.v61Card);
     previewFlipped = false;
-    openFullView('filtered', { sourceEl: cardBtn });
+    openFullView('filtered');
     return;
   }
   const albumBtn = e.target.closest('[data-album-card]');

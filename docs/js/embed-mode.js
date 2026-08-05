@@ -210,6 +210,11 @@ if (!embedded && shouldRedirectToShell()) {
   });
   window.addEventListener('load', () => { announceReady(); setTimeout(announceReady, 120); });
   window.addEventListener('pageshow', () => { announceReady(); setTimeout(announceReady, 80); });
+  window.addEventListener('starlight-cloud-ready', () => {
+    announceReady();
+    reportHeight();
+  });
+  window.__starlightEmbedAnnounceReady = announceReady;
   window.__starlightEmbedReportHeight = reportHeight;
   window.__starlightEmbedResetLayout = () => {
     reportHeight();
