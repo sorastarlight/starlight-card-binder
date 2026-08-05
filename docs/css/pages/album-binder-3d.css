@@ -1,0 +1,446 @@
+/* Interactive 3D album binder — themeable via CSS variables on .album-binder-3d-scene */
+
+.album-binder-3d-mount {
+  min-width: 0;
+}
+
+.album-binder-3d-scene {
+  --binder-cover-a: #eaf6ff;
+  --binder-cover-b: #ffd9ef;
+  --binder-page-a: #fffefb;
+  --binder-page-b: #f3f9ff;
+  --binder-spine: #9ed4ff;
+  --binder-ring: #dfefff;
+  --binder-ring-metal: #c8e8ff;
+  --binder-pocket: rgba(255, 255, 255, 0.42);
+  --binder-pocket-edge: rgba(107, 198, 248, 0.45);
+  --binder-glow: rgba(255, 186, 228, 0.35);
+  --binder-accent: #6bc6f8;
+  --binder-accent-soft: #ffb4da;
+  --binder-text: #405fa1;
+  position: relative;
+  padding: clamp(12px, 2vw, 20px) clamp(8px, 2vw, 16px) clamp(18px, 3vw, 28px);
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.album-binder-3d-atmosphere {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(255, 210, 240, 0.22), transparent 42%),
+    radial-gradient(circle at 82% 18%, rgba(168, 226, 255, 0.28), transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(107, 198, 248, 0.12), transparent 55%);
+}
+
+.album-binder-3d-starfield {
+  position: absolute;
+  inset: 0;
+  opacity: 0.55;
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1px, transparent 1px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.55) 0 1px, transparent 1px);
+  background-size: 120px 120px, 180px 180px;
+  background-position: 0 0, 40px 60px;
+  animation: albumBinderStarsDrift 48s linear infinite;
+}
+
+@keyframes albumBinderStarsDrift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-24px, 18px, 0); }
+}
+
+.album-binder-3d-stage {
+  position: relative;
+  z-index: 1;
+  perspective: 1400px;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--binder-tilt-x, 0deg)) rotateY(var(--binder-tilt-y, 0deg));
+  transition: transform 0.35s ease;
+}
+
+.album-binder-3d-shell {
+  position: relative;
+  max-width: min(980px, 100%);
+  margin: 0 auto;
+  filter: drop-shadow(0 28px 48px rgba(61, 83, 132, 0.18));
+}
+
+.album-binder-3d-book {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  transform-style: preserve-3d;
+}
+
+.album-binder-3d-spine {
+  position: absolute;
+  top: 4%;
+  bottom: 4%;
+  left: 50%;
+  width: 18px;
+  transform: translateX(-50%) translateZ(12px);
+  border-radius: 8px;
+  background: linear-gradient(180deg, var(--binder-ring-metal), var(--binder-spine));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.45),
+    0 0 18px var(--binder-glow);
+  z-index: 4;
+  pointer-events: none;
+}
+
+.album-binder-3d-spread {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(8px, 1.6vw, 14px);
+  transform-style: preserve-3d;
+  transition: opacity 0.22s ease, transform 0.55s cubic-bezier(0.22, 0.85, 0.28, 1);
+}
+
+.album-binder-3d-spread.is-turning-forward {
+  transform: perspective(1200px) rotateY(-6deg);
+  opacity: 0.35;
+}
+
+.album-binder-3d-spread.is-turning-back {
+  transform: perspective(1200px) rotateY(6deg);
+  opacity: 0.35;
+}
+
+.album-binder-3d-page {
+  position: relative;
+  min-width: 0;
+  transform-style: preserve-3d;
+}
+
+.album-binder-3d-page--left {
+  transform: rotateY(4deg);
+  transform-origin: right center;
+}
+
+.album-binder-3d-page--right {
+  transform: rotateY(-4deg);
+  transform-origin: left center;
+}
+
+.album-binder-3d-page-inner {
+  position: relative;
+  padding: clamp(12px, 2vw, 18px);
+  border-radius: 18px;
+  background:
+    linear-gradient(145deg, var(--binder-page-a), var(--binder-page-b)),
+    radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.65), transparent 38%);
+  border: 1px solid var(--binder-pocket-edge);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.55),
+    inset 0 -16px 28px rgba(107, 198, 248, 0.08),
+    0 12px 24px rgba(61, 83, 132, 0.08);
+}
+
+.album-binder-3d-rings {
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  width: 14px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fff, var(--binder-ring) 35%, var(--binder-ring-metal));
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, 0.65),
+    0 0 0 1px rgba(107, 198, 248, 0.25);
+  pointer-events: none;
+}
+
+.album-binder-3d-page--left .album-binder-3d-rings { right: 8px; }
+.album-binder-3d-page--right .album-binder-3d-rings { left: 8px; }
+
+.album-binder-3d-pocket-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(8px, 1.4vw, 12px);
+}
+
+.album-binder-3d-pocket {
+  position: relative;
+  min-width: 0;
+}
+
+.album-binder-3d-sleeve {
+  position: relative;
+  aspect-ratio: 5 / 7;
+  border-radius: 12px;
+  padding: 5px;
+  background: linear-gradient(145deg, var(--binder-pocket), rgba(255, 255, 255, 0.12));
+  border: 1px solid var(--binder-pocket-edge);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    inset 0 -8px 16px rgba(107, 198, 248, 0.08),
+    0 8px 16px rgba(61, 83, 132, 0.08);
+  overflow: hidden;
+}
+
+.album-binder-3d-sleeve::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(125deg, rgba(255, 255, 255, 0.42), transparent 42%, rgba(255, 255, 255, 0.12));
+  pointer-events: none;
+  z-index: 2;
+}
+
+.album-binder-3d-sleeve--empty {
+  display: grid;
+  place-items: center;
+  opacity: 0.72;
+}
+
+.album-binder-3d-pocket-star {
+  color: var(--binder-accent-soft);
+  font-size: 1.1rem;
+  opacity: 0.55;
+}
+
+.album-binder-3d-pocket-label {
+  display: block;
+  margin-top: 4px;
+  text-align: center;
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: var(--binder-text);
+  opacity: 0.55;
+}
+
+.album-binder-3d-card {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 8px;
+  transform-style: preserve-3d;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.album-binder-3d-card:hover,
+.album-binder-3d-card:focus-visible {
+  transform: translateY(-4px) rotateX(4deg) scale(1.02);
+  outline: 2px solid var(--binder-accent);
+  outline-offset: 2px;
+}
+
+.album-binder-3d-card-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.album-binder-3d-card-art img,
+.album-binder-3d-card-art .starlight-perspective-card,
+.album-binder-3d-card-art .starlight-card {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.album-binder-3d-card-number {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 3;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: rgba(42, 48, 76, 0.78);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 900;
+  pointer-events: none;
+}
+
+.album-binder-3d-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 3;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  font-size: 0.72rem;
+  font-weight: 900;
+  box-shadow: 0 4px 10px rgba(61, 83, 132, 0.14);
+  pointer-events: none;
+}
+
+.album-binder-3d-badge--favorite { color: #ffb347; }
+.album-binder-3d-badge--evolved { color: #9aa8ff; font-size: 0.65rem; }
+
+.album-binder-3d-corner {
+  position: absolute;
+  bottom: 8px;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  touch-action: none;
+  z-index: 5;
+}
+
+.album-binder-3d-corner.is-dragging {
+  cursor: grabbing;
+}
+
+.album-binder-3d-page--right.is-page-dragging {
+  transform: rotateY(calc(-4deg - var(--page-drag-progress, 0) * 92deg));
+  transition: none;
+}
+
+.album-binder-3d-page--left.is-page-dragging {
+  transform: rotateY(calc(4deg + var(--page-drag-progress, 0) * 92deg));
+  transition: none;
+}
+
+.album-binder-3d-spread.is-dragging-page .album-binder-3d-corner--right {
+  background: linear-gradient(135deg, transparent 42%, rgba(107, 198, 248, 0.32) 58%);
+}
+
+.album-binder-3d-spread.is-dragging-page .album-binder-3d-corner--left {
+  background: linear-gradient(225deg, transparent 42%, rgba(255, 186, 228, 0.32) 58%);
+}
+
+.album-binder-3d-corner--right {
+  right: 6px;
+  background: linear-gradient(135deg, transparent 50%, rgba(107, 198, 248, 0.18) 50%);
+  border-bottom-right-radius: 12px;
+}
+
+.album-binder-3d-corner--left {
+  left: 6px;
+  background: linear-gradient(225deg, transparent 50%, rgba(255, 186, 228, 0.18) 50%);
+  border-bottom-left-radius: 12px;
+}
+
+.album-binder-3d-corner:focus-visible {
+  outline: 2px solid var(--binder-accent);
+  outline-offset: 2px;
+}
+
+.album-binder-3d-controls {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 0 4px;
+}
+
+.album-binder-3d-status {
+  flex: 1 1 auto;
+  text-align: center;
+  color: var(--binder-text);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.album-binder-3d-nav[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.album-binder-3d-scene.is-turning .album-binder-3d-nav,
+.album-binder-3d-scene.is-turning .album-binder-3d-corner {
+  pointer-events: none;
+}
+
+.card-album-binder-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  margin-bottom: 12px;
+  border-radius: 16px;
+}
+
+.card-album-binder-toolbar label {
+  display: grid;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #6b7089;
+}
+
+.card-album-binder-toolbar select {
+  min-width: 160px;
+  min-height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(107, 198, 248, 0.28);
+  padding: 8px 10px;
+  font: inherit;
+  color: #405fa1;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.card-album-binder-toolbar .btn[disabled] {
+  opacity: 0.55;
+}
+
+@media (max-width: 860px) {
+  .album-binder-3d-spread {
+    grid-template-columns: 1fr;
+  }
+
+  .album-binder-3d-page--left,
+  .album-binder-3d-page--right {
+    transform: none;
+  }
+
+  .album-binder-3d-page--right {
+    display: none;
+  }
+
+  .album-binder-3d-spine {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .album-binder-3d-starfield {
+    animation: none;
+  }
+
+  .album-binder-3d-stage {
+    transition: none;
+    transform: none;
+  }
+
+  .album-binder-3d-spread,
+  .album-binder-3d-card {
+    transition: opacity 0.16s ease;
+  }
+
+  .album-binder-3d-spread.is-turning-forward,
+  .album-binder-3d-spread.is-turning-back {
+    transform: none;
+    opacity: 0;
+  }
+
+  .album-binder-3d-page--left,
+  .album-binder-3d-page--right {
+    transform: none;
+  }
+}

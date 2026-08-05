@@ -1,0 +1,50 @@
+/* Card flight from binder pocket / gallery tile into full-view */
+
+.starlight-card-flight {
+  position: fixed;
+  z-index: 100002;
+  pointer-events: none;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(61, 83, 132, 0.22);
+  transform-style: preserve-3d;
+  will-change: left, top, width, height, transform, opacity;
+}
+
+.starlight-card-flight img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.album-binder-3d-card.is-opening-full-view,
+.card-gallery-btn.is-opening-full-view {
+  opacity: 0.35;
+  transform: scale(0.96);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+#cardOverlay.is-flight-closing {
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+
+#cardOverlay.is-flight-closing .analyzer-modal {
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .starlight-card-flight {
+    display: none !important;
+  }
+
+  .album-binder-3d-card.is-opening-full-view,
+  .card-gallery-btn.is-opening-full-view {
+    opacity: 1;
+    transform: none;
+  }
+}

@@ -46,6 +46,36 @@
   </article>`;
   }
 
+  function renderBinderPocket(ctx, card, slotIndex, { side = 'left' } = {}) {
+    if (!card) {
+      return `<div class="album-binder-3d-pocket is-empty ${side === 'right' ? 'is-right' : 'is-left'}" data-pocket-side="${ctx.esc(side)}" data-pocket-slot="${slotIndex}">
+        <div class="album-binder-3d-sleeve album-binder-3d-sleeve--empty">
+          <span class="album-binder-3d-pocket-star" aria-hidden="true">✦</span>
+        </div>
+        <span class="album-binder-3d-pocket-label">Empty</span>
+      </div>`;
+    }
+    const got = ctx.isCollected(card.id);
+    const numberLabel = ctx.cardDisplayNumber?.(card)
+      || String(card.collectorNumber || card.number || '');
+    const favorited = ctx.isFavorite?.(card.id);
+    const prestigeClass = ctx.prestigeFrameClass?.(card.id) || '';
+    const evolved = prestigeClass && !prestigeClass.includes('stardust');
+    const badges = [
+      favorited ? '<span class="album-binder-3d-badge album-binder-3d-badge--favorite" aria-label="Favorite">★</span>' : '',
+      evolved ? '<span class="album-binder-3d-badge album-binder-3d-badge--evolved" aria-label="Evolved">✦</span>' : ''
+    ].join('');
+    return `<div class="album-binder-3d-pocket is-filled ${ctx.rarityClass(card)} ${prestigeClass}${favorited ? ' is-favorite' : ''}" data-pocket-side="${ctx.esc(side)}" data-pocket-slot="${slotIndex}" style="--pocket-i:${slotIndex}">
+      <div class="album-binder-3d-sleeve">
+        <button type="button" class="album-binder-3d-card" data-album-card="${ctx.esc(card.id)}" aria-label="Open ${ctx.esc(ctx.displayName(card))} full view">
+          <span class="album-binder-3d-card-art">${ctx.perspectiveArt(card, { imageUrl: card.imageUrl, alt: ctx.displayName(card), visible: ctx.perspectiveArtVisible(card, got) })}${ctx.prestigeFrameOverlayHtml(card.id)}</span>
+          <span class="album-binder-3d-card-number">${ctx.esc(numberLabel)}</span>
+          ${badges}
+        </button>
+      </div>
+    </div>`;
+  }
+
   function renderListTile(ctx, card, mode) {
     const got = ctx.isCollected(card.id);
     const quantity = ctx.getCardQuantity?.(card.id) || 0;
@@ -74,6 +104,7 @@
   global.StarlightCardTile = {
     renderGalleryTile,
     renderAlbumTile,
+    renderBinderPocket,
     renderListTile,
     wrapGalleryGrid,
     wrapAlbumGrid

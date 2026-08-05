@@ -896,8 +896,8 @@ function hydrateFilters(preserved = activeFilters()) {
 
 function applyAlbumBinderTheme() {
   if (pageName !== 'collection') return;
-  const root = $('#albumBinderStage');
-  if (!root) return;
+  const scene = $('#collectionGrid .album-binder-3d-scene') || $('#collectionGrid');
+  if (!scene) return;
   const themes = window.StarlightBinderThemes;
   if (!themes?.applyTheme) return;
   const level = Number($('[data-collector-level]')?.textContent) || 1;
@@ -905,7 +905,98 @@ function applyAlbumBinderTheme() {
     storedId: themes.readStoredThemeId?.(),
     collectorLevel: level
   });
-  themes.applyTheme(root, themeId);
+  themes.applyTheme(scene, themeId);
+}
+
+function getBinderOrganizeBy() {
+  const select = $('[data-binder-organize]');
+  const stored = window.StarlightAlbumBinder3D?.readOrganize?.();
+  if (select?.value) return select.value;
+  return stored || 'numberAsc';
+}
+
+function hydrateBinderOrganize() {
+  const select = $('[data-binder-organize]');
+  if (!select) return;
+  const value = window.StarlightAlbumBinder3D?.readOrganize?.() || 'numberAsc';
+  if ([...select.options].some(option => option.value === value)) {
+    select.value = value;
+  }
+}
+
+function sortedOwnedBinderCards(list) {
+  const organizeBy = getBinderOrganizeBy();
+  return window.StarlightAlbumBinder3D?.sortOwnedCards?.(list, organizeBy, { isFavorite })
+    || list.slice();
+}
+
+function turnAlbumBinderSpread(direction) {
+  const sceneApi = window.StarlightAlbumBinder3D;
+  const wrap = $('#collectionGrid');
+  const scene = wrap?.querySelector('.album-binder-3d-scene');
+  if (!scene || sceneApi?.isAnimating?.()) return;
+  const binderApi = window.StarlightAlbumBinder;
+  const baseList = cards.filter(c => isCollected(c.id));
+  const list = sortedOwnedBinderCards(filterCardList(baseList, activeFilters(), { respectOwnership: false }));
+  const current = binderApi?.paginateSpread?.(list, albumBinderPage);
+  if (!current) return;
+  if (direction === 'prev' && albumBinderPage <= 1) return;
+  if (direction === 'next' && albumBinderPage >= current.totalSpreads) return;
+  playSfx('page');
+  sceneApi.animateTurn(scene, direction, () => {
+    albumBinderPage += direction === 'prev' ? -1 : 1;
+    binderApi?.writePage?.(albumBinderPage);
+    renderGridPage('#collectionGrid', 'collection');
+  });
+}
+
+function preloadAlbumBinderSpreadImages(list, spreadIndex) {
+  const binderApi = window.StarlightAlbumBinder;
+  if (!binderApi?.paginateSpread || !Array.isArray(list)) return;
+  const sorted = sortedOwnedBinderCards(list);
+  [spreadIndex - 1, spreadIndex + 1].filter(index => index >= 1).forEach(index => {
+    const spreadData = binderApi.paginateSpread(sorted, index);
+    [...spreadData.left, ...spreadData.right].forEach(card => {
+      const url = card?.imageUrl || card?.thumbUrl;
+      if (!url) return;
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = url;
+    });
+  });
+}
+
+function renderAlbumBinder3D(wrap, list) {
+  const binderApi = window.StarlightAlbumBinder;
+  const sceneApi = window.StarlightAlbumBinder3D;
+  if (!wrap || !binderApi?.paginateSpread || !sceneApi?.renderSceneHtml) return false;
+  const sorted = sortedOwnedBinderCards(list);
+  const spreadData = binderApi.paginateSpread(sorted, albumBinderPage);
+  albumBinderPage = spreadData.spread;
+  binderApi.writePage(albumBinderPage);
+  const level = Number($('[data-collector-level]')?.textContent) || 1;
+  const themeId = window.StarlightBinderThemes?.resolveThemeId?.({ collectorLevel: level }) || 'starlight-classic';
+  const pagerHtml = binderApi.renderPagerHtml(spreadData);
+  wrap.innerHTML = sceneApi.renderSceneHtml({
+    spreadData,
+    ctx: cardTileContext(),
+    themeId,
+    pagerHtml
+  });
+  const scene = wrap.querySelector('.album-binder-3d-scene');
+  window.StarlightBinderThemes?.applyTheme?.(scene, themeId, { updateBadge: true });
+  sceneApi.bindScene(scene, {
+    onTurn: direction => turnAlbumBinderSpread(direction),
+    canTurn: direction => {
+      if (direction === 'prev') return spreadData.spread > 1;
+      if (direction === 'next') return spreadData.spread < spreadData.totalSpreads;
+      return false;
+    }
+  });
+  preloadAlbumBinderSpreadImages(sorted, spreadData.spread);
+  attachAlbumBinderHoverSfx(wrap);
+  scanPerspectiveCardsIn(wrap);
+  return true;
 }
 
 function renderFilterControls() {
@@ -1331,6 +1422,15 @@ function fullViewModal() {
       dialog: element => element.querySelector('.analyzer-modal') || element.querySelector('.full-card-stage'),
       labelledBy: 'fullViewCardTitle',
       closeOnBackdrop: true,
+      beforeClose: ({ reason, controller }) => {
+        if (reason === 'flyback-complete' || reason === 'destroy') return true;
+        const transition = window.StarlightCardViewTransition;
+        if (!transition?.getLastSourceSelector?.() || transition.motionReduced?.()) return true;
+        transition.flyBack({
+          onComplete: () => controller.close(undefined, 'flyback-complete')
+        });
+        return false;
+      },
       onOpen: () => {
         overlay.classList.add('open');
         document.body.classList.add('modal-open');
@@ -1346,8 +1446,9 @@ function fullViewModal() {
   return cardOverlayModal;
 }
 
-function openFullView(listMode = 'all') {
+function openFullView(listMode = 'all', options = {}) {
   if (!selected) return;
+  const { sourceEl = null } = options;
   fullViewListMode = listMode;
   analyzerActiveTab = 'details';
   analyzerHoloEnabled = true;
@@ -1366,27 +1467,50 @@ function openFullView(listMode = 'all') {
   }
   if (!fullViewList.find(c => c.id === selected.id)) fullViewList.unshift(selected);
   selectedIndex = Math.max(0, fullViewList.findIndex(c => c.id === selected.id));
-  overlayFlipped = previewFlipped;
-  $('#cardOverlay')?.classList.add('card-analyzer-open');
-  renderFullView();
-  playSfx('analyze');
-  const modal = fullViewModal();
-  if (modal) modal.open({ initialFocus: '.overlay-close' });
-  else {
-    bindFullViewBackdropClose($('#cardOverlay'));
-    $('#cardOverlay')?.classList.add('open');
-    document.body.classList.add('modal-open');
-    notifyShellChrome({ hideLiveFeed: true });
+
+  const revealModal = () => {
+    overlayFlipped = previewFlipped;
+    $('#cardOverlay')?.classList.add('card-analyzer-open');
+    renderFullView();
+    playSfx('analyze');
+    const modal = fullViewModal();
+    if (modal) modal.open({ initialFocus: '.overlay-close' });
+    else {
+      bindFullViewBackdropClose($('#cardOverlay'));
+      $('#cardOverlay')?.classList.add('open');
+      document.body.classList.add('modal-open');
+      notifyShellChrome({ hideLiveFeed: true });
+    }
+  };
+
+  const transition = window.StarlightCardViewTransition;
+  if (sourceEl && transition?.flyFromElement && !transition.motionReduced?.()) {
+    transition.flyFromElement(sourceEl, {
+      imageUrl: getVisibleImage(selected),
+      alt: getVisibleName(selected),
+      onReveal: revealModal
+    });
+    return;
   }
+  revealModal();
 }
 function closeFullView() {
-  $('#cardOverlay')?.classList.remove('card-analyzer-open');
-  if (cardOverlayModal?.isOpen) cardOverlayModal.close(undefined, 'page');
-  else {
+  const finalizeClose = () => {
+    $('#cardOverlay')?.classList.remove('card-analyzer-open');
     $('#cardOverlay')?.classList.remove('open');
     document.body.classList.remove('modal-open');
     notifyShellChrome({ hideLiveFeed: false });
+  };
+  if (cardOverlayModal?.isOpen) {
+    cardOverlayModal.close(undefined, 'page');
+    return;
   }
+  const transition = window.StarlightCardViewTransition;
+  if (transition?.getLastSourceSelector?.() && !transition.motionReduced?.()) {
+    transition.flyBack({ onComplete: finalizeClose });
+    return;
+  }
+  finalizeClose();
 }
 function stepFullView(dir) {
   const list = fullViewList.length ? fullViewList : cards;
@@ -1647,21 +1771,8 @@ function renderGridPage(target, mode) {
     ? `<button class="btn primary" type="button" data-reset-card-filters>${esc(collectionCopy.emptyFiltersCta || 'Reset Filters')}</button>`
     : `<a class="btn primary" href="binder?view=binder">${esc(mode === 'favorites' ? (collectionCopy.emptyFavoritesCta || 'Open Card Gallery') : (collectionCopy.emptyAllCta || 'Open Card Gallery'))}</a>`;
   if (mode === 'collection') {
-    const binderApi = window.StarlightAlbumBinder;
-    const spread = binderApi?.paginate
-      ? binderApi.paginate(list, albumBinderPage)
-      : { slice: list, page: 1, totalPages: 1, total: list.length };
-    albumBinderPage = spread.page;
-    binderApi?.writePage?.(albumBinderPage);
-    const pager = binderApi?.renderPagerHtml?.(spread) || '';
-    const spreadHtml = list.length
-      ? `${pager}<div class="card-album-spread is-ready">${window.StarlightCardTile?.wrapAlbumGrid
-        ? window.StarlightCardTile.wrapAlbumGrid(spread.slice.map((c, i) => renderAlbumCard(c, i)).join(''))
-        : `<div class="card-album-grid">${spread.slice.map((c, i) => renderAlbumCard(c, i)).join('')}</div>`}</div>${pager}`
-      : `<div class="empty-state"><h2>${esc(emptyTitle)}</h2><p>${esc(emptyLead)}</p>${emptyAction}</div>`;
-    wrap.innerHTML = spreadHtml;
-    attachAlbumBinderHoverSfx(wrap);
-    scanPerspectiveCardsIn(wrap);
+    if (list.length && renderAlbumBinder3D(wrap, list)) return;
+    wrap.innerHTML = `<div class="empty-state"><h2>${esc(emptyTitle)}</h2><p>${esc(emptyLead)}</p>${emptyAction}</div>`;
     return;
   }
   wrap.innerHTML = list.length
@@ -1905,29 +2016,23 @@ function applyCardFilterChange() {
   window.dispatchEvent(new CustomEvent('starlight-card-filters-changed'));
 }
 document.addEventListener('input', e => { if (e.target.matches('#globalSearch, [data-series], [data-rarity], [name="viewFilter"], #sortSelect, [data-filter-favorites]')) applyCardFilterChange(); });
-document.addEventListener('change', e => { if (e.target.matches('#globalSearch, [data-series], [data-rarity], [name="viewFilter"], #sortSelect, [data-filter-favorites]')) applyCardFilterChange(); });
+document.addEventListener('change', e => {
+  if (e.target.matches('#globalSearch, [data-series], [data-rarity], [name="viewFilter"], #sortSelect, [data-filter-favorites]')) applyCardFilterChange();
+  if (e.target.matches('[data-binder-organize]')) {
+    window.StarlightAlbumBinder3D?.writeOrganize?.(e.target.value);
+    albumBinderPage = 1;
+    window.StarlightAlbumBinder?.writePage?.(1);
+    renderGridPage('#collectionGrid', 'collection');
+  }
+});
 window.addEventListener('starlight-collection-tab-changed', () => {
   if (pageName === 'collection') renderAll();
 });
 document.addEventListener('click', e => {
-  const albumPageBtn = e.target.closest('[data-album-page]');
-  if (albumPageBtn && pageName === 'collection') {
+  const albumSpreadBtn = e.target.closest('[data-album-spread]');
+  if (albumSpreadBtn && pageName === 'collection') {
     e.preventDefault();
-    const spread = document.querySelector('#collectionGrid .card-album-spread');
-    const direction = albumPageBtn.dataset.albumPage;
-    if (direction === 'prev' && albumBinderPage > 1) albumBinderPage -= 1;
-    if (direction === 'next') albumBinderPage += 1;
-    if (spread) {
-      spread.classList.remove('is-ready');
-      spread.classList.add('is-turning');
-    }
-    playSfx('page');
-    window.setTimeout(() => {
-      renderGridPage('#collectionGrid', 'collection');
-      const nextSpread = document.querySelector('#collectionGrid .card-album-spread');
-      nextSpread?.classList.remove('is-turning');
-      nextSpread?.classList.add('is-ready');
-    }, spread ? 220 : 0);
+    if (!albumSpreadBtn.disabled) turnAlbumBinderSpread(albumSpreadBtn.dataset.albumSpread);
     return;
   }
   const reset = e.target.closest('[data-reset-card-filters]');
@@ -1954,6 +2059,21 @@ document.addEventListener('keydown', e => {
     }
     return;
   }
+  if (pageName === 'collection') {
+    const activeTab = document.querySelector('[data-collection-tab].active')?.dataset.collectionTab || 'all';
+    if (activeTab === 'all' && !window.StarlightAlbumBinder3D?.isAnimating?.()) {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        turnAlbumBinderSpread('prev');
+        return;
+      }
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        turnAlbumBinderSpread('next');
+        return;
+      }
+    }
+  }
   if ((e.key === 'Enter' || e.key === ' ') && pageName === 'collection') {
     const cardEl = e.target.closest?.('[data-open-collection-card]');
     if (!cardEl || e.target.closest('[data-toggle-favorite]')) return;
@@ -1963,6 +2083,7 @@ document.addEventListener('keydown', e => {
 });
 document.addEventListener('DOMContentLoaded', () => {
   albumBinderPage = window.StarlightAlbumBinder?.readPage?.() || 1;
+  hydrateBinderOrganize();
   renderFilterControls();
   if (pageName === 'binder') {
     ensureWebsiteBinderLanding().then(() => {
@@ -2307,7 +2428,7 @@ function attachV61HoverSfx() {
 }
 
 function attachAlbumBinderHoverSfx(root = document) {
-  root.querySelectorAll?.('.card-album-btn, .album-binder-btn')?.forEach(el => {
+  root.querySelectorAll?.('.card-album-btn, .album-binder-btn, .album-binder-3d-card')?.forEach(el => {
     if (el.dataset.albumHoverReady === '1') return;
     el.dataset.albumHoverReady = '1';
     el.addEventListener('mouseenter', () => playSfx('hover', el.dataset.albumCard || 'album'));
@@ -2329,14 +2450,13 @@ document.addEventListener('click', e => {
     renderAll();
     return;
   }
-  const cardBtn = e.target.closest('[data-v61-card]');
-  if (cardBtn) {
+  const cardBtn = e.target.closest('[data-v61-card], .card-gallery-btn');
+  if (cardBtn?.dataset?.v61Card) {
     e.preventDefault(); e.stopPropagation();
     selected = cards.find(c => c.id === cardBtn.dataset.v61Card) || selected;
     selectedIndex = cards.findIndex(c => c.id === cardBtn.dataset.v61Card);
     previewFlipped = false;
-    playSfx('analyze');
-    openFullView('filtered');
+    openFullView('filtered', { sourceEl: cardBtn });
     return;
   }
   const albumBtn = e.target.closest('[data-album-card]');
@@ -2345,8 +2465,7 @@ document.addEventListener('click', e => {
     selected = cards.find(c => c.id === albumBtn.dataset.albumCard) || selected;
     selectedIndex = cards.findIndex(c => c.id === albumBtn.dataset.albumCard);
     previewFlipped = false;
-    playSfx('analyze');
-    openFullView('collection');
+    openFullView('collection', { sourceEl: albumBtn });
     return;
   }
 }, true);

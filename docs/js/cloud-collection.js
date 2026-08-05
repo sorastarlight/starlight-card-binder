@@ -498,35 +498,59 @@ async function loadBinderApplication() {
         perspectiveScript.addEventListener(
             "load",
             () => {
-                const script = document.createElement("script");
-                script.src = "./js/app.js?v=1.9.7";
-                script.async = false;
-                script.dataset.starlightApp = "true";
+                const transitionScript = document.createElement("script");
+                transitionScript.src = "./js/card-view-transition.js?v=1.0.0";
+                transitionScript.async = false;
 
-                script.addEventListener(
+                transitionScript.addEventListener(
                     "load",
                     () => {
-                        console.log(
-                            "[Starlight] Binder application loaded."
+                        const script = document.createElement("script");
+                        script.src = "./js/app.js?v=1.9.9";
+                        script.async = false;
+                        script.dataset.starlightApp = "true";
+
+                        script.addEventListener(
+                            "load",
+                            () => {
+                                console.log(
+                                    "[Starlight] Binder application loaded."
+                                );
+                                resolve();
+                            },
+                            { once: true }
                         );
-                        resolve();
+
+                        script.addEventListener(
+                            "error",
+                            () => {
+                                reject(
+                                    new Error(
+                                        "The Binder application could not be loaded."
+                                    )
+                                );
+                            },
+                            { once: true }
+                        );
+
+                        document.body.appendChild(script);
                     },
                     { once: true }
                 );
 
-                script.addEventListener(
+                transitionScript.addEventListener(
                     "error",
                     () => {
                         reject(
                             new Error(
-                                "The Binder application could not be loaded."
+                                "The card view transition module could not be loaded."
                             )
                         );
                     },
                     { once: true }
                 );
 
-                document.body.appendChild(script);
+                document.body.appendChild(transitionScript);
             },
             { once: true }
         );
