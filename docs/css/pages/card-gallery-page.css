@@ -119,12 +119,31 @@ body[data-page="binder"] .card-gallery-grid {
   align-items: start;
 }
 
+body[data-page="binder"] .card-gallery-grid.is-filtering .card-gallery-item {
+  animation: none;
+  opacity: 0.72;
+  transform: scale(0.98);
+}
+
 body[data-page="binder"] .card-gallery-item {
   display: grid;
   gap: 8px;
   justify-items: center;
   min-height: 0 !important;
   min-width: 0;
+  animation: cardGalleryEnter 0.42s ease both;
+  animation-delay: calc(var(--i, 0) * 28ms);
+}
+
+@keyframes cardGalleryEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 body[data-page="binder"] .card-gallery-btn {
@@ -137,14 +156,39 @@ body[data-page="binder"] .card-gallery-btn {
   background: transparent;
   cursor: pointer;
   border-radius: 14px;
-  transition: transform 0.2s ease;
+  transition: transform 0.22s ease, filter 0.22s ease;
 }
 
 body[data-page="binder"] .card-gallery-btn:hover,
 body[data-page="binder"] .card-gallery-btn:focus-visible {
-  transform: translateY(-3px);
+  transform: translateY(-6px) scale(1.02);
   outline: 2px solid rgba(107, 198, 248, 0.8);
   outline-offset: 3px;
+}
+
+body[data-page="binder"] .card-gallery-btn:hover .card-gallery-art,
+body[data-page="binder"] .card-gallery-btn:focus-visible .card-gallery-art {
+  box-shadow:
+    0 0 0 1px rgba(255, 186, 228, 0.35),
+    0 18px 34px rgba(61, 83, 132, 0.18);
+}
+
+body[data-page="binder"] .card-gallery-fav {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 3;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #ffb347;
+  font-size: 0.82rem;
+  font-weight: 900;
+  box-shadow: 0 6px 14px rgba(61, 83, 132, 0.14);
+  pointer-events: none;
 }
 
 body[data-page="binder"] .card-gallery-btn::after {
@@ -222,5 +266,9 @@ body[data-page="binder"] .card-gallery-stage .empty-state {
   body[data-page="binder"] .card-gallery-btn,
   body[data-page="binder"] .card-gallery-progress-bar span {
     transition: none;
+  }
+
+  body[data-page="binder"] .card-gallery-item {
+    animation: none;
   }
 }

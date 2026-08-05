@@ -18,7 +18,7 @@ export function buildCardSearchHaystack(card = {}) {
 export function filterCardList(
   source,
   filters = {},
-  { respectOwnership = true, isCollected = () => false, sortCards = list => list } = {}
+  { respectOwnership = true, isCollected = () => false, isFavorite = () => false, sortCards = list => list } = {}
 ) {
   const list = (Array.isArray(source) ? source : []).filter(card => {
     const haystack = buildCardSearchHaystack(card);
@@ -29,7 +29,8 @@ export function filterCardList(
     const searchMatches = !query || haystack.includes(query);
     const ownershipMatches = !respectOwnership || !filters.view || filters.view === 'all'
       || (filters.view === 'collected' ? isCollected(card.id) : !isCollected(card.id));
-    return seriesMatches && rarityMatches && searchMatches && ownershipMatches;
+    const favoriteMatches = !filters.favoritesOnly || isFavorite(card.id);
+    return seriesMatches && rarityMatches && searchMatches && ownershipMatches && favoriteMatches;
   });
   sortCards(list, filters.sort);
   return list;
@@ -44,6 +45,7 @@ export function resolveBinderBrowseList(cards, filters = {}, options = {}) {
   const query = String(filters.q || '').trim();
   const searching = query.length > 0;
   const series = filters.series || 'All Series';
+  const favoritesOnly = Boolean(filters.favoritesOnly);
 
   const pool = series === 'All Series'
     ? catalog
@@ -54,11 +56,12 @@ export function resolveBinderBrowseList(cards, filters = {}, options = {}) {
   const heading = series === 'All Series'
     ? (searching ? 'Search results' : 'Card Gallery')
     : series;
+  const favoriteNote = favoritesOnly ? ' · favorites only' : '';
   const summary = series === 'All Series'
     ? (searching
-      ? `Showing ${list.length} of ${pool.length} cards matching “${query}”`
-      : `Showing ${list.length} of ${pool.length} cards · ${owned} collected`)
-    : `Showing ${list.length} of ${pool.length} cards in ${series} · ${owned} collected`;
+      ? `Showing ${list.length} of ${pool.length} cards matching “${query}”${favoriteNote}`
+      : `Showing ${list.length} of ${pool.length} cards · ${owned} collected${favoriteNote}`)
+    : `Showing ${list.length} of ${pool.length} cards in ${series} · ${owned} collected${favoriteNote}`;
 
   return {
     showLanding: false,

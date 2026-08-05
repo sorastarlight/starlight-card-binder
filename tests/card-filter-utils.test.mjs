@@ -122,6 +122,22 @@ test('filterCardList respects collected / missing ownership views', () => {
   assert.deepEqual(missing.map(card => card.id), ['b2']);
 });
 
+test('filterCardList supports favorites-only gallery filtering', () => {
+  const favorites = new Set(['a1']);
+  const list = filterCardList(catalog, {
+    q: '',
+    series: 'All Series',
+    rarity: 'All Rarities',
+    view: 'all',
+    favoritesOnly: true
+  }, {
+    respectOwnership: true,
+    isCollected: () => true,
+    isFavorite: id => favorites.has(id)
+  });
+  assert.deepEqual(list.map(card => card.id), ['a1']);
+});
+
 test('cardDisplayNumber prefers collector numbers', () => {
   assert.equal(cardDisplayNumber({ number: '001', collectorNumber: 'RS-001' }), 'RS-001');
   assert.equal(cardDisplayNumber({ number: '002' }), '002');

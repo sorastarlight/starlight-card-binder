@@ -150,6 +150,61 @@
   border-color: rgba(186, 170, 255, 0.28);
 }
 
+.card-album-binder[data-binder-theme="midnight-starlight"] .card-album-binder-head h2,
+.card-album-binder[data-binder-theme="midnight-starlight"] .card-album-meta strong {
+  color: #dce8ff;
+}
+
+.card-album-binder[data-binder-theme="sakura-bloom"] {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(255, 196, 220, 0.35), transparent 38%),
+    linear-gradient(155deg, rgba(255, 252, 255, 0.98), rgba(255, 236, 246, 0.94) 55%, rgba(255, 248, 230, 0.9));
+  border-color: rgba(255, 170, 210, 0.34);
+}
+
+.card-album-binder[data-binder-theme="sakura-bloom"]::before,
+.card-album-binder[data-binder-theme="sakura-bloom"]::after {
+  background: radial-gradient(circle at 50% 12%, #fff, rgba(255, 228, 240, 0.85) 40%, rgba(255, 170, 210, 0.45) 100%);
+}
+
+.card-album-pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 12px 24px 0;
+  padding-top: 4px;
+}
+
+.card-album-page-status {
+  color: #6b7089;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-align: center;
+  flex: 1 1 auto;
+}
+
+.card-album-page-btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.card-album-spread {
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  transform-origin: center left;
+}
+
+.card-album-spread.is-turning {
+  opacity: 0;
+  transform: perspective(900px) rotateY(-8deg) translateX(-8px);
+}
+
+.card-album-spread.is-ready {
+  opacity: 1;
+  transform: none;
+}
+
 .card-album-binder-head {
   position: relative;
   z-index: 1;
@@ -468,5 +523,13 @@
 @media (prefers-reduced-motion: reduce) {
   .card-album-btn {
     transition: none;
+  }
+
+  .card-album-spread {
+    transition: none;
+  }
+
+  .card-album-spread.is-turning {
+    transform: none;
   }
 }

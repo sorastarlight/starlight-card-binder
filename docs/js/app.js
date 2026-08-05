@@ -37,6 +37,8 @@ let analyzerHoloEnabled = true;
 let analyzerEvolutionEnabled = true;
 /** Full-view modal tab: details | story */
 let analyzerActiveTab = 'details';
+/** Current album binder spread page (1-based). */
+let albumBinderPage = 1;
 
 function fillWebsiteTokens(template, vars = {}) {
   return String(template || '').replace(/\{(\w+)\}/g, (_, key) => (
@@ -459,11 +461,48 @@ function perspectiveArtVisible(card, collected = false) {
   return window.StarlightPerspectiveCard?.hasPremiumPerspective?.(card) === true;
 }
 function flashGalleryFilterTransition() {
-  document.querySelectorAll('.starlight-gallery-grid, .v61-grid, .grid-page').forEach(el => {
+  document.querySelectorAll('.card-gallery-grid, .starlight-gallery-grid, .v61-grid, .grid-page').forEach(el => {
     el.classList.add('is-filtering');
     window.clearTimeout(el._starlightFilterFlash);
     el._starlightFilterFlash = window.setTimeout(() => el.classList.remove('is-filtering'), 240);
   });
+}
+function cardTileContext() {
+  return {
+    esc,
+    isCollected,
+    isFavorite,
+    getCardQuantity,
+    rarityClass,
+    prestigeFrameClass,
+    prestigeFrameOverlayHtml,
+    perspectiveArt,
+    perspectiveArtVisible,
+    getVisibleName,
+    getVisibleImage,
+    displayName,
+    cardIdentityChips,
+    cardBackUrl: CARD_BACK_URL,
+    cardDisplayNumber: window.StarlightCardFilters?.cardDisplayNumber,
+    websiteBinderLanding,
+    websiteSection,
+    fillWebsiteTokens
+  };
+}
+function renderSharedGalleryCard(card, i) {
+  const api = window.StarlightCardTile;
+  if (api?.renderGalleryTile) return api.renderGalleryTile(cardTileContext(), card, i);
+  return renderGalleryCardLegacy(card, i);
+}
+function renderSharedAlbumCard(card, i) {
+  const api = window.StarlightCardTile;
+  if (api?.renderAlbumTile) return api.renderAlbumTile(cardTileContext(), card, i);
+  return renderAlbumCardLegacy(card, i);
+}
+function renderSharedListCard(c, mode) {
+  const api = window.StarlightCardTile;
+  if (api?.renderListTile) return api.renderListTile(cardTileContext(), c, mode);
+  return renderAlbumListCardLegacy(c, mode);
 }
 function scanPerspectiveCardsIn(root = document) {
   window.StarlightPerspectiveCard?.scanPerspectiveCards?.(root);
@@ -851,6 +890,22 @@ function hydrateFilters(preserved = activeFilters()) {
   if (searchInput && preserved?.q) searchInput.value = preserved.q;
   const raritySelect = $('[data-rarity]');
   if (raritySelect && preserved?.rarity) raritySelect.value = preserved.rarity;
+  const favoritesOnly = $('[data-filter-favorites]');
+  if (favoritesOnly) favoritesOnly.checked = Boolean(preserved?.favoritesOnly);
+}
+
+function applyAlbumBinderTheme() {
+  if (pageName !== 'collection') return;
+  const root = $('#albumBinderStage');
+  if (!root) return;
+  const themes = window.StarlightBinderThemes;
+  if (!themes?.applyTheme) return;
+  const level = Number($('[data-collector-level]')?.textContent) || 1;
+  const themeId = themes.resolveThemeId({
+    storedId: themes.readStoredThemeId?.(),
+    collectorLevel: level
+  });
+  themes.applyTheme(root, themeId);
 }
 
 function renderFilterControls() {
@@ -880,6 +935,7 @@ function renderFilterControls() {
       <label><span>Rarity</span><select data-rarity aria-label="Filter by rarity"><option>All Rarities</option><option>Common</option><option>Uncommon</option><option>Rare</option><option>Epic</option><option>Legendary</option></select></label>
       <label><span>Sort By</span><select id="sortSelect" aria-label="Sort cards"><option value="numberAsc">Number (Low to High)</option><option value="numberDesc">Number (High to Low)</option><option value="nameAsc">Name (A to Z)</option><option value="rarityDesc">Rarity (Best First)</option></select></label>
       ${showView ? `<fieldset class="card-filter-view"><legend>Collection Status</legend><label><input checked name="viewFilter" type="radio" value="all"> All Cards</label><label><input name="viewFilter" type="radio" value="collected"> Collected</label><label><input name="viewFilter" type="radio" value="missing"> Not Collected</label></fieldset>` : ''}
+      ${isBinder ? `<fieldset class="card-filter-favorites"><legend>Favorites</legend><label><input type="checkbox" data-filter-favorites value="1"> Favorites only</label></fieldset>` : ''}
       <button class="card-filter-reset" type="button" data-reset-card-filters>${esc(resetLabel)}</button>
     </div>`;
   host.innerHTML = isBinder
@@ -898,7 +954,8 @@ function activeFilters() {
     series: ($('[data-series]')?.value || 'All Series'),
     rarity: ($('[data-rarity]')?.value || 'All Rarities'),
     view: ($('[name="viewFilter"]:checked')?.value || 'all'),
-    sort: ($('#sortSelect')?.value || 'numberAsc')
+    sort: ($('#sortSelect')?.value || 'numberAsc'),
+    favoritesOnly: Boolean($('[data-filter-favorites]')?.checked)
   };
 }
 
@@ -906,6 +963,7 @@ function filterOptions() {
   return {
     respectOwnership: true,
     isCollected,
+    isFavorite,
     sortCards
   };
 }
@@ -926,7 +984,8 @@ function filterCardList(source, filters = activeFilters(), { respectOwnership = 
     const rarityMatches = filters.rarity === 'All Rarities' || String(card.rarity || '').trim().toLowerCase() === String(filters.rarity || '').trim().toLowerCase();
     const searchMatches = !filters.q || haystack.includes(filters.q);
     const ownershipMatches = !respectOwnership || filters.view === 'all' || (filters.view === 'collected' ? isCollected(card.id) : !isCollected(card.id));
-    return seriesMatches && rarityMatches && searchMatches && ownershipMatches;
+    const favoriteMatches = !filters.favoritesOnly || isFavorite(card.id);
+    return seriesMatches && rarityMatches && searchMatches && ownershipMatches && favoriteMatches;
   });
   sortCards(list, filters.sort);
   return list;
@@ -1513,7 +1572,11 @@ function renderFullView() {
   scanPerspectiveCardsIn(overlay);
 }
 
-function renderAlbumCard(card, i) {
+function renderAlbumCard(card, i) { return renderSharedAlbumCard(card, i); }
+
+function renderAlbumListCard(c, mode) { return renderSharedListCard(c, mode); }
+
+function renderAlbumCardLegacy(card, i) {
   const got = isCollected(card.id);
   const numberLabel = window.StarlightCardFilters?.cardDisplayNumber?.(card) || String(card.collectorNumber || card.number || '');
   const qty = getCardQuantity(card.id);
@@ -1527,7 +1590,7 @@ function renderAlbumCard(card, i) {
   </article>`;
 }
 
-function renderAlbumListCard(c, mode) {
+function renderAlbumListCardLegacy(c, mode) {
   const got = isCollected(c.id);
   const quantity = getCardQuantity(c.id);
   const favorited = isFavorite(c.id);
@@ -1584,9 +1647,19 @@ function renderGridPage(target, mode) {
     ? `<button class="btn primary" type="button" data-reset-card-filters>${esc(collectionCopy.emptyFiltersCta || 'Reset Filters')}</button>`
     : `<a class="btn primary" href="binder?view=binder">${esc(mode === 'favorites' ? (collectionCopy.emptyFavoritesCta || 'Open Card Gallery') : (collectionCopy.emptyAllCta || 'Open Card Gallery'))}</a>`;
   if (mode === 'collection') {
-    wrap.innerHTML = list.length
-      ? `<div class="card-album-grid">${list.map((c, i) => renderAlbumCard(c, i)).join('')}</div>`
+    const binderApi = window.StarlightAlbumBinder;
+    const spread = binderApi?.paginate
+      ? binderApi.paginate(list, albumBinderPage)
+      : { slice: list, page: 1, totalPages: 1, total: list.length };
+    albumBinderPage = spread.page;
+    binderApi?.writePage?.(albumBinderPage);
+    const pager = binderApi?.renderPagerHtml?.(spread) || '';
+    const spreadHtml = list.length
+      ? `${pager}<div class="card-album-spread is-ready">${window.StarlightCardTile?.wrapAlbumGrid
+        ? window.StarlightCardTile.wrapAlbumGrid(spread.slice.map((c, i) => renderAlbumCard(c, i)).join(''))
+        : `<div class="card-album-grid">${spread.slice.map((c, i) => renderAlbumCard(c, i)).join('')}</div>`}</div>${pager}`
       : `<div class="empty-state"><h2>${esc(emptyTitle)}</h2><p>${esc(emptyLead)}</p>${emptyAction}</div>`;
+    wrap.innerHTML = spreadHtml;
     attachAlbumBinderHoverSfx(wrap);
     scanPerspectiveCardsIn(wrap);
     return;
@@ -1697,7 +1770,19 @@ function renderAbout() {
   const groups = [...new Set(cards.map(c => c.series))];
   about.innerHTML = groups.map(series => { const list = cards.filter(c => c.series === series); const legendary = list.filter(c=>c.rarity==='Legendary').length; return `<div class="collection-card text-card"><h3>${esc(series)}</h3><p>${esc(list.find(c=>c.seriesDescription)?.seriesDescription || 'A Starlight card series.')}</p><p><b>${list.length}</b> cards • <b>${legendary}</b> Legendary</p></div>`; }).join('');
 }
-function renderAll() { document.body.classList.toggle('sfx-on', sfxOn); renderShell(); if (pageName === 'binder') renderBinder(); renderGridPage('#collectionGrid', 'collection'); renderGridPage('#favoriteGrid', 'favorites'); renderGridPage('#collectionDuplicateGrid', 'duplicates'); renderFavoritesShowcase(); renderChecklist(); renderAbout(); updateRaritySelectClass(); }
+function renderAll() {
+  document.body.classList.toggle('sfx-on', sfxOn);
+  renderShell();
+  applyAlbumBinderTheme();
+  if (pageName === 'binder') renderBinder();
+  renderGridPage('#collectionGrid', 'collection');
+  renderGridPage('#favoriteGrid', 'favorites');
+  renderGridPage('#collectionDuplicateGrid', 'duplicates');
+  renderFavoritesShowcase();
+  renderChecklist();
+  renderAbout();
+  updateRaritySelectClass();
+}
 window.renderAll = renderAll;
 
 
@@ -1812,17 +1897,39 @@ document.addEventListener('click', e => {
 });
 function applyCardFilterChange() {
   page = 1;
+  albumBinderPage = 1;
+  window.StarlightAlbumBinder?.writePage?.(1);
   flashGalleryFilterTransition();
   renderAll();
   updateRaritySelectClass();
   window.dispatchEvent(new CustomEvent('starlight-card-filters-changed'));
 }
-document.addEventListener('input', e => { if (e.target.matches('#globalSearch, [data-series], [data-rarity], [name="viewFilter"], #sortSelect')) applyCardFilterChange(); });
-document.addEventListener('change', e => { if (e.target.matches('#globalSearch, [data-series], [data-rarity], [name="viewFilter"], #sortSelect')) applyCardFilterChange(); });
+document.addEventListener('input', e => { if (e.target.matches('#globalSearch, [data-series], [data-rarity], [name="viewFilter"], #sortSelect, [data-filter-favorites]')) applyCardFilterChange(); });
+document.addEventListener('change', e => { if (e.target.matches('#globalSearch, [data-series], [data-rarity], [name="viewFilter"], #sortSelect, [data-filter-favorites]')) applyCardFilterChange(); });
 window.addEventListener('starlight-collection-tab-changed', () => {
   if (pageName === 'collection') renderAll();
 });
 document.addEventListener('click', e => {
+  const albumPageBtn = e.target.closest('[data-album-page]');
+  if (albumPageBtn && pageName === 'collection') {
+    e.preventDefault();
+    const spread = document.querySelector('#collectionGrid .card-album-spread');
+    const direction = albumPageBtn.dataset.albumPage;
+    if (direction === 'prev' && albumBinderPage > 1) albumBinderPage -= 1;
+    if (direction === 'next') albumBinderPage += 1;
+    if (spread) {
+      spread.classList.remove('is-ready');
+      spread.classList.add('is-turning');
+    }
+    playSfx('page');
+    window.setTimeout(() => {
+      renderGridPage('#collectionGrid', 'collection');
+      const nextSpread = document.querySelector('#collectionGrid .card-album-spread');
+      nextSpread?.classList.remove('is-turning');
+      nextSpread?.classList.add('is-ready');
+    }, spread ? 220 : 0);
+    return;
+  }
   const reset = e.target.closest('[data-reset-card-filters]');
   if (!reset) return;
   $('#globalSearch') && ($('#globalSearch').value = '');
@@ -1831,6 +1938,8 @@ document.addEventListener('click', e => {
   $('#sortSelect') && ($('#sortSelect').value = 'numberAsc');
   const allCards = $('[name="viewFilter"][value="all"]');
   if (allCards) allCards.checked = true;
+  const favoritesOnly = $('[data-filter-favorites]');
+  if (favoritesOnly) favoritesOnly.checked = false;
   applyCardFilterChange();
 });
 document.addEventListener('keydown', e => {
@@ -1853,6 +1962,7 @@ document.addEventListener('keydown', e => {
   }
 });
 document.addEventListener('DOMContentLoaded', () => {
+  albumBinderPage = window.StarlightAlbumBinder?.readPage?.() || 1;
   renderFilterControls();
   if (pageName === 'binder') {
     ensureWebsiteBinderLanding().then(() => {
@@ -2030,7 +2140,9 @@ function initBinderSeriesCarouselLanding() {
   const root = document.getElementById('binderSeriesCarousel');
   if (root) window.StarlightBinderSeriesCarousel?.init(root);
 }
-function renderGalleryCard(card, i) {
+function renderGalleryCard(card, i) { return renderSharedGalleryCard(card, i); }
+
+function renderGalleryCardLegacy(card, i) {
   const got = isCollected(card.id);
   const img = got ? card.imageUrl : CARD_BACK_URL;
   const numberLabel = window.StarlightCardFilters?.cardDisplayNumber?.(card) || String(card.collectorNumber || card.number || '');
