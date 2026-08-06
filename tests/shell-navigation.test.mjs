@@ -131,6 +131,24 @@ test('sanitizeShellNavigation merges duplicate trading hub sidebar links but kee
   assert.ok(!merged.sidebar.sections[0].items.some(item => item.destination === 'offers'));
 });
 
+test('sanitizeShellNavigation injects User Rankings when remote nav omits it', () => {
+  const defaults = cloneDefaultShellNavigation();
+  const remoteSection = defaults.sidebar.sections.find(section => section.id === 'my-stuff');
+  const remoteItems = (remoteSection?.items || []).filter(item => item.destination !== 'rankings');
+  const merged = sanitizeShellNavigation({
+    ...defaults,
+    sidebar: {
+      sections: [{
+        ...remoteSection,
+        items: remoteItems
+      }]
+    }
+  });
+
+  assert.ok(merged.sidebar.sections[0].items.some(item => item.destination === 'rankings'));
+  assert.equal(merged.pageTitles.rankings, 'User Rankings');
+});
+
 test('sanitizeShellNavigation rejects unknown destinations and merges empty remote', () => {
   const merged = mergeShellNavigation({});
   assert.equal(merged.brandRibbon, 'Card Binder');

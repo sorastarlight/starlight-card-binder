@@ -115,6 +115,39 @@ function consolidateTradingNavItems(items = []) {
   return result;
 }
 
+function ensureDefaultSidebarItems(sections, defaults) {
+  const defaultSections = defaults.sidebar?.sections || [];
+  const presentDestinations = new Set();
+  sections.forEach(section => {
+    (section.items || []).forEach(item => {
+      if (item.destination) presentDestinations.add(item.destination);
+    });
+  });
+
+  defaultSections.forEach(defaultSection => {
+    const targetSection = sections.find(section => section.id === defaultSection.id)
+      || sections.find(section => section.label === defaultSection.label);
+    if (!targetSection) return;
+
+    (defaultSection.items || []).forEach(defaultItem => {
+      const destination = String(defaultItem.destination || '').trim();
+      if (!destination || presentDestinations.has(destination)) return;
+      if ((defaultItem.features || []).includes('sectionLabel')) return;
+
+      const insertItem = sanitizeItem(defaultItem, targetSection.items.length);
+      const tradesIndex = targetSection.items.findIndex(item => item.destination === 'trades');
+      if (tradesIndex >= 0 && destination !== 'trades') {
+        targetSection.items.splice(tradesIndex + 1, 0, insertItem);
+      } else {
+        targetSection.items.push(insertItem);
+      }
+      presentDestinations.add(destination);
+    });
+  });
+
+  return sections;
+}
+
 function sanitizeSection(section = {}, index = 0) {
   const items = Array.isArray(section.items) ? section.items.map(sanitizeItem).slice(0, 24) : [];
   return {
@@ -154,11 +187,18 @@ export function sanitizeShellNavigation(input) {
     })
     : defaults.topBar.quickLinks;
 
-  const sections = Array.isArray(source.sidebar?.sections)
-    ? source.sidebar.sections.map(sanitizeSection).slice(0, 8)
-    : defaults.sidebar.sections;
+  const sections = ensureDefaultSidebarItems(
+    Array.isArray(source.sidebar?.sections)
+      ? source.sidebar.sections.map(sanitizeSection).slice(0, 8)
+      : defaults.sidebar.sections.map(sanitizeSection),
+    defaults
+  );
 
   if (!sections.length) throw new Error('At least one sidebar section is required.');
+
+  for (const key of Object.keys(defaults.pageTitles)) {
+    if (!pageTitles[key]) pageTitles[key] = defaults.pageTitles[key];
+  }
 
   // Overwrite legacy product labels with the current defaults.
   for (const key of Object.keys(pageTitles)) {
