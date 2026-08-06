@@ -121,12 +121,11 @@
   container-type: inline-size;
   container-name: album-binder-panel;
   min-width: 0;
-  --binder-max-width: min(100%, 860px);
-  --binder-spread-gap: clamp(6px, 0.75cqi, 12px);
-  --binder-pocket-gap: clamp(5px, 0.65cqi, 10px);
-  --binder-shell-padding: clamp(12px, 1.5cqi, 18px);
-  --binder-page-padding: clamp(8px, 1cqi, 12px);
-  --binder-face-padding: clamp(8px, 1cqi, 12px);
+  --binder-spread-gap: clamp(6px, 0.75cqi, 14px);
+  --binder-pocket-gap: clamp(6px, 0.7cqi, 12px);
+  --binder-shell-padding: clamp(12px, 1.4cqi, 20px);
+  --binder-page-padding: clamp(8px, 1cqi, 14px);
+  --binder-face-padding: clamp(8px, 1cqi, 14px);
 }
 
 .card-album-binder {
@@ -147,10 +146,10 @@
 }
 
 .card-album-binder-mount {
-  width: var(--binder-max-width, min(100%, 860px));
+  width: 100%;
   max-width: 100%;
   min-width: 0;
-  margin: 0 auto;
+  margin: 0;
   padding: 0;
 }
 
@@ -375,15 +374,24 @@
 
 @container album-binder-panel (min-width: 720px) {
   .card-album-panel[data-collection-panel="all"] {
-    --binder-max-width: min(100%, 900px);
-    --binder-pocket-gap: clamp(6px, 0.7cqi, 11px);
+    --binder-pocket-gap: clamp(8px, 0.75cqi, 14px);
+    --binder-spread-gap: clamp(8px, 0.85cqi, 16px);
+    --binder-shell-padding: clamp(14px, 1.5cqi, 22px);
+  }
+}
+
+@container album-binder-panel (min-width: 1024px) {
+  .card-album-panel[data-collection-panel="all"] {
+    --binder-pocket-gap: clamp(10px, 0.8cqi, 16px);
+    --binder-spread-gap: clamp(10px, 0.9cqi, 18px);
+    --binder-face-padding: clamp(10px, 1.1cqi, 16px);
   }
 }
 
 @container album-binder-panel (max-width: 480px) {
   .card-album-panel[data-collection-panel="all"] {
-    --binder-max-width: 100%;
     --binder-pocket-gap: clamp(4px, 1.2cqi, 7px);
+    --binder-spread-gap: clamp(4px, 1cqi, 8px);
   }
 }
 
@@ -538,8 +546,8 @@
   display: block;
   width: 100%;
   aspect-ratio: 5 / 7;
-  padding: clamp(3px, 0.45cqi, 5px);
-  border-radius: clamp(9px, 1.15cqi, 12px);
+  padding: clamp(4px, 0.5cqi, 6px);
+  border-radius: clamp(10px, 1.2cqi, 14px);
   background: linear-gradient(145deg, color-mix(in srgb, var(--binder-pocket, rgba(255, 255, 255, 0.55)) 85%, transparent), rgba(255, 255, 255, 0.12));
   border: 1px solid color-mix(in srgb, var(--binder-pocket-edge, #6bc6f8) 28%, transparent);
   box-shadow:
@@ -617,10 +625,6 @@
   border-radius: inherit;
 }
 
-html.starlight-embedded .card-album-panel[data-collection-panel="all"] {
-  --binder-max-width: min(100%, 820px);
-}
-
 html.starlight-embedded .card-album-binder-toolbar {
   margin-bottom: 10px;
   padding: 12px 14px;
@@ -635,6 +639,7 @@ html.starlight-embedded .card-album-binder-toolbar {
   padding: 14px 16px;
   margin-bottom: 12px;
   border-radius: 16px;
+  width: 100%;
 }
 
 .card-album-binder-toolbar label {
