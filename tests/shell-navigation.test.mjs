@@ -21,6 +21,7 @@ test('default shell navigation includes core destinations and staff section', ()
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'trades' && entry.label === 'Trade With Others'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'profile' && entry.label === 'Profile'));
   assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'trades' && item.label === 'Trade With Others'));
+  assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'rankings' && item.label === 'User Rankings'));
   assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'feed' && item.label === 'LIVE Feed'));
   assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'quests' && item.label === 'Starlight Missions'));
   assert.equal(nav.pageTitles.feed, 'LIVE Feed');
@@ -102,7 +103,7 @@ test('sanitizeShellNavigation rewrites Journal profile labels to Profile', () =>
   assert.equal(renamed.accountMenu.signedIn[0].label, 'Profile');
 });
 
-test('sanitizeShellNavigation merges duplicate trading hub sidebar links', () => {
+test('sanitizeShellNavigation merges duplicate trading hub sidebar links but keeps User Rankings separate', () => {
   const merged = sanitizeShellNavigation({
     ...cloneDefaultShellNavigation(),
     sidebar: {
@@ -113,7 +114,7 @@ test('sanitizeShellNavigation merges duplicate trading hub sidebar links', () =>
         staffOnly: false,
         items: [
           { id: 'wishlist', label: 'My Wishlist', destination: 'trades', enabled: true, features: [] },
-          { id: 'rankings', label: 'Trade With Others', destination: 'rankings', enabled: true, features: [] },
+          { id: 'rankings', label: 'User Rankings', destination: 'rankings', enabled: true, features: [] },
           { id: 'offers', label: 'Trade Offers', destination: 'offers', enabled: true, features: ['tradeOfferBadge'] }
         ]
       }]
@@ -121,8 +122,11 @@ test('sanitizeShellNavigation merges duplicate trading hub sidebar links', () =>
   });
 
   const tradingItems = merged.sidebar.sections[0].items.filter(item => item.destination === 'trades');
+  const rankingItems = merged.sidebar.sections[0].items.filter(item => item.destination === 'rankings');
   assert.equal(tradingItems.length, 1);
+  assert.equal(rankingItems.length, 1);
   assert.equal(tradingItems[0].label, 'Trade With Others');
+  assert.equal(rankingItems[0].label, 'User Rankings');
   assert.ok(tradingItems[0].features.includes('tradeOfferBadge'));
   assert.ok(!merged.sidebar.sections[0].items.some(item => item.destination === 'offers'));
 });

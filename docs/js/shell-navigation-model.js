@@ -85,11 +85,11 @@ function consolidateTradingNavItems(items = []) {
     }
 
     let destination = String(item.destination || '').trim();
-    if (destination === 'rankings' || destination === 'offers') destination = 'trades';
+    if (destination === 'offers') destination = 'trades';
 
     const label = String(item.label || '').trim();
     const isTradingEntry = destination === 'trades'
-      || /wishlist|trade with others|trade offers|card exchange|trading hub|user rankings/i.test(label);
+      || /wishlist|trade with others|trade offers|card exchange|trading hub/i.test(label);
 
     if (!isTradingEntry) {
       result.push(item);

@@ -7,6 +7,7 @@ import { revealRewardSequence } from '../reward-reveal.js?v=1.5.16';
 import { getCachedWebsiteContent } from '../website-content-hydrate.js';
 import { maybeCelebrateSeriesCompletions } from '../series-complete-celebration.js?v=1.0.0';
 import { notifyShellEconomyChanged } from '../shell-economy.js';
+import { notifyShellFeedChanged } from '../shell-feed-notify.js';
 import { starBitAmountHtml, starBitIconHtml } from '../star-bit-icon.js';
 
 let shopCopy = getCachedWebsiteContent()?.shop || {};
@@ -338,6 +339,7 @@ async function confirmPurchase(){
     applyAwardedCardsToLocalStore(awardedCards);
     pendingPurchase=null;
     notifyShellEconomyChanged({ source: 'shop-purchase', boosterId: booster.id, cards: awardedCards });
+    notifyShellFeedChanged({ source: 'shop-purchase' });
     await load();
   }catch(error){
     say(error?.message||'This booster could not be opened.',true);

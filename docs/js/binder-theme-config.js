@@ -4,6 +4,7 @@
  */
 (function initStarlightBinderThemes(global) {
   const STORAGE_KEY = 'sora-starlight-binder-theme-v1';
+  const COLOR_STORAGE_KEY = 'sora-starlight-binder-colors-v1';
 
   const THEME_VARS = Object.freeze({
     'starlight-classic': {
@@ -76,6 +77,58 @@
     }
   ]);
 
+  const CUSTOMIZABLE_PIECES = Object.freeze([
+    { key: '--binder-cover-a', label: 'Cover (light)' },
+    { key: '--binder-cover-b', label: 'Cover (accent)' },
+    { key: '--binder-page-a', label: 'Page (light)' },
+    { key: '--binder-page-b', label: 'Page (shade)' },
+    { key: '--binder-spine', label: 'Spine' },
+    { key: '--binder-ring-metal', label: 'Rings' },
+    { key: '--binder-pocket-edge', label: 'Pocket trim' },
+    { key: '--binder-accent', label: 'Accent' }
+  ]);
+
+  const COLOR_SWATCHES = Object.freeze([
+    { id: 'starlight-blue', label: 'Starlight Blue', value: '#6bc6f8', minLevel: 1 },
+    { id: 'sky-mist', label: 'Sky Mist', value: '#9ed4ff', minLevel: 1 },
+    { id: 'blossom-pink', label: 'Blossom Pink', value: '#ffb4da', minLevel: 1 },
+    { id: 'lavender', label: 'Lavender', value: '#c8b4ff', minLevel: 1 },
+    { id: 'mint-glow', label: 'Mint Glow', value: '#8ee4c8', minLevel: 5 },
+    { id: 'sunset-gold', label: 'Sunset Gold', value: '#ffc84a', minLevel: 10 },
+    { id: 'midnight-indigo', label: 'Midnight Indigo', value: '#4a3f82', minLevel: 15 },
+    { id: 'sakura-rose', label: 'Sakura Rose', value: '#ff9ec8', minLevel: 20 }
+  ]);
+
+  function readCustomColors() {
+    try {
+      const raw = global.localStorage?.getItem(COLOR_STORAGE_KEY);
+      if (!raw) return {};
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === 'object' ? parsed : {};
+    } catch {
+      return {};
+    }
+  }
+
+  function writeCustomColors(colors = {}) {
+    try {
+      const next = colors && typeof colors === 'object' ? colors : {};
+      const hasValues = Object.values(next).some(Boolean);
+      if (!hasValues) global.localStorage?.removeItem(COLOR_STORAGE_KEY);
+      else global.localStorage?.setItem(COLOR_STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      // ignore
+    }
+  }
+
+  function applyCustomColors(root, colors = readCustomColors()) {
+    if (!root || !colors) return;
+    Object.entries(colors).forEach(([key, value]) => {
+      if (!value || !String(key).startsWith('--binder-')) return;
+      root.style.setProperty(key, value);
+    });
+  }
+
   function normalizeThemeId(themeId) {
     const id = String(themeId || '').trim();
     if (id === 'classic-starlight') return 'starlight-classic';
@@ -124,6 +177,7 @@
     Object.entries(vars).forEach(([key, value]) => {
       root.style.setProperty(key, value);
     });
+    applyCustomColors(root);
   }
 
   function applyTheme(root, themeId, { updateBadge = true } = {}) {
@@ -155,13 +209,19 @@
 
   global.StarlightBinderThemes = {
     STORAGE_KEY,
+    COLOR_STORAGE_KEY,
     THEMES,
     THEME_VARS,
+    CUSTOMIZABLE_PIECES,
+    COLOR_SWATCHES,
     listThemes,
     resolveThemeId,
     getTheme,
     applyTheme,
     applyThemeVars,
+    applyCustomColors,
+    readCustomColors,
+    writeCustomColors,
     normalizeThemeId,
     readStoredThemeId,
     writeStoredThemeId,

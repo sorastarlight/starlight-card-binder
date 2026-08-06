@@ -17,6 +17,7 @@ export const PUBLIC_SHELL_DESTINATIONS = Object.freeze([
   { value: 'season-pass', label: 'Seasonal Collection Pass' },
   { value: 'trades', label: 'Trade With Others' },
   { value: 'offers', label: 'Trade With Others' },
+  { value: 'rankings', label: 'User Rankings' },
   { value: 'feed', label: 'LIVE Feed' },
   { value: 'notifications', label: 'Notifications' },
   { value: 'rewards', label: 'Received Gifts' },
@@ -69,7 +70,6 @@ export const SHELL_LABEL_REWRITES = Object.freeze({
     'Card Exchange',
     'Wishlist & Trades',
     'Trading',
-    'User Rankings',
     'Trading Hub'
   ]),
   profile: Object.freeze([
@@ -102,6 +102,7 @@ export function createDefaultShellNavigation() {
       'season-pass': 'Seasonal Collection Pass',
       trades: 'Trade With Others',
       offers: 'Trade With Others',
+      rankings: 'User Rankings',
       feed: 'LIVE Feed',
       notifications: 'Notifications',
       rewards: 'Received Gifts',
@@ -140,6 +141,7 @@ export function createDefaultShellNavigation() {
             { id: 'season-pass', label: 'Seasonal Collection Pass', icon: { type: 'emoji', value: '🌌' }, destination: 'season-pass', enabled: true, features: [] },
             { id: 'trading-label', label: 'COMMUNITY HUB', icon: { type: 'emoji', value: '🤝' }, destination: '', enabled: true, features: ['sectionLabel'] },
             { id: 'trades', label: 'Trade With Others', icon: { type: 'emoji', value: '🤝' }, destination: 'trades', enabled: true, features: ['tradeOfferBadge'] },
+            { id: 'rankings', label: 'User Rankings', icon: { type: 'emoji', value: '🏆' }, destination: 'rankings', enabled: true, features: [] },
             { id: 'feed', label: 'LIVE Feed', icon: { type: 'emoji', value: '📡' }, destination: 'feed', enabled: true, features: [] }
           ]
         },

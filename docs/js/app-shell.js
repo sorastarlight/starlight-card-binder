@@ -32,7 +32,7 @@ const routes = {
   quests:{title:'Starlight Missions',src:'collection-quests.html'},
   'season-pass':{title:'Seasonal Collection Pass',src:'season-pass.html'},
   trades:{title:'Trade With Others',src:'trade-lists.html'}, offers:{title:'Trade With Others',src:'trade-lists.html'},
-  rankings:{title:'Trade With Others',src:'trade-lists.html'},
+  rankings:{title:'User Rankings',src:'trade-lists.html'},
   feed:{title:'LIVE Feed',src:'pull-feed.html'},
   notifications:{title:'Notifications',src:'notifications.html'}, rewards:{title:'Received Gifts',src:'received-rewards.html'}, profile:{title:'Profile',src:'profile-settings.html'}, login:{title:'Sign In',src:'login'}, collector:{title:'Collector Profile',src:'collector.html'},
   report:{title:'Report Profile',src:'report-profile.html'}, about:{title:'About',src:'about.html'}, socials:{title:'Socials',src:'socials.html'},
@@ -58,6 +58,7 @@ let currentLoadToken=0;
 let readyTimer=0;
 let retryCount=0;
 let embeddedInitialScrollDone=false;
+let liveFeedWidget = null;
 
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
@@ -168,8 +169,10 @@ function navigate(route,{push=true,extra={}}={}){
   const previousRoute = currentRoute;
   route = resolved;
   if (route === 'rankings') {
-    route = 'trades';
     extra = { section: 'collectors', ...(extra || {}) };
+  }
+  if (route === 'trades' && !extra?.section) {
+    extra = { section: 'my-trade', ...(extra || {}) };
   }
   if (route === 'offers') {
     route = 'trades';
@@ -477,6 +480,7 @@ async function hydrateAccount(){
   }
 
   applyAccountChrome(signedIn);
+  liveFeedWidget?.refresh?.();
 
   try{
     let navigation = await getShellNavigation();
@@ -592,9 +596,11 @@ window.addEventListener('message',async e=>{
   if(data.type==='starlight-auth-changed'){
     await syncShellSessionFromMessage(data.session);
     scheduleHydrateAccount();
+    liveFeedWidget?.refresh?.();
   }
   if(data.type==='starlight-navigate'){
-    const route = aliasShellRoute(data.view) || (isKnownShellRoute(data.view) ? data.view : '');
+    const view = data.view || data.route;
+    const route = aliasShellRoute(view) || (isKnownShellRoute(view) ? view : '');
     if(route) navigate(route,{extra:data.params||{}});
   }
   if(data.type==='starlight-trades-changed'||data.type==='starlight-view-ready')hydrateTradeOfferBadge();
@@ -607,6 +613,12 @@ window.addEventListener('message',async e=>{
     || data.type==='starlight-content-ready'
   ){
     window.dispatchEvent(new CustomEvent('starlight-dashboard-refresh',{detail:data}));
+  }
+  if (data.type === 'starlight-feed-changed' || data.type === 'starlight-wallet-changed') {
+    liveFeedWidget?.refresh?.();
+  }
+  if (data.type === 'starlight-view-ready' && data.claimed) {
+    liveFeedWidget?.refresh?.();
   }
   if (data.type==='starlight-view-ready'||data.type==='starlight-content-ready'||data.type==='starlight-app-ready'){
     markViewReady(data);
@@ -634,19 +646,8 @@ window.addEventListener('pageshow',event=>{
 });
 
 const initial=aliasShellRoute(new URLSearchParams(location.search).get('view')||'home')||'home';
-navigate(initial,{push:false});
-supabase.auth.onAuthStateChange((event)=>{
-  if(event==='INITIAL_SESSION'||event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='USER_UPDATED'||event==='TOKEN_REFRESHED'){
-    scheduleHydrateAccount();
-  }
-});
-scheduleHydrateAccount().then(ensureNotificationPopover);
-hydrateTradeOfferBadge();
-hydrateNotificationBadge();
-hydrateReceivedGiftBadge();
-hydrateActiveEventBanner();
 
-const liveFeedWidget = initLiveFeedWidget({
+liveFeedWidget = initLiveFeedWidget({
   onOpenFullFeed() {
     navigate('feed');
   }
@@ -656,3 +657,16 @@ if (isStudioPreview()) {
   document.getElementById('shellLiveFeed')?.setAttribute('hidden', '');
   liveFeedWidget?.setSuppressed?.(true);
 }
+
+navigate(initial,{push:false});
+supabase.auth.onAuthStateChange((event)=>{
+  if(event==='INITIAL_SESSION'||event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='USER_UPDATED'||event==='TOKEN_REFRESHED'){
+    scheduleHydrateAccount();
+    liveFeedWidget?.refresh?.();
+  }
+});
+scheduleHydrateAccount().then(ensureNotificationPopover);
+hydrateTradeOfferBadge();
+hydrateNotificationBadge();
+hydrateReceivedGiftBadge();
+hydrateActiveEventBanner();

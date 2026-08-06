@@ -120,7 +120,7 @@ function showCelebration(item, { canWearFlair = false } = {}) {
         if (value === 'feed') {
           try {
             window.parent?.postMessage?.(
-              { type: 'starlight-navigate', route: 'feed' },
+              { type: 'starlight-navigate', view: 'feed' },
               window.location.origin
             );
           } catch {

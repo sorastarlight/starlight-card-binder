@@ -7,7 +7,7 @@
 <link href="css/style.css?v=1.0.3" rel="stylesheet"/>
 <link href="css/v80-8-ui.css" rel="stylesheet"/>
 <link href="css/card-filters.css?v=1.0" rel="stylesheet"/>
-<link href="css/pages/card-album-page.css?v=2.8.0" rel="stylesheet"/>
+<link href="css/pages/card-album-page.css?v=2.9.0" rel="stylesheet"/>
 <script src="js/browser-performance.js?v=1.0.0" defer></script>
 <link rel="stylesheet" href="css/shared-ui.css?v=1.6.19">
 <link rel="stylesheet" href="css/prestige-frames.css?v=3.8">
@@ -54,19 +54,9 @@
 <section class="card-filter-panel panel" data-card-filter-context="collection" aria-label="Filter collection cards"></section>
 
 <section class="card-album-panel active" data-collection-panel="all">
-<div class="card-album-binder-toolbar panel">
-<label>Organize by
-<select data-binder-organize aria-label="Binder organization">
-<option value="numberAsc">Card number</option>
-<option value="numberDesc">Card number (high to low)</option>
-<option value="series">Series</option>
-<option value="rarityDesc">Rarity</option>
-<option value="favorites">Favorites first</option>
-<option value="nameAsc">Name (A–Z)</option>
-</select>
-</label>
+<div class="card-album-binder-actions panel">
 <span class="card-album-theme-badge" data-content="collection.binderThemeNote">Starlight Classic</span>
-<button class="btn" type="button" data-binder-customize disabled title="Customize Binder unlocks as you level up">Customize Binder</button>
+<button class="btn" type="button" data-binder-customize>Customize Binder</button>
 </div>
 <div id="collectionGrid" class="card-album-binder-mount" aria-label="My card album binder spread"></div>
 </section>
@@ -103,7 +93,8 @@
 <script src="js/site-dashboard.js" type="module"></script>
 <script src="js/pages/collection-page.js?v=1.0"></script>
 <script src="js/collection-redesign.js?v=1.4.0" type="module"></script>
-<script src="js/binder-theme-config.js?v=1.1.0"></script>
+<script src="js/binder-theme-config.js?v=1.2.0"></script>
+<script src="js/binder-customize.js?v=1.0.0"></script>
 <script src="js/album-binder.js?v=1.3.0"></script>
 <script src="js/card-tile.js?v=1.2.0"></script>
 <script src="js/starlight-perspective-card.js?v=1.0.0"></script>

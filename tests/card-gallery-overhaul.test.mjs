@@ -38,7 +38,8 @@ test('app.js wires album spread rendering and full view open', async () => {
   assert.match(app, /renderAlbumBinderSpread/);
   assert.match(app, /turnAlbumBinderSpread/);
   assert.match(app, /StarlightAlbumBinder/);
-  assert.match(app, /data-binder-organize/);
+  assert.match(app, /getBinderOrganizeBy/);
+  assert.match(app, /data-binder-customize/);
   assert.match(app, /data-album-spread/);
   assert.match(app, /initCardInteractionDelegation/);
   assert.match(app, /notifyEmbedLayoutReady/);
@@ -53,7 +54,8 @@ test('collection page loads spread binder modules and styles', async () => {
   assert.match(collection, /starlight-perspective-card\.js/);
   assert.doesNotMatch(collection, /album-binder-3d\.js/);
   assert.doesNotMatch(collection, /album-binder-3d\.css/);
-  assert.match(collection, /data-binder-organize/);
+  assert.match(collection, /binder-customize\.js/);
+  assert.match(collection, /data-binder-customize/);
   assert.match(collection, /card-album-binder-mount/);
   assert.match(collection, /Customize Binder/);
 });

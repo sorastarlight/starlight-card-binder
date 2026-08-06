@@ -2,6 +2,8 @@ import { loginShellHref, shellHref } from '../shell-route-utils.js';
 import { supabase } from '../supabase-client.js';
 import { getPullFeed } from '../social-service.js';
 
+const POLL_MS = 8000;
+
 const listEl = document.getElementById('pull-feed-list');
 const statusEl = document.getElementById('pull-feed-status');
 const moreBtn = document.getElementById('pull-feed-more');
@@ -10,6 +12,7 @@ const filterButtons = [...document.querySelectorAll('[data-feed-filter]')];
 let activeFilter = 'everyone';
 let items = [];
 let loading = false;
+let pollTimer = 0;
 
 function esc(value) {
   return String(value ?? '')
@@ -74,10 +77,10 @@ function renderItems() {
   moreBtn.hidden = items.length < 20;
 }
 
-async function loadFeed({ append = false } = {}) {
+async function loadFeed({ append = false, quiet = false } = {}) {
   if (loading) return;
   loading = true;
-  statusEl.textContent = append ? 'Loading more…' : 'Loading feed…';
+  if (!quiet) statusEl.textContent = append ? 'Loading more…' : 'Loading feed…';
   moreBtn.disabled = true;
 
   try {
@@ -125,6 +128,35 @@ filterButtons.forEach((button) => {
   });
 });
 
+function startFeedPolling() {
+  window.clearInterval(pollTimer);
+  pollTimer = window.setInterval(() => {
+    if (document.hidden || loading) return;
+    loadFeed({ quiet: true });
+  }, POLL_MS);
+}
+
+function stopFeedPolling() {
+  window.clearInterval(pollTimer);
+  pollTimer = 0;
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) stopFeedPolling();
+  else startFeedPolling();
+});
+
+window.addEventListener('starlight-feed-changed', () => {
+  loadFeed({ quiet: true });
+});
+
+window.addEventListener('message', (event) => {
+  if (event.origin !== location.origin) return;
+  if (event.data?.type === 'starlight-feed-changed') {
+    loadFeed({ quiet: true });
+  }
+});
+
 moreBtn?.addEventListener('click', () => loadFeed({ append: true }));
 
 listEl?.addEventListener('click', (event) => {
@@ -133,4 +165,4 @@ listEl?.addEventListener('click', (event) => {
   // Keep normal navigation inside the shell iframe; parent shell may intercept.
 });
 
-loadFeed();
+loadFeed().finally(startFeedPolling);

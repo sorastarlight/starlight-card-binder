@@ -909,19 +909,24 @@ function applyAlbumBinderTheme() {
 }
 
 function getBinderOrganizeBy() {
-  const select = $('[data-binder-organize]');
-  const stored = window.StarlightAlbumBinder?.readOrganize?.();
-  if (select?.value) return select.value;
-  return stored || 'numberAsc';
+  const sortSelect = $('#sortSelect');
+  if (sortSelect?.value) return sortSelect.value;
+  return window.StarlightAlbumBinder?.readOrganize?.() || 'numberAsc';
 }
 
-function hydrateBinderOrganize() {
-  const select = $('[data-binder-organize]');
-  if (!select) return;
-  const value = window.StarlightAlbumBinder?.readOrganize?.() || 'numberAsc';
-  if ([...select.options].some(option => option.value === value)) {
-    select.value = value;
-  }
+let albumCardOpening = false;
+
+function openAlbumBinderCard(sourceEl) {
+  const cardId = sourceEl?.dataset?.albumCard;
+  if (!cardId || albumCardOpening) return;
+  albumCardOpening = true;
+  selected = cards.find(card => card.id === cardId) || selected;
+  selectedIndex = Math.max(0, cards.findIndex(card => card.id === cardId));
+  previewFlipped = false;
+  openFullView('collection');
+  globalThis.requestAnimationFrame?.(() => {
+    albumCardOpening = false;
+  });
 }
 
 function sortedOwnedBinderCards(list) {
@@ -1008,15 +1013,6 @@ function initCardInteractionDelegation() {
       openFullView('filtered');
     });
   }
-}
-
-function openAlbumBinderCard(sourceEl) {
-  const cardId = sourceEl?.dataset?.albumCard;
-  if (!cardId) return;
-  selected = cards.find(card => card.id === cardId) || selected;
-  selectedIndex = Math.max(0, cards.findIndex(card => card.id === cardId));
-  previewFlipped = false;
-  openFullView('collection');
 }
 
 function renderAlbumBinderSpread(wrap, list, { quietLayout = false } = {}) {
@@ -2055,12 +2051,6 @@ function applyCardFilterChange() {
 document.addEventListener('input', e => { if (e.target.matches('#globalSearch, [data-series], [data-rarity], [name="viewFilter"], #sortSelect, [data-filter-favorites]')) applyCardFilterChange(); });
 document.addEventListener('change', e => {
   if (e.target.matches('#globalSearch, [data-series], [data-rarity], [name="viewFilter"], #sortSelect, [data-filter-favorites]')) applyCardFilterChange();
-  if (e.target.matches('[data-binder-organize]')) {
-    window.StarlightAlbumBinder?.writeOrganize?.(e.target.value);
-    albumBinderPage = 1;
-    window.StarlightAlbumBinder?.writePage?.(1);
-    renderGridPage('#collectionGrid', 'collection');
-  }
 });
 window.addEventListener('starlight-collection-tab-changed', () => {
   if (pageName === 'collection') renderAll();
@@ -2120,7 +2110,6 @@ document.addEventListener('keydown', e => {
 });
 document.addEventListener('DOMContentLoaded', () => {
   albumBinderPage = window.StarlightAlbumBinder?.readPage?.() || 1;
-  hydrateBinderOrganize();
   renderFilterControls();
   initCardInteractionDelegation();
   if (pageName === 'binder') {
@@ -2497,10 +2486,12 @@ document.addEventListener('click', e => {
     openFullView('filtered');
     return;
   }
-  const albumBtn = e.target.closest('[data-album-card]');
-  if (albumBtn) {
-    e.preventDefault(); e.stopPropagation();
-    openAlbumBinderCard(albumBtn);
+  const customizeBtn = e.target.closest('[data-binder-customize]');
+  if (customizeBtn && pageName === 'collection') {
+    e.preventDefault();
+    e.stopPropagation();
+    const level = Number($('[data-collector-level]')?.textContent) || 1;
+    window.StarlightBinderCustomize?.openModal?.({ collectorLevel: level });
     return;
   }
 }, true);

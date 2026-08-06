@@ -59,6 +59,7 @@ function readInitialView() {
   const tab = params.get('tab');
   if (tab === 'incoming' || tab === 'outgoing') return 'progress';
   if (tab === 'compose') return 'collectors';
+  if (!section && !tab) return 'my-trade';
   return normalizeView(section);
 }
 
