@@ -38,6 +38,25 @@ const file = normalizePageName(location.pathname);
 const currentRoute = routes[file] || null;
 const embedded = params.get('embed') === '1' || (window.parent !== window && !!currentRoute);
 
+/** Pages that serve multiple shell routes (e.g. rankings + trades share trade-lists.html). */
+const MULTI_VIEW_PAGES = {
+  'trade-lists.html': new Set(['rankings', 'trades', 'offers'])
+};
+
+function embedShellView() {
+  const fileView = currentRoute || file;
+  if (window.parent === window) return fileView;
+  try {
+    const parentView = new URLSearchParams(window.parent.location.search).get('view');
+    if (!parentView) return fileView;
+    const aliases = MULTI_VIEW_PAGES[file];
+    if (aliases?.has(parentView)) return parentView;
+    return fileView;
+  } catch {
+    return fileView;
+  }
+}
+
 function routeForUrl(value){
   try{
     const u = new URL(value, location.href);
@@ -81,7 +100,7 @@ function rewriteShellLinks(root = document){
 
 function send(type, extra = {}){
   if (window.parent === window) return;
-  parent.postMessage({type, view: currentRoute || file, ...extra}, location.origin);
+  parent.postMessage({type, view: embedShellView(), ...extra}, location.origin);
 }
 
 function resetEmbedDocumentScroll() {

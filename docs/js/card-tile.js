@@ -50,7 +50,7 @@
     return `<article class="card-album-slot ${ctx.rarityClass(card)} ${prestigeClass}${favorited ? ' is-favorite' : ''}" data-pocket-slot="${slotIndex}" style="--pocket-i:${slotIndex}">
       <button type="button" class="card-album-btn" data-album-card="${ctx.esc(card.id)}" aria-label="Open ${ctx.esc(ctx.displayName(card))} full view">
         <span class="card-album-sleeve">
-          <span class="card-album-art">${ctx.perspectiveArt(card, { imageUrl: card.imageUrl, alt: ctx.displayName(card), visible: ctx.perspectiveArtVisible(card, got) })}${ctx.prestigeFrameOverlayHtml(card.id)}</span>
+          <span class="card-album-art">${ctx.perspectiveArt(card, { imageUrl: card.imageUrl, alt: ctx.displayName(card), visible: false })}${ctx.prestigeFrameOverlayHtml(card.id)}</span>
           <span class="card-album-number">${ctx.esc(numberLabel)}</span>
           ${badges}
         </span>

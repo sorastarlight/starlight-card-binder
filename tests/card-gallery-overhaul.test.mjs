@@ -12,6 +12,7 @@ test('shared card tile module renders gallery, album, and list modes', async () 
   assert.match(source, /renderListTile/);
   assert.match(source, /card-gallery-item/);
   assert.match(source, /card-album-sleeve/);
+  assert.match(source, /visible: false/);
 });
 
 test('binder theme config exposes registry and CSS variable hooks', async () => {
@@ -44,7 +45,7 @@ test('app.js wires album spread rendering and full view open', async () => {
   assert.match(app, /initCardInteractionDelegation/);
   assert.match(app, /notifyEmbedLayoutReady/);
   assert.match(app, /openAlbumBinderCard/);
-  assert.match(app, /animateSpreadTurn/);
+  assert.match(app, /card-album-binder/);
 });
 
 test('collection page loads spread binder modules and styles', async () => {

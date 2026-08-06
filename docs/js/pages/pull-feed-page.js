@@ -84,8 +84,9 @@ async function loadFeed({ append = false, quiet = false } = {}) {
   moreBtn.disabled = true;
 
   try {
-    const { data: auth } = await supabase.auth.getUser();
-    if (!auth?.user) {
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user || (await supabase.auth.getUser()).data?.user;
+    if (!user) {
       statusEl.textContent = 'Sign in to browse the LIVE Feed.';
       listEl.innerHTML = `<div class="pull-feed-empty"><a href="${loginShellHref('signin')}" target="_top" data-shell-view="login">Sign in</a> to see Everyone, Following, or Just You.</div>`;
       moreBtn.hidden = true;
@@ -154,6 +155,15 @@ window.addEventListener('message', (event) => {
   if (event.origin !== location.origin) return;
   if (event.data?.type === 'starlight-feed-changed') {
     loadFeed({ quiet: true });
+  }
+  if (event.data?.type === 'starlight-auth-changed') {
+    loadFeed();
+  }
+});
+
+supabase.auth.onAuthStateChange((event) => {
+  if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+    loadFeed({ quiet: event !== 'SIGNED_IN' && event !== 'SIGNED_OUT' });
   }
 });
 

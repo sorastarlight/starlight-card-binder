@@ -256,4 +256,10 @@ window.addEventListener('starlight-trades-changed', () => {
   openTradesController?.refresh?.();
 });
 
+window.__starlightEmbedAnnounceReady?.();
+requestAnimationFrame(() => {
+  window.__starlightEmbedReportHeight?.();
+  window.__starlightEmbedAnnounceReady?.();
+});
+
 export { setHubView, openProposeTrade, closeProposeTrade };

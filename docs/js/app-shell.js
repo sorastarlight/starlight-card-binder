@@ -14,11 +14,11 @@ import {
 import { getShellNavigation } from './shell-navigation-service.js';
 import { applyShellNavigationToDom, applyShellPageTitles } from './shell-navigation-render.js';
 import { isStudioPreview, STUDIO_MSG } from './studio-preview.js';
-import { initLiveFeedWidget } from './live-feed-widget.js?v=1.4';
+import { initLiveFeedWidget } from './live-feed-widget.js?v=1.5';
 import { applyAvatarFrameClass } from './avatar-frame-utils.js';
 import { getMyProfileExtras } from './profile-extras-service.js';
 
-const SHELL_BUILD = '94.3.8';
+const SHELL_BUILD = '94.3.9';
 const VIEW_READY_TIMEOUT_MS = 6500;
 const MAX_VIEW_RETRIES = 1;
 
@@ -215,8 +215,21 @@ function navigate(route,{push=true,extra={}}={}){
   if(previousRoute==='login')scheduleHydrateAccount();
 }
 
+function viewsShareEmbeddedSrc(a, b) {
+  const left = routes[a];
+  const right = routes[b];
+  return Boolean(left?.src && right?.src && left.src === right.src);
+}
+
 function markViewReady(data={}){
-  if(data.view && routes[data.view] && data.view!==currentRoute)return;
+  if (
+    data.view
+    && routes[data.view]
+    && data.view !== currentRoute
+    && !viewsShareEmbeddedSrc(data.view, currentRoute)
+  ) {
+    return;
+  }
   clearReadyTimer();
   setViewState('ready');
   if(Number.isFinite(Number(data.height)))resizeEmbeddedView(Number(data.height));
@@ -625,7 +638,13 @@ window.addEventListener('message',async e=>{
   }
   if(data.type==='starlight-view-height')resizeEmbeddedView(Number(data.height));
   if(data.type==='starlight-view-reset'){
-    if(!data.view||data.view===currentRoute)resetEmbeddedViewLayout(Number(data.height));
+    if (
+      !data.view
+      || data.view === currentRoute
+      || viewsShareEmbeddedSrc(data.view, currentRoute)
+    ) {
+      resetEmbeddedViewLayout(Number(data.height));
+    }
   }
   if(data.type==='starlight-shell-chrome'){
     liveFeedWidget?.setSuppressed?.(Boolean(data.hideLiveFeed));

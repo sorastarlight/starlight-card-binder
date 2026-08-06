@@ -505,6 +505,12 @@ function renderSharedListCard(c, mode) {
   return renderAlbumListCardLegacy(c, mode);
 }
 function scanPerspectiveCardsIn(root = document) {
+  if (
+    root?.classList?.contains('card-album-binder')
+    || root?.querySelector?.('.card-album-binder')
+  ) {
+    return;
+  }
   window.StarlightPerspectiveCard?.scanPerspectiveCards?.(root);
 }
 function distributionLabel(card) {
@@ -923,9 +929,14 @@ function openAlbumBinderCard(sourceEl) {
   selected = cards.find(card => card.id === cardId) || selected;
   selectedIndex = Math.max(0, cards.findIndex(card => card.id === cardId));
   previewFlipped = false;
-  openFullView('collection');
-  globalThis.requestAnimationFrame?.(() => {
-    albumCardOpening = false;
+  window.requestAnimationFrame(() => {
+    try {
+      openFullView('collection');
+    } finally {
+      window.setTimeout(() => {
+        albumCardOpening = false;
+      }, 280);
+    }
   });
 }
 
@@ -989,13 +1000,15 @@ function initCardInteractionDelegation() {
   const collectionGrid = $('#collectionGrid');
   if (collectionGrid && collectionGrid.dataset.cardGridBound !== '1') {
     collectionGrid.dataset.cardGridBound = '1';
-    collectionGrid.addEventListener('click', event => {
+    const openFromEvent = (event) => {
       const btn = event.target.closest('[data-album-card]');
       if (!btn || pageName !== 'collection') return;
+      if (window.StarlightAlbumBinder?.isAnimating?.()) return;
       event.preventDefault();
       event.stopPropagation();
       openAlbumBinderCard(btn);
-    });
+    };
+    collectionGrid.addEventListener('click', openFromEvent);
   }
 
   const galleryGrid = $('#seriesGridStage');

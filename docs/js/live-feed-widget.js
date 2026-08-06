@@ -229,12 +229,18 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
     renderList();
   }
 
+  async function resolveSignedIn() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) return session.user;
+    const { data: auth } = await supabase.auth.getUser();
+    return auth?.user ?? null;
+  }
+
   async function refresh() {
     if (loading) return;
     loading = true;
     try {
-      const { data: auth } = await supabase.auth.getUser();
-      signedIn = Boolean(auth?.user);
+      signedIn = Boolean(await resolveSignedIn());
       if (!signedIn) {
         items = [];
         knownIds = new Set();
