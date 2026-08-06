@@ -944,7 +944,7 @@ function turnAlbumBinderSpread(direction) {
   const advance = () => {
     albumBinderPage += direction === 'prev' ? -1 : 1;
     binderApi.writePage(albumBinderPage);
-    renderGridPage('#collectionGrid', 'collection');
+    renderAlbumBinderSpread(wrap, list, { quietLayout: true });
   };
   if (binder && binderApi.animateSpreadTurn) {
     binderApi.animateSpreadTurn(binder, direction, advance);
@@ -969,16 +969,15 @@ function preloadAlbumBinderSpreadImages(list, spreadIndex) {
   });
 }
 
-function notifyEmbedLayoutReady() {
+function notifyEmbedLayoutReady({ quiet = false } = {}) {
   window.__starlightEmbedReportHeight?.();
-  if (pageName === 'collection' && window.parent !== window) {
-    window.__starlightEmbedAnnounceReady?.();
-    window.parent.postMessage({
-      type: 'starlight-app-ready',
-      view: 'collection',
-      height: document.documentElement?.scrollHeight || 0
-    }, location.origin);
-  }
+  if (quiet || pageName !== 'collection' || window.parent === window) return;
+  window.__starlightEmbedAnnounceReady?.();
+  window.parent.postMessage({
+    type: 'starlight-app-ready',
+    view: 'collection',
+    height: document.documentElement?.scrollHeight || 0
+  }, location.origin);
 }
 
 function initCardInteractionDelegation() {
@@ -1020,9 +1019,10 @@ function openAlbumBinderCard(sourceEl) {
   openFullView('collection');
 }
 
-function renderAlbumBinderSpread(wrap, list) {
+function renderAlbumBinderSpread(wrap, list, { quietLayout = false } = {}) {
   const binderApi = window.StarlightAlbumBinder;
   if (!wrap || !binderApi?.paginateSpread || !binderApi?.renderSpreadHtml) return false;
+  const scrollY = quietLayout ? (window.scrollY || document.documentElement?.scrollTop || 0) : 0;
   const sorted = sortedOwnedBinderCards(list);
   const spreadData = binderApi.paginateSpread(sorted, albumBinderPage);
   albumBinderPage = spreadData.spread;
@@ -1041,7 +1041,14 @@ function renderAlbumBinderSpread(wrap, list) {
   preloadAlbumBinderSpreadImages(sorted, spreadData.spread);
   attachAlbumBinderHoverSfx(wrap);
   scanPerspectiveCardsIn(wrap);
-  notifyEmbedLayoutReady();
+  if (quietLayout) {
+    window.requestAnimationFrame(() => {
+      window.scrollTo(0, scrollY);
+    });
+    notifyEmbedLayoutReady({ quiet: true });
+  } else {
+    notifyEmbedLayoutReady();
+  }
   return true;
 }
 

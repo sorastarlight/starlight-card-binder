@@ -92,7 +92,10 @@ function resetEmbedDocumentScroll() {
 }
 
 function measureContentHeight() {
-  resetEmbedDocumentScroll();
+  if (!embedScrollResetDone) {
+    resetEmbedDocumentScroll();
+    embedScrollResetDone = true;
+  }
   const docEl = document.documentElement;
   const body = document.body;
   const main = document.querySelector('body > main')
@@ -128,6 +131,7 @@ function documentHeight(){
 
 let lastHeight = 0;
 let resizeFrame = 0;
+let embedScrollResetDone = false;
 function reportHeight(){
   cancelAnimationFrame(resizeFrame);
   resizeFrame = requestAnimationFrame(() => {

@@ -57,6 +57,7 @@ let currentRoute='binder';
 let currentLoadToken=0;
 let readyTimer=0;
 let retryCount=0;
+let embeddedInitialScrollDone=false;
 
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
@@ -119,6 +120,7 @@ function armReadyTimeout(route,token){
 function loadEmbeddedView(route,{force=false,resetRetry=false}={}){
   if(!frame||!routes[route]?.src)return;
   if(resetRetry)retryCount=0;
+  embeddedInitialScrollDone=false;
   currentLoadToken=Date.now();
   const src=buildSrc(route,{retry:retryCount,token:currentLoadToken});
   setViewState('loading');
@@ -215,12 +217,15 @@ function markViewReady(data={}){
   clearReadyTimer();
   setViewState('ready');
   if(Number.isFinite(Number(data.height)))resizeEmbeddedView(Number(data.height));
-  window.requestAnimationFrame(() => {
+  if(!embeddedInitialScrollDone){
+    embeddedInitialScrollDone=true;
     window.requestAnimationFrame(() => {
-      mainContent?.scrollTo({top:0,left:0,behavior:'auto'});
-      window.scrollTo({top:0,left:0,behavior:'auto'});
+      window.requestAnimationFrame(() => {
+        mainContent?.scrollTo({top:0,left:0,behavior:'auto'});
+        window.scrollTo({top:0,left:0,behavior:'auto'});
+      });
     });
-  });
+  }
 }
 
 function resetEmbeddedViewLayout(height){
@@ -234,12 +239,7 @@ function resetEmbeddedViewLayout(height){
 function resizeEmbeddedView(value){
   if(!frame)return;
   const height=Math.max(560,Math.min(20000,Math.ceil(value||0)+8));
-  const previous=parseFloat(frame.style.height)||0;
   frame.style.height=`${height}px`;
-  if(previous>height+120){
-    mainContent?.scrollTo({top:0,left:0,behavior:'auto'});
-    window.scrollTo({top:0,left:0,behavior:'auto'});
-  }
 }
 
 
