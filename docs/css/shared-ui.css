@@ -201,6 +201,8 @@ input[type="range"],.st-slider{accent-color:var(--st-color-pink)}
 .st-toast.success{border-color:rgba(70,176,127,.5)}.st-toast.error{border-color:rgba(180,35,63,.5);color:var(--st-ui-danger)}.st-toast.info{border-color:rgba(255,130,200,.5)}
 @keyframes stToastIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
 .st-dialog-overlay{position:fixed;inset:0;z-index:100100;display:flex;align-items:safe center;justify-content:safe center;padding:max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:rgba(37,48,82,.56);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);opacity:0;transition:opacity var(--st-motion-normal)}.st-dialog-overlay.is-open{opacity:1}.st-dialog-overlay.hidden,.st-dialog-overlay[hidden]{display:none!important}
+.st-modal-backdrop{position:absolute;inset:0;z-index:0;border:0;padding:0;margin:0;background:transparent;cursor:default}
+.st-dialog-overlay>:not(.st-modal-backdrop){position:relative;z-index:1}
 /* Shell iframe contract: pin overlays to the visible parent viewport slice. shared-ui.js sets --st-embed-* and inline !important. */
 :is(.st-dialog-overlay,.st-r3-overlay,.st-evo-root,.editor,.rule-modal,.test-modal,.receipt,.profile-crop-modal).is-embed-anchored:not(.hidden):not([hidden]),
 :is(.st-dialog-overlay,.st-r3-overlay,.st-evo-root,.editor,.rule-modal,.test-modal,.receipt,.profile-crop-modal).is-embed-anchored.is-open{

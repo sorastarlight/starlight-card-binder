@@ -1464,15 +1464,17 @@ function notifyShellChrome({ hideLiveFeed = false } = {}) {
 }
 
 let cardOverlayModal = null;
+const FULL_VIEW_BACKDROP_HTML = '<button type="button" class="st-modal-backdrop" data-st-modal-backdrop tabindex="-1" aria-label="Close"></button>';
 function bindFullViewBackdropClose(overlay) {
   if (!overlay || overlay.dataset.fullViewBackdropBound === 'true') return;
   overlay.dataset.fullViewBackdropBound = 'true';
   overlay.addEventListener('click', (event) => {
     if (!overlay.classList.contains('open')) return;
-    const dialog = overlay.querySelector('.analyzer-modal') || overlay.querySelector('.full-card-stage');
-    if (!dialog) return;
-    const clickedBackdrop = event.target === overlay
-      || (overlay.contains(event.target) && !dialog.contains(event.target));
+    const dialog = overlay.querySelector('.full-card-stage') || overlay.querySelector('.analyzer-modal');
+    const clickedBackdrop = window.StarlightUI?.isBackdropClick?.(event, overlay, dialog)
+      ?? (event.target === overlay
+        || event.target.closest?.('[data-st-modal-backdrop]')
+        || (dialog && overlay.contains(event.target) && !dialog.contains(event.target)));
     if (clickedBackdrop) closeFullView();
   });
 }
@@ -1481,7 +1483,7 @@ function fullViewModal() {
   if (!overlay || !window.StarlightUI) return null;
   if (!cardOverlayModal) {
     cardOverlayModal = window.StarlightUI.adoptModal(overlay, {
-      dialog: element => element.querySelector('.analyzer-modal') || element.querySelector('.full-card-stage'),
+      dialog: element => element.querySelector('.full-card-stage') || element.querySelector('.analyzer-modal'),
       labelledBy: 'fullViewCardTitle',
       closeOnBackdrop: true,
       onOpen: () => {
@@ -1490,7 +1492,7 @@ function fullViewModal() {
         notifyShellChrome({ hideLiveFeed: true });
       },
       onClose: () => {
-        overlay.classList.remove('open');
+        overlay.classList.remove('open', 'card-analyzer-open');
         document.body.classList.remove('modal-open');
         notifyShellChrome({ hideLiveFeed: false });
       }
@@ -1618,7 +1620,7 @@ function renderFullView() {
   // Show Evolution once: badge when present, otherwise plain tier label.
   const evoValueHtml = evoBadge || `<span class="analyzer-evo-value">${esc(evoTier)}</span>`;
 
-  overlay.innerHTML = `<div class="full-card-stage analyzer-full-stage analyzer-sekai-stage ${rarityClass(selected)}" role="dialog" aria-modal="true" aria-labelledby="fullViewCardTitle" tabindex="-1">
+  overlay.innerHTML = `${FULL_VIEW_BACKDROP_HTML}<div class="full-card-stage analyzer-full-stage analyzer-sekai-stage ${rarityClass(selected)}" role="dialog" aria-modal="true" aria-labelledby="fullViewCardTitle" tabindex="-1">
     <div class="analyzer-bg" aria-hidden="true"><span></span><span></span><span></span></div>
     <div class="analyzer-modal">
       <span class="analyzer-spark analyzer-spark-tl" aria-hidden="true">✦</span>
@@ -1630,7 +1632,7 @@ function renderFullView() {
           <button class="analyzer-tab ${detailsTabActive ? 'is-active' : ''}" type="button" role="tab" data-analyzer-tab="details" aria-selected="${detailsTabActive ? 'true' : 'false'}">${esc(full.detailsTabLabel || 'Card Details')}</button>
           <button class="analyzer-tab ${detailsTabActive ? '' : 'is-active'}" type="button" role="tab" data-analyzer-tab="story" aria-selected="${detailsTabActive ? 'false' : 'true'}">${esc(full.storyTabLabel || 'Story')}</button>
         </div>
-        <button class="overlay-close analyzer-close" type="button" aria-label="Close">×</button>
+        <button class="overlay-close analyzer-close" type="button" data-st-modal-close aria-label="Close">×</button>
       </header>
       <div class="analyzer-body">
         <section class="analyzer-panel analyzer-panel-details ${detailsTabActive ? 'is-active' : ''}" data-analyzer-panel="details" ${detailsTabActive ? '' : 'hidden'}>
@@ -1700,7 +1702,7 @@ function renderFullView() {
         </section>
       </div>
       <footer class="analyzer-footer">
-        <button class="analyzer-footer-close" type="button">${esc(full.closeCta || 'Close')}</button>
+        <button class="analyzer-footer-close" type="button" data-st-modal-close>${esc(full.closeCta || 'Close')}</button>
       </footer>
     </div>
   </div>`;

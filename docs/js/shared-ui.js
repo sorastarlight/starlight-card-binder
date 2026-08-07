@@ -376,6 +376,26 @@ function topModal() {
   return modalStack[modalStack.length - 1] || null;
 }
 
+function ensureModalBackdrop(element) {
+  if (!element || element.querySelector(':scope > [data-st-modal-backdrop]')) return null;
+  const ownerDocument = element.ownerDocument;
+  const backdrop = ownerDocument.createElement('button');
+  backdrop.type = 'button';
+  backdrop.className = 'st-modal-backdrop';
+  backdrop.dataset.stModalBackdrop = '';
+  backdrop.tabIndex = -1;
+  backdrop.setAttribute('aria-label', 'Close');
+  element.insertBefore(backdrop, element.firstChild || null);
+  return backdrop;
+}
+
+function isBackdropClick(event, element, dialog) {
+  if (!element || !event?.target) return false;
+  if (event.target === element) return true;
+  if (event.target.closest?.('[data-st-modal-backdrop]') && element.contains(event.target)) return true;
+  return Boolean(dialog && element.contains(event.target) && !dialog.contains(event.target));
+}
+
 function adoptModal(element, options = {}) {
   if (!element) throw new Error('A modal element is required.');
   if (modalControllers.has(element)) return modalControllers.get(element);
@@ -401,6 +421,7 @@ function adoptModal(element, options = {}) {
   };
 
   configureDialog(resolveDialog());
+  if (options.closeOnBackdrop !== false) ensureModalBackdrop(element);
 
   const controller = {
     element,
@@ -422,6 +443,7 @@ function adoptModal(element, options = {}) {
       modalStack.push(controller);
       lockScroll(ownerDocument);
       syncOverlayEmbedAnchor(element, ownerDocument.defaultView);
+      if (options.closeOnBackdrop !== false) ensureModalBackdrop(element);
       options.onOpen?.(controller);
       element.dispatchEvent(new ownerDocument.defaultView.CustomEvent('starlight:modal-open', { detail: { controller } }));
       // Keep the overlay's own scroll at top. Avoid auto-scrolling the host — in tall
@@ -466,9 +488,7 @@ function adoptModal(element, options = {}) {
   function onClick(event) {
     if (options.closeOnBackdrop !== false) {
       const dialog = controller.dialog;
-      const clickedBackdrop = event.target === element
-        || (dialog && element.contains(event.target) && !dialog.contains(event.target));
-      if (clickedBackdrop) {
+      if (isBackdropClick(event, element, dialog)) {
         controller.close(undefined, 'backdrop');
         return;
       }
@@ -502,6 +522,7 @@ function createModal({
   overlay.hidden = true;
   overlay.setAttribute('aria-hidden', 'true');
   overlay.innerHTML = `
+    <button type="button" class="st-modal-backdrop" data-st-modal-backdrop tabindex="-1" aria-label="${escapeHtml(closeLabel)}"></button>
     <section class="st-dialog" role="dialog" aria-modal="true" aria-labelledby="${id}-title"${message ? ` aria-describedby="${id}-description"` : ''} tabindex="-1">
       <button class="st-dialog-close" type="button" data-st-modal-close aria-label="${escapeHtml(closeLabel)}">×</button>
       <h2 id="${id}-title">${escapeHtml(title)}</h2>
@@ -614,6 +635,8 @@ window.StarlightUI = {
   alert: alertDialog,
   createModal,
   adoptModal,
+  ensureModalBackdrop,
+  isBackdropClick,
   /** Pin an overlay to the visible shell-iframe slice (tall embeds). */
   anchorOverlayToVisibleViewport: syncOverlayEmbedAnchor,
   /** Clear embed viewport pin styles after close/cleanup. */

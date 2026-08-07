@@ -64,3 +64,19 @@ test('collector, shop, evolution, and quest dialogs use the shared modal control
   assert.match(quests, /adoptModal/);
   assert.doesNotMatch(evolution, /dialogEl\?\.classList\.(add|remove)\(['"]hidden['"]\)/);
 });
+
+test('shared modal controller supports click-outside backdrop dismissal', async () => {
+  const [sharedUi, appJs, css] = await Promise.all([
+    read('docs/js/shared-ui.js'),
+    read('docs/js/app.js'),
+    read('docs/css/shared-ui.css')
+  ]);
+
+  assert.match(sharedUi, /function ensureModalBackdrop/);
+  assert.match(sharedUi, /function isBackdropClick/);
+  assert.match(sharedUi, /data-st-modal-backdrop/);
+  assert.match(sharedUi, /closeOnBackdrop !== false/);
+  assert.match(appJs, /data-st-modal-backdrop/);
+  assert.match(appJs, /closeOnBackdrop:\s*true/);
+  assert.match(css, /\.st-modal-backdrop/);
+});

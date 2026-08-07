@@ -40,6 +40,9 @@
 html.starlight-embedded #cardOverlay.open.card-analyzer-open,
 #cardOverlay.card-analyzer-open,
 #cardOverlay.open.card-analyzer-open {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 100000 !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
@@ -61,6 +64,24 @@ html.starlight-embedded #cardOverlay.open.card-analyzer-open,
     rgba(36, 44, 88, 0.74) !important;
   backdrop-filter: blur(16px) saturate(1.12) !important;
   -webkit-backdrop-filter: blur(16px) saturate(1.12) !important;
+}
+
+#cardOverlay.card-analyzer-open .st-modal-backdrop,
+#cardOverlay.open.card-analyzer-open .st-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  cursor: default;
+}
+
+#cardOverlay.card-analyzer-open .full-card-stage,
+#cardOverlay.open.card-analyzer-open .full-card-stage {
+  position: relative;
+  z-index: 1;
 }
 
 /* Beat qol-ui `#cardOverlay .analyzer-full-stage { width:min(720px) }` and legacy shells */
