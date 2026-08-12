@@ -232,8 +232,6 @@
 .v61-card-art .starlight-card,
 .collection-image .starlight-perspective-card,
 .collection-image .starlight-card,
-.check-card .starlight-perspective-card,
-.check-card .starlight-card,
 .trade-listed-art .starlight-perspective-card,
 .trade-listed-art .starlight-card,
 .trade-collection-art .starlight-perspective-card,
@@ -251,6 +249,23 @@
 .st-r3-result-art .starlight-perspective-card,
 .st-r3-result-art .starlight-card {
   aspect-ratio: 5 / 7;
+}
+
+.check-card .starlight-perspective-card,
+.check-card .starlight-card {
+  width: 52px;
+  max-width: 52px;
+  height: auto;
+  flex: 0 0 52px;
+  aspect-ratio: 2.5 / 3.5;
+}
+
+.check-card .starlight-perspective-card img,
+.check-card .starlight-card img {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
 }
 
 #cardOverlay .starlight-perspective-card,

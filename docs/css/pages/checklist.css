@@ -79,3 +79,23 @@ body[data-page="checklist"] .checklist-empty-row .empty-state {
   text-align: center;
 }
 
+/* Keep registry thumbs compact even if premium perspective markup slips in. */
+body[data-page="checklist"] .check-card .starlight-perspective-card,
+body[data-page="checklist"] .check-card .starlight-card {
+  width: 52px;
+  max-width: 52px;
+  height: auto;
+  flex: 0 0 52px;
+  aspect-ratio: 2.5 / 3.5;
+}
+
+body[data-page="checklist"] .check-card .starlight-perspective-card img,
+body[data-page="checklist"] .check-card .starlight-card img,
+body[data-page="checklist"] .check-card > img {
+  width: 52px;
+  max-width: 52px;
+  height: auto;
+  aspect-ratio: 2.5 / 3.5;
+  object-fit: cover;
+}
+
