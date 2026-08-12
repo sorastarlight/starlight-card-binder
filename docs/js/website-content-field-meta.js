@@ -1117,12 +1117,18 @@ export const WEBSITE_PAGE_META = Object.freeze({
           { key: 'brandTitle', preview: 'title' },
           { key: 'signInDescription', multiline: true, preview: 'lead' },
           { key: 'signUpDescription', multiline: true },
+          { key: 'forgotDescription', multiline: true },
+          { key: 'resetDescription', multiline: true },
           { key: 'returnCta', preview: 'cta' },
           { key: 'signInModeLabel' },
           { key: 'signUpModeLabel' },
           { key: 'twitchCta', preview: 'cta-primary' },
+          { key: 'forgotPasswordCta' },
+          { key: 'backToSignInCta' },
           { key: 'submitSignIn' },
-          { key: 'submitSignUp' }
+          { key: 'submitSignUp' },
+          { key: 'submitForgot' },
+          { key: 'submitReset' }
         ]
       }
     ]

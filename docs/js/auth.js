@@ -5,16 +5,21 @@ import { supabase } from "./supabase-client.js";
  * Local testing returns to the local login page.
  * The live site returns to cards.sorastarlight.net.
  */
-function getAuthRedirectUrl() {
+function getAuthRedirectUrl(extraParams = {}) {
     const isLocal =
         window.location.hostname === "localhost" ||
         window.location.hostname === "127.0.0.1";
 
-    if (isLocal) {
-        return `${window.location.origin}/login`;
-    }
+    const base = isLocal
+        ? `${window.location.origin}/login`
+        : "https://cards.sorastarlight.net/login.html";
 
-    return "https://cards.sorastarlight.net/login.html";
+    const redirect = new URL(base);
+    Object.entries(extraParams).forEach(([key, value]) => {
+        if (value == null || value === "") return;
+        redirect.searchParams.set(key, String(value));
+    });
+    return redirect.toString();
 }
 
 /**
@@ -47,6 +52,22 @@ export async function signIn(email, password) {
         email,
         password
     });
+}
+
+/**
+ * Sends a password-reset email. The link returns to login with mode=reset.
+ */
+export async function requestPasswordReset(email) {
+    return await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: getAuthRedirectUrl({ mode: "reset" })
+    });
+}
+
+/**
+ * Sets a new password for the recovery session created by the reset email link.
+ */
+export async function updatePassword(password) {
+    return await supabase.auth.updateUser({ password });
 }
 
 

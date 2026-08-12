@@ -3,7 +3,9 @@ import { supabase } from "../supabase-client.js";
         import {
             signIn,
             signUp,
-            signInWithTwitch
+            signInWithTwitch,
+            requestPasswordReset,
+            updatePassword
         } from "../auth.js";
 
         import { getCachedWebsiteContent } from "../website-content-hydrate.js";
@@ -12,13 +14,28 @@ import { supabase } from "../supabase-client.js";
         const form =
             document.getElementById("auth-form");
 
+        const modeButtons =
+            document.getElementById("mode-buttons");
+
+        const providerLogin =
+            document.getElementById("provider-login");
+
         const twitchAuthButton = document.getElementById("twitch-auth-button");
+
+        const emailGroup =
+            document.getElementById("email-group");
 
         const emailInput =
             document.getElementById("email");
 
+        const passwordGroup =
+            document.getElementById("password-group");
+
         const passwordInput =
             document.getElementById("password");
+
+        const passwordLabel =
+            document.querySelector('#password-group label[for="password"]');
 
         const confirmPasswordInput =
             document.getElementById("confirm-password");
@@ -27,6 +44,9 @@ import { supabase } from "../supabase-client.js";
             document.getElementById(
                 "confirm-password-group"
             );
+
+        const confirmPasswordLabel =
+            document.getElementById("confirm-password-label");
 
         const signupIdentityGroup =
             document.getElementById(
@@ -56,6 +76,16 @@ import { supabase } from "../supabase-client.js";
                 "sign-up-mode-button"
             );
 
+        const forgotPasswordButton =
+            document.getElementById(
+                "forgot-password-button"
+            );
+
+        const backToSignInButton =
+            document.getElementById(
+                "back-to-sign-in-button"
+            );
+
         const pageDescription =
             document.getElementById(
                 "page-description"
@@ -75,6 +105,7 @@ import { supabase } from "../supabase-client.js";
             );
 
         let currentMode = "signin";
+        let passwordRecoveryPending = false;
         const defaultLogin = cloneDefaultWebsiteContent().login;
         let loginCopy = { ...defaultLogin };
         const brandTitleEl = document.querySelector('[data-content="login.brandTitle"]');
@@ -115,80 +146,84 @@ import { supabase } from "../supabase-client.js";
             }
         }
 
+        function submitLabelForMode(mode = currentMode) {
+            if (mode === "signup") return loginCopy.submitSignUp || "Create Account";
+            if (mode === "forgot") return loginCopy.submitForgot || "Send Reset Link";
+            if (mode === "reset") return loginCopy.submitReset || "Save New Password";
+            return loginCopy.submitSignIn || "Sign In";
+        }
+
+        function loadingLabelForMode(mode = currentMode) {
+            if (mode === "signup") return "Creating Account...";
+            if (mode === "forgot") return "Sending Reset Link...";
+            if (mode === "reset") return "Saving Password...";
+            return "Signing In...";
+        }
+
         function setLoading(isLoading) {
             submitButton.disabled = isLoading;
-
-            if (isLoading) {
-                submitButton.textContent =
-                    currentMode === "signin"
-                        ? "Signing In..."
-                        : "Creating Account...";
-
-                return;
-            }
-
-            submitButton.textContent =
-                currentMode === "signin"
-                    ? (loginCopy.submitSignIn || "Sign In")
-                    : (loginCopy.submitSignUp || "Create Account");
+            submitButton.textContent = isLoading
+                ? loadingLabelForMode()
+                : submitLabelForMode();
         }
 
         function setMode(mode) {
             currentMode = mode;
 
-            const isSignUp =
-                currentMode === "signup";
+            const isSignUp = currentMode === "signup";
+            const isForgot = currentMode === "forgot";
+            const isReset = currentMode === "reset";
+            const isSignIn = currentMode === "signin";
 
-            signInModeButton.classList.toggle(
-                "active",
-                !isSignUp
-            );
+            modeButtons?.classList.toggle("hidden", isForgot || isReset);
+            providerLogin?.classList.toggle("hidden", isForgot || isReset);
+            backToSignInButton?.classList.toggle("hidden", !(isForgot || isReset));
 
-            signUpModeButton.classList.toggle(
-                "active",
-                isSignUp
-            );
-
+            signInModeButton.classList.toggle("active", isSignIn);
+            signUpModeButton.classList.toggle("active", isSignUp);
             signInModeButton.textContent = loginCopy.signInModeLabel || "Sign In";
             signUpModeButton.textContent = loginCopy.signUpModeLabel || "Create Account";
             twitchAuthButton.textContent = loginCopy.twitchCta || "Continue with Twitch";
+            if (forgotPasswordButton) {
+                forgotPasswordButton.textContent = loginCopy.forgotPasswordCta || "Forgot password?";
+                forgotPasswordButton.classList.toggle("hidden", !isSignIn);
+            }
+            if (backToSignInButton) {
+                backToSignInButton.textContent = loginCopy.backToSignInCta || "Back to Sign In";
+            }
             if (returnCtaEl) {
                 returnCtaEl.textContent = loginCopy.returnCta || "Return to the Binder";
             }
 
-            signInModeButton.setAttribute(
-                "aria-pressed",
-                String(!isSignUp)
-            );
+            signInModeButton.setAttribute("aria-pressed", String(isSignIn));
+            signUpModeButton.setAttribute("aria-pressed", String(isSignUp));
 
-            signUpModeButton.setAttribute(
-                "aria-pressed",
-                String(isSignUp)
-            );
+            emailGroup?.classList.toggle("hidden", isReset);
+            emailInput.required = !isReset;
+            emailInput.disabled = isReset;
 
-            confirmPasswordGroup.classList.toggle(
-                "hidden",
-                !isSignUp
-            );
-
-            signupIdentityGroup?.classList.toggle(
-                "hidden",
-                !isSignUp
-            );
-
-            confirmPasswordInput.required =
-                isSignUp;
-
-            if (signupUsernameInput) {
-                signupUsernameInput.required = isSignUp;
+            passwordGroup?.classList.toggle("hidden", isForgot);
+            passwordInput.required = !isForgot;
+            if (passwordLabel) {
+                passwordLabel.textContent = isReset
+                    ? (loginCopy.newPasswordLabel || "New Password")
+                    : (loginCopy.passwordLabel || "Password");
             }
 
-            if (signupDisplayNameInput) {
-                signupDisplayNameInput.required = isSignUp;
+            confirmPasswordGroup.classList.toggle("hidden", !(isSignUp || isReset));
+            confirmPasswordInput.required = isSignUp || isReset;
+            if (confirmPasswordLabel) {
+                confirmPasswordLabel.textContent = isReset
+                    ? (loginCopy.confirmNewPasswordLabel || "Confirm New Password")
+                    : (loginCopy.confirmPasswordLabel || "Confirm Password");
             }
+
+            signupIdentityGroup?.classList.toggle("hidden", !isSignUp);
+            if (signupUsernameInput) signupUsernameInput.required = isSignUp;
+            if (signupDisplayNameInput) signupDisplayNameInput.required = isSignUp;
 
             passwordInput.autocomplete =
-                isSignUp
+                isSignUp || isReset
                     ? "new-password"
                     : "current-password";
 
@@ -196,18 +231,23 @@ import { supabase } from "../supabase-client.js";
                 brandTitleEl.textContent = loginCopy.brandTitle;
             }
 
-            pageDescription.textContent = isSignUp
-                ? loginCopy.signUpDescription
-                : loginCopy.signInDescription;
+            if (isForgot) {
+                pageDescription.textContent = loginCopy.forgotDescription
+                    || "Enter your email and we will send a link to reset your password.";
+            } else if (isReset) {
+                pageDescription.textContent = loginCopy.resetDescription
+                    || "Choose a new password for your Starlight account.";
+            } else if (isSignUp) {
+                pageDescription.textContent = loginCopy.signUpDescription;
+            } else {
+                pageDescription.textContent = loginCopy.signInDescription;
+            }
 
-            submitButton.textContent =
-                isSignUp
-                    ? (loginCopy.submitSignUp || "Create Account")
-                    : (loginCopy.submitSignIn || "Sign In");
-
+            submitButton.textContent = submitLabelForMode();
             displayStatus("");
 
-            emailInput.focus();
+            if (isReset) passwordInput.focus();
+            else emailInput.focus();
         }
 
         function setupPasswordToggle(
@@ -277,6 +317,23 @@ import { supabase } from "../supabase-client.js";
                 : `./binder?view=${encodeURIComponent(view)}`;
         }
 
+        function hashLooksLikeRecovery() {
+            const hash = String(window.location.hash || "").replace(/^#/, "");
+            if (!hash) return false;
+            const params = new URLSearchParams(hash);
+            return params.get("type") === "recovery";
+        }
+
+        function enterPasswordRecovery() {
+            passwordRecoveryPending = true;
+            setMode("reset");
+            displayStatus(
+                loginCopy.resetReadyStatus
+                    || "Reset link confirmed. Enter your new password below.",
+                "success"
+            );
+        }
+
         async function handleAuthenticationReturn() {
             const urlParameters =
                 new URLSearchParams(
@@ -294,6 +351,41 @@ import { supabase } from "../supabase-client.js";
                     "error"
                 );
 
+                return;
+            }
+
+            if (hashLooksLikeRecovery() || urlParameters.get("mode") === "reset") {
+                // Wait briefly for the client to exchange the recovery token.
+                const {
+                    data: { subscription }
+                } = supabase.auth.onAuthStateChange((event) => {
+                    if (event === "PASSWORD_RECOVERY") {
+                        enterPasswordRecovery();
+                    }
+                });
+
+                const { data, error } = await supabase.auth.getSession();
+                if (error) {
+                    subscription.unsubscribe();
+                    displayStatus(
+                        "We could not open the password reset link. Request a new one and try again.",
+                        "error"
+                    );
+                    setMode("forgot");
+                    return;
+                }
+
+                if (hashLooksLikeRecovery() || data.session) {
+                    enterPasswordRecovery();
+                } else {
+                    setMode("reset");
+                    displayStatus(
+                        "Opening your password reset… If nothing happens, request a new reset link.",
+                        ""
+                    );
+                }
+
+                window.setTimeout(() => subscription.unsubscribe(), 15000);
                 return;
             }
 
@@ -363,6 +455,15 @@ import { supabase } from "../supabase-client.js";
             }
         );
 
+        forgotPasswordButton?.addEventListener("click", () => {
+            setMode("forgot");
+        });
+
+        backToSignInButton?.addEventListener("click", () => {
+            passwordRecoveryPending = false;
+            setMode("signin");
+        });
+
         setupPasswordToggle(
             showPasswordButton,
             passwordInput
@@ -391,11 +492,20 @@ import { supabase } from "../supabase-client.js";
         applyLoginCopy(getCachedWebsiteContent());
 
         const requestedMode = new URLSearchParams(window.location.search).get("mode");
-        setMode(requestedMode === "signup" ? "signup" : "signin");
+        if (requestedMode === "signup") setMode("signup");
+        else if (requestedMode === "forgot") setMode("forgot");
+        else if (requestedMode === "reset") setMode("reset");
+        else setMode("signin");
 
         window.addEventListener("starlight-website-content-hydrated", (event) => {
             applyLoginCopy(event.detail);
             setMode(currentMode);
+        });
+
+        supabase.auth.onAuthStateChange((event) => {
+            if (event === "PASSWORD_RECOVERY") {
+                enterPasswordRecovery();
+            }
         });
 
         form.addEventListener(
@@ -411,13 +521,36 @@ import { supabase } from "../supabase-client.js";
                 const password =
                     passwordInput.value;
 
-                if (!email) {
+                if (currentMode !== "reset" && !email) {
                     displayStatus(
                         "Please enter your email address.",
                         "error"
                     );
 
                     emailInput.focus();
+                    return;
+                }
+
+                if (currentMode === "forgot") {
+                    setLoading(true);
+                    try {
+                        const { error } = await requestPasswordReset(email);
+                        if (error) throw error;
+                        displayStatus(
+                            loginCopy.forgotSentStatus
+                                || "If an account exists for that email, a reset link is on the way. Check your inbox.",
+                            "success"
+                        );
+                    } catch (error) {
+                        console.error("Password reset request failed:", error);
+                        displayStatus(
+                            error.message
+                                || "Unable to send a reset link right now. Please try again.",
+                            "error"
+                        );
+                    } finally {
+                        setLoading(false);
+                    }
                     return;
                 }
 
@@ -432,7 +565,7 @@ import { supabase } from "../supabase-client.js";
                 }
 
                 if (
-                    currentMode === "signup" &&
+                    (currentMode === "signup" || currentMode === "reset") &&
                     password !==
                         confirmPasswordInput.value
                 ) {
@@ -442,6 +575,33 @@ import { supabase } from "../supabase-client.js";
                     );
 
                     confirmPasswordInput.focus();
+                    return;
+                }
+
+                if (currentMode === "reset") {
+                    setLoading(true);
+                    try {
+                        const { error } = await updatePassword(password);
+                        if (error) throw error;
+                        passwordRecoveryPending = false;
+                        displayStatus(
+                            loginCopy.resetSuccessStatus
+                                || "Password updated! Taking you to the Binder...",
+                            "success"
+                        );
+                        window.setTimeout(() => {
+                            goToBinder("home");
+                        }, 1200);
+                    } catch (error) {
+                        console.error("Password update failed:", error);
+                        displayStatus(
+                            error.message
+                                || "Unable to update your password. Request a new reset link and try again.",
+                            "error"
+                        );
+                    } finally {
+                        setLoading(false);
+                    }
                     return;
                 }
 

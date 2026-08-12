@@ -67,15 +67,20 @@ test('login signup collects username and display name fields', async () => {
   assert.match(loginHtml, /id="signup-identity-group"/);
   assert.match(loginHtml, /id="signup-username"/);
   assert.match(loginHtml, /id="signup-display-name"/);
-  assert.match(loginHtml, /login\.css\?v=1\.3/);
+  assert.match(loginHtml, /id="forgot-password-button"/);
+  assert.match(loginHtml, /login\.css\?v=1\.4/);
   assert.match(loginHtml, /website-content-hydrate-page\.js\?v=1\.4/);
   assert.match(loginHtml, /embed-mode\.js/);
-  assert.match(loginHtml, /login-page\.js\?v=1\.10/);
+  assert.match(loginHtml, /login-page\.js\?v=1\.11/);
 
   assert.match(loginPage, /signupIdentityGroup/);
   assert.match(loginPage, /starlight-auth-changed[\s\S]*access_token/);
   assert.match(loginPage, /getCachedWebsiteContent/);
   assert.match(loginPage, /loginCopy\.submitSignUp/);
+  assert.match(loginPage, /requestPasswordReset/);
+  assert.match(loginPage, /updatePassword/);
+  assert.match(loginPage, /PASSWORD_RECOVERY/);
+  assert.match(loginPage, /setMode\("forgot"\)/);
   assert.match(loginPage, /goToBinder/);
   assert.match(loginPage, /\.\/binder\?view=/);
   assert.match(loginPage, /\^\[a-z0-9_\]\{3,24\}\$/);
@@ -84,8 +89,12 @@ test('login signup collects username and display name fields', async () => {
   assert.match(loginPage, /signUp\(\s*email,\s*password,\s*\{/);
 
   assert.match(authJs, /export async function signUp\(email, password, profile = \{\}\)/);
+  assert.match(authJs, /export async function requestPasswordReset/);
+  assert.match(authJs, /resetPasswordForEmail/);
+  assert.match(authJs, /export async function updatePassword/);
+  assert.match(authJs, /updateUser\(\{\s*password\s*\}\)/);
   assert.match(authJs, /data\.username = username/);
-  assert.match(authJs, /origin\}\/login`/);
+  assert.match(authJs, /origin\}\/login/);
   assert.match(authJs, /login\.html/);
   assert.match(authJs, /skipBrowserRedirect/);
   assert.match(loginPage, /skipBrowserRedirect: embedded/);
