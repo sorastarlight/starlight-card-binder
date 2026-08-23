@@ -85,8 +85,8 @@ test('admin quests page is wired into hub and shell', async () => {
   assert.match(hub, /Quests &amp; Season Pass/);
   assert.match(shell, /'admin-quests':\{title:'Quests & Season Pass',src:'admin-quests\.html'\}/);
   assert.match(css, /\.tab\.active/);
-  const embed = await read('docs/js/embed-mode.js');
-  assert.match(embed, /'admin-quests\.html':'admin-quests'/);
+  const embed = await read('docs/js/page-href.js');
+  assert.match(embed, /'admin-quests':\s*'admin-quests\.html'/);
   const routes = await read('docs/js/shell-route-utils.js');
   assert.match(routes, /'admin-quests'/);
 });

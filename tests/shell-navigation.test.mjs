@@ -177,13 +177,14 @@ test('sanitizeShellNavigation rejects unknown destinations and merges empty remo
 });
 
 test('website UI admin page and migration are wired', async () => {
-  const [html, page, hub, migration, embed, shell] = await Promise.all([
+  const [html, page, hub, migration, embed, shell, pageHref] = await Promise.all([
     read('docs/admin-ui.html'),
     read('docs/js/pages/admin-ui-page.js'),
     read('docs/admin-hub.html'),
     read('supabase/migrations/20260722040000_shell_navigation_settings.sql'),
     read('docs/js/embed-mode.js'),
-    read('docs/js/app-shell.js')
+    read('docs/js/app-shell.js'),
+    read('docs/js/page-href.js')
   ]);
   assert.match(html, /Website User Interface/);
   assert.match(html, /data-tab="account"/);
@@ -193,10 +194,10 @@ test('website UI admin page and migration are wired', async () => {
   assert.match(page, /renderAccountMenu|ACCOUNT_FEATURES|accountMenu/);
   assert.match(hub, /admin-ui\.html/);
   assert.match(migration, /admin_save_shell_navigation/);
-  assert.match(embed, /'admin-ui\.html':'admin-ui'/);
-  assert.match(embed, /'login\.html':'login'/);
-  assert.match(embed, /hasAuthReturnParams/);
-  assert.match(embed, /currentRoute === 'login' && hasAuthReturnParams\(\)/);
+  assert.match(embed, /routeForUrl/);
+  assert.match(embed, /binder\.html/);
+  assert.match(pageHref, /'admin-ui':\s*'admin-ui\.html'/);
+  assert.match(pageHref, /loginPageHref/);
   assert.match(shell, /login:\{title:'Sign In',src:'login'\}/);
   assert.match(shell, /navigate\('login',\{extra:\{mode\}\}\)/);
   assert.match(shell, /admin-ui/);
@@ -227,14 +228,14 @@ test('shell refreshes Star Bits totals when wallet or rewards change', async () 
   assert.match(bits, /notifyShellEconomyChanged/);
 });
 
-test('loginShellHref routes signed-out CTAs through the shell login view', () => {
-  assert.equal(loginShellHref('signin'), 'binder?view=login&mode=signin');
-  assert.equal(loginShellHref('signup'), 'binder?view=login&mode=signup');
-  assert.equal(loginShellHref(), 'binder?view=login&mode=signin');
+test('loginShellHref routes signed-out CTAs through the login page', () => {
+  assert.equal(loginShellHref('signin'), 'login.html?mode=signin');
+  assert.equal(loginShellHref('signup'), 'login.html?mode=signup');
+  assert.equal(loginShellHref(), 'login.html?mode=signin');
 });
 
 test('signed-out CTAs avoid standalone login.html links', async () => {
-  const [shop, feed, comments, redeem, bits, profile, daily, collector, importPage] = await Promise.all([
+  const [shop, feed, comments, redeem, bits, profile, daily, importPage] = await Promise.all([
     read('docs/js/pages/booster-shop-page.js'),
     read('docs/js/pages/pull-feed-page.js'),
     read('docs/js/card-comments.js'),
@@ -242,7 +243,6 @@ test('signed-out CTAs avoid standalone login.html links', async () => {
     read('docs/js/pages/star-bits-page.js'),
     read('docs/js/pages/profile-settings-page.js'),
     read('docs/daily-booster.html'),
-    read('docs/collector.html'),
     read('docs/import-collection.html')
   ]);
 
@@ -252,23 +252,23 @@ test('signed-out CTAs avoid standalone login.html links', async () => {
   assert.match(shop, /loginShellHref/);
   assert.match(comments, /loginShellHref/);
   assert.match(profile, /redirectToLogin/);
-  assert.match(daily, /binder\?view=login/);
-  assert.match(collector, /binder\?view=login/);
-  assert.match(importPage, /binder\?view=login/);
+  assert.match(daily, /login\.html/);
+  assert.match(importPage, /login\.html/);
 });
 
-test('shell navigation render and static shell HTML use extensionless binder hrefs', async () => {
-  const [render, binderHtml, homeHtml] = await Promise.all([
+test('shell navigation render uses page href helpers', async () => {
+  const [render, binderHtml, homeHtml, galleryHtml] = await Promise.all([
     read('docs/js/shell-navigation-render.js'),
     read('docs/binder.html'),
-    read('docs/home.html')
+    read('docs/home.html'),
+    read('docs/gallery.html')
   ]);
 
   assert.match(render, /shellHref\(/);
-  assert.doesNotMatch(render, /binder\.html\?/);
-  assert.match(binderHtml, /href="binder\?view=home"/);
-  assert.match(homeHtml, /href="binder\?view=daily"/);
-  assert.doesNotMatch(homeHtml, /binder\.html/);
+  assert.doesNotMatch(render, /binder\.html\?view=/);
+  assert.match(binderHtml, /binder-legacy-redirect\.js/);
+  assert.match(homeHtml, /index\.html/);
+  assert.match(galleryHtml, /card-gallery-page/);
 });
 
 test('shell refreshes account chrome after embedded login', async () => {

@@ -2,7 +2,7 @@ import { supabase } from './supabase-client.js';
 import { loadAndHydrateWebsiteContent } from './website-content-hydrate.js';
 
 const siteCopy = await loadAndHydrateWebsiteContent();
-const host = document.getElementById('news');
+const host = document.getElementById('news') || document.getElementById('newsList');
 const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({
   '&': '&amp;',
   '<': '&lt;',
@@ -29,7 +29,7 @@ try {
   if (error) throw error;
   const posts = Array.isArray(data) ? data : [];
   host.innerHTML = posts.length
-    ? posts.map(p => `<article class="news-card ${p.isPinned ? 'pinned' : ''}">${p.imageUrl ? `<img src="${esc(p.imageUrl)}" alt="">` : ''}<div class="news-body"><div class="meta"><span>${p.isPinned ? '📌 Featured Update' : 'Starlight Update'}</span><time>${date(p.publishedAt)}</time></div><h3>${esc(p.title)}</h3>${p.summary ? `<p>${esc(p.summary)}</p>` : ''}${p.body ? `<p class="news-full">${esc(p.body)}</p>` : ''}</div></article>`).join('')
+    ? posts.map(p => `<article class="news-card ${p.isPinned ? 'pinned' : ''}">${p.imageUrl ? `<img src="${esc(p.imageUrl)}" alt="">` : ''}<div><time>${date(p.publishedAt)}</time><h3>${esc(p.title)}</h3>${p.summary ? `<p>${esc(p.summary)}</p>` : ''}</div></article>`).join('')
     : '<div class="empty">No news has been posted yet. Check back soon! ✨</div>';
 } catch (e) {
   host.innerHTML = `<div class="empty">News could not be loaded right now.<br><small>${esc(e.message)}</small></div>`;

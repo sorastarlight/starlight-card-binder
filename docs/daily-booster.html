@@ -1,60 +1,67 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
-<title>Daily Free Booster Pack | Starlight Card Binder</title>
-<link href="css/style.css?v=1.0.2" rel="stylesheet"/>
-<link href="css/v80-8-ui.css" rel="stylesheet"/>
-<link rel="stylesheet" href="css/pages/daily-booster.css?v=1.1">
-<script src="js/browser-performance.js?v=1.0.0" defer></script>
-    <link rel="stylesheet" href="css/shared-ui.css?v=1.6.15">
-<link rel="stylesheet" href="css/qol-ui.css?v=94.2.8">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Daily Free Booster Pack | Starlight Card Binder</title>
+  <link rel="icon" href="site_assets/Sora_Starlight_Logo_Primary.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/tcg/site.css?v=1.0">
+  <link rel="stylesheet" href="css/tcg/pages.css?v=1.0">
+  <link rel="stylesheet" href="css/tcg/compat.css?v=1.0">
+  <link rel="stylesheet" href="css/pages/daily-booster.css?v=1.1">
+  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.22">
+  <link rel="stylesheet" href="css/qol-ui.css?v=94.2.11">
+  <script src="js/browser-performance.js?v=1.0.0" defer></script>
 </head>
-<body><script src="js/embed-mode.js?v=1.1.1" type="module"></script>
-<div class="sky"></div>
-<main class="daily-page">
-<section class="daily-panel">
-<header class="daily-header">
-  <div class="daily-header-icon" aria-hidden="true">✦</div>
-  <div class="daily-header-copy">
-    <p class="eyebrow" data-content="daily.eyebrow">Daily Collector Reward</p>
-    <h1 data-content="daily.title">Daily Free Booster Pack</h1>
-    <p data-content="daily.lead">Open today’s free pack, reveal four cards one at a time, and grow your Starlight collection. Your next free pack becomes available at midnight Eastern Time.</p>
-  </div>
-  <div class="daily-header-badge" data-content="daily.badge">FREE • DAILY</div>
-</header>
-<section aria-label="Free Daily Booster portal" class="portal-zone" id="portal-zone">
-<div aria-hidden="true" class="portal-ring"></div><div aria-hidden="true" class="portal-ribbons"><i></i><i></i><i></i></div>
-<button aria-describedby="daily-status-description" class="pack-trigger" disabled="" id="pack-trigger" type="button">
-<img id="daily-pack-image" alt="Free Daily Booster pack" class="pack-image" src="site_assets/series01_rising_star_booster.png"/>
-<span class="pack-ready-label" id="pack-ready-label">READY TO OPEN - CLICK THE PACK</span>
-</button>
-</section>
-<section class="daily-status-card"><h2 id="daily-status-heading">Your Free Booster Is Ready!</h2><p id="daily-status-description">Click the pack to view today's cards.</p><div class="countdown hidden" id="countdown"></div></section>
-<section class="more-packs-card" aria-labelledby="more-packs-title">
-  <div class="more-packs-icon" aria-hidden="true">✦</div>
-  <div>
-    <p class="eyebrow" data-content="daily.morePacksEyebrow">Keep the magic going</p>
-    <h2 id="more-packs-title" data-content="daily.morePacksTitle">Want to open more packs?</h2>
-    <p data-content="daily.morePacksLead">Extra cards are never wasted. Convert duplicate cards into <strong>Star Bits</strong>, then spend them in the <strong>Starlight Booster Shop</strong> for more chances to pull Rare, Epic, and Legendary cards.</p>
-    <div class="more-packs-loop"><span data-content="daily.loopStep1">Open packs</span><b>→</b><span data-content="daily.loopStep2">Collect extras</span><b>→</b><span data-content="daily.loopStep3">Earn Star Bits</span><b>→</b><span data-content="daily.loopStep4">Open more packs</span></div>
-  </div>
-  <div class="more-packs-actions">
-    <a class="daily-link secondary" href="binder?view=star-bits" data-shell-view="star-bits" data-content="daily.convertCta">Convert Extras</a>
-    <a class="daily-link primary" href="binder?view=shop" data-shell-view="shop" data-content="daily.shopCta">Visit Booster Shop</a>
-  </div>
-</section>
-
-<div class="daily-actions"><a class="daily-link primary hidden" href="binder?view=login&amp;mode=signin" id="sign-in-link" target="_top" data-shell-view="login" data-content="daily.signInCta">Sign In to Open</a></div>
-
-<section class="reward-section hidden" id="reward-section"><h2 id="reward-title" data-content="daily.pullsTitle">Your Pulls</h2><div class="reward-grid" id="reward-grid"></div></section>
-<p aria-live="polite" class="page-status" id="page-status" role="status"></p>
-</section></main>
-<script type="module" src="js/pages/website-content-hydrate-page.js?v=1.2"></script>
-<script type="module" src="js/pages/daily-booster-page.js?v=1.5.15"></script>
-<script src="js/starlight-perspective-card.js?v=1.0.0"></script>
-<script src="js/shared-ui.js?v=1.6.15"></script>
-<script src="js/qol-ui.js?v=94.2.8" defer></script>
-</body></html>
+<body data-page="pack">
+  <div id="site-header"></div>
+  <main id="main" class="daily-page">
+  <section class="daily-panel">
+  <header class="daily-header">
+    <div class="daily-header-icon" aria-hidden="true">✦</div>
+    <div class="daily-header-copy">
+      <p class="eyebrow" data-content="daily.eyebrow">Daily Collector Reward</p>
+      <h1 data-content="daily.title">Daily Free Booster Pack</h1>
+      <p data-content="daily.lead">Open today’s free pack, reveal four cards one at a time, and grow your Starlight collection. Your next free pack becomes available at midnight Eastern Time.</p>
+    </div>
+    <div class="daily-header-badge" data-content="daily.badge">FREE • DAILY</div>
+  </header>
+  <section aria-label="Free Daily Booster portal" class="portal-zone" id="portal-zone">
+  <div aria-hidden="true" class="portal-ring"></div><div aria-hidden="true" class="portal-ribbons"><i></i><i></i><i></i></div>
+  <button aria-describedby="daily-status-description" class="pack-trigger" disabled="" id="pack-trigger" type="button">
+  <img id="daily-pack-image" alt="Free Daily Booster pack" class="pack-image" src="site_assets/series01_rising_star_booster.png"/>
+  <span class="pack-ready-label" id="pack-ready-label">READY TO OPEN - CLICK THE PACK</span>
+  </button>
+  </section>
+  <section class="daily-status-card"><h2 id="daily-status-heading">Your Free Booster Is Ready!</h2><p id="daily-status-description">Click the pack to view today's cards.</p><div class="countdown hidden" id="countdown"></div></section>
+  <section class="more-packs-card" aria-labelledby="more-packs-title">
+    <div class="more-packs-icon" aria-hidden="true">✦</div>
+    <div>
+      <p class="eyebrow" data-content="daily.morePacksEyebrow">Keep the magic going</p>
+      <h2 id="more-packs-title" data-content="daily.morePacksTitle">Want to open more packs?</h2>
+      <p data-content="daily.morePacksLead">Extra cards are never wasted. Convert duplicate cards into <strong>Star Bits</strong>, then spend them in the <strong>Starlight Booster Shop</strong> for more chances to pull Rare, Epic, and Legendary cards.</p>
+      <div class="more-packs-loop"><span data-content="daily.loopStep1">Open packs</span><b>→</b><span data-content="daily.loopStep2">Collect extras</span><b>→</b><span data-content="daily.loopStep3">Earn Star Bits</span><b>→</b><span data-content="daily.loopStep4">Open more packs</span></div>
+    </div>
+    <div class="more-packs-actions">
+      <a class="daily-link secondary" href="star-bits.html" data-content="daily.convertCta">Convert Extras</a>
+      <a class="daily-link primary" href="booster-shop.html" data-content="daily.shopCta">Visit Booster Shop</a>
+    </div>
+  </section>
+  
+  <div class="daily-actions"><a class="daily-link primary hidden" href="login.html?mode=signin" id="sign-in-link" target="_top" data-content="daily.signInCta">Sign In to Open</a></div>
+  
+  <section class="reward-section hidden" id="reward-section"><h2 id="reward-title" data-content="daily.pullsTitle">Your Pulls</h2><div class="reward-grid" id="reward-grid"></div></section>
+  <p aria-live="polite" class="page-status" id="page-status" role="status"></p>
+  </section></main>
+  <div id="site-footer"></div>
+  <script type="module" src="js/tcg-chrome.js?v=1.0"></script>
+  <script type="module" src="js/pages/website-content-hydrate-page.js?v=1.2"></script>
+  <script type="module" src="js/pages/daily-booster-page.js?v=1.5.15"></script>
+  <script src="js/starlight-perspective-card.js?v=1.0.0"></script>
+  <script src="js/shared-ui.js?v=1.6.15"></script>
+  <script src="js/qol-ui.js?v=94.2.8" defer></script>
+</body>
+</html>

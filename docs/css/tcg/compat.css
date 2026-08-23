@@ -1,0 +1,109 @@
+/* Functional overlays for Card Binder systems inside TCG layout. */
+
+.card-gallery-page,
+.card-album-page,
+.checklist-page-mount,
+.starlight-page-mount {
+  padding: 0 6vw 4rem;
+}
+
+.card-gallery-page .panel,
+.card-album-page .panel,
+.card-filter-panel.panel {
+  border-radius: 1.2rem;
+  border: 1px solid var(--st-line);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--st-shadow);
+}
+
+.card-gallery-header,
+.card-album-header {
+  margin-bottom: 1rem;
+  padding: 1.4rem 1.5rem;
+}
+
+.card-gallery-header .eyebrow,
+.card-album-header .eyebrow {
+  color: var(--st-magenta);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+}
+
+.card-gallery-header h1,
+.card-album-header h1 {
+  margin: 0.2rem 0 0.5rem;
+  font-family: var(--font-display);
+  color: var(--st-navy);
+}
+
+#cardOverlay {
+  z-index: 95;
+}
+
+.lightbox,
+.modal-root,
+.starlight-modal {
+  z-index: 96;
+}
+
+.reward-reveal-root,
+.reward-reveal-overlay {
+  z-index: 100;
+}
+
+.btn,
+button.btn {
+  min-height: 44px;
+  padding: 0.55rem 1rem;
+  border-radius: var(--st-pill);
+  border: 1px solid var(--st-line);
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--st-heading);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.btn.primary {
+  border: 0;
+  background: linear-gradient(180deg, #ff90ca, #ff55ad);
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(255, 79, 167, 0.26);
+}
+
+.empty {
+  padding: 2rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px dashed var(--st-line);
+  color: var(--st-muted);
+  text-align: center;
+}
+
+.page-content-panel {
+  padding: 1.4rem;
+  border-radius: 1.2rem;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--st-line);
+  box-shadow: var(--st-shadow);
+}
+
+.admin-page-mount {
+  padding-top: 0;
+}
+
+body[data-page^="admin"] .admin-shell,
+body[data-page="admin"] .admin-shell {
+  padding-top: 0;
+  min-height: auto;
+}
+
+@media (max-width: 720px) {
+  .card-gallery-page,
+  .card-album-page,
+  .checklist-page-mount,
+  .starlight-page-mount {
+    padding-inline: 1rem;
+  }
+}

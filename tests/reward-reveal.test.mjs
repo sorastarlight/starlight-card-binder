@@ -197,7 +197,7 @@ test('keeps the fixed-center reveal lightweight and progressively loads artwork'
     readFile(new URL('../docs/css/reward-reveal.css', import.meta.url), 'utf8')
   ]);
 
-  assert.match(script, /\{ defer: true \}/);
+  assert.match(script, /defer:\s*true/);
   assert.match(script, /createDocumentFragment\(\)/);
   assert.match(script, /prepareCurrentCard\(\)/);
   assert.match(script, /const visibleLayers = Math\.min\(remaining, MAX_PILE_LAYERS\)/);

@@ -1,5 +1,7 @@
 /** Shared shell route allowlist + notification destination resolution. */
 
+import { loginPageHref, pageHref, pageForRoute } from './page-href.js';
+
 export const SHELL_ROUTE_KEYS = Object.freeze([
   'home',
   'binder',
@@ -212,13 +214,13 @@ export function resolveNotificationRoute(value, notice = {}) {
 }
 
 export function shellHref(view, extraParams = {}) {
-  const params = new URLSearchParams();
-  if (view) params.set('view', view);
-  Object.entries(extraParams).forEach(([key, value]) => {
-    if (value != null && value !== '') params.set(key, String(value));
-  });
-  return `binder?${params.toString()}`;
+  if (!view) return pageHref('home', extraParams);
+  const route = aliasShellRoute(view) || String(view);
+  if (isKnownShellRoute(route)) return pageHref(route, extraParams);
+  return pageHref('home', extraParams);
 }
+
+export { pageHref, pageForRoute, loginPageHref as loginPageHrefDirect } from './page-href.js';
 
 export function shellNotificationUrl(notice = {}) {
   const route = resolveNotificationRoute(notice.route, notice);
@@ -226,20 +228,12 @@ export function shellNotificationUrl(notice = {}) {
 }
 
 export function loginShellHref(mode = 'signin') {
-  return shellHref('login', { mode: mode === 'signup' ? 'signup' : 'signin' });
+  return loginPageHref(mode);
 }
 
 export function redirectToLogin(mode = 'signin', { delayMs = 0 } = {}) {
   const navigate = () => {
-    if (document.documentElement.classList.contains('starlight-embedded')) {
-      window.parent.postMessage({
-        type: 'starlight-navigate',
-        view: 'login',
-        params: { mode: mode === 'signup' ? 'signup' : 'signin' }
-      }, window.location.origin);
-      return;
-    }
-    window.location.href = loginShellHref(mode);
+    window.location.href = loginPageHref(mode);
   };
   if (delayMs > 0) window.setTimeout(navigate, delayMs);
   else navigate();

@@ -31,8 +31,9 @@ test('shell and shop surfaces wire the Star Bit image icon', async () => {
   assert.equal(starBitsItem?.icon?.type, 'image');
   assert.match(starBitsItem?.icon?.url || '', /star-bit\.png/);
 
-  const [binder, shop, bits, collection, checklist, shopPage, bitsCss, sharedCss] = await Promise.all([
-    read('docs/binder.html'),
+  const [gallery, tcgChrome, shop, bits, collection, checklist, shopPage, bitsCss, sharedCss] = await Promise.all([
+    read('docs/gallery.html'),
+    read('docs/js/tcg-chrome.js'),
     read('docs/booster-shop.html'),
     read('docs/star-bits.html'),
     read('docs/collection.html'),
@@ -41,8 +42,8 @@ test('shell and shop surfaces wire the Star Bit image icon', async () => {
     read('docs/css/pages/star-bits.css'),
     read('docs/css/shared-ui.css')
   ]);
-  assert.match(binder, /data-star-bits[\s\S]*star-bit\.png|star-bit\.png[\s\S]*data-star-bits/);
-  assert.match(binder, /My Star Bits[\s\S]*star-bit\.png|star-bit\.png[\s\S]*My Star Bits/);
+  assert.match(tcgChrome, /star-bit\.png/);
+  assert.match(gallery, /prestige-frames\.css/);
   assert.match(shop, /star-bit\.png/);
   assert.match(bits, /star-bit\.png/);
   assert.match(bitsCss, /\.duplicate-card\s*>\s*img/);

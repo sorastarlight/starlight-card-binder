@@ -10,6 +10,7 @@ import { supabase } from "../supabase-client.js";
 
         import { getCachedWebsiteContent } from "../website-content-hydrate.js";
         import { cloneDefaultWebsiteContent } from "../website-content-defaults.js";
+        import { pageHref } from "../page-href.js";
 
         const form =
             document.getElementById("auth-form");
@@ -312,9 +313,7 @@ import { supabase } from "../supabase-client.js";
                 return;
             }
 
-            window.location.href = view === 'binder'
-                ? './binder?view=home'
-                : `./binder?view=${encodeURIComponent(view)}`;
+            window.location.href = pageHref(view === 'binder' ? 'home' : view);
         }
 
         function hashLooksLikeRecovery() {

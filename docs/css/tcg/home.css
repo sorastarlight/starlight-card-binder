@@ -1,0 +1,214 @@
+.featured {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: 1fr minmax(240px, 34vw);
+  align-items: center;
+  padding: calc(var(--header-h) + 1.5rem) 6vw 4rem;
+  overflow: hidden;
+  background: linear-gradient(135deg, #bdecff, #ffe3f2);
+}
+.featured__bg,
+.featured__bg img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.featured__bg img {
+  opacity: 0;
+  transform: scale(1);
+  transition: opacity 700ms ease;
+}
+.featured__bg img.is-active {
+  opacity: 1;
+  animation: kenBurns 14s ease-out forwards;
+}
+.featured::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(237, 249, 255, 0.82), rgba(255, 240, 250, 0.42) 48%, rgba(189, 236, 255, 0.18) 78%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), transparent 38%, rgba(237, 249, 255, 0.55));
+  pointer-events: none;
+}
+@keyframes kenBurns {
+  from { transform: scale(1); }
+  to { transform: scale(1.1); }
+}
+
+.featured__copy,
+.featured__card-wrap {
+  position: relative;
+  z-index: 2;
+}
+.series-kicker {
+  margin: 0 0 0.4rem;
+  color: var(--st-magenta);
+  font-family: var(--font-display);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+.series-mark {
+  margin: 0;
+  max-width: 11ch;
+  font-family: var(--font-display);
+  font-size: clamp(3.2rem, 8vw, 7rem);
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  background: linear-gradient(180deg, #fff7c4, var(--st-gold) 45%, #ff8ad4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 8px 0 rgba(255, 255, 255, 0.55));
+}
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 1.7rem;
+}
+.featured__card-wrap {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+}
+.featured__card {
+  width: min(100%, 340px);
+  animation: cardFloat 4.2s ease-in-out infinite;
+  filter: drop-shadow(0 30px 40px rgba(29, 76, 168, 0.28));
+}
+.featured__card .st-card { cursor: default; padding: 0; background: transparent; box-shadow: none; }
+.featured__card .st-card img { border-radius: 1.05rem; box-shadow: 0 24px 50px rgba(8, 39, 125, 0.28); }
+.featured__card .st-card .meta { display: none; }
+.featured__card .st-card:hover { transform: none; filter: none; }
+.featured__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+  color: var(--st-navy);
+}
+.featured-nav {
+  position: absolute;
+  z-index: 3;
+  bottom: 1.5rem;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 1.2rem;
+}
+.featured-nav button {
+  width: 54px;
+  height: 54px;
+  border: 0;
+  border-radius: 0.7rem;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--st-navy);
+  font-size: 1.6rem;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(29, 76, 168, 0.16);
+}
+.featured-nav button:hover { background: var(--st-pink); color: #fff; }
+
+@keyframes cardFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.news-track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(280px, 1fr);
+  gap: 1.2rem;
+  overflow: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 0.6rem;
+}
+.news-card {
+  scroll-snap-align: start;
+  overflow: hidden;
+  border-radius: 1.2rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--st-line);
+  box-shadow: var(--st-shadow);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 200ms ease;
+}
+.news-card:hover { transform: translateY(-6px); }
+.news-card img {
+  width: 100%;
+  height: 210px;
+  object-fit: cover;
+  background: #d9f3ff;
+}
+.news-card div { padding: 1.1rem 1.15rem 1.3rem; }
+.news-card h3 {
+  margin: 0.35rem 0 0.4rem;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--st-navy);
+}
+.news-card time { color: var(--st-muted); font-size: 0.8rem; font-weight: 800; }
+
+.promos { display: grid; gap: 1.1rem; padding: 0 6vw 4.5rem; }
+.promo {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  min-height: 280px;
+  overflow: hidden;
+  border-radius: 1.6rem;
+  border: 1px solid var(--st-line);
+  box-shadow: var(--st-shadow);
+}
+.promo:nth-child(even) { grid-template-columns: 0.9fr 1.1fr; }
+.promo:nth-child(even) .promo-copy { order: 2; }
+.promo-copy {
+  display: grid;
+  align-content: center;
+  gap: 0.7rem;
+  padding: 3rem 6vw;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(234, 248, 255, 0.88));
+  color: var(--st-ink);
+}
+.promo:nth-child(2) .promo-copy { background: linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(255, 226, 241, 0.86)); }
+.promo:nth-child(3) .promo-copy { background: linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(232, 247, 239, 0.86)); }
+.promo:nth-child(4) .promo-copy { background: linear-gradient(145deg, rgba(255, 248, 200, 0.9), rgba(255, 255, 255, 0.92)); }
+.promo h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  color: var(--st-navy);
+}
+.promo p { margin: 0; color: var(--st-muted); max-width: 36rem; line-height: 1.55; }
+.promo-art {
+  min-height: 240px;
+  background-size: cover;
+  background-position: center;
+}
+.promo-art.pack { background-image: url("../../site_assets/tcg/news-pack.png"); }
+.promo-art.stage { background-image: url("../../site_assets/tcg/hero-bg-stage.png"); }
+.promo-art.concert { background-image: url("../../site_assets/tcg/news-concert.png"); }
+.promo-art.skates { background-image: url("../../site_assets/tcg/hero-bg-skates.png"); }
+
+@media (max-width: 900px) {
+  .featured {
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding-bottom: 5.5rem;
+  }
+  .series-mark { margin-inline: auto; }
+  .cta-row { justify-content: center; }
+  .promo, .promo:nth-child(even) { grid-template-columns: 1fr; }
+  .promo:nth-child(even) .promo-copy { order: 0; }
+  .promos { padding-inline: 1rem; }
+}

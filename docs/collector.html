@@ -1,259 +1,243 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
-<title>
-        Collector Profile | Starlight Card Binder
-    </title>
-<link href="css/style.css?v=1.0.2" rel="stylesheet"/>
-<link rel="stylesheet" href="css/pages/collector.css?v=1.15.0">
-<link rel="stylesheet" href="css/avatar-frames.css?v=1.3.0">
-<script src="js/browser-performance.js?v=1.0.0" defer></script>
-    <link rel="stylesheet" href="css/shared-ui.css?v=1.6.18">
-<link rel="stylesheet" href="css/qol-ui.css?v=94.2.8">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Collector Profile | Starlight Card Binder</title>
+  <link rel="icon" href="site_assets/Sora_Starlight_Logo_Primary.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/tcg/site.css?v=1.0">
+  <link rel="stylesheet" href="css/tcg/pages.css?v=1.0">
+  <link rel="stylesheet" href="css/tcg/compat.css?v=1.0">
+  <link rel="stylesheet" href="css/avatar-frames.css?v=1.3.0">
+  <link rel="stylesheet" href="css/pages/collector.css?v=1.15.0">
+  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.22">
+  <link rel="stylesheet" href="css/qol-ui.css?v=94.2.11">
+  <script src="js/browser-performance.js?v=1.0.0" defer></script>
 </head>
-<body><script src="js/embed-mode.js" type="module"></script>
-<div class="sky"></div>
-<main class="collector-page">
-<nav class="collector-nav">
-<div class="collector-nav-links">
-<a href="binder?view=binder" data-shell-view="binder">
-                    🗂️ Binder
-                </a>
-<a href="binder?view=collection" data-shell-view="collection">
-                    ♡ My Collection
-                </a>
-<a href="binder?view=checklist" data-shell-view="checklist">
-                    ☑ Checklist
-                </a>
-</div>
-<div class="collector-nav-links">
-<a href="binder?view=profile" data-shell-view="profile">
-                    ⚙ My Profile
-                </a>
-<a href="binder?view=login&amp;mode=signin" target="_top" data-shell-view="login">
-                    Sign In
-                </a>
-</div>
-</nav>
-<section class="collector-shell collector-state" id="loading-state">
-<h1 data-content="collector.loadingTitle">
-                Loading Collector Profile…
-            </h1>
-<p data-content="collector.loadingLead">
-                Gathering cards, favorites, and a tasteful
-                quantity of sparkles.
-            </p>
-</section>
-<section class="collector-shell collector-state hidden" id="missing-state">
-<h1 data-content="collector.missingTitle">
-                Collector Not Found
-            </h1>
-<p data-content="collector.missingLead">
-                This collector profile does not exist or has
-                not completed setup yet.
-            </p>
-<div class="collector-actions">
-<a class="collector-button primary" href="./binder?view=binder" data-content="collector.openBinderCta">
-                    Open the Binder
-                </a>
-</div>
-</section>
-<section class="collector-shell collector-state hidden" id="private-state">
-<h1 data-content="collector.privateTitle">
-                Private Collector Profile
-            </h1>
-<p data-content="collector.privateLead">
-                This collector has chosen to keep their
-                Starlight profile private.
-            </p>
-<div class="collector-actions">
-<a class="collector-button primary" href="./binder?view=binder" data-content="collector.openBinderCta">
-                    Open the Binder
-                </a>
-</div>
-</section>
-<section class="collector-shell collector-state error hidden" id="error-state">
-<h1 data-content="collector.errorTitle">
-                Profile Could Not Be Loaded
-            </h1>
-<p id="error-message" data-content="collector.errorLead">
-                Something went wrong while loading this profile.
-            </p>
-<div class="collector-actions">
-<button class="collector-button primary" id="retry-button" type="button" data-content="collector.retryCta">
-                    Try Again
-                </button>
-</div>
-</section>
-<article class="collector-shell hidden" id="profile-content">
-<div class="collector-banner" id="collector-banner"></div>
-<header class="collector-header">
-<div class="collector-avatar-wrap">
-<div aria-hidden="true" class="collector-avatar" id="collector-avatar">
-                    ✦
-                </div>
-<a class="collector-twitch-badge" id="collector-twitch-badge" href="#" target="_blank" rel="noopener" hidden></a>
-</div>
-<div class="collector-identity">
-<div class="collector-nameplate">
-<h1 id="collector-display-name">
-                        Collector
-                    </h1>
-<p class="collector-username" id="collector-username"></p>
-</div>
-<div class="collector-flair" id="collector-flair" hidden>
-<span class="collector-title" id="collector-title" hidden></span>
-<p class="collector-role" id="collector-bio" hidden></p>
-</div>
-<div class="collector-meta-row" id="collector-meta-row">
-<p class="collector-member" id="collector-member"></p>
-<p class="collector-follow-meta" id="collector-follow-meta" hidden></p>
-</div>
-<div class="collector-social-actions" id="collector-social-actions" hidden>
-<button type="button" class="collector-button collector-follow-button" id="follow-button" aria-pressed="false">
-<span class="collector-follow-icon" aria-hidden="true">♡</span>
-<span class="collector-follow-label" data-content="collector.followCta">Follow</span>
-</button>
-<button type="button" class="collector-button primary" id="gift-button" data-content="collector.giftCta">Send Gift</button>
-</div>
-</div>
-<span hidden data-content-source data-content="collector.defaultBio" id="collector-default-bio">A Starlight Card collector.</span>
-<span hidden data-content-source data-content="collector.followingCta" id="collector-following-cta">Following</span>
-</header>
-<div class="collector-content">
-<section class="collector-section collector-dashboard hidden" id="stats-section">
-<h2 data-content="collector.statsTitle">
-                        ✨ Collection Overview
-                    </h2>
-<div aria-label="Collection summary" class="collection-summary-grid" id="collector-summary-grid">
-<div><strong id="unique-card-count">0</strong><span>Unique Cards</span></div>
-<div><strong id="total-copy-count">0</strong><span>Total Copies</span></div>
-<div><strong id="favorite-card-count">0</strong><span>Favorites</span></div>
-<div><strong id="extra-copy-count">0</strong><span>Extra Copies</span></div>
-<div><strong id="catalog-total">0</strong><span>Available Cards</span></div>
-</div>
-<div class="collection-level-card" id="collector-level-card">
-<div><span>Collector Level</span><strong>Lv. <span id="collector-level">1</span></strong></div>
-<div class="collector-progress"><span id="collector-level-progress" data-level-progress=""></span></div>
-<small><span id="collector-points">0</span> / <span id="collector-next-points">25</span> points</small>
-</div>
-<div class="collection-progress-suite" id="collector-progress-suite">
-<article class="collection-progress-card">
-<div><span>Collection Completion</span><strong><span id="unique-card-count-inline">0</span> / <span id="catalog-total-inline">0</span></strong></div>
-<div class="collector-progress"><span id="collector-completion-progress"></span></div>
-<small><span id="completion-percent">0%</span> complete</small>
-</article>
-<article class="collection-progress-card collection-highlight-card">
-<div><span>Collection Spotlight</span><strong id="collector-highlight">Building their showcase…</strong></div>
-<small id="collector-insight">Collection highlights appear when stats are public.</small>
-<div class="collection-rarity-breakdown" id="collector-rarity-breakdown"></div>
-</article>
-<article class="collection-progress-card collection-series-progress">
-<div><span>Series Progress</span><strong>Their sets</strong></div>
-<div class="mini-series" id="collector-mini-series"></div>
-</article>
-</div>
-</section>
-<section class="collector-section hidden" id="showcase-section">
-<h2 data-content="collector.showcaseTitle">
-                        🌟 Favorite Card Showcase
-                    </h2>
-<div class="showcase-layout showcase-layout-hero">
-<img alt="" class="showcase-card-image" id="showcase-card-image" src=""/>
-<div class="showcase-copy">
-<p class="eyebrow">
-                                Featured Card
-                            </p>
-<h3 id="showcase-card-name"></h3>
-<p id="showcase-card-details"></p>
-<p id="showcase-card-description"></p>
-<p id="showcase-card-artist"></p>
-</div>
-</div>
-</section>
-<section class="collector-section hidden" id="highlights-section">
-<h2 data-content="collector.highlightsTitle">✨ Collector Highlights</h2>
-<div class="highlight-grid" id="highlight-grid"></div>
-</section>
-
-<section class="collector-section hidden" id="public-trades-section">
-<div class="trade-showcase-heading">
-<h2 data-content="collector.tradesTitle">💫 Wishlist &amp; Trades</h2>
-<div class="collector-trade-actions">
-<a class="trade-propose-button" href="binder?view=offers" id="propose-trade-button" data-content="collector.proposeTradeCta">🤝 Propose Trade</a>
-<a class="trade-report-button" href="binder?view=report" id="report-profile-button" hidden>⚑ Report Profile</a>
-</div>
-</div>
-<p id="trade-self-note" class="trade-showcase-empty hidden">This is your public profile. Use Wishlist &amp; Trade Offers from your account menu to manage listings.</p>
-<div id="trade-match-summary" class="trade-showcase-empty hidden"></div>
-<div id="trade-lists-error" class="trade-showcase-empty hidden" role="status"></div>
-<h3>Looking For</h3>
-<div class="trade-showcase-grid" id="public-wishlist-grid"></div>
-<h3 class="trade-showcase-title">Available For Trade</h3>
-<div class="trade-showcase-grid" id="public-trade-grid"></div>
-</section>
-<section class="collector-section hidden" id="favorites-section">
-<h2 data-content="collector.favoritesTitle">
-                        ♡ Favorite Cards
-                    </h2>
-<div class="favorite-grid" id="favorite-grid"></div>
-</section>
-</div>
-</article>
-<div class="st-dialog-overlay collector-gift-dialog hidden" id="gift-dialog" hidden aria-hidden="true">
-<section class="st-dialog collector-gift-panel" role="dialog" aria-modal="true" aria-labelledby="gift-dialog-title" tabindex="-1">
-<button type="button" class="st-dialog-close" data-st-modal-close aria-label="Close">×</button>
-<form class="collector-gift-form" id="gift-form">
-<h2 id="gift-dialog-title">Send a Gift</h2>
-<p class="collector-gift-lead">Send Star Bits or a duplicate card to <strong id="gift-recipient-label">this collector</strong>. They’ll find it in Received Gifts.</p>
-<label>Gift type
-<select id="gift-type">
-<option value="star_bits">Star Bits</option>
-<option value="card">Duplicate Card</option>
-</select>
-</label>
-<div id="gift-amount-wrap" class="collector-gift-block">
-<label for="gift-amount">Amount</label>
-<input id="gift-amount" type="number" min="1" max="50000" value="100"/>
-<p class="collector-gift-hint" id="gift-balance-hint">Loading your Star Bits balance…</p>
-<div class="collector-gift-presets" id="gift-presets" role="group" aria-label="Quick amounts">
-<button type="button" class="collector-button" data-gift-preset="50">50</button>
-<button type="button" class="collector-button" data-gift-preset="100">100</button>
-<button type="button" class="collector-button" data-gift-preset="250">250</button>
-<button type="button" class="collector-button" data-gift-preset="500">500</button>
-</div>
-</div>
-<div id="gift-card-wrap" class="collector-gift-block" hidden>
-<label for="gift-card-id">Choose a duplicate</label>
-<div class="collector-gift-card-row">
-<select id="gift-card-id">
-<option value="">Loading duplicates…</option>
-</select>
-<img class="collector-gift-preview" id="gift-card-preview" alt="" hidden>
-</div>
-<p class="collector-gift-hint" id="gift-card-hint">Only cards with extras (quantity 2+) can be gifted.</p>
-</div>
-<label>Message <span>(optional)</span>
-<input id="gift-message" type="text" maxlength="160" placeholder="Enjoy this sparkle ✦"/>
-</label>
-<p class="collector-gift-status" id="gift-status" role="status"></p>
-<div class="collector-gift-actions">
-<button type="submit" class="collector-button primary" id="gift-send-button">Send Gift</button>
-<button type="button" class="collector-button" data-st-modal-close>Cancel</button>
-</div>
-</form>
-</section>
-</div>
-</main>
-<script type="module" src="js/pages/website-content-hydrate-page.js?v=1.4"></script>
-<script src="js/pages/collector-page.js?v=1.6.5" type="module"></script>
-<script src="js/public-profile-extras.js?v=1.5.0" type="module"></script>
-<script src="js/public-trade-showcase.js?v=1.1" type="module"></script>
-<script type="module" src="js/public-twitch-profile.js?v=1.2.1"></script>
-<script src="js/shared-ui.js?v=1.6.18"></script>
-<script src="js/qol-ui.js?v=94.2.8" defer></script>
+<body data-page="profile">
+  <div id="site-header"></div>
+  <main id="main" class="collector-page">
+  <section class="collector-shell collector-state" id="loading-state">
+  <h1 data-content="collector.loadingTitle">
+                  Loading Collector Profile…
+              </h1>
+  <p data-content="collector.loadingLead">
+                  Gathering cards, favorites, and a tasteful
+                  quantity of sparkles.
+              </p>
+  </section>
+  <section class="collector-shell collector-state hidden" id="missing-state">
+  <h1 data-content="collector.missingTitle">
+                  Collector Not Found
+              </h1>
+  <p data-content="collector.missingLead">
+                  This collector profile does not exist or has
+                  not completed setup yet.
+              </p>
+  <div class="collector-actions">
+  <a class="collector-button primary" href="gallery.html" data-content="collector.openBinderCta">
+                      Open the Binder
+                  </a>
+  </div>
+  </section>
+  <section class="collector-shell collector-state hidden" id="private-state">
+  <h1 data-content="collector.privateTitle">
+                  Private Collector Profile
+              </h1>
+  <p data-content="collector.privateLead">
+                  This collector has chosen to keep their
+                  Starlight profile private.
+              </p>
+  <div class="collector-actions">
+  <a class="collector-button primary" href="gallery.html" data-content="collector.openBinderCta">
+                      Open the Binder
+                  </a>
+  </div>
+  </section>
+  <section class="collector-shell collector-state error hidden" id="error-state">
+  <h1 data-content="collector.errorTitle">
+                  Profile Could Not Be Loaded
+              </h1>
+  <p id="error-message" data-content="collector.errorLead">
+                  Something went wrong while loading this profile.
+              </p>
+  <div class="collector-actions">
+  <button class="collector-button primary" id="retry-button" type="button" data-content="collector.retryCta">
+                      Try Again
+                  </button>
+  </div>
+  </section>
+  <article class="collector-shell hidden" id="profile-content">
+  <div class="collector-banner" id="collector-banner"></div>
+  <header class="collector-header">
+  <div class="collector-avatar-wrap">
+  <div aria-hidden="true" class="collector-avatar" id="collector-avatar">
+                      ✦
+                  </div>
+  <a class="collector-twitch-badge" id="collector-twitch-badge" href="#" target="_blank" rel="noopener" hidden></a>
+  </div>
+  <div class="collector-identity">
+  <div class="collector-nameplate">
+  <h1 id="collector-display-name">
+                          Collector
+                      </h1>
+  <p class="collector-username" id="collector-username"></p>
+  </div>
+  <div class="collector-flair" id="collector-flair" hidden>
+  <span class="collector-title" id="collector-title" hidden></span>
+  <p class="collector-role" id="collector-bio" hidden></p>
+  </div>
+  <div class="collector-meta-row" id="collector-meta-row">
+  <p class="collector-member" id="collector-member"></p>
+  <p class="collector-follow-meta" id="collector-follow-meta" hidden></p>
+  </div>
+  <div class="collector-social-actions" id="collector-social-actions" hidden>
+  <button type="button" class="collector-button collector-follow-button" id="follow-button" aria-pressed="false">
+  <span class="collector-follow-icon" aria-hidden="true">♡</span>
+  <span class="collector-follow-label" data-content="collector.followCta">Follow</span>
+  </button>
+  <button type="button" class="collector-button primary" id="gift-button" data-content="collector.giftCta">Send Gift</button>
+  </div>
+  </div>
+  <span hidden data-content-source data-content="collector.defaultBio" id="collector-default-bio">A Starlight Card collector.</span>
+  <span hidden data-content-source data-content="collector.followingCta" id="collector-following-cta">Following</span>
+  </header>
+  <div class="collector-content">
+  <section class="collector-section collector-dashboard hidden" id="stats-section">
+  <h2 data-content="collector.statsTitle">
+                          ✨ Collection Overview
+                      </h2>
+  <div aria-label="Collection summary" class="collection-summary-grid" id="collector-summary-grid">
+  <div><strong id="unique-card-count">0</strong><span>Unique Cards</span></div>
+  <div><strong id="total-copy-count">0</strong><span>Total Copies</span></div>
+  <div><strong id="favorite-card-count">0</strong><span>Favorites</span></div>
+  <div><strong id="extra-copy-count">0</strong><span>Extra Copies</span></div>
+  <div><strong id="catalog-total">0</strong><span>Available Cards</span></div>
+  </div>
+  <div class="collection-level-card" id="collector-level-card">
+  <div><span>Collector Level</span><strong>Lv. <span id="collector-level">1</span></strong></div>
+  <div class="collector-progress"><span id="collector-level-progress" data-level-progress=""></span></div>
+  <small><span id="collector-points">0</span> / <span id="collector-next-points">25</span> points</small>
+  </div>
+  <div class="collection-progress-suite" id="collector-progress-suite">
+  <article class="collection-progress-card">
+  <div><span>Collection Completion</span><strong><span id="unique-card-count-inline">0</span> / <span id="catalog-total-inline">0</span></strong></div>
+  <div class="collector-progress"><span id="collector-completion-progress"></span></div>
+  <small><span id="completion-percent">0%</span> complete</small>
+  </article>
+  <article class="collection-progress-card collection-highlight-card">
+  <div><span>Collection Spotlight</span><strong id="collector-highlight">Building their showcase…</strong></div>
+  <small id="collector-insight">Collection highlights appear when stats are public.</small>
+  <div class="collection-rarity-breakdown" id="collector-rarity-breakdown"></div>
+  </article>
+  <article class="collection-progress-card collection-series-progress">
+  <div><span>Series Progress</span><strong>Their sets</strong></div>
+  <div class="mini-series" id="collector-mini-series"></div>
+  </article>
+  </div>
+  </section>
+  <section class="collector-section hidden" id="showcase-section">
+  <h2 data-content="collector.showcaseTitle">
+                          🌟 Favorite Card Showcase
+                      </h2>
+  <div class="showcase-layout showcase-layout-hero">
+  <img alt="" class="showcase-card-image" id="showcase-card-image" src=""/>
+  <div class="showcase-copy">
+  <p class="eyebrow">
+                                  Featured Card
+                              </p>
+  <h3 id="showcase-card-name"></h3>
+  <p id="showcase-card-details"></p>
+  <p id="showcase-card-description"></p>
+  <p id="showcase-card-artist"></p>
+  </div>
+  </div>
+  </section>
+  <section class="collector-section hidden" id="highlights-section">
+  <h2 data-content="collector.highlightsTitle">✨ Collector Highlights</h2>
+  <div class="highlight-grid" id="highlight-grid"></div>
+  </section>
+  
+  <section class="collector-section hidden" id="public-trades-section">
+  <div class="trade-showcase-heading">
+  <h2 data-content="collector.tradesTitle">💫 Wishlist &amp; Trades</h2>
+  <div class="collector-trade-actions">
+  <a class="trade-propose-button" href="trade-lists.html" id="propose-trade-button" data-content="collector.proposeTradeCta">🤝 Propose Trade</a>
+  <a class="trade-report-button" href="report-profile.html" id="report-profile-button" hidden>⚑ Report Profile</a>
+  </div>
+  </div>
+  <p id="trade-self-note" class="trade-showcase-empty hidden">This is your public profile. Use Wishlist &amp; Trade Offers from your account menu to manage listings.</p>
+  <div id="trade-match-summary" class="trade-showcase-empty hidden"></div>
+  <div id="trade-lists-error" class="trade-showcase-empty hidden" role="status"></div>
+  <h3>Looking For</h3>
+  <div class="trade-showcase-grid" id="public-wishlist-grid"></div>
+  <h3 class="trade-showcase-title">Available For Trade</h3>
+  <div class="trade-showcase-grid" id="public-trade-grid"></div>
+  </section>
+  <section class="collector-section hidden" id="favorites-section">
+  <h2 data-content="collector.favoritesTitle">
+                          ♡ Favorite Cards
+                      </h2>
+  <div class="favorite-grid" id="favorite-grid"></div>
+  </section>
+  </div>
+  </article>
+  <div class="st-dialog-overlay collector-gift-dialog hidden" id="gift-dialog" hidden aria-hidden="true">
+  <section class="st-dialog collector-gift-panel" role="dialog" aria-modal="true" aria-labelledby="gift-dialog-title" tabindex="-1">
+  <button type="button" class="st-dialog-close" data-st-modal-close aria-label="Close">×</button>
+  <form class="collector-gift-form" id="gift-form">
+  <h2 id="gift-dialog-title">Send a Gift</h2>
+  <p class="collector-gift-lead">Send Star Bits or a duplicate card to <strong id="gift-recipient-label">this collector</strong>. They’ll find it in Received Gifts.</p>
+  <label>Gift type
+  <select id="gift-type">
+  <option value="star_bits">Star Bits</option>
+  <option value="card">Duplicate Card</option>
+  </select>
+  </label>
+  <div id="gift-amount-wrap" class="collector-gift-block">
+  <label for="gift-amount">Amount</label>
+  <input id="gift-amount" type="number" min="1" max="50000" value="100"/>
+  <p class="collector-gift-hint" id="gift-balance-hint">Loading your Star Bits balance…</p>
+  <div class="collector-gift-presets" id="gift-presets" role="group" aria-label="Quick amounts">
+  <button type="button" class="collector-button" data-gift-preset="50">50</button>
+  <button type="button" class="collector-button" data-gift-preset="100">100</button>
+  <button type="button" class="collector-button" data-gift-preset="250">250</button>
+  <button type="button" class="collector-button" data-gift-preset="500">500</button>
+  </div>
+  </div>
+  <div id="gift-card-wrap" class="collector-gift-block" hidden>
+  <label for="gift-card-id">Choose a duplicate</label>
+  <div class="collector-gift-card-row">
+  <select id="gift-card-id">
+  <option value="">Loading duplicates…</option>
+  </select>
+  <img class="collector-gift-preview" id="gift-card-preview" alt="" hidden>
+  </div>
+  <p class="collector-gift-hint" id="gift-card-hint">Only cards with extras (quantity 2+) can be gifted.</p>
+  </div>
+  <label>Message <span>(optional)</span>
+  <input id="gift-message" type="text" maxlength="160" placeholder="Enjoy this sparkle ✦"/>
+  </label>
+  <p class="collector-gift-status" id="gift-status" role="status"></p>
+  <div class="collector-gift-actions">
+  <button type="submit" class="collector-button primary" id="gift-send-button">Send Gift</button>
+  <button type="button" class="collector-button" data-st-modal-close>Cancel</button>
+  </div>
+  </form>
+  </section>
+  </div>
+  </main>
+  <div id="site-footer"></div>
+  <script type="module" src="js/tcg-chrome.js?v=1.0"></script>
+  <script type="module" src="js/pages/website-content-hydrate-page.js?v=1.4"></script>
+  <script src="js/pages/collector-page.js?v=1.6.5" type="module"></script>
+  <script src="js/public-profile-extras.js?v=1.5.0" type="module"></script>
+  <script src="js/public-trade-showcase.js?v=1.1" type="module"></script>
+  <script type="module" src="js/public-twitch-profile.js?v=1.2.1"></script>
+  <script src="js/shared-ui.js?v=1.6.18"></script>
+  <script src="js/qol-ui.js?v=94.2.8" defer></script>
 </body>
 </html>

@@ -70,7 +70,7 @@ test('login signup collects username and display name fields', async () => {
   assert.match(loginHtml, /id="forgot-password-button"/);
   assert.match(loginHtml, /login\.css\?v=1\.4/);
   assert.match(loginHtml, /website-content-hydrate-page\.js\?v=1\.4/);
-  assert.match(loginHtml, /embed-mode\.js/);
+  assert.match(loginHtml, /tcg-chrome\.js/);
   assert.match(loginHtml, /login-page\.js\?v=1\.11/);
 
   assert.match(loginPage, /signupIdentityGroup/);
@@ -82,7 +82,8 @@ test('login signup collects username and display name fields', async () => {
   assert.match(loginPage, /PASSWORD_RECOVERY/);
   assert.match(loginPage, /setMode\("forgot"\)/);
   assert.match(loginPage, /goToBinder/);
-  assert.match(loginPage, /\.\/binder\?view=/);
+  assert.match(loginPage, /pageHref/);
+  assert.match(loginPage, /view === 'binder' \? 'home' : view/);
   assert.match(loginPage, /\^\[a-z0-9_\]\{3,24\}\$/);
   assert.match(loginPage, /signupDisplayName/);
   assert.match(loginPage, /claim_twitch_collector_identity/);

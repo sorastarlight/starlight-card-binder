@@ -1,67 +1,74 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Website Editor | Starlight Card Binder</title>
-  <link rel="stylesheet" href="css/style.css?v=1.0.2">
-  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.16">
+  <link rel="icon" href="site_assets/Sora_Starlight_Logo_Primary.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/tcg/site.css?v=1.0">
+  <link rel="stylesheet" href="css/tcg/pages.css?v=1.0">
+  <link rel="stylesheet" href="css/tcg/compat.css?v=1.0">
+  <link rel="stylesheet" href="css/tcg/admin.css?v=1.0">
   <link rel="stylesheet" href="css/pages/admin-website.css?v=2.1">
-  <link rel="stylesheet" href="css/qol-ui.css?v=94.2.8">
+  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.22">
+  <link rel="stylesheet" href="css/qol-ui.css?v=94.2.11">
   <script src="js/browser-performance.js?v=1.0.0" defer></script>
 </head>
-<body>
-  <script src="js/embed-mode.js" type="module"></script>
-  <div class="sky"></div>
-  <main class="page">
-    <section class="panel studio-panel">
-      <p class="eyebrow">Administration Hub</p>
-      <div class="toolbar">
-        <div>
-          <h1>Website Editor</h1>
-          <p class="lead">Pick a page, edit its copy, and watch the live preview update instantly. Save publishes site-wide.</p>
-        </div>
-        <div class="actions">
-          <button id="resetPageBtn" class="btn" type="button" hidden>Reset This Page</button>
-          <button id="saveBtn" class="btn primary" type="button" hidden>Save Changes</button>
-          <button id="resetBtn" class="btn danger" type="button" hidden>Reset Everything</button>
-        </div>
-      </div>
-      <p id="status" class="status" role="status">Checking staff access…</p>
-
-      <div id="app" class="hidden studio-app" hidden>
-        <aside class="page-picker" aria-label="Website pages">
-          <label class="field-search">
-            <span class="sr-only">Search fields</span>
-            <input id="fieldSearch" type="search" placeholder="Search fields…" autocomplete="off">
-          </label>
-          <div id="tablist" class="page-list" role="tablist" aria-label="Website pages"></div>
-        </aside>
-
-        <section class="studio-editor">
-          <div id="pageMeta" class="page-meta"></div>
-          <section id="editorPanel" class="tab-panel editor-scroll" role="tabpanel"></section>
-        </section>
-
-        <aside class="studio-preview" aria-label="Live page preview">
-          <div class="preview-toolbar">
-            <div>
-              <h2>Live preview</h2>
-              <p class="preview-hint">Draft changes appear here before Save.</p>
-            </div>
-            <div class="preview-actions">
-              <button type="button" class="btn small" id="reloadPreviewBtn">Reload</button>
-              <a class="btn small" id="openLivePage" href="home.html" target="_blank" rel="noopener">Open live</a>
-            </div>
+<body data-page="admin">
+  <div id="site-header"></div>
+  <main id="main" class="page">
+      <section class="panel studio-panel">
+        <p class="eyebrow">Administration Hub</p>
+        <div class="toolbar">
+          <div>
+            <h1>Website Editor</h1>
+            <p class="lead">Pick a page, edit its copy, and watch the live preview update instantly. Save publishes site-wide.</p>
           </div>
-          <div class="preview-frame-wrap">
-            <iframe id="previewFrame" title="Website content preview" loading="lazy"></iframe>
+          <div class="actions">
+            <button id="resetPageBtn" class="btn" type="button" hidden>Reset This Page</button>
+            <button id="saveBtn" class="btn primary" type="button" hidden>Save Changes</button>
+            <button id="resetBtn" class="btn danger" type="button" hidden>Reset Everything</button>
           </div>
-        </aside>
-      </div>
-    </section>
-  </main>
-
+        </div>
+        <p id="status" class="status" role="status">Checking staff access…</p>
+  
+        <div id="app" class="hidden studio-app" hidden>
+          <aside class="page-picker" aria-label="Website pages">
+            <label class="field-search">
+              <span class="sr-only">Search fields</span>
+              <input id="fieldSearch" type="search" placeholder="Search fields…" autocomplete="off">
+            </label>
+            <div id="tablist" class="page-list" role="tablist" aria-label="Website pages"></div>
+          </aside>
+  
+          <section class="studio-editor">
+            <div id="pageMeta" class="page-meta"></div>
+            <section id="editorPanel" class="tab-panel editor-scroll" role="tabpanel"></section>
+          </section>
+  
+          <aside class="studio-preview" aria-label="Live page preview">
+            <div class="preview-toolbar">
+              <div>
+                <h2>Live preview</h2>
+                <p class="preview-hint">Draft changes appear here before Save.</p>
+              </div>
+              <div class="preview-actions">
+                <button type="button" class="btn small" id="reloadPreviewBtn">Reload</button>
+                <a class="btn small" id="openLivePage" href="home.html" target="_blank" rel="noopener">Open live</a>
+              </div>
+            </div>
+            <div class="preview-frame-wrap">
+              <iframe id="previewFrame" title="Website content preview" loading="lazy"></iframe>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+  <div id="site-footer"></div>
+  <script type="module" src="js/tcg-chrome.js?v=1.0"></script>
   <script src="js/shared-ui.js?v=1.6.15"></script>
   <script type="module" src="js/pages/admin-website-page.js?v=2.4"></script>
   <script src="js/qol-ui.js?v=94.2.8" defer></script>

@@ -1,101 +1,106 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Card Boutique</title>
-  <link rel="stylesheet" href="css/style.css?v=1.0.2">
-  <script src="js/browser-performance.js?v=1.0.0" defer></script>
+  <link rel="icon" href="site_assets/Sora_Starlight_Logo_Primary.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/tcg/site.css?v=1.0">
+  <link rel="stylesheet" href="css/tcg/pages.css?v=1.0">
+  <link rel="stylesheet" href="css/tcg/compat.css?v=1.0">
   <link rel="stylesheet" href="css/pages/booster-shop.css?v=1.4">
-    <link rel="stylesheet" href="css/shared-ui.css?v=1.6.19">
-<link rel="stylesheet" href="css/qol-ui.css?v=94.2.10">
+  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.22">
+  <link rel="stylesheet" href="css/qol-ui.css?v=94.2.11">
+  <script src="js/browser-performance.js?v=1.0.0" defer></script>
 </head>
-<body>
-<script type="module" src="js/embed-mode.js?v=1.1.1"></script>
-<div class="sky"></div>
-<main class="shop-page">
-  <section class="shop-shell">
-    <header class="shop-hero">
-      <div class="hero-copy">
-        <p class="shop-kicker" data-content="shop.eyebrow">Magical Booster Marketplace</p>
-        <h1 class="shop-title" aria-label="Card Boutique" data-content="shop.title">
-          <span class="title-top">Card</span>
-          <span class="title-bottom">Boutique</span>
-        </h1>
-        <div class="hero-message">
-          <p data-content="shop.lead">Crack open wonder, chase your favorite cards, and turn every duplicate into fuel for your next magical pull.</p>
-          <strong data-content="shop.tagline">Exchange your Star Bits for booster packs and more!</strong>
+<body data-page="shop">
+  <div id="site-header"></div>
+  <main id="main" class="shop-page">
+    <section class="shop-shell">
+      <header class="shop-hero">
+        <div class="hero-copy">
+          <p class="shop-kicker" data-content="shop.eyebrow">Magical Booster Marketplace</p>
+          <h1 class="shop-title" aria-label="Card Boutique" data-content="shop.title">
+            <span class="title-top">Card</span>
+            <span class="title-bottom">Boutique</span>
+          </h1>
+          <div class="hero-message">
+            <p data-content="shop.lead">Crack open wonder, chase your favorite cards, and turn every duplicate into fuel for your next magical pull.</p>
+            <strong data-content="shop.tagline">Exchange your Star Bits for booster packs and more!</strong>
+          </div>
         </div>
-      </div>
-      <aside class="wallet-card" aria-label="Star Bits wallet">
-        <small data-content="shop.walletLabel">Your Star Bits</small>
-        <div class="wallet-amount"><img class="star-bit-icon star-bit-icon--lg" src="site_assets/icons/star-bit.png?v=2" alt="" width="28" height="28" decoding="async"><b id="balance">0</b></div>
-        <span id="wallet-note" data-content="shop.walletNote">Available to spend</span>
-        
-      </aside>
-    </header>
-
-    <section class="shop-main">
-      <section id="featured-stage" class="featured-stage" aria-live="polite"></section>
-      <div class="shop-tabs" role="tablist" aria-label="Shop categories">
-        <button class="active" type="button" data-shop-tab="all" data-content="shop.tabAll">All Packs</button>
-        <button type="button" data-shop-tab="slots" data-content="shop.tabStandard">Standard Packs</button>
-        <button type="button" data-shop-tab="series" data-content="shop.tabSeries">Series Packs</button>
-        <button type="button" data-shop-tab="special" data-content="shop.tabSpecial">Special Packs</button>
-      </div>
-      <div class="shop-toolbar">
-        <h2 class="section-title" data-content="shop.sectionTitle">✨ Booster Collection</h2>
-        <label class="shop-filter">Sort
-          <select id="sort-packs">
-            <option value="featured">Featured</option>
-            <option value="price-low">Price: Low to High</option>
-            <option value="price-high">Price: High to Low</option>
-            <option value="name">Name</option>
-          </select>
-        </label>
-      </div>
-      <div id="packs" class="pack-grid" aria-live="polite"></div>
-      <p id="status" class="shop-status" role="status" aria-live="polite"></p>
-      <footer class="shop-footer">
-        <div><strong data-content="shop.footerTitle">Turn duplicates into more pulls!</strong><span data-content="shop.footerLead">Trade in extra cards for Star Bits and keep your collection growing.</span></div>
-        <a class="gallery-link" href="binder?view=star-bits" data-shell-view="star-bits"><img class="star-bit-icon star-bit-icon--sm" src="site_assets/icons/star-bit.png?v=2" alt="" width="16" height="16" decoding="async"><span data-content="shop.footerCta">Go To My Star Bits</span></a>
-      </footer>
+        <aside class="wallet-card" aria-label="Star Bits wallet">
+          <small data-content="shop.walletLabel">Your Star Bits</small>
+          <div class="wallet-amount"><img class="star-bit-icon star-bit-icon--lg" src="site_assets/icons/star-bit.png?v=2" alt="" width="28" height="28" decoding="async"><b id="balance">0</b></div>
+          <span id="wallet-note" data-content="shop.walletNote">Available to spend</span>
+          
+        </aside>
+      </header>
+  
+      <section class="shop-main">
+        <section id="featured-stage" class="featured-stage" aria-live="polite"></section>
+        <div class="shop-tabs" role="tablist" aria-label="Shop categories">
+          <button class="active" type="button" data-shop-tab="all" data-content="shop.tabAll">All Packs</button>
+          <button type="button" data-shop-tab="slots" data-content="shop.tabStandard">Standard Packs</button>
+          <button type="button" data-shop-tab="series" data-content="shop.tabSeries">Series Packs</button>
+          <button type="button" data-shop-tab="special" data-content="shop.tabSpecial">Special Packs</button>
+        </div>
+        <div class="shop-toolbar">
+          <h2 class="section-title" data-content="shop.sectionTitle">✨ Booster Collection</h2>
+          <label class="shop-filter">Sort
+            <select id="sort-packs">
+              <option value="featured">Featured</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="name">Name</option>
+            </select>
+          </label>
+        </div>
+        <div id="packs" class="pack-grid" aria-live="polite"></div>
+        <p id="status" class="shop-status" role="status" aria-live="polite"></p>
+        <footer class="shop-footer">
+          <div><strong data-content="shop.footerTitle">Turn duplicates into more pulls!</strong><span data-content="shop.footerLead">Trade in extra cards for Star Bits and keep your collection growing.</span></div>
+          <a class="gallery-link" href="star-bits.html"><img class="star-bit-icon star-bit-icon--sm" src="site_assets/icons/star-bit.png?v=2" alt="" width="16" height="16" decoding="async"><span data-content="shop.footerCta">Go To My Star Bits</span></a>
+        </footer>
+      </section>
     </section>
-  </section>
-</main>
-
-<div id="pack-modal" class="st-dialog-overlay hidden" aria-hidden="true">
-  <section class="st-dialog st-dialog--wide shop-pack-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1">
-    <button id="modal-close" class="st-dialog-close" type="button" data-st-modal-close aria-label="Close">×</button>
-    <p class="shop-kicker">Pack Details</p>
-    <h2 id="modal-title">Booster Pack</h2>
-    <div class="modal-pack st-dialog-content">
-      <img id="modal-image" src="" alt="">
-      <div class="modal-copy"><p id="modal-description"></p><div id="modal-contents" class="contents-list"></div></div>
-    </div>
-  </section>
-</div>
-
-<div id="purchase-modal" class="st-dialog-overlay hidden" aria-hidden="true">
-  <section class="st-dialog shop-purchase-dialog" role="dialog" aria-modal="true" aria-labelledby="purchase-title" aria-describedby="purchase-description" tabindex="-1">
-    <button type="button" class="st-dialog-close" data-st-modal-close aria-label="Close">×</button>
-    <img id="purchase-image" class="purchase-art" src="" alt="" width="170" height="225">
-    <p class="shop-kicker">Confirm Your Purchase</p>
-    <h2 id="purchase-title">Open Booster Pack?</h2>
-    <p id="purchase-description">Spend Star Bits to open this booster pack.</p>
-    <div id="purchase-cost" class="purchase-cost"><img class="star-bit-icon star-bit-icon--sm" src="site_assets/icons/star-bit.png?v=2" alt="" width="16" height="16" decoding="async"> <span id="purchase-cost-amount">0 Star Bits</span></div>
-    <p id="purchase-balance" class="purchase-balance"></p>
-    <div class="st-dialog-actions">
-      <button id="purchase-cancel" class="st-dialog-cancel" type="button">Not Yet</button>
-      <button id="purchase-confirm" class="st-dialog-confirm" type="button">Open Pack</button>
-    </div>
-  </section>
-</div>
-
-<script type="module" src="js/pages/website-content-hydrate-page.js?v=1.2"></script>
-<script src="js/pages/booster-shop-page.js?v=1.6.8" type="module"></script>
-    <script src="js/starlight-perspective-card.js?v=1.0.0"></script>
-    <script src="js/shared-ui.js?v=1.6.15"></script>
-<script src="js/qol-ui.js?v=94.2.8" defer></script>
+  </main>
+  <div id="site-footer"></div>
+  <div id="pack-modal" class="st-dialog-overlay hidden" aria-hidden="true">
+    <section class="st-dialog st-dialog--wide shop-pack-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1">
+      <button id="modal-close" class="st-dialog-close" type="button" data-st-modal-close aria-label="Close">×</button>
+      <p class="shop-kicker">Pack Details</p>
+      <h2 id="modal-title">Booster Pack</h2>
+      <div class="modal-pack st-dialog-content">
+        <img id="modal-image" src="" alt="">
+        <div class="modal-copy"><p id="modal-description"></p><div id="modal-contents" class="contents-list"></div></div>
+      </div>
+    </section>
+  </div>
+  
+  <div id="purchase-modal" class="st-dialog-overlay hidden" aria-hidden="true">
+    <section class="st-dialog shop-purchase-dialog" role="dialog" aria-modal="true" aria-labelledby="purchase-title" aria-describedby="purchase-description" tabindex="-1">
+      <button type="button" class="st-dialog-close" data-st-modal-close aria-label="Close">×</button>
+      <img id="purchase-image" class="purchase-art" src="" alt="" width="170" height="225">
+      <p class="shop-kicker">Confirm Your Purchase</p>
+      <h2 id="purchase-title">Open Booster Pack?</h2>
+      <p id="purchase-description">Spend Star Bits to open this booster pack.</p>
+      <div id="purchase-cost" class="purchase-cost"><img class="star-bit-icon star-bit-icon--sm" src="site_assets/icons/star-bit.png?v=2" alt="" width="16" height="16" decoding="async"> <span id="purchase-cost-amount">0 Star Bits</span></div>
+      <p id="purchase-balance" class="purchase-balance"></p>
+      <div class="st-dialog-actions">
+        <button id="purchase-cancel" class="st-dialog-cancel" type="button">Not Yet</button>
+        <button id="purchase-confirm" class="st-dialog-confirm" type="button">Open Pack</button>
+      </div>
+    </section>
+  </div>
+  <script type="module" src="js/tcg-chrome.js?v=1.0"></script>
+  <script type="module" src="js/pages/website-content-hydrate-page.js?v=1.2"></script>
+  <script src="js/pages/booster-shop-page.js?v=1.6.8" type="module"></script>
+  <script src="js/starlight-perspective-card.js?v=1.0.0"></script>
+  <script src="js/shared-ui.js?v=1.6.15"></script>
+  <script src="js/qol-ui.js?v=94.2.8" defer></script>
 </body>
 </html>

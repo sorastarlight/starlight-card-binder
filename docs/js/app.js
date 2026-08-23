@@ -133,7 +133,12 @@ function applyOptionalText(el, value, fallback = '') {
 
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
-const pageName = document.body.dataset.page || "binder";
+const pageNameRaw = document.body.dataset.page || "binder";
+const pageName = pageNameRaw === "gallery"
+  ? "binder"
+  : pageNameRaw === "album"
+    ? "collection"
+    : pageNameRaw;
 
 function esc(v) { return String(v ?? "").replace(/[&<>'"]/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#039;",'"':"&quot;"}[m])); }
 function readStore(key) { try { return JSON.parse(localStorage.getItem(key)) || {}; } catch { return {}; } }
@@ -1815,7 +1820,7 @@ function renderGridPage(target, mode) {
       : (collectionCopy.emptyAllLead || 'Earn cards from Daily Boosters, redemption codes, and special rewards to fill your album binder.'));
   const emptyAction = baseList.length
     ? `<button class="btn primary" type="button" data-reset-card-filters>${esc(collectionCopy.emptyFiltersCta || 'Reset Filters')}</button>`
-    : `<a class="btn primary" href="binder?view=binder">${esc(mode === 'favorites' ? (collectionCopy.emptyFavoritesCta || 'Open Card Gallery') : (collectionCopy.emptyAllCta || 'Open Card Gallery'))}</a>`;
+    : `<a class="btn primary" href="gallery.html">${esc(mode === 'favorites' ? (collectionCopy.emptyFavoritesCta || 'Open Card Gallery') : (collectionCopy.emptyAllCta || 'Open Card Gallery'))}</a>`;
   if (mode === 'collection') {
     if (list.length && renderAlbumBinderSpread(wrap, list)) return;
     wrap.innerHTML = `<div class="empty-state"><h2>${esc(emptyTitle)}</h2><p>${esc(emptyLead)}</p>${emptyAction}</div>`;
@@ -1842,7 +1847,7 @@ function renderFavoritesShowcase() {
       : (collectionCopy.favoritesShowcaseEmptyLead || 'Star a card to put it on the Starlight stage. Your favorites will scroll here like a tiny idol parade.');
     const action = allFavorites.length
       ? `<button class="btn primary" type="button" data-reset-card-filters>${esc(collectionCopy.emptyFiltersCta || 'Reset Filters')}</button>`
-      : `<a class="btn primary" href="binder?view=binder">${esc(collectionCopy.favoritesShowcaseCta || 'Find Favorites')}</a>`;
+      : `<a class="btn primary" href="gallery.html">${esc(collectionCopy.favoritesShowcaseCta || 'Find Favorites')}</a>`;
     showcase.innerHTML = `<div class="empty-state trophy-empty"><h2>${esc(title)}</h2><p>${esc(lead)}</p>${action}</div>`;
     return;
   }

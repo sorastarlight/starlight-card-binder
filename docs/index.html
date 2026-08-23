@@ -1,6 +1,90 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Starlight Card Series Binder</title><meta http-equiv="refresh" content="0; url=binder?view=home"><link rel="canonical" href="binder?view=home"><script src="js/browser-performance.js?v=1.0.0" defer></script>
-    <link rel="stylesheet" href="css/shared-ui.css?v=1.6.15">
-<link rel="stylesheet" href="css/qol-ui.css?v=94.2.4">
-</head><body><p>Opening <a href="binder?view=home">Starlight Card Series Binder</a>...</p>    <script src="js/shared-ui.js?v=1.6.15"></script>
-<script src="js/qol-ui.js?v=94.2.4" defer></script>
-</body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Starlight Cards | Sora Starlight</title>
+  <link rel="icon" href="site_assets/Sora_Starlight_Logo_Primary.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/tcg/site.css?v=1.0">
+  <link rel="stylesheet" href="css/tcg/home.css?v=1.0">
+  <link rel="stylesheet" href="css/tcg/compat.css?v=1.0">
+  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.22">
+  <script src="js/browser-performance.js?v=1.0.0" defer></script>
+</head>
+<body class="page-home" data-page="home">
+  <div id="site-header"></div>
+  <main id="main">
+    <section class="featured" data-featured aria-roledescription="carousel" aria-label="Featured Starlight card">
+      <h1 class="visually-hidden">Starlight Cards: Rising Star</h1>
+      <div class="featured__bg" data-bg></div>
+      <div class="featured__copy">
+        <p class="series-kicker">Starlight Cards</p>
+        <p class="series-mark" data-series-name>Rising Star</p>
+        <div class="cta-row">
+          <a class="pill" data-series-link href="series.html">Go to the series page <span class="arrow">›</span></a>
+          <a class="pill" data-gallery-link href="gallery.html">See card gallery <span class="arrow">›</span></a>
+        </div>
+      </div>
+      <div class="featured__card-wrap">
+        <div class="featured__card" data-featured-card></div>
+        <p class="featured__name" data-featured-name></p>
+      </div>
+      <div class="featured-nav">
+        <button type="button" data-prev aria-label="Previous featured card">‹</button>
+        <button type="button" data-next aria-label="Next featured card">›</button>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>What's new!</h2>
+        <a href="news.html">See more news ›</a>
+      </div>
+      <div class="news-track" id="news" data-tcg-news="track"></div>
+    </section>
+
+    <section class="promos">
+      <article class="promo">
+        <div class="promo-copy">
+          <h2>Open your daily booster</h2>
+          <p>Claim a free Starlight booster every day, flip your pulls, and grow your cloud collection across devices.</p>
+          <a class="pill" href="daily-booster.html">Open daily booster <span class="arrow">›</span></a>
+        </div>
+        <div class="promo-art pack"></div>
+      </article>
+      <article class="promo">
+        <div class="promo-copy">
+          <h2>Starlight Album</h2>
+          <p>Every card you collect lives in My Album. Missing cards stay silhouetted until you earn them.</p>
+          <a class="pill" href="collection.html">Open my album <span class="arrow">›</span></a>
+        </div>
+        <div class="promo-art stage"></div>
+      </article>
+      <article class="promo">
+        <div class="promo-copy">
+          <h2>New to Starlight Cards?</h2>
+          <p>Browse the gallery, learn the rarities, then tear your first pack. Built for collectors who love sparkle.</p>
+          <a class="pill" href="about.html">How to collect <span class="arrow">›</span></a>
+        </div>
+        <div class="promo-art concert"></div>
+      </article>
+      <article class="promo">
+        <div class="promo-copy">
+          <h2>Starlight Shop</h2>
+          <p>Spend Star Bits on packs, singles, or gifts. Extra copies convert into bits — your last copy stays safe.</p>
+          <a class="pill" href="booster-shop.html">Visit the shop <span class="arrow">›</span></a>
+        </div>
+        <div class="promo-art skates"></div>
+      </article>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script type="module" src="js/tcg-chrome.js?v=1.0"></script>
+  <script type="module" src="js/pages/website-content-hydrate-page.js?v=1.2"></script>
+  <script type="module" src="js/tcg-home-featured.js?v=1.0"></script>
+  <script type="module" src="js/home-news.js?v=1.0"></script>
+</body>
+</html>
