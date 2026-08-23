@@ -1,140 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Evolve My Cards | Starlight Card Binder</title>
-  <link rel="icon" href="site_assets/Sora_Starlight_Logo_Primary.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/tcg/site.css?v=2.0">
-  <link rel="stylesheet" href="css/tcg/pages.css?v=2.0">
-  <link rel="stylesheet" href="css/tcg/compat.css?v=2.0">
-  <link rel="stylesheet" href="css/prestige-frames.css?v=3.8">
-  <link rel="stylesheet" href="css/pages/starlight-evolution.css?v=2.5.1">
-  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.22">
-  <link rel="stylesheet" href="css/qol-ui.css?v=94.2.11">
-  <script src="js/browser-performance.js?v=1.0.0" defer></script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
+<title>Evolve My Cards | Starlight Card Binder</title>
+<link href="css/style.css?v=1.0.3" rel="stylesheet"/>
+<link rel="stylesheet" href="css/shared-ui.css?v=1.6.19"/>
+<link rel="stylesheet" href="css/prestige-frames.css?v=3.8"/>
+<link rel="stylesheet" href="css/pages/starlight-evolution.css?v=2.5.1"/>
+<link rel="stylesheet" href="css/qol-ui.css?v=94.2.10"/>
+<script src="js/browser-performance.js?v=1.0.0" defer></script>
 </head>
-<body data-page="evolution">
-  <div id="site-header"></div>
-  <main id="main" class="starlight-evolution-page">
-    <header class="st-evo-hero panel">
-      <div class="st-evo-hero-copy">
-        <p class="eyebrow" data-content="starlightEvolution.eyebrow">My Stuff</p>
-        <h1 data-content="starlightEvolution.title">Evolve My Cards</h1>
-        <p class="st-evo-tagline" data-content="starlightEvolution.tagline">Infuse duplicate cards with Starlight Energy to awaken their true brilliance.</p>
-      </div>
-      <div class="st-evo-hero-actions">
-        <a class="btn primary" href="collection.html" data-content="starlightEvolution.collectionCta">Open My Starlight Album</a>
-      </div>
-    </header>
-  
-    <section class="prestige-legend st-evo-tier-showcase panel" aria-labelledby="st-evo-tiers-title">
-      <div class="prestige-legend-copy st-evo-tier-showcase-copy">
-        <p class="eyebrow" data-content="starlightEvolution.tiersLegendEyebrow">Starlight Evolution</p>
-        <h2 id="st-evo-tiers-title" data-content="starlightEvolution.tiersLegendTitle">Radiance tiers</h2>
-        <p data-content="starlightEvolution.tiersLegendLead">Each Evolution step spends duplicate extras and keeps one protected copy. Frames grow richer from Radiance I through the holographic Radiance V crown.</p>
-      </div>
-      <div class="st-evo-radiance-label-sources visually-hidden" aria-hidden="true">
-        <span data-content="starlightEvolution.prestigeStarBit">8 duplicates → ⭐ Radiance I</span>
-        <span data-content="starlightEvolution.prestigeProtostar">20 duplicates → ⭐⭐ Radiance II</span>
-        <span data-content="starlightEvolution.prestigeStarlight">45 duplicates → ⭐⭐⭐ Radiance III</span>
-        <span data-content="starlightEvolution.prestigeSuperStarlight">100 duplicates → ⭐⭐⭐⭐ Radiance IV</span>
-        <span data-content="starlightEvolution.prestigeStarlightBurst">220 duplicates → ⭐⭐⭐⭐⭐ Radiance V</span>
-      </div>
-      <div
-        class="st-evo-radiance-carousel"
-        id="st-evo-radiance-carousel"
-        role="region"
-        aria-roledescription="carousel"
-        aria-label="Radiance frame previews"
-        tabindex="0"
-      >
-        <div class="st-evo-radiance-viewport">
-          <div class="st-evo-radiance-stage" aria-live="polite"></div>
-          <div class="st-evo-radiance-floor" aria-hidden="true"></div>
-        </div>
-        <div class="st-evo-radiance-meta">
-          <span class="prestige-badge st-evo-radiance-active-badge prestige-star-bit">⭐ Radiance I</span>
-          <strong class="st-evo-radiance-active-cost" data-content="starlightEvolution.prestigeStarBit">8 duplicates → ⭐ Radiance I</strong>
-        </div>
-        <div class="st-evo-radiance-controls">
-          <button type="button" class="st-evo-radiance-nav st-evo-radiance-prev" aria-label="Previous Radiance tier">‹</button>
-          <div class="st-evo-radiance-dots" role="tablist" aria-label="Radiance tiers"></div>
-          <button type="button" class="st-evo-radiance-nav st-evo-radiance-next" aria-label="Next Radiance tier">›</button>
-        </div>
-      </div>
-    </section>
-  
-    <div class="st-evo-workspace">
-      <section class="st-evo-workbench panel st-evo-workbench-ready" aria-labelledby="st-evo-ready-title">
-        <header class="st-evo-workbench-head">
-          <div>
-            <h2 id="st-evo-ready-title" data-content="starlightEvolution.readyTitle">Ready to evolve</h2>
-            <p data-content="starlightEvolution.readyLead">Standard cards with enough duplicate extras for their next Radiance step appear here. Tap a card to Evolve in place.</p>
-          </div>
-        </header>
-        <p class="st-evo-status" id="st-evo-ready-status" role="status">Loading cards ready to evolve…</p>
-        <div class="st-evo-owned-grid st-evo-ready-grid" id="st-evo-ready-grid" hidden></div>
-      </section>
-  
-      <section class="st-evo-workbench panel st-evo-workbench-owned" aria-labelledby="st-evo-owned-title">
-        <header class="st-evo-workbench-head">
-          <div>
-            <h2 id="st-evo-owned-title" data-content="starlightEvolution.ownedTitle">Your evolved cards</h2>
-            <p data-content="starlightEvolution.ownedLead">Cards at Radiance I or higher live here. Open one to Evolve again or Unfuse extras.</p>
-          </div>
-        </header>
-        <p class="st-evo-status" id="st-evo-status" role="status">Loading your Evolution progress…</p>
-        <div class="st-evo-owned-grid" id="st-evo-owned-grid" hidden></div>
-      </section>
+<body data-page="starlight-evolution">
+<script src="js/embed-mode.js?v=1.1.4" type="module"></script>
+<div class="sky"></div>
+<main class="starlight-evolution-page">
+  <header class="st-evo-hero panel">
+    <div class="st-evo-hero-copy">
+      <p class="eyebrow" data-content="starlightEvolution.eyebrow">My Stuff</p>
+      <h1 data-content="starlightEvolution.title">Evolve My Cards</h1>
+      <p class="st-evo-tagline" data-content="starlightEvolution.tagline">Infuse duplicate cards with Starlight Energy to awaken their true brilliance.</p>
     </div>
-  
-    <section class="st-evo-guide panel" aria-labelledby="st-evo-how-title">
-      <h2 id="st-evo-how-title" data-content="starlightEvolution.howTitle">How Evolution works</h2>
-      <p data-content="starlightEvolution.howLead">Gather duplicate extras, pick a card below, and confirm Evolve. Your card upgrades to the next Radiance frame.</p>
-      <ol class="st-evo-steps">
-        <li>Collect duplicate copies beyond your protected first copy.</li>
-        <li>Open a card in Ready to evolve or Your evolved cards.</li>
-        <li>Confirm Evolve — extras are spent and the Radiance frame upgrades.</li>
-        <li>Unfuse later if you want a partial refund of spent extras.</li>
-      </ol>
-    </section>
-  </main>
-  <div id="site-footer"></div>
-  <div id="st-evo-result-modal" class="st-dialog-overlay st-evo-result-overlay hidden" aria-hidden="true">
-    <section class="st-dialog st-evo-result-dialog" role="dialog" aria-modal="true" aria-labelledby="st-evo-result-title" tabindex="-1">
-      <button id="st-evo-result-close" class="st-dialog-close" type="button" data-st-modal-close aria-label="Close">×</button>
-      <p class="st-evo-card-kicker">Starlight Evolution</p>
-      <h2 id="st-evo-result-title" class="st-evo-result-title">Evolution complete!</h2>
-      <div id="st-evo-result-body" class="st-dialog-content st-evo-result-body">
-        <div class="st-evo-result-showcase">
-          <div id="st-evo-result-aura" class="st-evo-result-aura" aria-hidden="true"></div>
-          <span id="st-evo-result-art" class="st-evo-result-art collection-image"></span>
+    <div class="st-evo-hero-actions">
+      <a class="btn primary" data-shell-view="collection" href="binder?view=collection" data-content="starlightEvolution.collectionCta">Open My Starlight Album</a>
+    </div>
+  </header>
+
+  <section class="prestige-legend st-evo-tier-showcase panel" aria-labelledby="st-evo-tiers-title">
+    <div class="prestige-legend-copy st-evo-tier-showcase-copy">
+      <p class="eyebrow" data-content="starlightEvolution.tiersLegendEyebrow">Starlight Evolution</p>
+      <h2 id="st-evo-tiers-title" data-content="starlightEvolution.tiersLegendTitle">Radiance tiers</h2>
+      <p data-content="starlightEvolution.tiersLegendLead">Each Evolution step spends duplicate extras and keeps one protected copy. Frames grow richer from Radiance I through the holographic Radiance V crown.</p>
+    </div>
+    <div class="st-evo-radiance-label-sources visually-hidden" aria-hidden="true">
+      <span data-content="starlightEvolution.prestigeStarBit">8 duplicates → ⭐ Radiance I</span>
+      <span data-content="starlightEvolution.prestigeProtostar">20 duplicates → ⭐⭐ Radiance II</span>
+      <span data-content="starlightEvolution.prestigeStarlight">45 duplicates → ⭐⭐⭐ Radiance III</span>
+      <span data-content="starlightEvolution.prestigeSuperStarlight">100 duplicates → ⭐⭐⭐⭐ Radiance IV</span>
+      <span data-content="starlightEvolution.prestigeStarlightBurst">220 duplicates → ⭐⭐⭐⭐⭐ Radiance V</span>
+    </div>
+    <div
+      class="st-evo-radiance-carousel"
+      id="st-evo-radiance-carousel"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Radiance frame previews"
+      tabindex="0"
+    >
+      <div class="st-evo-radiance-viewport">
+        <div class="st-evo-radiance-stage" aria-live="polite"></div>
+        <div class="st-evo-radiance-floor" aria-hidden="true"></div>
+      </div>
+      <div class="st-evo-radiance-meta">
+        <span class="prestige-badge st-evo-radiance-active-badge prestige-star-bit">⭐ Radiance I</span>
+        <strong class="st-evo-radiance-active-cost" data-content="starlightEvolution.prestigeStarBit">8 duplicates → ⭐ Radiance I</strong>
+      </div>
+      <div class="st-evo-radiance-controls">
+        <button type="button" class="st-evo-radiance-nav st-evo-radiance-prev" aria-label="Previous Radiance tier">‹</button>
+        <div class="st-evo-radiance-dots" role="tablist" aria-label="Radiance tiers"></div>
+        <button type="button" class="st-evo-radiance-nav st-evo-radiance-next" aria-label="Next Radiance tier">›</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="st-evo-workspace">
+    <section class="st-evo-workbench panel st-evo-workbench-ready" aria-labelledby="st-evo-ready-title">
+      <header class="st-evo-workbench-head">
+        <div>
+          <h2 id="st-evo-ready-title" data-content="starlightEvolution.readyTitle">Ready to evolve</h2>
+          <p data-content="starlightEvolution.readyLead">Standard cards with enough duplicate extras for their next Radiance step appear here. Tap a card to Evolve in place.</p>
         </div>
-        <p id="st-evo-result-tier" class="st-evo-result-tier" hidden></p>
-        <p id="st-evo-result-name" class="st-evo-result-name" hidden></p>
-      </div>
-      <div class="st-dialog-actions">
-        <button type="button" class="st-dialog-confirm" id="st-evo-result-done" data-st-modal-close>Continue</button>
-      </div>
+      </header>
+      <p class="st-evo-status" id="st-evo-ready-status" role="status">Loading cards ready to evolve…</p>
+      <div class="st-evo-owned-grid st-evo-ready-grid" id="st-evo-ready-grid" hidden></div>
+    </section>
+
+    <section class="st-evo-workbench panel st-evo-workbench-owned" aria-labelledby="st-evo-owned-title">
+      <header class="st-evo-workbench-head">
+        <div>
+          <h2 id="st-evo-owned-title" data-content="starlightEvolution.ownedTitle">Your evolved cards</h2>
+          <p data-content="starlightEvolution.ownedLead">Cards at Radiance I or higher live here. Open one to Evolve again or Unfuse extras.</p>
+        </div>
+      </header>
+      <p class="st-evo-status" id="st-evo-status" role="status">Loading your Evolution progress…</p>
+      <div class="st-evo-owned-grid" id="st-evo-owned-grid" hidden></div>
     </section>
   </div>
-  
-  <div id="st-evo-card-modal" class="st-dialog-overlay hidden" aria-hidden="true">
-    <section class="st-dialog st-evo-card-dialog" role="dialog" aria-modal="true" aria-labelledby="st-evo-card-title" tabindex="-1">
-      <button id="st-evo-card-close" class="st-dialog-close" type="button" data-st-modal-close aria-label="Close">×</button>
-      <p class="st-evo-card-kicker">Starlight Evolution</p>
-      <h2 id="st-evo-card-title">Card</h2>
-      <div id="st-evo-card-body" class="st-dialog-content"></div>
-    </section>
-  </div>
-  <script type="module" src="js/tcg-chrome.js?v=2.0"></script>
-  <script src="js/shared-ui.js?v=1.6.20"></script>
-  <script type="module" src="js/pages/website-content-hydrate-page.js?v=1.3"></script>
-  <script type="module" src="js/pages/starlight-evolution-page.js?v=2.3.1"></script>
-  <script src="js/qol-ui.js?v=94.2.9" defer></script>
+
+  <section class="st-evo-guide panel" aria-labelledby="st-evo-how-title">
+    <h2 id="st-evo-how-title" data-content="starlightEvolution.howTitle">How Evolution works</h2>
+    <p data-content="starlightEvolution.howLead">Gather duplicate extras, pick a card below, and confirm Evolve. Your card upgrades to the next Radiance frame.</p>
+    <ol class="st-evo-steps">
+      <li>Collect duplicate copies beyond your protected first copy.</li>
+      <li>Open a card in Ready to evolve or Your evolved cards.</li>
+      <li>Confirm Evolve — extras are spent and the Radiance frame upgrades.</li>
+      <li>Unfuse later if you want a partial refund of spent extras.</li>
+    </ol>
+  </section>
+</main>
+
+<div id="st-evo-result-modal" class="st-dialog-overlay st-evo-result-overlay hidden" aria-hidden="true">
+  <section class="st-dialog st-evo-result-dialog" role="dialog" aria-modal="true" aria-labelledby="st-evo-result-title" tabindex="-1">
+    <button id="st-evo-result-close" class="st-dialog-close" type="button" data-st-modal-close aria-label="Close">×</button>
+    <p class="st-evo-card-kicker">Starlight Evolution</p>
+    <h2 id="st-evo-result-title" class="st-evo-result-title">Evolution complete!</h2>
+    <div id="st-evo-result-body" class="st-dialog-content st-evo-result-body">
+      <div class="st-evo-result-showcase">
+        <div id="st-evo-result-aura" class="st-evo-result-aura" aria-hidden="true"></div>
+        <span id="st-evo-result-art" class="st-evo-result-art collection-image"></span>
+      </div>
+      <p id="st-evo-result-tier" class="st-evo-result-tier" hidden></p>
+      <p id="st-evo-result-name" class="st-evo-result-name" hidden></p>
+    </div>
+    <div class="st-dialog-actions">
+      <button type="button" class="st-dialog-confirm" id="st-evo-result-done" data-st-modal-close>Continue</button>
+    </div>
+  </section>
+</div>
+
+<div id="st-evo-card-modal" class="st-dialog-overlay hidden" aria-hidden="true">
+  <section class="st-dialog st-evo-card-dialog" role="dialog" aria-modal="true" aria-labelledby="st-evo-card-title" tabindex="-1">
+    <button id="st-evo-card-close" class="st-dialog-close" type="button" data-st-modal-close aria-label="Close">×</button>
+    <p class="st-evo-card-kicker">Starlight Evolution</p>
+    <h2 id="st-evo-card-title">Card</h2>
+    <div id="st-evo-card-body" class="st-dialog-content"></div>
+  </section>
+</div>
+
+<script src="js/shared-ui.js?v=1.6.20"></script>
+<script type="module" src="js/pages/website-content-hydrate-page.js?v=1.3"></script>
+<script type="module" src="js/pages/starlight-evolution-page.js?v=2.3.1"></script>
+<script src="js/qol-ui.js?v=94.2.9" defer></script>
 </body>
 </html>

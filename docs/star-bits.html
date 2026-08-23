@@ -1,88 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Star Bits Exchange | Starlight Card Binder</title>
-  <link rel="icon" href="site_assets/Sora_Starlight_Logo_Primary.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/tcg/site.css?v=2.0">
-  <link rel="stylesheet" href="css/tcg/pages.css?v=2.0">
-  <link rel="stylesheet" href="css/tcg/compat.css?v=2.0">
-  <link rel="stylesheet" href="css/pages/star-bits.css?v=1.8">
-  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.22">
-  <link rel="stylesheet" href="css/qol-ui.css?v=94.2.11">
-  <script src="js/browser-performance.js?v=1.0.0" defer></script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
+<title>Star Bits Exchange | Starlight Card Binder</title>
+<link href="css/style.css?v=1.0.2" rel="stylesheet"/>
+<link rel="stylesheet" href="css/pages/star-bits.css?v=1.8">
+<script src="js/browser-performance.js?v=1.0.0" defer></script>
+    <link rel="stylesheet" href="css/shared-ui.css?v=1.6.18">
+<link rel="stylesheet" href="css/qol-ui.css?v=94.2.8">
 </head>
-<body data-page="bits">
-  <div id="site-header"></div>
-  <main id="main" class="bits-page">
-  <section class="bits-panel">
-  <header class="bits-header">
-  <p class="eyebrow" data-content="starBits.eyebrow">Duplicate Card Exchange</p>
-  <h1><img class="star-bit-icon star-bit-icon--lg" src="site_assets/icons/star-bit.png?v=2" alt="" width="28" height="28" decoding="async"> <span data-content="starBits.title">Star Bits Exchange</span></h1>
-  <p data-content="starBits.lead">Extra copies can be converted into Star Bits. Your final copy of every card will always stay safely in your collection.</p>
-  </header>
-  
-  <section class="bits-summary hidden" id="summary-section">
-  <div class="summary-card"><strong class="star-bit-amount"><img class="star-bit-icon star-bit-icon--md" src="site_assets/icons/star-bit.png?v=2" alt="" width="20" height="20" decoding="async"><span id="balance-value">0</span></strong><span>Star Bits</span></div>
-  <div class="summary-card"><strong id="duplicate-card-types">0</strong><span>Cards With Extras</span></div>
-  <div class="summary-card"><strong id="duplicate-copy-count">0</strong><span>Duplicate Copies</span></div>
-  <div class="summary-card"><strong class="star-bit-amount"><img class="star-bit-icon star-bit-icon--md" src="site_assets/icons/star-bit.png?v=2" alt="" width="20" height="20" decoding="async"><span id="exchange-value">0</span></strong><span>Available Star Bits</span></div>
-  </section>
-  
-  <section class="rate-section hidden" id="rate-section">
-  <h2 data-content="starBits.ratesTitle">Exchange Values</h2>
-  <div class="rate-grid" id="rate-grid"></div>
-  </section>
-  
-  <section class="duplicate-section hidden qol-duplicate-section" id="duplicate-section">
-  <div class="duplicate-heading">
-    <div>
-      <p class="eyebrow" data-content="starBits.chooseTitle">Your Extra Copies</p>
-      <h2 data-content="starBits.chooseLead">Choose What to Exchange</h2>
-      <p data-content="starBits.chooseNote">One permanent copy of every card is automatically protected.</p>
-    </div>
-    <label class="qol-bulk-toggle">
-      <input id="select-all-toggle" class="qol-no-enhance" type="checkbox">
-      <span><strong>Select All Duplicates</strong><small>Select every extra copy while always keeping one permanent copy</small></span>
-      <span class="qol-switch-ui" aria-hidden="true"></span>
-    </label>
+<body><script src="js/embed-mode.js?v=1.1.1" type="module"></script>
+<div class="sky"></div>
+<main class="bits-page">
+<section class="bits-panel">
+<header class="bits-header">
+<p class="eyebrow" data-content="starBits.eyebrow">Duplicate Card Exchange</p>
+<h1><img class="star-bit-icon star-bit-icon--lg" src="site_assets/icons/star-bit.png?v=2" alt="" width="28" height="28" decoding="async"> <span data-content="starBits.title">Star Bits Exchange</span></h1>
+<p data-content="starBits.lead">Extra copies can be converted into Star Bits. Your final copy of every card will always stay safely in your collection.</p>
+</header>
+
+<section class="bits-summary hidden" id="summary-section">
+<div class="summary-card"><strong class="star-bit-amount"><img class="star-bit-icon star-bit-icon--md" src="site_assets/icons/star-bit.png?v=2" alt="" width="20" height="20" decoding="async"><span id="balance-value">0</span></strong><span>Star Bits</span></div>
+<div class="summary-card"><strong id="duplicate-card-types">0</strong><span>Cards With Extras</span></div>
+<div class="summary-card"><strong id="duplicate-copy-count">0</strong><span>Duplicate Copies</span></div>
+<div class="summary-card"><strong class="star-bit-amount"><img class="star-bit-icon star-bit-icon--md" src="site_assets/icons/star-bit.png?v=2" alt="" width="20" height="20" decoding="async"><span id="exchange-value">0</span></strong><span>Available Star Bits</span></div>
+</section>
+
+<section class="rate-section hidden" id="rate-section">
+<h2 data-content="starBits.ratesTitle">Exchange Values</h2>
+<div class="rate-grid" id="rate-grid"></div>
+</section>
+
+<section class="duplicate-section hidden qol-duplicate-section" id="duplicate-section">
+<div class="duplicate-heading">
+  <div>
+    <p class="eyebrow" data-content="starBits.chooseTitle">Your Extra Copies</p>
+    <h2 data-content="starBits.chooseLead">Choose What to Exchange</h2>
+    <p data-content="starBits.chooseNote">One permanent copy of every card is automatically protected.</p>
   </div>
-  
-  <section class="exchange-box exchange-box-top hidden" id="exchange-box">
-    <div class="exchange-box-copy">
-      <h2 data-content="starBits.exchangeTitle">Conversion Available</h2>
-      <p id="exchange-description">Select the duplicate cards and quantities you want to convert.</p>
-      <p class="exchange-note" data-content="starBits.exchangeNote">One permanent copy of every card is protected.</p>
+  <label class="qol-bulk-toggle">
+    <input id="select-all-toggle" class="qol-no-enhance" type="checkbox">
+    <span><strong>Select All Duplicates</strong><small>Select every extra copy while always keeping one permanent copy</small></span>
+    <span class="qol-switch-ui" aria-hidden="true"></span>
+  </label>
+</div>
+
+<section class="exchange-box exchange-box-top hidden" id="exchange-box">
+  <div class="exchange-box-copy">
+    <h2 data-content="starBits.exchangeTitle">Conversion Available</h2>
+    <p id="exchange-description">Select the duplicate cards and quantities you want to convert.</p>
+    <p class="exchange-note" data-content="starBits.exchangeNote">One permanent copy of every card is protected.</p>
+  </div>
+  <div class="exchange-box-actions">
+    <div class="selected-summary" id="selected-summary">0 copies selected · 0 Star Bits</div>
+    <div class="selection-toolbar-actions">
+      <button class="exchange-button secondary" id="clear-duplicate-selection" type="button">Clear Selection</button>
+      <button class="exchange-button" id="exchange-button" type="button" data-content="starBits.exchangeCta" disabled>Convert All Selected</button>
     </div>
-    <div class="exchange-box-actions">
-      <div class="selected-summary" id="selected-summary">0 copies selected · 0 Star Bits</div>
-      <div class="selection-toolbar-actions">
-        <button class="exchange-button secondary" id="clear-duplicate-selection" type="button">Clear Selection</button>
-        <button class="exchange-button" id="exchange-button" type="button" data-content="starBits.exchangeCta" disabled>Convert All Selected</button>
-      </div>
-    </div>
-  </section>
-  
-  <div class="duplicate-grid" id="duplicate-grid"></div>
-  </section>
-  
-  <section class="empty-state hidden" id="empty-state">
-  <h2 data-content="starBits.emptyTitle">No Duplicates Available</h2>
-  <p data-content="starBits.emptyLead">Your extra copies will appear here after opening Daily Boosters and reward packs.</p>
-  </section>
-  
-  <p aria-live="polite" class="page-status" id="page-status" role="status">Loading your Star Bits exchange…</p>
-  </section>
-  </main>
-  <div id="site-footer"></div>
-  <script type="module" src="js/tcg-chrome.js?v=2.0"></script>
-  <script type="module" src="js/pages/website-content-hydrate-page.js?v=1.2"></script>
-  <script src="js/pages/star-bits-page.js?v=1.7" type="module"></script>
-  <script src="js/shared-ui.js?v=1.6.15"></script>
-  <script src="js/qol-ui.js?v=94.2.8" defer></script>
+  </div>
+</section>
+
+<div class="duplicate-grid" id="duplicate-grid"></div>
+</section>
+
+<section class="empty-state hidden" id="empty-state">
+<h2 data-content="starBits.emptyTitle">No Duplicates Available</h2>
+<p data-content="starBits.emptyLead">Your extra copies will appear here after opening Daily Boosters and reward packs.</p>
+</section>
+
+<p aria-live="polite" class="page-status" id="page-status" role="status">Loading your Star Bits exchange…</p>
+</section>
+</main>
+<script type="module" src="js/pages/website-content-hydrate-page.js?v=1.2"></script>
+<script src="js/pages/star-bits-page.js?v=1.7" type="module"></script>
+<script src="js/shared-ui.js?v=1.6.15"></script>
+<script src="js/qol-ui.js?v=94.2.8" defer></script>
 </body>
 </html>

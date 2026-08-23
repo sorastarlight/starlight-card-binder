@@ -287,12 +287,11 @@ test('website editor admin page and public hooks are wired', async () => {
     embed,
     shell,
     routes,
-    pageHref,
     home,
     about,
     socials,
     login,
-    gallery,
+    binder,
     daily,
     shop,
     events,
@@ -322,12 +321,11 @@ test('website editor admin page and public hooks are wired', async () => {
     read('docs/js/embed-mode.js'),
     read('docs/js/app-shell.js'),
     read('docs/js/shell-route-utils.js'),
-    read('docs/js/page-href.js'),
-    read('docs/index.html'),
+    read('docs/home.html'),
     read('docs/about.html'),
     read('docs/socials.html'),
     read('docs/login.html'),
-    read('docs/gallery.html'),
+    read('docs/binder.html'),
     read('docs/daily-booster.html'),
     read('docs/booster-shop.html'),
     read('docs/events.html'),
@@ -364,19 +362,16 @@ test('website editor admin page and public hooks are wired', async () => {
   assert.match(hydrate, /\.social-links/);
   assert.match(hub, /admin-website\.html/);
   assert.match(hub, /Website Editor/);
-  assert.match(embed, /routeForUrl/);
-  assert.match(embed, /legacyBinderRedirectUrl|binder\.html/);
-  assert.match(pageHref, /'admin-website':\s*'admin-website\.html'/);
+  assert.match(embed, /'admin-website\.html':'admin-website'/);
   assert.match(shell, /'admin-website':\{title:'Website Editor'/);
   assert.match(routes, /'admin-website'/);
-  assert.match(home, /data-page="home"|class="page-home"/);
-  assert.match(home, /gallery\.html/);
-  assert.match(home, /daily-booster\.html/);
+  assert.match(home, /data-content="home\.title"/);
+  assert.match(home, /data-content="home\.primaryCta"/);
+  assert.match(home, /data-content="home\.newsLoading"/);
   assert.match(home, /website-content-hydrate-page\.js\?v=1\.2/);
-  assert.match(home, /tcg-home-featured\.js/);
   assert.match(about, /data-content="about\.lead"/);
   assert.match(about, /data-content="about\.seriesLoading"/);
-  assert.match(about, /tcg-chrome\.js/);
+  assert.match(about, /shared\.infoStripCollection/);
   assert.match(about, /website-content-hydrate-page\.js\?v=1\.2/);
   assert.match(socials, /id="socialLinks"/);
   assert.match(socials, /class="[^"]*social-links/);
@@ -386,7 +381,7 @@ test('website editor admin page and public hooks are wired', async () => {
   assert.match(loginPage, /loginCopy/);
   assert.match(loginPage, /getCachedWebsiteContent/);
   assert.match(loginPage, /starlight-website-content-hydrated/);
-  assert.match(gallery, /id="seriesHeroTitle"/);
+  assert.match(binder, /id="seriesHeroTitle"/);
   assert.match(app, /function renderSeriesHero\(/);
   assert.match(daily, /data-content="daily\.title"/);
   assert.match(daily, /data-content="daily\.signInCta"/);
@@ -397,9 +392,10 @@ test('website editor admin page and public hooks are wired', async () => {
   assert.match(events, /data-content="events\.emptyTitle"|data-content="events\.loading"/);
   assert.match(redeem, /data-content="redeem\.submitCta"/);
   assert.match(collection, /data-content="collection\.title"/);
-  assert.match(collection, /tcg-chrome\.js/);
+  assert.match(collection, /shared\.infoStripCollection/);
   assert.match(starBits, /data-content="starBits\.title"/);
   assert.match(checklist, /data-content="checklist\.title"/);
+  assert.match(checklist, /shared\.infoStripCopyright/);
   assert.match(trades, /data-content="trades\.title"/);
   assert.match(trades, /data-content="trades\.hubTabCollectors"/);
   assert.match(trades, /data-hub-view="my-trade"/);

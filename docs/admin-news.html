@@ -1,68 +1,62 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>News & Updates Management</title>
-  <link rel="icon" href="site_assets/Sora_Starlight_Logo_Primary.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/tcg/site.css?v=2.0">
-  <link rel="stylesheet" href="css/tcg/pages.css?v=2.0">
-  <link rel="stylesheet" href="css/tcg/compat.css?v=2.0">
-  <link rel="stylesheet" href="css/tcg/admin.css?v=2.0">
+  <link rel="stylesheet" href="css/style.css?v=1.0.2">
+  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.15">
   <link rel="stylesheet" href="css/pages/admin-news.css?v=1.1">
-  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.22">
-  <link rel="stylesheet" href="css/qol-ui.css?v=94.2.11">
+    <link rel="stylesheet" href="css/qol-ui.css?v=94.2.4">
   <script src="js/browser-performance.js?v=1.0.0" defer></script>
 </head>
-<body data-page="admin">
-  <div id="site-header"></div>
-  <main id="main" class="page">
-      <section class="panel">
-        <p class="eyebrow">Administration Hub</p>
-        <div class="toolbar">
-          <div>
-            <h1>News & Updates Management</h1>
-            <p class="lead">Publish announcements, development notes, event news, and featured updates to the Home page.</p>
-          </div>
-          <button id="newPost" class="btn primary" type="button">＋ New Update</button>
+<body>
+  <script src="js/embed-mode.js" type="module"></script>
+  <div class="sky"></div>
+  <main class="page">
+    <section class="panel">
+      <p class="eyebrow">Administration Hub</p>
+      <div class="toolbar">
+        <div>
+          <h1>News & Updates Management</h1>
+          <p class="lead">Publish announcements, development notes, event news, and featured updates to the Home page.</p>
         </div>
-        <p id="status" class="status" role="status">Loading news posts…</p>
-        <div id="list" class="list"></div>
-      </section>
-    </main>
-  <div id="site-footer"></div>
+        <button id="newPost" class="btn primary" type="button">＋ New Update</button>
+      </div>
+      <p id="status" class="status" role="status">Loading news posts…</p>
+      <div id="list" class="list"></div>
+    </section>
+  </main>
+
   <div id="editor" class="st-dialog-overlay editor hidden" aria-hidden="true">
-      <section class="st-dialog st-dialog--xl card" role="dialog" aria-modal="true" aria-labelledby="editorTitle" tabindex="-1">
-        <button type="button" class="st-dialog-close" id="close" data-st-modal-close aria-label="Close">×</button>
-        <div class="toolbar">
-          <h2 id="editorTitle">New Update</h2>
+    <section class="st-dialog st-dialog--xl card" role="dialog" aria-modal="true" aria-labelledby="editorTitle" tabindex="-1">
+      <button type="button" class="st-dialog-close" id="close" data-st-modal-close aria-label="Close">×</button>
+      <div class="toolbar">
+        <h2 id="editorTitle">New Update</h2>
+      </div>
+      <div class="grid">
+        <div class="field full"><label>Title<input id="title" maxlength="160"></label></div>
+        <div class="field full"><label>Short summary<input id="summary" maxlength="300"></label></div>
+        <div class="field full"><label>Full update<textarea id="body"></textarea></label></div>
+        <div class="field full">
+          <label>Header image URL<input id="imageUrl" placeholder="Upload or paste an image URL"></label>
+          <label class="btn upload-button">Browse & Upload Image<input id="imageFile" type="file" accept="image/*" hidden></label>
+          <img id="preview" class="preview" alt="Selected news header preview" hidden>
         </div>
-        <div class="grid">
-          <div class="field full"><label>Title<input id="title" maxlength="160"></label></div>
-          <div class="field full"><label>Short summary<input id="summary" maxlength="300"></label></div>
-          <div class="field full"><label>Full update<textarea id="body"></textarea></label></div>
-          <div class="field full">
-            <label>Header image URL<input id="imageUrl" placeholder="Upload or paste an image URL"></label>
-            <label class="btn upload-button">Browse & Upload Image<input id="imageFile" type="file" accept="image/*" hidden></label>
-            <img id="preview" class="preview" alt="Selected news header preview" hidden>
-          </div>
-          <div class="field"><label>Publish date<input id="publishedAt" type="datetime-local"></label></div>
-          <div class="field checks">
-            <label><input id="published" type="checkbox" checked> Published</label>
-            <label><input id="pinned" type="checkbox"> Pin as featured</label>
-          </div>
+        <div class="field"><label>Publish date<input id="publishedAt" type="datetime-local"></label></div>
+        <div class="field checks">
+          <label><input id="published" type="checkbox" checked> Published</label>
+          <label><input id="pinned" type="checkbox"> Pin as featured</label>
         </div>
-        <div class="actions editor-actions">
-          <button id="save" class="btn primary" type="button">Save Update</button>
-          <button id="delete" class="btn danger" type="button" hidden>Delete</button>
-        </div>
-        <p id="editorStatus" class="status" role="status"></p>
-      </section>
-    </div>
-  <script type="module" src="js/tcg-chrome.js?v=2.0"></script>
+      </div>
+      <div class="actions editor-actions">
+        <button id="save" class="btn primary" type="button">Save Update</button>
+        <button id="delete" class="btn danger" type="button" hidden>Delete</button>
+      </div>
+      <p id="editorStatus" class="status" role="status"></p>
+    </section>
+  </div>
+
   <script src="js/shared-ui.js?v=1.6.15"></script>
   <script type="module" src="js/pages/admin-news-page.js?v=1.1"></script>
   <script src="js/qol-ui.js?v=94.2.4" defer></script>

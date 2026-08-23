@@ -1,144 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Import Collection | Starlight Card Binder</title>
-  <link rel="icon" href="site_assets/Sora_Starlight_Logo_Primary.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/tcg/site.css?v=2.0">
-  <link rel="stylesheet" href="css/tcg/pages.css?v=2.0">
-  <link rel="stylesheet" href="css/tcg/compat.css?v=2.0">
-  <link rel="stylesheet" href="css/pages/import-collection.css?v=1.1">
-  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.22">
-  <link rel="stylesheet" href="css/qol-ui.css?v=94.2.11">
-  <script src="js/browser-performance.js?v=1.0.0" defer></script>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Import Collection | Starlight Card Binder
+    </title>
+
+    <link rel="stylesheet" href="css/pages/import-collection.css?v=1.1">
+<script src="js/browser-performance.js?v=1.0.0" defer></script>
+    <link rel="stylesheet" href="css/shared-ui.css?v=1.6.15">
+<link rel="stylesheet" href="css/qol-ui.css?v=94.2.4">
 </head>
-<body data-page="import">
-  <div id="site-header"></div>
-  <main id="main">
-          <section class="panel">
-              <h1>
-                  Import Your Collection
-              </h1>
-  
-              <p class="intro">
-                  Copy the cards already saved in this browser
-                  into your Starlight account so your collection
-                  can follow you between devices.
-              </p>
-  
-              <div
-                  id="account-box"
-                  class="account-box"
-              >
-                  <h2>Account</h2>
-  
-                  <p id="account-status">
-                      Checking your account...
-                  </p>
-              </div>
-  
-              <div
-                  id="local-summary"
-                  class="summary-box hidden"
-              >
-                  <h2>
-                      Browser Collection Found
-                  </h2>
-  
-                  <p id="local-summary-text"></p>
-  
-                  <p class="warning">
-                      Importing is additive. It will not delete
-                      cards already saved in your account, and
-                      your browser copy will remain untouched.
-                  </p>
-  
-                  <div
-                      id="local-card-grid"
-                      class="card-grid"
-                  ></div>
-              </div>
-  
-              <div
-                  id="no-local-collection"
-                  class="summary-box hidden"
-              >
-                  <h2>
-                      No Browser Collection Found
-                  </h2>
-  
-                  <p>
-                      This browser does not currently contain
-                      an older V79.9 collection to import.
-                  </p>
-              </div>
-  
-              <div
-                  id="cloud-summary"
-                  class="cloud-box hidden"
-              >
-                  <h2>
-                      Cloud Collection
-                  </h2>
-  
-                  <p id="cloud-summary-text"></p>
-  
-                  <div
-                      id="cloud-card-grid"
-                      class="card-grid"
-                  ></div>
-              </div>
-  
-              <div class="button-row">
-                  <button
-                      id="import-button"
-                      class="primary-button hidden"
-                      type="button"
-                  >
-                      Import My Collection
-                  </button>
-  
-                  <button
-                      id="refresh-button"
-                      class="secondary-button"
-                      type="button"
-                  >
-                      Refresh Cloud Collection
-                  </button>
-  
-                  <a
-                      class="button-link secondary-button"
-                      href="gallery.html"
-                  >
-                      Return to Binder
-                  </a>
-  
-                  <a
-                      id="sign-in-link"
-                      class="button-link primary-button hidden"
-                      href="login.html?mode=signin"
-                      target="_top"
-                  >
-                      Sign In
-                  </a>
-              </div>
-  
-              <p
-                  id="page-status"
-                  class="status"
-                  role="status"
-                  aria-live="polite"
-              ></p>
-          </section>
-      </main>
-  <div id="site-footer"></div>
-  <script type="module" src="js/tcg-chrome.js?v=2.0"></script>
-  <script type="module" src="js/pages/import-collection-page.js?v=1.0"></script>
-  <script src="js/shared-ui.js?v=1.6.15"></script>
-  <script src="js/qol-ui.js?v=94.2.4" defer></script>
+
+<body>
+    <main>
+        <section class="panel">
+            <h1>
+                Import Your Collection
+            </h1>
+
+            <p class="intro">
+                Copy the cards already saved in this browser
+                into your Starlight account so your collection
+                can follow you between devices.
+            </p>
+
+            <div
+                id="account-box"
+                class="account-box"
+            >
+                <h2>Account</h2>
+
+                <p id="account-status">
+                    Checking your account...
+                </p>
+            </div>
+
+            <div
+                id="local-summary"
+                class="summary-box hidden"
+            >
+                <h2>
+                    Browser Collection Found
+                </h2>
+
+                <p id="local-summary-text"></p>
+
+                <p class="warning">
+                    Importing is additive. It will not delete
+                    cards already saved in your account, and
+                    your browser copy will remain untouched.
+                </p>
+
+                <div
+                    id="local-card-grid"
+                    class="card-grid"
+                ></div>
+            </div>
+
+            <div
+                id="no-local-collection"
+                class="summary-box hidden"
+            >
+                <h2>
+                    No Browser Collection Found
+                </h2>
+
+                <p>
+                    This browser does not currently contain
+                    an older V79.9 collection to import.
+                </p>
+            </div>
+
+            <div
+                id="cloud-summary"
+                class="cloud-box hidden"
+            >
+                <h2>
+                    Cloud Collection
+                </h2>
+
+                <p id="cloud-summary-text"></p>
+
+                <div
+                    id="cloud-card-grid"
+                    class="card-grid"
+                ></div>
+            </div>
+
+            <div class="button-row">
+                <button
+                    id="import-button"
+                    class="primary-button hidden"
+                    type="button"
+                >
+                    Import My Collection
+                </button>
+
+                <button
+                    id="refresh-button"
+                    class="secondary-button"
+                    type="button"
+                >
+                    Refresh Cloud Collection
+                </button>
+
+                <a
+                    class="button-link secondary-button"
+                    href="./binder?view=binder"
+                >
+                    Return to Binder
+                </a>
+
+                <a
+                    id="sign-in-link"
+                    class="button-link primary-button hidden"
+                    href="./binder?view=login&amp;mode=signin"
+                    target="_top"
+                    data-shell-view="login"
+                >
+                    Sign In
+                </a>
+            </div>
+
+            <p
+                id="page-status"
+                class="status"
+                role="status"
+                aria-live="polite"
+            ></p>
+        </section>
+    </main>
+
+    <script type="module" src="js/pages/import-collection-page.js?v=1.0"></script>
+    <script src="js/shared-ui.js?v=1.6.15"></script>
+<script src="js/qol-ui.js?v=94.2.4" defer></script>
 </body>
 </html>

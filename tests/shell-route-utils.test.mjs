@@ -49,20 +49,19 @@ test('notification params normalize gift and event aliases', () => {
     source_key: 'received:ignored'
   }), { giftId: 'abc', event: 'evt-1', rewardId: 'abc', eventId: 'evt-1' });
   const rewardsUrl = new URL(shellNotificationUrl({ route: 'rewards', route_params: { rewardId: 'rr-1' } }), 'https://starlight.local/');
-  assert.equal(rewardsUrl.pathname.endsWith('received-rewards.html'), true);
+  assert.equal(rewardsUrl.searchParams.get('view'), 'rewards');
   assert.equal(rewardsUrl.searchParams.get('rewardId'), 'rr-1');
   assert.equal(extractShellRouteKey('/docs/binder.html?view=collection'), 'collection');
   assert.equal(extractShellRouteKey('/docs/binder?view=shop'), 'shop');
   assert.equal(extractShellRouteKey('/docs/binder'), 'binder');
 });
 
-test('shellHref builds standalone page routes with extra params', () => {
-  assert.equal(shellHref('home'), 'index.html');
-  assert.equal(shellHref('collector', { username: 'sora' }), 'collector.html?username=sora');
-  assert.equal(shellHref('binder'), 'gallery.html');
+test('shellHref builds extensionless binder routes with extra params', () => {
+  assert.equal(shellHref('home'), 'binder?view=home');
+  assert.equal(shellHref('collector', { username: 'sora' }), 'binder?view=collector&username=sora');
 });
 
-test('loginShellHref builds login page routes', () => {
-  assert.equal(loginShellHref('signin'), 'login.html?mode=signin');
-  assert.equal(loginShellHref('signup'), 'login.html?mode=signup');
+test('loginShellHref builds shell login routes', () => {
+  assert.equal(loginShellHref('signin'), 'binder?view=login&mode=signin');
+  assert.equal(loginShellHref('signup'), 'binder?view=login&mode=signup');
 });

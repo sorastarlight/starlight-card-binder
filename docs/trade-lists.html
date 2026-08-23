@@ -1,238 +1,232 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Trade With Others | Starlight Card Binder</title>
-  <link rel="icon" href="site_assets/Sora_Starlight_Logo_Primary.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/tcg/site.css?v=2.0">
-  <link rel="stylesheet" href="css/tcg/pages.css?v=2.0">
-  <link rel="stylesheet" href="css/tcg/compat.css?v=2.0">
+  <link rel="stylesheet" href="css/style.css?v=1.0.2">
+  <link rel="stylesheet" href="css/app-shell.css?v=1.2.1">
+  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.15">
+  <link rel="stylesheet" href="css/pages/trade-lists.css?v=2.0.0">
   <link rel="stylesheet" href="css/pages/trade-offers.css?v=1.4.3">
   <link rel="stylesheet" href="css/pages/user-rankings.css?v=1.2.0">
   <link rel="stylesheet" href="css/avatar-frames.css?v=1.3.0">
-  <link rel="stylesheet" href="css/pages/trade-lists.css?v=2.0.0">
-  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.22">
-  <link rel="stylesheet" href="css/qol-ui.css?v=94.2.11">
+  <link rel="stylesheet" href="css/qol-ui.css?v=94.2.8">
   <script src="js/browser-performance.js?v=1.0.0" defer></script>
 </head>
-<body data-page="trades">
-  <div id="site-header"></div>
-  <main id="main" class="trade-page trade-hub-page">
-      <section class="trade-head">
-        <p class="eyebrow" data-content="trades.eyebrow">Collector Exchange</p>
-        <h1 data-content="trades.title">🤝 Trade With Others</h1>
-        <p data-content="trades.lead">Find collectors, list duplicates for trade, propose exchanges, and track your offers — all in one place.</p>
-      </section>
-  
-      <nav class="trade-hub-tabs" role="tablist" aria-label="Trade With Others views">
-        <button type="button" class="active" data-hub-view="collectors" aria-selected="true" data-content="trades.hubTabCollectors">Find Collectors</button>
-        <button type="button" data-hub-view="my-trade" aria-selected="false" data-content="trades.hubTabMyTrade">My Cards For Trade</button>
-        <button type="button" data-hub-view="open-trades" aria-selected="false" data-content="trades.hubTabOpenTrades">Browse Open Trades</button>
-        <button type="button" data-hub-view="progress" aria-selected="false" data-content="trades.hubTabProgress">
-          My Trades In-Progress
-          <span class="trade-hub-tab-badge" data-hub-progress-badge hidden aria-label="Pending incoming offers">0</span>
-        </button>
-      </nav>
-  
-      <section class="trade-hub-panel trade-hub-panel-collectors rankings-page" data-hub-panel="collectors">
-        <section class="rankings-toolbar" aria-label="Collector search">
-          <div class="rankings-toolbar-row">
-            <label class="rankings-search" for="rankingsSearch">
-              <span data-content="rankings.searchLabel">Search collectors</span>
-              <input id="rankingsSearch" type="search" placeholder="Display name or username…" autocomplete="off" aria-controls="rankingsList" data-content-placeholder="rankings.searchPlaceholder">
-            </label>
-            <label class="rankings-sort" for="rankingsSort">
-              <span data-content="rankings.sortLabel">Sort</span>
-              <select id="rankingsSort">
-                <option value="level" selected data-content="rankings.sortLevel">Highest level</option>
-                <option value="collection" data-content="rankings.sortCollection">Collection %</option>
-                <option value="unique" data-content="rankings.sortUnique">Most unique cards</option>
-                <option value="name" data-content="rankings.sortName">Display name A–Z</option>
-              </select>
-            </label>
-          </div>
-          <p id="rankingsMeta" class="rankings-meta" aria-live="polite"></p>
-        </section>
-  
-        <div id="rankingsStatus" class="rankings-status" role="status">
-          <h2 data-content="rankings.loadingTitle">Loading rankings…</h2>
-          <p data-content="rankings.loadingLead">Gathering public collectors.</p>
-        </div>
-  
-        <ol id="rankingsList" class="rankings-list" aria-label="Collector rankings"></ol>
-        <div id="rankingsPager" class="rankings-pager" hidden></div>
-        <div id="rankingsLive" class="visually-hidden" aria-live="polite"></div>
-  
-        <div class="trade-propose-sheet trade-box" data-collectors-propose hidden>
-          <header class="trading-section-head trading-section-head-compact">
-            <button type="button" class="trade-propose-back st-button" data-propose-close>← Back to collectors</button>
-            <h2 data-content="trades.proposeTitle">Propose A Trade</h2>
-            <p data-content="trades.proposeLead">Pick a collector, choose cards from each side, and send your offer.</p>
-          </header>
-          <div class="composer">
-            <div data-propose-head></div>
-            <div data-propose-missing class="empty">
-              <p data-content="offers.composeEmpty">Search for a collector by username, display name, or email to start a trade offer.</p>
-              <div class="recipient-lookup">
-                <div class="recipient-search">
-                  <label for="proposeRecipientUsername">
-                    <span class="visually-hidden">Search collectors</span>
-                    <input id="proposeRecipientUsername" data-propose-recipient type="search" placeholder="Username, display name, or email…" aria-label="Search collectors by username, display name, or email" aria-autocomplete="list" aria-controls="proposeRecipientResults" aria-expanded="false" autocomplete="off">
-                  </label>
-                  <div id="proposeRecipientResults" data-propose-results class="recipient-results" role="listbox" hidden></div>
-                </div>
-                <button data-propose-load class="primary" type="button" data-content="offers.composeCta">Start Trade</button>
-              </div>
-            </div>
-            <div data-propose-form hidden>
-              <div class="trade-columns">
-                <div class="pick-panel">
-                  <h3 data-content="offers.yourOffer">Your Offer</h3>
-                  <label class="pick-search" for="proposeMyCardsSearch">
-                    <span class="visually-hidden">Search your offered cards</span>
-                    <input id="proposeMyCardsSearch" data-propose-my-search type="search" placeholder="Search your cards…" aria-label="Search your offered cards">
-                  </label>
-                  <div data-propose-my-cards class="pick-grid"></div>
-                </div>
-                <div class="pick-panel">
-                  <h3 data-content="offers.youRequest">You Request</h3>
-                  <label class="pick-search" for="proposeTheirCardsSearch">
-                    <span class="visually-hidden">Search their cards</span>
-                    <input id="proposeTheirCardsSearch" data-propose-their-search type="search" placeholder="Search their cards…" aria-label="Search their cards">
-                  </label>
-                  <div data-propose-their-cards class="pick-grid"></div>
-                </div>
-              </div>
-              <aside data-propose-summary class="offer-summary" hidden aria-live="polite"></aside>
-              <label class="propose-note-label">
-                <b>Optional note</b>
-                <textarea data-propose-note maxlength="300" placeholder="Add a friendly message…"></textarea>
-              </label>
-              <button data-propose-send class="primary" type="button" disabled data-content="offers.sendCta">Send Trade Offer</button>
-            </div>
-          </div>
-          <p data-propose-status class="status" role="status"></p>
-        </div>
-      </section>
-  
-      <section class="trade-hub-panel trade-hub-panel-my-trade" data-hub-panel="my-trade" hidden>
-        <header class="trade-manage-head trading-section-head">
-          <h2 data-content="trades.manageTitle">Cards Available for Trade</h2>
-          <p data-content="trades.manageLead">Manage the cards you currently have available and choose duplicates from your collection to offer for trade.</p>
-        </header>
-  
-        <section class="trade-panel trade-panel-listed">
-          <header class="trading-section-head trading-section-head-compact">
-            <h3 data-content="trades.listedTitle">Available for Trade</h3>
-            <p data-content="trades.listedLead">These duplicate copies are visible to other collectors browsing your profile.</p>
-            <p class="trade-listed-count" data-listed-count aria-live="polite">Nothing listed yet</p>
-          </header>
-          <div class="trade-section-toolbar">
-            <div data-listed-view-toggle></div>
-          </div>
-          <div id="listedForTradeGrid" class="trade-listed-grid" data-view="list" aria-live="polite"></div>
-        </section>
-  
-        <section class="trade-panel trade-panel-collection">
-          <header class="trading-section-head trading-section-head-compact">
-            <h3 data-content="trades.albumTitle">Add Cards from My Collection</h3>
-            <p data-content="trades.albumLead">Select cards you own, choose how many duplicate copies to list, then save your trade list.</p>
-          </header>
-          <div class="trade-collection-tools">
-            <label class="trade-search-label" for="tradeSearch">
-              <span class="visually-hidden">Search cards</span>
-              <input id="tradeSearch" type="search" placeholder="Search names or numbers…" aria-label="Search cards">
-            </label>
-            <label class="trade-filter-label" for="tradeSeriesFilter">
-              <span>Series</span>
-              <select id="tradeSeriesFilter" aria-label="Filter by series">
-                <option value="">All Series</option>
-              </select>
-            </label>
-            <label class="trade-filter-label" for="tradeRarityFilter">
-              <span>Rarity</span>
-              <select id="tradeRarityFilter" aria-label="Filter by rarity">
-                <option value="">All Rarities</option>
-              </select>
-            </label>
-            <label class="trade-filter-label" for="tradeSort">
-              <span>Sort</span>
-              <select id="tradeSort" aria-label="Sort cards">
-                <option value="number" selected>Card number</option>
-                <option value="name">Name</option>
-                <option value="rarity">Rarity</option>
-                <option value="quantity">Extra copies</option>
-              </select>
-            </label>
-            <label class="trade-duplicates-toggle">
-              <input id="tradeDuplicatesOnly" type="checkbox">
-              <span>Show only cards with duplicates</span>
-            </label>
-            <div data-collection-view-toggle></div>
-            <label class="privacy-toggle">
-              <input id="publicLists" type="checkbox" checked>
-              Show trade lists on my public profile
-            </label>
-          </div>
-          <div id="tradeAlbumGrid" class="trade-collection-grid" data-view="grid" aria-live="polite"></div>
-        </section>
-  
-        <aside class="trade-batch-bar" data-trade-batch hidden aria-live="polite">
-          <div class="trade-batch-copy">
-            <strong data-batch-card-count>0 cards selected</strong>
-            <span data-batch-copy-count>0 copies to list</span>
-          </div>
-          <div class="trade-batch-actions">
-            <button type="button" class="st-button" data-batch-clear>Clear</button>
-            <button type="button" class="st-button" data-batch-review>Review Trade List</button>
-            <button type="button" class="st-button primary" data-batch-save>Save Trade List</button>
-          </div>
-        </aside>
-  
-        <p id="myTradeStatus" class="trade-status" role="status"></p>
-      </section>
-  
-      <section class="trade-hub-panel trade-hub-panel-open-trades" data-hub-panel="open-trades" hidden>
-        <header class="trading-section-head">
-          <h2 data-content="trades.openTradesTitle">Browse Open Trades</h2>
-          <p data-content="trades.openTradesLead">Browse collectors who currently have cards listed for trade.</p>
-        </header>
-        <div class="open-trades-toolbar" aria-label="Open trades search">
-          <label class="open-trades-search" for="openTradesSearch">
-            <span data-content="trades.openTradesSearchLabel">Search collectors</span>
-            <input id="openTradesSearch" type="search" placeholder="Display name or username…" autocomplete="off" aria-controls="openTradesList" data-content-placeholder="trades.openTradesSearchPlaceholder">
+<body>
+  <script src="js/embed-mode.js?v=1.1.5" type="module"></script>
+  <div class="sky"></div>
+  <main class="trade-page trade-hub-page">
+    <section class="trade-head">
+      <p class="eyebrow" data-content="trades.eyebrow">Collector Exchange</p>
+      <h1 data-content="trades.title">🤝 Trade With Others</h1>
+      <p data-content="trades.lead">Find collectors, list duplicates for trade, propose exchanges, and track your offers — all in one place.</p>
+    </section>
+
+    <nav class="trade-hub-tabs" role="tablist" aria-label="Trade With Others views">
+      <button type="button" class="active" data-hub-view="collectors" aria-selected="true" data-content="trades.hubTabCollectors">Find Collectors</button>
+      <button type="button" data-hub-view="my-trade" aria-selected="false" data-content="trades.hubTabMyTrade">My Cards For Trade</button>
+      <button type="button" data-hub-view="open-trades" aria-selected="false" data-content="trades.hubTabOpenTrades">Browse Open Trades</button>
+      <button type="button" data-hub-view="progress" aria-selected="false" data-content="trades.hubTabProgress">
+        My Trades In-Progress
+        <span class="trade-hub-tab-badge" data-hub-progress-badge hidden aria-label="Pending incoming offers">0</span>
+      </button>
+    </nav>
+
+    <section class="trade-hub-panel trade-hub-panel-collectors rankings-page" data-hub-panel="collectors">
+      <section class="rankings-toolbar" aria-label="Collector search">
+        <div class="rankings-toolbar-row">
+          <label class="rankings-search" for="rankingsSearch">
+            <span data-content="rankings.searchLabel">Search collectors</span>
+            <input id="rankingsSearch" type="search" placeholder="Display name or username…" autocomplete="off" aria-controls="rankingsList" data-content-placeholder="rankings.searchPlaceholder">
           </label>
-          <p id="openTradesMeta" class="open-trades-meta" aria-live="polite"></p>
+          <label class="rankings-sort" for="rankingsSort">
+            <span data-content="rankings.sortLabel">Sort</span>
+            <select id="rankingsSort">
+              <option value="level" selected data-content="rankings.sortLevel">Highest level</option>
+              <option value="collection" data-content="rankings.sortCollection">Collection %</option>
+              <option value="unique" data-content="rankings.sortUnique">Most unique cards</option>
+              <option value="name" data-content="rankings.sortName">Display name A–Z</option>
+            </select>
+          </label>
         </div>
-        <div id="openTradesList" class="open-trades-list" aria-live="polite"></div>
-        <div id="openTradesPager" class="open-trades-pager" hidden></div>
-        <p id="openTradesStatus" class="trade-status" role="status"></p>
+        <p id="rankingsMeta" class="rankings-meta" aria-live="polite"></p>
       </section>
-  
-      <section class="trade-hub-panel trade-hub-panel-progress trade-box" data-hub-panel="progress" hidden>
+
+      <div id="rankingsStatus" class="rankings-status" role="status">
+        <h2 data-content="rankings.loadingTitle">Loading rankings…</h2>
+        <p data-content="rankings.loadingLead">Gathering public collectors.</p>
+      </div>
+
+      <ol id="rankingsList" class="rankings-list" aria-label="Collector rankings"></ol>
+      <div id="rankingsPager" class="rankings-pager" hidden></div>
+      <div id="rankingsLive" class="visually-hidden" aria-live="polite"></div>
+
+      <div class="trade-propose-sheet trade-box" data-collectors-propose hidden>
         <header class="trading-section-head trading-section-head-compact">
-          <h2 data-content="trades.progressTitle">My Trades In-Progress</h2>
-          <p data-content="trades.progressLead">Review incoming offers and track trades you have sent.</p>
+          <button type="button" class="trade-propose-back st-button" data-propose-close>← Back to collectors</button>
+          <h2 data-content="trades.proposeTitle">Propose A Trade</h2>
+          <p data-content="trades.proposeLead">Pick a collector, choose cards from each side, and send your offer.</p>
         </header>
-        <div class="progress-subtabs" data-progress-tablist role="tablist" aria-label="Trade offer inbox">
-          <button type="button" class="active" data-progress-tab="incoming" aria-selected="true" data-content="offers.tabIncoming">Incoming</button>
-          <button type="button" data-progress-tab="outgoing" aria-selected="false" data-content="offers.tabOutgoing">Sent</button>
+        <div class="composer">
+          <div data-propose-head></div>
+          <div data-propose-missing class="empty">
+            <p data-content="offers.composeEmpty">Search for a collector by username, display name, or email to start a trade offer.</p>
+            <div class="recipient-lookup">
+              <div class="recipient-search">
+                <label for="proposeRecipientUsername">
+                  <span class="visually-hidden">Search collectors</span>
+                  <input id="proposeRecipientUsername" data-propose-recipient type="search" placeholder="Username, display name, or email…" aria-label="Search collectors by username, display name, or email" aria-autocomplete="list" aria-controls="proposeRecipientResults" aria-expanded="false" autocomplete="off">
+                </label>
+                <div id="proposeRecipientResults" data-propose-results class="recipient-results" role="listbox" hidden></div>
+              </div>
+              <button data-propose-load class="primary" type="button" data-content="offers.composeCta">Start Trade</button>
+            </div>
+          </div>
+          <div data-propose-form hidden>
+            <div class="trade-columns">
+              <div class="pick-panel">
+                <h3 data-content="offers.yourOffer">Your Offer</h3>
+                <label class="pick-search" for="proposeMyCardsSearch">
+                  <span class="visually-hidden">Search your offered cards</span>
+                  <input id="proposeMyCardsSearch" data-propose-my-search type="search" placeholder="Search your cards…" aria-label="Search your offered cards">
+                </label>
+                <div data-propose-my-cards class="pick-grid"></div>
+              </div>
+              <div class="pick-panel">
+                <h3 data-content="offers.youRequest">You Request</h3>
+                <label class="pick-search" for="proposeTheirCardsSearch">
+                  <span class="visually-hidden">Search their cards</span>
+                  <input id="proposeTheirCardsSearch" data-propose-their-search type="search" placeholder="Search their cards…" aria-label="Search their cards">
+                </label>
+                <div data-propose-their-cards class="pick-grid"></div>
+              </div>
+            </div>
+            <aside data-propose-summary class="offer-summary" hidden aria-live="polite"></aside>
+            <label class="propose-note-label">
+              <b>Optional note</b>
+              <textarea data-propose-note maxlength="300" placeholder="Add a friendly message…"></textarea>
+            </label>
+            <button data-propose-send class="primary" type="button" disabled data-content="offers.sendCta">Send Trade Offer</button>
+          </div>
         </div>
-        <div data-progress-panel="incoming" class="progress-panel">
-          <div data-progress-incoming class="offer-list"></div>
+        <p data-propose-status class="status" role="status"></p>
+      </div>
+    </section>
+
+    <section class="trade-hub-panel trade-hub-panel-my-trade" data-hub-panel="my-trade" hidden>
+      <header class="trade-manage-head trading-section-head">
+        <h2 data-content="trades.manageTitle">Cards Available for Trade</h2>
+        <p data-content="trades.manageLead">Manage the cards you currently have available and choose duplicates from your collection to offer for trade.</p>
+      </header>
+
+      <section class="trade-panel trade-panel-listed">
+        <header class="trading-section-head trading-section-head-compact">
+          <h3 data-content="trades.listedTitle">Available for Trade</h3>
+          <p data-content="trades.listedLead">These duplicate copies are visible to other collectors browsing your profile.</p>
+          <p class="trade-listed-count" data-listed-count aria-live="polite">Nothing listed yet</p>
+        </header>
+        <div class="trade-section-toolbar">
+          <div data-listed-view-toggle></div>
         </div>
-        <div data-progress-panel="outgoing" class="progress-panel" hidden>
-          <div data-progress-outgoing class="offer-list"></div>
-        </div>
-        <p data-progress-status class="status" role="status"></p>
+        <div id="listedForTradeGrid" class="trade-listed-grid" data-view="list" aria-live="polite"></div>
       </section>
-    </main>
-  <div id="site-footer"></div>
-  <script type="module" src="js/tcg-chrome.js?v=2.0"></script>
+
+      <section class="trade-panel trade-panel-collection">
+        <header class="trading-section-head trading-section-head-compact">
+          <h3 data-content="trades.albumTitle">Add Cards from My Collection</h3>
+          <p data-content="trades.albumLead">Select cards you own, choose how many duplicate copies to list, then save your trade list.</p>
+        </header>
+        <div class="trade-collection-tools">
+          <label class="trade-search-label" for="tradeSearch">
+            <span class="visually-hidden">Search cards</span>
+            <input id="tradeSearch" type="search" placeholder="Search names or numbers…" aria-label="Search cards">
+          </label>
+          <label class="trade-filter-label" for="tradeSeriesFilter">
+            <span>Series</span>
+            <select id="tradeSeriesFilter" aria-label="Filter by series">
+              <option value="">All Series</option>
+            </select>
+          </label>
+          <label class="trade-filter-label" for="tradeRarityFilter">
+            <span>Rarity</span>
+            <select id="tradeRarityFilter" aria-label="Filter by rarity">
+              <option value="">All Rarities</option>
+            </select>
+          </label>
+          <label class="trade-filter-label" for="tradeSort">
+            <span>Sort</span>
+            <select id="tradeSort" aria-label="Sort cards">
+              <option value="number" selected>Card number</option>
+              <option value="name">Name</option>
+              <option value="rarity">Rarity</option>
+              <option value="quantity">Extra copies</option>
+            </select>
+          </label>
+          <label class="trade-duplicates-toggle">
+            <input id="tradeDuplicatesOnly" type="checkbox">
+            <span>Show only cards with duplicates</span>
+          </label>
+          <div data-collection-view-toggle></div>
+          <label class="privacy-toggle">
+            <input id="publicLists" type="checkbox" checked>
+            Show trade lists on my public profile
+          </label>
+        </div>
+        <div id="tradeAlbumGrid" class="trade-collection-grid" data-view="grid" aria-live="polite"></div>
+      </section>
+
+      <aside class="trade-batch-bar" data-trade-batch hidden aria-live="polite">
+        <div class="trade-batch-copy">
+          <strong data-batch-card-count>0 cards selected</strong>
+          <span data-batch-copy-count>0 copies to list</span>
+        </div>
+        <div class="trade-batch-actions">
+          <button type="button" class="st-button" data-batch-clear>Clear</button>
+          <button type="button" class="st-button" data-batch-review>Review Trade List</button>
+          <button type="button" class="st-button primary" data-batch-save>Save Trade List</button>
+        </div>
+      </aside>
+
+      <p id="myTradeStatus" class="trade-status" role="status"></p>
+    </section>
+
+    <section class="trade-hub-panel trade-hub-panel-open-trades" data-hub-panel="open-trades" hidden>
+      <header class="trading-section-head">
+        <h2 data-content="trades.openTradesTitle">Browse Open Trades</h2>
+        <p data-content="trades.openTradesLead">Browse collectors who currently have cards listed for trade.</p>
+      </header>
+      <div class="open-trades-toolbar" aria-label="Open trades search">
+        <label class="open-trades-search" for="openTradesSearch">
+          <span data-content="trades.openTradesSearchLabel">Search collectors</span>
+          <input id="openTradesSearch" type="search" placeholder="Display name or username…" autocomplete="off" aria-controls="openTradesList" data-content-placeholder="trades.openTradesSearchPlaceholder">
+        </label>
+        <p id="openTradesMeta" class="open-trades-meta" aria-live="polite"></p>
+      </div>
+      <div id="openTradesList" class="open-trades-list" aria-live="polite"></div>
+      <div id="openTradesPager" class="open-trades-pager" hidden></div>
+      <p id="openTradesStatus" class="trade-status" role="status"></p>
+    </section>
+
+    <section class="trade-hub-panel trade-hub-panel-progress trade-box" data-hub-panel="progress" hidden>
+      <header class="trading-section-head trading-section-head-compact">
+        <h2 data-content="trades.progressTitle">My Trades In-Progress</h2>
+        <p data-content="trades.progressLead">Review incoming offers and track trades you have sent.</p>
+      </header>
+      <div class="progress-subtabs" data-progress-tablist role="tablist" aria-label="Trade offer inbox">
+        <button type="button" class="active" data-progress-tab="incoming" aria-selected="true" data-content="offers.tabIncoming">Incoming</button>
+        <button type="button" data-progress-tab="outgoing" aria-selected="false" data-content="offers.tabOutgoing">Sent</button>
+      </div>
+      <div data-progress-panel="incoming" class="progress-panel">
+        <div data-progress-incoming class="offer-list"></div>
+      </div>
+      <div data-progress-panel="outgoing" class="progress-panel" hidden>
+        <div data-progress-outgoing class="offer-list"></div>
+      </div>
+      <p data-progress-status class="status" role="status"></p>
+    </section>
+  </main>
   <script type="module" src="js/pages/website-content-hydrate-page.js?v=1.3"></script>
   <script type="module" src="js/pages/trade-hub-page.js?v=1.3.2"></script>
   <script src="js/starlight-perspective-card.js?v=1.0.0"></script>

@@ -90,7 +90,7 @@ test('Starlight Evolution migration and client wiring are present', async () => 
     evoCss,
     analyzerCss,
     collection,
-    gallery,
+    binder,
     evoPage,
     shellDefaults,
     shellRoutes,
@@ -108,7 +108,7 @@ test('Starlight Evolution migration and client wiring are present', async () => 
     read('docs/css/pages/starlight-evolution.css'),
     read('docs/css/pages/card-analyzer.css'),
     read('docs/collection.html'),
-    read('docs/gallery.html'),
+    read('docs/binder.html'),
     read('docs/starlight-evolution.html'),
     read('docs/js/shell-navigation-defaults.js'),
     read('docs/js/shell-route-utils.js'),
@@ -160,13 +160,13 @@ test('Starlight Evolution migration and client wiring are present', async () => 
   assert.match(evoCss, /st-evo-radiance-carousel|stEvoRadianceFloat/);
   assert.match(analyzerCss, /prestige-particles/);
   assert.match(analyzerCss, /Beat qol-ui/);
-  assert.match(collection, /prestige-frames\.css/);
-  assert.match(collection, /qol-ui\.css/);
-  assert.match(gallery, /prestige-frames\.css/);
-  assert.match(gallery, /qol-ui\.css/);
+  assert.match(collection, /card-analyzer\.css/);
+  assert.match(collection, /qol-ui\.css[\s\S]*card-analyzer\.css/s);
+  assert.match(binder, /qol-ui\.css[\s\S]*card-analyzer\.css/s);
+  assert.match(binder, /starlight-evolution/);
   assert.match(evoPage, /Evolve My Cards/);
   assert.match(evoPage, /Infuse duplicate cards with Starlight Energy/);
-  assert.match(evoPage, /collection\.html/);
+  assert.match(evoPage, /binder\?view=collection/);
   assert.match(shellDefaults, /starlight-evolution/);
   assert.match(shellRoutes, /starlight-evolution/);
   assert.match(appShell, /starlight-evolution\.html/);

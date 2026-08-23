@@ -31,7 +31,7 @@ test('favorite sync failure rolls back UI and notifies the collector', async () 
 test('gallery page keeps filters visible and uses rebuilt markup', async () => {
   const app = await read('docs/js/app.js');
   const css = await read('docs/css/pages/card-gallery-page.css');
-  const gallery = await read('docs/gallery.html');
+  const binder = await read('docs/binder.html');
 
   assert.match(app, /function syncBinderSeriesMode\(browse\)/);
   assert.match(app, /function ensureBinderFilterPanel\(/);
@@ -42,12 +42,12 @@ test('gallery page keeps filters visible and uses rebuilt markup', async () => {
   assert.match(app, /function previewDisplayTogglesHtml\(/);
   assert.match(css, /\.card-gallery-grid/);
   assert.match(css, /is-unowned.*card-gallery-art img/);
-  assert.match(gallery, /card-gallery-page/);
-  assert.match(gallery, /card-gallery-page\.css/);
-  assert.match(gallery, /id="seriesGridStage"/);
-  assert.match(gallery, /data-card-filter-context="binder"/);
-  assert.doesNotMatch(gallery, /binder\.css/);
-  assert.doesNotMatch(gallery, /id="v62Showcase"/);
+  assert.match(binder, /card-gallery-page/);
+  assert.match(binder, /card-gallery-page\.css/);
+  assert.match(binder, /id="seriesGridStage"/);
+  assert.match(binder, /data-card-filter-context="binder"/);
+  assert.doesNotMatch(binder, /binder\.css/);
+  assert.doesNotMatch(binder, /id="v62Showcase"/);
 });
 
 test('shell-safe profile links avoid binder-in-binder nesting', async () => {

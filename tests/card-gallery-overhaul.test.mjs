@@ -62,8 +62,7 @@ test('collection page loads spread binder modules and styles', async () => {
 });
 
 test('gallery page loads shared card modules', async () => {
-  const gallery = await read('docs/gallery.html');
-  assert.match(gallery, /card-tile\.js/);
-  assert.match(gallery, /binder-theme-config\.js/);
-  assert.match(gallery, /app\.js/);
+  const binder = await read('docs/binder.html');
+  assert.match(binder, /card-tile\.js/);
+  assert.match(binder, /binder-theme-config\.js/);
 });

@@ -1,7 +1,5 @@
 /** Shared Studio / admin live-preview helpers. */
 
-import { pageHref } from './page-href.js';
-
 export const STUDIO_PREVIEW_PARAM = 'studioPreview';
 
 export const STUDIO_MSG = Object.freeze({
@@ -27,12 +25,10 @@ export function buildContentStudioPreviewUrl(previewUrl) {
   return `${file}?${url.searchParams.toString()}`;
 }
 
-/** Full site preview for Website UI editing. */
+/** Full binder shell preview for Website UI editing. */
 export function buildShellStudioPreviewUrl(view = 'home') {
   const params = new URLSearchParams();
+  params.set('view', view || 'home');
   params.set(STUDIO_PREVIEW_PARAM, '1');
-  params.set('embed', '1');
-  const base = pageHref(view || 'home');
-  const join = base.includes('?') ? '&' : '?';
-  return `${base}${join}${params.toString()}`;
+  return `binder?${params.toString()}`;
 }

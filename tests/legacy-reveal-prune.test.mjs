@@ -5,12 +5,11 @@ import test from 'node:test';
 const read = relativePath => readFile(new URL(`../${relativePath}`, import.meta.url), 'utf8');
 
 test('legacy reveal layers keep live binder analyzer/pack styles and drop proven-dead skins', async () => {
-  const [css03, css09, appJs, binderHtml, galleryHtml] = await Promise.all([
+  const [css03, css09, appJs, binderHtml] = await Promise.all([
     read('docs/css/legacy/03-reveal-v28-v33.css'),
     read('docs/css/legacy/09-reveal-v67-v80.css'),
     read('docs/js/app.js'),
-    read('docs/binder.html'),
-    read('docs/gallery.html')
+    read('docs/binder.html')
   ]);
   const legacy = `${css03}\n${css09}`;
 
@@ -42,6 +41,5 @@ test('legacy reveal layers keep live binder analyzer/pack styles and drop proven
 
   assert.match(appJs, /analyzer-full-stage/);
   assert.match(appJs, /v61-pack v78-pack/);
-  assert.match(binderHtml, /binder-legacy-redirect\.js/);
-  assert.match(galleryHtml, /css\/tcg\/site\.css/);
+  assert.match(binderHtml, /css\/style\.css\?v=1\.0\.3/);
 });

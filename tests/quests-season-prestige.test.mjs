@@ -63,21 +63,21 @@ test('quests and season pass are shell destinations', () => {
 });
 
 test('quests and season pass pages wire services and claim UI', async () => {
-  const [questsPage, seasonPage, questsHtml, seasonHtml, shell, pageHref] = await Promise.all([
+  const [questsPage, seasonPage, questsHtml, seasonHtml, shell, embed] = await Promise.all([
     read('docs/js/pages/collection-quests-page.js'),
     read('docs/js/pages/season-pass-page.js'),
     read('docs/collection-quests.html'),
     read('docs/season-pass.html'),
     read('docs/js/app-shell.js'),
-    read('docs/js/page-href.js')
+    read('docs/js/embed-mode.js')
   ]);
   assert.match(questsPage, /claimCollectionQuest/);
   assert.match(seasonPage, /claimSeasonPassTier/);
   assert.match(questsPage, /getCachedWebsiteContent/);
   assert.match(seasonPage, /getMySeasonPass/);
-  assert.match(pageHref, /quests:\s*'collection-quests\.html'/);
-  assert.match(pageHref, /'season-pass':\s*'season-pass\.html'/);
-  assert.match(pageHref, /'starlight-evolution':\s*'starlight-evolution\.html'/);
+  assert.match(embed, /'collection-quests\.html':'quests'/);
+  assert.match(embed, /'season-pass\.html':'season-pass'/);
+  assert.match(embed, /'starlight-evolution\.html':'starlight-evolution'/);
   assert.match(questsHtml, /collection-quests-page\.js/);
   assert.match(seasonHtml, /season-pass-page\.js/);
   assert.match(shell, /quests:\{title:'Starlight Missions',src:'collection-quests\.html'\}/);
@@ -87,9 +87,9 @@ test('quests and season pass pages wire services and claim UI', async () => {
 });
 
 test('binder and collection load Starlight Evolution frame styles and helpers', async () => {
-  const [app, gallery, collection, css, reveal, migration, evolutionMigration, evoPage] = await Promise.all([
+  const [app, binder, collection, css, reveal, migration, evolutionMigration, evoPage] = await Promise.all([
     read('docs/js/app.js'),
-    read('docs/gallery.html'),
+    read('docs/binder.html'),
     read('docs/collection.html'),
     read('docs/css/prestige-frames.css'),
     read('docs/js/reward-reveal.js'),
@@ -103,7 +103,7 @@ test('binder and collection load Starlight Evolution frame styles and helpers', 
   assert.match(app, /fuseSelectedCard/);
   assert.match(app, /full-card-wrap[\s\S]*\$\{prestigeClass\}/);
   assert.match(app, /prestigeFrameOverlayHtml/);
-  assert.match(gallery, /prestige-frames\.css/);
+  assert.match(binder, /prestige-frames\.css/);
   assert.match(collection, /prestige-frames\.css/);
   assert.match(css, /\.prestige-badge\.prestige-starlight-burst/);
   assert.match(css, /\.prestige-badge\.prestige-star-bit/);
