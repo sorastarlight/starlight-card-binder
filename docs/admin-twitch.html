@@ -8,10 +8,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/tcg/site.css?v=1.0">
-  <link rel="stylesheet" href="css/tcg/pages.css?v=1.0">
-  <link rel="stylesheet" href="css/tcg/compat.css?v=1.0">
-  <link rel="stylesheet" href="css/tcg/admin.css?v=1.0">
+  <link rel="stylesheet" href="css/tcg/site.css?v=2.0">
+  <link rel="stylesheet" href="css/tcg/pages.css?v=2.0">
+  <link rel="stylesheet" href="css/tcg/compat.css?v=2.0">
+  <link rel="stylesheet" href="css/tcg/admin.css?v=2.0">
   <link rel="stylesheet" href="css/pages/admin-twitch.css?v=1.1">
   <link rel="stylesheet" href="css/shared-ui.css?v=1.6.22">
   <link rel="stylesheet" href="css/qol-ui.css?v=94.2.11">
@@ -26,7 +26,7 @@
   <div class="view" data-view="viewers"><h2>Linked Twitch Viewers</h2><div id="viewerList" class="viewer-list"></div></div><div class="view" data-view="history"><div class="actions actions-spread"><div><h2 class="heading-bottom-sm">Reward History</h2><p class="muted subtitle-top-zero">Review successful, ignored, and failed Twitch reward events.</p></div><button class="btn secondary" id="refreshHistory">↻ Refresh</button></div><div class="history-tools"><input id="historySearch" placeholder="Search viewer, reward, or error"><select id="historyStatus"><option value="">All statuses</option><option value="delivered">Delivered</option><option value="received">Received</option><option value="ignored">Ignored</option><option value="failed">Failed</option></select><select id="historyType"><option value="">All triggers</option><option value="channel_points">Channel Points</option><option value="subscription">Subscription</option><option value="follow">Follow</option><option value="manual">Manual</option></select><select id="historyRange"><option value="all">All dates</option><option value="1">Last 24 hours</option><option value="7">Last 7 days</option><option value="30">Last 30 days</option></select></div><div id="historyList" class="history-list"></div></div></section></main>
   <div id="site-footer"></div>
   <div id="testRuleModal" class="st-dialog-overlay test-modal hidden" aria-hidden="true"><div class="st-dialog test-card" role="dialog" aria-modal="true" aria-labelledby="testRuleTitle" tabindex="-1"><button type="button" id="closeTestRuleModal" class="st-dialog-close" data-st-modal-close aria-label="Close">×</button><h2 id="testRuleTitle">Test Twitch Redeem</h2><p class="muted">Send this redeem to a linked collector without spending Channel Points.</p><input type="hidden" id="testRuleId"><label>Linked Twitch Viewer<select id="testViewer"><option value="">Select a linked viewer…</option></select></label><div class="actions space-top-16"><button class="btn" id="confirmTestRule">Send Test Gift</button><button class="btn secondary" id="cancelTestRule" data-st-modal-close>Cancel</button></div></div></div>
-  <script type="module" src="js/tcg-chrome.js?v=1.0"></script>
+  <script type="module" src="js/tcg-chrome.js?v=2.0"></script>
   <script type="module" src="js/pages/admin-twitch-page.js?v=1.3"></script>
   <script src="js/qol-ui.js?v=94.2.4" defer></script>
 </body>

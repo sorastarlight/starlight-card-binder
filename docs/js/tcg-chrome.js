@@ -136,7 +136,6 @@ function headerMarkup(page) {
         <img src="${LOGO}" alt="Sora Starlight">
       </a>
       <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false">Menu</button>
-      <div class="account-bar">${accountBar}</div>
       <div class="nav-wrap">
         <nav class="primary-nav" aria-label="Main">
           <div class="nav-item${itemCurrent(['series'])}">
@@ -173,13 +172,13 @@ function headerMarkup(page) {
               <a href="${pageHref('about')}"${current('collect')}>How to collect</a>
             </div>
           </div>
-          <a class="top-link nav-link" href="${pageHref('about')}"${current('collect')}>How to collect</a>
           <a class="top-link nav-link" href="news.html"${current('news')}>News</a>
           <a class="top-link nav-link" href="${pageHref('shop')}"${current('shop')}>Shop</a>
           <a class="top-link nav-link" href="${pageHref('events')}"${current('events')}>Events</a>
         </nav>
         <button class="motion-toggle" type="button" data-motion aria-pressed="false">Reduce motion</button>
       </div>
+      <div class="account-bar">${accountBar}</div>
     </header>
   `;
 }

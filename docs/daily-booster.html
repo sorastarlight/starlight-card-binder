@@ -8,9 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/tcg/site.css?v=1.0">
-  <link rel="stylesheet" href="css/tcg/pages.css?v=1.0">
-  <link rel="stylesheet" href="css/tcg/compat.css?v=1.0">
+  <link rel="stylesheet" href="css/tcg/site.css?v=2.0">
+  <link rel="stylesheet" href="css/tcg/pages.css?v=2.0">
+  <link rel="stylesheet" href="css/tcg/compat.css?v=2.0">
   <link rel="stylesheet" href="css/pages/daily-booster.css?v=1.1">
   <link rel="stylesheet" href="css/shared-ui.css?v=1.6.22">
   <link rel="stylesheet" href="css/qol-ui.css?v=94.2.11">
@@ -18,16 +18,21 @@
 </head>
 <body data-page="pack">
   <div id="site-header"></div>
-  <main id="main" class="daily-page">
-  <section class="daily-panel">
+  <main id="main">
+  <header class="page-hero">
+    <div class="asset-placeholder bg" aria-hidden="true">INSERT ASSET</div>
+    <p class="kicker" data-content="daily.eyebrow">Daily Collector Reward</p>
+    <h1 data-content="daily.title">Daily Free Booster Pack</h1>
+    <p class="lead" data-content="daily.lead">Open today’s free pack, reveal four cards one at a time, and grow your Starlight collection. Your next free pack becomes available at midnight Eastern Time.</p>
+  </header>
+  <div class="daily-page page-stage">
+  <section class="daily-panel panel">
   <header class="daily-header">
     <div class="daily-header-icon" aria-hidden="true">✦</div>
     <div class="daily-header-copy">
-      <p class="eyebrow" data-content="daily.eyebrow">Daily Collector Reward</p>
-      <h1 data-content="daily.title">Daily Free Booster Pack</h1>
-      <p data-content="daily.lead">Open today’s free pack, reveal four cards one at a time, and grow your Starlight collection. Your next free pack becomes available at midnight Eastern Time.</p>
+      <p class="eyebrow" data-content="daily.badge">FREE • DAILY</p>
+      <h2>Open today’s pack</h2>
     </div>
-    <div class="daily-header-badge" data-content="daily.badge">FREE • DAILY</div>
   </header>
   <section aria-label="Free Daily Booster portal" class="portal-zone" id="portal-zone">
   <div aria-hidden="true" class="portal-ring"></div><div aria-hidden="true" class="portal-ribbons"><i></i><i></i><i></i></div>
@@ -55,9 +60,9 @@
   
   <section class="reward-section hidden" id="reward-section"><h2 id="reward-title" data-content="daily.pullsTitle">Your Pulls</h2><div class="reward-grid" id="reward-grid"></div></section>
   <p aria-live="polite" class="page-status" id="page-status" role="status"></p>
-  </section></main>
+  </section></div></main>
   <div id="site-footer"></div>
-  <script type="module" src="js/tcg-chrome.js?v=1.0"></script>
+  <script type="module" src="js/tcg-chrome.js?v=2.0"></script>
   <script type="module" src="js/pages/website-content-hydrate-page.js?v=1.2"></script>
   <script type="module" src="js/pages/daily-booster-page.js?v=1.5.15"></script>
   <script src="js/starlight-perspective-card.js?v=1.0.0"></script>

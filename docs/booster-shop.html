@@ -8,9 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/tcg/site.css?v=1.0">
-  <link rel="stylesheet" href="css/tcg/pages.css?v=1.0">
-  <link rel="stylesheet" href="css/tcg/compat.css?v=1.0">
+  <link rel="stylesheet" href="css/tcg/site.css?v=2.0">
+  <link rel="stylesheet" href="css/tcg/pages.css?v=2.0">
+  <link rel="stylesheet" href="css/tcg/compat.css?v=2.0">
   <link rel="stylesheet" href="css/pages/booster-shop.css?v=1.4">
   <link rel="stylesheet" href="css/shared-ui.css?v=1.6.22">
   <link rel="stylesheet" href="css/qol-ui.css?v=94.2.11">
@@ -18,25 +18,23 @@
 </head>
 <body data-page="shop">
   <div id="site-header"></div>
-  <main id="main" class="shop-page">
+  <main id="main">
+    <header class="page-hero">
+      <div class="asset-placeholder bg" aria-hidden="true">INSERT ASSET</div>
+      <p class="kicker" data-content="shop.eyebrow">Magical Booster Marketplace</p>
+      <h1 data-content="shop.title">Card Boutique</h1>
+      <p class="lead" data-content="shop.lead">Crack open wonder, chase your favorite cards, and turn every duplicate into fuel for your next magical pull.</p>
+    </header>
+    <div class="shop-page page-stage">
     <section class="shop-shell">
-      <header class="shop-hero">
+      <header class="shop-hero panel">
         <div class="hero-copy">
-          <p class="shop-kicker" data-content="shop.eyebrow">Magical Booster Marketplace</p>
-          <h1 class="shop-title" aria-label="Card Boutique" data-content="shop.title">
-            <span class="title-top">Card</span>
-            <span class="title-bottom">Boutique</span>
-          </h1>
-          <div class="hero-message">
-            <p data-content="shop.lead">Crack open wonder, chase your favorite cards, and turn every duplicate into fuel for your next magical pull.</p>
-            <strong data-content="shop.tagline">Exchange your Star Bits for booster packs and more!</strong>
-          </div>
+          <strong data-content="shop.tagline">Exchange your Star Bits for booster packs and more!</strong>
         </div>
         <aside class="wallet-card" aria-label="Star Bits wallet">
           <small data-content="shop.walletLabel">Your Star Bits</small>
           <div class="wallet-amount"><img class="star-bit-icon star-bit-icon--lg" src="site_assets/icons/star-bit.png?v=2" alt="" width="28" height="28" decoding="async"><b id="balance">0</b></div>
           <span id="wallet-note" data-content="shop.walletNote">Available to spend</span>
-          
         </aside>
       </header>
   
@@ -67,6 +65,7 @@
         </footer>
       </section>
     </section>
+    </div>
   </main>
   <div id="site-footer"></div>
   <div id="pack-modal" class="st-dialog-overlay hidden" aria-hidden="true">
@@ -96,7 +95,7 @@
       </div>
     </section>
   </div>
-  <script type="module" src="js/tcg-chrome.js?v=1.0"></script>
+  <script type="module" src="js/tcg-chrome.js?v=2.0"></script>
   <script type="module" src="js/pages/website-content-hydrate-page.js?v=1.2"></script>
   <script src="js/pages/booster-shop-page.js?v=1.6.8" type="module"></script>
   <script src="js/starlight-perspective-card.js?v=1.0.0"></script>

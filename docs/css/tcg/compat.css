@@ -1,25 +1,12 @@
-/* Functional overlays for Card Binder systems inside TCG layout. */
-
-.card-gallery-page,
-.card-album-page,
-.checklist-page-mount,
-.starlight-page-mount {
-  padding: 0 6vw 4rem;
-}
-
-.card-gallery-page .panel,
-.card-album-page .panel,
-.card-filter-panel.panel {
-  border-radius: 1.2rem;
-  border: 1px solid var(--st-line);
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: var(--st-shadow);
-}
+/* Bridges for functional collector systems inside TCG layout */
 
 .card-gallery-header,
-.card-album-header {
+.card-album-header,
+.card-filter-panel,
+.card-gallery-stage,
+.card-album-panel {
   margin-bottom: 1rem;
-  padding: 1.4rem 1.5rem;
+  padding: 1.1rem 1.25rem;
 }
 
 .card-gallery-header .eyebrow,
@@ -28,82 +15,66 @@
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  font-size: 0.78rem;
+  font-size: 0.74rem;
 }
 
 .card-gallery-header h1,
 .card-album-header h1 {
-  margin: 0.2rem 0 0.5rem;
+  margin: 0.2rem 0 0.45rem;
   font-family: var(--font-display);
   color: var(--st-navy);
 }
 
-#cardOverlay {
-  z-index: 95;
-}
-
+#cardOverlay { z-index: 95; }
 .lightbox,
 .modal-root,
-.starlight-modal {
-  z-index: 96;
-}
-
+.starlight-modal,
+.st-dialog-overlay { z-index: 96; }
 .reward-reveal-root,
-.reward-reveal-overlay {
-  z-index: 100;
+.reward-reveal-overlay { z-index: 100; }
+
+.daily-page,
+.shop-page,
+.bits-page,
+.collector-page,
+.profile-settings-page,
+.trade-hub-page,
+.admin-page {
+  padding: 1.25rem var(--page-pad) 3rem;
 }
 
-.btn,
-button.btn {
-  min-height: 44px;
-  padding: 0.55rem 1rem;
-  border-radius: var(--st-pill);
-  border: 1px solid var(--st-line);
-  background: rgba(255, 255, 255, 0.94);
-  color: var(--st-heading);
-  font-weight: 800;
-  cursor: pointer;
+body[data-page="login"] #main {
+  display: grid;
+  justify-items: center;
+  padding: 5.5rem var(--page-pad) 3rem;
 }
 
-.btn.primary {
-  border: 0;
-  background: linear-gradient(180deg, #ff90ca, #ff55ad);
-  color: #fff;
-  box-shadow: 0 10px 22px rgba(255, 79, 167, 0.26);
-}
-
-.empty {
-  padding: 2rem;
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px dashed var(--st-line);
-  color: var(--st-muted);
-  text-align: center;
-}
-
-.page-content-panel {
+body[data-page="login"] .login-panel {
+  width: min(480px, 100%);
   padding: 1.4rem;
   border-radius: 1.2rem;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.96);
   border: 1px solid var(--st-line);
   box-shadow: var(--st-shadow);
 }
 
-.admin-page-mount {
-  padding-top: 0;
-}
-
-body[data-page^="admin"] .admin-shell,
-body[data-page="admin"] .admin-shell {
-  padding-top: 0;
+.admin-shell {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 0;
   min-height: auto;
+  padding-top: 0;
 }
 
-@media (max-width: 720px) {
-  .card-gallery-page,
-  .card-album-page,
-  .checklist-page-mount,
-  .starlight-page-mount {
-    padding-inline: 1rem;
-  }
+.admin-sidebar {
+  padding: 1.2rem 1rem 2rem;
+  background: rgba(255, 255, 255, 0.86);
+  border-right: 1px solid var(--st-line);
+}
+
+.admin-stage { padding: 1.2rem var(--page-pad) 3rem; }
+
+@media (max-width: 860px) {
+  .admin-shell { grid-template-columns: 1fr; }
+  .admin-sidebar { border-right: 0; border-bottom: 1px solid var(--st-line); }
 }

@@ -1,11 +1,11 @@
 import { supabase } from './supabase-client.js';
 import { pageHref } from './page-href.js';
 
-const PLACEHOLDER_LABEL = 'INSERT ASSET';
-
+const PLACEHOLDER = 'INSERT ASSET';
 const root = document.querySelector('[data-featured]');
-if (root) {
-  const bg = root.querySelector('[data-bg]');
+if (!root) {
+  /* home only */
+} else {
   const cardHost = root.querySelector('[data-featured-card]');
   const nameHost = root.querySelector('[data-featured-name]');
   const heading = root.querySelector('[data-series-name]');
@@ -14,10 +14,6 @@ if (root) {
   let slides = [];
   let index = 0;
   let timer = 0;
-
-  if (bg) {
-    bg.innerHTML = `<div class="asset-placeholder featured-bg-placeholder" aria-hidden="true">${PLACEHOLDER_LABEL}</div>`;
-  }
 
   function esc(value) {
     return String(value ?? '').replace(/[&<>"']/g, c => ({
@@ -30,15 +26,15 @@ if (root) {
     if (img) {
       return `<div class="st-card"><img src="${esc(img)}" alt="${esc(card.name || 'Starlight card')}"></div>`;
     }
-    return `<div class="st-card st-card-placeholder" aria-label="${esc(card.name || PLACEHOLDER_LABEL)}"><span>${PLACEHOLDER_LABEL}</span></div>`;
+    return `<div class="st-card-placeholder" aria-label="${PLACEHOLDER}"><span>${PLACEHOLDER}</span></div>`;
   }
 
   function show(next) {
     if (!slides.length) return;
     index = (next + slides.length) % slides.length;
     const slide = slides[index];
-    if (cardHost && slide) cardHost.innerHTML = cardMarkup(slide);
-    if (nameHost && slide) nameHost.textContent = slide.name || 'N/A';
+    if (cardHost) cardHost.innerHTML = cardMarkup(slide);
+    if (nameHost) nameHost.textContent = slide.name || 'N/A';
     if (heading) heading.textContent = slide.seriesName || 'Rising Star';
     if (seriesLink) seriesLink.href = 'series.html';
     if (galleryLink) galleryLink.href = pageHref('binder');
@@ -72,9 +68,7 @@ if (root) {
       .limit(12);
     if (error) throw error;
     slides = (data || []).map((card) => ({ ...card, seriesName: 'Rising Star' }));
-    if (!slides.length) {
-      slides = [{ name: 'N/A', seriesName: 'Rising Star' }];
-    }
+    if (!slides.length) slides = [{ name: 'N/A', seriesName: 'Rising Star' }];
     show(0);
     play();
   } catch {

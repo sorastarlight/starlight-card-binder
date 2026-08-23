@@ -8,9 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/tcg/site.css?v=1.0">
-  <link rel="stylesheet" href="css/tcg/home.css?v=1.0">
-  <link rel="stylesheet" href="css/tcg/compat.css?v=1.0">
+  <link rel="stylesheet" href="css/tcg/site.css?v=2.0">
+  <link rel="stylesheet" href="css/tcg/home.css?v=2.0">
+  <link rel="stylesheet" href="css/tcg/compat.css?v=2.0">
   <link rel="stylesheet" href="css/shared-ui.css?v=1.6.22">
   <script src="js/browser-performance.js?v=1.0.0" defer></script>
 </head>
@@ -18,14 +18,17 @@
   <div id="site-header"></div>
   <main id="main">
     <section class="featured" data-featured aria-roledescription="carousel" aria-label="Featured Starlight card">
-      <h1 class="visually-hidden">Starlight Cards: Rising Star</h1>
-      <div class="featured__bg" data-bg></div>
+      <h1 class="visually-hidden">Starlight Cards</h1>
+      <div class="featured__bg" data-bg>
+        <div class="asset-placeholder featured-bg-placeholder" aria-hidden="true">INSERT ASSET</div>
+      </div>
       <div class="featured__copy">
         <p class="series-kicker">Starlight Cards</p>
         <p class="series-mark" data-series-name>Rising Star</p>
+        <p class="featured-lead">Collect, open boosters, and build your album in the cloud.</p>
         <div class="cta-row">
-          <a class="pill" data-series-link href="series.html">Go to the series page <span class="arrow">›</span></a>
-          <a class="pill" data-gallery-link href="gallery.html">See card gallery <span class="arrow">›</span></a>
+          <a class="pill" data-series-link href="series.html">Explore the series <span class="arrow">›</span></a>
+          <a class="pill light" data-gallery-link href="gallery.html">Card gallery <span class="arrow">›</span></a>
         </div>
       </div>
       <div class="featured__card-wrap">
@@ -40,8 +43,8 @@
 
     <section class="section">
       <div class="section-head">
-        <h2>What's new!</h2>
-        <a href="news.html">See more news ›</a>
+        <h2>What's new</h2>
+        <a href="news.html">See all news ›</a>
       </div>
       <div class="news-track" id="news" data-tcg-news="track"></div>
     </section>
@@ -49,42 +52,34 @@
     <section class="promos">
       <article class="promo">
         <div class="promo-copy">
-          <h2>Open your daily booster</h2>
-          <p>Claim a free Starlight booster every day, flip your pulls, and grow your cloud collection across devices.</p>
+          <h2>Free daily booster</h2>
+          <p>Claim a pack every day, flip your pulls, and grow a synced collection across devices.</p>
           <a class="pill" href="daily-booster.html">Open daily booster <span class="arrow">›</span></a>
         </div>
-        <div class="promo-art pack"></div>
+        <div class="promo-art asset-placeholder" aria-hidden="true"></div>
       </article>
       <article class="promo">
         <div class="promo-copy">
-          <h2>Starlight Album</h2>
-          <p>Every card you collect lives in My Album. Missing cards stay silhouetted until you earn them.</p>
+          <h2>Your album</h2>
+          <p>Collected cards live in My Album. Missing cards stay silhouetted until you earn them.</p>
           <a class="pill" href="collection.html">Open my album <span class="arrow">›</span></a>
         </div>
-        <div class="promo-art stage"></div>
-      </article>
-      <article class="promo">
-        <div class="promo-copy">
-          <h2>New to Starlight Cards?</h2>
-          <p>Browse the gallery, learn the rarities, then tear your first pack. Built for collectors who love sparkle.</p>
-          <a class="pill" href="about.html">How to collect <span class="arrow">›</span></a>
-        </div>
-        <div class="promo-art concert"></div>
+        <div class="promo-art asset-placeholder" aria-hidden="true"></div>
       </article>
       <article class="promo">
         <div class="promo-copy">
           <h2>Starlight Shop</h2>
-          <p>Spend Star Bits on packs, singles, or gifts. Extra copies convert into bits — your last copy stays safe.</p>
+          <p>Spend Star Bits on packs and gifts. Extra copies convert into bits — your last copy stays safe.</p>
           <a class="pill" href="booster-shop.html">Visit the shop <span class="arrow">›</span></a>
         </div>
-        <div class="promo-art skates"></div>
+        <div class="promo-art asset-placeholder" aria-hidden="true"></div>
       </article>
     </section>
   </main>
   <div id="site-footer"></div>
-  <script type="module" src="js/tcg-chrome.js?v=1.0"></script>
+  <script type="module" src="js/tcg-chrome.js?v=2.0"></script>
   <script type="module" src="js/pages/website-content-hydrate-page.js?v=1.2"></script>
-  <script type="module" src="js/tcg-home-featured.js?v=1.0"></script>
+  <script type="module" src="js/tcg-home-featured.js?v=2.0"></script>
   <script type="module" src="js/home-news.js?v=1.0"></script>
 </body>
 </html>
