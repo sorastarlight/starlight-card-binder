@@ -1,11 +1,7 @@
 import { supabase } from './supabase-client.js';
 import { pageHref } from './page-href.js';
 
-const BG = [
-  'site_assets/tcg/hero-bg-stage.png',
-  'site_assets/tcg/hero-bg-skates.png',
-  'site_assets/tcg/hero-bg-concert.png'
-];
+const PLACEHOLDER_LABEL = 'INSERT ASSET';
 
 const root = document.querySelector('[data-featured]');
 if (root) {
@@ -19,13 +15,9 @@ if (root) {
   let index = 0;
   let timer = 0;
 
-  BG.forEach((src, slideIndex) => {
-    const img = document.createElement('img');
-    img.src = src;
-    img.alt = '';
-    if (slideIndex === 0) img.classList.add('is-active');
-    bg?.appendChild(img);
-  });
+  if (bg) {
+    bg.innerHTML = `<div class="asset-placeholder featured-bg-placeholder" aria-hidden="true">${PLACEHOLDER_LABEL}</div>`;
+  }
 
   function esc(value) {
     return String(value ?? '').replace(/[&<>"']/g, c => ({
@@ -34,19 +26,19 @@ if (root) {
   }
 
   function cardMarkup(card) {
-    const img = card.thumbnail_url || card.image_url || 'site_assets/tcg/card-back.png';
-    return `<div class="st-card"><img src="${esc(img)}" alt="${esc(card.name || 'Starlight card')}"></div>`;
+    const img = card.thumbnail_url || card.image_url || '';
+    if (img) {
+      return `<div class="st-card"><img src="${esc(img)}" alt="${esc(card.name || 'Starlight card')}"></div>`;
+    }
+    return `<div class="st-card st-card-placeholder" aria-label="${esc(card.name || PLACEHOLDER_LABEL)}"><span>${PLACEHOLDER_LABEL}</span></div>`;
   }
 
   function show(next) {
     if (!slides.length) return;
     index = (next + slides.length) % slides.length;
     const slide = slides[index];
-    bg?.querySelectorAll('img').forEach((img, imgIndex) => {
-      img.classList.toggle('is-active', imgIndex === index % BG.length);
-    });
     if (cardHost && slide) cardHost.innerHTML = cardMarkup(slide);
-    if (nameHost && slide) nameHost.textContent = slide.name || 'Starlight Card';
+    if (nameHost && slide) nameHost.textContent = slide.name || 'N/A';
     if (heading) heading.textContent = slide.seriesName || 'Rising Star';
     if (seriesLink) seriesLink.href = 'series.html';
     if (galleryLink) galleryLink.href = pageHref('binder');
@@ -55,6 +47,7 @@ if (root) {
   function play() {
     window.clearInterval(timer);
     if (document.documentElement.classList.contains('reduce-motion')) return;
+    if (slides.length < 2) return;
     timer = window.setInterval(() => show(index + 1), 7000);
   }
 
@@ -80,17 +73,12 @@ if (root) {
     if (error) throw error;
     slides = (data || []).map((card) => ({ ...card, seriesName: 'Rising Star' }));
     if (!slides.length) {
-      slides = [{ name: 'Starlight Card', thumbnail_url: 'site_assets/tcg/art-001.png', seriesName: 'Rising Star' }];
+      slides = [{ name: 'N/A', seriesName: 'Rising Star' }];
     }
     show(0);
     play();
   } catch {
-    slides = [{ name: 'Starlight Card', thumbnail_url: 'site_assets/tcg/art-001.png', seriesName: 'Rising Star' }];
+    slides = [{ name: 'N/A', seriesName: 'Rising Star' }];
     show(0);
   }
-}
-
-const newsHost = document.getElementById('news');
-if (newsHost && newsHost.dataset.tcgNews === 'track') {
-  /* home-news.js renders into #news */
 }

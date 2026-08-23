@@ -11,7 +11,8 @@
   background: linear-gradient(135deg, #bdecff, #ffe3f2);
 }
 .featured__bg,
-.featured__bg img {
+.featured__bg img,
+.featured__bg .featured-bg-placeholder {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -26,6 +27,25 @@
 .featured__bg img.is-active {
   opacity: 1;
   animation: kenBurns 14s ease-out forwards;
+}
+.featured__bg .featured-bg-placeholder {
+  display: grid;
+  place-items: center;
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(107, 198, 248, 0.16),
+      rgba(107, 198, 248, 0.16) 14px,
+      rgba(255, 130, 200, 0.14) 14px,
+      rgba(255, 130, 200, 0.14) 28px
+    ),
+    linear-gradient(135deg, #bdecff, #ffe3f2);
+  color: var(--st-muted);
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2.6vw, 1.6rem);
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 .featured::after {
   content: "";
@@ -89,6 +109,29 @@
 .featured__card .st-card img { border-radius: 1.05rem; box-shadow: 0 24px 50px rgba(8, 39, 125, 0.28); }
 .featured__card .st-card .meta { display: none; }
 .featured__card .st-card:hover { transform: none; filter: none; }
+.featured__card .st-card-placeholder {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 2.5 / 3.5;
+  width: min(100%, 340px);
+  border-radius: 1.05rem;
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(107, 198, 248, 0.18),
+      rgba(107, 198, 248, 0.18) 10px,
+      rgba(255, 130, 200, 0.16) 10px,
+      rgba(255, 130, 200, 0.16) 20px
+    ),
+    #edf9ff;
+  color: var(--st-muted);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  box-shadow: 0 24px 50px rgba(8, 39, 125, 0.18);
+}
 .featured__name {
   margin: 0;
   font-family: var(--font-display);
@@ -192,13 +235,33 @@
 .promo p { margin: 0; color: var(--st-muted); max-width: 36rem; line-height: 1.55; }
 .promo-art {
   min-height: 240px;
-  background-size: cover;
-  background-position: center;
+  display: grid;
+  place-items: center;
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(107, 198, 248, 0.12),
+      rgba(107, 198, 248, 0.12) 12px,
+      rgba(255, 130, 200, 0.1) 12px,
+      rgba(255, 130, 200, 0.1) 24px
+    ),
+    linear-gradient(145deg, #edf9ff, #ffeaf6);
+  color: var(--st-muted);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
-.promo-art.pack { background-image: url("../../site_assets/tcg/news-pack.png"); }
-.promo-art.stage { background-image: url("../../site_assets/tcg/hero-bg-stage.png"); }
-.promo-art.concert { background-image: url("../../site_assets/tcg/news-concert.png"); }
-.promo-art.skates { background-image: url("../../site_assets/tcg/hero-bg-skates.png"); }
+.promo-art::before {
+  content: "INSERT ASSET";
+}
+.promo-art.pack,
+.promo-art.stage,
+.promo-art.concert,
+.promo-art.skates {
+  background-image: none;
+}
 
 @media (max-width: 900px) {
   .featured {
