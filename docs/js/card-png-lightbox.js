@@ -5,7 +5,7 @@
 
 const ROOT_ID = 'starlight-png-lightbox';
 const STYLE_ID = 'starlight-png-lightbox-css';
-const STYLE_HREF = 'css/card-png-lightbox.css?v=1.0.1';
+const STYLE_HREF = 'css/card-png-lightbox.css?v=1.0.2';
 
 function getHost() {
   try {
@@ -188,29 +188,40 @@ function open(options = {}) {
   };
 
   root.onclick = (event) => {
-    if (event.target.closest('[data-png-close]')) {
+    event.stopPropagation();
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    if (target.closest('[data-png-close]')) {
+      event.preventDefault();
       close();
       return;
     }
-    if (event.target.closest('[data-png-prev]')) {
+    if (target.closest('[data-png-prev]')) {
+      event.preventDefault();
       step(-1);
       return;
     }
-    if (event.target.closest('[data-png-next]')) {
+    if (target.closest('[data-png-next]')) {
+      event.preventDefault();
       step(1);
       return;
     }
-    if (event.target.closest('[data-png-holo]')) {
+    if (target.closest('[data-png-holo]')) {
+      event.preventDefault();
       active?.onHoloToggle?.();
       renderActive();
       return;
     }
-    if (event.target.closest('[data-png-details]')) {
+    if (target.closest('[data-png-details]')) {
+      event.preventDefault();
       const card = active?.list?.[active.index];
       const onDetails = options.onDetails;
       close();
       onDetails?.(card);
     }
+  };
+  root.onpointerdown = (event) => {
+    event.stopPropagation();
   };
 
   renderActive();

@@ -81,5 +81,9 @@ test('card click opens png lightbox before the analyzer', async () => {
   assert.match(lightbox, /Details|data-png-details/);
   assert.match(lightbox, /data-png-holo/);
   assert.match(lightbox, /starlight-png-lightbox/);
+  assert.match(lightbox, /stopPropagation/);
   assert.match(lightbox, /ArrowLeft|ArrowRight/);
+  const lightboxCss = await read('docs/css/card-png-lightbox.css');
+  assert.match(lightboxCss, /z-index:\s*10050/);
+  assert.match(lightboxCss, /max-width:\s*min\(100%,\s*340px\)/);
 });
