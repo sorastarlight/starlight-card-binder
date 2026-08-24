@@ -23,6 +23,8 @@ test('default shell navigation includes core destinations and staff account link
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'collection' && entry.label === 'My Card Album Binder'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'daily' && entry.label === 'Free Daily Booster'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'shop' && entry.label === 'Card Boutique'));
+  assert.equal(nav.brandRibbon, 'Starlight Cards');
+  assert.equal(nav.chrome?.layout, 'hybrid');
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'checklist' && entry.label === 'Star Registry'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'quests' && entry.label === 'Starlight Missions'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'trades' && entry.label === 'Trade With Others'));
@@ -348,7 +350,7 @@ test('sanitizeShellNavigation preserves chrome layout mode', () => {
     ...cloneDefaultShellNavigation(),
     chrome: { layout: 'sidebar-only' }
   });
-  assert.equal(invalid.chrome.layout, 'masthead');
+  assert.equal(invalid.chrome.layout, 'hybrid');
 });
 
 test('shell navigation render applies hybrid layout classes', async () => {
@@ -357,6 +359,7 @@ test('shell navigation render applies hybrid layout classes', async () => {
     read('docs/css/app-shell.css')
   ]);
   assert.match(render, /applyShellLayoutToDom/);
+  assert.match(render, /querySelectorAll\('\.binder-ribbon'\)/);
   assert.match(render, /shell-hybrid-layout/);
   assert.match(render, /layout === 'hybrid'/);
   assert.match(shellCss, /shell-hybrid-layout/);
@@ -378,6 +381,9 @@ test('shell navigation render and static shell HTML use extensionless binder hre
   assert.match(binderHtml, /href="binder\?view=home"/);
   assert.match(binderHtml, /shell-masthead/);
   assert.match(binderHtml, /shell-masthead-nav/);
+  assert.match(binderHtml, /shell-hybrid-layout/);
+  assert.match(binderHtml, /shell-sidebar-brand/);
+  assert.match(binderHtml, /binder-ribbon/);
   assert.match(homeHtml, /href="binder\?view=daily"/);
   assert.doesNotMatch(homeHtml, /binder\.html/);
 });

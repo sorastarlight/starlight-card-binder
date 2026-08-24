@@ -117,6 +117,14 @@ export function applyShellLayoutToDom(layout = 'masthead') {
     '--shell-sidebar-w',
     mode === 'hybrid' ? 'min(286px, 28vw)' : '0px'
   );
+  const frame = document.getElementById('shellViewIframe');
+  if (frame?.contentWindow) {
+    try {
+      frame.contentWindow.postMessage({ type: 'starlight-shell-layout', layout: mode }, location.origin);
+    } catch {
+      /* cross-origin or not loaded */
+    }
+  }
   window.dispatchEvent(new CustomEvent('starlight-shell-layout-changed', { detail: { layout: mode } }));
   return mode;
 }
@@ -164,8 +172,10 @@ export function applyShellNavigationToDom(navigation, { isStaff = false } = {}) 
       .join('');
   }
 
-  const ribbon = document.querySelector('.binder-ribbon');
-  if (ribbon && config.brandRibbon) ribbon.textContent = config.brandRibbon;
+  const ribbons = document.querySelectorAll('.binder-ribbon');
+  ribbons.forEach(ribbon => {
+    if (config.brandRibbon) ribbon.textContent = config.brandRibbon;
+  });
 
   document.querySelectorAll('.staff-link').forEach(el => el.classList.toggle('visible', Boolean(isStaff)));
   document.querySelectorAll('.shell-nav-staff, .shell-mega.shell-nav-staff').forEach(el => {

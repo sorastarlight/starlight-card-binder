@@ -174,6 +174,13 @@ if (!embedded && shouldRedirectToShell()) {
   location.replace(`binder?${out.toString()}`);
 } else if (embedded) {
   document.documentElement.classList.add('starlight-embedded');
+  window.addEventListener('message', event => {
+    if (event.origin !== location.origin) return;
+    const data = event.data || {};
+    if (data.type === 'starlight-shell-layout') {
+      document.documentElement.dataset.shellLayout = data.layout === 'hybrid' ? 'hybrid' : 'masthead';
+    }
+  });
   const style = document.createElement('style');
   style.textContent = `
     html.starlight-embedded,html.starlight-embedded body{background:transparent!important;min-height:0!important;height:auto!important;overflow:hidden!important;scroll-behavior:auto!important}

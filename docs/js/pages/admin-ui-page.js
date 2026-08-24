@@ -422,8 +422,8 @@ function renderAll() {
   if (layoutSelect && navigation) {
     navigation.chrome = navigation.chrome && typeof navigation.chrome === 'object'
       ? navigation.chrome
-      : { layout: 'masthead' };
-    layoutSelect.value = navigation.chrome.layout === 'hybrid' ? 'hybrid' : 'masthead';
+      : { layout: 'hybrid' };
+    layoutSelect.value = navigation.chrome.layout === 'masthead' ? 'masthead' : 'hybrid';
   }
   ensureAccountMenu();
   renderSidebar();
@@ -514,8 +514,8 @@ layoutSelect?.addEventListener('change', () => {
   if (!navigation) return;
   navigation.chrome = navigation.chrome && typeof navigation.chrome === 'object'
     ? navigation.chrome
-    : { layout: 'masthead' };
-  navigation.chrome.layout = layoutSelect.value === 'hybrid' ? 'hybrid' : 'masthead';
+    : { layout: 'hybrid' };
+  navigation.chrome.layout = layoutSelect.value === 'masthead' ? 'masthead' : 'hybrid';
   renderAll();
 });
 

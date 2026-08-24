@@ -360,7 +360,39 @@ body.unified-shell{padding-left:env(safe-area-inset-left);padding-right:env(safe
    V88.2.1 ? navigation, top bar, and sidebar simplification
    ============================================================ */
 .unified-shell .sidebar{overflow-y:auto!important}
-.unified-shell .sidebar .brand{margin-bottom:4px}
+.unified-shell .sidebar .brand,
+.unified-shell .shell-sidebar-brand{
+  display:grid;
+  justify-items:center;
+  gap:0;
+  margin:0 0 12px;
+  padding:2px 4px 8px;
+  text-decoration:none;
+  color:inherit;
+  flex:none;
+}
+.unified-shell .shell-sidebar-brand .logo{
+  width:min(205px,100%);
+  height:auto;
+  display:block;
+}
+.unified-shell .shell-sidebar-brand .binder-ribbon{
+  display:block;
+  width:100%;
+  margin-top:-10px;
+  padding:8px 14px;
+  border-radius:999px;
+  text-align:center;
+  font-weight:900;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  font-size:clamp(.72rem,2.4vw,.84rem);
+  line-height:1.2;
+  color:#334f8d;
+  background:linear-gradient(135deg,rgba(107,198,248,.38),rgba(255,130,200,.28));
+  border:1px solid rgba(107,198,248,.42);
+  box-shadow:0 8px 18px rgba(61,83,132,.1);
+}
 .unified-shell .unified-nav{padding-bottom:8px}
 .unified-shell .filters{margin-top:2px}
 .shell-account-bar-v883{display:grid!important;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"menu feed actions";gap:10px 14px;padding:11px 14px!important}
@@ -1025,7 +1057,8 @@ body.shell-masthead-layout.shell-hybrid-layout .site{
 
 body.shell-masthead-layout.shell-hybrid-layout .shell-drawer,
 body.shell-masthead-layout.shell-hybrid-layout .sidebar{
-  display:block!important;
+  display:flex!important;
+  flex-direction:column;
   position:sticky;
   top:calc(var(--shell-masthead-h, 64px) + 8px);
   align-self:start;
@@ -1039,6 +1072,21 @@ body.shell-masthead-layout.shell-hybrid-layout .sidebar{
   box-shadow:none;
   padding:12px 8px 20px;
   z-index:1;
+}
+
+body.shell-masthead-layout.shell-hybrid-layout .sidebar .unified-nav{
+  flex:1;
+  min-height:0;
+  overflow-y:auto;
+}
+
+@media(min-width:981px){
+  body.shell-masthead-layout.shell-hybrid-layout .shell-masthead-brand{
+    display:none!important;
+  }
+  body.shell-masthead-layout.shell-hybrid-layout .shell-masthead-inner{
+    grid-template-columns:minmax(0,1fr) auto;
+  }
 }
 
 body.shell-masthead-layout.shell-hybrid-layout .shell-drawer-backdrop{

@@ -730,6 +730,14 @@ window.addEventListener('message',async e=>{
   }
   if (data.type==='starlight-view-ready'||data.type==='starlight-content-ready'||data.type==='starlight-app-ready'){
     markViewReady(data);
+    if (frame?.contentWindow) {
+      const layout = document.body.dataset.shellLayout || 'hybrid';
+      try {
+        frame.contentWindow.postMessage({ type: 'starlight-shell-layout', layout }, location.origin);
+      } catch {
+        /* iframe not ready */
+      }
+    }
   }
   if(data.type==='starlight-view-height')resizeEmbeddedView(Number(data.height));
   if(data.type==='starlight-view-reset'){

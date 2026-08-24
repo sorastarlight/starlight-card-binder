@@ -89,7 +89,7 @@ export function createDefaultShellNavigation() {
     version: 2,
     brandRibbon: 'Starlight Cards',
     chrome: {
-      layout: 'masthead'
+      layout: 'hybrid'
     },
     pageTitles: {
       home: 'Home',
