@@ -1233,49 +1233,23 @@ window.addEventListener('starlight-website-content-hydrated', (event) => {
   }
 });
 
-function renderGalleryProgress(browse = resolveBinderBrowse()) {
-  const host = $('#tcgGalleryProgress');
-  if (!host) return;
-  const list = browse?.list || [];
-  const poolSize = browse?.poolSize || list.length || cards.length;
-  const owned = list.filter(c => isCollected(c.id)).length;
-  const pct = poolSize ? Math.round((owned / poolSize) * 100) : 0;
-  host.hidden = !poolSize;
-  host.innerHTML = `<div class="card-gallery-progress-copy">${owned} / ${poolSize} collected (${pct}%)</div><div class="card-gallery-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="${poolSize}" aria-valuenow="${owned}" aria-label="Gallery collection progress"><span style="width:${pct}%"></span></div>`;
-}
-
 function renderSeriesHero(browse = resolveBinderBrowse()) {
   const f = activeFilters();
-  const searching = Boolean(f.q);
   const title = $('#seriesHeroTitle');
   const desc = $('#seriesHeroDescription');
   const eyebrow = $('.card-gallery-header .eyebrow, .series-hero .eyebrow');
-  const stats = $('#seriesHeroStats');
   const toolbar = $('#seriesHeroToolbar');
   if (!title || !desc) return;
   const list = f.series === 'All Series' ? cards : cards.filter(c => c.series === f.series);
-  const got = list.filter(c => isCollected(c.id)).length;
   const landing = websiteBinderLanding || window.__starlightWebsiteContent?.binderLanding || websiteSection('binderLanding');
   const browsingSeries = f.series !== 'All Series';
   applyOptionalText(title, landing?.title, 'Starlight Card Gallery');
-  applyOptionalText(desc, landing?.lead, 'Browse every card in the series. Uncollected cards stay face-down until you earn them.');
+  applyOptionalText(desc, landing?.lead, 'Browse every officially released card. Tap a card to view it fullscreen.');
   if (browsingSeries) {
     title.textContent = `${f.series} ⭐`;
-    desc.textContent = list.find(c => c.seriesDescription)?.seriesDescription || landing?.gridBrowseLead || 'Browse this set and collect every card.';
+    desc.textContent = list.find(c => c.seriesDescription)?.seriesDescription || landing?.gridBrowseLead || 'Browse the cards in this set.';
   }
   if (eyebrow) applyOptionalText(eyebrow, landing?.eyebrow, 'Starlight Cards');
-  if (stats) {
-    const rarityBits = ['Common','Uncommon','Rare','Epic','Legendary'].map(r => {
-      const n = list.filter(c => c.rarity === r).length;
-      return n ? `<span class="hero-pill rarity-pill rarity-${r.toLowerCase()}">${r}: ${n}</span>` : '';
-    }).join('');
-    const totalPill = fillWebsiteTokens(landing.totalCardsPill || '{count} total cards', { count: cards.length });
-    const collectedPill = fillWebsiteTokens(landing.collectedPill || '{owned} / {total} collected', { owned: got, total: list.length });
-    stats.innerHTML = browsingSeries
-      ? `<span class="hero-pill progress">${esc(collectedPill)}</span>${rarityBits}`
-      : `<span class="hero-pill progress">${esc(totalPill)}</span><span class="hero-pill progress">${esc(collectedPill)}</span>${rarityBits}`;
-  }
-  renderGalleryProgress(browse);
   if (toolbar) {
     if (browsingSeries) {
       toolbar.hidden = false;

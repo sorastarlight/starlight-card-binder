@@ -41,53 +41,6 @@ body[data-page="binder"] .card-gallery-toolbar {
   margin-bottom: 4px;
 }
 
-body[data-page="binder"] .card-gallery-stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-body[data-page="binder"] .card-gallery-stats .hero-pill {
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.82);
-  border: 1px solid rgba(107, 198, 248, 0.24);
-  color: #405fa1;
-  font-size: 0.78rem;
-  font-weight: 800;
-}
-
-body[data-page="binder"] .card-gallery-progress {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px 16px;
-  margin-top: 10px;
-}
-
-body[data-page="binder"] .card-gallery-progress-copy {
-  font-size: 0.82rem;
-  font-weight: 800;
-  color: #2a3f72;
-}
-
-body[data-page="binder"] .card-gallery-progress-bar {
-  flex: 1 1 180px;
-  height: 10px;
-  border-radius: 999px;
-  background: rgba(107, 198, 248, 0.16);
-  overflow: hidden;
-}
-
-body[data-page="binder"] .card-gallery-progress-bar span {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, rgba(107, 198, 248, 0.95), rgba(255, 130, 200, 0.88));
-  transition: width 0.35s ease;
-}
-
 body[data-page="binder"] .card-gallery-summary {
   margin: 8px 0 0;
   color: #6b7089;
@@ -285,8 +238,7 @@ body[data-page="binder"] .card-gallery-stage .empty-state {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body[data-page="binder"] .card-gallery-btn,
-  body[data-page="binder"] .card-gallery-progress-bar span {
+  body[data-page="binder"] .card-gallery-btn {
     transition: none;
   }
 
