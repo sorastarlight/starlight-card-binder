@@ -967,7 +967,7 @@ function renderFilterControls() {
       <label><span>Rarity</span><select data-rarity aria-label="Filter by rarity"><option>All Rarities</option><option>Common</option><option>Uncommon</option><option>Rare</option><option>Epic</option><option>Legendary</option></select></label>
       <label><span>Sort By</span><select id="sortSelect" aria-label="Sort cards"><option value="numberAsc">Number (Low to High)</option><option value="numberDesc">Number (High to Low)</option><option value="nameAsc">Name (A to Z)</option><option value="rarityDesc">Rarity (Best First)</option></select></label>
       ${showView ? `<fieldset class="card-filter-view"><legend>Collection Status</legend><label><input checked name="viewFilter" type="radio" value="all"> All Cards</label><label><input name="viewFilter" type="radio" value="collected"> Collected</label><label><input name="viewFilter" type="radio" value="missing"> Not Collected</label></fieldset>` : ''}
-      ${isBinder ? `<fieldset class="card-filter-favorites"><legend>Favorites</legend><label><input type="checkbox" data-filter-favorites value="1"> Favorites only</label></fieldset>` : ''}
+      ${isBinder ? `<fieldset class="card-filter-view card-filter-favorites"><legend>Favorites</legend><label><input class="qol-no-enhance" type="checkbox" data-filter-favorites value="1"> Favorites only</label></fieldset>` : ''}
       <button class="card-filter-reset" type="button" data-reset-card-filters>${esc(resetLabel)}</button>
     </div>`;
   host.innerHTML = isBinder
@@ -1233,31 +1233,18 @@ window.addEventListener('starlight-website-content-hydrated', (event) => {
   }
 });
 
-function renderSeriesHero(browse = resolveBinderBrowse()) {
+function renderSeriesHero() {
   const f = activeFilters();
-  const title = $('#seriesHeroTitle');
-  const desc = $('#seriesHeroDescription');
-  const eyebrow = $('.card-gallery-header .eyebrow, .series-hero .eyebrow');
   const toolbar = $('#seriesHeroToolbar');
-  if (!title || !desc) return;
-  const list = f.series === 'All Series' ? cards : cards.filter(c => c.series === f.series);
+  if (!toolbar) return;
   const landing = websiteBinderLanding || window.__starlightWebsiteContent?.binderLanding || websiteSection('binderLanding');
   const browsingSeries = f.series !== 'All Series';
-  applyOptionalText(title, landing?.title, 'Starlight Card Gallery');
-  applyOptionalText(desc, landing?.lead, 'Browse every officially released card. Tap a card to view it fullscreen.');
   if (browsingSeries) {
-    title.textContent = `${f.series} ⭐`;
-    desc.textContent = list.find(c => c.seriesDescription)?.seriesDescription || landing?.gridBrowseLead || 'Browse the cards in this set.';
-  }
-  if (eyebrow) applyOptionalText(eyebrow, landing?.eyebrow, 'Starlight Cards');
-  if (toolbar) {
-    if (browsingSeries) {
-      toolbar.hidden = false;
-      toolbar.innerHTML = `<button id="backToSeries" class="btn" type="button">${esc(landing.backToSeriesCta || '← All Series')}</button><p class="card-gallery-summary" data-filter-summary role="status" aria-live="polite"></p>`;
-    } else {
-      toolbar.hidden = true;
-      toolbar.innerHTML = '';
-    }
+    toolbar.hidden = false;
+    toolbar.innerHTML = `<button id="backToSeries" class="btn" type="button">${esc(landing.backToSeriesCta || '← All Series')}</button>`;
+  } else {
+    toolbar.hidden = true;
+    toolbar.innerHTML = '';
   }
 }
 
@@ -2065,10 +2052,7 @@ function renderBinder() {
   const browse = applyFilters();
   syncBinderSeriesMode(browse);
   ensureBinderFilterPanel();
-  renderSeriesHero(browse);
-  $$('[data-filter-summary]').forEach(element => {
-    element.textContent = browse.summary || '';
-  });
+  renderSeriesHero();
   const grid = $('#seriesGridStage');
   if (grid) {
     grid.innerHTML = renderGalleryGridHtml(browse);

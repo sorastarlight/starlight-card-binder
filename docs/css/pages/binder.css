@@ -78,8 +78,9 @@ body[data-page="binder"] .binder-browse-chrome .card-filter-panel {
   box-shadow: none;
 }
 
-body[data-page="binder"] .card-filter-fields {
-  grid-template-columns: minmax(220px, 1.45fr) repeat(3, minmax(130px, 1fr)) minmax(250px, 1.15fr) auto;
+body[data-page="binder"] .card-filter-fields,
+body[data-page="binder"] .card-filter-fields--binder {
+  grid-template-columns: minmax(200px, 1.4fr) repeat(3, minmax(120px, 1fr)) minmax(220px, 1.1fr) minmax(140px, auto) auto;
 }
 
 @media (max-width: 1180px) {

@@ -2,7 +2,7 @@
   const enhance = input => {
     if (!(input instanceof HTMLInputElement) || input.type !== 'checkbox') return;
     if (input.dataset.qolEnhanced === '1' || input.classList.contains('qol-no-enhance')) return;
-    if (input.closest('.switch,.switch-row,.status-toggle,.toggle-card,.privacy-toggle')) return;
+    if (input.closest('.switch,.switch-row,.status-toggle,.toggle-card,.privacy-toggle,.card-filter-panel')) return;
     if (input.hidden) return;
     const label = input.closest('label');
     if (!label || label.classList.contains('qol-toggle-label')) return;

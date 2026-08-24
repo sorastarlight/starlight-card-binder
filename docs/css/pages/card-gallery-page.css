@@ -9,43 +9,27 @@ body[data-page="binder"] .card-gallery-page {
   min-width: 0;
 }
 
-body[data-page="binder"] .card-gallery-header {
-  padding: clamp(14px, 2.2vw, 22px) clamp(4px, 1vw, 8px);
-  border-radius: 0;
-  background: transparent;
+body[data-page="binder"] .card-gallery-page > .visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
   border: 0;
-  box-shadow: none;
-}
-
-body[data-page="binder"] .card-gallery-header h1 {
-  margin: 0.1em 0 0.3em;
-  color: #2a3f72;
-  font-size: clamp(1.55rem, 3.4vw, 2.35rem);
-  font-style: normal;
-  text-shadow: none;
-  line-height: 1.08;
-}
-
-body[data-page="binder"] .card-gallery-header p,
-body[data-page="binder"] .card-gallery-header .eyebrow {
-  color: #66759a;
-  text-shadow: none;
 }
 
 body[data-page="binder"] .card-gallery-toolbar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
-  margin-bottom: 4px;
 }
 
-body[data-page="binder"] .card-gallery-summary {
-  margin: 8px 0 0;
-  color: #6b7089;
-  font-size: 0.86rem;
-  font-weight: 800;
+body[data-page="binder"] .card-gallery-toolbar[hidden] {
+  display: none !important;
 }
 
 body[data-page="binder"] .card-gallery-page .card-filter-panel {

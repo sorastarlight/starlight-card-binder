@@ -434,7 +434,7 @@ async function loadBinderApplication() {
         return;
     }
 
-    window.StarlightCardFilters = await import('./card-filter-utils.js?v=1.1.0');
+    window.StarlightCardFilters = await import('./card-filter-utils.js?v=1.1.1');
     window.StarlightFavoriteUtils = await import('./favorite-utils.js?v=1.0.0');
 
     return new Promise((resolve, reject) => {
@@ -453,7 +453,7 @@ async function loadBinderApplication() {
                     "load",
                     () => {
                         const script = document.createElement("script");
-                        script.src = "./js/app.js?v=1.9.19";
+                        script.src = "./js/app.js?v=1.9.20";
                         script.async = false;
                         script.dataset.starlightApp = "true";
 

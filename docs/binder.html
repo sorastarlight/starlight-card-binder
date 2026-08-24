@@ -7,8 +7,8 @@
 <link href="css/style.css?v=1.0.3" rel="stylesheet"/>
 <link href="css/v80-8-ui.css" rel="stylesheet"/>
 <link href="css/app-shell.css?v=1.4.4" rel="stylesheet"/>
-<link href="css/card-filters.css?v=1.0" rel="stylesheet"/>
-<link href="css/pages/card-gallery-page.css?v=2.3.1" rel="stylesheet"/>
+<link href="css/card-filters.css?v=1.1.0" rel="stylesheet"/>
+<link href="css/pages/card-gallery-page.css?v=2.4.0" rel="stylesheet"/>
 <link href="css/card-view-transition.css?v=1.0.0" rel="stylesheet"/>
 <script src="js/browser-performance.js?v=1.0.0" defer></script>
 <link rel="stylesheet" href="css/shared-ui.css?v=1.6.22">
@@ -90,13 +90,8 @@
 
 <div class="shell-native-view" id="binderNativeView">
   <div class="card-gallery-page">
-    <header class="card-gallery-header panel">
-      <div class="card-gallery-toolbar" id="seriesHeroToolbar" hidden></div>
-      <p class="eyebrow">Starlight Cards</p>
-      <h1 id="seriesHeroTitle">Starlight Card Gallery</h1>
-      <p id="seriesHeroDescription">Browse every officially released card. Tap a card to view it fullscreen.</p>
-      <p class="card-gallery-summary" data-filter-summary role="status" aria-live="polite"></p>
-    </header>
+    <h1 class="visually-hidden">Starlight Card Gallery</h1>
+    <div class="card-gallery-toolbar" id="seriesHeroToolbar" hidden></div>
     <section class="card-filter-panel panel" data-card-filter-context="binder" aria-label="Filter gallery cards"></section>
     <section class="card-gallery-stage panel" id="seriesGridStage" aria-label="Starlight card gallery"></section>
   </div>
@@ -115,6 +110,6 @@
 <script src="js/starlight-perspective-card.js?v=1.0.0"></script>
 <script type="module" src="js/card-png-lightbox.js?v=1.0.2"></script>
 <script src="js/shared-ui.js?v=1.6.22"></script>
-<script src="js/qol-ui.js?v=94.2.10" defer></script>
+<script src="js/qol-ui.js?v=94.2.11" defer></script>
 </body>
 </html>

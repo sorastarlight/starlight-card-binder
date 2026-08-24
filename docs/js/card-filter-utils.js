@@ -57,16 +57,17 @@ export function resolveBinderBrowseList(cards, filters = {}, options = {}) {
     ? (searching ? 'Search results' : 'Card Gallery')
     : series;
   const favoriteNote = favoritesOnly ? ' · favorites only' : '';
-  const summary = series === 'All Series'
-    ? (searching
-      ? `Showing ${list.length} of ${pool.length} cards matching “${query}”${favoriteNote}`
-      : `Showing ${list.length} of ${pool.length} cards · ${owned} collected${favoriteNote}`)
-    : `Showing ${list.length} of ${pool.length} cards in ${series} · ${owned} collected${favoriteNote}`;
+  const summary = searching
+    ? `Showing ${list.length} of ${pool.length} cards matching “${query}”${favoriteNote}`
+    : (series === 'All Series'
+      ? `Showing ${list.length} of ${pool.length} cards${favoriteNote}`
+      : `Showing ${list.length} of ${pool.length} cards in ${series}${favoriteNote}`);
 
   return {
     showLanding: false,
     list,
     poolSize: pool.length,
+    owned,
     heading,
     summary
   };

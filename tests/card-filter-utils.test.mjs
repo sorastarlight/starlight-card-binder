@@ -68,7 +68,8 @@ test('resolveBinderBrowseList shows full gallery for All Series without query', 
   assert.equal(browse.list.length, 3);
   assert.equal(browse.poolSize, 3);
   assert.equal(browse.heading, 'Card Gallery');
-  assert.match(browse.summary, /0 collected/);
+  assert.match(browse.summary, /Showing 3 of 3 cards/);
+  assert.doesNotMatch(browse.summary, /collected/);
 });
 
 test('resolveBinderBrowseList searches the full catalog when All Series + query', () => {

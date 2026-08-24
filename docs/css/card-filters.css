@@ -39,6 +39,10 @@
   gap: 12px;
 }
 
+.card-filter-fields--binder {
+  grid-template-columns: minmax(200px, 1.4fr) repeat(3, minmax(120px, 1fr)) minmax(220px, 1.1fr) minmax(140px, auto) auto;
+}
+
 .card-filter-fields > label,
 .card-filter-view {
   display: grid;
@@ -104,6 +108,14 @@
   accent-color: #ff82c8;
 }
 
+.card-filter-favorites {
+  grid-template-columns: max-content;
+}
+
+.card-filter-favorites label {
+  min-height: 28px;
+}
+
 .card-filter-reset {
   min-height: 44px;
   padding: 9px 16px;
@@ -133,6 +145,7 @@
 
 @media (max-width: 1180px) {
   .card-filter-fields,
+  .card-filter-fields--binder,
   [data-card-filter-context="collection"] .card-filter-fields,
   [data-card-filter-context="checklist"] .card-filter-fields {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -141,6 +154,10 @@
   .card-filter-view {
     grid-template-columns: repeat(3, 1fr);
   }
+
+  .card-filter-favorites {
+    grid-template-columns: max-content;
+  }
 }
 
 @media (max-width: 620px) {
@@ -148,6 +165,7 @@
   .card-filter-heading { align-items: flex-start; flex-direction: column; }
   .card-filter-heading > p { text-align: left; }
   .card-filter-fields,
+  .card-filter-fields--binder,
   [data-card-filter-context="collection"] .card-filter-fields,
   [data-card-filter-context="checklist"] .card-filter-fields { grid-template-columns: 1fr; }
   .card-filter-view { grid-template-columns: 1fr; }
