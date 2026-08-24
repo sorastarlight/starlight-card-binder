@@ -967,7 +967,7 @@ function renderFilterControls() {
       <label><span>Rarity</span><select data-rarity aria-label="Filter by rarity"><option>All Rarities</option><option>Common</option><option>Uncommon</option><option>Rare</option><option>Epic</option><option>Legendary</option></select></label>
       <label><span>Sort By</span><select id="sortSelect" aria-label="Sort cards"><option value="numberAsc">Number (Low to High)</option><option value="numberDesc">Number (High to Low)</option><option value="nameAsc">Name (A to Z)</option><option value="rarityDesc">Rarity (Best First)</option></select></label>
       ${showView ? `<fieldset class="card-filter-view"><legend>Collection Status</legend><label><input checked name="viewFilter" type="radio" value="all"> All Cards</label><label><input name="viewFilter" type="radio" value="collected"> Collected</label><label><input name="viewFilter" type="radio" value="missing"> Not Collected</label></fieldset>` : ''}
-      ${isBinder ? `<fieldset class="card-filter-view card-filter-favorites"><legend>Favorites</legend><label><input class="qol-no-enhance" type="checkbox" data-filter-favorites value="1"> Favorites only</label></fieldset>` : ''}
+      ${isBinder ? `<label class="card-filter-favorites"><span>Favorites</span><span class="card-filter-favorites-control"><input class="qol-no-enhance" type="checkbox" data-filter-favorites value="1"><span>Favorites only</span></span></label>` : ''}
       <button class="card-filter-reset" type="button" data-reset-card-filters>${esc(resetLabel)}</button>
     </div>`;
   host.innerHTML = isBinder

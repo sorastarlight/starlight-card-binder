@@ -51,7 +51,7 @@
   margin: 0;
 }
 
-.card-filter-fields label > span,
+.card-filter-fields > label > span:first-child,
 .card-filter-view legend {
   color: #52679b;
   font-size: .72rem;
@@ -109,11 +109,51 @@
 }
 
 .card-filter-favorites {
-  grid-template-columns: max-content;
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  margin: 0;
 }
 
-.card-filter-favorites label {
-  min-height: 28px;
+.card-filter-favorites > span:first-child {
+  color: #52679b;
+  font-size: .72rem;
+  font-weight: 950;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.card-filter-favorites-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid rgba(107, 198, 248, .3);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, .72);
+  color: #52679b;
+  font-size: .8rem;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.card-filter-favorites-control input[type="checkbox"] {
+  position: static;
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: #ff82c8;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.card-filter-favorites:has(input:checked) .card-filter-favorites-control {
+  border-color: rgba(255, 130, 200, .55);
+  background: rgba(255, 241, 250, .92);
+  color: #405fa1;
 }
 
 .card-filter-reset {
@@ -154,10 +194,6 @@
   .card-filter-view {
     grid-template-columns: repeat(3, 1fr);
   }
-
-  .card-filter-favorites {
-    grid-template-columns: max-content;
-  }
 }
 
 @media (max-width: 620px) {
@@ -169,5 +205,6 @@
   [data-card-filter-context="collection"] .card-filter-fields,
   [data-card-filter-context="checklist"] .card-filter-fields { grid-template-columns: 1fr; }
   .card-filter-view { grid-template-columns: 1fr; }
+  .card-filter-favorites-control { width: 100%; justify-content: flex-start; }
 }
 
