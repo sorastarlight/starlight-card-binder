@@ -73,6 +73,24 @@ function sanitizeAccountMenuItems(items, fallback) {
   return source.map(sanitizeItem).slice(0, 16);
 }
 
+function ensureAccountMenuAdminHub(signedIn, defaults) {
+  const list = Array.isArray(signedIn) ? [...signedIn] : [];
+  const hasAdmin = list.some(item =>
+    item.destination === 'admin'
+    || item.id === 'admin-hub'
+    || ((item.features || []).includes('staffOnly') && /admin/i.test(item.label || ''))
+  );
+  if (hasAdmin) return list;
+  const adminItem = (defaults.accountMenu?.signedIn || [])
+    .find(item => item.destination === 'admin' || item.id === 'admin-hub');
+  if (!adminItem) return list;
+  const insert = sanitizeItem(adminItem, list.length);
+  const sepIndex = list.findIndex(item => (item.features || []).includes('separator'));
+  if (sepIndex >= 0) list.splice(sepIndex, 0, insert);
+  else list.push(insert);
+  return list;
+}
+
 function consolidateTradingNavItems(items = []) {
   const result = [];
   let tradingHubItem = null;
@@ -149,9 +167,17 @@ function ensureDefaultSidebarItems(sections, defaults) {
   return sections;
 }
 
+function rewriteSectionLabel(section) {
+  const id = String(section.id || '');
+  const label = String(section.label || '').trim();
+  if (id === 'cards' && /^cards$/i.test(label)) return 'Starlight Cards Gallery';
+  if (id === 'collect' && /^collect$/i.test(label)) return 'My Collection';
+  return label || section.label;
+}
+
 function sanitizeSection(section = {}, index = 0) {
   const items = Array.isArray(section.items) ? section.items.map(sanitizeItem).slice(0, 40) : [];
-  return {
+  const next = {
     id: String(section.id || `section-${index}`).slice(0, 64),
     label: String(section.label || 'Section').trim().slice(0, 80) || 'Section',
     icon: asIcon(section.icon),
@@ -160,6 +186,8 @@ function sanitizeSection(section = {}, index = 0) {
     mobileOnly: Boolean(section.mobileOnly),
     items: consolidateTradingNavItems(items)
   };
+  next.label = rewriteSectionLabel(next);
+  return next;
 }
 
 export function sanitizeShellNavigation(input) {
@@ -195,7 +223,7 @@ export function sanitizeShellNavigation(input) {
       ? source.sidebar.sections.map(sanitizeSection).slice(0, 8)
       : defaults.sidebar.sections.map(sanitizeSection),
     defaults
-  );
+  ).filter(section => section.id !== 'series' && section.id !== 'admin');
 
   if (!sections.length) throw new Error('At least one sidebar section is required.');
 
@@ -219,7 +247,10 @@ export function sanitizeShellNavigation(input) {
     : defaults.accountMenu;
 
   const accountMenu = {
-    signedIn: sanitizeAccountMenuItems(accountMenuSource.signedIn, defaults.accountMenu.signedIn),
+    signedIn: ensureAccountMenuAdminHub(
+      sanitizeAccountMenuItems(accountMenuSource.signedIn, defaults.accountMenu.signedIn),
+      defaults
+    ),
     signedOut: sanitizeAccountMenuItems(accountMenuSource.signedOut, defaults.accountMenu.signedOut)
   };
   for (const list of [accountMenu.signedIn, accountMenu.signedOut]) {

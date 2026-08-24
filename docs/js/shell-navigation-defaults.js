@@ -112,26 +112,8 @@ export function createDefaultShellNavigation() {
     sidebar: {
       sections: [
         {
-          id: 'series',
-          label: 'Series',
-          icon: { type: 'emoji', value: '✦' },
-          staffOnly: false,
-          mega: true,
-          items: [
-            {
-              id: 'all-series',
-              label: 'All Series',
-              icon: { type: 'emoji', value: '🃏' },
-              destination: 'binder',
-              enabled: true,
-              features: ['clearSeries'],
-              className: 'shell-series-all'
-            }
-          ]
-        },
-        {
           id: 'cards',
-          label: 'Cards',
+          label: 'Starlight Cards Gallery',
           icon: { type: 'emoji', value: '🃏' },
           staffOnly: false,
           mega: true,
@@ -142,7 +124,7 @@ export function createDefaultShellNavigation() {
         },
         {
           id: 'collect',
-          label: 'Collect',
+          label: 'My Collection',
           icon: { type: 'emoji', value: '♡' },
           staffOnly: false,
           mega: true,
@@ -182,16 +164,6 @@ export function createDefaultShellNavigation() {
             { id: 'rewards', label: 'Received Gifts', icon: { type: 'emoji', value: '🎁' }, destination: 'rewards', enabled: true, features: ['receivedGiftBadge'] },
             { id: 'profile', label: 'Profile', icon: { type: 'emoji', value: '👤' }, destination: 'profile', enabled: true, features: [] }
           ]
-        },
-        {
-          id: 'admin',
-          label: 'Administration Hub',
-          icon: { type: 'emoji', value: '🛠️' },
-          staffOnly: true,
-          mega: false,
-          items: [
-            { id: 'admin-hub', label: 'Open Administration Hub', icon: { type: 'emoji', value: '🛠️' }, destination: 'admin', enabled: true, features: ['staffOnly'], className: 'staff-link' }
-          ]
         }
       ]
     },
@@ -209,6 +181,7 @@ export function createDefaultShellNavigation() {
         { id: 'rewards', label: 'Received Gifts', destination: 'rewards', enabled: true, features: ['receivedGiftBadge'] },
         { id: 'trades', label: 'Trade With Others', destination: 'trades', enabled: true, features: ['tradeOfferBadge'] },
         { id: 'redeem', label: 'Redeem A Code', destination: 'redeem', enabled: true, features: [] },
+        { id: 'admin-hub', label: 'Administration Hub', destination: 'admin', enabled: true, features: ['staffOnly'] },
         { id: 'sep-1', label: '', destination: '', enabled: true, features: ['separator'] },
         { id: 'sign-out', label: 'Sign Out', destination: '', enabled: true, features: ['signOut'] }
       ],

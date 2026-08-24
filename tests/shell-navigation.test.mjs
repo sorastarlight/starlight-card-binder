@@ -7,12 +7,17 @@ import { readFile } from 'node:fs/promises';
 
 const read = relativePath => readFile(new URL(`../${relativePath}`, import.meta.url), 'utf8');
 
-test('default shell navigation includes core destinations and staff section', () => {
+test('default shell navigation includes core destinations and staff account link', () => {
   const nav = cloneDefaultShellNavigation();
   const ids = nav.sidebar.sections.map(section => section.id);
-  assert.deepEqual(ids.slice(0, 4), ['series', 'cards', 'collect', 'community']);
-  assert.equal(nav.sidebar.sections[0].label, 'Series');
-  assert.ok(nav.sidebar.sections.some(section => section.staffOnly));
+  assert.deepEqual(ids.slice(0, 3), ['cards', 'collect', 'community']);
+  assert.equal(nav.sidebar.sections[0].label, 'Starlight Cards Gallery');
+  assert.equal(nav.sidebar.sections[1].label, 'My Collection');
+  assert.ok(!nav.sidebar.sections.some(section => section.id === 'series'));
+  assert.ok(!nav.sidebar.sections.some(section => section.staffOnly));
+  assert.ok(nav.accountMenu.signedIn.some(item =>
+    item.destination === 'admin' && (item.features || []).includes('staffOnly')
+  ));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'offers'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'feed' && entry.label === 'LIVE Feed'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'collection' && entry.label === 'My Card Album Binder'));
@@ -268,6 +273,66 @@ test('signed-out CTAs avoid standalone login.html links', async () => {
   assert.match(daily, /binder\?view=login/);
   assert.match(collector, /binder\?view=login/);
   assert.match(importPage, /binder\?view=login/);
+});
+
+test('sanitizeShellNavigation strips Series/Admin sidebar and keeps Admin Hub in account menu', () => {
+  const cleaned = sanitizeShellNavigation({
+    ...cloneDefaultShellNavigation(),
+    sidebar: {
+      sections: [
+        {
+          id: 'series',
+          label: 'Series',
+          icon: { type: 'emoji', value: '✦' },
+          staffOnly: false,
+          mega: true,
+          items: [
+            { id: 'all-series', label: 'All Series', destination: 'binder', enabled: true, features: ['clearSeries'] }
+          ]
+        },
+        {
+          id: 'cards',
+          label: 'Cards',
+          icon: { type: 'emoji', value: '🃏' },
+          staffOnly: false,
+          mega: true,
+          items: [
+            { id: 'binder', label: 'Starlight Card Gallery', destination: 'binder', enabled: true, features: [] }
+          ]
+        },
+        {
+          id: 'admin',
+          label: 'Administration Hub',
+          icon: { type: 'emoji', value: '🛠️' },
+          staffOnly: true,
+          mega: false,
+          items: [
+            { id: 'admin-hub', label: 'Open Administration Hub', destination: 'admin', enabled: true, features: ['staffOnly'] }
+          ]
+        }
+      ]
+    },
+    accountMenu: {
+      signedIn: [
+        { id: 'profile-settings', label: 'Profile', destination: 'profile', enabled: true, features: [] },
+        { id: 'sep-1', label: '', destination: '', enabled: true, features: ['separator'] },
+        { id: 'sign-out', label: 'Sign Out', destination: '', enabled: true, features: ['signOut'] }
+      ],
+      signedOut: cloneDefaultShellNavigation().accountMenu.signedOut
+    }
+  });
+  assert.ok(!cleaned.sidebar.sections.some(section => section.id === 'series'));
+  assert.ok(!cleaned.sidebar.sections.some(section => section.id === 'admin'));
+  assert.equal(cleaned.sidebar.sections.find(section => section.id === 'cards')?.label, 'Starlight Cards Gallery');
+  assert.ok(cleaned.accountMenu.signedIn.some(item =>
+    item.destination === 'admin' && (item.features || []).includes('staffOnly')
+  ));
+});
+
+test('shell navigation render gates staff account items', async () => {
+  const render = await read('docs/js/shell-navigation-render.js');
+  assert.match(render, /features\.includes\('staffOnly'\) && !isStaff/);
+  assert.match(render, /map\(item => renderAccountMenuItem\(item, \{ isStaff \}\)/);
 });
 
 test('shell navigation render and static shell HTML use extensionless binder hrefs', async () => {

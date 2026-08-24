@@ -1,27 +1,26 @@
-/* Card Gallery page — self-contained; avoids legacy v61 binder layout */
+/* Card Gallery — TCG Live–style dense, fluid, full-bleed under masthead */
 
 body[data-page="binder"] .card-gallery-page {
   display: grid;
-  gap: 16px;
+  gap: clamp(12px, 1.8vw, 20px);
   grid-column: 1 / -1;
+  width: 100%;
+  max-width: none;
   min-width: 0;
 }
 
 body[data-page="binder"] .card-gallery-header {
-  padding: clamp(18px, 3vw, 28px);
-  border-radius: 22px;
-  background:
-    radial-gradient(circle at 12% 18%, rgba(255, 186, 228, 0.26), transparent 36%),
-    radial-gradient(circle at 88% 12%, rgba(168, 226, 255, 0.3), transparent 34%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.97), rgba(239, 249, 255, 0.92));
-  border: 1px solid rgba(107, 198, 248, 0.28);
-  box-shadow: 0 16px 40px rgba(61, 83, 132, 0.1);
+  padding: clamp(14px, 2.2vw, 22px) clamp(4px, 1vw, 8px);
+  border-radius: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
 }
 
 body[data-page="binder"] .card-gallery-header h1 {
-  margin: 0.15em 0 0.35em;
+  margin: 0.1em 0 0.3em;
   color: #2a3f72;
-  font-size: clamp(1.75rem, 4vw, 2.6rem);
+  font-size: clamp(1.55rem, 3.4vw, 2.35rem);
   font-style: normal;
   text-shadow: none;
   line-height: 1.08;
@@ -39,14 +38,14 @@ body[data-page="binder"] .card-gallery-toolbar {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 body[data-page="binder"] .card-gallery-stats {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 body[data-page="binder"] .card-gallery-stats .hero-pill {
@@ -64,7 +63,7 @@ body[data-page="binder"] .card-gallery-progress {
   flex-wrap: wrap;
   align-items: center;
   gap: 10px 16px;
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 body[data-page="binder"] .card-gallery-progress-copy {
@@ -90,33 +89,37 @@ body[data-page="binder"] .card-gallery-progress-bar span {
 }
 
 body[data-page="binder"] .card-gallery-summary {
-  margin: 10px 0 0;
+  margin: 8px 0 0;
   color: #6b7089;
   font-size: 0.86rem;
   font-weight: 800;
 }
 
 body[data-page="binder"] .card-gallery-page .card-filter-panel {
-  padding: 18px 22px;
-  border-radius: 18px;
+  padding: clamp(12px, 1.8vw, 18px) clamp(14px, 2vw, 20px);
+  border-radius: 16px;
   border: 1px solid rgba(107, 198, 248, 0.24);
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.88);
 }
 
+/* Full-bleed art stage — cards scale with viewport like TCG Live */
 body[data-page="binder"] .card-gallery-stage {
-  padding: clamp(14px, 2.4vw, 22px);
-  border-radius: 22px;
-  border: 1px solid rgba(107, 198, 248, 0.22);
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 14px 36px rgba(61, 83, 132, 0.08);
+  padding: clamp(6px, 1.2vw, 14px) 0 clamp(28px, 4vw, 48px);
+  border-radius: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
   min-width: 0;
+  width: 100%;
 }
 
 body[data-page="binder"] .card-gallery-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 158px), 1fr));
-  gap: clamp(14px, 2vw, 22px);
+  /* Dense fluid columns: ~8 across on wide desktops, fewer on narrow */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, clamp(96px, 11vw, 148px)), 1fr));
+  gap: clamp(10px, 1.4vw, 18px);
   align-items: start;
+  width: 100%;
 }
 
 body[data-page="binder"] .card-gallery-grid.is-filtering .card-gallery-item {
@@ -127,18 +130,18 @@ body[data-page="binder"] .card-gallery-grid.is-filtering .card-gallery-item {
 
 body[data-page="binder"] .card-gallery-item {
   display: grid;
-  gap: 8px;
-  justify-items: center;
+  gap: 0;
+  justify-items: stretch;
   min-height: 0 !important;
   min-width: 0;
   animation: cardGalleryEnter 0.42s ease both;
-  animation-delay: calc(var(--i, 0) * 28ms);
+  animation-delay: calc(var(--i, 0) * 20ms);
 }
 
 @keyframes cardGalleryEnter {
   from {
     opacity: 0;
-    transform: translateY(10px) scale(0.96);
+    transform: translateY(8px) scale(0.97);
   }
   to {
     opacity: 1;
@@ -149,46 +152,47 @@ body[data-page="binder"] .card-gallery-item {
 body[data-page="binder"] .card-gallery-btn {
   position: relative;
   width: 100%;
-  max-width: 188px;
+  max-width: none;
   margin: 0;
   padding: 0;
   border: 0;
   background: transparent;
   cursor: pointer;
   touch-action: manipulation;
-  border-radius: 14px;
-  transition: transform 0.22s ease, filter 0.22s ease;
+  border-radius: 10px;
+  transition: transform 0.2s ease, filter 0.2s ease;
 }
 
 body[data-page="binder"] .card-gallery-btn:hover,
 body[data-page="binder"] .card-gallery-btn:focus-visible {
-  transform: translateY(-6px) scale(1.02);
-  outline: 2px solid rgba(107, 198, 248, 0.8);
+  transform: translateY(-5px) scale(1.03);
+  outline: 2px solid rgba(107, 198, 248, 0.85);
   outline-offset: 3px;
+  z-index: 1;
 }
 
 body[data-page="binder"] .card-gallery-btn:hover .card-gallery-art,
 body[data-page="binder"] .card-gallery-btn:focus-visible .card-gallery-art {
   box-shadow:
     0 0 0 1px rgba(255, 186, 228, 0.35),
-    0 18px 34px rgba(61, 83, 132, 0.18);
+    0 16px 28px rgba(61, 83, 132, 0.2);
 }
 
 body[data-page="binder"] .card-gallery-fav {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 6px;
+  right: 6px;
   z-index: 3;
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   display: grid;
   place-items: center;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.92);
   color: #ffb347;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 900;
-  box-shadow: 0 6px 14px rgba(61, 83, 132, 0.14);
+  box-shadow: 0 4px 12px rgba(61, 83, 132, 0.14);
   pointer-events: none;
 }
 
@@ -200,10 +204,10 @@ body[data-page="binder"] .card-gallery-art {
   display: block;
   width: 100%;
   aspect-ratio: 5 / 7;
-  border-radius: 14px;
+  border-radius: 8px;
   overflow: hidden;
   background: #eef4ff;
-  box-shadow: 0 10px 22px rgba(61, 83, 132, 0.12);
+  box-shadow: 0 8px 18px rgba(61, 83, 132, 0.14);
   pointer-events: none;
 }
 
@@ -224,7 +228,7 @@ body[data-page="binder"] .card-gallery-art .prestige-frame-overlay {
 body[data-page="binder"] .card-gallery-item.is-owned .card-gallery-art {
   box-shadow:
     0 0 0 1px rgba(255, 186, 228, 0.28),
-    0 14px 26px rgba(61, 83, 132, 0.14);
+    0 12px 22px rgba(61, 83, 132, 0.14);
 }
 
 body[data-page="binder"] .card-gallery-item.is-unowned .card-gallery-art img {
@@ -235,24 +239,30 @@ body[data-page="binder"] .card-gallery-item.is-unowned .card-gallery-art img {
 
 body[data-page="binder"] .card-gallery-number {
   position: absolute;
-  top: 8px;
-  left: 8px;
+  top: 6px;
+  left: 6px;
   z-index: 2;
-  padding: 4px 8px;
+  padding: 3px 7px;
   border-radius: 999px;
-  background: rgba(42, 48, 76, 0.78);
+  background: rgba(42, 48, 76, 0.72);
   color: #fff;
-  font-size: 0.68rem;
+  font-size: 0.62rem;
   font-weight: 900;
   pointer-events: none;
+  opacity: 0.92;
 }
 
+/* Art-first: ownership copy lives in aria-label; hide caption chrome */
 body[data-page="binder"] .card-gallery-status {
-  text-align: center;
-  color: #66759a;
-  font-size: 0.72rem;
-  font-weight: 800;
-  line-height: 1.35;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 body[data-page="binder"] .card-gallery-stage .empty-state {
@@ -263,8 +273,14 @@ body[data-page="binder"] .card-gallery-stage .empty-state {
 
 @media (max-width: 720px) {
   body[data-page="binder"] .card-gallery-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 108px), 1fr));
+    gap: 10px;
+  }
+}
+
+@media (min-width: 1600px) {
+  body[data-page="binder"] .card-gallery-grid {
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 132px), 1fr));
-    gap: 12px;
   }
 }
 

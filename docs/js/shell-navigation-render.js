@@ -45,9 +45,10 @@ function itemHref(item) {
   return shellHref(destination, params);
 }
 
-function renderAccountMenuItem(item) {
+function renderAccountMenuItem(item, { isStaff = false } = {}) {
   if (item.enabled === false) return '';
   const features = item.features || [];
+  if (features.includes('staffOnly') && !isStaff) return '';
   if (features.includes('separator')) {
     return '<hr class="shell-account-menu-sep" aria-hidden="true"/>';
   }
@@ -64,7 +65,8 @@ function renderAccountMenuItem(item) {
     return `<a role="menuitem" class="shell-profile-link" data-shell-profile-link="" href="${shellHref('profile')}">${esc(item.label || 'View My Profile')}${itemBadge(features)}</a>`;
   }
   const destination = item.destination || 'home';
-  return `<a role="menuitem" data-shell-view="${esc(destination)}" href="${shellHref(destination)}">${esc(item.label || destination)}${itemBadge(features)}</a>`;
+  const staffClass = features.includes('staffOnly') ? ' staff-link visible' : '';
+  return `<a role="menuitem" class="${staffClass.trim()}" data-shell-view="${esc(destination)}" href="${shellHref(destination)}">${esc(item.label || destination)}${itemBadge(features)}</a>`;
 }
 
 function renderNavLink(item) {
@@ -132,13 +134,13 @@ export function applyShellNavigationToDom(navigation, { isStaff = false } = {}) 
   const signedInMenu = document.querySelector('.shell-account-menu-signed-in');
   if (signedInMenu) {
     signedInMenu.innerHTML = (config.accountMenu?.signedIn || [])
-      .map(renderAccountMenuItem)
+      .map(item => renderAccountMenuItem(item, { isStaff }))
       .join('');
   }
   const signedOutMenu = document.querySelector('.shell-account-menu-signed-out');
   if (signedOutMenu) {
     signedOutMenu.innerHTML = (config.accountMenu?.signedOut || [])
-      .map(renderAccountMenuItem)
+      .map(item => renderAccountMenuItem(item, { isStaff }))
       .join('');
   }
 

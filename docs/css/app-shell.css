@@ -953,3 +953,41 @@ body.shell-masthead-layout .shell-drawer .unified-nav{
   body.shell-masthead-layout .shell-menu-button{display:none}
   body.shell-masthead-layout .shell-mega.is-mobile-only{display:none}
 }
+
+/* Full-bleed content under masthead — fluid pages fill remaining viewport */
+body.shell-masthead-layout.unified-shell{
+  overflow:auto!important;
+}
+body.shell-masthead-layout.unified-shell .site{
+  display:block;
+  width:100%;
+  max-width:none;
+  height:auto!important;
+  min-height:calc(100dvh - var(--shell-masthead-h, 68px));
+  overflow:visible!important;
+  padding-inline:var(--shell-chrome-pad);
+  padding-bottom:clamp(20px, 3vw, 40px);
+}
+body.shell-masthead-layout.unified-shell .main{
+  width:100%;
+  max-width:none;
+  height:auto!important;
+  min-height:calc(100dvh - var(--shell-masthead-h, 68px) - 48px);
+  overflow:visible!important;
+}
+body.shell-masthead-layout .shell-view-frame.active,
+body.shell-masthead-layout .shell-native-view:not(.hidden),
+body.shell-masthead-layout .card-gallery-page,
+body.shell-masthead-layout .card-album-page{
+  width:100%;
+  max-width:none;
+  min-width:0;
+}
+body.shell-masthead-layout .shell-view-frame iframe{
+  width:100%;
+  height:calc(100dvh - var(--shell-masthead-h, 68px) - 96px);
+  min-height:min(720px, calc(100dvh - var(--shell-masthead-h, 68px) - 72px));
+}
+body.shell-masthead-layout .shell-account-menu .staff-link:not(.visible){
+  display:none!important;
+}

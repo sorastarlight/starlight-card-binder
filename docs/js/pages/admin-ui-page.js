@@ -33,6 +33,7 @@ const ACCOUNT_FEATURES = [
   { id: 'receivedGiftBadge', label: 'Received gifts count badge' },
   { id: 'tradeOfferBadge', label: 'Trade offers count badge' },
   { id: 'profileLink', label: 'My public profile link' },
+  { id: 'staffOnly', label: 'Staff / admin only' },
   { id: 'separator', label: 'Separator line' },
   { id: 'signOut', label: 'Sign out action' },
   { id: 'signIn', label: 'Sign in action' },
