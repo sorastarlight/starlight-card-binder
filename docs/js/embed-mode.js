@@ -183,10 +183,22 @@ if (!embedded && shouldRedirectToShell()) {
     html.starlight-embedded .site-footer-links{display:none!important}
     html.starlight-embedded .site{display:block!important;width:100%!important;max-width:none!important;margin:0!important;padding:0!important;min-height:0!important}
     html.starlight-embedded .site>.sidebar{display:none!important}
-    html.starlight-embedded .main{width:100%!important;max-width:none!important;margin:0!important;padding:14px!important;min-height:0!important;overflow:visible!important}
+    html.starlight-embedded .main{width:100%!important;max-width:none!important;margin:0!important;padding:clamp(10px,1.6vw,16px)!important;min-height:0!important;overflow:visible!important}
+    html.starlight-embedded .home,
+    html.starlight-embedded .page,
+    html.starlight-embedded .studio,
     html.starlight-embedded .daily-page,html.starlight-embedded .bits-page,html.starlight-embedded .collector-page,
     html.starlight-embedded .profile-settings-page,html.starlight-embedded .admin-page,html.starlight-embedded .redeem-page,
-    html.starlight-embedded .trade-offers-page,html.starlight-embedded .trade-hub-page,html.starlight-embedded .shop-page,html.starlight-embedded .login-page{width:100%!important;max-width:none!important;margin:0!important;padding:14px!important;min-height:0!important}
+    html.starlight-embedded .trade-offers-page,html.starlight-embedded .trade-hub-page,html.starlight-embedded .shop-page,html.starlight-embedded .login-page,
+    html.starlight-embedded .notifications-page,html.starlight-embedded .quests-page,html.starlight-embedded .season-pass-page,
+    html.starlight-embedded .events-page,html.starlight-embedded .about-page,html.starlight-embedded .socials-page,
+    html.starlight-embedded .checklist-page,html.starlight-embedded .pull-feed-page,html.starlight-embedded .received-rewards-page,
+    html.starlight-embedded .card-album-page,html.starlight-embedded .card-gallery-page{
+      width:100%!important;max-width:none!important;margin-left:0!important;margin-right:0!important;box-sizing:border-box!important
+    }
+    html.starlight-embedded .daily-page,html.starlight-embedded .bits-page,html.starlight-embedded .collector-page,
+    html.starlight-embedded .profile-settings-page,html.starlight-embedded .admin-page,html.starlight-embedded .redeem-page,
+    html.starlight-embedded .trade-offers-page,html.starlight-embedded .trade-hub-page,html.starlight-embedded .shop-page,html.starlight-embedded .login-page{padding:clamp(10px,1.6vw,16px)!important;min-height:0!important}
     html.starlight-embedded .page-head:first-child{margin-top:0!important}
     html.starlight-embedded .embedded-filter-panel{margin:0 0 14px!important}
     html.starlight-embedded .page-status:not(.error),html.starlight-embedded .status.success{display:none!important}

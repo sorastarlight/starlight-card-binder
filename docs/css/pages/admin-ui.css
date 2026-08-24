@@ -1,6 +1,6 @@
 *{box-sizing:border-box}
 body{min-height:100vh}
-.page{width:min(100%,1680px);margin:auto;padding:18px}
+.page{width:100%;max-width:none;margin:0;padding:clamp(14px,2vw,22px)}
 .panel,.studio-panel{padding:22px;border:2px solid rgba(107,198,248,.4);border-radius:25px;background:rgba(255,255,255,.96);box-shadow:0 20px 55px rgba(61,83,132,.14)}
 h1,h2,h3{color:#405fa1;margin:0 0 .35em}
 .lead{color:#6d7692;line-height:1.55;margin:0}

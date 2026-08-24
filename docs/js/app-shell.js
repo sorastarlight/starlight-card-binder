@@ -18,7 +18,7 @@ import { initLiveFeedWidget } from './live-feed-widget.js?v=1.5';
 import { applyAvatarFrameClass } from './avatar-frame-utils.js';
 import { getMyProfileExtras } from './profile-extras-service.js';
 
-const SHELL_BUILD = '94.4.0';
+const SHELL_BUILD = '94.4.1';
 const VIEW_READY_TIMEOUT_MS = 6500;
 const MAX_VIEW_RETRIES = 1;
 

@@ -707,13 +707,16 @@ body.unified-shell{padding-left:env(safe-area-inset-left);padding-right:env(safe
 
 /* ===== TCG Live–style sticky masthead ===== */
 body.shell-masthead-layout{
-  --shell-masthead-h:72px;
+  --shell-masthead-h:clamp(60px, 8vw, 76px);
+  --shell-chrome-pad:clamp(12px, 2.2vw, 28px);
 }
+/* Keep masthead above LIVE strip / qol sticky chrome (z-index 1500). */
 body.shell-masthead-layout .shell-masthead{
   position:sticky;
   top:0;
-  z-index:1100;
-  isolation:isolate;
+  z-index:5000;
+  overflow:visible;
+  width:100%;
   background:linear-gradient(180deg,rgba(255,255,255,.97),rgba(245,251,255,.94));
   border-bottom:1px solid rgba(107,198,248,.34);
   box-shadow:0 10px 28px rgba(61,83,132,.1);
@@ -722,54 +725,65 @@ body.shell-masthead-layout .shell-masthead-inner{
   display:grid;
   grid-template-columns:auto minmax(0,1fr) auto;
   align-items:center;
-  gap:12px 18px;
-  max-width:1400px;
-  margin:0 auto;
-  padding:10px max(16px,env(safe-area-inset-right)) 10px max(16px,env(safe-area-inset-left));
+  gap:clamp(8px, 1.4vw, 20px);
+  width:100%;
+  max-width:none;
+  margin:0;
+  padding:clamp(8px, 1.2vw, 12px) var(--shell-chrome-pad);
   min-height:var(--shell-masthead-h);
 }
 body.shell-masthead-layout .shell-masthead-brand{
   display:inline-flex;
   align-items:center;
-  gap:10px;
+  gap:clamp(8px, 1vw, 12px);
+  min-width:0;
   text-decoration:none;
   color:#334f8d;
   font-weight:900;
 }
 body.shell-masthead-layout .shell-masthead-brand .logo{
-  width:44px;
-  height:44px;
+  width:clamp(36px, 4.2vw, 48px);
+  height:clamp(36px, 4.2vw, 48px);
   object-fit:contain;
+  flex:none;
 }
 body.shell-masthead-layout .shell-masthead-brand .binder-ribbon{
   font-family:inherit;
-  font-size:.92rem;
+  font-size:clamp(.78rem, 1.05vw, .95rem);
   letter-spacing:.04em;
   text-transform:uppercase;
+  white-space:nowrap;
 }
 body.shell-masthead-layout .shell-masthead-nav{
   display:flex;
-  flex-wrap:wrap;
+  flex-wrap:nowrap;
   align-items:center;
   justify-content:center;
-  gap:4px 6px;
+  gap:clamp(2px, .4vw, 8px);
   min-width:0;
+  overflow-x:auto;
+  overflow-y:visible;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
 }
-body.shell-masthead-layout .shell-mega{position:relative}
+body.shell-masthead-layout .shell-masthead-nav::-webkit-scrollbar{display:none}
+body.shell-masthead-layout .shell-mega{position:relative;flex:none}
 body.shell-masthead-layout .shell-mega-trigger,
 body.shell-masthead-layout .shell-top-link{
   display:inline-flex;
   align-items:center;
   gap:4px;
-  min-height:42px;
-  padding:8px 12px;
+  min-height:clamp(36px, 4.5vw, 44px);
+  padding:clamp(6px, .8vw, 10px) clamp(8px, 1.1vw, 14px);
   border:0;
   border-radius:999px;
   background:transparent;
   color:#405fa1;
   font:inherit;
+  font-size:clamp(.82rem, 1.05vw, .98rem);
   font-weight:850;
   text-decoration:none;
+  white-space:nowrap;
   cursor:pointer;
 }
 body.shell-masthead-layout .shell-mega-trigger:hover,
@@ -786,17 +800,17 @@ body.shell-masthead-layout .shell-mega-panel{
   top:calc(100% + 8px);
   left:50%;
   transform:translateX(-50%);
-  z-index:1200;
+  z-index:5100;
   display:grid;
   gap:4px;
-  min-width:min(280px,82vw);
+  min-width:min(300px, min(92vw, 360px));
   max-height:min(70vh,520px);
   overflow:auto;
   padding:12px;
   border:1px solid rgba(107,198,248,.3);
   border-radius:16px;
-  background:rgba(255,255,255,.98);
-  box-shadow:0 18px 40px rgba(61,83,132,.18);
+  background:rgba(255,255,255,.99);
+  box-shadow:0 18px 40px rgba(61,83,132,.22);
 }
 body.shell-masthead-layout .shell-mega-panel[hidden]{display:none!important}
 body.shell-masthead-layout .shell-mega-panel .shell-nav-item{
@@ -818,19 +832,44 @@ body.shell-masthead-layout .shell-masthead-actions{
   display:flex;
   align-items:center;
   justify-content:flex-end;
-  gap:8px;
+  gap:clamp(6px, 1vw, 10px);
+  min-width:0;
 }
 body.shell-masthead-layout .shell-masthead-actions .shell-account-main strong{
-  max-width:140px;
+  max-width:clamp(72px, 12vw, 160px);
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
 }
+body.shell-masthead-layout .shell-account-menu{
+  z-index:5200;
+}
+/* Deprioritize LIVE / event chrome so menus never paint underneath. */
+body.shell-masthead-layout.unified-shell .shell-account-bar,
+body.shell-masthead-layout .shell-live-strip,
+body.shell-masthead-layout .shell-account-bar.shell-live-strip{
+  position:relative!important;
+  top:auto!important;
+  z-index:2!important;
+  margin-bottom:10px!important;
+  backdrop-filter:none;
+  box-shadow:none!important;
+}
+body.shell-masthead-layout .shell-live-feed-body{
+  z-index:20;
+}
+body.shell-masthead-layout.unified-shell .shell-event-banner,
+body.shell-masthead-layout .shell-event-banner{
+  position:relative!important;
+  top:auto!important;
+  z-index:1!important;
+}
 body.shell-masthead-layout .site{
   display:block;
-  max-width:1400px;
-  margin:0 auto;
-  padding:0 max(12px,env(safe-area-inset-right)) 24px max(12px,env(safe-area-inset-left));
+  width:100%;
+  max-width:none;
+  margin:0;
+  padding:0 var(--shell-chrome-pad) 24px;
 }
 body.shell-masthead-layout .shell-drawer{
   display:none;
@@ -841,12 +880,24 @@ body.shell-masthead-layout .shell-live-strip{
   padding:0;
   border:0;
   background:transparent;
-  box-shadow:none;
 }
 body.shell-masthead-layout .shell-live-strip .shell-live-feed{
   width:100%;
 }
-body.shell-masthead-layout .main{width:100%;min-width:0}
+body.shell-masthead-layout .main{
+  width:100%;
+  min-width:0;
+  max-width:none;
+}
+body.shell-masthead-layout .shell-native-view,
+body.shell-masthead-layout .shell-view-frame,
+body.shell-masthead-layout .card-gallery-page{
+  width:100%;
+  max-width:none;
+}
+body.shell-masthead-layout .shell-view-frame{
+  border-radius:18px;
+}
 body.shell-masthead-layout .shell-view-frame iframe{
   height:calc(100dvh - var(--shell-masthead-h) - 110px);
   min-height:640px;
@@ -855,7 +906,7 @@ body.shell-masthead-layout .shell-drawer-backdrop{
   display:none;
   position:fixed;
   inset:0;
-  z-index:1090;
+  z-index:4900;
   background:rgba(32,42,72,.42);
 }
 body.shell-masthead-layout.shell-menu-open .shell-drawer-backdrop{
@@ -864,7 +915,7 @@ body.shell-masthead-layout.shell-menu-open .shell-drawer-backdrop{
 body.shell-masthead-layout.shell-menu-open .shell-drawer{
   display:block;
   position:fixed;
-  z-index:1105;
+  z-index:5100;
   top:0;
   bottom:0;
   left:0;
@@ -880,6 +931,15 @@ body.shell-masthead-layout .shell-drawer .unified-nav{
   box-shadow:none;
   background:transparent;
   padding:0;
+}
+@media(max-width:1180px) and (min-width:981px){
+  body.shell-masthead-layout .shell-masthead-brand .binder-ribbon{
+    max-width:11ch;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  body.shell-masthead-layout .shell-masthead-actions .shell-account-main span[data-shell-account-sub],
+  body.shell-masthead-layout .shell-profile-mini-stats{display:none}
 }
 @media(max-width:980px){
   body.shell-masthead-layout .shell-masthead-inner{

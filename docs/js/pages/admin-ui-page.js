@@ -24,6 +24,7 @@ const FEATURES = [
   { id: 'tradeOfferBadge', label: 'Trade offer badge' },
   { id: 'notificationBadge', label: 'Notification badge' },
   { id: 'receivedGiftBadge', label: 'Received gift badge' },
+  { id: 'clearSeries', label: 'Clear series filter (gallery)' },
   { id: 'sectionLabel', label: 'Section label (no destination)' }
 ];
 
@@ -142,23 +143,26 @@ function renderIconControls(icon, scopeAttrs) {
 function renderSidebar() {
   const sections = navigation?.sidebar?.sections || [];
   sidebarPanel.innerHTML = `
+    <p class="lead">These sections power the sticky top masthead mega menus and the mobile drawer. Enable “Mega menu” for desktop dropdowns.</p>
     <div class="section-list">
       ${sections.map((section, sIndex) => `
         <article class="section-card" data-section="${sIndex}">
           <header>
             <div class="section-meta">
-              <label>Section label
+              <label>Menu label
                 <input type="text" maxlength="80" value="${esc(section.label || '')}" data-field="sectionLabel" data-section="${sIndex}">
               </label>
               ${renderIconControls(section.icon, `data-section="${sIndex}" data-target="section"`)}
               <div class="checks">
+                <label><input type="checkbox" data-field="mega" data-section="${sIndex}" ${section.mega ? 'checked' : ''}> Mega menu (desktop masthead)</label>
+                <label><input type="checkbox" data-field="mobileOnly" data-section="${sIndex}" ${section.mobileOnly ? 'checked' : ''}> Mobile drawer only</label>
                 <label><input type="checkbox" data-field="staffOnly" data-section="${sIndex}" ${section.staffOnly ? 'checked' : ''}> Staff only</label>
               </div>
             </div>
             <div class="row-tools">
               <button type="button" class="btn small" data-action="move-section" data-section="${sIndex}" data-delta="-1" ${sIndex === 0 ? 'disabled' : ''}>↑</button>
               <button type="button" class="btn small" data-action="move-section" data-section="${sIndex}" data-delta="1" ${sIndex === sections.length - 1 ? 'disabled' : ''}>↓</button>
-              <button type="button" class="btn small danger" data-action="remove-section" data-section="${sIndex}">Remove section</button>
+              <button type="button" class="btn small danger" data-action="remove-section" data-section="${sIndex}">Remove menu</button>
             </div>
           </header>
           <div class="items">
@@ -196,16 +200,16 @@ function renderSidebar() {
                   </div>
                 </div>
               `;
-            }).join('') || '<p class="lead">No items in this section yet.</p>'}
+            }).join('') || '<p class="lead">No items in this menu yet.</p>'}
           </div>
           <div class="panel-actions">
             <button type="button" class="btn small" data-action="add-item" data-section="${sIndex}">＋ Add item</button>
           </div>
         </article>
-      `).join('') || '<p class="lead">No sidebar sections yet.</p>'}
+      `).join('') || '<p class="lead">No masthead menus yet.</p>'}
     </div>
     <div class="panel-actions">
-      <button type="button" class="btn" data-action="add-section">＋ Add section</button>
+      <button type="button" class="btn" data-action="add-section">＋ Add menu</button>
     </div>
   `;
 }
@@ -349,7 +353,7 @@ function renderPreview() {
       <div class="preview-ribbon">${esc(navigation.brandRibbon || 'Card Binder')}</div>
       ${sections.map((section) => `
         <div class="preview-section">
-          <strong>${previewIcon(section.icon)} ${esc(section.label || 'Section')}${section.staffOnly ? ' <small>(staff)</small>' : ''}</strong>
+          <strong>${previewIcon(section.icon)} ${esc(section.label || 'Menu')}${section.mega ? ' <small>(mega)</small>' : ''}${section.mobileOnly ? ' <small>(mobile)</small>' : ''}${section.staffOnly ? ' <small>(staff)</small>' : ''}</strong>
           <ul>
             ${(section.items || []).map((item) => {
               const isLabel = (item.features || []).includes('sectionLabel');
@@ -512,6 +516,18 @@ function onEditorInput(event) {
     renderPreview();
     return;
   }
+  if (field === 'mega') {
+    const section = getSection(Number(el.dataset.section));
+    if (section) section.mega = el.checked;
+    renderPreview();
+    return;
+  }
+  if (field === 'mobileOnly') {
+    const section = getSection(Number(el.dataset.section));
+    if (section) section.mobileOnly = el.checked;
+    renderPreview();
+    return;
+  }
   if (field === 'iconEmoji') {
     const sIndex = Number(el.dataset.section);
     const iIndex = el.dataset.item != null ? Number(el.dataset.item) : null;
@@ -643,9 +659,11 @@ async function onEditorClick(event) {
   if (action === 'add-section') {
     navigation.sidebar.sections.push({
       id: uid('section'),
-      label: 'New section',
+      label: 'New menu',
       icon: { type: 'emoji', value: '✦' },
       staffOnly: false,
+      mega: true,
+      mobileOnly: false,
       items: []
     });
     renderAll();
@@ -793,7 +811,7 @@ resetBtn.addEventListener('click', async () => {
   if (busy) return;
   const ok = await window.StarlightUI.confirm({
     title: 'Reset website UI?',
-    message: 'This restores the default sidebar, top bar, account menu, brand ribbon, and page titles. Unsaved edits will be lost.',
+    message: 'This restores the default masthead menus, top bar, account menu, brand ribbon, and page titles. Unsaved edits will be lost.',
     confirmText: 'Reset to Defaults',
     danger: true
   });

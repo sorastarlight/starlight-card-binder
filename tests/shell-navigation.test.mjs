@@ -190,8 +190,12 @@ test('website UI admin page and migration are wired', async () => {
     read('docs/js/app-shell.js')
   ]);
   assert.match(html, /Website User Interface/);
+  assert.match(html, /Masthead Menus/);
   assert.match(html, /data-tab="account"/);
   assert.match(html, /64[\u00d7x]64/i);
+  assert.match(page, /Mega menu \(desktop masthead\)/);
+  assert.match(page, /clearSeries/);
+  assert.match(page, /data-field="mega"/);
   assert.match(page, /uploadStudioAsset\(file, 'nav-icons'\)/);
   assert.match(page, /shellPreviewFrame|NAV_DRAFT|buildShellStudioPreviewUrl/);
   assert.match(page, /renderAccountMenu|ACCOUNT_FEATURES|accountMenu/);
@@ -201,10 +205,15 @@ test('website UI admin page and migration are wired', async () => {
   assert.match(embed, /'login\.html':'login'/);
   assert.match(embed, /hasAuthReturnParams/);
   assert.match(embed, /currentRoute === 'login' && hasAuthReturnParams\(\)/);
+  assert.match(embed, /html\.starlight-embedded \.home/);
   assert.match(shell, /login:\{title:'Sign In',src:'login'\}/);
   assert.match(shell, /navigate\('login',\{extra:\{mode\}\}\)/);
   assert.match(shell, /admin-ui/);
   assert.match(shell, /refreshShellBadges|data-notification-dot/);
+  const shellCss = await read('docs/css/app-shell.css');
+  assert.match(shellCss, /z-index:\s*5000/);
+  assert.match(shellCss, /--shell-chrome-pad/);
+  assert.match(shellCss, /shell-masthead-layout\.unified-shell \.shell-account-bar/);
 });
 
 test('shell refreshes Star Bits totals when wallet or rewards change', async () => {
