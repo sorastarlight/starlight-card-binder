@@ -23,11 +23,11 @@ test('quests and season pass are shell destinations', () => {
     false
   );
   const nav = createDefaultShellNavigation();
-  const myStuff = nav.sidebar.sections.find((section) => section.id === 'my-stuff');
-  assert.ok(myStuff.items.some((item) => item.destination === 'quests'));
-  assert.ok(myStuff.items.some((item) => item.destination === 'season-pass'));
+  const collect = nav.sidebar.sections.find((section) => section.id === 'collect');
+  assert.ok(collect.items.some((item) => item.destination === 'quests'));
+  assert.ok(collect.items.some((item) => item.destination === 'season-pass'));
   assert.equal(
-    myStuff.items.some((item) => item.destination === 'starlight-evolution'),
+    collect.items.some((item) => item.destination === 'starlight-evolution'),
     false
   );
 });

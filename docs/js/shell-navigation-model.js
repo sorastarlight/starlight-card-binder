@@ -63,7 +63,8 @@ function sanitizeItem(item = {}, index = 0) {
     destination,
     enabled: item.enabled !== false,
     features,
-    className: String(item.className || '').trim().slice(0, 80)
+    className: String(item.className || '').trim().slice(0, 80),
+    seriesKey: String(item.seriesKey || '').trim().slice(0, 120)
   };
 }
 
@@ -149,12 +150,14 @@ function ensureDefaultSidebarItems(sections, defaults) {
 }
 
 function sanitizeSection(section = {}, index = 0) {
-  const items = Array.isArray(section.items) ? section.items.map(sanitizeItem).slice(0, 24) : [];
+  const items = Array.isArray(section.items) ? section.items.map(sanitizeItem).slice(0, 40) : [];
   return {
     id: String(section.id || `section-${index}`).slice(0, 64),
     label: String(section.label || 'Section').trim().slice(0, 80) || 'Section',
     icon: asIcon(section.icon),
     staffOnly: Boolean(section.staffOnly),
+    mega: Boolean(section.mega),
+    mobileOnly: Boolean(section.mobileOnly),
     items: consolidateTradingNavItems(items)
   };
 }
@@ -227,7 +230,7 @@ export function sanitizeShellNavigation(input) {
   }
 
   return {
-    version: 1,
+    version: Number(source.version) >= 2 ? 2 : 2,
     brandRibbon: String(source.brandRibbon ?? defaults.brandRibbon).trim().slice(0, 40) || defaults.brandRibbon,
     pageTitles,
     sidebar: { sections },

@@ -9,7 +9,9 @@ const read = relativePath => readFile(new URL(`../${relativePath}`, import.meta.
 
 test('default shell navigation includes core destinations and staff section', () => {
   const nav = cloneDefaultShellNavigation();
-  assert.equal(nav.sidebar.sections[0].label, 'Explore The Starlight Card Series');
+  const ids = nav.sidebar.sections.map(section => section.id);
+  assert.deepEqual(ids.slice(0, 4), ['series', 'cards', 'collect', 'community']);
+  assert.equal(nav.sidebar.sections[0].label, 'Series');
   assert.ok(nav.sidebar.sections.some(section => section.staffOnly));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'offers'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'feed' && entry.label === 'LIVE Feed'));
@@ -20,15 +22,17 @@ test('default shell navigation includes core destinations and staff section', ()
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'quests' && entry.label === 'Starlight Missions'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'trades' && entry.label === 'Trade With Others'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'profile' && entry.label === 'Profile'));
-  assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'trades' && item.label === 'Trade With Others'));
-  assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'rankings' && item.label === 'User Rankings'));
-  assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'feed' && item.label === 'LIVE Feed'));
-  assert.ok(nav.sidebar.sections[1].items.some(item => item.destination === 'quests' && item.label === 'Starlight Missions'));
+  const collect = nav.sidebar.sections.find(section => section.id === 'collect');
+  const community = nav.sidebar.sections.find(section => section.id === 'community');
+  assert.ok(community.items.some(item => item.destination === 'trades' && item.label === 'Trade With Others'));
+  assert.ok(community.items.some(item => item.destination === 'rankings' && item.label === 'User Rankings'));
+  assert.ok(community.items.some(item => item.destination === 'feed' && item.label === 'LIVE Feed'));
+  assert.ok(collect.items.some(item => item.destination === 'quests' && item.label === 'Starlight Missions'));
   assert.equal(nav.pageTitles.feed, 'LIVE Feed');
   assert.equal(nav.pageTitles.collection, 'My Card Album Binder');
   assert.equal(nav.pageTitles.binder, 'Starlight Card Gallery');
   assert.equal(nav.pageTitles.daily, 'Daily Free Booster Pack');
-  assert.equal(nav.topBar.quickLinks.length, 0);
+  assert.ok(nav.topBar.quickLinks.some(link => link.destination === 'events'));
   assert.ok(nav.accountMenu.signedIn.some(item => (item.features || []).includes('notificationBadge')));
   assert.ok(nav.accountMenu.signedIn.some(item => (item.features || []).includes('receivedGiftBadge')));
   assert.ok(nav.accountMenu.signedIn.some(item => (item.features || []).includes('tradeOfferBadge')));
@@ -133,7 +137,7 @@ test('sanitizeShellNavigation merges duplicate trading hub sidebar links but kee
 
 test('sanitizeShellNavigation injects User Rankings when remote nav omits it', () => {
   const defaults = cloneDefaultShellNavigation();
-  const remoteSection = defaults.sidebar.sections.find(section => section.id === 'my-stuff');
+  const remoteSection = defaults.sidebar.sections.find(section => section.id === 'community');
   const remoteItems = (remoteSection?.items || []).filter(item => item.destination !== 'rankings');
   const merged = sanitizeShellNavigation({
     ...defaults,
@@ -151,7 +155,7 @@ test('sanitizeShellNavigation injects User Rankings when remote nav omits it', (
 
 test('sanitizeShellNavigation rejects unknown destinations and merges empty remote', () => {
   const merged = mergeShellNavigation({});
-  assert.equal(merged.brandRibbon, 'Card Binder');
+  assert.equal(merged.brandRibbon, 'Starlight Cards');
   assert.ok(merged.accountMenu.signedIn.length > 0);
   const renamed = sanitizeShellNavigation({
     ...cloneDefaultShellNavigation(),
@@ -265,10 +269,30 @@ test('shell navigation render and static shell HTML use extensionless binder hre
   ]);
 
   assert.match(render, /shellHref\(/);
+  assert.match(render, /populateSeriesMegaMenus/);
+  assert.match(render, /shell-mega-trigger/);
+  assert.match(render, /data-series-mega-panel/);
   assert.doesNotMatch(render, /binder\.html\?/);
   assert.match(binderHtml, /href="binder\?view=home"/);
+  assert.match(binderHtml, /shell-masthead/);
+  assert.match(binderHtml, /shell-masthead-nav/);
   assert.match(homeHtml, /href="binder\?view=daily"/);
   assert.doesNotMatch(homeHtml, /binder\.html/);
+});
+
+test('shell masthead wires mega menus and series browse params', async () => {
+  const [shell, defaults] = await Promise.all([
+    read('docs/js/app-shell.js'),
+    read('docs/js/shell-navigation-defaults.js')
+  ]);
+  assert.match(shell, /wireMastheadMenus/);
+  assert.match(shell, /closeAllMegaMenus/);
+  assert.match(shell, /data-series-key|dataset\.seriesKey/);
+  assert.match(shell, /applyStarlightSeriesFilter/);
+  assert.match(shell, /locationExtraParams/);
+  assert.match(defaults, /mega:\s*true/);
+  assert.match(defaults, /clearSeries/);
+  assert.match(defaults, /brandRibbon: 'Starlight Cards'/);
 });
 
 test('shell refreshes account chrome after embedded login', async () => {

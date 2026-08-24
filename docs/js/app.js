@@ -474,6 +474,7 @@ function applyLoadedCards(data, fromCache = false) {
   selected = cards.find(c => c.id === selected?.id) || cards[0] || null;
   selectedIndex = Math.max(0, cards.findIndex(c => c.id === selected?.id));
   hydrateFilters();
+  applySeriesQueryFromUrl();
   renderAll();
   warmCriticalAssets();
   scheduleIdleImagePreload();
@@ -663,6 +664,119 @@ function hydrateFilters(preserved = activeFilters()) {
   if (raritySelect && preserved?.rarity) raritySelect.value = preserved.rarity;
   const favoritesOnly = $('[data-filter-favorites]');
   if (favoritesOnly) favoritesOnly.checked = Boolean(preserved?.favoritesOnly);
+  syncShellSeriesMenus();
+}
+
+function readSeriesQueryParam() {
+  try {
+    const params = new URLSearchParams(location.search);
+    return String(params.get('series') || '').trim();
+  } catch {
+    return '';
+  }
+}
+
+function applySeriesQueryFromUrl() {
+  const requested = readSeriesQueryParam();
+  if (!requested) return;
+  const select = $('[data-series]');
+  if (!select) return;
+  const options = Array.from(select.options || []).map(option => option.value);
+  if (requested === 'All Series' || options.includes(requested)) {
+    select.value = requested;
+  }
+}
+
+function syncShellSeriesMenus() {
+  const populate = window.StarlightShellNav?.populateSeriesMegaMenus
+    || window.parent?.StarlightShellNav?.populateSeriesMegaMenus;
+  try {
+    populate?.(getSeriesGroups());
+  } catch {
+    /* shell may be unavailable */
+  }
+}
+
+function buildLightboxList(listMode = 'filtered') {
+  if (listMode === 'favorites') {
+    return filterCardList(cards.filter(c => isFavorite(c.id)), activeFilters(), { respectOwnership: false });
+  }
+  if (listMode === 'collection') {
+    return filterCardList(cards.filter(c => isCollected(c.id)), activeFilters(), { respectOwnership: false });
+  }
+  if (listMode === 'duplicates') {
+    return filterCardList(cards.filter(c => getCardQuantity(c.id) > 1), activeFilters(), { respectOwnership: false });
+  }
+  if (listMode === 'filtered') {
+    applyFilters();
+    return filtered.length ? [...filtered] : [...cards];
+  }
+  return [...cards];
+}
+
+function openPngLightbox(listMode = 'filtered') {
+  if (!selected) return;
+  const api = window.StarlightPngLightbox || window.parent?.StarlightPngLightbox;
+  if (!api?.open) {
+    openFullView(listMode);
+    return;
+  }
+  const list = buildLightboxList(listMode);
+  if (!list.find(c => c.id === selected.id)) list.unshift(selected);
+  const index = Math.max(0, list.findIndex(c => c.id === selected.id));
+  fullViewListMode = listMode;
+  fullViewList = list;
+  selectedIndex = index;
+  let lightboxHoloEnabled = true;
+  api.open({
+    list,
+    cardId: selected.id,
+    restoreFocus: document.activeElement,
+    getCardArt: (card) => {
+      const got = isCollected(card.id);
+      return {
+        src: got ? (card.imageUrl || card.thumbnailUrl || CARD_BACK_URL) : CARD_BACK_URL,
+        alt: getVisibleName(card)
+      };
+    },
+    getCardMeta: (card) => ({
+      kicker: card.series || 'Starlight Cards',
+      title: getVisibleName(card),
+      sub: [
+        window.StarlightCardFilters?.cardDisplayNumber?.(card) || card.collectorNumber || card.number || '',
+        getVisibleRarity(card)
+      ].filter(Boolean).join(' · ')
+    }),
+    supportsHolo: (card) => isCollected(card.id) && cardSupportsHoloToggle(card),
+    getFinish: (card) => {
+      const got = isCollected(card.id);
+      if (!got || !lightboxHoloEnabled || !cardSupportsHoloToggle(card)) {
+        return { className: '', markup: '', holoOn: false };
+      }
+      return {
+        className: cardFinishClass(card, true),
+        markup: holoSparkMarkup(card, true),
+        holoOn: true
+      };
+    },
+    onHoloToggle: () => {
+      lightboxHoloEnabled = !lightboxHoloEnabled;
+      return lightboxHoloEnabled;
+    },
+    onStep: (card, nextIndex) => {
+      selected = card;
+      selectedIndex = nextIndex;
+      previewFlipped = false;
+    },
+    onDetails: (card) => {
+      if (card) {
+        selected = card;
+        selectedIndex = Math.max(0, list.findIndex(c => c.id === card.id));
+      }
+      openFullView(listMode);
+    }
+  });
+  playSfx('analyze');
 }
 
 function applyAlbumBinderTheme() {
@@ -696,7 +810,7 @@ function openAlbumBinderCard(sourceEl) {
   previewFlipped = false;
   window.requestAnimationFrame(() => {
     try {
-      openFullView('collection');
+      openPngLightbox('collection');
     } finally {
       window.setTimeout(() => {
         albumCardOpening = false;
@@ -788,7 +902,7 @@ function initCardInteractionDelegation() {
       selected = cards.find(card => card.id === cardId) || selected;
       selectedIndex = Math.max(0, cards.findIndex(card => card.id === cardId));
       previewFlipped = false;
-      openFullView('filtered');
+      openPngLightbox('filtered');
     });
   }
 }
@@ -1699,6 +1813,19 @@ function renderAll() {
   notifyEmbedLayoutReady();
 }
 window.renderAll = renderAll;
+window.applyStarlightSeriesFilter = (seriesName) => {
+  const requested = String(seriesName || '').trim() || readSeriesQueryParam() || 'All Series';
+  const select = $('[data-series]');
+  if (select) {
+    const options = Array.from(select.options || []).map(option => option.value);
+    if (requested === 'All Series' || options.includes(requested) || !options.length) {
+      select.value = requested;
+    }
+  }
+  page = 1;
+  renderAll();
+};
+
 
 
 function startPackOpen(series) {
@@ -1861,11 +1988,13 @@ document.addEventListener('DOMContentLoaded', () => {
     ensureWebsiteBinderLanding().then(() => {
       refreshBinderFiltersForDisplay();
       applyBinderDisplayLayout();
+      applySeriesQueryFromUrl();
       renderSeriesHero();
       renderBinder();
     });
   }
   loadCards();
+
   $('#prevPage')?.addEventListener('click', () => { page = Math.max(1, page - 1); renderAll(); playSfx('page'); });
   $('#nextPage')?.addEventListener('click', () => { page += 1; renderAll(); playSfx('page'); });
   $('#sfxToggle')?.addEventListener('click', () => { sfxOn = !sfxOn; localStorage.setItem(SFX_KEY, sfxOn ? 'on' : 'off'); renderAll(); });
@@ -2220,7 +2349,7 @@ document.addEventListener('click', e => {
     selected = cards.find(c => c.id === cardBtn.dataset.v61Card) || selected;
     selectedIndex = cards.findIndex(c => c.id === cardBtn.dataset.v61Card);
     previewFlipped = false;
-    openFullView('filtered');
+    openPngLightbox('filtered');
     return;
   }
   const customizeBtn = e.target.closest('[data-binder-customize]');

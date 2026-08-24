@@ -65,4 +65,21 @@ test('gallery page loads shared card modules', async () => {
   const binder = await read('docs/binder.html');
   assert.match(binder, /card-tile\.js/);
   assert.match(binder, /binder-theme-config\.js/);
+  assert.match(binder, /card-png-lightbox\.js/);
+});
+
+test('card click opens png lightbox before the analyzer', async () => {
+  const [app, lightbox] = await Promise.all([
+    read('docs/js/app.js'),
+    read('docs/js/card-png-lightbox.js')
+  ]);
+  assert.match(app, /openPngLightbox\('gallery'\)|openPngLightbox\('filtered'\)/);
+  assert.match(app, /openPngLightbox\('album'\)|openPngLightbox\('collection'\)/);
+  assert.match(app, /window\.applyStarlightSeriesFilter/);
+  assert.match(app, /supportsHolo/);
+  assert.match(lightbox, /openCardPngLightbox|function open\(/);
+  assert.match(lightbox, /Details|data-png-details/);
+  assert.match(lightbox, /data-png-holo/);
+  assert.match(lightbox, /starlight-png-lightbox/);
+  assert.match(lightbox, /ArrowLeft|ArrowRight/);
 });

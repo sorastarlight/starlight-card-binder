@@ -12,13 +12,13 @@ import {
   shellHref
 } from './shell-route-utils.js';
 import { getShellNavigation } from './shell-navigation-service.js';
-import { applyShellNavigationToDom, applyShellPageTitles } from './shell-navigation-render.js';
+import { applyShellNavigationToDom, applyShellPageTitles, populateSeriesMegaMenus } from './shell-navigation-render.js';
 import { isStudioPreview, STUDIO_MSG } from './studio-preview.js';
 import { initLiveFeedWidget } from './live-feed-widget.js?v=1.5';
 import { applyAvatarFrameClass } from './avatar-frame-utils.js';
 import { getMyProfileExtras } from './profile-extras-service.js';
 
-const SHELL_BUILD = '94.3.9';
+const SHELL_BUILD = '94.4.0';
 const VIEW_READY_TIMEOUT_MS = 6500;
 const MAX_VIEW_RETRIES = 1;
 
@@ -47,9 +47,11 @@ const nativeView=document.getElementById('binderNativeView');
 const frameWrap=document.getElementById('shellViewFrame');
 const frame=document.getElementById('shellViewIframe');
 const menuButton=document.getElementById('shellMenuButton');
+const drawerBackdrop=document.getElementById('shellDrawerBackdrop');
 const accountMenuButton=document.getElementById('shellAccountMenuButton');
 const accountMenu=document.getElementById('shellAccountMenu');
 const mainContent=document.querySelector('.main');
+const masthead=document.getElementById('shellMasthead');
 const AVATAR_SILHOUETTE='<svg class="shell-avatar-silhouette" viewBox="0 0 40 40" width="22" height="22" focusable="false" aria-hidden="true"><circle cx="20" cy="14" r="7" fill="currentColor"/><path d="M8 33c1.8-7.2 6.4-10.5 12-10.5S30.2 25.8 32 33" fill="currentColor"/></svg>';
 let profileUsername='';
 let currentRoute='binder';
@@ -58,6 +60,91 @@ let readyTimer=0;
 let retryCount=0;
 let embeddedInitialScrollDone=false;
 let liveFeedWidget = null;
+
+function closeAllMegaMenus(){
+  document.querySelectorAll('.shell-mega.is-open').forEach(mega=>{
+    mega.classList.remove('is-open');
+    const trigger=mega.querySelector('[data-mega-trigger]');
+    const panel=mega.querySelector('.shell-mega-panel');
+    if(trigger) trigger.setAttribute('aria-expanded','false');
+    if(panel) panel.hidden=true;
+  });
+}
+
+function setShellMenuOpen(open){
+  document.body.classList.toggle('shell-menu-open', open);
+  if(drawerBackdrop) drawerBackdrop.hidden=!open;
+  if(!open) closeAllMegaMenus();
+}
+
+function openMegaMenu(mega){
+  if(!mega) return;
+  closeAllMegaMenus();
+  mega.classList.add('is-open');
+  const trigger=mega.querySelector('[data-mega-trigger]');
+  const panel=mega.querySelector('.shell-mega-panel');
+  if(trigger) trigger.setAttribute('aria-expanded','true');
+  if(panel) panel.hidden=false;
+}
+
+function wireMastheadMenus(){
+  let hoverTimer=0;
+  masthead?.addEventListener('click', event=>{
+    const trigger=event.target.closest('[data-mega-trigger]');
+    if(trigger){
+      event.preventDefault();
+      const mega=trigger.closest('.shell-mega');
+      const wasOpen=mega?.classList.contains('is-open');
+      closeAllMegaMenus();
+      if(!wasOpen) openMegaMenu(mega);
+      return;
+    }
+    if(event.target.closest('.shell-mega-panel a, .shell-top-link')){
+      closeAllMegaMenus();
+      setShellMenuOpen(false);
+    }
+  });
+  masthead?.addEventListener('pointerenter', event=>{
+    if(window.matchMedia('(hover: hover) and (pointer: fine)').matches===false) return;
+    const mega=event.target.closest?.('.shell-mega');
+    if(!mega || !masthead.contains(mega)) return;
+    window.clearTimeout(hoverTimer);
+    hoverTimer=window.setTimeout(()=>openMegaMenu(mega), 80);
+  }, true);
+  masthead?.addEventListener('pointerleave', event=>{
+    const mega=event.target.closest?.('.shell-mega');
+    if(!mega || !masthead.contains(mega)) return;
+    window.clearTimeout(hoverTimer);
+    hoverTimer=window.setTimeout(()=>{
+      if(!mega.matches(':hover, :focus-within')) closeAllMegaMenus();
+    }, 160);
+  }, true);
+  document.addEventListener('click', event=>{
+    if(event.target.closest('.shell-mega, .shell-masthead-nav')) return;
+    closeAllMegaMenus();
+  });
+  document.addEventListener('keydown', event=>{
+    if(event.key==='Escape'){
+      closeAllMegaMenus();
+      setShellMenuOpen(false);
+    }
+  });
+}
+
+function locationExtraParams(){
+  const extra={};
+  try{
+    new URLSearchParams(location.search).forEach((value, key)=>{
+      if(key!=='view' && value) extra[key]=value;
+    });
+  }catch(_e){/* ignore */}
+  return extra;
+}
+
+window.StarlightShellNav = {
+  populateSeriesMegaMenus,
+  closeAllMegaMenus
+};
 
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
@@ -195,6 +282,8 @@ function navigate(route,{push=true,extra={}}={}){
   if(push)history.pushState({view:route},'',url);
   setActive(route);
   document.body.classList.remove('shell-menu-open');
+  if(drawerBackdrop) drawerBackdrop.hidden=true;
+  closeAllMegaMenus();
   mainContent?.scrollTo({top:0,left:0,behavior:'auto'});
   if(route==='binder'){
     clearReadyTimer();
@@ -202,7 +291,12 @@ function navigate(route,{push=true,extra={}}={}){
     frameWrap?.classList.remove('active','is-loading','has-error');
     if(frame)setFrameLocation('about:blank');
     document.title='Starlight Card Gallery | Starlight Card Binder';
-    window.renderAll?.();
+    const series = extra?.series;
+    if(series && window.applyStarlightSeriesFilter){
+      window.applyStarlightSeriesFilter(series);
+    } else {
+      window.renderAll?.();
+    }
     if(previousRoute==='login')scheduleHydrateAccount();
     return;
   }
@@ -550,10 +644,24 @@ document.addEventListener('click',e=>{
   if(a){
     e.preventDefault();
     closeAccountMenu();
-    navigate(a.dataset.shellView);
+    const extra = {};
+    if (a.dataset.seriesKey) extra.series = a.dataset.seriesKey;
+    if (a.dataset.clearSeries === '1') extra.series = 'All Series';
+    const href = a.getAttribute('href') || '';
+    try {
+      const parsed = new URL(href, location.href);
+      parsed.searchParams.forEach((value, key) => {
+        if (key !== 'view' && value) extra[key] = extra[key] || value;
+      });
+    } catch {
+      /* ignore */
+    }
+    navigate(a.dataset.shellView, { extra });
   }
 });
-menuButton?.addEventListener('click',()=>document.body.classList.toggle('shell-menu-open'));
+menuButton?.addEventListener('click',()=>setShellMenuOpen(!document.body.classList.contains('shell-menu-open')));
+drawerBackdrop?.addEventListener('click',()=>setShellMenuOpen(false));
+wireMastheadMenus();
 accountMenuButton?.addEventListener('click',e=>{
   e.stopPropagation();
   setAccountMenuOpen(Boolean(accountMenu?.hidden));
@@ -600,7 +708,10 @@ document.addEventListener('click',e=>{
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape')closeAccountMenu();
 });
-window.addEventListener('popstate',()=>navigate(new URLSearchParams(location.search).get('view')||'home',{push:false}));
+window.addEventListener('popstate',()=>{
+  const params=new URLSearchParams(location.search);
+  navigate(params.get('view')||'home',{push:false,extra:locationExtraParams()});
+});
 window.addEventListener('message',async e=>{
   if(e.origin!==location.origin)return;
   const data=e.data||{};
@@ -676,7 +787,7 @@ if (isStudioPreview()) {
   liveFeedWidget?.setSuppressed?.(true);
 }
 
-navigate(initial,{push:false});
+navigate(initial,{push:false,extra:locationExtraParams()});
 supabase.auth.onAuthStateChange((event)=>{
   if(event==='INITIAL_SESSION'||event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='USER_UPDATED'||event==='TOKEN_REFRESHED'){
     scheduleHydrateAccount();

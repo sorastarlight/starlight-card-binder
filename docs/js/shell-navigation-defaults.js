@@ -84,8 +84,8 @@ export const SHELL_LABEL_REWRITES = Object.freeze({
 
 export function createDefaultShellNavigation() {
   return {
-    version: 1,
-    brandRibbon: 'Card Binder',
+    version: 2,
+    brandRibbon: 'Starlight Cards',
     pageTitles: {
       home: 'Home',
       binder: 'Starlight Card Gallery',
@@ -112,31 +112,58 @@ export function createDefaultShellNavigation() {
     sidebar: {
       sections: [
         {
-          id: 'explore',
-          label: 'Explore The Starlight Card Series',
+          id: 'series',
+          label: 'Series',
           icon: { type: 'emoji', value: '✦' },
           staffOnly: false,
+          mega: true,
           items: [
-            { id: 'home', label: 'Home', icon: { type: 'emoji', value: '🏠' }, destination: 'home', enabled: true, features: [] },
-            { id: 'binder', label: 'Starlight Card Gallery', icon: { type: 'emoji', value: '🃏' }, destination: 'binder', enabled: true, features: [] },
+            {
+              id: 'all-series',
+              label: 'All Series',
+              icon: { type: 'emoji', value: '🃏' },
+              destination: 'binder',
+              enabled: true,
+              features: ['clearSeries'],
+              className: 'shell-series-all'
+            }
+          ]
+        },
+        {
+          id: 'cards',
+          label: 'Cards',
+          icon: { type: 'emoji', value: '🃏' },
+          staffOnly: false,
+          mega: true,
+          items: [
+            { id: 'binder', label: 'Starlight Card Gallery', icon: { type: 'emoji', value: '🃏' }, destination: 'binder', enabled: true, features: ['clearSeries'] },
+            { id: 'checklist', label: 'Star Registry', icon: { type: 'emoji', value: '☑' }, destination: 'checklist', enabled: true, features: [] }
+          ]
+        },
+        {
+          id: 'collect',
+          label: 'Collect',
+          icon: { type: 'emoji', value: '♡' },
+          staffOnly: false,
+          mega: true,
+          items: [
+            { id: 'collection', label: 'My Card Album Binder', icon: { type: 'emoji', value: '📒' }, destination: 'collection', enabled: true, features: [] },
             { id: 'daily', label: 'Free Daily Booster', icon: { type: 'emoji', value: '✨' }, destination: 'daily', enabled: true, features: ['dailyBadge'], className: 'shell-daily-link' },
             { id: 'shop', label: 'Card Boutique', icon: { type: 'emoji', value: '🛍️' }, destination: 'shop', enabled: true, features: [], className: 'shell-shop-link' },
-            { id: 'events', label: 'Starlight Events', icon: { type: 'emoji', value: '🎉' }, destination: 'events', enabled: true, features: [] },
+            { id: 'star-bits', label: 'My Star Bits', icon: starBitNavIcon(), destination: 'star-bits', enabled: true, features: [] },
+            { id: 'quests', label: 'Starlight Missions', icon: { type: 'emoji', value: '🧭' }, destination: 'quests', enabled: true, features: [] },
+            { id: 'season-pass', label: 'Seasonal Collection Pass', icon: { type: 'emoji', value: '🌌' }, destination: 'season-pass', enabled: true, features: [] },
             { id: 'redeem', label: 'Redeem A Code', icon: { type: 'emoji', value: '🎟️' }, destination: 'redeem', enabled: true, features: [] }
           ]
         },
         {
-          id: 'my-stuff',
-          label: 'My Stuff',
-          icon: { type: 'emoji', value: '♡' },
+          id: 'community',
+          label: 'Community',
+          icon: { type: 'emoji', value: '🤝' },
           staffOnly: false,
+          mega: true,
           items: [
-            { id: 'collection', label: 'My Card Album Binder', icon: { type: 'emoji', value: '📒' }, destination: 'collection', enabled: true, features: [] },
-            { id: 'star-bits', label: 'My Star Bits', icon: starBitNavIcon(), destination: 'star-bits', enabled: true, features: [] },
-            { id: 'checklist', label: 'Star Registry', icon: { type: 'emoji', value: '☑' }, destination: 'checklist', enabled: true, features: [] },
-            { id: 'quests', label: 'Starlight Missions', icon: { type: 'emoji', value: '🧭' }, destination: 'quests', enabled: true, features: [] },
-            { id: 'season-pass', label: 'Seasonal Collection Pass', icon: { type: 'emoji', value: '🌌' }, destination: 'season-pass', enabled: true, features: [] },
-            { id: 'trading-label', label: 'COMMUNITY HUB', icon: { type: 'emoji', value: '🤝' }, destination: '', enabled: true, features: ['sectionLabel'] },
+            { id: 'events', label: 'Starlight Events', icon: { type: 'emoji', value: '🎉' }, destination: 'events', enabled: true, features: [] },
             { id: 'trades', label: 'Trade With Others', icon: { type: 'emoji', value: '🤝' }, destination: 'trades', enabled: true, features: ['tradeOfferBadge'] },
             { id: 'rankings', label: 'User Rankings', icon: { type: 'emoji', value: '🏆' }, destination: 'rankings', enabled: true, features: [] },
             { id: 'feed', label: 'LIVE Feed', icon: { type: 'emoji', value: '📡' }, destination: 'feed', enabled: true, features: [] }
@@ -147,7 +174,10 @@ export function createDefaultShellNavigation() {
           label: 'Account',
           icon: { type: 'emoji', value: '' },
           staffOnly: false,
+          mega: false,
+          mobileOnly: true,
           items: [
+            { id: 'home', label: 'Home', icon: { type: 'emoji', value: '🏠' }, destination: 'home', enabled: true, features: [] },
             { id: 'notifications', label: 'Notifications', icon: { type: 'emoji', value: '🔔' }, destination: 'notifications', enabled: true, features: ['notificationBadge'] },
             { id: 'rewards', label: 'Received Gifts', icon: { type: 'emoji', value: '🎁' }, destination: 'rewards', enabled: true, features: ['receivedGiftBadge'] },
             { id: 'profile', label: 'Profile', icon: { type: 'emoji', value: '👤' }, destination: 'profile', enabled: true, features: [] }
@@ -158,6 +188,7 @@ export function createDefaultShellNavigation() {
           label: 'Administration Hub',
           icon: { type: 'emoji', value: '🛠️' },
           staffOnly: true,
+          mega: false,
           items: [
             { id: 'admin-hub', label: 'Open Administration Hub', icon: { type: 'emoji', value: '🛠️' }, destination: 'admin', enabled: true, features: ['staffOnly'], className: 'staff-link' }
           ]
@@ -165,7 +196,10 @@ export function createDefaultShellNavigation() {
       ]
     },
     topBar: {
-      quickLinks: []
+      quickLinks: [
+        { id: 'events-top', label: 'Events', destination: 'events', enabled: true },
+        { id: 'trades-top', label: 'Trades', destination: 'trades', enabled: true }
+      ]
     },
     accountMenu: {
       signedIn: [

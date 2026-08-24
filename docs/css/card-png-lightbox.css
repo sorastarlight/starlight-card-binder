@@ -1,0 +1,206 @@
+/* Art-first fullscreen PNG lightbox */
+
+body.png-lightbox-open {
+  overflow: hidden !important;
+}
+
+.png-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+  display: grid;
+  place-items: center;
+  padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+}
+
+.png-lightbox[hidden] {
+  display: none !important;
+}
+
+.png-lightbox-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 12, 28, 0.88);
+  backdrop-filter: blur(10px);
+}
+
+.png-lightbox-dialog {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 12px;
+  width: min(980px, 100%);
+  max-height: min(96dvh, 100%);
+  padding: 8px 8px 12px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #f4f7ff;
+}
+
+.png-lightbox-stage {
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  max-height: min(78dvh, 820px);
+}
+
+.png-lightbox-art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  max-width: 100%;
+  max-height: min(78dvh, 820px);
+}
+
+.png-lightbox-image {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(100%, 560px);
+  max-height: min(78dvh, 820px);
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+.png-lightbox-art .st-holo-spark {
+  pointer-events: none;
+}
+
+.png-lightbox-art.is-holo-off .st-holo-spark {
+  display: none !important;
+}
+
+.png-lightbox-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px 18px;
+  padding: 10px 14px 4px;
+  border-radius: 16px;
+  background: rgba(14, 20, 40, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.png-lightbox-kicker {
+  margin: 0;
+  color: #ff9ad4;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.png-lightbox-meta h2 {
+  margin: 0.15rem 0 0.2rem;
+  color: #f7f9ff;
+  font-size: clamp(1.15rem, 2.4vw, 1.55rem);
+  line-height: 1.15;
+}
+
+.png-lightbox-sub {
+  margin: 0;
+  color: rgba(232, 238, 255, 0.78);
+  font-weight: 700;
+}
+
+.png-lightbox-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.png-lightbox-details,
+.png-lightbox-holo,
+.png-lightbox-close,
+.png-lightbox-nav {
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 850;
+}
+
+.png-lightbox-details,
+.png-lightbox-holo {
+  min-height: 40px;
+  padding: 0 16px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #f7f9ff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+}
+
+.png-lightbox-details {
+  background: linear-gradient(135deg, rgba(107, 198, 248, 0.95), rgba(255, 130, 200, 0.92));
+  color: #1c2748;
+  box-shadow: none;
+}
+
+.png-lightbox-close,
+.png-lightbox-nav {
+  position: absolute;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.16);
+  color: #f7f9ff;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+}
+
+.png-lightbox-close {
+  top: 4px;
+  right: 4px;
+  width: 44px;
+  height: 44px;
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.png-lightbox-nav {
+  top: 42%;
+  width: 46px;
+  height: 46px;
+  font-size: 1.7rem;
+  line-height: 1;
+}
+
+.png-lightbox-prev { left: 2px; }
+.png-lightbox-next { right: 2px; }
+
+.png-lightbox-nav:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.png-lightbox-close:hover,
+.png-lightbox-nav:hover:not(:disabled),
+.png-lightbox-details:hover,
+.png-lightbox-holo:hover,
+.png-lightbox-close:focus-visible,
+.png-lightbox-nav:focus-visible,
+.png-lightbox-details:focus-visible,
+.png-lightbox-holo:focus-visible {
+  outline: 2px solid rgba(107, 198, 248, 0.9);
+  outline-offset: 2px;
+}
+
+@media (max-width: 720px) {
+  .png-lightbox-image {
+    max-width: min(100%, 92vw);
+  }
+  .png-lightbox-nav {
+    top: auto;
+    bottom: 108px;
+  }
+  .png-lightbox-meta {
+    padding: 10px 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .png-lightbox-backdrop {
+    backdrop-filter: none;
+  }
+}

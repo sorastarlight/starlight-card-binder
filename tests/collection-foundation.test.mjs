@@ -8,14 +8,15 @@ test('keeps the requested collection navigation labels in the shared shell', asy
   const binder = await read('docs/binder.html');
   const shell = await read('docs/js/app-shell.js');
 
-  for (const label of [
-    'Explore The Starlight Card Series',
-    'Starlight Card Gallery',
-    'Redeem A Code',
-    'My Stuff',
-    'My Card Album Binder',
-    'Star Registry'
-  ]) assert.match(binder, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  assert.match(binder, /Starlight Card Gallery/);
+  assert.match(binder, /shell-masthead/);
+  const defaults = await read('docs/js/shell-navigation-defaults.js');
+  assert.match(defaults, /label: 'Series'/);
+  assert.match(defaults, /label: 'Cards'/);
+  assert.match(defaults, /label: 'Collect'/);
+  assert.match(defaults, /Redeem A Code/);
+  assert.match(defaults, /My Card Album Binder/);
+  assert.match(defaults, /Star Registry/);
 
   assert.match(shell, /collection:\{title:'My Card Album Binder'/);
   assert.match(shell, /binder:\{title:'Starlight Card Gallery'/);

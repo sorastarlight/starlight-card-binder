@@ -36,6 +36,15 @@ function itemBadge(features = []) {
   return '';
 }
 
+function itemHref(item) {
+  const destination = item.destination || 'home';
+  const features = item.features || [];
+  const params = {};
+  if (features.includes('clearSeries')) params.series = 'All Series';
+  if (item.seriesKey) params.series = item.seriesKey;
+  return shellHref(destination, params);
+}
+
 function renderAccountMenuItem(item) {
   if (item.enabled === false) return '';
   const features = item.features || [];
@@ -58,7 +67,7 @@ function renderAccountMenuItem(item) {
   return `<a role="menuitem" data-shell-view="${esc(destination)}" href="${shellHref(destination)}">${esc(item.label || destination)}${itemBadge(features)}</a>`;
 }
 
-function renderSidebarItem(item) {
+function renderNavLink(item) {
   if (item.enabled === false) return '';
   const features = item.features || [];
   if (features.includes('sectionLabel')) {
@@ -67,37 +76,57 @@ function renderSidebarItem(item) {
   const destination = item.destination || 'home';
   const classes = ['shell-nav-item', item.className || ''].filter(Boolean).join(' ');
   const staffClass = features.includes('staffOnly') ? ' staff-link' : '';
-  return `<a class="${esc(classes)}${staffClass}" data-shell-view="${esc(destination)}" href="${shellHref(destination)}">${renderIcon(item.icon)} <span>${esc(item.label)}</span>${itemBadge(features)}</a>`;
+  const seriesAttr = item.seriesKey ? ` data-series-key="${esc(item.seriesKey)}"` : '';
+  const clearAttr = features.includes('clearSeries') ? ' data-clear-series="1"' : '';
+  return `<a class="${esc(classes)}${staffClass}" data-shell-view="${esc(destination)}" href="${itemHref(item)}"${seriesAttr}${clearAttr}>${renderIcon(item.icon)} <span>${esc(item.label)}</span>${itemBadge(features)}</a>`;
 }
 
-function renderSidebarSection(section) {
-  const itemsHtml = (section.items || []).map(renderSidebarItem).join('');
+function renderMegaSection(section) {
+  const itemsHtml = (section.items || []).map(renderNavLink).join('');
   if (!itemsHtml.trim()) return '';
   const staffClass = section.staffOnly ? ' shell-nav-staff' : '';
-  return `<div class="shell-nav-section${staffClass}"><p class="shell-nav-label">${renderIcon(section.icon)} ${esc(section.label)}</p>${itemsHtml}</div>`;
+  const mobileClass = section.mobileOnly ? ' is-mobile-only' : '';
+  const seriesPanelAttr = section.id === 'series' ? ' data-series-mega-panel' : '';
+  return `<div class="shell-mega${staffClass}${mobileClass}" data-mega="${esc(section.id)}">
+    <button type="button" class="shell-mega-trigger" aria-expanded="false" aria-haspopup="true" data-mega-trigger="${esc(section.id)}">${esc(section.label)} <span aria-hidden="true">▾</span></button>
+    <div class="shell-mega-panel" role="region" aria-label="${esc(section.label)}" hidden${seriesPanelAttr}>
+      ${itemsHtml}
+    </div>
+  </div>`;
+}
+
+function renderDrawerSection(section) {
+  const itemsHtml = (section.items || []).map(renderNavLink).join('');
+  if (!itemsHtml.trim()) return '';
+  const staffClass = section.staffOnly ? ' shell-nav-staff' : '';
+  return `<div class="shell-nav-section${staffClass}" data-nav-section="${esc(section.id)}"><p class="shell-nav-label">${renderIcon(section.icon)} ${esc(section.label)}</p>${itemsHtml}</div>`;
 }
 
 export function applyShellNavigationToDom(navigation, { isStaff = false } = {}) {
   const config = mergeShellNavigation(navigation || cloneDefaultShellNavigation());
+  const sections = config.sidebar.sections || [];
+
+  const mastheadNav = document.querySelector('.shell-masthead-nav');
+  if (mastheadNav) {
+    const megaSections = sections.filter(section => section.mega);
+    const topQuick = (config.topBar.quickLinks || []).filter(link => link.enabled !== false);
+    const quickHtml = topQuick
+      .map(link => `<a class="shell-top-link" data-shell-view="${esc(link.destination)}" href="${shellHref(link.destination)}">${esc(link.label)}</a>`)
+      .join('');
+    mastheadNav.innerHTML = `${megaSections.map(renderMegaSection).join('')}${quickHtml}`;
+  }
+
   const nav = document.querySelector('.unified-nav');
   if (nav) {
-    nav.innerHTML = config.sidebar.sections.map(renderSidebarSection).join('');
+    nav.innerHTML = sections.map(renderDrawerSection).join('');
     nav.classList.toggle('has-staff-access', Boolean(isStaff));
     document.querySelectorAll('.staff-link').forEach(el => el.classList.toggle('visible', Boolean(isStaff)));
   }
 
   const top = document.querySelector('.shell-primary-links');
   if (top) {
-    const links = (config.topBar.quickLinks || []).filter(link => link.enabled !== false);
-    if (links.length) {
-      top.hidden = false;
-      top.innerHTML = links
-        .map(link => `<a data-shell-view="${esc(link.destination)}" href="${shellHref(link.destination)}">${esc(link.label)}</a>`)
-        .join('');
-    } else {
-      top.innerHTML = '';
-      top.hidden = true;
-    }
+    top.innerHTML = '';
+    top.hidden = true;
   }
 
   const signedInMenu = document.querySelector('.shell-account-menu-signed-in');
@@ -116,7 +145,36 @@ export function applyShellNavigationToDom(navigation, { isStaff = false } = {}) 
   const ribbon = document.querySelector('.binder-ribbon');
   if (ribbon && config.brandRibbon) ribbon.textContent = config.brandRibbon;
 
+  document.querySelectorAll('.staff-link').forEach(el => el.classList.toggle('visible', Boolean(isStaff)));
+  document.querySelectorAll('.shell-nav-staff, .shell-mega.shell-nav-staff').forEach(el => {
+    el.hidden = !isStaff;
+  });
+
   return config;
+}
+
+/** Fill Series mega menu + drawer section from catalog groups. */
+export function populateSeriesMegaMenus(groups = []) {
+  const list = Array.isArray(groups) ? groups : [];
+  const links = list.map((group) => {
+    const key = group.series || group.seriesName || '';
+    if (!key) return '';
+    return `<a class="shell-nav-item" data-shell-view="binder" data-series-key="${esc(key)}" href="${shellHref('binder', { series: key })}"><span class="shell-nav-icon" aria-hidden="true">✦</span> <span>${esc(group.seriesName || key)}</span></a>`;
+  }).join('');
+
+  const allLink = `<a class="shell-nav-item shell-series-all" data-shell-view="binder" data-clear-series="1" href="${shellHref('binder', { series: 'All Series' })}"><span class="shell-nav-icon" aria-hidden="true">🃏</span> <span>All Series</span></a>`;
+
+  document.querySelectorAll('[data-series-mega-panel]').forEach(panel => {
+    panel.innerHTML = `${allLink}${links}`;
+  });
+
+  const drawerSeries = document.querySelector('.unified-nav [data-nav-section="series"]');
+  if (drawerSeries) {
+    const label = drawerSeries.querySelector('.shell-nav-label');
+    drawerSeries.innerHTML = `${label ? label.outerHTML : '<p class="shell-nav-label">Series</p>'}${allLink}${links}`;
+  }
+
+  return list.length;
 }
 
 export function applyShellPageTitles(routes, navigation) {

@@ -59,6 +59,8 @@ test('notification params normalize gift and event aliases', () => {
 test('shellHref builds extensionless binder routes with extra params', () => {
   assert.equal(shellHref('home'), 'binder?view=home');
   assert.equal(shellHref('collector', { username: 'sora' }), 'binder?view=collector&username=sora');
+  assert.equal(shellHref('binder', { series: 'All Series' }), 'binder?view=binder&series=All+Series');
+  assert.equal(shellHref('binder', { series: 'Rising Star' }), 'binder?view=binder&series=Rising+Star');
 });
 
 test('loginShellHref builds shell login routes', () => {

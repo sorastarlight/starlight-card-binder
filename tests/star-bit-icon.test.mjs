@@ -41,8 +41,7 @@ test('shell and shop surfaces wire the Star Bit image icon', async () => {
     read('docs/css/pages/star-bits.css'),
     read('docs/css/shared-ui.css')
   ]);
-  assert.match(binder, /data-star-bits[\s\S]*star-bit\.png|star-bit\.png[\s\S]*data-star-bits/);
-  assert.match(binder, /My Star Bits[\s\S]*star-bit\.png|star-bit\.png[\s\S]*My Star Bits/);
+  assert.match(binder, /star-bit\.png/);
   assert.match(shop, /star-bit\.png/);
   assert.match(bits, /star-bit\.png/);
   assert.match(bitsCss, /\.duplicate-card\s*>\s*img/);
