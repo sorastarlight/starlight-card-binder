@@ -27,7 +27,6 @@ const duplicateCopyCount = document.getElementById('duplicate-copy-count');
 const exchangeValue = document.getElementById('exchange-value');
 const rateGrid = document.getElementById('rate-grid');
 const duplicateGrid = document.getElementById('duplicate-grid');
-const exchangeDescription = document.getElementById('exchange-description');
 const exchangeButton = document.getElementById('exchange-button');
 const selectedSummary = document.getElementById('selected-summary');
 const selectAllToggle = document.getElementById('select-all-toggle');
@@ -63,7 +62,7 @@ function renderRates(rates) {
   for (const rarity of rarityOrder) {
     const card = document.createElement('div');
     card.className = `rate-card rarity-${rarity.toLowerCase()}`;
-    card.innerHTML = `<span>${esc(rarity)}</span><strong class="star-bit-amount">${starBitIconHtml(esc, { size: 'sm' })}${esc(rates?.[rarity] ?? 0)}</strong>`;
+    card.innerHTML = `<span class="rate-label">${esc(rarity)}</span><strong class="star-bit-amount">${starBitIconHtml(esc, { size: 'sm' })}${esc(rates?.[rarity] ?? 0)}</strong>`;
     rateGrid.append(card);
   }
 }
@@ -90,18 +89,11 @@ function selectedCardsForReveal() {
 
 function updateSelectionSummary() {
   const { copies, bits } = getSelectedTotals();
-  selectedSummary.innerHTML = `<strong>${copies}</strong> ${copies === 1 ? 'copy' : 'copies'} selected <span>→</span> ${starBitAmountHtml(esc, bits, { iconSize: 'sm', suffix: 'Star Bits' })}`;
+  selectedSummary.innerHTML = copies > 0
+    ? `<strong>${copies}</strong> ${copies === 1 ? 'copy' : 'copies'} · ${starBitAmountHtml(esc, bits, { iconSize: 'sm', suffix: 'Star Bits' })}`
+    : 'Select duplicate copies to convert';
   exchangeButton.disabled = copies <= 0 || isConverting;
-  exchangeDescription.textContent = copies > 0
-    ? `Convert ${copies} selected duplicate ${copies === 1 ? 'copy' : 'copies'} into ${bits} Star Bits.`
-    : 'Select the duplicate cards and quantities you want to convert.';
-
-  duplicateGrid.querySelectorAll('[data-card-id]').forEach((article) => {
-    const cardId = article.dataset.cardId;
-    const qty = selections.get(cardId) || 0;
-    const convertButton = article.querySelector('.card-convert-now');
-    if (convertButton) convertButton.disabled = qty < 1 || isConverting;
-  });
+  document.body.classList.toggle('bits-has-selection', copies > 0);
 }
 
 function setSelection(cardId, quantity, maximum) {
@@ -111,13 +103,8 @@ function setSelection(cardId, quantity, maximum) {
 
   const article = duplicateGrid.querySelector(`[data-card-id="${CSS.escape(cardId)}"]`);
   if (article) {
-    const checkbox = article.querySelector('input[type="checkbox"]');
     const input = article.querySelector('input[type="number"]');
-    if (checkbox) checkbox.checked = safe === Number(maximum);
-    if (input) {
-      input.value = String(safe);
-      input.disabled = false;
-    }
+    if (input) input.value = String(safe);
     article.classList.toggle('is-selected', safe > 0);
   }
 
@@ -148,27 +135,17 @@ function renderDuplicates(cards) {
     const name = document.createElement('h3');
     name.textContent = `#${card.cardNumber} ${card.name}`;
 
-    const rarity = document.createElement('p');
-    rarity.textContent = `${card.rarity} • ${card.seriesName}`;
+    const meta = document.createElement('p');
+    meta.className = 'duplicate-meta';
+    meta.textContent = `${card.rarity} · ${card.seriesName}`;
 
-    const quantity = document.createElement('p');
-    quantity.textContent = `${card.totalQuantity} owned • ${card.duplicateQuantity} duplicate${card.duplicateQuantity === 1 ? '' : 's'}`;
+    const owned = document.createElement('p');
+    owned.className = 'duplicate-owned';
+    owned.textContent = `${card.totalQuantity} owned · ${card.duplicateQuantity} extra`;
 
     const value = document.createElement('span');
     value.className = 'value-pill';
     value.innerHTML = `${starBitAmountHtml(esc, card.bitsPerDuplicate, { iconSize: 'xs' })} each`;
-
-    const selectRow = document.createElement('label');
-    selectRow.className = 'duplicate-select-row qol-card-toggle';
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.className = 'qol-no-enhance';
-    const selectText = document.createElement('span');
-    selectText.innerHTML = '<strong>Select all copies</strong><small>Use every duplicate of this card</small>';
-    const switchVisual = document.createElement('span');
-    switchVisual.className = 'qol-switch-ui';
-    switchVisual.setAttribute('aria-hidden', 'true');
-    selectRow.append(checkbox, selectText, switchVisual);
 
     const controls = document.createElement('div');
     controls.className = 'duplicate-quantity-control';
@@ -181,6 +158,7 @@ function renderDuplicates(cards) {
     input.min = '0';
     input.max = String(card.duplicateQuantity);
     input.value = '0';
+    input.inputMode = 'numeric';
     input.setAttribute('aria-label', `Duplicate copies of ${card.name} to convert`);
     const plus = document.createElement('button');
     plus.type = 'button';
@@ -188,13 +166,6 @@ function renderDuplicates(cards) {
     plus.setAttribute('aria-label', `Increase ${card.name} quantity`);
     controls.append(minus, input, plus);
 
-    checkbox.addEventListener('change', () => {
-      setSelection(
-        card.cardId,
-        checkbox.checked ? Number(card.duplicateQuantity || 0) : 0,
-        card.duplicateQuantity
-      );
-    });
     input.addEventListener('input', () => {
       setSelection(card.cardId, input.value, card.duplicateQuantity);
     });
@@ -207,30 +178,9 @@ function renderDuplicates(cards) {
       setSelection(card.cardId, current + 1, card.duplicateQuantity);
     });
 
-    const convertButton = document.createElement('button');
-    convertButton.type = 'button';
-    convertButton.className = 'card-convert-now';
-    convertButton.textContent = 'Convert Now';
-    convertButton.disabled = true;
-    convertButton.addEventListener('click', async () => {
-      const qty = selections.get(card.cardId) || 0;
-      if (qty < 1) {
-        toast('Choose at least one duplicate copy first.', 'error');
-        return;
-      }
-      await runConversion(
-        [{ cardId: card.cardId, quantity: qty }],
-        [card],
-        {
-          title: 'Convert this card?',
-          message: `Convert ${qty} duplicate ${qty === 1 ? 'copy' : 'copies'} of ${card.name} into Star Bits?`
-        }
-      );
-    });
-
     const info = document.createElement('div');
     info.className = 'duplicate-card-info';
-    info.append(name, rarity, quantity, value, selectRow, controls, convertButton);
+    info.append(name, meta, owned, value, controls);
     article.append(image, info);
     duplicateGrid.append(article);
   }
@@ -286,12 +236,12 @@ async function runConversion(payload, revealCards, confirmOptions) {
   }, 0);
 
   const confirmed = await window.StarlightUI?.confirm?.({
-    title: confirmOptions?.title || 'Convert Your Duplicates?',
+    title: confirmOptions?.title || 'Convert your duplicates?',
     message: confirmOptions?.message
-      || `You are about to convert ${copies} selected duplicate ${copies === 1 ? 'copy' : 'copies'} into ${bits} Star Bits.`,
-    warning: 'This cannot be undone. Your final copy of every card will remain safely in your collection.',
+      || `Convert ${copies} duplicate ${copies === 1 ? 'copy' : 'copies'} into ${bits} Star Bits?`,
+    warning: 'This cannot be undone. Your final copy of every card stays in your collection.',
     confirmText: 'Convert to Star Bits',
-    cancelText: 'Keep My Duplicates'
+    cancelText: 'Keep my duplicates'
   });
   if (!confirmed) return;
 
