@@ -82,10 +82,15 @@ export const SHELL_LABEL_REWRITES = Object.freeze({
   ])
 });
 
+export const SHELL_LAYOUT_MODES = Object.freeze(['masthead', 'hybrid']);
+
 export function createDefaultShellNavigation() {
   return {
     version: 2,
     brandRibbon: 'Starlight Cards',
+    chrome: {
+      layout: 'masthead'
+    },
     pageTitles: {
       home: 'Home',
       binder: 'Starlight Card Gallery',

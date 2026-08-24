@@ -45,6 +45,7 @@ const ACCOUNT_SPECIAL = new Set(['separator', 'signOut', 'signIn', 'signUp', 'pr
 const statusEl = byId('status');
 const appEl = byId('app');
 const brandInput = byId('brandRibbon');
+const layoutSelect = byId('shellLayout');
 const sidebarPanel = byId('panel-sidebar');
 const topbarPanel = byId('panel-topbar');
 const accountPanel = byId('panel-account');
@@ -143,8 +144,12 @@ function renderIconControls(icon, scopeAttrs) {
 
 function renderSidebar() {
   const sections = navigation?.sidebar?.sections || [];
+  const layout = navigation?.chrome?.layout === 'hybrid' ? 'hybrid' : 'masthead';
+  const layoutNote = layout === 'hybrid'
+    ? 'Hybrid layout shows these sections in the persistent left sidebar. Top Bar quick links appear as slim links in the masthead.'
+    : 'These sections power the sticky top masthead mega menus and the mobile drawer. Enable “Mega menu” for desktop dropdowns.';
   sidebarPanel.innerHTML = `
-    <p class="lead">These sections power the sticky top masthead mega menus and the mobile drawer. Enable “Mega menu” for desktop dropdowns.</p>
+    <p class="lead">${esc(layoutNote)}</p>
     <div class="section-list">
       ${sections.map((section, sIndex) => `
         <article class="section-card" data-section="${sIndex}">
@@ -414,6 +419,12 @@ function loadShellPreview({ force = false } = {}) {
 
 function renderAll() {
   if (brandInput && navigation) brandInput.value = navigation.brandRibbon || '';
+  if (layoutSelect && navigation) {
+    navigation.chrome = navigation.chrome && typeof navigation.chrome === 'object'
+      ? navigation.chrome
+      : { layout: 'masthead' };
+    layoutSelect.value = navigation.chrome.layout === 'hybrid' ? 'hybrid' : 'masthead';
+  }
   ensureAccountMenu();
   renderSidebar();
   renderTopBar();
@@ -497,6 +508,15 @@ brandInput?.addEventListener('input', () => {
   if (!navigation) return;
   navigation.brandRibbon = brandInput.value;
   renderPreview();
+});
+
+layoutSelect?.addEventListener('change', () => {
+  if (!navigation) return;
+  navigation.chrome = navigation.chrome && typeof navigation.chrome === 'object'
+    ? navigation.chrome
+    : { layout: 'masthead' };
+  navigation.chrome.layout = layoutSelect.value === 'hybrid' ? 'hybrid' : 'masthead';
+  renderAll();
 });
 
 function onEditorInput(event) {

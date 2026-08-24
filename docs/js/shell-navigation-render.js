@@ -104,9 +104,27 @@ function renderDrawerSection(section) {
   return `<div class="shell-nav-section${staffClass}" data-nav-section="${esc(section.id)}"><p class="shell-nav-label">${renderIcon(section.icon)} ${esc(section.label)}</p>${itemsHtml}</div>`;
 }
 
+export function resolveShellLayout(navigation) {
+  const layout = navigation?.chrome?.layout;
+  return layout === 'hybrid' ? 'hybrid' : 'masthead';
+}
+
+export function applyShellLayoutToDom(layout = 'masthead') {
+  const mode = layout === 'hybrid' ? 'hybrid' : 'masthead';
+  document.body.dataset.shellLayout = mode;
+  document.body.classList.toggle('shell-hybrid-layout', mode === 'hybrid');
+  document.documentElement.style.setProperty(
+    '--shell-sidebar-w',
+    mode === 'hybrid' ? 'min(286px, 28vw)' : '0px'
+  );
+  window.dispatchEvent(new CustomEvent('starlight-shell-layout-changed', { detail: { layout: mode } }));
+  return mode;
+}
+
 export function applyShellNavigationToDom(navigation, { isStaff = false } = {}) {
   const config = mergeShellNavigation(navigation || cloneDefaultShellNavigation());
   const sections = config.sidebar.sections || [];
+  const layout = resolveShellLayout(config);
 
   const mastheadNav = document.querySelector('.shell-masthead-nav');
   if (mastheadNav) {
@@ -115,7 +133,9 @@ export function applyShellNavigationToDom(navigation, { isStaff = false } = {}) 
     const quickHtml = topQuick
       .map(link => `<a class="shell-top-link" data-shell-view="${esc(link.destination)}" href="${shellHref(link.destination)}">${esc(link.label)}</a>`)
       .join('');
-    mastheadNav.innerHTML = `${megaSections.map(renderMegaSection).join('')}${quickHtml}`;
+    mastheadNav.innerHTML = layout === 'hybrid'
+      ? quickHtml
+      : `${megaSections.map(renderMegaSection).join('')}${quickHtml}`;
   }
 
   const nav = document.querySelector('.unified-nav');
@@ -151,6 +171,8 @@ export function applyShellNavigationToDom(navigation, { isStaff = false } = {}) 
   document.querySelectorAll('.shell-nav-staff, .shell-mega.shell-nav-staff').forEach(el => {
     el.hidden = !isStaff;
   });
+
+  applyShellLayoutToDom(layout);
 
   return config;
 }

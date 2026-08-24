@@ -34,6 +34,15 @@
           <input id="brandRibbon" maxlength="40" placeholder="Card Binder">
         </div>
 
+        <div class="field layout-field">
+          <label for="shellLayout">Site layout</label>
+          <select id="shellLayout" aria-describedby="shellLayoutHint">
+            <option value="masthead">Top masthead — mega menus across the top</option>
+            <option value="hybrid">Hybrid — left sidebar navigation + slim top quick links</option>
+          </select>
+          <p id="shellLayoutHint" class="lead">Hybrid keeps full section links in the left sidebar and shows Top Bar quick links in a slim strip under the brand row.</p>
+        </div>
+
         <div class="tabs" role="tablist" aria-label="Website UI editors">
           <button type="button" class="tab active" role="tab" aria-selected="true" data-tab="sidebar" id="tab-sidebar" aria-controls="panel-sidebar">Masthead Menus</button>
           <button type="button" class="tab" role="tab" aria-selected="false" data-tab="topbar" id="tab-topbar" aria-controls="panel-topbar">Top Bar</button>
@@ -69,7 +78,7 @@
   </main>
 
   <script src="js/shared-ui.js?v=1.6.15"></script>
-  <script type="module" src="js/pages/admin-ui-page.js?v=2.4"></script>
+  <script type="module" src="js/pages/admin-ui-page.js?v=2.5"></script>
   <script src="js/qol-ui.js?v=94.2.8" defer></script>
 </body>
 </html>

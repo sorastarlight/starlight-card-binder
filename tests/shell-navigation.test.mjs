@@ -203,7 +203,9 @@ test('website UI admin page and migration are wired', async () => {
   assert.match(page, /data-field="mega"/);
   assert.match(page, /uploadStudioAsset\(file, 'nav-icons'\)/);
   assert.match(page, /shellPreviewFrame|NAV_DRAFT|buildShellStudioPreviewUrl/);
-  assert.match(page, /renderAccountMenu|ACCOUNT_FEATURES|accountMenu/);
+  assert.match(html, /id="shellLayout"/);
+  assert.match(page, /navigation\.chrome\.layout/);
+  assert.match(page, /layoutSelect/);
   assert.match(hub, /admin-ui\.html/);
   assert.match(migration, /admin_save_shell_navigation/);
   assert.match(embed, /'admin-ui\.html':'admin-ui'/);
@@ -333,6 +335,32 @@ test('shell navigation render gates staff account items', async () => {
   const render = await read('docs/js/shell-navigation-render.js');
   assert.match(render, /features\.includes\('staffOnly'\) && !isStaff/);
   assert.match(render, /map\(item => renderAccountMenuItem\(item, \{ isStaff \}\)/);
+});
+
+test('sanitizeShellNavigation preserves chrome layout mode', () => {
+  const hybrid = sanitizeShellNavigation({
+    ...cloneDefaultShellNavigation(),
+    chrome: { layout: 'hybrid' }
+  });
+  assert.equal(hybrid.chrome.layout, 'hybrid');
+
+  const invalid = sanitizeShellNavigation({
+    ...cloneDefaultShellNavigation(),
+    chrome: { layout: 'sidebar-only' }
+  });
+  assert.equal(invalid.chrome.layout, 'masthead');
+});
+
+test('shell navigation render applies hybrid layout classes', async () => {
+  const [render, shellCss] = await Promise.all([
+    read('docs/js/shell-navigation-render.js'),
+    read('docs/css/app-shell.css')
+  ]);
+  assert.match(render, /applyShellLayoutToDom/);
+  assert.match(render, /shell-hybrid-layout/);
+  assert.match(render, /layout === 'hybrid'/);
+  assert.match(shellCss, /shell-hybrid-layout/);
+  assert.match(shellCss, /grid-template-columns:var\(--shell-sidebar-w\)/);
 });
 
 test('shell navigation render and static shell HTML use extensionless binder hrefs', async () => {
