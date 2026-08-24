@@ -296,9 +296,11 @@ test('shell masthead wires mega menus and series browse params', async () => {
   ]);
   assert.match(shell, /wireMastheadMenus/);
   assert.match(shell, /closeAllMegaMenus/);
+  assert.match(shell, /stopPropagation/);
   assert.match(shell, /data-series-key|dataset\.seriesKey/);
   assert.match(shell, /applyStarlightSeriesFilter/);
   assert.match(shell, /locationExtraParams/);
+  assert.doesNotMatch(shell, /pointerenter[\s\S]*openMegaMenu/);
   assert.match(defaults, /mega:\s*true/);
   assert.match(defaults, /clearSeries/);
   assert.match(defaults, /brandRibbon: 'Starlight Cards'/);

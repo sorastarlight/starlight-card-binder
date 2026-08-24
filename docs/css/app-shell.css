@@ -91,12 +91,12 @@ body.unified-shell[data-page="binder"] .shell-view-frame.active {
   }
 }
 
-/* V82.2 — Starlight Mode removed; hero content now uses the full width. */
+/* V82.2 ? Starlight Mode removed; hero content now uses the full width. */
 body[data-page="binder"] .series-hero {
   grid-template-columns: minmax(0, 1fr) !important;
 }
 
-/* V82.3 — more expressive collector navigation and sidebar presentation */
+/* V82.3 ? more expressive collector navigation and sidebar presentation */
 .unified-nav{position:relative;overflow:hidden;background:linear-gradient(155deg,rgba(255,255,255,.96),rgba(239,249,255,.9) 48%,rgba(255,238,249,.88));box-shadow:0 13px 34px rgba(61,83,132,.12)}
 .unified-nav::before{content:"";position:absolute;inset:-60% -20%;background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.7) 49%,transparent 63%);transform:translateX(-80%);animation:navSheen 9s ease-in-out infinite;pointer-events:none}
 .unified-nav a{position:relative;isolation:isolate;border:1px solid transparent;overflow:hidden}
@@ -104,7 +104,7 @@ body[data-page="binder"] .series-hero {
 .unified-nav a:hover::before,.unified-nav a:focus-visible::before,.unified-nav a.active::before{opacity:1;transform:scaleX(1)}
 .unified-nav a:hover,.unified-nav a:focus-visible{transform:translateX(4px) scale(1.015);border-color:rgba(255,130,200,.24);box-shadow:0 8px 18px rgba(61,83,132,.09)}
 .unified-nav a.active{transform:translateX(3px);box-shadow:0 8px 22px rgba(255,130,200,.15),inset 0 0 0 1px rgba(255,255,255,.6)}
-.unified-nav a.active::after{content:"✦";margin-left:auto;color:#ff82c8;text-shadow:0 0 10px rgba(255,130,200,.65);animation:activeStar 1.8s ease-in-out infinite}
+.unified-nav a.active::after{content:"?";margin-left:auto;color:#ff82c8;text-shadow:0 0 10px rgba(255,130,200,.65);animation:activeStar 1.8s ease-in-out infinite}
 .side-card:not(.filters){transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}.side-card:not(.filters):hover{transform:translateY(-2px);border-color:rgba(255,130,200,.34);box-shadow:0 12px 28px rgba(61,83,132,.1)}
 .economy-card{position:relative;overflow:hidden}.economy-card::after{content:"";position:absolute;width:90px;height:90px;right:-35px;top:-38px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.86),transparent 70%);pointer-events:none}
 .economy-card .economy-link,.economy-card .daily-widget-link{transition:.18s ease}.economy-card .economy-link:hover,.economy-card .daily-widget-link:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(255,130,200,.16)}
@@ -112,7 +112,7 @@ body[data-page="binder"] .series-hero {
 @media(prefers-reduced-motion:reduce){.unified-nav::before,.unified-nav a.active::after{animation:none!important}}
 
 /* ============================================================
-   V82.3.2 — UNIFIED SIDEBAR HEIGHT / OVERFLOW HOTFIX
+   V82.3.2 ? UNIFIED SIDEBAR HEIGHT / OVERFLOW HOTFIX
    The base compact desktop rules set .sidebar to overflow:hidden,
    which clips navigation, economy widgets, series progress, and
    filters when the unified shell grows taller than the viewport.
@@ -201,12 +201,12 @@ body[data-page="binder"] .series-hero {
 .unified-nav a.shell-daily-link:has(.shell-daily-ready-badge:not([hidden])){border-color:rgba(254,211,52,.62);background:linear-gradient(120deg,rgba(255,249,205,.95),rgba(255,224,241,.95));box-shadow:0 0 18px rgba(255,130,200,.25)}
 .shell-shop-link{white-space:nowrap}
 .economy-card [data-daily-status].daily-ready{display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border-radius:999px;background:linear-gradient(135deg,#fff5bb,#ffd9ed);color:#8a4b75;box-shadow:0 0 16px rgba(255,130,200,.3);animation:shellReadyPulse 1.4s ease-in-out infinite}
-.economy-card [data-daily-status].daily-ready::before{content:'✦';color:#e9a900}
+.economy-card [data-daily-status].daily-ready::before{content:'?';color:#e9a900}
 @keyframes shellReadyPulse{0%,100%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.045);filter:brightness(1.08)}}
 @media(max-width:1180px){.unified-nav a.shell-daily-link{font-size:.82rem}.shell-daily-ready-badge{font-size:.56rem;padding:2px 5px}}
 @media(prefers-reduced-motion:reduce){.shell-daily-ready-badge,.economy-card [data-daily-status].daily-ready{animation:none!important}}
 
-/* V82.8.2 — compact sidebar groups and clipping repair */
+/* V82.8.2 ? compact sidebar groups and clipping repair */
 @media (min-width:1181px){
   .unified-shell .site{grid-template-columns:292px minmax(0,1fr)!important}
   .unified-shell .sidebar{padding:12px 11px 20px!important;gap:9px!important;scrollbar-gutter:auto!important}
@@ -230,7 +230,7 @@ body[data-page="binder"] .series-hero {
   .unified-shell .side-card{padding:9px!important}
 }
 
-/* V82.8.4 — Keep the top-left logo clean and static.
+/* V82.8.4 ? Keep the top-left logo clean and static.
    Disable any inherited sweep/shine pseudo-elements or animations. */
 .unified-shell .brand,
 .unified-shell .brand .logo {
@@ -357,7 +357,7 @@ body.unified-shell{padding-left:env(safe-area-inset-left);padding-right:env(safe
 
 
 /* ============================================================
-   V88.2.1 — navigation, top bar, and sidebar simplification
+   V88.2.1 ? navigation, top bar, and sidebar simplification
    ============================================================ */
 .unified-shell .sidebar{overflow-y:auto!important}
 .unified-shell .sidebar .brand{margin-bottom:4px}
@@ -390,7 +390,7 @@ body.unified-shell{padding-left:env(safe-area-inset-left);padding-right:env(safe
 .shell-primary-links a[data-shell-view="home"]{font-weight:950}
 @media(max-width:980px){.shell-primary-links{overflow-x:auto;scrollbar-width:none}.shell-primary-links::-webkit-scrollbar{display:none}}
 
-/* V94.1 — longer, clearer navigation labels. */
+/* V94.1 ? longer, clearer navigation labels. */
 @media (min-width: 1181px) {
   body.unified-shell .site { grid-template-columns: minmax(286px, 310px) minmax(0, 1fr); }
 }
@@ -705,7 +705,7 @@ body.unified-shell{padding-left:env(safe-area-inset-left);padding-right:env(safe
   .shell-live-feed-pulse,.shell-live-feed-ticker-track,.shell-live-feed-ticker-item,.shell-live-feed-item{animation:none!important}
 }
 
-/* ===== TCG Live�style sticky masthead ===== */
+/* ===== TCG Live?style sticky masthead ===== */
 body.shell-masthead-layout{
   --shell-masthead-h:clamp(60px, 8vw, 76px);
   --shell-chrome-pad:clamp(12px, 2.2vw, 28px);
@@ -756,18 +756,15 @@ body.shell-masthead-layout .shell-masthead-brand .binder-ribbon{
 }
 body.shell-masthead-layout .shell-masthead-nav{
   display:flex;
-  flex-wrap:nowrap;
+  flex-wrap:wrap;
   align-items:center;
   justify-content:center;
   gap:clamp(2px, .4vw, 8px);
   min-width:0;
-  overflow-x:auto;
-  overflow-y:visible;
-  scrollbar-width:none;
-  -ms-overflow-style:none;
+  overflow:visible;
 }
-body.shell-masthead-layout .shell-masthead-nav::-webkit-scrollbar{display:none}
-body.shell-masthead-layout .shell-mega{position:relative;flex:none}
+body.shell-masthead-layout .shell-mega{position:relative;flex:none;z-index:1}
+body.shell-masthead-layout .shell-mega.is-open{z-index:5}
 body.shell-masthead-layout .shell-mega-trigger,
 body.shell-masthead-layout .shell-top-link{
   display:inline-flex;

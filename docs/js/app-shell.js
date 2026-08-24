@@ -18,7 +18,7 @@ import { initLiveFeedWidget } from './live-feed-widget.js?v=1.5';
 import { applyAvatarFrameClass } from './avatar-frame-utils.js';
 import { getMyProfileExtras } from './profile-extras-service.js';
 
-const SHELL_BUILD = '94.4.1';
+const SHELL_BUILD = '94.4.2';
 const VIEW_READY_TIMEOUT_MS = 6500;
 const MAX_VIEW_RETRIES = 1;
 
@@ -88,11 +88,11 @@ function openMegaMenu(mega){
 }
 
 function wireMastheadMenus(){
-  let hoverTimer=0;
   masthead?.addEventListener('click', event=>{
     const trigger=event.target.closest('[data-mega-trigger]');
     if(trigger){
       event.preventDefault();
+      event.stopPropagation();
       const mega=trigger.closest('.shell-mega');
       const wasOpen=mega?.classList.contains('is-open');
       closeAllMegaMenus();
@@ -104,21 +104,6 @@ function wireMastheadMenus(){
       setShellMenuOpen(false);
     }
   });
-  masthead?.addEventListener('pointerenter', event=>{
-    if(window.matchMedia('(hover: hover) and (pointer: fine)').matches===false) return;
-    const mega=event.target.closest?.('.shell-mega');
-    if(!mega || !masthead.contains(mega)) return;
-    window.clearTimeout(hoverTimer);
-    hoverTimer=window.setTimeout(()=>openMegaMenu(mega), 80);
-  }, true);
-  masthead?.addEventListener('pointerleave', event=>{
-    const mega=event.target.closest?.('.shell-mega');
-    if(!mega || !masthead.contains(mega)) return;
-    window.clearTimeout(hoverTimer);
-    hoverTimer=window.setTimeout(()=>{
-      if(!mega.matches(':hover, :focus-within')) closeAllMegaMenus();
-    }, 160);
-  }, true);
   document.addEventListener('click', event=>{
     if(event.target.closest('.shell-mega, .shell-masthead-nav')) return;
     closeAllMegaMenus();
