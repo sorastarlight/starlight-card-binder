@@ -1,10 +1,3 @@
-import {
-  normalizeFusionTier,
-  prestigeClassName,
-  prestigeFrameImageUrl,
-  prestigeLabel
-} from './prestige-utils.js';
-
 const DEFAULT_BACK = 'site_assets/StarlightCard_Back_NewLogo.png';
 const ALLOWED_RARITIES = new Set(['common', 'uncommon', 'rare', 'epic', 'legendary']);
 const MAX_PILE_LAYERS = 8;
@@ -78,13 +71,6 @@ export function normalizeRevealCard(card = {}) {
       ?? 0
     ) || 0)
   );
-  const prestigeTier = normalizeFusionTier(
-    card.prestigeTier
-    ?? card.prestige_tier
-    ?? card.fusionTier
-    ?? card.fusion_tier
-    ?? 'standard'
-  );
   return {
     ...card,
     id,
@@ -98,8 +84,7 @@ export function normalizeRevealCard(card = {}) {
     effectStyle: card.effectStyle ?? catalog.effectStyle ?? '',
     effectIntensity: card.effectIntensity ?? catalog.effectIntensity,
     isDuplicate: Boolean(card.isDuplicate ?? card.is_duplicate ?? card.duplicate),
-    quantity,
-    prestigeTier
+    quantity
   };
 }
 
@@ -132,31 +117,6 @@ function finishEffectBadge(card, doc) {
   const badgeClass = window.StarlightUI?.finishEffectBadgeClass?.(card) || '';
   if (!label || !badgeClass) return null;
   return createElement(doc, 'span', `st-r3-badge ${badgeClass}`, label);
-}
-
-function prestigeRevealBadge(card, doc) {
-  const tier = normalizeFusionTier(card?.prestigeTier);
-  if (!tier || tier === 'stardust' || tier === 'standard') return null;
-  const token = String(tier).replace(/_/g, '-');
-  return createElement(
-    doc,
-    'span',
-    `st-r3-badge prestige-badge prestige-${token}`,
-    prestigeLabel(tier)
-  );
-}
-
-function prestigeActorClass(card) {
-  return prestigeClassName(normalizeFusionTier(card?.prestigeTier));
-}
-
-function prestigeFrameOverlayElement(card, doc) {
-  const src = prestigeFrameImageUrl(normalizeFusionTier(card?.prestigeTier));
-  if (!src) return null;
-  const overlay = createImage(doc, src, '', '', 'prestige-frame-overlay', { loading: 'lazy' });
-  overlay.setAttribute('aria-hidden', 'true');
-  overlay.draggable = false;
-  return overlay;
 }
 
 function attachHoloSpark(element, card) {
@@ -288,11 +248,6 @@ const REVEAL_STYLESHEET_URL = new URL(
   `../css/reward-reveal.css?v=${REVEAL_PRESENTATION_VERSION}`,
   import.meta.url
 ).href;
-const PRESTIGE_STYLESHEET_ID = 'starlight-prestige-frames';
-const PRESTIGE_STYLESHEET_URL = new URL(
-  '../css/prestige-frames.css?v=3.8',
-  import.meta.url
-).href;
 const stylesheetLoads = new WeakMap();
 const imagePreparations = new WeakMap();
 
@@ -301,7 +256,6 @@ function installStyles(doc) {
 
   const existing = doc.getElementById(REVEAL_STYLESHEET_ID);
   if (existing?.sheet) {
-    ensurePrestigeStyles(doc);
     return Promise.resolve();
   }
 
@@ -316,18 +270,8 @@ function installStyles(doc) {
     link.href = REVEAL_STYLESHEET_URL;
     doc.head.append(link);
   }
-  ensurePrestigeStyles(doc);
   stylesheetLoads.set(doc, load);
   return load;
-}
-
-function ensurePrestigeStyles(doc) {
-  if (doc.getElementById(PRESTIGE_STYLESHEET_ID)) return;
-  const link = doc.createElement('link');
-  link.id = PRESTIGE_STYLESHEET_ID;
-  link.rel = 'stylesheet';
-  link.href = PRESTIGE_STYLESHEET_URL;
-  doc.head.append(link);
 }
 
 function createElement(doc, tagName, className, text = '') {
@@ -771,9 +715,8 @@ export async function revealRewardSequence(cards = [], options = {}) {
       resultsPopulated = true;
       const fragment = doc.createDocumentFragment();
       rewards.forEach(card => {
-        const prestigeClass = prestigeActorClass(card);
-        const item = createElement(doc, 'article', `st-r3-result-card rarity-${card.rarity} ${prestigeClass}`.trim());
-        const art = createElement(doc, 'span', `st-r3-result-art ${cardFinishClass(card)} ${prestigeClass}`.trim());
+        const item = createElement(doc, 'article', `st-r3-result-card rarity-${card.rarity}`);
+        const art = createElement(doc, 'span', `st-r3-result-art ${cardFinishClass(card)}`.trim());
         mountCardArt(doc, art, card, {
           imgClass: 'st-r3-result-image',
           alt: `${card.name} card artwork`,
@@ -793,12 +736,9 @@ export async function revealRewardSequence(cards = [], options = {}) {
             : (revealCopy.badgeNew || 'New')
         );
         const finish = finishEffectBadge(card, doc);
-        const prestige = prestigeRevealBadge(card, doc);
-        badges.append(rarity, ...(finish ? [finish] : []), ...(prestige ? [prestige] : []), status);
+        badges.append(rarity, ...(finish ? [finish] : []), status);
         copy.append(name, detail, badges);
         attachHoloSpark(art, card);
-        const resultOverlay = prestigeFrameOverlayElement(card, doc);
-        if (resultOverlay) art.append(resultOverlay);
         item.append(art, copy);
         fragment.append(item);
       });
@@ -808,18 +748,15 @@ export async function revealRewardSequence(cards = [], options = {}) {
 
     const prepareCurrentCard = () => {
       const card = rewards[index];
-      cardFront.className = `st-r3-card-face st-r3-card-front ${cardFinishClass(card)} ${prestigeActorClass(card)}`.trim();
+      cardFront.className = `st-r3-card-face st-r3-card-front ${cardFinishClass(card)}`.trim();
       currentFrontImage = mountCardArt(doc, cardFront, card, {
         imgClass: 'st-r3-card-image',
         defer: true
       });
       attachHoloSpark(cardFront, card);
-      const revealOverlay = prestigeFrameOverlayElement(card, doc);
-      if (revealOverlay) cardFront.append(revealOverlay);
-      actor.className = `st-r3-card-actor rarity-${card.rarity} ${prestigeActorClass(card)}`.trim();
+      actor.className = `st-r3-card-actor rarity-${card.rarity}`;
       actor.setAttribute('aria-label', `Reveal ${card.name}`);
       revealScene.dataset.rarity = card.rarity;
-      revealScene.dataset.prestige = card.prestigeTier || 'standard';
       startImageLoad(currentFrontImage);
     };
 
@@ -909,11 +846,9 @@ export async function revealRewardSequence(cards = [], options = {}) {
       cardName.textContent = card.name;
       cardMeta.textContent = cardDescription(card) || fallbackMeta;
       const finishBadge = finishEffectBadge(card, doc);
-      const prestigeBadge = prestigeRevealBadge(card, doc);
       cardBadges.replaceChildren(
         createElement(doc, 'span', `st-r3-badge rarity-${card.rarity}`, prettyMeta(card.rarity)),
         ...(finishBadge ? [finishBadge] : []),
-        ...(prestigeBadge ? [prestigeBadge] : []),
         createElement(
           doc,
           'span',

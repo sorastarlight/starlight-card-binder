@@ -50,19 +50,16 @@ test('profile crop dialog uses the shared st-dialog contract', async () => {
   assert.match(moderationHtml, /st-dialog-close/);
 });
 
-test('collector, shop, evolution, and quest dialogs use the shared modal controller', async () => {
-  const [shop, collector, evolution, quests] = await Promise.all([
+test('collector, shop, and quest dialogs use the shared modal controller', async () => {
+  const [shop, collector, quests] = await Promise.all([
     read('docs/js/pages/booster-shop-page.js'),
     read('docs/js/pages/collector-page.js'),
-    read('docs/js/pages/starlight-evolution-page.js'),
     read('docs/js/pages/admin-quests-page.js')
   ]);
 
   assert.match(shop, /adoptModal/);
   assert.match(collector, /adoptModal/);
-  assert.match(evolution, /adoptModal/);
   assert.match(quests, /adoptModal/);
-  assert.doesNotMatch(evolution, /dialogEl\?\.classList\.(add|remove)\(['"]hidden['"]\)/);
 });
 
 test('shared modal controller supports click-outside backdrop dismissal', async () => {

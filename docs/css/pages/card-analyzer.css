@@ -598,9 +598,7 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
   z-index: 1;
 }
 
-#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front > img:not(.prestige-frame-overlay),
-#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front > .prestige-frame-overlay,
-#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front > .prestige-particles,
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front > img,
 #cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front > .st-holo-spark {
   position: absolute !important;
   inset: 0 !important;
@@ -635,7 +633,7 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
   opacity: 1 !important;
 }
 
-#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front > img:not(.prestige-frame-overlay) {
+#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front > img {
   object-fit: cover !important;
   z-index: 1 !important;
 }
@@ -643,17 +641,6 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
 #cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front > .st-holo-spark {
   z-index: 4 !important;
   pointer-events: none !important;
-}
-
-#cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front > .prestige-particles {
-  z-index: 3 !important;
-  pointer-events: none !important;
-}
-
-#cardOverlay .analyzer-sekai-stage .analyzer-card-shell.is-evolution-off .prestige-particles,
-#cardOverlay .analyzer-sekai-stage .analyzer-card-shell.is-evolution-off .face.front .prestige-particles {
-  display: none !important;
-  opacity: 0 !important;
 }
 
 #cardOverlay .analyzer-sekai-stage #fullCard3d.analyzer-card-shell .face.front.card-finish-holographic > img {
@@ -666,18 +653,6 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
 #cardOverlay .analyzer-sekai-stage .analyzer-card-shell.is-holo-off .finish-effect {
   display: none !important;
   opacity: 0 !important;
-}
-
-#cardOverlay .analyzer-sekai-stage .analyzer-card-shell.is-evolution-off .prestige-frame-overlay,
-#cardOverlay .analyzer-sekai-stage .analyzer-card-shell.is-evolution-off .face.front .prestige-frame-overlay {
-  display: none !important;
-  opacity: 0 !important;
-}
-
-#cardOverlay .analyzer-sekai-stage .prestige-frame-overlay {
-  z-index: 6 !important;
-  object-fit: contain !important;
-  pointer-events: none !important;
 }
 
 #cardOverlay .analyzer-sekai-stage .analyzer-soft-note {
@@ -769,11 +744,6 @@ html.starlight-embedded #cardOverlay.card-analyzer-open .analyzer-full-stage.ana
 
 #cardOverlay .analyzer-sekai-stage .analyzer-evo-value {
   margin-right: 0;
-}
-
-#cardOverlay .analyzer-sekai-stage .analyzer-stat-value .prestige-badge {
-  margin-top: 0;
-  vertical-align: middle;
 }
 
 #cardOverlay .analyzer-sekai-stage .analyzer-skill-block {

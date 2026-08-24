@@ -2,22 +2,6 @@ import { cloneDefaultWebsiteContent, HOME_QUICK_LINK_IDS } from './website-conte
 
 const QUICK_LINK_SET = new Set(HOME_QUICK_LINK_IDS);
 const MAX_STRING = 500;
-const LEGACY_COLLECTION_PRESTIGE_KEYS = Object.freeze([
-  'prestigeLegendEyebrow',
-  'prestigeLegendTitle',
-  'prestigeLegendLead',
-  'prestigeStardust',
-  'prestigeStarBit',
-  'prestigeProtostar',
-  'prestigeStarlight',
-  'prestigeSuperStarlight',
-  'prestigeStarlightBurst',
-  'prestigeRookie',
-  'prestigeChampion',
-  'prestigeUltimate',
-  'prestigeMega'
-]);
-const LEGACY_STARLIGHT_EVOLUTION_KEYS = Object.freeze(['tiersTitle']);
 
 function text(value, fallback = '', max = MAX_STRING) {
   const next = String(value ?? '').trim();
@@ -161,29 +145,7 @@ const WEBSITE_TITLE_REWRITES = Object.freeze({
   'Resets each day at 00:00 UTC.': 'Resets once per day.',
   'Resets each Monday at 00:00 UTC.': 'Resets each Monday.',
   'Complete Daily and Weekly Missions to earn Star Bits and titles. Daily resets at 00:00 UTC. Weekly resets Monday 00:00 UTC.':
-    'Complete Daily and Weekly Missions to earn Star Bits and titles. Reset times appear below in your local time.',
-  '★ Stardust': 'Standard',
-  '★★ Star Bit': '⭐ Radiance I',
-  '★★★ Protostar': '⭐⭐ Radiance II',
-  '★★★★ Star': '⭐⭐⭐ Radiance III',
-  '★★★★★ Super Star': '⭐⭐⭐⭐ Radiance IV',
-  '★★★★★★ Super Starlight': '⭐⭐⭐⭐⭐ Radiance V',
-  'Base tier · ★ Stardust': 'Every card starts unevolved.',
-  '8 duplicates → ★★ Star Bit': '8 duplicates → ⭐ Radiance I',
-  '20 duplicates → ★★★ Protostar': '20 duplicates → ⭐⭐ Radiance II',
-  '45 duplicates → ★★★★ Star': '45 duplicates → ⭐⭐⭐ Radiance III',
-  '100 duplicates → ★★★★★ Super Star': '100 duplicates → ⭐⭐⭐⭐ Radiance IV',
-  '220 duplicates → ★★★★★★ Super Starlight': '220 duplicates → ⭐⭐⭐⭐⭐ Radiance V',
-  'Starlight Card Evolution': 'Evolve My Cards',
-  'Evolution tiers': 'Radiance tiers',
-  'Card Fusion': 'Radiance tiers',
-  'Fusion levels': 'Radiance tiers',
-  'Tap an evolved card below to open details and Evolve when you have enough duplicate extras. Each step spends extras and keeps one protected copy.':
-    'Gather duplicate extras, pick a card below, and confirm Evolve. Duplicates orbit, burst, and reveal a richer Radiance frame.',
-  'Cards evolved to Radiance I or higher appear here. Tap a card to view details and Evolve in place.':
-    'Cards at Radiance I or higher live here. Open one to Evolve again or Unfuse extras.',
-  'No evolved cards yet. Gather duplicates, then Evolve from Collection.':
-    'No evolved cards yet. When a card is ready below, Evolve it to see its Radiance frame here.'
+    'Complete Daily and Weekly Missions to earn Star Bits and titles. Reset times appear below in your local time.'
 });
 
 function rewriteLegacyWebsiteText(value) {
@@ -200,40 +162,28 @@ function applyWebsiteTitleRewrites(section = {}) {
   return out;
 }
 
-/** Move album prestige legend + older evolution keys onto the Evolve My Cards page. */
-function normalizeLegacyStarlightEvolution(starlightEvolution = {}, collection = {}) {
-  const evo = { ...starlightEvolution };
-  const coll = collection && typeof collection === 'object' ? collection : {};
-
-  if (!String(evo.tiersLegendTitle || '').trim() && String(evo.tiersTitle || '').trim()) {
-    evo.tiersLegendTitle = evo.tiersTitle;
-  }
-
-  const prestigeMap = [
-    ['prestigeLegendEyebrow', 'tiersLegendEyebrow'],
-    ['prestigeLegendTitle', 'tiersLegendTitle'],
-    ['prestigeLegendLead', 'tiersLegendLead'],
-    ['prestigeStarBit', 'prestigeStarBit'],
-    ['prestigeProtostar', 'prestigeProtostar'],
-    ['prestigeStarlight', 'prestigeStarlight'],
-    ['prestigeSuperStarlight', 'prestigeSuperStarlight'],
-    ['prestigeStarlightBurst', 'prestigeStarlightBurst']
-  ];
-
-  for (const [fromKey, toKey] of prestigeMap) {
-    if (String(evo[toKey] || '').trim()) continue;
-    const migrated = coll[fromKey] || evo[fromKey];
-    if (String(migrated || '').trim()) evo[toKey] = migrated;
-  }
-
-  return evo;
-}
-
 function stripLegacyKeys(section = {}, keys = []) {
   const out = { ...section };
   for (const key of keys) delete out[key];
   return out;
 }
+
+const LEGACY_COLLECTION_PRESTIGE_KEYS = Object.freeze([
+  'prestigeLegendEyebrow',
+  'prestigeLegendTitle',
+  'prestigeLegendLead',
+  'prestigeStardust',
+  'prestigeStarBit',
+  'prestigeProtostar',
+  'prestigeStarlight',
+  'prestigeSuperStarlight',
+  'prestigeStarlightBurst',
+  'prestigeRookie',
+  'prestigeChampion',
+  'prestigeUltimate',
+  'prestigeMega',
+  'evolutionLabel'
+]);
 
 function sanitizeBinderDisplay(source = {}, defaults = {}) {
   return {
@@ -285,15 +235,6 @@ export function sanitizeWebsiteContent(input) {
       LEGACY_COLLECTION_PRESTIGE_KEYS
     ),
     starBits: applyWebsiteTitleRewrites(sanitizeStringMap(source.starBits || {}, defaults.starBits)),
-    starlightEvolution: stripLegacyKeys(
-      applyWebsiteTitleRewrites(
-        sanitizeStringMap(
-          normalizeLegacyStarlightEvolution(source.starlightEvolution || {}, source.collection || {}),
-          defaults.starlightEvolution || {}
-        )
-      ),
-      LEGACY_STARLIGHT_EVOLUTION_KEYS
-    ),
     checklist: applyWebsiteTitleRewrites(sanitizeStringMap(source.checklist || {}, defaults.checklist)),
     quests: applyWebsiteTitleRewrites(sanitizeStringMap(source.quests || {}, defaults.quests)),
     seasonPass: applyWebsiteTitleRewrites(sanitizeStringMap(source.seasonPass || {}, defaults.seasonPass)),

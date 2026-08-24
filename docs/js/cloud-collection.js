@@ -3,11 +3,8 @@ import "./card-catalog-service.js";
 
 import { applyAwardedCardsToLocalStore } from "./collection-local-store.js";
 import {
-    evolveMyCard,
-    fuseMyCard,
     getCurrentUser,
-    loadCloudCollection,
-    unfuseMyCard
+    loadCloudCollection
 } from "./collection-sync.js";
 
 const COLLECTION_KEY =
@@ -18,9 +15,6 @@ const FAVORITES_KEY =
 
 const QUANTITIES_KEY =
     "sora-starlight-card-binder-v80-quantities";
-
-const PRESTIGE_KEY =
-    "sora-starlight-card-binder-v80-prestige-tiers";
 
 const FAVORITE_CHECK_INTERVAL_MS = 1500;
 
@@ -145,26 +139,10 @@ function writeLocalObject(key, value) {
  * Converts Supabase ownership rows into the formats already used
  * by the original Binder.
  */
-function normalizePrestigeTier(value) {
-    const tier = String(value || "stardust").trim().toLowerCase();
-    const allowed = new Set([
-        "stardust",
-        "star_bit",
-        "protostar",
-        "starlight",
-        "super_starlight",
-        "starlight_burst"
-    ]);
-    if (allowed.has(tier)) return tier;
-    // Legacy fusion tiers map to base after Starlight Evolution reset.
-    return "stardust";
-}
-
 function createLocalStores(cloudRows) {
     const collectedCards = {};
     const favoriteCards = {};
     const quantities = {};
-    const prestigeTiers = {};
 
     for (const row of cloudRows) {
         const cardId =
@@ -176,7 +154,6 @@ function createLocalStores(cloudRows) {
 
         collectedCards[cardId] = true;
         quantities[cardId] = Math.max(1, Number(row.quantity || 1));
-        prestigeTiers[cardId] = normalizePrestigeTier(row.prestige_tier);
 
         if (row.is_favorite === true) {
             favoriteCards[cardId] = true;
@@ -186,8 +163,7 @@ function createLocalStores(cloudRows) {
     return {
         collectedCards,
         favoriteCards,
-        quantities,
-        prestigeTiers
+        quantities
     };
 }
 
@@ -238,8 +214,7 @@ async function synchronizeCloudCollection() {
     const {
         collectedCards,
         favoriteCards,
-        quantities,
-        prestigeTiers
+        quantities
     } = createLocalStores(cloudRows);
 
     writeLocalObject(
@@ -255,11 +230,6 @@ async function synchronizeCloudCollection() {
     writeLocalObject(
         QUANTITIES_KEY,
         quantities
-    );
-
-    writeLocalObject(
-        PRESTIGE_KEY,
-        prestigeTiers
     );
 
     previousFavoriteStore = {
@@ -466,29 +436,6 @@ async function loadBinderApplication() {
 
     window.StarlightCardFilters = await import('./card-filter-utils.js?v=1.1.0');
     window.StarlightFavoriteUtils = await import('./favorite-utils.js?v=1.0.0');
-    window.StarlightPrestigeUtils = await import('./prestige-utils.js?v=1.6.1');
-    const applyLocalEvolutionResult = (cardId, result) => {
-        const id = String(cardId || '').trim();
-        if (!id || !result) return;
-        const quantities = readLocalObject(QUANTITIES_KEY);
-        const prestigeTiers = readLocalObject(PRESTIGE_KEY);
-        const nextQty = Math.max(1, Number(result.quantity || quantities[id] || 1));
-        const nextTier = normalizePrestigeTier(
-            result.evolutionTier || result.fusionTier || result.prestigeTier || prestigeTiers[id]
-        );
-        quantities[id] = nextQty;
-        prestigeTiers[id] = nextTier;
-        writeLocalObject(QUANTITIES_KEY, quantities);
-        writeLocalObject(PRESTIGE_KEY, prestigeTiers);
-    };
-    window.StarlightFusion = {
-        fuseMyCard,
-        evolveMyCard,
-        unfuseMyCard,
-        applyLocalFusionResult: applyLocalEvolutionResult,
-        applyLocalEvolutionResult
-    };
-    window.StarlightEvolution = window.StarlightFusion;
 
     return new Promise((resolve, reject) => {
         const perspectiveScript = document.createElement("script");

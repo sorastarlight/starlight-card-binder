@@ -256,7 +256,6 @@ export const WEBSITE_PAGE_META = Object.freeze({
           { key: 'seriesLabel' },
           { key: 'collectorNumberLabel' },
           { key: 'rarityLabel' },
-          { key: 'evolutionLabel' },
           { key: 'traitLabel' },
           { key: 'illustratorLabel' },
           { key: 'ownedLabel' },
@@ -562,62 +561,6 @@ export const WEBSITE_PAGE_META = Object.freeze({
           { key: 'favoritesShowcaseTitle' },
           { key: 'favoritesShowcaseEmptyLead', multiline: true },
           { key: 'favoritesShowcaseCta' }
-        ]
-      }
-    ]
-  },
-  starlightEvolution: {
-    description: 'Evolve My Cards — Radiance tier legend, workbench copy, and how-it-works guide.',
-    previewUrl: 'starlight-evolution.html',
-    groups: [
-      {
-        id: 'hero',
-        label: 'Hero',
-        open: true,
-        fields: [
-          { key: 'eyebrow', preview: 'eyebrow' },
-          { key: 'title', preview: 'title' },
-          { key: 'tagline', multiline: true, preview: 'tagline' },
-          { key: 'collectionCta' }
-        ]
-      },
-      {
-        id: 'prestige',
-        label: 'Radiance tier legend',
-        fields: [
-          { key: 'tiersLegendEyebrow' },
-          { key: 'tiersLegendTitle' },
-          { key: 'tiersLegendLead', multiline: true },
-          { key: 'prestigeStarBit' },
-          { key: 'prestigeProtostar' },
-          { key: 'prestigeStarlight' },
-          { key: 'prestigeSuperStarlight' },
-          { key: 'prestigeStarlightBurst' }
-        ]
-      },
-      {
-        id: 'workbench',
-        label: 'Evolution workbench',
-        fields: [
-          { key: 'readyTitle' },
-          { key: 'readyLead', multiline: true },
-          { key: 'readyEmpty', multiline: true },
-          { key: 'ownedTitle' },
-          { key: 'ownedLead', multiline: true },
-          { key: 'ownedEmpty', multiline: true }
-        ]
-      },
-      {
-        id: 'copy',
-        label: 'How it works',
-        fields: [
-          { key: 'howTitle' },
-          { key: 'howLead', multiline: true },
-          { key: 'starBit' },
-          { key: 'protostar' },
-          { key: 'star' },
-          { key: 'superStar' },
-          { key: 'superStarlight' }
         ]
       }
     ]

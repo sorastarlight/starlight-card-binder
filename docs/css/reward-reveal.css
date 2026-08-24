@@ -733,7 +733,7 @@
   pointer-events: none;
 }
 
-.st-r3-card-actor:not(.prestige-frame) .st-r3-card-front > .st-r3-card-image {
+.st-r3-card-actor .st-r3-card-front > .st-r3-card-image {
   object-fit: contain;
   transform: none;
 }

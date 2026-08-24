@@ -27,7 +27,6 @@ const routes = {
   binder:{title:'Starlight Card Gallery',src:null}, collection:{title:'My Card Album Binder',src:'collection.html'},
   daily:{title:'Daily Free Booster Pack',src:'daily-booster.html'}, shop:{title:'Card Boutique',src:'booster-shop.html'}, events:{title:'Starlight Events',src:'events.html'}, redeem:{title:'Redeem A Code',src:'redeem.html'},
   'star-bits':{title:'Star Bits Exchange',src:'star-bits.html'},
-  'starlight-evolution':{title:'Starlight Card Evolution',src:'starlight-evolution.html'},
   checklist:{title:'Star Registry',src:'checklist.html'},
   quests:{title:'Starlight Missions',src:'collection-quests.html'},
   'season-pass':{title:'Seasonal Collection Pass',src:'season-pass.html'},
@@ -268,7 +267,7 @@ function normalizeNotificationRoute(value,notice={}){
   const raw=String(value||'binder').trim();
   const withoutShell=raw.replace(/^https?:\/\/[^/]+\/?/i,'').replace(/^\/?binder\.html\?view=/i,'').replace(/^\/?/,'');
   const key=withoutShell.split(/[?&#]/)[0].toLowerCase();
-  const aliases={daily:'daily','daily-booster':'daily','daily-booster.html':'daily','free-daily-booster':'daily',notifications:'notifications','notifications.html':'notifications',collection:'collection','collection.html':'collection',offers:'offers','trade-offers':'offers','trade-offers.html':'offers',trades:'trades','trade-lists':'trades','trade-lists.html':'trades',events:'events','events.html':'events',shop:'shop','booster-shop':'shop','booster-shop.html':'shop',profile:'profile','profile-settings':'profile','profile-settings.html':'profile',rewards:'rewards','received-rewards':'rewards','received-rewards.html':'rewards',collector:'collector','collector.html':'collector',report:'report','report-profile':'report','report-profile.html':'report',quests:'quests','collection-quests':'quests','collection-quests.html':'quests','season-pass':'season-pass','season-pass.html':'season-pass','starlight-evolution':'starlight-evolution','starlight-evolution.html':'starlight-evolution','starlight-card-evolution':'starlight-evolution'};
+  const aliases={daily:'daily','daily-booster':'daily','daily-booster.html':'daily','free-daily-booster':'daily',notifications:'notifications','notifications.html':'notifications',collection:'collection','collection.html':'collection',offers:'offers','trade-offers':'offers','trade-offers.html':'offers',trades:'trades','trade-lists':'trades','trade-lists.html':'trades',events:'events','events.html':'events',shop:'shop','booster-shop':'shop','booster-shop.html':'shop',profile:'profile','profile-settings':'profile','profile-settings.html':'profile',rewards:'rewards','received-rewards':'rewards','received-rewards.html':'rewards',collector:'collector','collector.html':'collector',report:'report','report-profile':'report','report-profile.html':'report',quests:'quests','collection-quests':'quests','collection-quests.html':'quests','season-pass':'season-pass','season-pass.html':'season-pass'};
   return aliases[key]||key||'binder';
 }
 

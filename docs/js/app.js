@@ -13,7 +13,6 @@ const SFX = {
 const STORAGE_KEY = "sora-starlight-card-binder-v5-collected";
 const FAVORITES_KEY = "sora-starlight-card-binder-v5-favorites";
 const QUANTITIES_KEY = "sora-starlight-card-binder-v80-quantities";
-const PRESTIGE_KEY = "sora-starlight-card-binder-v80-prestige-tiers";
 const SFX_KEY = "sora-starlight-card-binder-v7-sfx";
 const PER_PAGE = 18;
 const RARITY_SCORE = { Legendary: 5, Epic: 4, Rare: 3, Uncommon: 2, Common: 1 };
@@ -26,7 +25,6 @@ let selected = null;
 let sfxOn = localStorage.getItem(SFX_KEY) !== "off";
 let previewFlipped = false;
 let previewHoloEnabled = true;
-let previewEvolutionEnabled = true;
 let overlayFlipped = false;
 let fullViewList = [];
 let fullViewListMode = 'all';
@@ -34,7 +32,6 @@ let websiteContentPromise = null;
 let websiteBinderLanding = null;
 /** Analyzer session display toggles (not persisted). */
 let analyzerHoloEnabled = true;
-let analyzerEvolutionEnabled = true;
 /** Full-view modal tab: details | story */
 let analyzerActiveTab = 'details';
 /** Current album binder spread page (1-based). */
@@ -141,133 +138,16 @@ function writeStore(key, value) { localStorage.setItem(key, JSON.stringify(value
 function isCollected(id) { return !!readStore(STORAGE_KEY)[id]; }
 function isFavorite(id) { return !!readStore(FAVORITES_KEY)[id]; }
 function getCardQuantity(id) { return Math.max(isCollected(id) ? 1 : 0, Number(readStore(QUANTITIES_KEY)[id] || 0)); }
-function prestigeUtils() { return window.StarlightPrestigeUtils || {}; }
-function tierCssToken(tier) {
-  return String(tier || 'stardust').trim().toLowerCase().replace(/_/g, '-');
-}
-async function confirmAction(options = {}) {
-  const opts = {
-    title: options.title || 'Confirm',
-    message: options.message || '',
-    warning: options.warning || '',
-    confirmText: options.confirmText || 'Confirm',
-    cancelText: options.cancelText || 'Cancel',
-    danger: !!options.danger
-  };
-  if (typeof window.StarlightUI?.confirm === 'function') {
-    try {
-      return !!(await window.StarlightUI.confirm(opts));
-    } catch (error) {
-      console.warn('[Starlight] confirm dialog failed', error);
-      return false;
-    }
-  }
-  console.warn('[Starlight] confirm dialog unavailable');
-  return false;
-}
-function getCardPrestigeTier(id) {
-  const utils = prestigeUtils();
-  const stored = readStore(PRESTIGE_KEY)[id];
-  if (utils.normalizeEvolutionTier) return utils.normalizeEvolutionTier(stored);
-  if (utils.normalizeFusionTier) return utils.normalizeFusionTier(stored);
-  const tier = String(stored || 'stardust').trim().toLowerCase();
-  const allowed = ['stardust', 'star_bit', 'protostar', 'starlight', 'super_starlight', 'starlight_burst'];
-  return allowed.includes(tier) ? tier : 'stardust';
-}
-function setCardLocalFusion(id, quantity, tier) {
-  const quantities = readStore(QUANTITIES_KEY);
-  const prestige = readStore(PRESTIGE_KEY);
-  const utils = prestigeUtils();
-  quantities[id] = Math.max(1, Number(quantity) || 1);
-  prestige[id] = utils.normalizeEvolutionTier?.(tier)
-    || utils.normalizeFusionTier?.(tier)
-    || String(tier || 'stardust').toLowerCase();
-  writeStore(QUANTITIES_KEY, quantities);
-  writeStore(PRESTIGE_KEY, prestige);
-}
-function prestigeFrameClass(cardId) {
-  const utils = prestigeUtils();
-  const tier = getCardPrestigeTier(cardId);
-  if (utils.prestigeClassName) return utils.prestigeClassName(tier);
-  if (!tier || tier === 'stardust') return '';
-  return `prestige-frame prestige-${tierCssToken(tier)}`;
-}
-function prestigeFrameOverlayHtml(cardId) {
-  const utils = prestigeUtils();
-  const tier = getCardPrestigeTier(cardId);
-  return utils.prestigeFrameOverlayHtml?.(tier) || '';
-}
-function prestigeFrameEffectsHtml(cardId) {
-  const utils = prestigeUtils();
-  const tier = getCardPrestigeTier(cardId);
-  return utils.prestigeFrameEffectsHtml?.(tier) || prestigeFrameOverlayHtml(cardId);
-}
-function prestigeBadgeHtml(cardId) {
-  const utils = prestigeUtils();
-  const tier = getCardPrestigeTier(cardId);
-  if (!tier || tier === 'stardust') return '';
-  const label = utils.prestigeLabel?.(tier) || tier;
-  return `<span class="prestige-badge prestige-${tierCssToken(tier)}">${esc(label)}</span>`;
-}
-function cardHasStarlightEvolution(cardId) {
-  const tier = getCardPrestigeTier(cardId);
-  return Boolean(tier && tier !== 'stardust');
-}
 function cardSupportsHoloToggle(card) {
   return Boolean(card && isHolographicCard(card));
 }
 function analyzerDisplayTogglesHtml(card) {
-  if (!card) return '';
-  const showHolo = cardSupportsHoloToggle(card);
-  const showEvolution = cardHasStarlightEvolution(card.id);
-  if (!showHolo && !showEvolution) return '';
-  const buttons = [];
-  if (showHolo) {
-    buttons.push(`<button class="btn" type="button" data-toggle-analyzer-holo aria-pressed="${analyzerHoloEnabled ? 'true' : 'false'}">${analyzerHoloEnabled ? 'Holo On' : 'Holo Off'}</button>`);
-  }
-  if (showEvolution) {
-    buttons.push(`<button class="btn" type="button" data-toggle-analyzer-evolution aria-pressed="${analyzerEvolutionEnabled ? 'true' : 'false'}">${analyzerEvolutionEnabled ? 'Evolution On' : 'Evolution Off'}</button>`);
-  }
-  return `<div class="analyzer-display-toggles">${buttons.join('')}</div>`;
+  if (!card || !cardSupportsHoloToggle(card)) return '';
+  return `<div class="analyzer-display-toggles"><button class="btn" type="button" data-toggle-analyzer-holo aria-pressed="${analyzerHoloEnabled ? 'true' : 'false'}">${analyzerHoloEnabled ? 'Holo On' : 'Holo Off'}</button></div>`;
 }
 function previewDisplayTogglesHtml(card, got = false) {
-  if (!got || !card) return '';
-  const showHolo = cardSupportsHoloToggle(card);
-  const showEvolution = cardHasStarlightEvolution(card.id);
-  if (!showHolo && !showEvolution) return '';
-  const buttons = [];
-  if (showHolo) {
-    buttons.push(`<button class="btn" type="button" data-toggle-preview-holo aria-pressed="${previewHoloEnabled ? 'true' : 'false'}">${previewHoloEnabled ? 'Holo On' : 'Holo Off'}</button>`);
-  }
-  if (showEvolution) {
-    buttons.push(`<button class="btn" type="button" data-toggle-preview-evolution aria-pressed="${previewEvolutionEnabled ? 'true' : 'false'}">${previewEvolutionEnabled ? 'Evolution On' : 'Evolution Off'}</button>`);
-  }
-  return `<div class="v62-panel-toggles analyzer-display-toggles">${buttons.join('')}</div>`;
-}
-function evolutionActionHtml(cardId) {
-  if (pageName !== 'collection') return '';
-  const utils = prestigeUtils();
-  const qty = getCardQuantity(cardId);
-  const tier = getCardPrestigeTier(cardId);
-  const next = utils.nextEvolutionTier?.(tier) || utils.nextFusionTier?.(tier) || utils.nextTier?.(tier);
-  const cost = utils.evolutionCostForNextTier?.(tier) ?? utils.fusionCostForNextTier?.(tier) ?? utils.fusionCostForNext?.(tier);
-  const label = utils.prestigeLabel?.(tier) || 'Standard';
-  const extras = utils.evolutionExtras?.(qty) ?? utils.fusionExtras?.(qty) ?? Math.max(0, qty - 1);
-  const canEvolve = utils.canEvolve?.(qty, tier) ?? utils.canFuse?.(qty, tier) ?? (cost != null && extras >= cost);
-  const canUnfuse = utils.canUnfuse?.(tier) ?? (tier !== 'stardust');
-  const refund = utils.evolutionUnfuseRefund?.(tier);
-  const nextLabel = next ? (utils.prestigeLabel?.(next) || next) : '';
-  const maxNote = (!next || cost == null)
-    ? `<p><strong>⭐⭐⭐⭐⭐ Radiance V</strong> — maximum Starlight Evolution reached.</p>`
-    : `<p>Evolve to <strong>${esc(nextLabel)}</strong> — costs <strong>${cost}</strong> duplicate${cost === 1 ? '' : 's'}.</p>`;
-  return `<div class="evolution-action fusion-action analyzer-evo-strip">
-    <p><strong>${esc(label)}</strong> · ${extras} extra${extras === 1 ? '' : 's'} available</p>
-    ${maxNote}
-    <div class="evolution-action-row">
-      <button class="btn primary" type="button" data-fuse-card="${esc(cardId)}" ${canEvolve && next ? '' : 'disabled'}>${canEvolve && next ? `Evolve to ${esc(nextLabel)}` : (next ? `Need ${cost} extras` : 'Max Evolution')}</button>
-      <button class="btn" type="button" data-unfuse-card="${esc(cardId)}" ${canUnfuse ? '' : 'disabled'}>${canUnfuse ? `Unfuse (+${refund ?? 0})` : 'Cannot Unfuse'}</button>
-    </div>
-  </div>`;
+  if (!got || !card || !cardSupportsHoloToggle(card)) return '';
+  return `<div class="v62-panel-toggles analyzer-display-toggles"><button class="btn" type="button" data-toggle-preview-holo aria-pressed="${previewHoloEnabled ? 'true' : 'false'}">${previewHoloEnabled ? 'Holo On' : 'Holo Off'}</button></div>`;
 }
 function rarityStarsHtml(card, label) {
   const score = RARITY_SCORE[card?.rarity] || RARITY_SCORE[label] || 1;
@@ -295,125 +175,12 @@ function setAnalyzerTab(tab) {
     root.querySelector('.analyzer-body')?.scrollTo?.({ top: 0, behavior: 'smooth' });
   }
 }
-function fusionActionHtml(cardId) {
-  return evolutionActionHtml(cardId);
-}
-async function playEvolutionReveal(card, fromTier, toTier, cost, label) {
-  try {
-    const mod = await import('./starlight-evolution-reveal.js?v=3.0.0');
-    await mod.playStarlightEvolutionReveal({
-      imageUrl: getVisibleImage(card),
-      cardName: getVisibleName(card),
-      fromTier,
-      toTier,
-      label,
-      cost
-    });
-  } catch (error) {
-    console.warn('[Starlight] Evolution reveal unavailable', error);
-  }
-}
-async function fuseSelectedCard(cardId) {
-  const id = String(cardId || selected?.id || '').trim();
-  if (!id || pageName !== 'collection') return;
-  const utils = prestigeUtils();
-  const qty = getCardQuantity(id);
-  const tier = getCardPrestigeTier(id);
-  const next = utils.nextEvolutionTier?.(tier) || utils.nextFusionTier?.(tier) || utils.nextTier?.(tier);
-  const cost = utils.evolutionCostForNextTier?.(tier) ?? utils.fusionCostForNextTier?.(tier) ?? utils.fusionCostForNext?.(tier);
-  if (!next || cost == null) {
-    window.StarlightUI?.toast?.('This card is already at Radiance V.', 'info');
-    return;
-  }
-  if (!(utils.canEvolve?.(qty, tier) ?? utils.canFuse?.(qty, tier))) {
-    window.StarlightUI?.toast?.(`Need ${cost} duplicates to evolve.`, 'error');
-    return;
-  }
-  const nextLabel = utils.prestigeLabel?.(next) || next;
-  const confirmed = await confirmAction({
-    title: `Evolve to ${nextLabel}?`,
-    message: `This spends ${cost} duplicate${cost === 1 ? '' : 's'} and keeps 1 copy. Your Starlight Evolution will become ${nextLabel}.`,
-    warning: 'You can Unfuse later for a partial refund.',
-    confirmText: `Evolve (−${cost})`,
-    cancelText: 'Cancel',
-    danger: true
-  });
-  if (!confirmed) return;
-  try {
-    const api = window.StarlightEvolution || window.StarlightFusion;
-    const result = await (api?.evolveMyCard?.(id) || api?.fuseMyCard?.(id));
-    if (!result) throw new Error('Starlight Evolution is unavailable while signed out.');
-    const card = cards.find(c => c.id === id) || selected;
-    await playEvolutionReveal(card, tier, result.evolutionTier || result.fusionTier || result.prestigeTier || next, cost, result.label || nextLabel);
-    api.applyLocalEvolutionResult?.(id, result);
-    api.applyLocalFusionResult?.(id, result);
-    setCardLocalFusion(id, result.quantity, result.evolutionTier || result.fusionTier || result.prestigeTier || next);
-    window.StarlightUI?.toast?.(`Evolved to ${result.label || nextLabel}!`, 'success');
-    playSfx('sparkle');
-    renderAll();
-    if ($('#cardOverlay')?.classList.contains('open') || cardOverlayModal?.isOpen) renderFullView();
-  } catch (error) {
-    const message = error?.message || error?.error_description || 'Evolution failed.';
-    window.StarlightUI?.toast?.(message, 'error');
-  }
-}
-async function unfuseSelectedCard(cardId) {
-  const id = String(cardId || selected?.id || '').trim();
-  if (!id || pageName !== 'collection') return;
-  const utils = prestigeUtils();
-  const tier = getCardPrestigeTier(id);
-  const prev = utils.previousEvolutionTier?.(tier);
-  const refund = utils.evolutionUnfuseRefund?.(tier);
-  if (!prev || refund == null) {
-    window.StarlightUI?.toast?.('This card has not been evolved yet.', 'info');
-    return;
-  }
-  const prevLabel = utils.prestigeLabel?.(prev) || prev;
-  const confirmed = await confirmAction({
-    title: `Unfuse to ${prevLabel}?`,
-    message: `This steps Evolution down one level and refunds ${refund} duplicate${refund === 1 ? '' : 's'} (half of the step cost, rounded down).`,
-    confirmText: `Unfuse (+${refund})`,
-    cancelText: 'Cancel',
-    danger: true
-  });
-  if (!confirmed) return;
-  try {
-    const api = window.StarlightEvolution || window.StarlightFusion;
-    const result = await api?.unfuseMyCard?.(id);
-    if (!result) throw new Error('Unfuse is unavailable while signed out.');
-    api.applyLocalEvolutionResult?.(id, result);
-    api.applyLocalFusionResult?.(id, result);
-    setCardLocalFusion(id, result.quantity, result.evolutionTier || result.fusionTier || result.prestigeTier || prev);
-    window.StarlightUI?.toast?.(`Unfused to ${result.label || prevLabel}. +${result.refund ?? refund} copies restored.`, 'success');
-    playSfx('page');
-    renderAll();
-    if ($('#cardOverlay')?.classList.contains('open') || cardOverlayModal?.isOpen) renderFullView();
-  } catch (error) {
-    const message = error?.message || error?.error_description || 'Unfuse failed.';
-    window.StarlightUI?.toast?.(message, 'error');
-  }
-}
 function applyAnalyzerDisplayToggles() {
   const card = $('#fullCard3d');
   if (!card) return;
   card.classList.toggle('is-holo-off', !analyzerHoloEnabled);
-  card.classList.toggle('is-evolution-off', !analyzerEvolutionEnabled);
   const frontFace = card.querySelector('.face.front');
   const got = selected && isCollected(selected.id);
-  const prestigeTokens = ['prestige-frame', 'prestige-star-bit', 'prestige-protostar', 'prestige-starlight', 'prestige-super-starlight', 'prestige-starlight-burst'];
-  prestigeTokens.forEach((token) => card.classList.remove(token));
-  if (got && analyzerEvolutionEnabled) {
-    prestigeFrameClass(selected.id).split(/\s+/).filter(Boolean).forEach((token) => card.classList.add(token));
-    frontFace?.querySelector('.prestige-particles')?.remove();
-    frontFace?.querySelector('.prestige-frame-overlay')?.remove();
-    const effectsMarkup = prestigeFrameEffectsHtml(selected.id);
-    if (effectsMarkup) {
-      frontFace?.insertAdjacentHTML('beforeend', effectsMarkup);
-    }
-  } else {
-    frontFace?.querySelector('.prestige-particles')?.remove();
-    frontFace?.querySelector('.prestige-frame-overlay')?.remove();
-  }
   if (!analyzerHoloEnabled) {
     frontFace?.classList.remove('card-finish-holographic', 'card-finish-sparkle-foil', 'card-finish-gold');
     window.StarlightUI?.ensureFinishEffectLayer?.(frontFace, '');
@@ -474,8 +241,6 @@ function cardTileContext() {
     isFavorite,
     getCardQuantity,
     rarityClass,
-    prestigeFrameClass,
-    prestigeFrameOverlayHtml,
     perspectiveArt,
     perspectiveArtVisible,
     getVisibleName,
@@ -1417,15 +1182,14 @@ function renderDetail() {
   const artClass = unownedArtClass(selected, { flipped: previewFlipped });
   const side = websiteSection('binderSidePanel');
   const qty = getCardQuantity(selected.id);
-  const previewPrestige = got ? prestigeFrameClass(selected.id) : '';
   detail.innerHTML = `
   <div class="detail-actions top-actions-preview">
     <button class="btn primary" id="flipPreview" type="button">${esc(side.flipCta || '↻ Flip')}</button>
     <button class="btn" id="openFullView" type="button">${esc(side.fullViewCta || '⛶ Full View')}</button>
   </div>
-  <button class="preview-card flip-card simple-flip ${previewFlipped ? 'show-back showing-card-back' : ''} ${rarityClass(selected)} ${previewPrestige}" id="previewCard" type="button" aria-label="Open full card view" data-finish-class="${esc(got ? cardFinishClass(selected, true) : '')}" data-holographic="${got && isHolographicCard(selected)}">
+  <button class="preview-card flip-card simple-flip ${previewFlipped ? 'show-back showing-card-back' : ''} ${rarityClass(selected)}" id="previewCard" type="button" aria-label="Open full card view" data-finish-class="${esc(got ? cardFinishClass(selected, true) : '')}" data-holographic="${got && isHolographicCard(selected)}">
     <span class="preview-inner">
-      <span class="face front ${cardFinishClass(selected, got && !previewFlipped)}"><img class="${artClass}" src="${esc(previewFlipped ? CARD_BACK_URL : getVisibleImage(selected))}" alt="${esc(previewFlipped ? 'Card back' : getVisibleName(selected))}" onerror="this.src='${CARD_BACK_URL}'">${holoSparkMarkup(selected, got && !previewFlipped)}${got ? prestigeFrameOverlayHtml(selected.id) : ''}</span>
+      <span class="face front ${cardFinishClass(selected, got && !previewFlipped)}"><img class="${artClass}" src="${esc(previewFlipped ? CARD_BACK_URL : getVisibleImage(selected))}" alt="${esc(previewFlipped ? 'Card back' : getVisibleName(selected))}" onerror="this.src='${CARD_BACK_URL}'">${holoSparkMarkup(selected, got && !previewFlipped)}</span>
       <span class="face back"><img src="${CARD_BACK_URL}" alt="Card back"></span>
     </span>
   </button>
@@ -1506,7 +1270,6 @@ function openFullView(listMode = 'all') {
   fullViewListMode = listMode;
   analyzerActiveTab = 'details';
   analyzerHoloEnabled = true;
-  analyzerEvolutionEnabled = true;
   if (listMode === 'favorites') {
     fullViewList = filterCardList(cards.filter(c => isFavorite(c.id)), activeFilters(), { respectOwnership: false });
   } else if (listMode === 'collection') {
@@ -1578,7 +1341,6 @@ function renderFullView() {
   const visibleRarity = getVisibleRarity(selected);
   const full = websiteSection('binderFullView');
   const qty = getCardQuantity(selected.id);
-  const prestigeClass = got && analyzerEvolutionEnabled ? prestigeFrameClass(selected.id) : '';
   const finishClass = got && analyzerHoloEnabled ? cardFinishClass(selected, true) : '';
   const premiumPerspective = window.StarlightPerspectiveCard?.hasPremiumPerspective?.(selected);
   const holoMarkup = got && analyzerHoloEnabled && !overlayFlipped && !premiumPerspective ? holoSparkMarkup(selected, true) : '';
@@ -1596,14 +1358,11 @@ function renderFullView() {
   const sub = got ? subcategoryLabel(selected) : '';
   const variant = got ? variantLabel(selected) : '';
   const finish = got ? finishLabel(selected) : '';
-  const evoTier = got ? (prestigeUtils().prestigeLabel?.(getCardPrestigeTier(selected.id)) || 'Standard') : '';
   const storyText = got
     ? (selected.cardDescription || 'No card story has been added yet.')
     : getVisibleDescription(selected);
   const noteText = got
-    ? (pageName === 'collection'
-      ? 'Evolve duplicates from this album view · display toggles preview holo & frames.'
-      : 'Tap Flip to peek the back · drag the card to tilt.')
+    ? 'Tap Flip to peek the back · drag the card to tilt.'
     : 'Collect this card to unlock its full story and details.';
   const traitName = got
     ? [category, sub].filter(Boolean).join(' · ')
@@ -1616,9 +1375,6 @@ function renderFullView() {
     : 'Earn this card from Daily Boosters, packs, or rewards.';
   if (analyzerActiveTab !== 'story') analyzerActiveTab = 'details';
   const detailsTabActive = analyzerActiveTab !== 'story';
-  const evoBadge = got ? prestigeBadgeHtml(selected.id) : '';
-  // Show Evolution once: badge when present, otherwise plain tier label.
-  const evoValueHtml = evoBadge || `<span class="analyzer-evo-value">${esc(evoTier)}</span>`;
 
   overlay.innerHTML = `${FULL_VIEW_BACKDROP_HTML}<div class="full-card-stage analyzer-full-stage analyzer-sekai-stage ${rarityClass(selected)}" role="dialog" aria-modal="true" aria-labelledby="fullViewCardTitle" tabindex="-1">
     <div class="analyzer-bg" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -1654,9 +1410,9 @@ function renderFullView() {
               <div class="analyzer-card-stage">
                 <button class="overlay-arrow left analyzer-arrow" type="button" aria-label="Previous card">‹</button>
                 <button class="overlay-arrow right analyzer-arrow" type="button" aria-label="Next card">›</button>
-                <div class="full-card-wrap simple-flip analyzer-card-shell analyzer-card-3d ${overlayFlipped ? 'show-back showing-card-back' : ''} ${analyzerHoloEnabled ? '' : 'is-holo-off'} ${analyzerEvolutionEnabled ? '' : 'is-evolution-off'} ${rarityClass(selected)} ${prestigeClass}" id="fullCard3d" aria-label="${esc(overlayFlipped ? 'Card back' : visibleName)}" data-holographic="${got && analyzerHoloEnabled && isHolographicCard(selected)}" data-finish-class="${esc(finishClass)}">
+                <div class="full-card-wrap simple-flip analyzer-card-shell analyzer-card-3d ${overlayFlipped ? 'show-back showing-card-back' : ''} ${analyzerHoloEnabled ? '' : 'is-holo-off'} ${rarityClass(selected)}" id="fullCard3d" aria-label="${esc(overlayFlipped ? 'Card back' : visibleName)}" data-holographic="${got && analyzerHoloEnabled && isHolographicCard(selected)}" data-finish-class="${esc(finishClass)}">
                   <span class="full-inner">
-                    <span class="face front ${finishClass}">${frontArt}${!overlayFlipped ? holoMarkup : ''}${prestigeClass ? prestigeFrameEffectsHtml(selected.id) : ''}</span>
+                    <span class="face front ${finishClass}">${frontArt}${!overlayFlipped ? holoMarkup : ''}</span>
                     <span class="face back"><img src="${esc(CARD_BACK_URL)}" alt="Card back" draggable="false"></span>
                   </span>
                 </div>
@@ -1671,7 +1427,6 @@ function renderFullView() {
               ${analyzerStatRow(full.rarityLabel || 'Rarity', `<b class="${rarityClass(selected)}">${esc(visibleRarity)}</b>`, { icon: '★' })}
               ${analyzerStatRow(full.collectorNumberLabel || 'Collector #', esc(collectorNo), { icon: '#' })}
               ${got ? analyzerStatRow(full.ownedLabel || 'Owned', `×${qty}`, { icon: '♡' }) : analyzerStatRow(full.ownedLabel || 'Owned', esc(full.notCollectedLabel || 'Not collected'), { icon: '♡' })}
-              ${got ? analyzerStatRow(full.evolutionLabel || 'Evolution', evoValueHtml, { icon: '✦' }) : ''}
               ${got && selected.artist ? analyzerStatRow(full.illustratorLabel || 'Artist', esc(selected.artist), { icon: '✎' }) : ''}
               <div class="analyzer-skill-block">
                 <div class="analyzer-skill-head">
@@ -1685,7 +1440,6 @@ function renderFullView() {
                   ${got ? `<button class="btn overlay-favorite analyzer-favorite" type="button" data-toggle-favorite="${esc(selected.id)}" aria-pressed="${isFavorite(selected.id) ? 'true' : 'false'}">${esc(isFavorite(selected.id) ? (full.favoritedCta || '★ Favorited') : (full.favoriteCta || '♡ Favorite'))}</button>` : ''}
                   ${got ? analyzerDisplayTogglesHtml(selected) : ''}
                 </div>
-                ${got && pageName === 'collection' ? evolutionActionHtml(selected.id) : ''}
               </div>
             </aside>
           </div>
@@ -1750,10 +1504,9 @@ function renderAlbumCardLegacy(card, i) {
   const got = isCollected(card.id);
   const numberLabel = window.StarlightCardFilters?.cardDisplayNumber?.(card) || String(card.collectorNumber || card.number || '');
   const qty = getCardQuantity(card.id);
-  const prestigeClass = prestigeFrameClass(card.id);
-  return `<article class="card-album-slot ${rarityClass(card)} ${prestigeClass}" style="--i:${i}">
+  return `<article class="card-album-slot ${rarityClass(card)}" style="--i:${i}">
     <button class="card-album-btn" type="button" data-album-card="${esc(card.id)}" aria-label="Open ${esc(displayName(card))} full view">
-      <span class="card-album-art">${perspectiveArt(card, { imageUrl: card.imageUrl, alt: displayName(card), visible: perspectiveArtVisible(card, got) })}${prestigeFrameOverlayHtml(card.id)}</span>
+      <span class="card-album-art">${perspectiveArt(card, { imageUrl: card.imageUrl, alt: displayName(card), visible: perspectiveArtVisible(card, got) })}</span>
       <span class="card-album-number">${esc(numberLabel)}</span>
     </button>
     <span class="card-album-meta"><strong>${esc(displayName(card))}</strong><span class="card-album-qty">×${qty}</span></span>
@@ -1765,7 +1518,7 @@ function renderAlbumListCardLegacy(c, mode) {
   const quantity = getCardQuantity(c.id);
   const favorited = isFavorite(c.id);
   return `<article class="card-album-list-card ${rarityClass(c)}" data-id="${esc(c.id)}" data-open-collection-card="${esc(c.id)}" role="button" tabindex="0" aria-label="Open ${esc(getVisibleName(c))} full view">
-    <div class="card-album-list-art">${perspectiveArt(c, { imageUrl: getVisibleImage(c), alt: getVisibleName(c), visible: perspectiveArtVisible(c, got) })}${got ? prestigeFrameOverlayHtml(c.id) : ''}</div>
+    <div class="card-album-list-art">${perspectiveArt(c, { imageUrl: getVisibleImage(c), alt: getVisibleName(c), visible: perspectiveArtVisible(c, got) })}</div>
     <h3>${esc(getVisibleName(c))}</h3>
     <p class="card-album-list-sub">${esc(c.collectorNumber || c.number)} · ${esc(c.series)}</p>
     <div class="card-meta-chips compact">${cardIdentityChips(c, { hidden: !got })}</div>
@@ -1971,20 +1724,6 @@ function updateRaritySelectClass() {
 // V35: pointer tilt is handled per card by attachTiltTo().
 // The older global pointermove tilt was removed to prevent duplicate hover state and SFX jitter.
 document.addEventListener('click', e => {
-  const fuseCard = e.target.closest('[data-fuse-card]');
-  if (fuseCard) {
-    e.preventDefault();
-    e.stopPropagation();
-    fuseSelectedCard(fuseCard.dataset.fuseCard);
-    return;
-  }
-  const unfuseCard = e.target.closest('[data-unfuse-card]');
-  if (unfuseCard) {
-    e.preventDefault();
-    e.stopPropagation();
-    unfuseSelectedCard(unfuseCard.dataset.unfuseCard);
-    return;
-  }
   if (e.target.closest('[data-toggle-analyzer-holo]')) {
     e.preventDefault();
     e.stopPropagation();
@@ -1994,18 +1733,6 @@ document.addEventListener('click', e => {
     if (btn) {
       btn.setAttribute('aria-pressed', analyzerHoloEnabled ? 'true' : 'false');
       btn.textContent = analyzerHoloEnabled ? 'Holo On' : 'Holo Off';
-    }
-    return;
-  }
-  if (e.target.closest('[data-toggle-analyzer-evolution]')) {
-    e.preventDefault();
-    e.stopPropagation();
-    analyzerEvolutionEnabled = !analyzerEvolutionEnabled;
-    applyAnalyzerDisplayToggles();
-    const btn = e.target.closest('[data-toggle-analyzer-evolution]');
-    if (btn) {
-      btn.setAttribute('aria-pressed', analyzerEvolutionEnabled ? 'true' : 'false');
-      btn.textContent = analyzerEvolutionEnabled ? 'Evolution On' : 'Evolution Off';
     }
     return;
   }
@@ -2313,11 +2040,10 @@ function renderGalleryCardLegacy(card, i) {
   const img = got ? card.imageUrl : CARD_BACK_URL;
   const numberLabel = window.StarlightCardFilters?.cardDisplayNumber?.(card) || String(card.collectorNumber || card.number || '');
   const qty = getCardQuantity(card.id);
-  const prestigeClass = got ? prestigeFrameClass(card.id) : '';
   const stateClass = got ? 'is-owned' : 'is-unowned';
-  return `<article class="card-gallery-item ${rarityClass(card)} ${stateClass} ${prestigeClass}" style="--i:${i}">
+  return `<article class="card-gallery-item ${rarityClass(card)} ${stateClass}" style="--i:${i}">
     <button class="card-gallery-btn" type="button" data-v61-card="${esc(card.id)}" aria-label="View ${esc(getVisibleName(card))}">
-      <span class="card-gallery-art">${perspectiveArt(card, { imageUrl: img, alt: getVisibleName(card), visible: perspectiveArtVisible(card, got) })}${got ? prestigeFrameOverlayHtml(card.id) : ''}</span>
+      <span class="card-gallery-art">${perspectiveArt(card, { imageUrl: img, alt: getVisibleName(card), visible: perspectiveArtVisible(card, got) })}</span>
       <span class="card-gallery-number">${esc(numberLabel)}</span>
     </button>
     <span class="card-gallery-status">${esc(got
@@ -2353,7 +2079,6 @@ function renderV61Card(card, i) {
 function applyPreviewSideToggles(cardEl, card, got) {
   if (!cardEl || !card) return;
   cardEl.classList.toggle('is-holo-off', !previewHoloEnabled);
-  cardEl.classList.toggle('is-evolution-off', !previewEvolutionEnabled);
   const frontFace = cardEl.querySelector('.face.front');
   const showFinish = got && previewHoloEnabled && !previewFlipped;
   const finishClass = showFinish ? cardFinishClass(card, true) : '';
@@ -2409,7 +2134,6 @@ function renderV62Showcase(inSeriesSelect = false, browse = resolveBinderBrowse(
   const visibleRarity = getVisibleRarity(card);
   const qty = getCardQuantity(card.id);
   const ownedQtyText = fillWebsiteTokens(side.ownedQtyLabel || 'Owned ×{qty}', { qty });
-  const previewPrestige = got && previewEvolutionEnabled ? prestigeFrameClass(card.id) : '';
   const finishClass = got && previewHoloEnabled && !previewFlipped ? cardFinishClass(card, true) : '';
   const premiumPerspective = window.StarlightPerspectiveCard?.hasPremiumPerspective?.(card);
   const previewHoloMarkup = previewFlipped || !previewHoloEnabled || premiumPerspective ? '' : holoSparkMarkup(card, got);
@@ -2425,9 +2149,9 @@ function renderV62Showcase(inSeriesSelect = false, browse = resolveBinderBrowse(
       <button class="btn" id="v62Full" type="button">${esc(side.fullViewCta || '⛶ Full View')}</button>
     </div>
     ${previewDisplayTogglesHtml(card, got)}
-    <button class="v62-preview-card flip-card simple-flip ${previewFlipped ? 'show-back showing-card-back' : ''} ${previewPrestige} ${previewHoloEnabled ? '' : 'is-holo-off'} ${previewEvolutionEnabled ? '' : 'is-evolution-off'}" id="v62PreviewCard" type="button" aria-label="Open full view for ${esc(visibleName)}" data-finish-class="${esc(finishClass)}" data-holographic="${got && previewHoloEnabled && isHolographicCard(card)}">
+    <button class="v62-preview-card flip-card simple-flip ${previewFlipped ? 'show-back showing-card-back' : ''} ${previewHoloEnabled ? '' : 'is-holo-off'}" id="v62PreviewCard" type="button" aria-label="Open full view for ${esc(visibleName)}" data-finish-class="${esc(finishClass)}" data-holographic="${got && previewHoloEnabled && isHolographicCard(card)}">
       <span class="preview-inner">
-        <span class="face front ${finishClass}">${previewFrontArt}${previewHoloMarkup}${previewPrestige ? prestigeFrameOverlayHtml(card.id) : ''}</span>
+        <span class="face front ${finishClass}">${previewFrontArt}${previewHoloMarkup}</span>
         <span class="face back"><img src="${CARD_BACK_URL}" alt="Starlight card back"></span>
       </span>
     </button>
@@ -2451,15 +2175,10 @@ function renderV62Showcase(inSeriesSelect = false, browse = resolveBinderBrowse(
   scanPerspectiveCardsIn(panel);
   $('#v62Flip')?.addEventListener('click', (e) => { e.stopPropagation(); previewFlipped = !previewFlipped; flipCardImage($('#v62PreviewCard'), getVisibleImage(card), getVisibleName(card), previewFlipped); applyPreviewSideToggles($('#v62PreviewCard'), card, got); playSfx('flip'); });
   $('#v62Full')?.addEventListener('click', (e) => { e.stopPropagation(); playSfx('analyze'); openFullView('filtered'); });
-  $('#v62PreviewCard')?.addEventListener('click', (e) => { if (e.target.closest('#v62Flip, [data-toggle-preview-holo], [data-toggle-preview-evolution], [data-toggle-favorite]')) return; playSfx('analyze'); openFullView('filtered'); });
+  $('#v62PreviewCard')?.addEventListener('click', (e) => { if (e.target.closest('#v62Flip, [data-toggle-preview-holo], [data-toggle-favorite]')) return; playSfx('analyze'); openFullView('filtered'); });
   panel.querySelector('[data-toggle-preview-holo]')?.addEventListener('click', (e) => {
     e.stopPropagation();
     previewHoloEnabled = !previewHoloEnabled;
-    renderV62Showcase(false, browse);
-  });
-  panel.querySelector('[data-toggle-preview-evolution]')?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    previewEvolutionEnabled = !previewEvolutionEnabled;
     renderV62Showcase(false, browse);
   });
 }

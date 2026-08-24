@@ -2,7 +2,7 @@ const params = new URLSearchParams(location.search);
 const routes = {
   'binder.html':'binder','index.html':'binder','home.html':'home','collection.html':'collection','checklist.html':'checklist','daily-booster.html':'daily',
   'booster-shop.html':'shop','events.html':'events','star-bits.html':'star-bits','redeem.html':'redeem','notifications.html':'notifications','received-rewards.html':'rewards','profile-settings.html':'profile',
-  'season-pass.html':'season-pass','collection-quests.html':'quests','starlight-evolution.html':'starlight-evolution','login.html':'login',
+  'season-pass.html':'season-pass','collection-quests.html':'quests','login.html':'login',
   'trade-lists.html':'trades','trade-offers.html':'offers','user-rankings.html':'rankings','pull-feed.html':'feed','collector.html':'collector','report-profile.html':'report',
   'about.html':'about','socials.html':'socials','admin-hub.html':'admin','admin-codes.html':'admin-codes',
   'admin-staff.html':'admin-staff','admin-audit.html':'admin-audit','admin-moderation.html':'admin-moderation',
