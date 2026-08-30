@@ -118,6 +118,33 @@ export function resolveShellLayout(navigation) {
   return layout === 'hybrid' ? 'hybrid' : 'masthead';
 }
 
+export function resolveShellLiveFeedVisible(navigation) {
+  return navigation?.chrome?.showLiveFeed !== false;
+}
+
+export function applyShellLiveFeedToDom(visible = true) {
+  const show = visible !== false;
+  document.body.classList.toggle('shell-live-feed-off', !show);
+  document.documentElement.classList.toggle('shell-live-feed-off', !show);
+  const strip = document.getElementById('shellLiveStrip');
+  if (strip) strip.hidden = !show;
+  const feed = document.getElementById('shellLiveFeed');
+  if (feed) {
+    if (!show) {
+      feed.hidden = true;
+      feed.classList.add('is-suppressed');
+    } else {
+      feed.hidden = false;
+      feed.classList.remove('is-suppressed');
+    }
+  }
+  if (!show) {
+    document.documentElement.style.setProperty('--shell-live-feed-h', '0px');
+  }
+  window.dispatchEvent(new CustomEvent('starlight-shell-live-feed-changed', { detail: { visible: show } }));
+  return show;
+}
+
 export function applyShellLayoutToDom(layout = 'masthead') {
   const mode = layout === 'hybrid' ? 'hybrid' : 'masthead';
   document.body.dataset.shellLayout = mode;
@@ -192,6 +219,7 @@ export function applyShellNavigationToDom(navigation, { isStaff = false } = {}) 
   });
 
   applyShellLayoutToDom(layout);
+  applyShellLiveFeedToDom(resolveShellLiveFeedVisible(config));
 
   return config;
 }

@@ -24,6 +24,13 @@ body.unified-shell .sidebar{
   overscroll-behavior:contain;
   scrollbar-width:thin;
 }
+/* Masthead + hybrid: keep sidebar below sticky LIVE strip and top nav. */
+body.unified-shell.shell-masthead-layout.shell-hybrid-layout .sidebar,
+body.unified-shell.shell-masthead-layout.shell-hybrid-layout .shell-drawer{
+  top:calc(var(--shell-chrome-top, 112px) + 8px)!important;
+  height:calc(100dvh - var(--shell-chrome-top, 112px) - 20px)!important;
+  max-height:calc(100dvh - var(--shell-chrome-top, 112px) - 20px)!important;
+}
 body.unified-shell .main{
   height:100vh!important;
   min-height:0!important;
@@ -32,7 +39,19 @@ body.unified-shell .main{
   scroll-behavior:smooth;
   scrollbar-width:thin;
 }
-body.unified-shell .shell-account-bar{
+body.unified-shell.shell-masthead-layout .main{
+  height:auto!important;
+  max-height:none!important;
+  overflow:visible!important;
+}
+body.unified-shell.shell-masthead-layout .site{
+  height:auto!important;
+  overflow:visible!important;
+}
+body.unified-shell.shell-masthead-layout{
+  overflow:auto!important;
+}
+body.unified-shell .shell-account-bar:not(.shell-live-strip-top){
   position:sticky!important;
   top:0!important;
   z-index:1500!important;
@@ -45,7 +64,7 @@ body.unified-shell .shell-event-banner{
   top:86px;
   z-index:1300;
 }
-html{scroll-padding-top:110px}
+html{scroll-padding-top:calc(var(--shell-chrome-top, 112px) + 16px)}
 @media(max-width:900px){
   body.unified-shell{overflow:auto!important}
   body.unified-shell .site{height:auto!important;min-height:100vh!important;overflow:visible!important}

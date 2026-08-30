@@ -19,6 +19,18 @@ h1,h2,h3{color:#405fa1;margin:0 0 .35em}
 
 .brand-field{margin:8px 0 18px;max-width:420px}
 .field label,.title-grid label{display:block;margin-bottom:5px;color:#405fa1;font-weight:850}
+.field label.checkbox-row{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  margin-bottom:8px;
+  font-weight:800;
+  cursor:pointer;
+}
+.field label.checkbox-row input{
+  margin-top:3px;
+  width:auto;
+}
 .field input,.field select,.title-grid input,.item-row input,.item-row select,.section-card>header input{
   width:100%;padding:10px 12px;border:2px solid rgba(107,198,248,.28);border-radius:11px;font:inherit
 }

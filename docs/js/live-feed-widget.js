@@ -341,9 +341,14 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
   return {
     refresh,
     setSuppressed(hidden) {
-      root.hidden = Boolean(hidden);
-      root.classList.toggle('is-suppressed', Boolean(hidden));
-      if (hidden) window.clearInterval(timer);
+      const off = Boolean(hidden);
+      root.hidden = off;
+      root.classList.toggle('is-suppressed', off);
+      const strip = document.getElementById('shellLiveStrip');
+      if (strip && !document.body.classList.contains('shell-live-feed-off')) {
+        strip.hidden = off;
+      }
+      if (off) window.clearInterval(timer);
       else start();
     },
     destroy() {

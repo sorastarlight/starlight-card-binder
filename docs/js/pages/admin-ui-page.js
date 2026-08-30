@@ -47,6 +47,7 @@ const statusEl = byId('status');
 const appEl = byId('app');
 const brandInput = byId('brandRibbon');
 const layoutSelect = byId('shellLayout');
+const liveFeedToggle = byId('shellLiveFeedToggle');
 const sidebarPanel = byId('panel-sidebar');
 const topbarPanel = byId('panel-topbar');
 const accountPanel = byId('panel-account');
@@ -428,8 +429,9 @@ function renderAll() {
   if (layoutSelect && navigation) {
     navigation.chrome = navigation.chrome && typeof navigation.chrome === 'object'
       ? navigation.chrome
-      : { layout: 'hybrid' };
+      : { layout: 'hybrid', showLiveFeed: true };
     layoutSelect.value = navigation.chrome.layout === 'masthead' ? 'masthead' : 'hybrid';
+    if (liveFeedToggle) liveFeedToggle.checked = navigation.chrome.showLiveFeed !== false;
   }
   ensureAccountMenu();
   renderSidebar();
@@ -520,9 +522,18 @@ layoutSelect?.addEventListener('change', () => {
   if (!navigation) return;
   navigation.chrome = navigation.chrome && typeof navigation.chrome === 'object'
     ? navigation.chrome
-    : { layout: 'hybrid' };
+    : { layout: 'hybrid', showLiveFeed: true };
   navigation.chrome.layout = layoutSelect.value === 'masthead' ? 'masthead' : 'hybrid';
   renderAll();
+});
+
+liveFeedToggle?.addEventListener('change', () => {
+  if (!navigation) return;
+  navigation.chrome = navigation.chrome && typeof navigation.chrome === 'object'
+    ? navigation.chrome
+    : { layout: 'hybrid', showLiveFeed: true };
+  navigation.chrome.showLiveFeed = Boolean(liveFeedToggle.checked);
+  renderPreview();
 });
 
 function onEditorInput(event) {

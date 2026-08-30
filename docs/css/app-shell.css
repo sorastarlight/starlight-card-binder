@@ -7,6 +7,8 @@
   --shell-gold:var(--st-color-gold, #fed334);
   --shell-ink:var(--st-color-ink, #30344f);
   --shell-muted:var(--st-color-muted, #6b7089);
+  --shell-live-feed-h:48px;
+  --shell-chrome-top:calc(var(--shell-live-feed-h, 48px) + var(--shell-masthead-h, 64px));
 }
 .unified-nav{display:grid;gap:7px;margin:14px 0 18px;padding:12px;border:1px solid rgba(107,198,248,.32);border-radius:18px;background:linear-gradient(145deg,rgba(255,255,255,.9),rgba(245,251,255,.86));box-shadow:0 9px 22px rgba(61,83,132,.08)}
 .unified-nav a{display:flex;align-items:center;gap:10px;min-height:42px;padding:9px 12px;border-radius:12px;color:#405fa1;font-weight:850;text-decoration:none;transition:.16s ease}
@@ -775,11 +777,42 @@ body.unified-shell{padding-left:env(safe-area-inset-left);padding-right:env(safe
 body.shell-masthead-layout{
   --shell-masthead-h:clamp(60px, 8vw, 76px);
   --shell-chrome-pad:clamp(12px, 2.2vw, 28px);
+  --shell-chrome-top:calc(var(--shell-live-feed-h, 48px) + var(--shell-masthead-h, 64px));
 }
-/* Keep masthead above LIVE strip / qol sticky chrome (z-index 1500). */
-body.shell-masthead-layout .shell-masthead{
+
+/* Frozen LIVE activity row — always above site chrome */
+body.shell-masthead-layout .shell-live-strip-top{
   position:sticky;
   top:0;
+  z-index:5100;
+  display:block;
+  width:100%;
+  margin:0;
+  padding:6px var(--shell-chrome-pad);
+  border:0;
+  border-bottom:1px solid rgba(107,198,248,.28);
+  background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(245,251,255,.96));
+  box-shadow:0 8px 22px rgba(61,83,132,.1);
+}
+body.shell-masthead-layout .shell-live-strip-top .shell-live-feed{
+  width:100%;
+  margin:0;
+}
+body.shell-masthead-layout .shell-live-feed-body{
+  z-index:5200;
+}
+body.shell-masthead-layout.shell-live-feed-off .shell-live-strip-top,
+body.shell-live-feed-off .shell-live-strip-top{
+  display:none!important;
+}
+body.shell-live-feed-off{
+  --shell-live-feed-h:0px;
+}
+
+/* Keep masthead directly under the LIVE strip. */
+body.shell-masthead-layout .shell-masthead{
+  position:sticky;
+  top:var(--shell-live-feed-h, 48px);
   z-index:5000;
   overflow:visible;
   width:100%;
@@ -907,20 +940,7 @@ body.shell-masthead-layout .shell-masthead-actions .shell-account-main strong{
 body.shell-masthead-layout .shell-account-menu{
   z-index:5200;
 }
-/* Deprioritize LIVE / event chrome so menus never paint underneath. */
-body.shell-masthead-layout.unified-shell .shell-account-bar,
-body.shell-masthead-layout .shell-live-strip,
-body.shell-masthead-layout .shell-account-bar.shell-live-strip{
-  position:relative!important;
-  top:auto!important;
-  z-index:2!important;
-  margin-bottom:10px!important;
-  backdrop-filter:none;
-  box-shadow:none!important;
-}
-body.shell-masthead-layout .shell-live-feed-body{
-  z-index:20;
-}
+/* LIVE strip now lives above the masthead; keep event banner in-flow under content. */
 body.shell-masthead-layout.unified-shell .shell-event-banner,
 body.shell-masthead-layout .shell-event-banner{
   position:relative!important;
@@ -937,16 +957,6 @@ body.shell-masthead-layout .site{
 body.shell-masthead-layout .shell-drawer{
   display:none;
 }
-body.shell-masthead-layout .shell-live-strip{
-  display:block;
-  margin:12px 0 10px;
-  padding:0;
-  border:0;
-  background:transparent;
-}
-body.shell-masthead-layout .shell-live-strip .shell-live-feed{
-  width:100%;
-}
 body.shell-masthead-layout .main{
   width:100%;
   min-width:0;
@@ -962,7 +972,7 @@ body.shell-masthead-layout .shell-view-frame{
   border-radius:18px;
 }
 body.shell-masthead-layout .shell-view-frame iframe{
-  height:calc(100dvh - var(--shell-masthead-h) - 110px);
+  height:calc(100dvh - var(--shell-chrome-top, 112px) - 48px);
   min-height:640px;
 }
 body.shell-masthead-layout .shell-drawer-backdrop{
@@ -1085,7 +1095,7 @@ body.shell-masthead-layout.shell-hybrid-layout .site{
   max-width:none;
   margin:0;
   padding:0 var(--shell-chrome-pad) 24px;
-  min-height:calc(100dvh - var(--shell-masthead-h, 64px));
+  min-height:calc(100dvh - var(--shell-chrome-top, 112px));
   align-items:start;
 }
 
@@ -1093,19 +1103,19 @@ body.shell-masthead-layout.shell-hybrid-layout .shell-drawer,
 body.shell-masthead-layout.shell-hybrid-layout .sidebar{
   display:flex!important;
   flex-direction:column;
-  position:sticky;
-  top:calc(var(--shell-masthead-h, 64px) + 8px);
-  align-self:start;
+  position:sticky!important;
+  top:calc(var(--shell-chrome-top, 112px) + 8px)!important;
+  align-self:start!important;
   width:auto;
   min-width:0;
-  height:calc(100dvh - var(--shell-masthead-h, 64px) - 20px);
-  max-height:calc(100dvh - var(--shell-masthead-h, 64px) - 20px);
+  height:calc(100dvh - var(--shell-chrome-top, 112px) - 20px)!important;
+  max-height:calc(100dvh - var(--shell-chrome-top, 112px) - 20px)!important;
   overflow-x:hidden;
   overflow-y:auto;
   transform:none!important;
   box-shadow:none;
   padding:12px 8px 20px;
-  z-index:1;
+  z-index:40;
 }
 
 body.shell-masthead-layout.shell-hybrid-layout .sidebar .unified-nav{

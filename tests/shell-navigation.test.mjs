@@ -265,8 +265,11 @@ test('website UI admin page and migration are wired', async () => {
   assert.match(page, /uploadStudioAsset\(file, 'nav-icons'\)/);
   assert.match(page, /shellPreviewFrame|NAV_DRAFT|buildShellStudioPreviewUrl/);
   assert.match(html, /id="shellLayout"/);
+  assert.match(html, /id="shellLiveFeedToggle"/);
   assert.match(page, /navigation\.chrome\.layout/);
+  assert.match(page, /navigation\.chrome\.showLiveFeed/);
   assert.match(page, /layoutSelect/);
+  assert.match(page, /liveFeedToggle/);
   assert.match(hub, /admin-ui\.html/);
   assert.match(migration, /admin_save_shell_navigation/);
   assert.match(embed, /'admin-ui\.html':'admin-ui'/);
@@ -278,10 +281,12 @@ test('website UI admin page and migration are wired', async () => {
   assert.match(shell, /navigate\('login',\{extra:\{mode\}\}\)/);
   assert.match(shell, /admin-ui/);
   assert.match(shell, /refreshShellBadges|data-notification-dot/);
+  assert.match(shell, /syncShellChromeHeights|applyLiveFeedVisibility/);
   const shellCss = await read('docs/css/app-shell.css');
   assert.match(shellCss, /z-index:\s*5000/);
   assert.match(shellCss, /--shell-chrome-pad/);
-  assert.match(shellCss, /shell-masthead-layout\.unified-shell \.shell-account-bar/);
+  assert.match(shellCss, /shell-live-strip-top/);
+  assert.match(shellCss, /--shell-chrome-top/);
 });
 
 test('shell refreshes Star Bits totals when wallet or rewards change', async () => {
@@ -408,26 +413,41 @@ test('sanitizeShellNavigation preserves chrome layout mode', () => {
     chrome: { layout: 'hybrid' }
   });
   assert.equal(hybrid.chrome.layout, 'hybrid');
+  assert.equal(hybrid.chrome.showLiveFeed, true);
 
   const invalid = sanitizeShellNavigation({
     ...cloneDefaultShellNavigation(),
     chrome: { layout: 'sidebar-only' }
   });
   assert.equal(invalid.chrome.layout, 'hybrid');
+
+  const feedOff = sanitizeShellNavigation({
+    ...cloneDefaultShellNavigation(),
+    chrome: { layout: 'hybrid', showLiveFeed: false }
+  });
+  assert.equal(feedOff.chrome.showLiveFeed, false);
 });
 
 test('shell navigation render applies hybrid layout classes', async () => {
-  const [render, shellCss] = await Promise.all([
+  const [render, shellCss, binderHtml, adminHtml] = await Promise.all([
     read('docs/js/shell-navigation-render.js'),
-    read('docs/css/app-shell.css')
+    read('docs/css/app-shell.css'),
+    read('docs/binder.html'),
+    read('docs/admin-ui.html')
   ]);
   assert.match(render, /is-bare/);
   assert.match(render, /applyShellLayoutToDom/);
+  assert.match(render, /applyShellLiveFeedToDom/);
   assert.match(render, /querySelectorAll\('\.binder-ribbon'\)/);
   assert.match(render, /shell-hybrid-layout/);
   assert.match(render, /layout === 'hybrid'/);
   assert.match(shellCss, /shell-hybrid-layout/);
   assert.match(shellCss, /grid-template-columns:var\(--shell-sidebar-w\)/);
+  assert.match(shellCss, /shell-live-strip-top/);
+  assert.match(shellCss, /--shell-chrome-top/);
+  assert.match(binderHtml, /shell-live-strip-top/);
+  assert.match(binderHtml, /id="shellLiveStrip"/);
+  assert.match(adminHtml, /shellLiveFeedToggle/);
 });
 
 test('shell navigation render and static shell HTML use extensionless binder hrefs', async () => {

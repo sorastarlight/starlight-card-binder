@@ -354,11 +354,14 @@ export function sanitizeShellNavigation(input) {
   const chromeSource = source.chrome && typeof source.chrome === 'object' ? source.chrome : {};
   const layoutRaw = String(chromeSource.layout || defaults.chrome?.layout || 'masthead').trim().toLowerCase();
   const layout = SHELL_LAYOUT_MODES.includes(layoutRaw) ? layoutRaw : defaults.chrome.layout;
+  const showLiveFeed = chromeSource.showLiveFeed !== false
+    && chromeSource.show_live_feed !== false
+    && chromeSource.liveFeed !== false;
 
   return {
     version: Number(source.version) >= 2 ? 2 : 2,
     brandRibbon: String(source.brandRibbon ?? defaults.brandRibbon).trim().slice(0, 40) || defaults.brandRibbon,
-    chrome: { layout },
+    chrome: { layout, showLiveFeed },
     pageTitles,
     sidebar: { sections },
     topBar: { quickLinks },

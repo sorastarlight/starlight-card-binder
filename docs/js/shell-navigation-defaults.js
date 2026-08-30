@@ -127,7 +127,8 @@ export function createDefaultShellNavigation() {
     version: 2,
     brandRibbon: 'Starlight Cards',
     chrome: {
-      layout: 'hybrid'
+      layout: 'hybrid',
+      showLiveFeed: true
     },
     // Page chrome titles match clear navigation labels.
     pageTitles: {

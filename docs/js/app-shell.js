@@ -14,11 +14,11 @@ import {
 import { getShellNavigation } from './shell-navigation-service.js';
 import { applyShellNavigationToDom, applyShellPageTitles, populateSeriesMegaMenus } from './shell-navigation-render.js';
 import { isStudioPreview, STUDIO_MSG } from './studio-preview.js';
-import { initLiveFeedWidget } from './live-feed-widget.js?v=1.5';
+import { initLiveFeedWidget } from './live-feed-widget.js?v=1.6';
 import { applyAvatarFrameClass } from './avatar-frame-utils.js';
 import { getMyProfileExtras } from './profile-extras-service.js';
 
-const SHELL_BUILD = '94.4.2';
+const SHELL_BUILD = '94.5.0';
 const VIEW_READY_TIMEOUT_MS = 6500;
 const MAX_VIEW_RETRIES = 1;
 
@@ -52,6 +52,7 @@ const accountMenuButton=document.getElementById('shellAccountMenuButton');
 const accountMenu=document.getElementById('shellAccountMenu');
 const mainContent=document.querySelector('.main');
 const masthead=document.getElementById('shellMasthead');
+const liveStrip=document.getElementById('shellLiveStrip');
 const AVATAR_SILHOUETTE='<svg class="shell-avatar-silhouette" viewBox="0 0 40 40" width="22" height="22" focusable="false" aria-hidden="true"><circle cx="20" cy="14" r="7" fill="currentColor"/><path d="M8 33c1.8-7.2 6.4-10.5 12-10.5S30.2 25.8 32 33" fill="currentColor"/></svg>';
 let profileUsername='';
 let currentRoute='binder';
@@ -60,6 +61,37 @@ let readyTimer=0;
 let retryCount=0;
 let embeddedInitialScrollDone=false;
 let liveFeedWidget = null;
+let liveFeedAdminEnabled = true;
+let liveFeedViewSuppressed = false;
+
+function syncShellChromeHeights(){
+  const liveH = (!liveFeedAdminEnabled || liveFeedViewSuppressed || liveStrip?.hidden)
+    ? 0
+    : Math.ceil(liveStrip?.getBoundingClientRect?.().height || 0);
+  const mastH = Math.ceil(masthead?.getBoundingClientRect?.().height || 0);
+  document.documentElement.style.setProperty('--shell-live-feed-h', `${liveH}px`);
+  if (mastH > 0) {
+    document.documentElement.style.setProperty('--shell-masthead-h', `${mastH}px`);
+  }
+  const chromeTop = liveH + (mastH || 64);
+  document.documentElement.style.setProperty('--shell-chrome-top', `${chromeTop}px`);
+}
+
+function applyLiveFeedVisibility(){
+  const showAdmin = liveFeedAdminEnabled && !isStudioPreview();
+  document.body.classList.toggle('shell-live-feed-off', !showAdmin);
+  if (liveStrip) liveStrip.hidden = !showAdmin;
+  const showWidget = showAdmin && !liveFeedViewSuppressed;
+  liveFeedWidget?.setSuppressed?.(!showWidget);
+  if (showAdmin && !liveFeedViewSuppressed) {
+    const feed = document.getElementById('shellLiveFeed');
+    if (feed) {
+      feed.hidden = false;
+      feed.classList.remove('is-suppressed');
+    }
+  }
+  syncShellChromeHeights();
+}
 
 function closeAllMegaMenus(){
   document.querySelectorAll('.shell-mega.is-open').forEach(mega=>{
@@ -580,6 +612,8 @@ async function hydrateAccount(){
     }
     applyShellPageTitles(routes, navigation);
     applyShellNavigationToDom(navigation, { isStaff: Boolean(access?.isStaff) || isStudioPreview() });
+    liveFeedAdminEnabled = navigation?.chrome?.showLiveFeed !== false;
+    applyLiveFeedVisibility();
     applyProfileLink();
     refreshShellBadges();
     if(currentRoute !== 'binder' && routes[currentRoute]?.title){
@@ -596,6 +630,8 @@ async function hydrateAccount(){
           window.__starlightShellNavigationDraft = data.navigation || null;
           applyShellPageTitles(routes, data.navigation || {});
           applyShellNavigationToDom(data.navigation || null, { isStaff: true });
+          liveFeedAdminEnabled = data.navigation?.chrome?.showLiveFeed !== false;
+          applyLiveFeedVisibility();
           applyProfileLink();
           refreshShellBadges();
           setActive(currentRoute);
@@ -750,7 +786,8 @@ window.addEventListener('message',async e=>{
     }
   }
   if(data.type==='starlight-shell-chrome'){
-    liveFeedWidget?.setSuppressed?.(Boolean(data.hideLiveFeed));
+    liveFeedViewSuppressed = Boolean(data.hideLiveFeed);
+    applyLiveFeedVisibility();
   }
 });
 
@@ -776,8 +813,18 @@ liveFeedWidget = initLiveFeedWidget({
 });
 
 if (isStudioPreview()) {
-  document.getElementById('shellLiveFeed')?.setAttribute('hidden', '');
-  liveFeedWidget?.setSuppressed?.(true);
+  liveFeedAdminEnabled = false;
+  applyLiveFeedVisibility();
+} else {
+  syncShellChromeHeights();
+  if (typeof ResizeObserver !== 'undefined') {
+    const chromeObserver = new ResizeObserver(() => syncShellChromeHeights());
+    if (liveStrip) chromeObserver.observe(liveStrip);
+    if (masthead) chromeObserver.observe(masthead);
+  } else {
+    window.addEventListener('resize', syncShellChromeHeights);
+  }
+  window.addEventListener('starlight-shell-live-feed-changed', syncShellChromeHeights);
 }
 
 navigate(initial,{push:false,extra:locationExtraParams()});
