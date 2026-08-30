@@ -24,13 +24,20 @@ body.unified-shell .sidebar{
   overscroll-behavior:contain;
   scrollbar-width:thin;
 }
-/* Hybrid: left nav shares the masthead row (under LIVE only), never under top nav. */
+/* Hybrid: full-height left column; LIVE + top nav live only in the content column. */
 body.unified-shell.shell-masthead-layout.shell-hybrid-layout .sidebar,
 body.unified-shell.shell-masthead-layout.shell-hybrid-layout .shell-drawer{
-  top:calc(var(--shell-live-feed-h, 48px) + 8px)!important;
-  height:calc(100dvh - var(--shell-live-feed-h, 48px) - 20px)!important;
-  max-height:calc(100dvh - var(--shell-live-feed-h, 48px) - 20px)!important;
-  z-index:5050!important;
+  top:0!important;
+  height:100dvh!important;
+  max-height:100dvh!important;
+  z-index:5200!important;
+}
+@media(min-width:981px){
+  body.unified-shell.shell-masthead-layout.shell-hybrid-layout .site{
+    display:contents!important;
+    height:auto!important;
+    overflow:visible!important;
+  }
 }
 body.unified-shell .main{
   height:100vh!important;
