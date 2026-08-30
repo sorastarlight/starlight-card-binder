@@ -1071,7 +1071,10 @@ body.shell-masthead-layout .shell-account-menu .staff-link:not(.visible){
 /* ===== Hybrid layout: persistent sidebar + slim top quick links ===== */
 body.shell-masthead-layout.shell-hybrid-layout{
   --shell-sidebar-w:min(286px, 28vw);
+  --shell-hybrid-gap:clamp(10px, 1.4vw, 16px);
   --shell-masthead-h:clamp(52px, 6.5vw, 64px);
+  /* Top bar only spans the content column; sidebar owns the left edge. */
+  --shell-masthead-inset:calc(var(--shell-chrome-pad) + var(--shell-sidebar-w) + var(--shell-hybrid-gap));
 }
 
 body.shell-masthead-layout.shell-hybrid-layout .shell-masthead-nav{
@@ -1087,10 +1090,25 @@ body.shell-masthead-layout.shell-hybrid-layout .shell-masthead-nav .shell-top-li
   font-size:clamp(.78rem, .95vw, .9rem);
 }
 
+/* Masthead stops at the left nav — no horizontal overlay. */
+@media(min-width:981px){
+  body.shell-masthead-layout.shell-hybrid-layout .shell-masthead{
+    box-sizing:border-box;
+    width:calc(100% - var(--shell-masthead-inset));
+    max-width:calc(100% - var(--shell-masthead-inset));
+    margin-left:var(--shell-masthead-inset);
+    border-left:1px solid rgba(107,198,248,.28);
+    border-radius:0 0 0 14px;
+  }
+  body.shell-masthead-layout.shell-hybrid-layout .shell-masthead-inner{
+    padding-left:clamp(10px, 1.2vw, 16px);
+  }
+}
+
 body.shell-masthead-layout.shell-hybrid-layout .site{
   display:grid!important;
   grid-template-columns:var(--shell-sidebar-w) minmax(0, 1fr);
-  gap:clamp(10px, 1.4vw, 16px);
+  gap:var(--shell-hybrid-gap);
   width:100%;
   max-width:none;
   margin:0;
@@ -1104,18 +1122,24 @@ body.shell-masthead-layout.shell-hybrid-layout .sidebar{
   display:flex!important;
   flex-direction:column;
   position:sticky!important;
-  top:calc(var(--shell-chrome-top, 112px) + 8px)!important;
+  /* Sit under LIVE only — share the masthead row, never tuck beneath it. */
+  top:calc(var(--shell-live-feed-h, 48px) + 8px)!important;
   align-self:start!important;
   width:auto;
   min-width:0;
-  height:calc(100dvh - var(--shell-chrome-top, 112px) - 20px)!important;
-  max-height:calc(100dvh - var(--shell-chrome-top, 112px) - 20px)!important;
+  /* Pull up beside the indented masthead (site follows masthead in the DOM). */
+  margin-top:calc(-1 * var(--shell-masthead-h, 64px));
+  height:calc(100dvh - var(--shell-live-feed-h, 48px) - 20px)!important;
+  max-height:calc(100dvh - var(--shell-live-feed-h, 48px) - 20px)!important;
   overflow-x:hidden;
   overflow-y:auto;
   transform:none!important;
   box-shadow:none;
   padding:12px 8px 20px;
-  z-index:40;
+  z-index:5050;
+  background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(245,251,255,.94));
+  border:1px solid rgba(107,198,248,.28);
+  border-radius:16px;
 }
 
 body.shell-masthead-layout.shell-hybrid-layout .sidebar .unified-nav{
@@ -1192,11 +1216,13 @@ body.shell-masthead-layout.shell-hybrid-layout.unified-shell .main{
     top:0;
     bottom:0;
     left:0;
+    margin-top:0;
     height:100dvh;
     max-height:100dvh;
     width:min(320px, 88vw);
     padding:calc(12px + env(safe-area-inset-top)) 14px calc(18px + env(safe-area-inset-bottom));
     box-shadow:18px 0 45px rgba(31,42,72,.24);
+    border-radius:0;
     z-index:5100;
   }
 

@@ -443,6 +443,7 @@ test('shell navigation render applies hybrid layout classes', async () => {
   assert.match(render, /layout === 'hybrid'/);
   assert.match(shellCss, /shell-hybrid-layout/);
   assert.match(shellCss, /grid-template-columns:var\(--shell-sidebar-w\)/);
+  assert.match(shellCss, /--shell-masthead-inset/);
   assert.match(shellCss, /shell-live-strip-top/);
   assert.match(shellCss, /--shell-chrome-top/);
   assert.match(binderHtml, /shell-live-strip-top/);

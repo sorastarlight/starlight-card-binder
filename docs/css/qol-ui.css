@@ -24,12 +24,13 @@ body.unified-shell .sidebar{
   overscroll-behavior:contain;
   scrollbar-width:thin;
 }
-/* Masthead + hybrid: keep sidebar below sticky LIVE strip and top nav. */
+/* Hybrid: left nav shares the masthead row (under LIVE only), never under top nav. */
 body.unified-shell.shell-masthead-layout.shell-hybrid-layout .sidebar,
 body.unified-shell.shell-masthead-layout.shell-hybrid-layout .shell-drawer{
-  top:calc(var(--shell-chrome-top, 112px) + 8px)!important;
-  height:calc(100dvh - var(--shell-chrome-top, 112px) - 20px)!important;
-  max-height:calc(100dvh - var(--shell-chrome-top, 112px) - 20px)!important;
+  top:calc(var(--shell-live-feed-h, 48px) + 8px)!important;
+  height:calc(100dvh - var(--shell-live-feed-h, 48px) - 20px)!important;
+  max-height:calc(100dvh - var(--shell-live-feed-h, 48px) - 20px)!important;
+  z-index:5050!important;
 }
 body.unified-shell .main{
   height:100vh!important;
