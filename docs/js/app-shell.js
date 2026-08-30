@@ -24,16 +24,16 @@ const MAX_VIEW_RETRIES = 1;
 
 const routes = {
   home:{title:'Home',src:'home.html'},
-  binder:{title:'Starlight Card Gallery',src:null}, collection:{title:'My Card Album Binder',src:'collection.html'},
-  daily:{title:'Free Daily Booster',src:'daily-booster.html'}, shop:{title:'Card Boutique',src:'booster-shop.html'}, events:{title:'Starlight Events',src:'events.html'}, redeem:{title:'Redeem A Code',src:'redeem.html'},
-  'star-bits':{title:'Star Bits Exchange',src:'star-bits.html'},
-  checklist:{title:'Star Registry',src:'checklist.html'},
-  quests:{title:'Starlight Missions',src:'collection-quests.html'},
-  'season-pass':{title:'Seasonal Collection Pass',src:'season-pass.html'},
-  trades:{title:'Trade With Others',src:'trade-lists.html'}, offers:{title:'Trade With Others',src:'trade-lists.html'},
-  rankings:{title:'User Rankings',src:'trade-lists.html'},
+  binder:{title:'Card Gallery',src:null}, collection:{title:'My Collection',src:'collection.html'},
+  daily:{title:'Daily Booster',src:'daily-booster.html'}, shop:{title:'Shop',src:'booster-shop.html'}, events:{title:'Events',src:'events.html'}, redeem:{title:'Redeem Code',src:'redeem.html'},
+  'star-bits':{title:'Star Bits',src:'star-bits.html'},
+  checklist:{title:'Card Checklist',src:'checklist.html'},
+  quests:{title:'Missions',src:'collection-quests.html'},
+  'season-pass':{title:'Season Pass',src:'season-pass.html'},
+  trades:{title:'Trade',src:'trade-lists.html'}, offers:{title:'Trade',src:'trade-lists.html'},
+  rankings:{title:'Rankings',src:'trade-lists.html'},
   feed:{title:'Activity Feed',src:'pull-feed.html'},
-  notifications:{title:'Notifications',src:'notifications.html'}, rewards:{title:'Received Gifts',src:'received-rewards.html'}, profile:{title:'Profile',src:'profile-settings.html'}, login:{title:'Sign In',src:'login'}, collector:{title:'Collector Profile',src:'collector.html'},
+  notifications:{title:'Notifications',src:'notifications.html'}, rewards:{title:'Gifts',src:'received-rewards.html'}, profile:{title:'Profile',src:'profile-settings.html'}, login:{title:'Sign In',src:'login'}, collector:{title:'Collector Profile',src:'collector.html'},
   report:{title:'Report Profile',src:'report-profile.html'}, about:{title:'About',src:'about.html'}, socials:{title:'Socials',src:'socials.html'},
   admin:{title:'Administration Hub',src:'admin-hub.html'}, 'admin-codes':{title:'Reward Code Console',src:'admin-codes.html'},
   'admin-staff':{title:'Staff Management',src:'admin-staff.html'}, 'admin-audit':{title:'Audit Log',src:'admin-audit.html'},
@@ -275,7 +275,7 @@ function navigate(route,{push=true,extra={}}={}){
     nativeView?.classList.remove('hidden');
     frameWrap?.classList.remove('active','is-loading','has-error');
     if(frame)setFrameLocation('about:blank');
-    document.title='Starlight Card Gallery | Starlight Card Binder';
+    document.title='Card Gallery | Starlight Card Binder';
     const series = extra?.series;
     if(series && window.applyStarlightSeriesFilter){
       window.applyStarlightSeriesFilter(series);

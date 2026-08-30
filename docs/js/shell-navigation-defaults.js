@@ -86,7 +86,8 @@ export const SHELL_LABEL_REWRITES = Object.freeze({
     'Star Bits Exchange'
   ]),
   events: Object.freeze([
-    'Starlight Events'
+    'Starlight Events',
+    '✨ Starlight Events'
   ]),
   trades: Object.freeze([
     'My Wishlist',
@@ -95,7 +96,8 @@ export const SHELL_LABEL_REWRITES = Object.freeze({
     'Trading',
     'Trading Hub',
     'Trade With Others',
-    'Trade Offers'
+    'Trade Offers',
+    '🤝 Trade With Others'
   ]),
   rankings: Object.freeze([
     'User Rankings'
@@ -111,7 +113,8 @@ export const SHELL_LABEL_REWRITES = Object.freeze({
     'LIVE Feed'
   ]),
   rewards: Object.freeze([
-    'Received Gifts'
+    'Received Gifts',
+    '🎁 Received Gifts'
   ])
 });
 
@@ -124,25 +127,25 @@ export function createDefaultShellNavigation() {
     chrome: {
       layout: 'hybrid'
     },
-    // Magical product names for page chrome; nav labels stay clear (see sidebar).
+    // Page chrome titles match clear navigation labels.
     pageTitles: {
       home: 'Home',
-      binder: 'Starlight Card Gallery',
-      collection: 'My Card Album Binder',
-      daily: 'Free Daily Booster',
-      shop: 'Card Boutique',
-      events: 'Starlight Events',
-      redeem: 'Redeem A Code',
-      'star-bits': 'Star Bits Exchange',
-      checklist: 'Star Registry',
-      quests: 'Starlight Missions',
-      'season-pass': 'Seasonal Collection Pass',
-      trades: 'Trade With Others',
-      offers: 'Trade With Others',
-      rankings: 'User Rankings',
+      binder: 'Card Gallery',
+      collection: 'My Collection',
+      daily: 'Daily Booster',
+      shop: 'Shop',
+      events: 'Events',
+      redeem: 'Redeem Code',
+      'star-bits': 'Star Bits',
+      checklist: 'Card Checklist',
+      quests: 'Missions',
+      'season-pass': 'Season Pass',
+      trades: 'Trade',
+      offers: 'Trade',
+      rankings: 'Rankings',
       feed: 'Activity Feed',
       notifications: 'Notifications',
-      rewards: 'Received Gifts',
+      rewards: 'Gifts',
       profile: 'Profile',
       about: 'About',
       socials: 'Socials',

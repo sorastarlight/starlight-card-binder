@@ -8,7 +8,7 @@ test('keeps the requested collection navigation labels in the shared shell', asy
   const binder = await read('docs/binder.html');
   const shell = await read('docs/js/app-shell.js');
 
-  assert.match(binder, /Starlight Card Gallery/);
+  assert.match(binder, /Card Gallery/);
   assert.match(binder, /shell-masthead/);
   const defaults = await read('docs/js/shell-navigation-defaults.js');
   assert.match(defaults, /label: 'Cards'/);
@@ -17,11 +17,11 @@ test('keeps the requested collection navigation labels in the shared shell', asy
   assert.doesNotMatch(defaults, /id: 'series'/);
   assert.match(defaults, /id: 'admin-hub'/);
   assert.match(defaults, /Redeem Code/);
-  assert.match(defaults, /My Card Album Binder/);
-  assert.match(defaults, /Star Registry/);
+  assert.match(defaults, /pageTitles:[\s\S]*collection: 'My Collection'/);
+  assert.match(defaults, /pageTitles:[\s\S]*checklist: 'Card Checklist'/);
 
-  assert.match(shell, /collection:\{title:'My Card Album Binder'/);
-  assert.match(shell, /binder:\{title:'Starlight Card Gallery'/);
+  assert.match(shell, /collection:\{title:'My Collection'/);
+  assert.match(shell, /binder:\{title:'Card Gallery'/);
 });
 
 test('gallery and album pages use rebuilt markup and render hooks', async () => {

@@ -47,12 +47,20 @@ test('default shell navigation includes core destinations and staff account link
   assert.ok(community.items.some(item => item.destination === 'feed' && item.label === 'Activity Feed'));
   assert.ok(account.items.some(item => item.destination === 'rewards' && item.label === 'Gifts'));
   assert.equal(account.mobileOnly, false);
+  assert.equal(nav.pageTitles.collection, 'My Collection');
+  assert.equal(nav.pageTitles.binder, 'Card Gallery');
+  assert.equal(nav.pageTitles.checklist, 'Card Checklist');
+  assert.equal(nav.pageTitles.shop, 'Shop');
+  assert.equal(nav.pageTitles.daily, 'Daily Booster');
+  assert.equal(nav.pageTitles.quests, 'Missions');
+  assert.equal(nav.pageTitles.trades, 'Trade');
+  assert.equal(nav.pageTitles.rewards, 'Gifts');
+  assert.equal(nav.pageTitles.rankings, 'Rankings');
+  assert.equal(nav.pageTitles['star-bits'], 'Star Bits');
+  assert.equal(nav.pageTitles['season-pass'], 'Season Pass');
+  assert.equal(nav.pageTitles.events, 'Events');
+  assert.equal(nav.pageTitles.redeem, 'Redeem Code');
   assert.equal(nav.pageTitles.feed, 'Activity Feed');
-  assert.equal(nav.pageTitles.collection, 'My Card Album Binder');
-  assert.equal(nav.pageTitles.binder, 'Starlight Card Gallery');
-  assert.equal(nav.pageTitles.checklist, 'Star Registry');
-  assert.equal(nav.pageTitles.shop, 'Card Boutique');
-  assert.equal(nav.pageTitles.daily, 'Free Daily Booster');
   assert.ok(nav.topBar.quickLinks.some(link => link.destination === 'events'));
   assert.ok(nav.accountMenu.signedIn.some(item => (item.features || []).includes('notificationBadge')));
   assert.ok(nav.accountMenu.signedIn.some(item => (item.features || []).includes('receivedGiftBadge')));
@@ -88,12 +96,12 @@ test('sanitizeShellNavigation overwrites legacy product labels with new defaults
       }]
     }
   });
-  assert.equal(renamed.pageTitles.collection, 'My Card Album Binder');
-  assert.equal(renamed.pageTitles.daily, 'Free Daily Booster');
-  assert.equal(renamed.pageTitles.shop, 'Card Boutique');
-  assert.equal(renamed.pageTitles.checklist, 'Star Registry');
-  assert.equal(renamed.pageTitles.quests, 'Starlight Missions');
-  assert.equal(renamed.pageTitles.trades, 'Trade With Others');
+  assert.equal(renamed.pageTitles.collection, 'My Collection');
+  assert.equal(renamed.pageTitles.daily, 'Daily Booster');
+  assert.equal(renamed.pageTitles.shop, 'Shop');
+  assert.equal(renamed.pageTitles.checklist, 'Card Checklist');
+  assert.equal(renamed.pageTitles.quests, 'Missions');
+  assert.equal(renamed.pageTitles.trades, 'Trade');
   assert.equal(renamed.pageTitles.profile, 'Profile');
   assert.equal(renamed.pageTitles.feed, 'Activity Feed');
   assert.equal(renamed.sidebar.sections[0].items[0].label, 'My Collection');
@@ -171,7 +179,7 @@ test('sanitizeShellNavigation injects User Rankings when remote nav omits it', (
   });
 
   assert.ok(merged.sidebar.sections[0].items.some(item => item.destination === 'rankings'));
-  assert.equal(merged.pageTitles.rankings, 'User Rankings');
+  assert.equal(merged.pageTitles.rankings, 'Rankings');
 });
 
 test('sanitizeShellNavigation rejects unknown destinations and merges empty remote', () => {

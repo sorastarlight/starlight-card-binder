@@ -372,7 +372,7 @@ test('website editor admin page and public hooks are wired', async () => {
   assert.match(loginPage, /loginCopy/);
   assert.match(loginPage, /getCachedWebsiteContent/);
   assert.match(loginPage, /starlight-website-content-hydrated/);
-  assert.match(binder, /Starlight Card Gallery/);
+  assert.match(binder, /Card Gallery/);
   assert.match(binder, /card-gallery-page/);
   assert.match(app, /function renderSeriesHero\(/);
   assert.match(daily, /data-content="daily\.title"/);

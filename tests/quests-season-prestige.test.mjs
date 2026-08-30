@@ -50,8 +50,8 @@ test('quests and season pass pages wire services and claim UI', async () => {
   assert.doesNotMatch(embed, /starlight-evolution/);
   assert.match(questsHtml, /collection-quests-page\.js/);
   assert.match(seasonHtml, /season-pass-page\.js/);
-  assert.match(shell, /quests:\{title:'Starlight Missions',src:'collection-quests\.html'\}/);
-  assert.match(shell, /'season-pass':\{title:'Seasonal Collection Pass',src:'season-pass\.html'\}/);
+  assert.match(shell, /quests:\{title:'Missions',src:'collection-quests\.html'\}/);
+  assert.match(shell, /'season-pass':\{title:'Season Pass',src:'season-pass\.html'\}/);
   assert.doesNotMatch(shell, /starlight-evolution/);
   assert.match(questsPage, /data-cadence-tab|activeCadence/);
   assert.match(questsHtml, /Daily Missions|data-cadence-tab="daily"/);
