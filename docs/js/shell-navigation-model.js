@@ -5,6 +5,7 @@ import {
   SHELL_LAYOUT_MODES
 } from './shell-navigation-defaults.js';
 import { isKnownShellRoute } from './shell-route-utils.js';
+import { isShellNavIconId, shellNavIconForKey } from './shell-nav-icons.js';
 
 const ALLOWED_DESTINATIONS = new Set(PUBLIC_SHELL_DESTINATIONS.map(entry => entry.value));
 const DEFAULT_DESTINATION_LABELS = Object.fromEntries(
@@ -32,7 +33,22 @@ function asIcon(icon) {
       path: icon.path ? String(icon.path) : ''
     };
   }
+  if (icon.type === 'svg' && icon.value) {
+    return {
+      type: 'svg',
+      value: String(icon.value).trim().slice(0, 40)
+    };
+  }
   return { type: 'emoji', value: String(icon.value || '').slice(0, 8) };
+}
+
+/** Prefer cohesive SVG icons over legacy emoji; keep custom uploads. */
+function upgradeShellIcon(icon, key) {
+  if (icon?.type === 'image' && icon.url) return icon;
+  if (icon?.type === 'svg' && isShellNavIconId(icon.value)) return icon;
+  const upgraded = shellNavIconForKey(key);
+  if (upgraded.type === 'svg') return upgraded;
+  return icon;
 }
 
 function sanitizeItem(item = {}, index = 0) {
@@ -193,6 +209,11 @@ function sanitizeSection(section = {}, index = 0) {
     items: consolidateTradingNavItems(items)
   };
   next.label = rewriteSectionLabel(next);
+  next.icon = upgradeShellIcon(next.icon, next.id);
+  next.items = next.items.map((item) => ({
+    ...item,
+    icon: upgradeShellIcon(item.icon, item.destination || item.id)
+  }));
   return next;
 }
 

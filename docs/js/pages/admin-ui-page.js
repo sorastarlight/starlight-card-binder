@@ -12,6 +12,7 @@ import {
 } from '../shell-navigation-defaults.js';
 import { uploadStudioAsset } from '../content-studio-service.js';
 import { buildShellStudioPreviewUrl, STUDIO_MSG } from '../studio-preview.js';
+import { renderShellNavIcon } from '../shell-nav-icons.js';
 
 const byId = (id) => document.getElementById(id);
 const esc = (value) =>
@@ -114,6 +115,9 @@ function iconPreviewHtml(icon) {
   if (icon?.type === 'image' && icon.url) {
     return `<span class="icon-preview"><img src="${esc(icon.url)}" alt=""></span>`;
   }
+  if (icon?.type === 'svg' && icon.value) {
+    return `<span class="icon-preview icon-preview-svg">${renderShellNavIcon(icon, esc)}</span>`;
+  }
   return `<span class="icon-preview">${esc(icon?.value || '·')}</span>`;
 }
 
@@ -126,19 +130,21 @@ function moveItem(list, index, delta) {
 
 function renderIconControls(icon, scopeAttrs) {
   const isImage = icon?.type === 'image' && icon.url;
+  const isSvg = icon?.type === 'svg' && icon.value;
+  const lockEmoji = isImage || isSvg;
   return `
     <div class="icon-row">
       ${iconPreviewHtml(icon)}
-      <input type="text" maxlength="8" value="${esc(isImage ? '' : (icon?.value || ''))}" data-field="iconEmoji" ${scopeAttrs} placeholder="Emoji" aria-label="Icon emoji" ${isImage ? 'disabled' : ''}>
+      <input type="text" maxlength="8" value="${esc(lockEmoji ? '' : (icon?.value || ''))}" data-field="iconEmoji" ${scopeAttrs} placeholder="Emoji" aria-label="Icon emoji" ${lockEmoji ? 'disabled' : ''}>
       <label class="btn small upload-label">Upload icon
         <input type="file" accept="image/png,image/webp,image/*" hidden data-action="upload-icon" ${scopeAttrs}>
       </label>
-      ${isImage ? `<button type="button" class="btn small" data-action="clear-icon" ${scopeAttrs}>Use emoji</button>` : ''}
+      ${lockEmoji ? `<button type="button" class="btn small" data-action="clear-icon" ${scopeAttrs}>Use emoji</button>` : ''}
     </div>
     <p class="icon-picker-label">Brand icons</p>
     ${brandPickerHtml(icon, scopeAttrs)}
     <p class="icon-picker-label">Emoji</p>
-    ${emojiPickerHtml(isImage ? '' : (icon?.value || ''), scopeAttrs)}
+    ${emojiPickerHtml(lockEmoji ? '' : (icon?.value || ''), scopeAttrs)}
   `;
 }
 

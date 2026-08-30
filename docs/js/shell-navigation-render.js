@@ -1,6 +1,7 @@
 import { mergeShellNavigation } from './shell-navigation-model.js';
 import { cloneDefaultShellNavigation } from './shell-navigation-defaults.js';
 import { loginShellHref, shellHref } from './shell-route-utils.js';
+import { renderShellNavIcon } from './shell-nav-icons.js';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
   '&': '&amp;',
@@ -11,6 +12,9 @@ const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
 }[char]));
 
 function renderIcon(icon, fallback = '') {
+  if (icon?.type === 'svg' && icon.value) {
+    return renderShellNavIcon(icon, esc);
+  }
   if (icon?.type === 'image' && icon.url) {
     const isStarBit = String(icon.url).includes('star-bit.');
     const cls = isStarBit ? 'shell-nav-icon-img star-bit-icon' : 'shell-nav-icon-img';
@@ -198,10 +202,10 @@ export function populateSeriesMegaMenus(groups = []) {
   const links = list.map((group) => {
     const key = group.series || group.seriesName || '';
     if (!key) return '';
-    return `<a class="shell-nav-item" data-shell-view="binder" data-series-key="${esc(key)}" href="${shellHref('binder', { series: key })}"><span class="shell-nav-icon" aria-hidden="true">✦</span> <span>${esc(group.seriesName || key)}</span></a>`;
+    return `<a class="shell-nav-item" data-shell-view="binder" data-series-key="${esc(key)}" href="${shellHref('binder', { series: key })}">${renderShellNavIcon('gallery', esc)} <span>${esc(group.seriesName || key)}</span></a>`;
   }).join('');
 
-  const allLink = `<a class="shell-nav-item shell-series-all" data-shell-view="binder" data-clear-series="1" href="${shellHref('binder', { series: 'All Series' })}"><span class="shell-nav-icon" aria-hidden="true">🃏</span> <span>All Series</span></a>`;
+  const allLink = `<a class="shell-nav-item shell-series-all" data-shell-view="binder" data-clear-series="1" href="${shellHref('binder', { series: 'All Series' })}">${renderShellNavIcon('cards', esc)} <span>All Series</span></a>`;
 
   document.querySelectorAll('[data-series-mega-panel]').forEach(panel => {
     panel.innerHTML = `${allLink}${links}`;

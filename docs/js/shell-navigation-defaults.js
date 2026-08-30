@@ -1,6 +1,7 @@
 /** Default shell chrome config (mirrors binder.html). */
 
 import { starBitNavIcon } from './star-bit-icon.js';
+import { shellNavIcon } from './shell-nav-icons.js';
 
 /** Clear, product-style destination labels for navigation chrome. */
 export const PUBLIC_SHELL_DESTINATIONS = Object.freeze([
@@ -152,64 +153,64 @@ export function createDefaultShellNavigation() {
         {
           id: 'home',
           label: '',
-          icon: { type: 'emoji', value: '🏠' },
+          icon: shellNavIcon('home'),
           staffOnly: false,
           mega: false,
           items: [
-            { id: 'home', label: 'Home', icon: { type: 'emoji', value: '🏠' }, destination: 'home', enabled: true, features: [] }
+            { id: 'home', label: 'Home', icon: shellNavIcon('home'), destination: 'home', enabled: true, features: [] }
           ]
         },
         {
           id: 'cards',
           label: 'Cards',
-          icon: { type: 'emoji', value: '🃏' },
+          icon: shellNavIcon('cards'),
           staffOnly: false,
           mega: true,
           items: [
-            { id: 'binder', label: 'Card Gallery', icon: { type: 'emoji', value: '🃏' }, destination: 'binder', enabled: true, features: ['clearSeries'] },
-            { id: 'checklist', label: 'Card Checklist', icon: { type: 'emoji', value: '📋' }, destination: 'checklist', enabled: true, features: [] }
+            { id: 'binder', label: 'Card Gallery', icon: shellNavIcon('gallery'), destination: 'binder', enabled: true, features: ['clearSeries'] },
+            { id: 'checklist', label: 'Card Checklist', icon: shellNavIcon('checklist'), destination: 'checklist', enabled: true, features: [] }
           ]
         },
         {
           id: 'collect',
           label: 'Collection',
-          icon: { type: 'emoji', value: '📖' },
+          icon: shellNavIcon('collection'),
           staffOnly: false,
           mega: true,
           items: [
-            { id: 'collection', label: 'My Collection', icon: { type: 'emoji', value: '📖' }, destination: 'collection', enabled: true, features: [] },
-            { id: 'daily', label: 'Daily Booster', icon: { type: 'emoji', value: '✨' }, destination: 'daily', enabled: true, features: ['dailyBadge'], className: 'shell-daily-link' },
-            { id: 'shop', label: 'Shop', icon: { type: 'emoji', value: '🛍️' }, destination: 'shop', enabled: true, features: [], className: 'shell-shop-link' },
+            { id: 'collection', label: 'My Collection', icon: shellNavIcon('collection'), destination: 'collection', enabled: true, features: [] },
+            { id: 'daily', label: 'Daily Booster', icon: shellNavIcon('daily'), destination: 'daily', enabled: true, features: ['dailyBadge'], className: 'shell-daily-link' },
+            { id: 'shop', label: 'Shop', icon: shellNavIcon('shop'), destination: 'shop', enabled: true, features: [], className: 'shell-shop-link' },
             { id: 'star-bits', label: 'Star Bits', icon: starBitNavIcon(), destination: 'star-bits', enabled: true, features: [] },
-            { id: 'quests', label: 'Missions', icon: { type: 'emoji', value: '🎯' }, destination: 'quests', enabled: true, features: [] },
-            { id: 'season-pass', label: 'Season Pass', icon: { type: 'emoji', value: '🎟️' }, destination: 'season-pass', enabled: true, features: [] },
-            { id: 'redeem', label: 'Redeem Code', icon: { type: 'emoji', value: '🎫' }, destination: 'redeem', enabled: true, features: [] }
+            { id: 'quests', label: 'Missions', icon: shellNavIcon('missions'), destination: 'quests', enabled: true, features: [] },
+            { id: 'season-pass', label: 'Season Pass', icon: shellNavIcon('season-pass'), destination: 'season-pass', enabled: true, features: [] },
+            { id: 'redeem', label: 'Redeem Code', icon: shellNavIcon('redeem'), destination: 'redeem', enabled: true, features: [] }
           ]
         },
         {
           id: 'community',
           label: 'Community',
-          icon: { type: 'emoji', value: '🤝' },
+          icon: shellNavIcon('community'),
           staffOnly: false,
           mega: true,
           items: [
-            { id: 'events', label: 'Events', icon: { type: 'emoji', value: '🎉' }, destination: 'events', enabled: true, features: [] },
-            { id: 'trades', label: 'Trade', icon: { type: 'emoji', value: '🤝' }, destination: 'trades', enabled: true, features: ['tradeOfferBadge'] },
-            { id: 'rankings', label: 'Rankings', icon: { type: 'emoji', value: '🏆' }, destination: 'rankings', enabled: true, features: [] },
-            { id: 'feed', label: 'Activity Feed', icon: { type: 'emoji', value: '📰' }, destination: 'feed', enabled: true, features: [] }
+            { id: 'events', label: 'Events', icon: shellNavIcon('events'), destination: 'events', enabled: true, features: [] },
+            { id: 'trades', label: 'Trade', icon: shellNavIcon('trade'), destination: 'trades', enabled: true, features: ['tradeOfferBadge'] },
+            { id: 'rankings', label: 'Rankings', icon: shellNavIcon('rankings'), destination: 'rankings', enabled: true, features: [] },
+            { id: 'feed', label: 'Activity Feed', icon: shellNavIcon('feed'), destination: 'feed', enabled: true, features: [] }
           ]
         },
         {
           id: 'account',
           label: 'Account',
-          icon: { type: 'emoji', value: '👤' },
+          icon: shellNavIcon('account'),
           staffOnly: false,
           mega: false,
           mobileOnly: false,
           items: [
-            { id: 'profile', label: 'Profile', icon: { type: 'emoji', value: '👤' }, destination: 'profile', enabled: true, features: [] },
-            { id: 'notifications', label: 'Notifications', icon: { type: 'emoji', value: '🔔' }, destination: 'notifications', enabled: true, features: ['notificationBadge'] },
-            { id: 'rewards', label: 'Gifts', icon: { type: 'emoji', value: '🎁' }, destination: 'rewards', enabled: true, features: ['receivedGiftBadge'] }
+            { id: 'profile', label: 'Profile', icon: shellNavIcon('profile'), destination: 'profile', enabled: true, features: [] },
+            { id: 'notifications', label: 'Notifications', icon: shellNavIcon('notifications'), destination: 'notifications', enabled: true, features: ['notificationBadge'] },
+            { id: 'rewards', label: 'Gifts', icon: shellNavIcon('gifts'), destination: 'rewards', enabled: true, features: ['receivedGiftBadge'] }
           ]
         }
       ]

@@ -15,6 +15,40 @@
 .unified-nav .staff-link{display:none}.unified-nav .staff-link.visible{display:flex}
 .shell-nav-icon-img{width:20px;height:20px;object-fit:contain;flex:none;border-radius:4px;vertical-align:middle}
 .shell-nav-label .shell-nav-icon-img{width:16px;height:16px}
+.shell-nav-svg{
+  flex:none;
+  width:20px;
+  height:20px;
+  display:block;
+  stroke:currentColor;
+  fill:none;
+  stroke-width:1.75;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  color:#5b7ab8;
+  opacity:.92;
+}
+.shell-nav-label .shell-nav-svg{
+  width:15px;
+  height:15px;
+  color:#8a93aa;
+  opacity:.85;
+}
+.unified-nav a:hover .shell-nav-svg,
+.unified-nav a:focus-visible .shell-nav-svg{
+  color:#ff79bd;
+  opacity:1;
+}
+.unified-nav a.active .shell-nav-svg{
+  color:#e45fa8;
+  opacity:1;
+  filter:drop-shadow(0 0 6px rgba(255,130,200,.35));
+}
+.unified-nav a.shell-daily-link .shell-nav-svg{color:#d4a017}
+.unified-nav a.shell-shop-link .shell-nav-svg{color:#6b9adf}
+.unified-nav a[data-shell-view="trades"] .shell-nav-svg{color:#8b74c9}
+.unified-nav a[data-shell-view="star-bits"] .shell-nav-icon-img{filter:drop-shadow(0 1px 2px rgba(255,130,200,.25))}
+.shell-nav-icon{flex:none;font-size:1.05rem;line-height:1;width:1.25em;text-align:center}
 .shell-account-bar{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:14px;padding:13px 17px;border:1px solid rgba(107,198,248,.36);border-radius:17px;background:rgba(255,255,255,.93);box-shadow:0 9px 24px rgba(61,83,132,.09)}
 .shell-account-main{min-width:0}.shell-account-main strong{display:block;color:#405fa1;font-size:1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.shell-account-main span{color:var(--shell-muted);font-size:.86rem}
 .shell-account-stats{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}.shell-stat{display:inline-flex;gap:5px;align-items:center;padding:7px 10px;border-radius:999px;background:linear-gradient(135deg,rgba(254,211,52,.18),rgba(255,130,200,.14));color:#765600;font-weight:850;font-size:.86rem}.shell-avatar{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--shell-blue),var(--shell-pink));color:#fff;font-weight:950;box-shadow:0 7px 18px rgba(255,130,200,.25)}
