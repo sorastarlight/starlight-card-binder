@@ -11,11 +11,12 @@ test('keeps the requested collection navigation labels in the shared shell', asy
   assert.match(binder, /Starlight Card Gallery/);
   assert.match(binder, /shell-masthead/);
   const defaults = await read('docs/js/shell-navigation-defaults.js');
-  assert.match(defaults, /label: 'Starlight Cards Gallery'/);
+  assert.match(defaults, /label: 'Cards'/);
+  assert.match(defaults, /label: 'Card Gallery'/);
   assert.match(defaults, /label: 'My Collection'/);
   assert.doesNotMatch(defaults, /id: 'series'/);
   assert.match(defaults, /id: 'admin-hub'/);
-  assert.match(defaults, /Redeem A Code/);
+  assert.match(defaults, /Redeem Code/);
   assert.match(defaults, /My Card Album Binder/);
   assert.match(defaults, /Star Registry/);
 

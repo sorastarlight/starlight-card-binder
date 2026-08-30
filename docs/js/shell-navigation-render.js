@@ -101,7 +101,12 @@ function renderDrawerSection(section) {
   const itemsHtml = (section.items || []).map(renderNavLink).join('');
   if (!itemsHtml.trim()) return '';
   const staffClass = section.staffOnly ? ' shell-nav-staff' : '';
-  return `<div class="shell-nav-section${staffClass}" data-nav-section="${esc(section.id)}"><p class="shell-nav-label">${renderIcon(section.icon)} ${esc(section.label)}</p>${itemsHtml}</div>`;
+  const label = String(section.label || '').trim();
+  const labelHtml = label
+    ? `<p class="shell-nav-label">${renderIcon(section.icon)} ${esc(label)}</p>`
+    : '';
+  const bareClass = label ? '' : ' is-bare';
+  return `<div class="shell-nav-section${staffClass}${bareClass}" data-nav-section="${esc(section.id)}">${labelHtml}${itemsHtml}</div>`;
 }
 
 export function resolveShellLayout(navigation) {

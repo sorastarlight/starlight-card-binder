@@ -2,24 +2,25 @@
 
 import { starBitNavIcon } from './star-bit-icon.js';
 
+/** Clear, product-style destination labels for navigation chrome. */
 export const PUBLIC_SHELL_DESTINATIONS = Object.freeze([
   { value: 'home', label: 'Home' },
-  { value: 'binder', label: 'Card Binder' },
-  { value: 'daily', label: 'Free Daily Booster' },
-  { value: 'shop', label: 'Card Boutique' },
-  { value: 'events', label: 'Starlight Events' },
-  { value: 'redeem', label: 'Redeem A Code' },
-  { value: 'collection', label: 'My Card Album Binder' },
-  { value: 'star-bits', label: 'My Star Bits' },
-  { value: 'checklist', label: 'Star Registry' },
-  { value: 'quests', label: 'Starlight Missions' },
-  { value: 'season-pass', label: 'Seasonal Collection Pass' },
-  { value: 'trades', label: 'Trade With Others' },
-  { value: 'offers', label: 'Trade With Others' },
-  { value: 'rankings', label: 'User Rankings' },
-  { value: 'feed', label: 'LIVE Feed' },
+  { value: 'binder', label: 'Card Gallery' },
+  { value: 'daily', label: 'Daily Booster' },
+  { value: 'shop', label: 'Shop' },
+  { value: 'events', label: 'Events' },
+  { value: 'redeem', label: 'Redeem Code' },
+  { value: 'collection', label: 'My Collection' },
+  { value: 'star-bits', label: 'Star Bits' },
+  { value: 'checklist', label: 'Card Checklist' },
+  { value: 'quests', label: 'Missions' },
+  { value: 'season-pass', label: 'Season Pass' },
+  { value: 'trades', label: 'Trade' },
+  { value: 'offers', label: 'Trade' },
+  { value: 'rankings', label: 'Rankings' },
+  { value: 'feed', label: 'Activity Feed' },
   { value: 'notifications', label: 'Notifications' },
-  { value: 'rewards', label: 'Received Gifts' },
+  { value: 'rewards', label: 'Gifts' },
   { value: 'profile', label: 'Profile' },
   { value: 'about', label: 'About' },
   { value: 'socials', label: 'Socials' },
@@ -29,47 +30,74 @@ export const PUBLIC_SHELL_DESTINATIONS = Object.freeze([
 export const COMMON_NAV_EMOJIS = Object.freeze([
   '✦', '♡', '🏠', '🗂️', '✨', '🛍️', '🎉', '🎟️', '☑', '🤝', '💫', '🔔', '🎁', '👤', '🛠️',
   '⭐', '🌟', '💎', '🎴', '📦', '🛒', '📰', '🎮', '📺', '🔗', '⚙️', '📋', '🧭', '🌈', '💜',
-  '𝕏', '▶️'
+  '𝕏', '▶️', '🃏', '📖', '🎯', '🏆', '🎫'
 ]);
 
 /** Brand mark presets for navigation (Twitch, YouTube, X). */
 export { BRAND_ICONS, BRAND_ICON_IDS, brandIconToken } from './brand-icons.js';
 
-/** Old default labels → new product names (overwrite saved studio defaults). */
+/**
+ * Old / branded nav labels → rewrite to current PUBLIC_SHELL_DESTINATIONS labels.
+ * Page titles use a separate magical default and prefer that fallback when matched.
+ */
 export const SHELL_LABEL_REWRITES = Object.freeze({
   daily: Object.freeze([
     'Daily Wish',
     'Free Daily Booster',
-    'Daily Booster',
+    'Daily Free Booster',
     'Daily Free Booster Pack'
   ]),
   shop: Object.freeze([
     'Starlight Card Shop',
-    'Card Shop'
+    'Card Shop',
+    'Card Boutique'
   ]),
   collection: Object.freeze([
     'My Starlight Album',
     'My Card Collection & Favorites',
     'My Card Collection',
-    'My Collection'
+    'My Card Album Binder'
   ]),
   binder: Object.freeze([
     'The Starlight Card Series Binder',
-    'Starlight Card Series Binder'
+    'Starlight Card Series Binder',
+    'Starlight Card Gallery',
+    'Starlight Cards Gallery',
+    'Card Binder'
   ]),
   checklist: Object.freeze([
     'My Checklist',
-    'Checklist'
+    'Checklist',
+    'Star Registry'
   ]),
   quests: Object.freeze([
-    'Collection Quests'
+    'Collection Quests',
+    'Starlight Missions'
+  ]),
+  'season-pass': Object.freeze([
+    'Seasonal Collection Pass'
+  ]),
+  redeem: Object.freeze([
+    'Redeem A Code'
+  ]),
+  'star-bits': Object.freeze([
+    'My Star Bits',
+    'Star Bits Exchange'
+  ]),
+  events: Object.freeze([
+    'Starlight Events'
   ]),
   trades: Object.freeze([
     'My Wishlist',
     'Card Exchange',
     'Wishlist & Trades',
     'Trading',
-    'Trading Hub'
+    'Trading Hub',
+    'Trade With Others',
+    'Trade Offers'
+  ]),
+  rankings: Object.freeze([
+    'User Rankings'
   ]),
   profile: Object.freeze([
     'Profile & Settings',
@@ -78,7 +106,11 @@ export const SHELL_LABEL_REWRITES = Object.freeze({
     'Journal'
   ]),
   feed: Object.freeze([
-    'Pull Feed'
+    'Pull Feed',
+    'LIVE Feed'
+  ]),
+  rewards: Object.freeze([
+    'Received Gifts'
   ])
 });
 
@@ -91,11 +123,12 @@ export function createDefaultShellNavigation() {
     chrome: {
       layout: 'hybrid'
     },
+    // Magical product names for page chrome; nav labels stay clear (see sidebar).
     pageTitles: {
       home: 'Home',
       binder: 'Starlight Card Gallery',
       collection: 'My Card Album Binder',
-      daily: 'Daily Free Booster Pack',
+      daily: 'Free Daily Booster',
       shop: 'Card Boutique',
       events: 'Starlight Events',
       redeem: 'Redeem A Code',
@@ -106,7 +139,7 @@ export function createDefaultShellNavigation() {
       trades: 'Trade With Others',
       offers: 'Trade With Others',
       rankings: 'User Rankings',
-      feed: 'LIVE Feed',
+      feed: 'Activity Feed',
       notifications: 'Notifications',
       rewards: 'Received Gifts',
       profile: 'Profile',
@@ -117,30 +150,40 @@ export function createDefaultShellNavigation() {
     sidebar: {
       sections: [
         {
+          id: 'home',
+          label: '',
+          icon: { type: 'emoji', value: '🏠' },
+          staffOnly: false,
+          mega: false,
+          items: [
+            { id: 'home', label: 'Home', icon: { type: 'emoji', value: '🏠' }, destination: 'home', enabled: true, features: [] }
+          ]
+        },
+        {
           id: 'cards',
-          label: 'Starlight Cards Gallery',
+          label: 'Cards',
           icon: { type: 'emoji', value: '🃏' },
           staffOnly: false,
           mega: true,
           items: [
-            { id: 'binder', label: 'Starlight Card Gallery', icon: { type: 'emoji', value: '🃏' }, destination: 'binder', enabled: true, features: ['clearSeries'] },
-            { id: 'checklist', label: 'Star Registry', icon: { type: 'emoji', value: '☑' }, destination: 'checklist', enabled: true, features: [] }
+            { id: 'binder', label: 'Card Gallery', icon: { type: 'emoji', value: '🃏' }, destination: 'binder', enabled: true, features: ['clearSeries'] },
+            { id: 'checklist', label: 'Card Checklist', icon: { type: 'emoji', value: '📋' }, destination: 'checklist', enabled: true, features: [] }
           ]
         },
         {
           id: 'collect',
-          label: 'My Collection',
-          icon: { type: 'emoji', value: '♡' },
+          label: 'Collection',
+          icon: { type: 'emoji', value: '📖' },
           staffOnly: false,
           mega: true,
           items: [
-            { id: 'collection', label: 'My Card Album Binder', icon: { type: 'emoji', value: '📒' }, destination: 'collection', enabled: true, features: [] },
-            { id: 'daily', label: 'Free Daily Booster', icon: { type: 'emoji', value: '✨' }, destination: 'daily', enabled: true, features: ['dailyBadge'], className: 'shell-daily-link' },
-            { id: 'shop', label: 'Card Boutique', icon: { type: 'emoji', value: '🛍️' }, destination: 'shop', enabled: true, features: [], className: 'shell-shop-link' },
-            { id: 'star-bits', label: 'My Star Bits', icon: starBitNavIcon(), destination: 'star-bits', enabled: true, features: [] },
-            { id: 'quests', label: 'Starlight Missions', icon: { type: 'emoji', value: '🧭' }, destination: 'quests', enabled: true, features: [] },
-            { id: 'season-pass', label: 'Seasonal Collection Pass', icon: { type: 'emoji', value: '🌌' }, destination: 'season-pass', enabled: true, features: [] },
-            { id: 'redeem', label: 'Redeem A Code', icon: { type: 'emoji', value: '🎟️' }, destination: 'redeem', enabled: true, features: [] }
+            { id: 'collection', label: 'My Collection', icon: { type: 'emoji', value: '📖' }, destination: 'collection', enabled: true, features: [] },
+            { id: 'daily', label: 'Daily Booster', icon: { type: 'emoji', value: '✨' }, destination: 'daily', enabled: true, features: ['dailyBadge'], className: 'shell-daily-link' },
+            { id: 'shop', label: 'Shop', icon: { type: 'emoji', value: '🛍️' }, destination: 'shop', enabled: true, features: [], className: 'shell-shop-link' },
+            { id: 'star-bits', label: 'Star Bits', icon: starBitNavIcon(), destination: 'star-bits', enabled: true, features: [] },
+            { id: 'quests', label: 'Missions', icon: { type: 'emoji', value: '🎯' }, destination: 'quests', enabled: true, features: [] },
+            { id: 'season-pass', label: 'Season Pass', icon: { type: 'emoji', value: '🎟️' }, destination: 'season-pass', enabled: true, features: [] },
+            { id: 'redeem', label: 'Redeem Code', icon: { type: 'emoji', value: '🎫' }, destination: 'redeem', enabled: true, features: [] }
           ]
         },
         {
@@ -150,24 +193,23 @@ export function createDefaultShellNavigation() {
           staffOnly: false,
           mega: true,
           items: [
-            { id: 'events', label: 'Starlight Events', icon: { type: 'emoji', value: '🎉' }, destination: 'events', enabled: true, features: [] },
-            { id: 'trades', label: 'Trade With Others', icon: { type: 'emoji', value: '🤝' }, destination: 'trades', enabled: true, features: ['tradeOfferBadge'] },
-            { id: 'rankings', label: 'User Rankings', icon: { type: 'emoji', value: '🏆' }, destination: 'rankings', enabled: true, features: [] },
-            { id: 'feed', label: 'LIVE Feed', icon: { type: 'emoji', value: '📡' }, destination: 'feed', enabled: true, features: [] }
+            { id: 'events', label: 'Events', icon: { type: 'emoji', value: '🎉' }, destination: 'events', enabled: true, features: [] },
+            { id: 'trades', label: 'Trade', icon: { type: 'emoji', value: '🤝' }, destination: 'trades', enabled: true, features: ['tradeOfferBadge'] },
+            { id: 'rankings', label: 'Rankings', icon: { type: 'emoji', value: '🏆' }, destination: 'rankings', enabled: true, features: [] },
+            { id: 'feed', label: 'Activity Feed', icon: { type: 'emoji', value: '📰' }, destination: 'feed', enabled: true, features: [] }
           ]
         },
         {
           id: 'account',
           label: 'Account',
-          icon: { type: 'emoji', value: '' },
+          icon: { type: 'emoji', value: '👤' },
           staffOnly: false,
           mega: false,
-          mobileOnly: true,
+          mobileOnly: false,
           items: [
-            { id: 'home', label: 'Home', icon: { type: 'emoji', value: '🏠' }, destination: 'home', enabled: true, features: [] },
+            { id: 'profile', label: 'Profile', icon: { type: 'emoji', value: '👤' }, destination: 'profile', enabled: true, features: [] },
             { id: 'notifications', label: 'Notifications', icon: { type: 'emoji', value: '🔔' }, destination: 'notifications', enabled: true, features: ['notificationBadge'] },
-            { id: 'rewards', label: 'Received Gifts', icon: { type: 'emoji', value: '🎁' }, destination: 'rewards', enabled: true, features: ['receivedGiftBadge'] },
-            { id: 'profile', label: 'Profile', icon: { type: 'emoji', value: '👤' }, destination: 'profile', enabled: true, features: [] }
+            { id: 'rewards', label: 'Gifts', icon: { type: 'emoji', value: '🎁' }, destination: 'rewards', enabled: true, features: ['receivedGiftBadge'] }
           ]
         }
       ]
@@ -175,17 +217,17 @@ export function createDefaultShellNavigation() {
     topBar: {
       quickLinks: [
         { id: 'events-top', label: 'Events', destination: 'events', enabled: true },
-        { id: 'trades-top', label: 'Trades', destination: 'trades', enabled: true }
+        { id: 'trades-top', label: 'Trade', destination: 'trades', enabled: true }
       ]
     },
     accountMenu: {
       signedIn: [
         { id: 'view-profile', label: 'View My Profile', destination: 'collector', enabled: true, features: ['profileLink'] },
         { id: 'profile-settings', label: 'Profile', destination: 'profile', enabled: true, features: [] },
-        { id: 'notifications', label: 'View My Notifications', destination: 'notifications', enabled: true, features: ['notificationBadge'] },
-        { id: 'rewards', label: 'Received Gifts', destination: 'rewards', enabled: true, features: ['receivedGiftBadge'] },
-        { id: 'trades', label: 'Trade With Others', destination: 'trades', enabled: true, features: ['tradeOfferBadge'] },
-        { id: 'redeem', label: 'Redeem A Code', destination: 'redeem', enabled: true, features: [] },
+        { id: 'notifications', label: 'Notifications', destination: 'notifications', enabled: true, features: ['notificationBadge'] },
+        { id: 'rewards', label: 'Gifts', destination: 'rewards', enabled: true, features: ['receivedGiftBadge'] },
+        { id: 'trades', label: 'Trade', destination: 'trades', enabled: true, features: ['tradeOfferBadge'] },
+        { id: 'redeem', label: 'Redeem Code', destination: 'redeem', enabled: true, features: [] },
         { id: 'admin-hub', label: 'Administration Hub', destination: 'admin', enabled: true, features: ['staffOnly'] },
         { id: 'sep-1', label: '', destination: '', enabled: true, features: ['separator'] },
         { id: 'sign-out', label: 'Sign Out', destination: '', enabled: true, features: ['signOut'] }

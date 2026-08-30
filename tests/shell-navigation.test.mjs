@@ -10,35 +10,49 @@ const read = relativePath => readFile(new URL(`../${relativePath}`, import.meta.
 test('default shell navigation includes core destinations and staff account link', () => {
   const nav = cloneDefaultShellNavigation();
   const ids = nav.sidebar.sections.map(section => section.id);
-  assert.deepEqual(ids.slice(0, 3), ['cards', 'collect', 'community']);
-  assert.equal(nav.sidebar.sections[0].label, 'Starlight Cards Gallery');
-  assert.equal(nav.sidebar.sections[1].label, 'My Collection');
+  assert.deepEqual(ids, ['home', 'cards', 'collect', 'community', 'account']);
+  assert.equal(nav.sidebar.sections[0].label, '');
+  assert.equal(nav.sidebar.sections[1].label, 'Cards');
+  assert.equal(nav.sidebar.sections[2].label, 'Collection');
   assert.ok(!nav.sidebar.sections.some(section => section.id === 'series'));
   assert.ok(!nav.sidebar.sections.some(section => section.staffOnly));
   assert.ok(nav.accountMenu.signedIn.some(item =>
     item.destination === 'admin' && (item.features || []).includes('staffOnly')
   ));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'offers'));
-  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'feed' && entry.label === 'LIVE Feed'));
-  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'collection' && entry.label === 'My Card Album Binder'));
-  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'daily' && entry.label === 'Free Daily Booster'));
-  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'shop' && entry.label === 'Card Boutique'));
+  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'feed' && entry.label === 'Activity Feed'));
+  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'collection' && entry.label === 'My Collection'));
+  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'daily' && entry.label === 'Daily Booster'));
+  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'shop' && entry.label === 'Shop'));
   assert.equal(nav.brandRibbon, 'Starlight Cards');
   assert.equal(nav.chrome?.layout, 'hybrid');
-  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'checklist' && entry.label === 'Star Registry'));
-  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'quests' && entry.label === 'Starlight Missions'));
-  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'trades' && entry.label === 'Trade With Others'));
+  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'checklist' && entry.label === 'Card Checklist'));
+  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'quests' && entry.label === 'Missions'));
+  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'trades' && entry.label === 'Trade'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'profile' && entry.label === 'Profile'));
+  const home = nav.sidebar.sections.find(section => section.id === 'home');
+  const cards = nav.sidebar.sections.find(section => section.id === 'cards');
   const collect = nav.sidebar.sections.find(section => section.id === 'collect');
   const community = nav.sidebar.sections.find(section => section.id === 'community');
-  assert.ok(community.items.some(item => item.destination === 'trades' && item.label === 'Trade With Others'));
-  assert.ok(community.items.some(item => item.destination === 'rankings' && item.label === 'User Rankings'));
-  assert.ok(community.items.some(item => item.destination === 'feed' && item.label === 'LIVE Feed'));
-  assert.ok(collect.items.some(item => item.destination === 'quests' && item.label === 'Starlight Missions'));
-  assert.equal(nav.pageTitles.feed, 'LIVE Feed');
+  const account = nav.sidebar.sections.find(section => section.id === 'account');
+  assert.ok(home.items.some(item => item.destination === 'home' && item.label === 'Home'));
+  assert.ok(cards.items.some(item => item.destination === 'binder' && item.label === 'Card Gallery'));
+  assert.ok(cards.items.some(item => item.destination === 'checklist' && item.label === 'Card Checklist'));
+  assert.ok(collect.items.some(item => item.destination === 'collection' && item.label === 'My Collection'));
+  assert.ok(collect.items.some(item => item.destination === 'daily' && item.label === 'Daily Booster'));
+  assert.ok(collect.items.some(item => item.destination === 'shop' && item.label === 'Shop'));
+  assert.ok(collect.items.some(item => item.destination === 'quests' && item.label === 'Missions'));
+  assert.ok(community.items.some(item => item.destination === 'trades' && item.label === 'Trade'));
+  assert.ok(community.items.some(item => item.destination === 'rankings' && item.label === 'Rankings'));
+  assert.ok(community.items.some(item => item.destination === 'feed' && item.label === 'Activity Feed'));
+  assert.ok(account.items.some(item => item.destination === 'rewards' && item.label === 'Gifts'));
+  assert.equal(account.mobileOnly, false);
+  assert.equal(nav.pageTitles.feed, 'Activity Feed');
   assert.equal(nav.pageTitles.collection, 'My Card Album Binder');
   assert.equal(nav.pageTitles.binder, 'Starlight Card Gallery');
-  assert.equal(nav.pageTitles.daily, 'Daily Free Booster Pack');
+  assert.equal(nav.pageTitles.checklist, 'Star Registry');
+  assert.equal(nav.pageTitles.shop, 'Card Boutique');
+  assert.equal(nav.pageTitles.daily, 'Free Daily Booster');
   assert.ok(nav.topBar.quickLinks.some(link => link.destination === 'events'));
   assert.ok(nav.accountMenu.signedIn.some(item => (item.features || []).includes('notificationBadge')));
   assert.ok(nav.accountMenu.signedIn.some(item => (item.features || []).includes('receivedGiftBadge')));
@@ -81,10 +95,10 @@ test('sanitizeShellNavigation overwrites legacy product labels with new defaults
   assert.equal(renamed.pageTitles.quests, 'Starlight Missions');
   assert.equal(renamed.pageTitles.trades, 'Trade With Others');
   assert.equal(renamed.pageTitles.profile, 'Profile');
-  assert.equal(renamed.pageTitles.feed, 'LIVE Feed');
-  assert.equal(renamed.sidebar.sections[0].items[0].label, 'My Card Album Binder');
-  assert.equal(renamed.sidebar.sections[0].items[1].label, 'Free Daily Booster');
-  assert.equal(renamed.sidebar.sections[0].items[2].label, 'LIVE Feed');
+  assert.equal(renamed.pageTitles.feed, 'Activity Feed');
+  assert.equal(renamed.sidebar.sections[0].items[0].label, 'My Collection');
+  assert.equal(renamed.sidebar.sections[0].items[1].label, 'Daily Booster');
+  assert.equal(renamed.sidebar.sections[0].items[2].label, 'Activity Feed');
 });
 
 test('sanitizeShellNavigation rewrites Journal profile labels to Profile', () => {
@@ -136,8 +150,8 @@ test('sanitizeShellNavigation merges duplicate trading hub sidebar links but kee
   const rankingItems = merged.sidebar.sections[0].items.filter(item => item.destination === 'rankings');
   assert.equal(tradingItems.length, 1);
   assert.equal(rankingItems.length, 1);
-  assert.equal(tradingItems[0].label, 'Trade With Others');
-  assert.equal(rankingItems[0].label, 'User Rankings');
+  assert.equal(tradingItems[0].label, 'Trade');
+  assert.equal(rankingItems[0].label, 'Rankings');
   assert.ok(tradingItems[0].features.includes('tradeOfferBadge'));
   assert.ok(!merged.sidebar.sections[0].items.some(item => item.destination === 'offers'));
 });
@@ -179,8 +193,8 @@ test('sanitizeShellNavigation rejects unknown destinations and merges empty remo
       }]
     }
   });
-  assert.equal(renamed.pageTitles.feed, 'LIVE Feed');
-  assert.equal(renamed.sidebar.sections[0].items[0].label, 'LIVE Feed');
+  assert.equal(renamed.pageTitles.feed, 'Activity Feed');
+  assert.equal(renamed.sidebar.sections[0].items[0].label, 'Activity Feed');
   assert.throws(() => sanitizeShellNavigation({
     ...cloneDefaultShellNavigation(),
     topBar: { quickLinks: [{ id: 'x', label: 'Bad', destination: 'not-real', enabled: true }] }
@@ -327,7 +341,11 @@ test('sanitizeShellNavigation strips Series/Admin sidebar and keeps Admin Hub in
   });
   assert.ok(!cleaned.sidebar.sections.some(section => section.id === 'series'));
   assert.ok(!cleaned.sidebar.sections.some(section => section.id === 'admin'));
-  assert.equal(cleaned.sidebar.sections.find(section => section.id === 'cards')?.label, 'Starlight Cards Gallery');
+  assert.equal(cleaned.sidebar.sections.find(section => section.id === 'cards')?.label, 'Cards');
+  assert.equal(
+    cleaned.sidebar.sections.find(section => section.id === 'cards')?.items?.[0]?.label,
+    'Card Gallery'
+  );
   assert.ok(cleaned.accountMenu.signedIn.some(item =>
     item.destination === 'admin' && (item.features || []).includes('staffOnly')
   ));
@@ -358,6 +376,7 @@ test('shell navigation render applies hybrid layout classes', async () => {
     read('docs/js/shell-navigation-render.js'),
     read('docs/css/app-shell.css')
   ]);
+  assert.match(render, /is-bare/);
   assert.match(render, /applyShellLayoutToDom/);
   assert.match(render, /querySelectorAll\('\.binder-ribbon'\)/);
   assert.match(render, /shell-hybrid-layout/);

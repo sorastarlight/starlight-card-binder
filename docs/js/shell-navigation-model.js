@@ -11,14 +11,16 @@ const DEFAULT_DESTINATION_LABELS = Object.fromEntries(
   PUBLIC_SHELL_DESTINATIONS.map(entry => [entry.value, entry.label])
 );
 
-function rewriteLegacyLabel(destination, label, fallback) {
+function rewriteLegacyLabel(destination, label, fallback, { preferFallback = false } = {}) {
   const current = String(label || '').trim();
   if (!current) return fallback;
-  if (/^the community$|^community(\s+hub)?$/i.test(current)) return 'COMMUNITY HUB';
+  if (/^the community$|^community(\s+hub)?$/i.test(current)) return 'Community';
   const legacy = SHELL_LABEL_REWRITES[destination];
   if (!legacy?.length) return current;
   const matched = legacy.some(entry => entry.toLowerCase() === current.toLowerCase());
-  return matched ? (DEFAULT_DESTINATION_LABELS[destination] || fallback || current) : current;
+  if (!matched) return current;
+  if (preferFallback) return fallback || DEFAULT_DESTINATION_LABELS[destination] || current;
+  return DEFAULT_DESTINATION_LABELS[destination] || fallback || current;
 }
 
 function asIcon(icon) {
@@ -120,7 +122,7 @@ function consolidateTradingNavItems(items = []) {
       tradingHubItem = {
         ...item,
         destination: 'trades',
-        label: DEFAULT_DESTINATION_LABELS.trades || 'Trade With Others',
+        label: DEFAULT_DESTINATION_LABELS.trades || 'Trade',
         features: [...features]
       };
       result.push(tradingHubItem);
@@ -171,8 +173,11 @@ function ensureDefaultSidebarItems(sections, defaults) {
 function rewriteSectionLabel(section) {
   const id = String(section.id || '');
   const label = String(section.label || '').trim();
-  if (id === 'cards' && /^cards$/i.test(label)) return 'Starlight Cards Gallery';
-  if (id === 'collect' && /^collect$/i.test(label)) return 'My Collection';
+  if (id === 'home') return '';
+  if (id === 'cards' && /^(cards|starlight cards gallery)$/i.test(label)) return 'Cards';
+  if (id === 'collect' && /^(collect|my collection)$/i.test(label)) return 'Collection';
+  if (id === 'community' && /^(community|community hub)$/i.test(label)) return 'Community';
+  if (id === 'account' && /^account$/i.test(label)) return 'Account';
   return label || section.label;
 }
 
@@ -199,7 +204,9 @@ export function sanitizeShellNavigation(input) {
     for (const [key, value] of Object.entries(source.pageTitles)) {
       if (!isKnownShellRoute(key)) continue;
       const next = String(value || '').trim().slice(0, 80) || defaults.pageTitles[key] || key;
-      pageTitles[key] = rewriteLegacyLabel(key, next, defaults.pageTitles[key] || key);
+      pageTitles[key] = rewriteLegacyLabel(key, next, defaults.pageTitles[key] || key, {
+        preferFallback: true
+      });
     }
   }
 
@@ -232,9 +239,11 @@ export function sanitizeShellNavigation(input) {
     if (!pageTitles[key]) pageTitles[key] = defaults.pageTitles[key];
   }
 
-  // Overwrite legacy product labels with the current defaults.
+  // Nav chrome uses clear destination labels; page titles keep magical defaults.
   for (const key of Object.keys(pageTitles)) {
-    pageTitles[key] = rewriteLegacyLabel(key, pageTitles[key], defaults.pageTitles[key] || key);
+    pageTitles[key] = rewriteLegacyLabel(key, pageTitles[key], defaults.pageTitles[key] || key, {
+      preferFallback: true
+    });
   }
   for (const section of sections) {
     for (const item of section.items || []) {
