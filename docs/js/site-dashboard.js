@@ -35,7 +35,7 @@ async function loadEconomy() {
     setText('[data-star-bits]', '—'); setText('[data-duplicates]', '—');
     document.querySelectorAll('[data-daily-status]').forEach(el=>el.textContent='Sign in to claim');
     document.querySelectorAll('[data-daily-cta]').forEach(el=>{el.classList.remove('is-loading','is-ready','is-claimed');el.classList.add('is-claimed');});
-    setText('[data-daily-cta-label]', 'Sign In for Daily Booster');
+    setText('[data-daily-cta-label]', 'Sign In for Free Daily Starlight Pack');
     document.querySelectorAll('[data-daily-nav-badge]').forEach(el=>{el.hidden=true;});
     return;
   }
@@ -61,14 +61,14 @@ async function loadEconomy() {
     const ctas = document.querySelectorAll('[data-daily-cta]');
     if (daily.available) {
       document.querySelectorAll('[data-daily-status]').forEach(el=>{el.textContent='Ready to Open!';el.classList.remove('daily-claimed');el.classList.add('daily-ready');});
-      setText('[data-daily-countdown]', 'Free booster available now');
-      setText('[data-daily-cta-label]', '🌟 CLAIM YOUR DAILY BOOSTER');
-      ctas.forEach(el=>{el.classList.remove('is-loading','is-claimed');el.classList.add('is-ready');el.setAttribute('aria-label','Daily Booster available to open now');});
+      setText('[data-daily-countdown]', 'Free pack available now');
+      setText('[data-daily-cta-label]', '🌟 CLAIM YOUR FREE DAILY STARLIGHT PACK');
+      ctas.forEach(el=>{el.classList.remove('is-loading','is-claimed');el.classList.add('is-ready');el.setAttribute('aria-label','Free Daily Starlight Pack available to open now');});
       document.querySelectorAll('[data-daily-nav-badge]').forEach(el=>{el.hidden=false;el.textContent='READY';});
     } else {
       document.querySelectorAll('[data-daily-status]').forEach(el=>{el.textContent='Claimed Today';el.classList.remove('daily-ready');el.classList.add('daily-claimed');});
-      setText('[data-daily-cta-label]', 'Free Booster Claimed');
-      ctas.forEach(el=>{el.classList.remove('is-loading','is-ready');el.classList.add('is-claimed');el.setAttribute('aria-label','View Daily Booster countdown');});
+      setText('[data-daily-cta-label]', 'Free Pack Claimed');
+      ctas.forEach(el=>{el.classList.remove('is-loading','is-ready');el.classList.add('is-claimed');el.setAttribute('aria-label','View Free Daily Starlight Pack countdown');});
       document.querySelectorAll('[data-daily-nav-badge]').forEach(el=>{el.hidden=true;});
       startCountdown(daily.nextClaimAt);
     }

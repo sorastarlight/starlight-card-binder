@@ -659,7 +659,7 @@ import {
             if (social.newestPull) parts.push(cardTile(social.newestPull, "Newest Pull"));
             const streak = Number(social.pullStreakDays || 0);
             if (streak > 0) {
-                parts.push(`<article class="highlight-card is-meta"><p class="eyebrow">Pull Streak</p><strong>${streak} day${streak === 1 ? "" : "s"}</strong><span>Daily Booster streak</span></article>`);
+                parts.push(`<article class="highlight-card is-meta"><p class="eyebrow">Pull Streak</p><strong>${streak} day${streak === 1 ? "" : "s"}</strong><span>Free Daily Starlight Pack streak</span></article>`);
             }
 
             if (!parts.length) return;

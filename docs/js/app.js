@@ -1072,7 +1072,7 @@ function getVisibleRarity(card) {
   if (isCollected(card.id) || isDullUnownedPreview()) return card.rarity;
   return "Unknown";
 }
-function getVisibleDescription(card) { return isCollected(card.id) ? card.cardDescription : "This card has not been collected yet. Earn it from Daily Boosters, reward codes, or future events."; }
+function getVisibleDescription(card) { return isCollected(card.id) ? card.cardDescription : "This card has not been collected yet. Earn it from Free Daily Starlight Packs, reward codes, or future events."; }
 
 function toggleFavorite(id) {
   const api = window.StarlightFavoriteUtils;
@@ -1447,7 +1447,7 @@ function renderFullView() {
     ? [variant && !isStandardMeta(variant) ? variant : '', finish && !isStandardMeta(finish) ? finish : '']
         .filter(Boolean)
         .join(' · ') || `${finishLabel(selected)} finish`
-    : 'Earn this card from Daily Boosters, packs, or rewards.';
+    : 'Earn this card from Free Daily Starlight Packs, packs, or rewards.';
   if (analyzerActiveTab !== 'story') analyzerActiveTab = 'details';
   const detailsTabActive = analyzerActiveTab !== 'story';
 
@@ -1640,7 +1640,7 @@ function renderGridPage(target, mode) {
     ? (collectionCopy.emptyFiltersLead || 'Try resetting one or more filters to see additional cards.')
     : (mode === 'favorites'
       ? (collectionCopy.emptyFavoritesLead || 'Tap the star on your favorite cards and this showcase will sparkle to life.')
-      : (collectionCopy.emptyAllLead || 'Earn cards from Daily Boosters, redemption codes, and special rewards to fill your album binder.'));
+      : (collectionCopy.emptyAllLead || 'Earn cards from Free Daily Starlight Packs, redemption codes, and special rewards to fill your album binder.'));
   const emptyAction = baseList.length
     ? `<button class="btn primary" type="button" data-reset-card-filters>${esc(collectionCopy.emptyFiltersCta || 'Reset Filters')}</button>`
     : `<a class="btn primary" href="binder?view=binder">${esc(mode === 'favorites' ? (collectionCopy.emptyFavoritesCta || 'Open Card Gallery') : (collectionCopy.emptyAllCta || 'Open Card Gallery'))}</a>`;

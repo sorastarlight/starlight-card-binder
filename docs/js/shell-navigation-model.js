@@ -153,6 +153,63 @@ function consolidateTradingNavItems(items = []) {
   return result;
 }
 
+/** Move checklist → Collection and daily → Cards when remote nav still uses the prior layout. */
+function relocateSidebarDestinations(sections, defaults) {
+  const moves = [
+    { destination: 'checklist', targetSectionId: 'collect' },
+    { destination: 'daily', targetSectionId: 'cards' }
+  ];
+
+  for (const move of moves) {
+    const targetSection = sections.find(section => section.id === move.targetSectionId)
+      || sections.find(section => {
+        const defaultSection = (defaults.sidebar?.sections || []).find(entry => entry.id === move.targetSectionId);
+        return defaultSection && section.label === defaultSection.label;
+      });
+    if (!targetSection) continue;
+
+    let relocated = null;
+    for (const section of sections) {
+      if (section === targetSection) continue;
+      const index = (section.items || []).findIndex(item => item.destination === move.destination);
+      if (index < 0) continue;
+      relocated = section.items.splice(index, 1)[0];
+      break;
+    }
+    if (!relocated) continue;
+    if ((targetSection.items || []).some(item => item.destination === move.destination)) continue;
+
+    const defaultSection = (defaults.sidebar?.sections || []).find(entry => entry.id === move.targetSectionId);
+    const defaultOrder = (defaultSection?.items || []).map(item => item.destination);
+    const desiredIndex = defaultOrder.indexOf(move.destination);
+    if (desiredIndex < 0) {
+      targetSection.items.push(relocated);
+      continue;
+    }
+
+    let insertAt = targetSection.items.length;
+    for (let i = desiredIndex + 1; i < defaultOrder.length; i += 1) {
+      const afterIndex = targetSection.items.findIndex(item => item.destination === defaultOrder[i]);
+      if (afterIndex >= 0) {
+        insertAt = afterIndex;
+        break;
+      }
+    }
+    if (insertAt === targetSection.items.length) {
+      for (let i = desiredIndex - 1; i >= 0; i -= 1) {
+        const beforeIndex = targetSection.items.findIndex(item => item.destination === defaultOrder[i]);
+        if (beforeIndex >= 0) {
+          insertAt = beforeIndex + 1;
+          break;
+        }
+      }
+    }
+    targetSection.items.splice(insertAt, 0, relocated);
+  }
+
+  return sections;
+}
+
 function ensureDefaultSidebarItems(sections, defaults) {
   const defaultSections = defaults.sidebar?.sections || [];
   const presentDestinations = new Set();
@@ -248,9 +305,12 @@ export function sanitizeShellNavigation(input) {
     : defaults.topBar.quickLinks;
 
   const sections = ensureDefaultSidebarItems(
-    Array.isArray(source.sidebar?.sections)
-      ? source.sidebar.sections.map(sanitizeSection).slice(0, 8)
-      : defaults.sidebar.sections.map(sanitizeSection),
+    relocateSidebarDestinations(
+      Array.isArray(source.sidebar?.sections)
+        ? source.sidebar.sections.map(sanitizeSection).slice(0, 8)
+        : defaults.sidebar.sections.map(sanitizeSection),
+      defaults
+    ),
     defaults
   ).filter(section => section.id !== 'series' && section.id !== 'admin');
 

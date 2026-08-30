@@ -22,7 +22,7 @@ test('default shell navigation includes core destinations and staff account link
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'offers'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'feed' && entry.label === 'Activity Feed'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'collection' && entry.label === 'My Collection'));
-  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'daily' && entry.label === 'Daily Booster'));
+  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'daily' && entry.label === 'Free Daily Starlight Pack'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'shop' && entry.label === 'Shop'));
   assert.equal(nav.brandRibbon, 'Starlight Cards');
   assert.equal(nav.chrome?.layout, 'hybrid');
@@ -37,9 +37,9 @@ test('default shell navigation includes core destinations and staff account link
   const account = nav.sidebar.sections.find(section => section.id === 'account');
   assert.ok(home.items.some(item => item.destination === 'home' && item.label === 'Home'));
   assert.ok(cards.items.some(item => item.destination === 'binder' && item.label === 'Card Gallery'));
-  assert.ok(cards.items.some(item => item.destination === 'checklist' && item.label === 'Card Checklist'));
+  assert.ok(cards.items.some(item => item.destination === 'daily' && item.label === 'Free Daily Starlight Pack'));
   assert.ok(collect.items.some(item => item.destination === 'collection' && item.label === 'My Collection'));
-  assert.ok(collect.items.some(item => item.destination === 'daily' && item.label === 'Daily Booster'));
+  assert.ok(collect.items.some(item => item.destination === 'checklist' && item.label === 'Card Checklist'));
   assert.ok(collect.items.some(item => item.destination === 'shop' && item.label === 'Shop'));
   assert.ok(collect.items.some(item => item.destination === 'quests' && item.label === 'Missions'));
   assert.ok(community.items.some(item => item.destination === 'trades' && item.label === 'Trade'));
@@ -51,7 +51,7 @@ test('default shell navigation includes core destinations and staff account link
   assert.equal(nav.pageTitles.binder, 'Card Gallery');
   assert.equal(nav.pageTitles.checklist, 'Card Checklist');
   assert.equal(nav.pageTitles.shop, 'Shop');
-  assert.equal(nav.pageTitles.daily, 'Daily Booster');
+  assert.equal(nav.pageTitles.daily, 'Free Daily Starlight Pack');
   assert.equal(nav.pageTitles.quests, 'Missions');
   assert.equal(nav.pageTitles.trades, 'Trade');
   assert.equal(nav.pageTitles.rewards, 'Gifts');
@@ -97,7 +97,7 @@ test('sanitizeShellNavigation overwrites legacy product labels with new defaults
     }
   });
   assert.equal(renamed.pageTitles.collection, 'My Collection');
-  assert.equal(renamed.pageTitles.daily, 'Daily Booster');
+  assert.equal(renamed.pageTitles.daily, 'Free Daily Starlight Pack');
   assert.equal(renamed.pageTitles.shop, 'Shop');
   assert.equal(renamed.pageTitles.checklist, 'Card Checklist');
   assert.equal(renamed.pageTitles.quests, 'Missions');
@@ -105,8 +105,45 @@ test('sanitizeShellNavigation overwrites legacy product labels with new defaults
   assert.equal(renamed.pageTitles.profile, 'Profile');
   assert.equal(renamed.pageTitles.feed, 'Activity Feed');
   assert.equal(renamed.sidebar.sections[0].items[0].label, 'My Collection');
-  assert.equal(renamed.sidebar.sections[0].items[1].label, 'Daily Booster');
+  assert.equal(renamed.sidebar.sections[0].items[1].label, 'Free Daily Starlight Pack');
   assert.equal(renamed.sidebar.sections[0].items[2].label, 'Activity Feed');
+});
+
+test('sanitizeShellNavigation relocates checklist to Collection and daily to Cards', () => {
+  const relocated = sanitizeShellNavigation({
+    ...cloneDefaultShellNavigation(),
+    sidebar: {
+      sections: [
+        {
+          id: 'cards',
+          label: 'Cards',
+          icon: { type: 'emoji', value: '' },
+          staffOnly: false,
+          items: [
+            { id: 'binder', label: 'Card Gallery', destination: 'binder', enabled: true, features: [] },
+            { id: 'checklist', label: 'Card Checklist', destination: 'checklist', enabled: true, features: [] }
+          ]
+        },
+        {
+          id: 'collect',
+          label: 'Collection',
+          icon: { type: 'emoji', value: '' },
+          staffOnly: false,
+          items: [
+            { id: 'collection', label: 'My Collection', destination: 'collection', enabled: true, features: [] },
+            { id: 'daily', label: 'Daily Booster', destination: 'daily', enabled: true, features: ['dailyBadge'] },
+            { id: 'shop', label: 'Shop', destination: 'shop', enabled: true, features: [] }
+          ]
+        }
+      ]
+    }
+  });
+  const cards = relocated.sidebar.sections.find(section => section.id === 'cards');
+  const collect = relocated.sidebar.sections.find(section => section.id === 'collect');
+  assert.ok(cards.items.some(item => item.destination === 'daily' && item.label === 'Free Daily Starlight Pack'));
+  assert.ok(!cards.items.some(item => item.destination === 'checklist'));
+  assert.ok(collect.items.some(item => item.destination === 'checklist' && item.label === 'Card Checklist'));
+  assert.ok(!collect.items.some(item => item.destination === 'daily'));
 });
 
 test('sanitizeShellNavigation rewrites Journal profile labels to Profile', () => {

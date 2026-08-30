@@ -99,11 +99,15 @@ function sanitizeEnum(value, allowed, fallback) {
 
 /** Overwrite known legacy page titles with the current product defaults. */
 const WEBSITE_TITLE_REWRITES = Object.freeze({
-  'Daily Wish': 'Daily Booster',
-  'Daily Free Booster Pack': 'Daily Booster',
-  'Free Daily Booster': 'Daily Booster',
-  'Open Daily Wish': 'Open Daily Booster',
-  '✨ Open Daily Wish': '✨ Open Daily Booster',
+  'Daily Wish': 'Free Daily Starlight Pack',
+  'Daily Booster': 'Free Daily Starlight Pack',
+  'Daily Free Booster Pack': 'Free Daily Starlight Pack',
+  'Free Daily Booster': 'Free Daily Starlight Pack',
+  'Free Daily Booster Pack': 'Free Daily Starlight Pack',
+  'Open Daily Wish': 'Open Free Daily Starlight Pack',
+  'Open Daily Booster': 'Open Free Daily Starlight Pack',
+  '✨ Open Daily Wish': '✨ Open Free Daily Starlight Pack',
+  '✨ Open Daily Booster': '✨ Open Free Daily Starlight Pack',
   'Starlight Card Shop': 'Shop',
   'Card Boutique': 'Shop',
   'Starlight Card Gallery': 'Card Gallery',

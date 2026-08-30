@@ -45,5 +45,5 @@ test('gallery and album pages use rebuilt markup and render hooks', async () => 
 
 test('removes daily-booster promotion from collection page', async () => {
   const collection = await read('docs/collection.html');
-  assert.doesNotMatch(collection, /data-daily-status|Open Daily Booster/);
+  assert.doesNotMatch(collection, /data-daily-status|Open Daily Booster|Open Free Daily Starlight Pack/);
 });

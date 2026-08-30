@@ -7,7 +7,7 @@ import { shellNavIcon } from './shell-nav-icons.js';
 export const PUBLIC_SHELL_DESTINATIONS = Object.freeze([
   { value: 'home', label: 'Home' },
   { value: 'binder', label: 'Card Gallery' },
-  { value: 'daily', label: 'Daily Booster' },
+  { value: 'daily', label: 'Free Daily Starlight Pack' },
   { value: 'shop', label: 'Shop' },
   { value: 'events', label: 'Events' },
   { value: 'redeem', label: 'Redeem Code' },
@@ -44,9 +44,11 @@ export { BRAND_ICONS, BRAND_ICON_IDS, brandIconToken } from './brand-icons.js';
 export const SHELL_LABEL_REWRITES = Object.freeze({
   daily: Object.freeze([
     'Daily Wish',
+    'Daily Booster',
     'Free Daily Booster',
     'Daily Free Booster',
-    'Daily Free Booster Pack'
+    'Daily Free Booster Pack',
+    'Free Daily Booster Pack'
   ]),
   shop: Object.freeze([
     'Starlight Card Shop',
@@ -132,7 +134,7 @@ export function createDefaultShellNavigation() {
       home: 'Home',
       binder: 'Card Gallery',
       collection: 'My Collection',
-      daily: 'Daily Booster',
+      daily: 'Free Daily Starlight Pack',
       shop: 'Shop',
       events: 'Events',
       redeem: 'Redeem Code',
@@ -171,7 +173,7 @@ export function createDefaultShellNavigation() {
           mega: true,
           items: [
             { id: 'binder', label: 'Card Gallery', icon: shellNavIcon('gallery'), destination: 'binder', enabled: true, features: ['clearSeries'] },
-            { id: 'checklist', label: 'Card Checklist', icon: shellNavIcon('checklist'), destination: 'checklist', enabled: true, features: [] }
+            { id: 'daily', label: 'Free Daily Starlight Pack', icon: shellNavIcon('daily'), destination: 'daily', enabled: true, features: ['dailyBadge'], className: 'shell-daily-link' }
           ]
         },
         {
@@ -182,7 +184,7 @@ export function createDefaultShellNavigation() {
           mega: true,
           items: [
             { id: 'collection', label: 'My Collection', icon: shellNavIcon('collection'), destination: 'collection', enabled: true, features: [] },
-            { id: 'daily', label: 'Daily Booster', icon: shellNavIcon('daily'), destination: 'daily', enabled: true, features: ['dailyBadge'], className: 'shell-daily-link' },
+            { id: 'checklist', label: 'Card Checklist', icon: shellNavIcon('checklist'), destination: 'checklist', enabled: true, features: [] },
             { id: 'shop', label: 'Shop', icon: shellNavIcon('shop'), destination: 'shop', enabled: true, features: [], className: 'shell-shop-link' },
             { id: 'star-bits', label: 'Star Bits', icon: starBitNavIcon(), destination: 'star-bits', enabled: true, features: [] },
             { id: 'quests', label: 'Missions', icon: shellNavIcon('missions'), destination: 'quests', enabled: true, features: [] },

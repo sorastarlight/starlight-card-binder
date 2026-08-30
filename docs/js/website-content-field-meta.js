@@ -318,7 +318,7 @@ export const WEBSITE_PAGE_META = Object.freeze({
     ]
   },
   daily: {
-    description: 'Daily Free Booster portal states, CTAs, and more-packs block.',
+    description: 'Free Daily Starlight Pack portal states, CTAs, and more-packs block.',
     previewUrl: 'daily-booster.html',
     groups: [
       {
