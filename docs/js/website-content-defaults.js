@@ -486,13 +486,13 @@ Season Pass Name Color (pink/gold gradient)`,
     },
     about: {
       eyebrow: 'About',
-      title: 'About the Starlight Card Binder',
+      title: 'About',
       lead: 'A cute interactive collection binder for Sora Starlight cards. Reveal cards, track sets, favorite your pulls, and keep the sparkle goblin economy alive.',
       seriesLoading: 'Loading card series…'
     },
     socials: {
       eyebrow: 'Socials',
-      title: 'Socials & Links',
+      title: 'Socials',
       lead: 'Find Sora Starlight around the web, follow the sparkle trail, and come hang out on stream!',
       links: [
         { id: 'x', icon: 'brand:x', label: 'X / Twitter', handle: '@SoraStarlightVT', url: 'https://x.com/SoraStarlightVT' },

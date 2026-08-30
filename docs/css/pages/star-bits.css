@@ -28,7 +28,7 @@
   border: 0;
 }
 
-.bits-page {
+.bits-page.public-page {
   width: 100%;
   max-width: none;
   margin: 0;
@@ -36,12 +36,17 @@
   min-width: 0;
 }
 
-.bits-panel {
-  padding: clamp(18px, 3vw, 26px);
-  border: 1px solid var(--bits-line);
-  border-radius: 22px;
+.bits-page .bits-panel.public-panel {
+  padding: clamp(16px, 2.5vw, 24px);
+  border: 1px solid rgba(107, 198, 248, 0.26);
+  border-radius: 18px;
   background: rgba(255, 255, 255, 0.97);
-  box-shadow: var(--bits-panel-shadow);
+  box-shadow: 0 12px 28px rgba(61, 83, 132, 0.08);
+}
+
+.bits-page .bits-header.public-hero {
+  text-align: left;
+  margin-bottom: clamp(14px, 2vw, 20px);
 }
 
 .bits-header {
