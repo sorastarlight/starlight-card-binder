@@ -68,13 +68,12 @@ function syncShellChromeHeights(){
   const liveH = (!liveFeedAdminEnabled || liveFeedViewSuppressed || liveStrip?.hidden)
     ? 0
     : Math.ceil(liveStrip?.getBoundingClientRect?.().height || 0);
-  const mastH = Math.ceil(masthead?.getBoundingClientRect?.().height || 0);
+  const mastTotalH = Math.ceil(masthead?.getBoundingClientRect?.().height || 0);
   document.documentElement.style.setProperty('--shell-live-feed-h', `${liveH}px`);
-  if (mastH > 0) {
-    document.documentElement.style.setProperty('--shell-masthead-h', `${mastH}px`);
+  if (mastTotalH > 0) {
+    document.documentElement.style.setProperty('--shell-masthead-h', `${mastTotalH}px`);
+    document.documentElement.style.setProperty('--shell-chrome-top', `${mastTotalH}px`);
   }
-  const chromeTop = liveH + (mastH || 64);
-  document.documentElement.style.setProperty('--shell-chrome-top', `${chromeTop}px`);
 }
 
 function applyLiveFeedVisibility(){

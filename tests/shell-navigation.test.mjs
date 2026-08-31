@@ -448,6 +448,7 @@ test('shell navigation render applies hybrid layout classes', async () => {
   assert.match(shellCss, /--shell-chrome-top/);
   assert.match(binderHtml, /shell-live-strip-top/);
   assert.match(binderHtml, /id="shellLiveStrip"/);
+  assert.match(binderHtml, /id="shellMasthead"[\s\S]*id="shellLiveStrip"/);
   assert.match(adminHtml, /shellLiveFeedToggle/);
 });
 
