@@ -285,7 +285,7 @@ test('website UI admin page and migration are wired', async () => {
   const shellCss = await read('docs/css/app-shell.css');
   assert.match(shellCss, /z-index:\s*5000/);
   assert.match(shellCss, /--shell-chrome-pad/);
-  assert.match(shellCss, /shell-live-strip-top/);
+  assert.match(shellCss, /shell-live-strip-bottom/);
   assert.match(shellCss, /--shell-chrome-top/);
 });
 
@@ -461,11 +461,11 @@ test('shell navigation render applies hybrid layout classes', async () => {
   assert.match(shellCss, /shell-hybrid-layout/);
   assert.match(shellCss, /grid-template-areas/);
   assert.match(shellCss, /display:contents/);
-  assert.match(shellCss, /shell-live-strip-top/);
+  assert.match(shellCss, /shell-live-strip-bottom/);
   assert.match(shellCss, /--shell-chrome-top/);
-  assert.match(binderHtml, /shell-live-strip-top/);
+  assert.match(binderHtml, /shell-live-strip-bottom/);
   assert.match(binderHtml, /id="shellLiveStrip"/);
-  assert.match(binderHtml, /id="shellMasthead"[\s\S]*id="shellLiveStrip"/);
+  assert.match(binderHtml, /id="shellLiveStrip"[\s\S]*shell-live-feed-body[\s\S]*shell-live-feed-head/);
   assert.match(adminHtml, /shellLiveFeedToggle/);
 });
 

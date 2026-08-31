@@ -14,7 +14,7 @@ import {
 import { getShellNavigation } from './shell-navigation-service.js';
 import { applyShellNavigationToDom, applyShellPageTitles, populateSeriesMegaMenus } from './shell-navigation-render.js';
 import { isStudioPreview, STUDIO_MSG } from './studio-preview.js';
-import { initLiveFeedWidget } from './live-feed-widget.js?v=1.6';
+import { initLiveFeedWidget } from './live-feed-widget.js?v=1.7';
 import { applyAvatarFrameClass } from './avatar-frame-utils.js';
 import { getMyProfileExtras } from './profile-extras-service.js';
 

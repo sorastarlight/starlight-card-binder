@@ -1,0 +1,14 @@
+---
+description: Always commit and push completed work to origin
+alwaysApply: true
+---
+
+# Always commit and push
+
+When a task is complete and there are local changes worth keeping:
+
+1. Create a focused git commit (follow the repo commit protocol).
+2. Push to `origin` on the current branch immediately after.
+3. Do not wait for a separate "commit" or "push" request.
+
+Still never force-push, amend published history, or skip hooks unless explicitly asked.

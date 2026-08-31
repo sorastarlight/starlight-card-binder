@@ -27,14 +27,6 @@ function relativeTime(value) {
   return `${Math.floor(hours / 24)}d`;
 }
 
-function readExpanded() {
-  try {
-    return localStorage.getItem(STORAGE_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
-
 function writeExpanded(expanded) {
   try {
     localStorage.setItem(STORAGE_KEY, expanded ? '1' : '0');
@@ -218,10 +210,14 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
     root.classList.toggle('is-collapsed', !expanded);
     if (toggle) {
       toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-      toggle.textContent = expanded ? '▴' : '▾';
+      // Bottom footer: collapsed shows up-chevron (expand upward); expanded shows down-chevron.
+      toggle.textContent = expanded ? '▾' : '▴';
       toggle.setAttribute('aria-label', expanded ? 'Collapse live feed' : 'Expand live feed');
     }
     writeExpanded(expanded);
+    window.dispatchEvent(new CustomEvent('starlight-shell-live-feed-changed', {
+      detail: { expanded: Boolean(expanded) }
+    }));
   }
 
   function render({ animateTicker = false } = {}) {
@@ -335,7 +331,7 @@ export function initLiveFeedWidget({ onOpenFullFeed } = {}) {
     });
   }
 
-  setExpanded(readExpanded());
+  setExpanded(false);
   start();
 
   return {

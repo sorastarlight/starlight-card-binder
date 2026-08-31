@@ -121,21 +121,48 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .sh
   color: var(--st-chrome-bar-muted);
 }
 
-/* LIVE strip under dark bar */
-body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-live-strip-top {
-  max-width: none;
-  margin: 0;
-  padding: 4px var(--st-chrome-pad-inline);
-  border-top: 1px solid var(--st-chrome-bar-line);
-  background: #352a52;
+/* LIVE strip docked as bottom footer */
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-live-strip-bottom .shell-live-feed {
+  background: linear-gradient(180deg, #3a2f58, #2a2140);
+  border-top-color: rgba(255, 130, 200, 0.35);
+  box-shadow: 0 -12px 36px rgba(20, 12, 40, 0.35);
+}
+
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-live-strip-bottom .shell-live-feed-title,
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-live-strip-bottom .shell-live-feed-state,
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-live-strip-bottom .shell-live-feed-ticker-item,
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-live-strip-bottom .shell-live-feed-ticker-copy {
   color: #fff;
 }
 
-body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-live-strip-top .shell-live-feed-title,
-body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-live-strip-top .shell-live-feed-state,
-body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-live-strip-top .shell-live-feed-open,
-body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-live-strip-top .shell-live-feed-toggle {
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-live-strip-bottom .shell-live-feed-state {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-live-strip-bottom .shell-live-feed-open,
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-live-strip-bottom .shell-live-feed-toggle {
   color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-live-strip-bottom .shell-live-feed-body {
+  background: rgba(42, 33, 64, 0.98);
+  border-bottom-color: rgba(255, 130, 200, 0.2);
+}
+
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-live-strip-bottom .shell-live-feed-item {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-live-strip-bottom .shell-live-feed-copy strong {
+  color: #fff;
+}
+
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-live-strip-bottom .shell-live-feed-copy span,
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-live-strip-bottom .shell-live-feed-empty {
+  color: rgba(255, 255, 255, 0.7);
 }
 
 /* —— Full-bleed content under the bar —— */
