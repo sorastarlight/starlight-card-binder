@@ -25,7 +25,7 @@ test('default shell navigation includes core destinations and staff account link
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'daily' && entry.label === 'Free Daily Starlight Pack'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'shop' && entry.label === 'Shop'));
   assert.equal(nav.brandRibbon, 'Starlight Cards');
-  assert.equal(nav.chrome?.layout, 'hybrid');
+  assert.equal(nav.chrome?.layout, 'masthead');
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'checklist' && entry.label === 'Card Checklist'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'quests' && entry.label === 'Missions'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'trades' && entry.label === 'Trade'));
@@ -419,7 +419,7 @@ test('sanitizeShellNavigation preserves chrome layout mode', () => {
     ...cloneDefaultShellNavigation(),
     chrome: { layout: 'sidebar-only' }
   });
-  assert.equal(invalid.chrome.layout, 'hybrid');
+  assert.equal(invalid.chrome.layout, 'masthead');
 
   const feedOff = sanitizeShellNavigation({
     ...cloneDefaultShellNavigation(),
@@ -467,7 +467,9 @@ test('shell navigation render and static shell HTML use extensionless binder hre
   assert.match(binderHtml, /href="binder\?view=home"/);
   assert.match(binderHtml, /shell-masthead/);
   assert.match(binderHtml, /shell-masthead-nav/);
-  assert.match(binderHtml, /shell-hybrid-layout/);
+  assert.match(binderHtml, /starlight-chrome\.css/);
+  assert.match(binderHtml, /shell-masthead-layout/);
+  assert.doesNotMatch(binderHtml, /shell-hybrid-layout/);
   assert.match(binderHtml, /shell-sidebar-brand/);
   assert.match(binderHtml, /binder-ribbon/);
   assert.match(homeHtml, /href="binder\?view=daily"/);
