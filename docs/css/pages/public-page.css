@@ -1,3 +1,5 @@
+@import url('../starlight-public.css');
+
 /**
  * Shared public-page rhythm for collector-facing pages.
  * Prefer these tokens over nested chrome / heavy panel stacks.
@@ -24,6 +26,10 @@
   margin: 0;
   padding: clamp(10px, 1.8vw, 20px) clamp(10px, 2vw, 18px) 72px;
   min-width: 0;
+}
+
+.public-page.st-public {
+  padding: 0;
 }
 
 .public-page .public-panel,

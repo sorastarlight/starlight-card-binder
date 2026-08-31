@@ -3,7 +3,7 @@
  * Masthead-only layout: full-width bar, centered content column, mobile drawer.
  */
 :root {
-  --st-chrome-max: 1240px;
+  --st-chrome-max: 1360px;
   --st-chrome-pad-inline: clamp(16px, 3vw, 28px);
   --st-magic-lavender: #e8d4ff;
   --st-magic-rose: #ffe8f4;
@@ -100,10 +100,11 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .main {
 }
 
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-view-frame {
-  border-radius: 20px;
-  border: 1px solid rgba(107, 198, 248, 0.28);
+  border-radius: 8px;
+  border: 1px solid rgba(107, 198, 248, 0.2);
   overflow: hidden;
-  box-shadow: 0 16px 40px rgba(61, 83, 132, 0.1);
+  box-shadow: 0 8px 24px rgba(61, 83, 132, 0.06);
+  background: transparent;
 }
 
 /* Mobile drawer — magical panel */

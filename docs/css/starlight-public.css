@@ -1,0 +1,300 @@
+/**
+ * Starlight public pages — Pokémon TCG–style layout + magical-girl palette.
+ * Used inside the binder shell iframe and standalone public routes.
+ */
+:root {
+  --st-pub-max: min(1360px, 100%);
+  --st-pub-pad: clamp(16px, 2.5vw, 28px);
+  --st-pub-ink: var(--st-color-ink, #3d5088);
+  --st-pub-muted: var(--st-color-muted, #6b7089);
+  --st-pub-pink: var(--st-color-pink, #ff82c8);
+  --st-pub-blue: var(--st-color-blue, #6bc6f8);
+  --st-pub-gold: var(--st-color-gold, #fed334);
+  --st-pub-lavender: var(--st-color-lavender, #e8d4ff);
+  --st-pub-line: rgba(107, 198, 248, 0.32);
+  --st-pub-radius: 4px;
+  --st-pub-radius-lg: 8px;
+}
+
+html.starlight-embedded,
+html.starlight-embedded body {
+  background: transparent !important;
+}
+
+.st-public {
+  width: 100%;
+  max-width: var(--st-pub-max);
+  margin: 0 auto;
+  padding: 0 var(--st-pub-pad) clamp(32px, 5vw, 48px);
+  color: var(--st-pub-ink);
+  box-sizing: border-box;
+}
+
+.st-public *,
+.st-public *::before,
+.st-public *::after {
+  box-sizing: border-box;
+}
+
+.st-section-title {
+  margin: 0 0 clamp(12px, 2vw, 18px);
+  color: var(--st-pub-ink);
+  font-size: clamp(1.35rem, 2.8vw, 1.85rem);
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+}
+
+.st-section-title--sm {
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  margin-bottom: 12px;
+}
+
+.st-eyebrow {
+  margin: 0 0 6px;
+  color: var(--st-pub-pink);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.st-lead {
+  margin: 0;
+  max-width: 42rem;
+  color: var(--st-pub-muted);
+  font-size: clamp(0.92rem, 1.3vw, 1rem);
+  line-height: 1.55;
+}
+
+.st-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 42px;
+  padding: 10px 18px;
+  border: 1px solid var(--st-pub-line);
+  border-radius: var(--st-pub-radius);
+  background: #fff;
+  color: var(--st-pub-ink);
+  font: inherit;
+  font-weight: 900;
+  font-size: 0.88rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.st-btn:hover,
+.st-btn:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(61, 83, 132, 0.12);
+  outline: none;
+}
+
+.st-btn--primary {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--st-pub-blue), var(--st-pub-pink));
+  color: #fff;
+  box-shadow: 0 8px 22px rgba(255, 130, 200, 0.28);
+}
+
+.st-btn--ghost {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.st-link-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 10px;
+  color: var(--st-pub-pink);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.st-link-cta::after {
+  content: '→';
+}
+
+.st-empty {
+  padding: clamp(24px, 4vw, 40px) 16px;
+  text-align: center;
+  border: 1px dashed var(--st-pub-line);
+  border-radius: var(--st-pub-radius-lg);
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--st-pub-muted);
+}
+
+/* Page head — used on non-home public routes */
+.st-page-head {
+  margin-bottom: clamp(20px, 3vw, 28px);
+  padding-bottom: clamp(16px, 2.5vw, 22px);
+  border-bottom: 3px solid rgba(107, 198, 248, 0.35);
+}
+
+.st-page-head h1 {
+  margin: 0 0 8px;
+  font-size: clamp(1.6rem, 3.8vw, 2.4rem);
+  line-height: 1.1;
+}
+
+.st-page-head--split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: clamp(16px, 3vw, 24px);
+  align-items: end;
+}
+
+.st-page-head__aside {
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 130, 200, 0.28);
+  border-radius: var(--st-pub-radius-lg);
+  background: rgba(255, 255, 255, 0.96);
+  text-align: center;
+  min-width: min(100%, 180px);
+}
+
+.st-page-head__aside small {
+  display: block;
+  color: var(--st-pub-muted);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.st-tabstrip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: clamp(16px, 2.5vw, 22px);
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.st-tabstrip button {
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid var(--st-pub-line);
+  border-radius: var(--st-pub-radius);
+  background: #fff;
+  color: var(--st-pub-ink);
+  font: inherit;
+  font-weight: 900;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.st-tabstrip button.active,
+.st-tabstrip button[aria-selected="true"] {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--st-pub-pink), var(--st-pub-blue));
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(255, 130, 200, 0.22);
+}
+
+.st-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.st-band {
+  margin-top: clamp(24px, 4vw, 32px);
+  padding: clamp(16px, 2.5vw, 20px);
+  border: 1px solid var(--st-pub-line);
+  border-radius: var(--st-pub-radius-lg);
+  background: linear-gradient(100deg, rgba(237, 249, 255, 0.92), rgba(255, 237, 248, 0.92));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.st-band strong {
+  display: block;
+  color: var(--st-pub-pink);
+  font-size: 1.05rem;
+}
+
+.st-band span {
+  display: block;
+  margin-top: 4px;
+  color: var(--st-pub-muted);
+  font-size: 0.86rem;
+}
+
+@media (max-width: 760px) {
+  .st-page-head--split {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .st-band {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.st-panel {
+  margin-bottom: var(--st-pub-pad);
+  padding: clamp(16px, 2.5vw, 22px);
+  border: 1px solid var(--st-pub-line);
+  border-radius: var(--st-pub-radius-lg);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 10px 28px rgba(61, 83, 132, 0.08);
+}
+
+/* Bridge legacy public-page / home classes */
+.public-page {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.public-page .section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin: clamp(28px, 4vw, 40px) 0 14px;
+}
+
+.public-page .section-head h2 {
+  margin: 0;
+  font-size: clamp(1.25rem, 2.8vw, 1.65rem);
+  color: var(--st-pub-ink);
+}
+
+.public-page .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 10px 18px;
+  border: 1px solid var(--st-pub-line);
+  border-radius: var(--st-pub-radius);
+  background: #fff;
+  color: var(--st-pub-ink);
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.public-page .btn.primary {
+  border: 0;
+  background: linear-gradient(135deg, var(--st-pub-blue), var(--st-pub-pink));
+  color: #fff;
+}

@@ -1,261 +1,306 @@
-/* Home — Pokémon TCG–style spotlight + magical feature pillars */
+/* Home — Pokémon TCG “What’s new” carousel + promo grid + news band */
 :root {
   --blue:var(--st-color-blue, #6bc6f8);
   --pink:var(--st-color-pink, #ff82c8);
   --gold:var(--st-color-gold, #fed334);
-  --ink:var(--st-color-ink, #405fa1);
-  --muted:var(--st-color-muted, #6d7692);
+  --ink:var(--st-color-ink, #3d5088);
+  --muted:var(--st-color-muted, #6b7089);
 }
 
-.home.home-magical {
-  padding: 0;
+.st-home {
+  padding-top: 4px;
 }
 
-.home-magical .home-spotlight {
-  position: relative;
-  margin-bottom: clamp(28px, 4vw, 40px);
-  border-radius: 22px;
-  overflow: hidden;
-  border: 1px solid rgba(107, 198, 248, 0.35);
-  background: linear-gradient(135deg, var(--st-magic-sky), var(--st-magic-rose));
-  box-shadow:
-    0 20px 50px rgba(61, 83, 132, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+/* —— Hero carousel (What's new!) —— */
+.st-home-hero {
+  margin-bottom: clamp(32px, 5vw, 48px);
 }
 
-.home-magical .home-spotlight-track {
+.st-home-hero__head {
   display: flex;
-  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.st-home-hero__viewport {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--st-pub-radius-lg);
+  background: #1a2848;
+  box-shadow: 0 20px 48px rgba(45, 62, 105, 0.22);
+}
+
+.st-home-hero__track {
+  display: flex;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }
 
-.home-magical .home-spotlight-slide {
+.st-home-hero__slide {
   flex: 0 0 100%;
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-  align-items: center;
-  gap: clamp(12px, 2vw, 24px);
-  min-height: clamp(220px, 32vw, 320px);
-  padding: clamp(20px, 3vw, 32px);
-  box-sizing: border-box;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  align-items: stretch;
+  min-height: clamp(260px, 36vw, 380px);
+  color: #fff;
+  background:
+    linear-gradient(115deg, rgba(26, 40, 72, 0.92) 0%, rgba(26, 40, 72, 0.55) 42%, rgba(255, 130, 200, 0.35) 100%),
+    linear-gradient(135deg, #5eb8f0 0%, #c8a0ff 48%, #ff9fd4 100%);
 }
 
-.home-magical .home-spotlight-date {
-  display: block;
-  margin-top: 8px;
-  color: var(--muted, #6d7692);
-  font-size: 0.78rem;
-  font-weight: 800;
+.st-home-hero__copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  padding: clamp(24px, 4vw, 40px);
 }
 
-.home-magical .home-spotlight-copy .eyebrow {
-  margin: 0 0 6px;
-  color: #e2529f;
-  font-size: 0.78rem;
+.st-home-hero__copy .st-eyebrow {
+  color: #ffd6ec;
+}
+
+.st-home-hero__copy h2 {
+  margin: 0;
+  font-size: clamp(1.5rem, 3.5vw, 2.35rem);
+  line-height: 1.08;
   font-weight: 900;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
 }
 
-.home-magical .home-spotlight-copy h2 {
-  margin: 0 0 10px;
-  color: var(--ink, #405fa1);
-  font-size: clamp(1.35rem, 3.2vw, 2.1rem);
-  line-height: 1.12;
-}
-
-.home-magical .home-spotlight-copy p {
-  margin: 0 0 16px;
+.st-home-hero__copy p {
+  margin: 0;
   max-width: 36rem;
-  color: var(--muted, #6d7692);
-  font-size: clamp(0.92rem, 1.4vw, 1.02rem);
+  color: rgba(255, 255, 255, 0.88);
+  font-size: clamp(0.92rem, 1.35vw, 1.02rem);
   line-height: 1.55;
 }
 
-.home-magical .home-spotlight-media {
+.st-home-hero__date {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.st-home-hero__media {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 160px;
+  padding: clamp(16px, 2.5vw, 24px);
+  min-height: 200px;
 }
 
-.home-magical .home-spotlight-media img {
-  max-width: 100%;
-  max-height: clamp(140px, 22vw, 240px);
-  border-radius: 16px;
+.st-home-hero__media img {
+  width: 100%;
+  max-height: clamp(180px, 28vw, 300px);
   object-fit: cover;
-  box-shadow: 0 16px 36px rgba(255, 130, 200, 0.25);
+  border-radius: var(--st-pub-radius-lg);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
 }
 
-.home-magical .home-spotlight-media .home-spotlight-star {
-  font-size: clamp(4rem, 12vw, 7rem);
+.st-home-hero__star {
+  font-size: clamp(5rem, 14vw, 8rem);
   line-height: 1;
-  filter: drop-shadow(0 8px 20px rgba(255, 130, 200, 0.4));
+  filter: drop-shadow(0 10px 24px rgba(255, 200, 240, 0.45));
 }
 
-.home-magical .home-spotlight-controls {
+.st-home-hero__nav {
   position: absolute;
   bottom: 14px;
-  right: 16px;
+  right: 14px;
   display: flex;
   gap: 8px;
 }
 
-.home-magical .home-spotlight-controls button {
-  width: 36px;
-  height: 36px;
-  border: 1px solid rgba(107, 198, 248, 0.45);
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.92);
-  color: #4a5f94;
-  font-size: 1.2rem;
+.st-home-hero__nav button {
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--ink);
+  font-size: 1.15rem;
   font-weight: 900;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(61, 83, 132, 0.1);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
 }
 
-.home-magical .home-spotlight-controls button:hover,
-.home-magical .home-spotlight-controls button:focus-visible {
-  border-color: rgba(255, 130, 200, 0.55);
-  background: #fff;
+.st-home-hero__dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
 }
 
-.home-magical .home-block-title {
-  margin: 0 0 clamp(14px, 2vw, 20px);
-  color: var(--ink, #405fa1);
-  font-size: clamp(1.2rem, 2.8vw, 1.65rem);
-  letter-spacing: 0.02em;
+.st-home-hero__dots button {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(107, 198, 248, 0.45);
+  cursor: pointer;
 }
 
-.home-magical .home-welcome {
-  margin-bottom: clamp(24px, 3.5vw, 36px);
-  padding: clamp(18px, 2.5vw, 28px);
-  border: 1px solid rgba(107, 198, 248, 0.28);
-  border-radius: 20px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(248, 244, 255, 0.92));
-  box-shadow: 0 12px 32px rgba(61, 83, 132, 0.08);
+.st-home-hero__dots button.is-active {
+  background: var(--pink);
+  box-shadow: 0 0 0 3px rgba(255, 130, 200, 0.35);
 }
 
-.home-magical .home-welcome h1 {
-  margin: 0.15em 0 0.45em;
-  color: var(--ink, #405fa1);
-  font-size: clamp(1.5rem, 3.5vw, 2.2rem);
-  line-height: 1.08;
-}
-
-.home-magical .home-welcome > p[data-content="home.lead"] {
-  max-width: 44rem;
-  margin: 0;
-  color: var(--muted, #6d7692);
-  line-height: 1.55;
-}
-
-.home-magical .home-welcome .eyebrow {
-  margin: 0 0 6px;
-  color: #e2529f;
-  font-size: 0.78rem;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.home-magical .hero-actions {
+/* —— Quick actions (CMS CTAs) —— */
+.st-home-quick {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 16px;
-}
-
-.home-magical .home-pillars {
   margin-bottom: clamp(28px, 4vw, 40px);
 }
 
-.home-magical .home-pillar-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(12px, 1.8vw, 18px);
+/* —— Promo grid (Pokémon feature tiles) —— */
+.st-home-promos {
+  margin-bottom: clamp(32px, 5vw, 48px);
 }
 
-.home-magical .home-pillar {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: clamp(16px, 2.2vw, 22px);
-  border: 1px solid rgba(107, 198, 248, 0.28);
-  border-radius: 18px;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(248, 251, 255, 0.92));
+.st-promo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(12px, 1.8vw, 16px);
+}
+
+.st-promo-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: start;
+  padding: clamp(16px, 2.2vw, 20px);
+  border: 1px solid var(--st-pub-line);
+  border-radius: var(--st-pub-radius-lg);
+  background: linear-gradient(145deg, #fff 0%, #f8f4ff 100%);
   text-decoration: none;
   color: inherit;
-  box-shadow: 0 10px 28px rgba(61, 83, 132, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 8px 24px rgba(61, 83, 132, 0.08);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
-.home-magical .home-pillar:hover,
-.home-magical .home-pillar:focus-visible {
-  transform: translateY(-3px);
-  box-shadow:
-    0 16px 36px rgba(61, 83, 132, 0.12),
-    0 0 0 2px rgba(255, 130, 200, 0.2);
+.st-promo-card:hover,
+.st-promo-card:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(61, 83, 132, 0.14);
   outline: none;
 }
 
-.home-magical .home-pillar-icon {
-  font-size: 1.5rem;
-  line-height: 1;
+.st-promo-card__icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--st-pub-radius);
+  background: linear-gradient(135deg, rgba(107, 198, 248, 0.25), rgba(255, 130, 200, 0.22));
+  font-size: 1.35rem;
 }
 
-.home-magical .home-pillar strong {
-  color: var(--ink, #405fa1);
+.st-promo-card strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ink);
   font-size: 1.02rem;
 }
 
-.home-magical .home-pillar span {
-  color: var(--muted, #6d7692);
+.st-promo-card span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+/* —— News band —— */
+.st-home-news {
+  margin-bottom: 16px;
+}
+
+.st-news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.st-news-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--st-pub-line);
+  border-radius: var(--st-pub-radius-lg);
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(61, 83, 132, 0.08);
+}
+
+.st-news-card.is-pinned {
+  border-color: rgba(254, 211, 52, 0.55);
+  box-shadow: 0 0 0 2px rgba(254, 211, 52, 0.25), 0 10px 26px rgba(61, 83, 132, 0.1);
+}
+
+.st-news-card img {
+  display: block;
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  background: linear-gradient(135deg, #e9f7ff, #fff0f8);
+}
+
+.st-news-card__body {
+  padding: 14px 16px 16px;
+}
+
+.st-news-card__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.st-news-card h3 {
+  margin: 0 0 6px;
+  color: var(--ink);
+  font-size: 1.05rem;
+  line-height: 1.25;
+}
+
+.st-news-card p {
+  margin: 0;
+  color: var(--muted);
   font-size: 0.88rem;
   line-height: 1.45;
 }
 
-.home-magical .home-pillar-cta {
-  margin-top: 4px;
-  color: #e2529f;
-  font-size: 0.78rem;
-  font-weight: 900;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.home-magical .news-grid {
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-}
-
-.home-magical .btn {
-  min-height: 44px;
+.st-news-card .news-full {
+  margin-top: 8px;
+  font-size: 0.84rem;
 }
 
 @media (max-width: 900px) {
-  .home-magical .home-pillar-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .home-magical .home-spotlight-slide {
+  .st-home-hero__slide {
     grid-template-columns: 1fr;
     min-height: auto;
   }
 
-  .home-magical .home-spotlight-media {
+  .st-home-hero__media {
     order: -1;
-    min-height: 120px;
+    min-height: 140px;
   }
-}
 
-@media (max-width: 560px) {
-  .home-magical .home-pillar-grid {
+  .st-promo-grid {
     grid-template-columns: 1fr;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .home-magical .home-spotlight-track {
+  .st-home-hero__track {
     transition: none;
   }
 }

@@ -1,66 +1,120 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Home | Starlight Card Binder</title><link rel="stylesheet" href="css/style.css?v=1.0.2"><link rel="stylesheet" href="css/shared-ui.css?v=1.6.23"><script src="js/browser-performance.js?v=1.0.0" defer></script><link rel="stylesheet" href="css/pages/public-page.css?v=1.0.1"><link rel="stylesheet" href="css/pages/home.css?v=2.0.1"><link rel="stylesheet" href="css/qol-ui.css?v=94.2.4">
-</head><body><script src="js/embed-mode.js" type="module"></script><div class="sky"></div><main class="home public-page home-magical">
-<section class="home-spotlight" aria-label="Featured updates">
-  <div class="home-spotlight-track" id="homeSpotlightTrack"></div>
-  <div class="home-spotlight-controls" hidden>
-    <button type="button" data-home-spotlight-prev aria-label="Previous featured update">‹</button>
-    <button type="button" data-home-spotlight-next aria-label="Next featured update">›</button>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Home | Starlight Card Binder</title>
+<link rel="stylesheet" href="css/style.css?v=1.0.2">
+<link rel="stylesheet" href="css/shared-ui.css?v=1.6.24">
+<script src="js/browser-performance.js?v=1.0.0" defer></script>
+<link rel="stylesheet" href="css/starlight-public.css?v=1.1.0">
+<link rel="stylesheet" href="css/pages/public-page.css?v=2.0.0">
+<link rel="stylesheet" href="css/pages/home.css?v=3.0.0">
+<link rel="stylesheet" href="css/qol-ui.css?v=94.2.4">
+</head>
+<body>
+<script src="js/embed-mode.js" type="module"></script>
+<main class="st-public st-home public-page" id="home">
+  <div class="st-cms-hooks" hidden aria-hidden="true">
+    <span data-content="home.eyebrow">Welcome, Starlight Collector!</span>
+    <span data-content="home.title">Your magical card adventure starts here.</span>
+    <span data-content="home.lead">Collect Starlight Cards, open booster packs, trade with other collectors, join seasonal events, and keep up with the latest news from Sora Starlight.</span>
+    <span data-content="home.primaryCta">✨ Open Free Daily Starlight Pack</span>
+    <span data-content="home.secondaryCta">🗂️ Browse Card Gallery</span>
+    <span data-content="home.newsEyebrow">Latest from Starlight</span>
+    <span data-content="home.newsTitle">News & Updates</span>
+    <span data-content="home.newsLoading">Loading the latest Starlight news…</span>
   </div>
-</section>
 
-<section class="home-welcome" aria-label="Welcome">
-  <p class="eyebrow" data-content="home.eyebrow">Welcome, Starlight Collector!</p>
-  <h1 data-content="home.title">Your magical card adventure starts here.</h1>
-  <p data-content="home.lead">Collect Starlight Cards, open booster packs, trade with other collectors, join seasonal events, and keep up with the latest news from Sora Starlight.</p>
-  <div class="hero-actions">
-    <a class="btn primary" href="binder?view=daily" data-shell-view="daily" data-content="home.primaryCta">✨ Open Free Daily Starlight Pack</a>
-    <a class="btn" href="binder?view=binder" data-shell-view="binder" data-content="home.secondaryCta">🗂️ Browse Card Gallery</a>
+  <section class="st-home-hero" aria-label="What's new">
+    <div class="st-home-hero__head">
+      <h2 class="st-section-title">What's new!</h2>
+    </div>
+    <div class="st-home-hero__viewport">
+      <div class="st-home-hero__track" id="homeSpotlightTrack"></div>
+      <div class="st-home-hero__nav" hidden>
+        <button type="button" data-home-spotlight-prev aria-label="Previous slide">‹</button>
+        <button type="button" data-home-spotlight-next aria-label="Next slide">›</button>
+      </div>
+    </div>
+    <div class="st-home-hero__dots" id="homeSpotlightDots" hidden></div>
+  </section>
+
+  <div class="st-home-quick hero-actions">
+    <a class="st-btn st-btn--primary" href="binder?view=daily" data-shell-view="daily" data-content="home.primaryCta">✨ Open Free Daily Starlight Pack</a>
+    <a class="st-btn st-btn--ghost" href="binder?view=binder" data-shell-view="binder" data-content="home.secondaryCta">🗂️ Browse Card Gallery</a>
   </div>
-</section>
 
-<section class="home-pillars" aria-label="Explore Starlight">
-  <h2 class="home-block-title">Start your magical journey</h2>
-  <div class="home-pillar-grid">
-    <a class="home-pillar" href="binder?view=daily" data-shell-view="daily">
-      <span class="home-pillar-icon" aria-hidden="true">✨</span>
-      <strong>Free Daily Starlight Pack</strong>
-      <span>Open a complimentary pack every day and grow your collection.</span>
-      <span class="home-pillar-cta">Open pack</span>
-    </a>
-    <a class="home-pillar" href="binder?view=shop" data-shell-view="shop">
-      <span class="home-pillar-icon" aria-hidden="true">🛍️</span>
-      <strong>Starlight Card Shop</strong>
-      <span>Browse booster packs, bundles, and limited releases.</span>
-      <span class="home-pillar-cta">Visit shop</span>
-    </a>
-    <a class="home-pillar" href="binder?view=collection" data-shell-view="collection">
-      <span class="home-pillar-icon" aria-hidden="true">♡</span>
-      <strong>My Collection</strong>
-      <span>View your album, favorites, and collector progress.</span>
-      <span class="home-pillar-cta">View collection</span>
-    </a>
-    <a class="home-pillar" href="binder?view=events" data-shell-view="events">
-      <span class="home-pillar-icon" aria-hidden="true">🎉</span>
-      <strong>Starlight Events</strong>
-      <span>Join seasonal celebrations and limited-time rewards.</span>
-      <span class="home-pillar-cta">See events</span>
-    </a>
-    <a class="home-pillar" href="binder?view=quests" data-shell-view="quests">
-      <span class="home-pillar-icon" aria-hidden="true">🎯</span>
-      <strong>Starlight Missions</strong>
-      <span>Complete quests and earn Star Bits along the way.</span>
-      <span class="home-pillar-cta">View missions</span>
-    </a>
-    <a class="home-pillar" href="binder?view=trades" data-shell-view="trades">
-      <span class="home-pillar-icon" aria-hidden="true">🤝</span>
-      <strong>Trade With Collectors</strong>
-      <span>Swap cards, manage offers, and build your wishlist.</span>
-      <span class="home-pillar-cta">Start trading</span>
-    </a>
-  </div>
-</section>
+  <section class="st-home-promos" aria-label="Explore Starlight">
+    <h2 class="st-section-title st-section-title--sm">Explore the Starlight Card Hub</h2>
+    <div class="st-promo-grid">
+      <a class="st-promo-card" href="binder?view=daily" data-shell-view="daily">
+        <span class="st-promo-card__icon" aria-hidden="true">✨</span>
+        <div>
+          <strong>Free Daily Starlight Pack</strong>
+          <span>Open a complimentary pack every day and grow your collection.</span>
+          <span class="st-link-cta">Open pack</span>
+        </div>
+      </a>
+      <a class="st-promo-card" href="binder?view=shop" data-shell-view="shop">
+        <span class="st-promo-card__icon" aria-hidden="true">🛍️</span>
+        <div>
+          <strong>Starlight Card Shop</strong>
+          <span>Browse booster packs, bundles, and limited releases.</span>
+          <span class="st-link-cta">Visit shop</span>
+        </div>
+      </a>
+      <a class="st-promo-card" href="binder?view=collection" data-shell-view="collection">
+        <span class="st-promo-card__icon" aria-hidden="true">♡</span>
+        <div>
+          <strong>My Collection</strong>
+          <span>View your album, favorites, and collector progress.</span>
+          <span class="st-link-cta">View collection</span>
+        </div>
+      </a>
+      <a class="st-promo-card" href="binder?view=events" data-shell-view="events">
+        <span class="st-promo-card__icon" aria-hidden="true">🎉</span>
+        <div>
+          <strong>Starlight Events</strong>
+          <span>Join seasonal celebrations and limited-time rewards.</span>
+          <span class="st-link-cta">See events</span>
+        </div>
+      </a>
+      <a class="st-promo-card" href="binder?view=quests" data-shell-view="quests">
+        <span class="st-promo-card__icon" aria-hidden="true">🎯</span>
+        <div>
+          <strong>Starlight Missions</strong>
+          <span>Complete quests and earn Star Bits along the way.</span>
+          <span class="st-link-cta">View missions</span>
+        </div>
+      </a>
+      <a class="st-promo-card" href="binder?view=trades" data-shell-view="trades">
+        <span class="st-promo-card__icon" aria-hidden="true">🤝</span>
+        <div>
+          <strong>Trade With Collectors</strong>
+          <span>Swap cards, manage offers, and build your wishlist.</span>
+          <span class="st-link-cta">Start trading</span>
+        </div>
+      </a>
+    </div>
+  </section>
 
-<div class="section-head"><div><p class="eyebrow" data-content="home.newsEyebrow">Latest from Starlight</p><h2 data-content="home.newsTitle">News & Updates</h2></div></div>
-<section id="news" class="news-grid"><div class="empty" data-content="home.newsLoading">Loading the latest Starlight news…</div></section>
-</main><script type="module" src="js/pages/website-content-hydrate-page.js?v=1.2"></script><script type="module" src="js/home-spotlight.js?v=1.0.0"></script><script type="module" src="js/home-news.js"></script><script src="js/shared-ui.js?v=1.6.23"></script><script src="js/qol-ui.js?v=94.2.4" defer></script>
-</body></html>
+  <section class="st-home-news" aria-labelledby="homeNewsTitle">
+    <div class="section-head">
+      <div>
+        <p class="st-eyebrow" data-content="home.newsEyebrow">Latest from Starlight</p>
+        <h2 class="st-section-title" id="homeNewsTitle" data-content="home.newsTitle">News & Updates</h2>
+      </div>
+    </div>
+    <div id="news" class="st-news-grid">
+      <div class="st-empty" data-content="home.newsLoading">Loading the latest Starlight news…</div>
+    </div>
+  </section>
+</main>
+<script type="module" src="js/pages/website-content-hydrate-page.js?v=1.2"></script>
+<script type="module" src="js/home-spotlight.js?v=2.0.0"></script>
+<script type="module" src="js/home-news.js?v=2.0.0"></script>
+<script src="js/shared-ui.js?v=1.6.24"></script>
+<script src="js/qol-ui.js?v=94.2.4" defer></script>
+</body>
+</html>

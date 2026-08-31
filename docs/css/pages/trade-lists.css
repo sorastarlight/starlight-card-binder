@@ -1,51 +1,19 @@
 /* Trade With Others — unified hub layout */
-.trade-hub-page.public-page {
-  width: 100%;
-  max-width: none;
-  margin: 0;
-  padding: clamp(10px, 1.8vw, 20px) clamp(10px, 2vw, 16px) 64px;
-  color: var(--st-color-ink, #405fa1);
+.trade-hub-page.st-public {
+  padding-bottom: clamp(32px, 5vw, 48px);
+  color: var(--st-color-ink, #3d5088);
 }
 
-.trade-hub-page .trade-head.public-hero {
-  text-align: left;
-  margin: 0 0 16px;
-  padding: clamp(16px, 2.4vw, 22px);
-  border: 1px solid rgba(107, 198, 248, 0.26);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.97);
-  box-shadow: 0 12px 28px rgba(61, 83, 132, 0.08);
-}
-
-.trade-hub-page .trade-head .eyebrow {
-  margin: 0 0 0.35rem;
-  color: var(--st-color-pink, #ff82c8);
-  font-weight: 900;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  font-size: 0.78rem;
+.trade-hub-page .trade-head.st-page-head {
+  margin-bottom: clamp(20px, 3vw, 28px);
 }
 
 .trade-hub-page .trade-head h1 {
-  margin: 0.15rem 0 0.45rem;
-  color: #405fa1;
-  font-size: clamp(1.7rem, 4vw, 2.4rem);
+  margin: 0 0 8px;
 }
 
-.trade-hub-page .trade-head p {
-  margin: 0;
-  max-width: 44rem;
-  color: var(--st-color-muted, #6b7089);
-  font-weight: 650;
-  line-height: 1.55;
-}
-
-.trade-hub-page .trade-hub-tabs {
+.trade-hub-page .trade-hub-tabs.st-tabstrip {
   margin-bottom: 14px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  box-shadow: none;
 }
 
 .trade-hub-tabs {
