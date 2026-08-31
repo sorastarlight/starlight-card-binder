@@ -352,14 +352,20 @@ export function sanitizeShellNavigation(input) {
   }
 
   const chromeSource = source.chrome && typeof source.chrome === 'object' ? source.chrome : {};
-  const layoutRaw = String(chromeSource.layout || defaults.chrome?.layout || 'masthead').trim().toLowerCase();
+  const sourceVersion = Number(source.version) || 0;
+  const defaultVersion = Number(defaults.version) || 3;
+  let layoutRaw = String(chromeSource.layout || defaults.chrome?.layout || 'masthead').trim().toLowerCase();
+  if (sourceVersion < 3 && layoutRaw === 'hybrid') {
+    layoutRaw = 'masthead';
+  }
   const layout = SHELL_LAYOUT_MODES.includes(layoutRaw) ? layoutRaw : defaults.chrome.layout;
   const showLiveFeed = chromeSource.showLiveFeed !== false
     && chromeSource.show_live_feed !== false
     && chromeSource.liveFeed !== false;
+  const version = sourceVersion >= defaultVersion ? sourceVersion : defaultVersion;
 
   return {
-    version: Number(source.version) >= 2 ? 2 : 2,
+    version,
     brandRibbon: String(source.brandRibbon ?? defaults.brandRibbon).trim().slice(0, 40) || defaults.brandRibbon,
     chrome: { layout, showLiveFeed },
     pageTitles,

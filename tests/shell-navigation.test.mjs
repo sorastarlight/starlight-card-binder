@@ -407,6 +407,23 @@ test('shell navigation render gates staff account items', async () => {
   assert.match(render, /map\(item => renderAccountMenuItem\(item, \{ isStaff \}\)/);
 });
 
+test('sanitizeShellNavigation upgrades legacy hybrid chrome to masthead', () => {
+  const legacy = sanitizeShellNavigation({
+    ...cloneDefaultShellNavigation(),
+    version: 2,
+    chrome: { layout: 'hybrid', showLiveFeed: true }
+  });
+  assert.equal(legacy.version, 3);
+  assert.equal(legacy.chrome.layout, 'masthead');
+
+  const explicitHybrid = sanitizeShellNavigation({
+    ...cloneDefaultShellNavigation(),
+    version: 3,
+    chrome: { layout: 'hybrid', showLiveFeed: true }
+  });
+  assert.equal(explicitHybrid.chrome.layout, 'hybrid');
+});
+
 test('sanitizeShellNavigation preserves chrome layout mode', () => {
   const hybrid = sanitizeShellNavigation({
     ...cloneDefaultShellNavigation(),

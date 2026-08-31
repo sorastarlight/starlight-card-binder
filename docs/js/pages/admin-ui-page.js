@@ -429,7 +429,7 @@ function renderAll() {
   if (layoutSelect && navigation) {
     navigation.chrome = navigation.chrome && typeof navigation.chrome === 'object'
       ? navigation.chrome
-      : { layout: 'hybrid', showLiveFeed: true };
+      : { layout: 'masthead', showLiveFeed: true };
     layoutSelect.value = navigation.chrome.layout === 'masthead' ? 'masthead' : 'hybrid';
     if (liveFeedToggle) liveFeedToggle.checked = navigation.chrome.showLiveFeed !== false;
   }
@@ -522,7 +522,7 @@ layoutSelect?.addEventListener('change', () => {
   if (!navigation) return;
   navigation.chrome = navigation.chrome && typeof navigation.chrome === 'object'
     ? navigation.chrome
-    : { layout: 'hybrid', showLiveFeed: true };
+    : { layout: 'masthead', showLiveFeed: true };
   navigation.chrome.layout = layoutSelect.value === 'masthead' ? 'masthead' : 'hybrid';
   renderAll();
 });
@@ -531,7 +531,7 @@ liveFeedToggle?.addEventListener('change', () => {
   if (!navigation) return;
   navigation.chrome = navigation.chrome && typeof navigation.chrome === 'object'
     ? navigation.chrome
-    : { layout: 'hybrid', showLiveFeed: true };
+    : { layout: 'masthead', showLiveFeed: true };
   navigation.chrome.showLiveFeed = Boolean(liveFeedToggle.checked);
   renderPreview();
 });

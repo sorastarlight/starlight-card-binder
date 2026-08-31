@@ -766,7 +766,7 @@ window.addEventListener('message',async e=>{
   if (data.type==='starlight-view-ready'||data.type==='starlight-content-ready'||data.type==='starlight-app-ready'){
     markViewReady(data);
     if (frame?.contentWindow) {
-      const layout = document.body.dataset.shellLayout || 'hybrid';
+      const layout = document.body.dataset.shellLayout || 'masthead';
       try {
         frame.contentWindow.postMessage({ type: 'starlight-shell-layout', layout }, location.origin);
       } catch {
