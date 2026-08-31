@@ -10,15 +10,35 @@
   padding-bottom: clamp(32px, 5vw, 48px);
 }
 
-.card-album-header.st-page-head {
-  display: grid;
-  gap: 14px;
-  padding-bottom: clamp(16px, 2.5vw, 22px);
+.card-album-header.st-bleed-banner {
+  display: block;
   border: 0;
-  border-bottom: 3px solid rgba(107, 198, 248, 0.35);
   border-radius: 0;
-  background: transparent;
+  background:
+    radial-gradient(circle at 82% 40%, rgba(255, 200, 240, 0.35), transparent 42%),
+    radial-gradient(circle at 12% 20%, rgba(107, 198, 248, 0.4), transparent 36%),
+    linear-gradient(115deg, #3d2a68 0%, #5a3d8c 38%, #ff82c8 100%);
   box-shadow: none;
+  padding: clamp(28px, 5vw, 48px) var(--st-pub-pad, 16px);
+}
+
+.card-album-header .card-album-stats > div {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.card-album-header .card-album-stats span,
+.card-album-header .card-album-progress-row small {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.card-album-header .card-album-stats strong {
+  color: #fff;
+}
+
+.card-album-header .card-album-progress {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .card-album-page.public-page {

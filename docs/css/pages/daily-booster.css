@@ -9,12 +9,11 @@
 }
 
 .daily-page.st-public {
-  padding-bottom: clamp(32px, 5vw, 48px);
+  padding-bottom: 0;
 }
 
-.daily-header h1 {
-  margin: 0 0 8px;
-  color: var(--b-ink);
+.daily-header.st-bleed-banner h1 {
+  color: #fff;
 }
 
 .daily-header-badge.st-page-head__aside {
@@ -22,7 +21,7 @@
   letter-spacing: 0.06em;
   color: #8d5b00;
   background: #fff4b8;
-  border-color: rgba(254, 211, 52, 0.45);
+  border-color: rgba(254, 211, 52, 0.55);
 }
 
 .portal-zone.st-panel {

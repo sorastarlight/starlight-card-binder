@@ -8,19 +8,27 @@
 }
 
 .shop-page.st-public {
-  padding-bottom: clamp(32px, 5vw, 48px);
+  padding-bottom: 0;
 }
 
-.shop-hero.st-page-head {
-  border-bottom-width: 3px;
-}
-
-.shop-tagline {
+.shop-hero.st-bleed-banner .shop-tagline {
   display: block;
   margin-top: 8px;
-  color: var(--shop-pink);
+  color: #ffe0f2;
   font-size: 0.92rem;
   font-weight: 900;
+}
+
+.shop-hero.st-bleed-banner .shop-title {
+  color: #fff;
+}
+
+.wallet-card.st-page-head__aside .wallet-amount {
+  color: #fff;
+}
+
+.shop-main.st-public-body {
+  padding-top: clamp(20px, 3vw, 32px);
 }
 
 .shop-kicker {

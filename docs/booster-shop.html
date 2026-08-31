@@ -6,30 +6,32 @@
   <title>Shop</title>
   <link rel="stylesheet" href="css/style.css?v=1.0.2">
   <script src="js/browser-performance.js?v=1.0.0" defer></script>
-  <link rel="stylesheet" href="css/starlight-public.css?v=1.1.0">
-  <link rel="stylesheet" href="css/pages/public-page.css?v=2.0.0">
-  <link rel="stylesheet" href="css/pages/booster-shop.css?v=2.0.0">
+  <link rel="stylesheet" href="css/starlight-public.css?v=1.2.0">
+  <link rel="stylesheet" href="css/pages/public-page.css?v=2.1.0">
+  <link rel="stylesheet" href="css/pages/booster-shop.css?v=2.1.0">
   <link rel="stylesheet" href="css/shared-ui.css?v=1.6.19">
   <link rel="stylesheet" href="css/qol-ui.css?v=94.2.10">
 </head>
 <body>
 <script type="module" src="js/embed-mode.js?v=1.1.1"></script>
 <main class="st-public shop-page public-page">
-  <header class="st-page-head st-page-head--split shop-hero">
-    <div class="hero-copy">
-      <p class="st-eyebrow shop-kicker" data-content="shop.eyebrow">Magical Booster Marketplace</p>
-      <h1 class="shop-title" data-content="shop.title">Shop</h1>
-      <p class="st-lead" data-content="shop.lead">Crack open wonder, chase your favorite cards, and turn every duplicate into fuel for your next magical pull.</p>
-      <strong class="shop-tagline" data-content="shop.tagline">Exchange your Star Bits for booster packs and more!</strong>
+  <header class="st-bleed-banner shop-hero">
+    <div class="st-bleed-banner__inner st-page-head st-page-head--split">
+      <div class="hero-copy">
+        <p class="st-eyebrow shop-kicker" data-content="shop.eyebrow">Magical Booster Marketplace</p>
+        <h1 class="shop-title" data-content="shop.title">Shop</h1>
+        <p class="st-lead" data-content="shop.lead">Crack open wonder, chase your favorite cards, and turn every duplicate into fuel for your next magical pull.</p>
+        <strong class="shop-tagline" data-content="shop.tagline">Exchange your Star Bits for booster packs and more!</strong>
+      </div>
+      <aside class="st-page-head__aside st-bleed-banner__aside wallet-card" aria-label="Star Bits wallet">
+        <small data-content="shop.walletLabel">Your Star Bits</small>
+        <div class="wallet-amount"><img class="star-bit-icon star-bit-icon--lg" src="site_assets/icons/star-bit.png?v=2" alt="" width="28" height="28" decoding="async"><b id="balance">0</b></div>
+        <span id="wallet-note" data-content="shop.walletNote">Available to spend</span>
+      </aside>
     </div>
-    <aside class="st-page-head__aside wallet-card" aria-label="Star Bits wallet">
-      <small data-content="shop.walletLabel">Your Star Bits</small>
-      <div class="wallet-amount"><img class="star-bit-icon star-bit-icon--lg" src="site_assets/icons/star-bit.png?v=2" alt="" width="28" height="28" decoding="async"><b id="balance">0</b></div>
-      <span id="wallet-note" data-content="shop.walletNote">Available to spend</span>
-    </aside>
   </header>
 
-  <section class="shop-main">
+  <div class="st-public-body shop-main">
     <section id="featured-stage" class="featured-stage" aria-live="polite"></section>
     <div class="st-tabstrip shop-tabs" role="tablist" aria-label="Shop categories">
       <button class="active" type="button" data-shop-tab="all" data-content="shop.tabAll">All Packs</button>
@@ -54,7 +56,7 @@
       <div><strong data-content="shop.footerTitle">Turn duplicates into more pulls!</strong><span data-content="shop.footerLead">Trade in extra cards for Star Bits and keep your collection growing.</span></div>
       <a class="st-btn st-btn--primary gallery-link" href="binder?view=star-bits" data-shell-view="star-bits"><img class="star-bit-icon star-bit-icon--sm" src="site_assets/icons/star-bit.png?v=2" alt="" width="16" height="16" decoding="async"><span data-content="shop.footerCta">Go To My Star Bits</span></a>
     </footer>
-  </section>
+  </div>
 </main>
 
 <div id="pack-modal" class="st-dialog-overlay hidden" aria-hidden="true">

@@ -1,11 +1,11 @@
 /* Trade With Others — unified hub layout */
 .trade-hub-page.st-public {
-  padding-bottom: clamp(32px, 5vw, 48px);
+  padding-bottom: 0;
   color: var(--st-color-ink, #3d5088);
 }
 
-.trade-hub-page .trade-head.st-page-head {
-  margin-bottom: clamp(20px, 3vw, 28px);
+.trade-hub-page .trade-head.st-bleed-banner {
+  margin-bottom: 0;
 }
 
 .trade-hub-page .trade-head h1 {

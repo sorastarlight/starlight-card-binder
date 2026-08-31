@@ -1,9 +1,9 @@
 .events-page.st-public {
-  padding-bottom: clamp(32px, 5vw, 48px);
+  padding-bottom: 0;
 }
 
-.events-header.st-page-head {
-  margin-bottom: clamp(20px, 3vw, 28px);
+.events-header.st-bleed-banner {
+  margin-bottom: 0;
 }
 
 .event-card {

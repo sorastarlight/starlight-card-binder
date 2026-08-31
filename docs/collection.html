@@ -7,10 +7,10 @@
 <link href="css/style.css?v=1.0.3" rel="stylesheet"/>
 <link href="css/v80-8-ui.css" rel="stylesheet"/>
 <link href="css/card-filters.css?v=1.0" rel="stylesheet"/>
-<link href="css/pages/card-album-page.css?v=2.10.0" rel="stylesheet"/>
+<link rel="stylesheet" href="css/starlight-public.css?v=1.2.0">
+<link rel="stylesheet" href="css/pages/public-page.css?v=2.1.0">
+<link href="css/pages/card-album-page.css?v=2.11.0" rel="stylesheet"/>
 <script src="js/browser-performance.js?v=1.0.0" defer></script>
-<link rel="stylesheet" href="css/starlight-public.css?v=1.1.0">
-<link rel="stylesheet" href="css/pages/public-page.css?v=2.0.0">
 <link rel="stylesheet" href="css/shared-ui.css?v=1.6.20">
 <link rel="stylesheet" href="css/qol-ui.css?v=94.2.11">
 <link rel="stylesheet" href="css/pages/card-analyzer.css?v=2.4.7">
@@ -27,8 +27,9 @@
 </div>
 </aside>
 <main class="st-public main card-album-page public-page">
-<header class="st-page-head card-album-header">
-<div class="card-album-intro">
+<header class="st-bleed-banner card-album-header">
+<div class="st-bleed-banner__inner st-bleed-banner__inner--solo">
+<div class="card-album-intro st-page-head">
 <p class="st-eyebrow" data-content="collection.eyebrow">My Stuff</p>
 <h1 data-content="collection.title">My Collection</h1>
 <p class="st-lead" data-content="collection.lead">Your collected cards in a themed binder. Custom covers unlock as you level up.</p>
@@ -45,8 +46,10 @@
 <div class="card-album-progress"><span data-progress=""></span></div>
 <small><span data-collected="">0</span> / <span data-total="">0</span> · <span data-percent="">0%</span></small>
 </div>
+</div>
 </header>
 
+<div class="st-public-body">
 <nav class="st-tabstrip card-album-tabs" aria-label="Collection views">
 <button class="card-album-tab active" data-collection-tab="all" type="button" data-content="collection.tabAll">Collected Cards</button>
 <button class="card-album-tab" data-collection-tab="favorites" type="button" data-content="collection.tabFavorites">Favorites</button>
@@ -87,6 +90,7 @@
 <p><b>Collection:</b> <span data-content="shared.infoStripCollection">Cards are earned through Free Daily Starlight Packs, reward codes, and special events.</span></p>
 <p data-content="shared.infoStripCopyright">© 2026 Sora Starlight</p>
 </section>
+</div>
 </main>
 </div>
 <div aria-hidden="true" aria-live="polite" id="cardOverlay" hidden></div>

@@ -23,17 +23,98 @@ html.starlight-embedded body {
 
 .st-public {
   width: 100%;
-  max-width: var(--st-pub-max);
-  margin: 0 auto;
-  padding: 0 var(--st-pub-pad) clamp(32px, 5vw, 48px);
+  max-width: none;
+  margin: 0;
+  padding: 0 0 clamp(32px, 5vw, 48px);
   color: var(--st-pub-ink);
   box-sizing: border-box;
+  background: #fff;
 }
 
 .st-public *,
 .st-public *::before,
 .st-public *::after {
   box-sizing: border-box;
+}
+
+/* Constrained content column under full-bleed banners */
+.st-public-body {
+  width: 100%;
+  max-width: var(--st-pub-max);
+  margin: 0 auto;
+  padding: clamp(20px, 3vw, 32px) var(--st-pub-pad) 0;
+}
+
+/* Full-bleed top banner (Pokémon TCG hero band) */
+.st-bleed-banner {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  padding: clamp(28px, 5vw, 56px) var(--st-pub-pad);
+  color: #fff;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 82% 40%, rgba(255, 200, 240, 0.35), transparent 42%),
+    radial-gradient(circle at 12% 20%, rgba(107, 198, 248, 0.4), transparent 36%),
+    linear-gradient(115deg, #3d2a68 0%, #5a3d8c 38%, #ff82c8 100%);
+}
+
+.st-bleed-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.18) 0 1px, transparent 2px);
+  background-size: 28px 28px;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.st-bleed-banner__inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: var(--st-pub-max);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: clamp(16px, 3vw, 32px);
+  align-items: center;
+}
+
+.st-bleed-banner__inner--solo {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.st-bleed-banner .st-eyebrow {
+  color: #ffd6ec;
+}
+
+.st-bleed-banner h1 {
+  margin: 0 0 10px;
+  color: #fff;
+  font-size: clamp(1.75rem, 4.5vw, 2.75rem);
+  line-height: 1.05;
+  font-weight: 900;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.25);
+}
+
+.st-bleed-banner .st-lead {
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 40rem;
+}
+
+.st-bleed-banner__aside {
+  justify-self: end;
+}
+
+@media (max-width: 800px) {
+  .st-bleed-banner__inner {
+    grid-template-columns: 1fr;
+  }
+
+  .st-bleed-banner__aside {
+    justify-self: start;
+  }
 }
 
 .st-section-title {
@@ -130,38 +211,39 @@ html.starlight-embedded body {
   color: var(--st-pub-muted);
 }
 
-/* Page head — used on non-home public routes */
+/* Page head — maps onto bleed banner when used as .st-bleed-banner */
 .st-page-head {
-  margin-bottom: clamp(20px, 3vw, 28px);
-  padding-bottom: clamp(16px, 2.5vw, 22px);
-  border-bottom: 3px solid rgba(107, 198, 248, 0.35);
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
 .st-page-head h1 {
   margin: 0 0 8px;
-  font-size: clamp(1.6rem, 3.8vw, 2.4rem);
-  line-height: 1.1;
+  font-size: clamp(1.75rem, 4.5vw, 2.75rem);
+  line-height: 1.05;
 }
 
 .st-page-head--split {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: clamp(16px, 3vw, 24px);
-  align-items: end;
+  display: contents;
 }
 
 .st-page-head__aside {
+  position: relative;
+  z-index: 1;
   padding: 12px 14px;
-  border: 1px solid rgba(255, 130, 200, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: var(--st-pub-radius-lg);
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(8px);
   text-align: center;
   min-width: min(100%, 180px);
+  color: #fff;
 }
 
 .st-page-head__aside small {
   display: block;
-  color: var(--st-pub-muted);
+  color: rgba(255, 255, 255, 0.8);
   font-size: 0.68rem;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -236,11 +318,6 @@ html.starlight-embedded body {
 }
 
 @media (max-width: 760px) {
-  .st-page-head--split {
-    grid-template-columns: 1fr;
-    align-items: stretch;
-  }
-
   .st-band {
     flex-direction: column;
     align-items: stretch;
