@@ -24,7 +24,21 @@ function renderIcon(icon, fallback = '') {
   return emoji ? `<span class="shell-nav-icon">${esc(emoji)}</span>` : '';
 }
 
+function dailyNavAttrs(features = []) {
+  return features.includes('dailyRainbow') ? ' data-daily-nav-rainbow=""' : '';
+}
+
+function dailyNavClasses(features = [], className = '') {
+  const classes = [];
+  if (features.includes('dailyBadge') || features.includes('dailyRainbow')) {
+    classes.push(className || 'shell-daily-link');
+  }
+  if (features.includes('dailyRainbow')) classes.push('shell-daily-rainbow-link');
+  return classes;
+}
+
 function itemBadge(features = []) {
+  if (features.includes('dailyRainbow')) return '';
   if (features.includes('dailyBadge')) {
     return '<span class="shell-daily-ready-badge" data-daily-nav-badge="" hidden="">READY</span>';
   }
@@ -69,7 +83,11 @@ function renderNavLink(item) {
     return `<p class="shell-nav-label shell-nav-label-sub">${renderIcon(item.icon)} ${esc(item.label)}</p>${seriesSlot}`;
   }
   const destination = item.destination || 'home';
-  const classes = ['shell-nav-item', item.className || ''].filter(Boolean).join(' ');
+  const dailyClasses = dailyNavClasses(features, item.className);
+  const classes = [
+    'shell-nav-item',
+    ...(dailyClasses.length ? dailyClasses : [item.className].filter(Boolean))
+  ].filter(Boolean).join(' ');
   const staffClass = features.includes('staffOnly') ? ' staff-link' : '';
   const seriesAttr = item.seriesKey ? ` data-series-key="${esc(item.seriesKey)}"` : '';
   const clearAttr = features.includes('clearSeries') || features.includes('clearCardSet') ? ' data-clear-series="1"' : '';
@@ -77,7 +95,7 @@ function renderNavLink(item) {
     ? 'event'
     : (features.includes('specialCards') ? 'special' : (features.includes('clearCardSet') ? '' : null));
   const cardSetAttr = cardSet != null ? ` data-card-set="${esc(cardSet)}"` : '';
-  return `<a class="${esc(classes)}${staffClass}" data-shell-view="${esc(destination)}" href="${itemHref(item)}"${seriesAttr}${clearAttr}${cardSetAttr}>${renderIcon(item.icon)} <span>${esc(item.label)}</span>${itemBadge(features)}</a>`;
+  return `<a class="${esc(classes)}${staffClass}" data-shell-view="${esc(destination)}" href="${itemHref(item)}"${seriesAttr}${clearAttr}${cardSetAttr}${dailyNavAttrs(features)}>${renderIcon(item.icon)} <span>${esc(item.label)}</span>${itemBadge(features)}</a>`;
 }
 
 function renderAccountMenuItem(item, { isStaff = false } = {}) {
@@ -198,9 +216,9 @@ export function applyShellNavigationToDom(navigation, { isStaff = false } = {}) 
       const classes = [
         'shell-top-link',
         link.className || '',
-        features.includes('dailyBadge') ? 'shell-daily-top-link' : ''
+        ...dailyNavClasses(features, 'shell-daily-top-link')
       ].filter(Boolean).join(' ');
-      return `<a class="${esc(classes)}" data-shell-view="${esc(link.destination)}" href="${shellHref(link.destination)}"><span>${esc(link.label)}</span>${itemBadge(features)}</a>`;
+      return `<a class="${esc(classes)}" data-shell-view="${esc(link.destination)}" href="${shellHref(link.destination)}"${dailyNavAttrs(features)}><span>${esc(link.label)}</span>${itemBadge(features)}</a>`;
     };
     const homeHtml = homeQuick
       ? linkHtml(homeQuick)

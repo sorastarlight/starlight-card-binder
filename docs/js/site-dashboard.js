@@ -1,6 +1,7 @@
 
 import { supabase } from "./supabase-client.js";
 import { levelFromPoints } from "./collector-level.js";
+import { applyDailyNavReadyState } from "./daily-nav-indicator.js";
 
 let countdownTimer = null;
 
@@ -36,7 +37,7 @@ async function loadEconomy() {
     document.querySelectorAll('[data-daily-status]').forEach(el=>el.textContent='Sign in to claim');
     document.querySelectorAll('[data-daily-cta]').forEach(el=>{el.classList.remove('is-loading','is-ready','is-claimed');el.classList.add('is-claimed');});
     setText('[data-daily-cta-label]', 'Sign In for Free Daily Starlight Pack');
-    document.querySelectorAll('[data-daily-nav-badge]').forEach(el=>{el.hidden=true;});
+    applyDailyNavReadyState(false);
     return;
   }
   const [{data: preview,error:previewError},{data: daily,error:dailyError},{data: rows,error:cardsError},{data: profile},{data: wallet}] = await Promise.all([
@@ -64,12 +65,12 @@ async function loadEconomy() {
       setText('[data-daily-countdown]', 'Free pack available now');
       setText('[data-daily-cta-label]', '🌟 CLAIM YOUR FREE DAILY STARLIGHT PACK');
       ctas.forEach(el=>{el.classList.remove('is-loading','is-claimed');el.classList.add('is-ready');el.setAttribute('aria-label','Free Daily Starlight Pack available to open now');});
-      document.querySelectorAll('[data-daily-nav-badge]').forEach(el=>{el.hidden=false;el.textContent='READY';});
+      applyDailyNavReadyState(true);
     } else {
       document.querySelectorAll('[data-daily-status]').forEach(el=>{el.textContent='Claimed Today';el.classList.remove('daily-ready');el.classList.add('daily-claimed');});
       setText('[data-daily-cta-label]', 'Free Pack Claimed');
       ctas.forEach(el=>{el.classList.remove('is-loading','is-ready');el.classList.add('is-claimed');el.setAttribute('aria-label','View Free Daily Starlight Pack countdown');});
-      document.querySelectorAll('[data-daily-nav-badge]').forEach(el=>{el.hidden=true;});
+      applyDailyNavReadyState(false);
       startCountdown(daily.nextClaimAt);
     }
   }

@@ -17,6 +17,7 @@ import { isStudioPreview, STUDIO_MSG } from './studio-preview.js';
 import { initLiveFeedWidget } from './live-feed-widget.js?v=1.7';
 import { applyAvatarFrameClass } from './avatar-frame-utils.js';
 import { getMyProfileExtras } from './profile-extras-service.js';
+import { applyDailyNavReadyState } from './daily-nav-indicator.js';
 
 const SHELL_BUILD = '94.5.0';
 const VIEW_READY_TIMEOUT_MS = 6500;
@@ -515,10 +516,30 @@ async function hydrateTradeOfferBadge(){
   }catch(e){badges.forEach(b=>b.hidden=true);console.warn('[Starlight] Trade offer badge failed',e)}
 }
 
+async function hydrateDailyNavIndicator(){
+  try{
+    const { data: authData } = await supabase.auth.getUser();
+    if(!authData?.user){
+      applyDailyNavReadyState(false);
+      return;
+    }
+    const { data: daily, error } = await supabase.rpc('get_daily_booster_status');
+    if(error||!daily){
+      applyDailyNavReadyState(false);
+      return;
+    }
+    applyDailyNavReadyState(Boolean(daily.available));
+  }catch(e){
+    applyDailyNavReadyState(false);
+    console.warn('[Starlight] Daily nav indicator failed',e);
+  }
+}
+
 function refreshShellBadges(){
   hydrateTradeOfferBadge();
   hydrateNotificationBadge();
   hydrateReceivedGiftBadge();
+  hydrateDailyNavIndicator();
 }
 
 function applyAccountChrome(isSignedIn){

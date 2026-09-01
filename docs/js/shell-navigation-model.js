@@ -442,7 +442,7 @@ function normalizeTopBarQuickLinks(links, defaults) {
     label: 'Free Daily Card Pack',
     destination: 'daily',
     enabled: true,
-    features: ['dailyBadge'],
+    features: ['dailyRainbow'],
     className: 'shell-daily-top-link'
   };
 

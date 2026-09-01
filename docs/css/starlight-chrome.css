@@ -171,6 +171,59 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-top-link .shell-dail
   display: none !important;
 }
 
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-top-link.shell-daily-rainbow-link {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+}
+
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-top-link.shell-daily-rainbow-link > span {
+  position: relative;
+  z-index: 1;
+}
+
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-top-link.shell-daily-rainbow-link.is-daily-ready {
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.35);
+}
+
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-top-link.shell-daily-rainbow-link.is-daily-ready::before {
+  content: "";
+  position: absolute;
+  inset: 6px -6px;
+  border-radius: 4px;
+  background: conic-gradient(from 0deg, #ff0040, #ff8a00, #ffe600, #00e676, #00b0ff, #7c4dff, #ff0040);
+  animation: shellDailyRainbowSpin 2.6s linear infinite, shellDailyRainbowPulse 1.7s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-top-link.shell-daily-rainbow-link.is-daily-ready::after {
+  content: "";
+  position: absolute;
+  inset: 8px -4px;
+  border-radius: 3px;
+  background: var(--st-chrome-bar);
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes shellDailyRainbowSpin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shellDailyRainbowPulse {
+  0%, 100% { opacity: 0.82; filter: brightness(1) saturate(1); }
+  50% { opacity: 1; filter: brightness(1.18) saturate(1.15); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-top-link.shell-daily-rainbow-link.is-daily-ready::before {
+    animation: none;
+    opacity: 0.95;
+  }
+}
+
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead,
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-nav,
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-mega {

@@ -236,12 +236,28 @@ body[data-page="binder"] .series-hero {
 .shell-daily-ready-badge{margin-left:auto;padding:3px 7px;border-radius:999px;background:linear-gradient(135deg,#fed334,#ff82c8);color:#fff;font-size:.62rem;font-weight:1000;letter-spacing:.06em;box-shadow:0 0 0 2px rgba(255,255,255,.7),0 0 14px rgba(255,130,200,.65);animation:shellReadyPulse 1.25s ease-in-out infinite}
 .shell-daily-ready-badge[hidden]{display:none!important}
 .unified-nav a.shell-daily-link:has(.shell-daily-ready-badge:not([hidden])){border-color:rgba(254,211,52,.62);background:linear-gradient(120deg,rgba(255,249,205,.95),rgba(255,224,241,.95));box-shadow:0 0 18px rgba(255,130,200,.25)}
+.shell-daily-rainbow-link{position:relative;isolation:isolate;overflow:visible}
+.shell-daily-rainbow-link>span{position:relative;z-index:1}
+.shell-daily-rainbow-link.is-daily-ready{color:#8a4b75;text-shadow:0 0 8px rgba(255,130,200,.35)}
+.shell-daily-rainbow-link.is-daily-ready::before{
+  content:"";position:absolute;inset:-3px;border-radius:14px;
+  background:conic-gradient(from 0deg,#ff0040,#ff8a00,#ffe600,#00e676,#00b0ff,#7c4dff,#ff0040);
+  animation:shellDailyRainbowSpin 2.6s linear infinite,shellDailyRainbowPulse 1.7s ease-in-out infinite;
+  pointer-events:none;z-index:0
+}
+.shell-daily-rainbow-link.is-daily-ready::after{
+  content:"";position:absolute;inset:1px;border-radius:12px;background:linear-gradient(145deg,#fff,#f7fbff);
+  pointer-events:none;z-index:0
+}
+body.shell-masthead-layout .shell-top-link.shell-daily-rainbow-link.is-daily-ready::after{background:var(--st-chrome-bar,#0d0d0f)}
+@keyframes shellDailyRainbowSpin{to{transform:rotate(360deg)}}
+@keyframes shellDailyRainbowPulse{0%,100%{opacity:.82;filter:brightness(1) saturate(1)}50%{opacity:1;filter:brightness(1.18) saturate(1.15)}}
 .shell-shop-link{white-space:nowrap}
 .economy-card [data-daily-status].daily-ready{display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border-radius:999px;background:linear-gradient(135deg,#fff5bb,#ffd9ed);color:#8a4b75;box-shadow:0 0 16px rgba(255,130,200,.3);animation:shellReadyPulse 1.4s ease-in-out infinite}
 .economy-card [data-daily-status].daily-ready::before{content:'?';color:#e9a900}
 @keyframes shellReadyPulse{0%,100%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.045);filter:brightness(1.08)}}
 @media(max-width:1180px){.unified-nav a.shell-daily-link{font-size:.82rem}.shell-daily-ready-badge{font-size:.56rem;padding:2px 5px}}
-@media(prefers-reduced-motion:reduce){.shell-daily-ready-badge,.economy-card [data-daily-status].daily-ready{animation:none!important}}
+@media(prefers-reduced-motion:reduce){.shell-daily-ready-badge,.economy-card [data-daily-status].daily-ready,.shell-daily-rainbow-link.is-daily-ready::before{animation:none!important}}
 
 /* V82.8.2 ? compact sidebar groups and clipping repair */
 @media (min-width:1181px){
@@ -296,6 +312,7 @@ body[data-page="binder"] .series-hero {
 }
 :is(.firefox-performance-mode, .starlight-performance-lite) .daily-booster-cta.is-ready,
 :is(.firefox-performance-mode, .starlight-performance-lite) .shell-daily-ready-badge,
+:is(.firefox-performance-mode, .starlight-performance-lite) .shell-daily-rainbow-link.is-daily-ready::before,
 :is(.firefox-performance-mode, .starlight-performance-lite) .economy-card [data-daily-status].daily-ready,
 :is(.firefox-performance-mode, .starlight-performance-lite) .unified-nav a.active::after {
   animation: none !important;
