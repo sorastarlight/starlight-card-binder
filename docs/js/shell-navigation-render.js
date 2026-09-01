@@ -174,12 +174,18 @@ export function applyShellNavigationToDom(navigation, { isStaff = false } = {}) 
   if (mastheadNav) {
     const megaSections = sections.filter(section => section.mega);
     const topQuick = (config.topBar.quickLinks || []).filter(link => link.enabled !== false);
-    const quickHtml = topQuick
-      .map(link => `<a class="shell-top-link" data-shell-view="${esc(link.destination)}" href="${shellHref(link.destination)}">${esc(link.label)}</a>`)
-      .join('');
+    const homeQuick = topQuick.find(link => link.destination === 'home');
+    const otherQuick = topQuick.filter(link => link.destination !== 'home');
+    const linkHtml = (link) =>
+      `<a class="shell-top-link" data-shell-view="${esc(link.destination)}" href="${shellHref(link.destination)}">${esc(link.label)}</a>`;
+    const homeHtml = homeQuick
+      ? linkHtml(homeQuick)
+      : `<a class="shell-top-link" data-shell-view="home" href="${shellHref('home')}">Home</a>`;
+    const otherHtml = otherQuick.map(linkHtml).join('');
+    const megaHtml = megaSections.map(renderMegaSection).join('');
     mastheadNav.innerHTML = layout === 'hybrid'
-      ? quickHtml
-      : `${megaSections.map(renderMegaSection).join('')}${quickHtml}`;
+      ? `${homeHtml}${otherHtml}`
+      : `${homeHtml}${megaHtml}${otherHtml}`;
   }
 
   const nav = document.querySelector('.unified-nav');

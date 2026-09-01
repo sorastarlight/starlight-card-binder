@@ -61,6 +61,7 @@ test('default shell navigation includes core destinations and staff account link
   assert.equal(nav.pageTitles.events, 'Events');
   assert.equal(nav.pageTitles.redeem, 'Redeem Code');
   assert.equal(nav.pageTitles.feed, 'Activity Feed');
+  assert.ok(nav.topBar.quickLinks.some(link => link.destination === 'home' && link.label === 'Home'));
   assert.ok(nav.topBar.quickLinks.some(link => link.destination === 'events'));
   assert.ok(nav.accountMenu.signedIn.some(item => (item.features || []).includes('notificationBadge')));
   assert.ok(nav.accountMenu.signedIn.some(item => (item.features || []).includes('receivedGiftBadge')));
@@ -494,9 +495,10 @@ test('shell navigation render and static shell HTML use extensionless binder hre
 });
 
 test('shell masthead wires mega menus and series browse params', async () => {
-  const [shell, defaults] = await Promise.all([
+  const [shell, defaults, render] = await Promise.all([
     read('docs/js/app-shell.js'),
-    read('docs/js/shell-navigation-defaults.js')
+    read('docs/js/shell-navigation-defaults.js'),
+    read('docs/js/shell-navigation-render.js')
   ]);
   assert.match(shell, /wireMastheadMenus/);
   assert.match(shell, /closeAllMegaMenus/);
@@ -505,9 +507,12 @@ test('shell masthead wires mega menus and series browse params', async () => {
   assert.match(shell, /applyStarlightSeriesFilter/);
   assert.match(shell, /locationExtraParams/);
   assert.doesNotMatch(shell, /pointerenter[\s\S]*openMegaMenu/);
+  assert.match(render, /destination === 'home'/);
+  assert.match(render, /Home/);
   assert.match(defaults, /mega:\s*true/);
   assert.match(defaults, /clearSeries/);
   assert.match(defaults, /brandRibbon: 'Starlight Cards'/);
+  assert.match(defaults, /home-top/);
 });
 
 test('shell refreshes account chrome after embedded login', async () => {

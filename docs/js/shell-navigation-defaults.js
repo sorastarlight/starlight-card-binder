@@ -223,6 +223,7 @@ export function createDefaultShellNavigation() {
     },
     topBar: {
       quickLinks: [
+        { id: 'home-top', label: 'Home', destination: 'home', enabled: true },
         { id: 'events-top', label: 'Events', destination: 'events', enabled: true },
         { id: 'trades-top', label: 'Trade', destination: 'trades', enabled: true }
       ]
