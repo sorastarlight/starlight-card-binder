@@ -65,8 +65,8 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-brand-lockup {
 
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-brand .logo {
   width: auto !important;
-  height: 56px !important;
-  max-width: min(480px, 44vw) !important;
+  height: 52px !important;
+  max-width: min(440px, 42vw) !important;
   object-fit: contain;
   flex: none;
   filter: drop-shadow(0 2px 8px rgba(255, 130, 200, 0.35));
