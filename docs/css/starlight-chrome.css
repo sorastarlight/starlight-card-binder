@@ -65,8 +65,8 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-brand-lockup {
 
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-brand .logo {
   width: auto;
-  height: 62px;
-  max-width: min(520px, 46vw);
+  height: 68px;
+  max-width: min(580px, 50vw);
   object-fit: contain;
   flex: none;
   filter: drop-shadow(0 2px 8px rgba(255, 130, 200, 0.35));
@@ -356,8 +356,8 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-drawer {
 
 @media (max-width: 600px) {
   body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-brand .logo {
-    height: 44px;
-    max-width: min(320px, 68vw);
+    height: 48px;
+    max-width: min(340px, 72vw);
   }
 
   body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-inner {
