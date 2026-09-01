@@ -171,27 +171,6 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-top-link .shell-dail
   display: none !important;
 }
 
-body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-top-link.shell-daily-rainbow-link {
-  --shell-rainbow-radius: 0;
-  --shell-rainbow-border: 2px;
-  position: relative;
-  isolation: isolate;
-  overflow: visible;
-}
-
-body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-top-link.shell-daily-rainbow-link > span {
-  position: relative;
-  z-index: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-top-link.shell-daily-rainbow-link.is-daily-ready::before {
-    animation: none;
-    opacity: 0.85;
-    transform: rotate(45deg);
-  }
-}
-
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead,
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-nav,
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-mega {

@@ -51,25 +51,34 @@ function upgradeShellIcon(icon, key) {
   return icon;
 }
 
+function sanitizeNavFeatures(features = [], destination = '') {
+  const list = Array.isArray(features) ? features.map(String).filter(Boolean) : [];
+  const hadRainbow = list.includes('dailyRainbow');
+  const next = list.filter(feature => feature !== 'dailyRainbow');
+  if (destination === 'daily' && hadRainbow && !next.includes('dailyBadge')) {
+    next.push('dailyBadge');
+  }
+  return next.slice(0, 8);
+}
+
 function sanitizeItem(item = {}, index = 0) {
-  const features = Array.isArray(item.features)
-    ? item.features.map(String).filter(Boolean).slice(0, 8)
-    : [];
+  const destination = String(item.destination || '').trim();
+  const features = sanitizeNavFeatures(item.features, destination);
   const isLabel = features.includes('sectionLabel');
   const isSeparator = features.includes('separator');
   const isAuthAction = features.some((feature) =>
     ['signOut', 'signIn', 'signUp', 'profileLink'].includes(feature)
   );
-  const destination = isLabel || isSeparator ? '' : String(item.destination || '').trim();
+  const resolvedDestination = isLabel || isSeparator ? '' : destination;
   if (
     !isLabel &&
     !isSeparator &&
     !isAuthAction &&
-    destination &&
-    !ALLOWED_DESTINATIONS.has(destination) &&
-    !isKnownShellRoute(destination)
+    resolvedDestination &&
+    !ALLOWED_DESTINATIONS.has(resolvedDestination) &&
+    !isKnownShellRoute(resolvedDestination)
   ) {
-    throw new Error(`Unsupported navigation destination: ${destination}`);
+    throw new Error(`Unsupported navigation destination: ${resolvedDestination}`);
   }
   const rawLabel = String(item.label || (isSeparator ? '' : 'Untitled')).trim().slice(0, 80)
     || (isSeparator ? '' : 'Untitled');
@@ -77,9 +86,9 @@ function sanitizeItem(item = {}, index = 0) {
     id: String(item.id || `item-${index}`).slice(0, 64),
     label: isLabel || isSeparator
       ? rewriteLegacyLabel('', rawLabel, rawLabel)
-      : rewriteLegacyLabel(destination, rawLabel, rawLabel),
+      : rewriteLegacyLabel(resolvedDestination, rawLabel, rawLabel),
     icon: asIcon(item.icon),
-    destination,
+    destination: resolvedDestination,
     enabled: item.enabled !== false,
     features,
     className: String(item.className || '').trim().slice(0, 80),
@@ -442,7 +451,7 @@ function normalizeTopBarQuickLinks(links, defaults) {
     label: 'Free Daily Card Pack',
     destination: 'daily',
     enabled: true,
-    features: ['dailyRainbow'],
+    features: ['dailyBadge'],
     className: 'shell-daily-top-link'
   };
 
@@ -528,9 +537,7 @@ export function sanitizeShellNavigation(input) {
         if (!ALLOWED_DESTINATIONS.has(destination)) {
           throw new Error(`Unsupported top-bar destination: ${destination || '(empty)'}`);
         }
-        const features = Array.isArray(link.features)
-          ? link.features.map(String).filter(Boolean).slice(0, 8)
-          : [];
+        const features = sanitizeNavFeatures(link.features, destination);
         const rawLabel = String(link.label || destination).trim().slice(0, 40) || destination;
         return {
           id: String(link.id || `top-${index}`).slice(0, 64),

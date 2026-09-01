@@ -83,7 +83,7 @@ test('default shell navigation includes core destinations and staff account link
   assert.ok(nav.topBar.quickLinks.some(link =>
     link.destination === 'daily'
     && link.label === 'Free Daily Card Pack'
-    && (link.features || []).includes('dailyRainbow')
+    && (link.features || []).includes('dailyBadge')
   ));
   assert.ok(!nav.topBar.quickLinks.some(link => link.destination === 'events'));
   assert.ok(!nav.topBar.quickLinks.some(link => link.destination === 'trades'));
@@ -115,7 +115,7 @@ test('sanitizeShellNavigation migrates top bar off Events/Trade and onto Daily P
   assert.ok(migrated.topBar.quickLinks.some(link =>
     link.destination === 'daily'
     && link.label === 'Free Daily Card Pack'
-    && (link.features || []).includes('dailyRainbow')
+    && (link.features || []).includes('dailyBadge')
   ));
 });
 
@@ -628,21 +628,42 @@ test('shell navigation render and static shell HTML use extensionless binder hre
   assert.doesNotMatch(homeHtml, /binder\.html/);
 });
 
-test('daily nav indicator module and rainbow markup are wired', async () => {
-  const [indicator, render, dashboard, shell, shellCss] = await Promise.all([
+test('sanitizeShellNavigation strips dailyRainbow and restores dailyBadge on daily links', () => {
+  const migrated = sanitizeShellNavigation({
+    ...cloneDefaultShellNavigation(),
+    topBar: {
+      quickLinks: [
+        { id: 'home-top', label: 'Home', destination: 'home', enabled: true, features: [] },
+        {
+          id: 'daily-top',
+          label: 'Free Daily Card Pack',
+          destination: 'daily',
+          enabled: true,
+          features: ['dailyRainbow'],
+          className: 'shell-daily-top-link'
+        }
+      ]
+    }
+  });
+  const daily = migrated.topBar.quickLinks.find(link => link.destination === 'daily');
+  assert.ok(daily);
+  assert.ok((daily.features || []).includes('dailyBadge'));
+  assert.ok(!(daily.features || []).includes('dailyRainbow'));
+});
+
+test('daily nav indicator module and READY badge markup are wired', async () => {
+  const [indicator, render, dashboard, shell] = await Promise.all([
     read('docs/js/daily-nav-indicator.js'),
     read('docs/js/shell-navigation-render.js'),
     read('docs/js/site-dashboard.js'),
-    read('docs/js/app-shell.js'),
-    read('docs/css/app-shell.css')
+    read('docs/js/app-shell.js')
   ]);
   assert.match(indicator, /applyDailyNavReadyState/);
-  assert.match(indicator, /data-daily-nav-rainbow/);
-  assert.match(indicator, /is-daily-ready/);
-  assert.match(render, /data-daily-nav-rainbow/);
-  assert.match(render, /shell-daily-rainbow-link/);
-  assert.match(shellCss, /mask-composite:exclude/);
-  assert.match(shellCss, /shellDailyRainbowOrbit/);
+  assert.match(indicator, /data-daily-nav-badge/);
+  assert.doesNotMatch(indicator, /dailyRainbow|data-daily-nav-rainbow/);
+  assert.match(render, /data-daily-nav-badge/);
+  assert.match(render, /shell-daily-top-link/);
+  assert.doesNotMatch(render, /dailyRainbow|shell-daily-rainbow-link/);
   assert.match(dashboard, /applyDailyNavReadyState/);
   assert.match(shell, /hydrateDailyNavIndicator/);
 });
@@ -662,7 +683,7 @@ test('shell masthead wires mega menus and series browse params', async () => {
   assert.doesNotMatch(shell, /pointerenter[\s\S]*openMegaMenu/);
   assert.match(render, /destination === 'home'/);
   assert.match(render, /Home/);
-  assert.match(render, /shell-daily-rainbow-link|dailyRainbow|data-daily-nav-rainbow/);
+  assert.match(render, /shell-daily-top-link|dailyBadge/);
   assert.match(defaults, /Free Daily Card Pack/);
   assert.match(defaults, /mega:\s*true/);
   assert.match(defaults, /clearSeries/);

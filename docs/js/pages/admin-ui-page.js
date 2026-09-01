@@ -23,8 +23,7 @@ const esc = (value) =>
 mountAdminCrumb({ tool: 'Navigation Studio' });
 
 const FEATURES = [
-  { id: 'dailyBadge', label: 'Daily indicator: READY badge' },
-  { id: 'dailyRainbow', label: 'Daily indicator: Rainbow glow' },
+  { id: 'dailyBadge', label: 'Daily badge (READY)' },
   { id: 'tradeOfferBadge', label: 'Trade offer badge' },
   { id: 'notificationBadge', label: 'Notification badge' },
   { id: 'receivedGiftBadge', label: 'Received gift badge' },
@@ -38,8 +37,7 @@ const FEATURES = [
 ];
 
 const TOP_BAR_FEATURES = [
-  { id: 'dailyBadge', label: 'Daily indicator: READY badge' },
-  { id: 'dailyRainbow', label: 'Daily indicator: Rainbow glow' },
+  { id: 'dailyBadge', label: 'Daily badge (READY)' },
   { id: 'tradeOfferBadge', label: 'Trade offer badge' },
   { id: 'notificationBadge', label: 'Notification badge' },
   { id: 'receivedGiftBadge', label: 'Received gift badge' },
@@ -231,7 +229,7 @@ function renderTopBar() {
   const links = navigation?.topBar?.quickLinks || [];
   topbarPanel.innerHTML = `
     <h3 class="admin-panel__title">Strip links</h3>
-    <p class="lead">Top-navigation strip links (for example Home and Free Daily Card Pack). Reorder, rename, enable/disable, and choose a daily indicator: READY badge or rainbow glow (one at a time).</p>
+    <p class="lead">Top-navigation strip links (for example Home and Free Daily Card Pack). Reorder, rename, enable/disable, and attach badges without shifting neighboring menus.</p>
     <div class="link-list admin-editor-list">
       ${links.map((link, index) => {
         const features = new Set(link.features || []);
@@ -399,8 +397,6 @@ function onEditorInput(event) {
     const set = new Set(item.features || []);
     if (el.checked) set.add(feature);
     else set.delete(feature);
-    if (el.checked && feature === 'dailyBadge') set.delete('dailyRainbow');
-    if (el.checked && feature === 'dailyRainbow') set.delete('dailyBadge');
     item.features = [...set];
     if (feature === 'sectionLabel') {
       if (el.checked) item.destination = '';
@@ -440,10 +436,7 @@ function onEditorInput(event) {
     const set = new Set(link.features || []);
     if (el.checked) set.add(feature);
     else set.delete(feature);
-    if (el.checked && feature === 'dailyBadge') set.delete('dailyRainbow');
-    if (el.checked && feature === 'dailyRainbow') set.delete('dailyBadge');
     link.features = [...set];
-    if (feature === 'dailyBadge' || feature === 'dailyRainbow') renderAll();
   }
 }
 

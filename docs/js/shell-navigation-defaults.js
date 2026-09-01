@@ -238,7 +238,7 @@ export function createDefaultShellNavigation() {
     topBar: {
       quickLinks: [
         { id: 'home-top', label: 'Home', destination: 'home', enabled: true, features: [] },
-        { id: 'daily-top', label: 'Free Daily Card Pack', destination: 'daily', enabled: true, features: ['dailyRainbow'], className: 'shell-daily-top-link' }
+        { id: 'daily-top', label: 'Free Daily Card Pack', destination: 'daily', enabled: true, features: ['dailyBadge'], className: 'shell-daily-top-link' }
       ]
     },
     accountMenu: {
