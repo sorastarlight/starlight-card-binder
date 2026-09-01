@@ -10,7 +10,8 @@
   --st-chrome-bar-ink: #fff;
   --st-chrome-bar-muted: rgba(255, 255, 255, 0.82);
   --st-chrome-bar-line: rgba(255, 130, 200, 0.28);
-  --st-masthead-nav-break: 1920px;
+  --st-masthead-nav-break: 2000px;
+  --st-masthead-nav-expand: 2000px;
   --st-magic-lavender: #e8d4ff;
   --st-magic-rose: #ffe8f4;
   --st-magic-sky: #e8f6ff;
@@ -43,7 +44,7 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-inner {
   padding: 0 var(--st-chrome-pad-inline);
   min-height: var(--st-chrome-bar-h);
   height: var(--st-chrome-bar-h);
-  grid-template-columns: minmax(0, auto) minmax(0, 1fr) minmax(0, auto);
+  grid-template-columns: auto auto minmax(0, 1fr);
   gap: clamp(10px, 1.6vw, 24px);
   align-items: center;
 }
@@ -82,6 +83,8 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-brand .bind
 }
 
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-menu-button {
+  display: inline-grid;
+  place-items: center;
   color: var(--st-chrome-bar-ink);
   border-color: rgba(255, 255, 255, 0.28);
   background: rgba(255, 255, 255, 0.08);
@@ -91,6 +94,7 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-menu-button {
 
 /* Nav grouped to the right of the bar, before account */
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-nav {
+  display: none;
   flex: 1 1 auto;
   justify-content: flex-end;
   gap: 2px;
@@ -391,45 +395,65 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-drawer {
   color: #fff;
 }
 
-@container shell-masthead (max-width: 1820px) {
+/* Collapsed by default — expand only when the masthead container is wide enough */
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-inner.shell-masthead--force-collapse .shell-masthead-nav {
+  display: none !important;
+}
+
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-inner.shell-masthead--force-collapse .shell-menu-button {
+  display: inline-grid !important;
+  place-items: center;
+}
+
+@container shell-masthead (min-width: 2000px) {
   .shell-masthead-nav {
-    display: none !important;
+    display: flex !important;
   }
 
   .shell-menu-button {
-    display: inline-grid !important;
-    place-items: center;
-  }
-
-  .shell-masthead-inner {
-    grid-template-columns: auto auto minmax(0, 1fr) !important;
-  }
-
-  .shell-masthead-actions .shell-account-main {
     display: none !important;
   }
 
-  .shell-masthead-actions .shell-account-menu-button {
-    max-width: none;
-    padding: 3px;
-    border-radius: 999px;
+  .shell-masthead-inner {
+    grid-template-columns: minmax(0, auto) minmax(0, 1fr) minmax(0, auto) !important;
   }
 }
 
-@media (max-width: 1920px) {
+@container shell-masthead (min-width: 2000px) {
+  .shell-masthead-inner.shell-masthead--force-collapse .shell-masthead-nav {
+    display: none !important;
+  }
+
+  .shell-masthead-inner.shell-masthead--force-collapse .shell-menu-button {
+    display: inline-grid !important;
+    place-items: center;
+  }
+}
+
+@media (min-width: 2000px) {
   body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-nav {
-    display: none;
+    display: flex;
   }
 
   body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-menu-button {
-    display: inline-grid;
-    place-items: center;
+    display: none;
   }
 
   body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-inner {
-    grid-template-columns: auto auto minmax(0, 1fr);
+    grid-template-columns: minmax(0, auto) minmax(0, 1fr) minmax(0, auto);
   }
 
+  body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-inner.shell-masthead--force-collapse .shell-masthead-nav {
+    display: none !important;
+  }
+
+  body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-inner.shell-masthead--force-collapse .shell-menu-button {
+    display: inline-grid !important;
+    place-items: center;
+  }
+}
+
+@media (max-width: 1999px) {
   body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-account-main strong,
   body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-account-handle,
   body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-profile-mini-stats,
@@ -441,12 +465,6 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-drawer {
     max-width: none;
     padding: 3px;
     border-radius: 999px;
-  }
-}
-
-@media (min-width: 1921px) {
-  body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-menu-button {
-    display: none;
   }
 }
 

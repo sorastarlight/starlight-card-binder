@@ -804,7 +804,8 @@ body.unified-shell{padding-left:env(safe-area-inset-left);padding-right:env(safe
 /* ===== TCG Live?style sticky masthead ===== */
 body.shell-masthead-layout{
   --shell-masthead-h:76px;
-  --shell-masthead-nav-break:1920px;
+  --shell-masthead-nav-break:2000px;
+  --shell-masthead-nav-expand:2000px;
   --shell-chrome-pad:clamp(16px, 2.2vw, 28px);
   --shell-chrome-top:var(--shell-masthead-h, 76px);
 }
@@ -843,7 +844,7 @@ body.shell-masthead-layout .shell-masthead-inner{
   container-type:inline-size;
   container-name:shell-masthead;
   display:grid;
-  grid-template-columns:minmax(0, auto) minmax(0, 1fr) minmax(0, auto);
+  grid-template-columns:auto auto minmax(0, 1fr);
   align-items:center;
   gap:clamp(10px, 1.6vw, 24px);
   width:100%;
@@ -883,7 +884,7 @@ body.shell-masthead-layout .shell-masthead-brand .binder-ribbon{
   display:none !important;
 }
 body.shell-masthead-layout .shell-masthead-nav{
-  display:flex;
+  display:none;
   flex:1 1 auto;
   flex-wrap:nowrap;
   align-items:center;
@@ -893,6 +894,24 @@ body.shell-masthead-layout .shell-masthead-nav{
   max-width:100%;
   overflow-x:clip;
   overflow-y:visible;
+}
+body.shell-masthead-layout .shell-menu-button{
+  display:inline-grid;
+  place-items:center;
+  order:0;
+}
+body.shell-masthead-layout .shell-masthead-brand{
+  order:1;
+}
+body.shell-masthead-layout .shell-masthead-actions{
+  order:2;
+}
+body.shell-masthead-layout .shell-masthead-inner.shell-masthead--force-collapse .shell-masthead-nav{
+  display:none!important;
+}
+body.shell-masthead-layout .shell-masthead-inner.shell-masthead--force-collapse .shell-menu-button{
+  display:inline-grid!important;
+  place-items:center;
 }
 body.shell-masthead-layout .shell-mega{position:relative;flex:0 1 auto;min-width:0;z-index:1}
 body.shell-masthead-layout .shell-mega.is-open{z-index:5}
@@ -1152,31 +1171,28 @@ body.shell-masthead-layout .shell-drawer .unified-nav{
   background:transparent;
   padding:0;
 }
-@container shell-masthead (max-width: 1820px) {
-  .shell-masthead-nav{display:none!important}
-  .shell-menu-button{display:inline-grid!important;place-items:center;order:0}
-  .shell-masthead-inner{grid-template-columns:auto auto minmax(0,1fr)!important}
-  .shell-masthead-brand{order:1}
-  .shell-masthead-actions{order:2;justify-content:flex-end}
-  .shell-masthead-actions .shell-account-main{display:none!important}
-  .shell-masthead-actions .shell-account-menu-button{max-width:none;padding:3px;border-radius:999px}
+@container shell-masthead (min-width: 2000px) {
+  .shell-masthead-nav{display:flex!important}
+  .shell-menu-button{display:none!important}
+  .shell-masthead-inner{grid-template-columns:minmax(0, auto) minmax(0, 1fr) minmax(0, auto)!important}
+  .shell-masthead-brand{order:0}
+  .shell-masthead-actions{order:0}
+  .shell-masthead-inner.shell-masthead--force-collapse .shell-masthead-nav{display:none!important}
+  .shell-masthead-inner.shell-masthead--force-collapse .shell-menu-button{display:inline-grid!important;place-items:center;order:0}
 }
-@media(max-width:1920px){
-  body.shell-masthead-layout .shell-masthead-inner{
-    grid-template-columns:auto auto 1fr;
-  }
-  body.shell-masthead-layout .shell-masthead-nav{display:none}
-  body.shell-masthead-layout .shell-menu-button{display:inline-grid;place-items:center;order:0}
-  body.shell-masthead-layout .shell-masthead-brand{order:1}
-  body.shell-masthead-layout .shell-masthead-actions{order:2;justify-content:flex-end}
+@media(min-width:2000px){
+  body.shell-masthead-layout .shell-masthead-nav{display:flex}
+  body.shell-masthead-layout .shell-menu-button{display:none}
+  body.shell-masthead-layout .shell-masthead-inner{grid-template-columns:minmax(0, auto) minmax(0, 1fr) minmax(0, auto)}
+  body.shell-masthead-layout .shell-masthead-inner.shell-masthead--force-collapse .shell-masthead-nav{display:none!important}
+  body.shell-masthead-layout .shell-masthead-inner.shell-masthead--force-collapse .shell-menu-button{display:inline-grid!important;place-items:center;order:0}
+  body.shell-masthead-layout .shell-mega.is-mobile-only{display:none}
+}
+@media(max-width:1999px){
   body.shell-masthead-layout .shell-masthead-actions .shell-account-main span:not([data-shell-account-sub]),
   body.shell-masthead-layout .shell-masthead-actions .shell-account-main strong,
   body.shell-masthead-layout .shell-profile-mini-stats{display:none}
   body.shell-masthead-layout .shell-masthead-actions .shell-account-menu-button{max-width:none;padding:3px;border-radius:999px}
-}
-@media(min-width:1921px){
-  body.shell-masthead-layout .shell-menu-button{display:none}
-  body.shell-masthead-layout .shell-mega.is-mobile-only{display:none}
 }
 
 /* Full-bleed content under masthead — fluid pages fill remaining viewport */

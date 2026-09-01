@@ -669,16 +669,20 @@ test('daily nav indicator module and READY badge markup are wired', async () => 
 });
 
 test('masthead nav collapses for laptop widths and scaled 1920 displays', async () => {
-  const [chrome, shell] = await Promise.all([
+  const [chrome, shell, fit, appShell] = await Promise.all([
     read('docs/css/starlight-chrome.css'),
-    read('docs/css/app-shell.css')
+    read('docs/css/app-shell.css'),
+    read('docs/js/masthead-nav-fit.js'),
+    read('docs/js/app-shell.js')
   ]);
   assert.match(chrome, /container-type:\s*inline-size/);
-  assert.match(chrome, /@container shell-masthead \(max-width: 1820px\)/);
-  assert.match(chrome, /1920px[\s\S]*shell-masthead-nav[\s\S]*display:\s*none/);
-  assert.match(chrome, /binder-ribbon[\s\S]*display:\s*none !important/);
-  assert.match(shell, /max-width:1920px[\s\S]*shell-masthead-nav\{display:none\}/);
-  assert.match(shell, /min-width:1921px[\s\S]*shell-menu-button\{display:none\}/);
+  assert.match(chrome, /@container shell-masthead \(min-width: 2000px\)/);
+  assert.match(chrome, /shell-masthead--force-collapse/);
+  assert.match(chrome, /shell-masthead-nav[\s\S]*display:\s*none/);
+  assert.match(shell, /min-width:2000px[\s\S]*shell-masthead-nav\{display:flex\}/);
+  assert.match(shell, /shell-masthead--force-collapse/);
+  assert.match(fit, /syncMastheadNavFit|scrollWidth/);
+  assert.match(appShell, /scheduleMastheadNavFit/);
 });
 
 test('shell masthead wires mega menus and series browse params', async () => {

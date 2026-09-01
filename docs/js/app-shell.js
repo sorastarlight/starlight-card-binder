@@ -13,6 +13,7 @@ import {
 } from './shell-route-utils.js';
 import { getShellNavigation } from './shell-navigation-service.js';
 import { applyShellNavigationToDom, applyShellPageTitles, populateSeriesMegaMenus } from './shell-navigation-render.js';
+import { scheduleMastheadNavFit } from './masthead-nav-fit.js';
 import { isStudioPreview, STUDIO_MSG } from './studio-preview.js';
 import { initLiveFeedWidget } from './live-feed-widget.js?v=1.7';
 import { applyAvatarFrameClass } from './avatar-frame-utils.js';
@@ -647,6 +648,7 @@ async function hydrateAccount(){
     }
     applyShellPageTitles(routes, navigation);
     applyShellNavigationToDom(navigation, { isStaff: Boolean(access?.isStaff) || isStudioPreview() });
+    scheduleMastheadNavFit();
     liveFeedAdminEnabled = navigation?.chrome?.showLiveFeed !== false;
     applyLiveFeedVisibility();
     applyProfileLink();
@@ -665,6 +667,7 @@ async function hydrateAccount(){
           window.__starlightShellNavigationDraft = data.navigation || null;
           applyShellPageTitles(routes, data.navigation || {});
           applyShellNavigationToDom(data.navigation || null, { isStaff: true });
+          scheduleMastheadNavFit();
           liveFeedAdminEnabled = data.navigation?.chrome?.showLiveFeed !== false;
           applyLiveFeedVisibility();
           applyProfileLink();
@@ -680,6 +683,7 @@ async function hydrateAccount(){
   }catch(e){
     console.warn('[Starlight] Shell navigation config failed', e);
     applyShellNavigationToDom(null, { isStaff: Boolean(access?.isStaff) });
+    scheduleMastheadNavFit();
     applyProfileLink();
     refreshShellBadges();
   }
@@ -859,11 +863,17 @@ if (isStudioPreview()) {
 } else {
   syncShellChromeHeights();
   if (typeof ResizeObserver !== 'undefined') {
-    const chromeObserver = new ResizeObserver(() => syncShellChromeHeights());
+    const chromeObserver = new ResizeObserver(() => {
+      syncShellChromeHeights();
+      scheduleMastheadNavFit();
+    });
     if (liveStrip) chromeObserver.observe(liveStrip);
     if (masthead) chromeObserver.observe(masthead);
   } else {
-    window.addEventListener('resize', syncShellChromeHeights);
+    window.addEventListener('resize', () => {
+      syncShellChromeHeights();
+      scheduleMastheadNavFit();
+    });
   }
   window.addEventListener('starlight-shell-live-feed-changed', syncShellChromeHeights);
 }
