@@ -1,4 +1,6 @@
 import {getDatabaseHealth,repairDatabaseHealth,exportDatabaseBackup,downloadJson} from '../database-health-service.js';
+import {mountAdminCrumb} from '../admin-shell.js';
+mountAdminCrumb({tool:'Database Health & Backup'});
 const status=document.getElementById('status'),content=document.getElementById('content'),summary=document.getElementById('summary'),checks=document.getElementById('checks');
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function describe(item){return item.name||item.cardName||item.slotName||item.id||item.cardId||item.boosterId||item.collectorNumber||JSON.stringify(item)}

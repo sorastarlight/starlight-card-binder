@@ -1,5 +1,8 @@
 import { getMyStaffAccess } from '../staff-service.js';
 import { listProfileReports, updateProfileReport, setProfileModeration } from '../moderation-service.js';
+import { mountAdminCrumb } from '../admin-shell.js';
+
+mountAdminCrumb({ tool: 'Moderation Dashboard' });
 
 const statusEl = document.getElementById('status');
 const list = document.getElementById('list');

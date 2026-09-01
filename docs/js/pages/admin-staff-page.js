@@ -9,6 +9,9 @@ import {
   listUserUnlockables,
   setUserUnlockables
 } from '../staff-service.js';
+import { mountAdminCrumb } from '../admin-shell.js';
+
+mountAdminCrumb({ tool: 'User & Role Management' });
 
 const status = document.getElementById('status');
 const content = document.getElementById('content');

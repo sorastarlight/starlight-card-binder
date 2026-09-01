@@ -1,6 +1,9 @@
 import { listAdminNews, saveNews, deleteNews } from '../news-service.js';
 import { uploadStudioAsset } from '../content-studio-service.js';
 import { getMyStaffAccess } from '../staff-service.js';
+import { mountAdminCrumb } from '../admin-shell.js';
+
+mountAdminCrumb({ tool: 'News & Updates' });
 
 const byId = id => document.getElementById(id);
 const escapeHtml = window.StarlightUI.escapeHtml;

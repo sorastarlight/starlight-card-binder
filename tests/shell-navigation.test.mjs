@@ -326,12 +326,16 @@ test('website UI admin page and migration are wired', async () => {
     read('docs/js/embed-mode.js'),
     read('docs/js/app-shell.js')
   ]);
-  assert.match(html, /Website User Interface/);
+  assert.match(html, /Navigation Studio/);
   assert.match(html, /Masthead Menus/);
   assert.match(html, /data-tab="account"/);
+  assert.match(html, /data-tab="topbar"/);
   assert.match(html, /64[\u00d7x]64/i);
   assert.match(page, /Mega menu \(desktop masthead\)/);
   assert.match(page, /clearSeries/);
+  assert.match(page, /eventCards/);
+  assert.match(page, /specialCards/);
+  assert.match(page, /linkFeature|TOP_BAR_FEATURES/);
   assert.match(page, /data-field="mega"/);
   assert.match(page, /uploadStudioAsset\(file, 'nav-icons'\)/);
   assert.match(page, /shellPreviewFrame|NAV_DRAFT|buildShellStudioPreviewUrl/);
@@ -341,7 +345,9 @@ test('website UI admin page and migration are wired', async () => {
   assert.match(page, /navigation\.chrome\.showLiveFeed/);
   assert.match(page, /layoutSelect/);
   assert.match(page, /liveFeedToggle/);
-  assert.match(hub, /admin-ui\.html/);
+  assert.match(hub, /Navigation Studio/);
+  assert.match(hub, /admin-suite/);
+  assert.match(await read('docs/js/pages/admin-hub-page.js'), /admin-ui\.html/);
   assert.match(migration, /admin_save_shell_navigation/);
   assert.match(embed, /'admin-ui\.html':'admin-ui'/);
   assert.match(embed, /'login\.html':'login'/);
@@ -358,6 +364,36 @@ test('website UI admin page and migration are wired', async () => {
   assert.match(shellCss, /--shell-chrome-pad/);
   assert.match(shellCss, /shell-live-strip-bottom/);
   assert.match(shellCss, /--shell-chrome-top/);
+});
+
+test('sanitizeShellNavigation preserves editor-authored top bar order and features', () => {
+  const preserved = sanitizeShellNavigation({
+    ...cloneDefaultShellNavigation(),
+    topBar: {
+      quickLinks: [
+        {
+          id: 'daily-top',
+          label: 'Daily Freebie',
+          destination: 'daily',
+          enabled: true,
+          features: [],
+          className: 'shell-daily-top-link'
+        },
+        {
+          id: 'home-top',
+          label: 'Start',
+          destination: 'home',
+          enabled: true,
+          features: []
+        }
+      ]
+    }
+  });
+  assert.equal(preserved.topBar.quickLinks[0].destination, 'daily');
+  assert.equal(preserved.topBar.quickLinks[0].label, 'Daily Freebie');
+  assert.ok(!(preserved.topBar.quickLinks[0].features || []).includes('dailyBadge'));
+  assert.equal(preserved.topBar.quickLinks[1].destination, 'home');
+  assert.equal(preserved.topBar.quickLinks[1].label, 'Start');
 });
 
 test('shell refreshes Star Bits totals when wallet or rewards change', async () => {

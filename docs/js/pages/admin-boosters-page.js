@@ -23,6 +23,10 @@ import {
   adminSaveAvatarFrame,
   adminSetRewardFrame,
 } from "../avatar-frames-admin-service.js";
+import { mountAdminCrumb } from "../admin-shell.js";
+
+mountAdminCrumb({ tool: "Starlight Card Management" });
+
 const $ = (s) => document.querySelector(s),
   status = $("#status"),
   app = $("#app"),

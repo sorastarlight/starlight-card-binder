@@ -1,3 +1,39 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Database Health | Starlight Card Binder</title><link rel="stylesheet" href="css/style.css?v=1.0.2"><link rel="stylesheet" href="css/shared-ui.css?v=1.6.15"><link rel="stylesheet" href="css/pages/admin-health.css?v=1.0"><script src="js/browser-performance.js?v=1.0.0" defer></script><link rel="stylesheet" href="css/qol-ui.css?v=94.2.4">
-</head><body><script src="js/embed-mode.js" type="module"></script><div class="sky"></div><main class="health-page"><section class="health-shell"><div class="health-head"><div><p class="eyebrow">Administration Hub</p><h1>🩺 Database Health & Backup</h1><p>Find data problems before they become haunted buttons, broken packs, or missing cards.</p></div><div class="health-actions"><button class="secondary-btn" id="refresh">↻ Run Health Check</button><button class="primary-btn" id="backup">⬇ Download Backup</button></div></div><p id="status" class="status">Loading database health…</p><div id="content" class="hidden"><div id="summary" class="health-summary"></div><div id="checks" class="health-list"></div></div></section></main><script type="module" src="js/pages/admin-health-page.js?v=1.0"></script><script src="js/shared-ui.js?v=1.6.15"></script><script src="js/qol-ui.js?v=94.2.4" defer></script>
-</body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Database Health | Starlight Card Binder</title>
+  <link rel="stylesheet" href="css/style.css?v=1.0.2">
+  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.16">
+  <link rel="stylesheet" href="css/pages/admin-shell.css?v=1.0.0">
+  <link rel="stylesheet" href="css/pages/admin-health.css?v=1.1.0">
+  <link rel="stylesheet" href="css/qol-ui.css?v=94.2.8">
+  <script src="js/browser-performance.js?v=1.0.0" defer></script>
+</head>
+<body class="admin-suite">
+  <script src="js/embed-mode.js" type="module"></script>
+  <div class="admin-suite-frame">
+    <nav class="admin-suite-crumb" id="adminCrumb" aria-label="Administration breadcrumb"></nav>
+    <header class="admin-suite-header">
+      <div>
+        <h1>Database Health &amp; Backup</h1>
+        <p class="admin-suite-lead">Find data problems before they become haunted buttons, broken packs, or missing cards.</p>
+      </div>
+      <div class="admin-suite-actions health-actions">
+        <button class="secondary-btn admin-btn" id="refresh">↻ Run Health Check</button>
+        <button class="primary-btn admin-btn admin-btn--primary" id="backup">⬇ Download Backup</button>
+      </div>
+    </header>
+    <p id="status" class="admin-status status">Loading database health…</p>
+    <div id="content" class="admin-panel health-shell hidden">
+      <div id="summary" class="health-summary"></div>
+      <div id="checks" class="health-list"></div>
+    </div>
+    <a class="admin-back-link" href="admin-hub.html">Return to Administration Hub</a>
+  </div>
+  <script type="module" src="js/pages/admin-health-page.js?v=1.1.0"></script>
+  <script src="js/shared-ui.js?v=1.6.16"></script>
+  <script src="js/qol-ui.js?v=94.2.8" defer></script>
+</body>
+</html>

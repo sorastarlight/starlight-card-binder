@@ -1,4 +1,5 @@
 import { getMyStaffAccess } from '../staff-service.js';
+import { mountAdminCrumb } from '../admin-shell.js';
 import {
   cloneDefaultWebsiteContent,
   HOME_QUICK_LINK_IDS,
@@ -606,5 +607,7 @@ resetBtn.addEventListener('click', async () => {
     busy = false;
   }
 });
+
+mountAdminCrumb({ tool: 'Website Editor' });
 
 await boot();

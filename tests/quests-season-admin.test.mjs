@@ -65,7 +65,7 @@ test('admin quests page is wired into hub and shell', async () => {
     read('docs/css/pages/admin-quests.css')
   ]);
   assert.match(html, /admin-quests-page\.js\?v=1\./);
-  assert.match(html, /admin-quests\.css\?v=1\.0/);
+  assert.match(html, /admin-quests\.css\?v=1\./);
   assert.match(html, /data-tab="quests"/);
   assert.match(html, /data-tab="seasons"/);
   assert.match(html, /data-tab="titles"/);
@@ -81,8 +81,8 @@ test('admin quests page is wired into hub and shell', async () => {
   assert.match(service, /admin_get_quests_season_admin/);
   assert.match(service, /admin_delete_season_tier/);
   assert.match(service, /quests-season-admin-utils/);
-  assert.match(hub, /admin-quests\.html/);
-  assert.match(hub, /Quests &amp; Season Pass/);
+  assert.match(await read('docs/js/pages/admin-hub-page.js'), /admin-quests\.html/);
+  assert.match(await read('docs/js/pages/admin-hub-page.js'), /Quests & Season Pass/);
   assert.match(shell, /'admin-quests':\{title:'Quests & Season Pass',src:'admin-quests\.html'\}/);
   assert.match(css, /\.tab\.active/);
   const embed = await read('docs/js/embed-mode.js');

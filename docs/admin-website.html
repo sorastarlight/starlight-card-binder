@@ -6,29 +6,28 @@
   <title>Website Editor | Starlight Card Binder</title>
   <link rel="stylesheet" href="css/style.css?v=1.0.2">
   <link rel="stylesheet" href="css/shared-ui.css?v=1.6.16">
-  <link rel="stylesheet" href="css/pages/admin-website.css?v=2.1">
+  <link rel="stylesheet" href="css/pages/admin-shell.css?v=1.0.0">
+  <link rel="stylesheet" href="css/pages/admin-website.css?v=2.2.0">
   <link rel="stylesheet" href="css/qol-ui.css?v=94.2.8">
   <script src="js/browser-performance.js?v=1.0.0" defer></script>
 </head>
-<body>
+<body class="admin-suite">
   <script src="js/embed-mode.js" type="module"></script>
-  <div class="sky"></div>
-  <main class="page">
-    <section class="panel studio-panel">
-      <p class="eyebrow">Administration Hub</p>
-      <div class="toolbar">
-        <div>
-          <h1>Website Editor</h1>
-          <p class="lead">Pick a page, edit its copy, and watch the live preview update instantly. Save publishes site-wide.</p>
-        </div>
-        <div class="actions">
-          <button id="resetPageBtn" class="btn" type="button" hidden>Reset This Page</button>
-          <button id="saveBtn" class="btn primary" type="button" hidden>Save Changes</button>
-          <button id="resetBtn" class="btn danger" type="button" hidden>Reset Everything</button>
-        </div>
+  <div class="admin-suite-frame">
+    <nav class="admin-suite-crumb" id="adminCrumb" aria-label="Administration breadcrumb"></nav>
+    <header class="admin-suite-header">
+      <div>
+        <h1>Website Editor</h1>
+        <p class="admin-suite-lead">Pick a page, edit its copy, and watch the live preview update instantly. Save publishes site-wide.</p>
       </div>
-      <p id="status" class="status" role="status">Checking staff access…</p>
-
+      <div class="admin-suite-actions admin-toolbar">
+        <button id="resetPageBtn" class="admin-btn" type="button" hidden>Reset This Page</button>
+        <button id="saveBtn" class="admin-btn admin-btn--primary" type="button" hidden>Save Changes</button>
+        <button id="resetBtn" class="admin-btn admin-btn--danger" type="button" hidden>Reset Everything</button>
+      </div>
+    </header>
+    <p id="status" class="admin-status status" role="status">Checking staff access…</p>
+    <div class="admin-panel studio-panel">
       <div id="app" class="hidden studio-app" hidden>
         <aside class="page-picker" aria-label="Website pages">
           <label class="field-search">
@@ -59,11 +58,12 @@
           </div>
         </aside>
       </div>
-    </section>
-  </main>
+    </div>
+    <a class="admin-back-link" href="admin-hub.html">Return to Administration Hub</a>
+  </div>
 
-  <script src="js/shared-ui.js?v=1.6.15"></script>
-  <script type="module" src="js/pages/admin-website-page.js?v=2.4"></script>
+  <script type="module" src="js/pages/admin-website-page.js?v=2.5.0"></script>
+  <script src="js/shared-ui.js?v=1.6.16"></script>
   <script src="js/qol-ui.js?v=94.2.8" defer></script>
 </body>
 </html>

@@ -7,6 +7,7 @@ import {
   saveCollectorTitle,
   deleteSeasonTier
 } from '../quests-season-admin-service.js';
+import { mountAdminCrumb } from '../admin-shell.js';
 import {
   slugifyAdminId,
   requirementNeedsTarget,
@@ -14,6 +15,8 @@ import {
   toDatetimeLocalValue,
   fromDatetimeLocalValue
 } from '../quests-season-admin-utils.js';
+
+mountAdminCrumb({ tool: 'Quests & Season Pass' });
 
 const byId = (id) => document.getElementById(id);
 const escapeHtml = window.StarlightUI.escapeHtml;

@@ -217,7 +217,10 @@ function stripDailyFromSidebar(sections = []) {
   return sections;
 }
 
-/** Refresh Cards mega to Gallery / Series / Event / Special when remote nav is stale. */
+/**
+ * Migrate legacy Cards megas that still bury Daily Pack or use a non-clickable
+ * Card Series label slot. Preserve editor-authored modern Cards trees.
+ */
 function normalizeCardsSection(sections, defaults) {
   const cards = sections.find(section => section.id === 'cards');
   const defaultCards = (defaults.sidebar?.sections || []).find(section => section.id === 'cards');
@@ -228,17 +231,18 @@ function normalizeCardsSection(sections, defaults) {
     item.id === 'card-series' || /^card series$/i.test(String(item.label || '').trim())
   );
   const seriesItem = seriesIndex >= 0 ? items[seriesIndex] : null;
-  const seriesIsClickable = seriesItem
-    && seriesItem.destination === 'binder'
-    && !(seriesItem.features || []).includes('sectionLabel')
-    && !(seriesItem.features || []).includes('seriesLinksSlot');
+  const seriesIsLegacyLabel = seriesItem
+    && (
+      (seriesItem.features || []).includes('sectionLabel')
+      || (seriesItem.features || []).includes('seriesLinksSlot')
+      || !seriesItem.destination
+    );
 
-  const needsReset = items.some(item => item.destination === 'daily')
-    || !items.some(item => item.id === 'event-cards')
-    || !items.some(item => item.id === 'special-cards')
-    || !seriesIsClickable;
+  const hasDaily = items.some(item => item.destination === 'daily');
+  const isEmpty = items.length === 0;
+  const needsLegacyReset = isEmpty || hasDaily || seriesIsLegacyLabel;
 
-  if (needsReset) {
+  if (needsLegacyReset) {
     cards.items = defaultCards.items.map((item, index) => sanitizeItem(item, index));
   }
   return sections;
@@ -268,40 +272,54 @@ function normalizeCollectSection(sections, defaults) {
   return sections;
 }
 
-/** Ensure Shop is its own mega with Card Shop / Twitch Season Pass / Redeem Code. */
+/**
+ * Ensure a Shop mega exists when shop destinations were stranded under Collection.
+ * Do not rewrite an editor-authored Shop menu that already has shop destinations.
+ */
 function normalizeShopSection(sections, defaults) {
   const defaultShop = (defaults.sidebar?.sections || []).find(section => section.id === 'shop');
   if (!defaultShop) return sections;
 
   const collect = sections.find(section => section.id === 'collect');
+  const strandedShopItems = collect
+    ? (collect.items || []).filter(item => SHOP_SECTION_DESTINATIONS.has(item.destination))
+    : [];
   if (collect) {
     collect.items = (collect.items || []).filter(item => !SHOP_SECTION_DESTINATIONS.has(item.destination));
   }
 
   let shop = sections.find(section => section.id === 'shop');
-  const needsReset = !shop
-    || !(shop.items || []).some(item => item.destination === 'shop')
-    || !(shop.items || []).some(item => item.destination === 'season-pass')
-    || !(shop.items || []).some(item => item.destination === 'redeem')
-    || (shop.items || []).some(item => item.destination === 'shop' && /^shop$/i.test(String(item.label || '').trim()));
-
   if (!shop) {
     shop = sanitizeSection(structuredClone(defaultShop), sections.length);
+    if (strandedShopItems.length) {
+      shop.items = strandedShopItems.map((item, index) => sanitizeItem({
+        ...item,
+        label: item.destination === 'shop' && /^shop$/i.test(String(item.label || '').trim())
+          ? 'Card Shop'
+          : item.label
+      }, index));
+    }
     const collectIndex = sections.findIndex(section => section.id === 'collect');
     const communityIndex = sections.findIndex(section => section.id === 'community');
     const insertAt = collectIndex >= 0
       ? collectIndex + 1
       : (communityIndex >= 0 ? communityIndex : sections.length);
     sections.splice(insertAt, 0, shop);
-  } else if (needsReset) {
-    shop.label = 'Shop';
-    shop.mega = true;
-    shop.items = defaultShop.items.map((item, index) => sanitizeItem(item, index));
-  } else {
-    shop.label = 'Shop';
-    shop.mega = true;
+    return sections;
   }
 
+  if (strandedShopItems.length) {
+    const present = new Set((shop.items || []).map(item => item.destination));
+    for (const item of strandedShopItems) {
+      if (present.has(item.destination)) continue;
+      shop.items.push(sanitizeItem(item, shop.items.length));
+      present.add(item.destination);
+    }
+  }
+
+  if (/^(shop|card shop)$/i.test(String(shop.label || '').trim())) {
+    shop.label = 'Shop';
+  }
   return sections;
 }
 
@@ -371,16 +389,13 @@ function rewriteSectionLabel(section) {
   return label || section.label;
 }
 
-/** Drop Events/Trade from the top bar (they live under Community) and keep Daily Pack + READY badge. */
+/**
+ * Strip legacy Community dupes from the top bar. Inject Daily Pack only when
+ * migrating away from Events/Trade. Preserve editor-authored top-bar order,
+ * labels, features, and className otherwise.
+ */
 function normalizeTopBarQuickLinks(links, defaults) {
   const defaultLinks = Array.isArray(defaults.topBar?.quickLinks) ? defaults.topBar.quickLinks : [];
-  const defaultHome = defaultLinks.find(link => link.destination === 'home') || {
-    id: 'home-top',
-    label: 'Home',
-    destination: 'home',
-    enabled: true,
-    features: []
-  };
   const defaultDaily = defaultLinks.find(link => link.destination === 'daily') || {
     id: 'daily-top',
     label: 'Free Daily Card Pack',
@@ -391,33 +406,41 @@ function normalizeTopBarQuickLinks(links, defaults) {
   };
 
   const communityDupes = new Set(['events', 'trades', 'offers']);
-  const cleaned = (Array.isArray(links) ? links : [])
-    .filter(link => link && !communityDupes.has(String(link.destination || '')));
+  const source = Array.isArray(links) ? links : [];
+  const hadLegacyCommunity = source.some(link =>
+    communityDupes.has(String(link?.destination || ''))
+  );
+  const cleaned = source.filter(link => link && !communityDupes.has(String(link.destination || '')));
 
-  const withHome = cleaned.some(link => link.destination === 'home')
-    ? cleaned
-    : [defaultHome, ...cleaned];
+  if (!cleaned.length) {
+    return defaultLinks.map((link, index) => ({
+      id: String(link.id || `top-${index}`).slice(0, 64),
+      label: String(link.label || link.destination).slice(0, 40),
+      destination: link.destination,
+      enabled: link.enabled !== false,
+      features: Array.isArray(link.features) ? [...link.features] : [],
+      className: String(link.className || '').trim().slice(0, 80)
+    })).slice(0, 10);
+  }
 
-  const dailyIndex = withHome.findIndex(link => link.destination === 'daily');
-  let next;
-  if (dailyIndex < 0) {
-    next = [...withHome, { ...defaultDaily, features: [...(defaultDaily.features || [])] }];
-  } else {
-    next = withHome.map((link, index) => {
-      if (index !== dailyIndex) return link;
-      const features = new Set(link.features || []);
-      features.add('dailyBadge');
-      const label = /^free daily( starlight)? (card )?pack$/i.test(String(link.label || '').trim())
-        || !String(link.label || '').trim()
-        ? defaultDaily.label
-        : link.label;
-      return {
-        ...link,
-        label,
-        features: [...features],
-        className: link.className || defaultDaily.className || 'shell-daily-top-link'
-      };
-    });
+  let next = cleaned.map((link) => {
+    if (link.destination !== 'daily') return link;
+    const label = !String(link.label || '').trim()
+      || /^free daily( starlight)? (card )?pack$/i.test(String(link.label || '').trim())
+      ? defaultDaily.label
+      : link.label;
+    return {
+      ...link,
+      label,
+      className: link.className || defaultDaily.className || 'shell-daily-top-link'
+    };
+  });
+
+  if (hadLegacyCommunity && !next.some(link => link.destination === 'daily')) {
+    next = [...next, {
+      ...defaultDaily,
+      features: [...(defaultDaily.features || [])]
+    }];
   }
 
   return next.slice(0, 10);

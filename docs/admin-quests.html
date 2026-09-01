@@ -3,33 +3,33 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Quests &amp; Season Pass | Starlight Cards</title>
+  <title>Quests &amp; Season Pass | Starlight Card Binder</title>
   <link rel="stylesheet" href="css/style.css?v=1.0.2">
-  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.15">
-  <link rel="stylesheet" href="css/pages/admin-quests.css?v=1.0.1">
-  <link rel="stylesheet" href="css/qol-ui.css?v=94.2.4">
+  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.16">
+  <link rel="stylesheet" href="css/pages/admin-shell.css?v=1.0.0">
+  <link rel="stylesheet" href="css/pages/admin-quests.css?v=1.1.0">
+  <link rel="stylesheet" href="css/qol-ui.css?v=94.2.8">
   <script src="js/browser-performance.js?v=1.0.0" defer></script>
-  <script src="js/shared-ui.js?v=1.6.15"></script>
 </head>
-<body>
-  <script type="module" src="js/embed-mode.js"></script>
-  <main class="page">
-    <section class="studio">
-      <div class="hero">
-        <div>
-          <p class="eyebrow">Administration Hub</p>
-          <h1>Quests &amp; Season Pass</h1>
-          <p>Manage Starlight Missions, Seasonal Collection Pass seasons and tiers, and collector titles used as rewards.</p>
-        </div>
+<body class="admin-suite">
+  <script src="js/embed-mode.js" type="module"></script>
+  <div class="admin-suite-frame">
+    <nav class="admin-suite-crumb" id="adminCrumb" aria-label="Administration breadcrumb"></nav>
+    <header class="admin-suite-header">
+      <div>
+        <h1>Quests &amp; Season Pass</h1>
+        <p class="admin-suite-lead">Manage Starlight Missions, Seasonal Collection Pass seasons and tiers, and collector titles used as rewards.</p>
       </div>
+    </header>
 
-      <div class="tabs" role="tablist" aria-label="Quests and Season Pass sections">
+    <div class="admin-panel studio">
+      <div class="tabs admin-tabs" role="tablist" aria-label="Quests and Season Pass sections">
         <button class="tab active" type="button" data-tab="quests" role="tab" aria-selected="true">Quests</button>
         <button class="tab" type="button" data-tab="seasons" role="tab" aria-selected="false">Season Pass</button>
         <button class="tab" type="button" data-tab="titles" role="tab" aria-selected="false">Titles</button>
       </div>
 
-      <p id="status" class="status" role="status">Loading…</p>
+      <p id="status" class="admin-status status" role="status">Loading…</p>
 
       <div class="view active" data-view="quests">
         <div class="actions actions-spread-bottom">
@@ -37,7 +37,7 @@
             <h2 class="heading-flush">Starlight Missions</h2>
             <p class="muted">Create and edit daily, weekly, and one-time missions with requirement targets and rewards.</p>
           </div>
-          <button class="btn" id="newQuest" type="button">＋ New Quest</button>
+          <button class="btn admin-btn admin-btn--primary" id="newQuest" type="button">＋ New Quest</button>
         </div>
         <div id="questList" class="item-list"></div>
       </div>
@@ -48,7 +48,7 @@
             <h2 class="heading-flush">Season Pass</h2>
             <p class="muted">Configure seasons, audience gates, and reward tiers.</p>
           </div>
-          <button class="btn" id="newSeason" type="button">＋ New Season</button>
+          <button class="btn admin-btn admin-btn--primary" id="newSeason" type="button">＋ New Season</button>
         </div>
         <div id="seasonList" class="item-list"></div>
       </div>
@@ -59,12 +59,13 @@
             <h2 class="heading-flush">Collector Titles</h2>
             <p class="muted">Catalog titles for quest and season-tier reward pickers. Id is immutable after create.</p>
           </div>
-          <button class="btn" id="newTitle" type="button">＋ New Title</button>
+          <button class="btn admin-btn admin-btn--primary" id="newTitle" type="button">＋ New Title</button>
         </div>
         <div id="titleList" class="item-list"></div>
       </div>
-    </section>
-  </main>
+    </div>
+    <a class="admin-back-link" href="admin-hub.html">Return to Administration Hub</a>
+  </div>
 
   <div id="questEditor" class="st-dialog-overlay editor hidden" aria-hidden="true">
     <section class="st-dialog st-dialog--xl card" role="dialog" aria-modal="true" aria-labelledby="questEditorTitle" tabindex="-1">
@@ -188,7 +189,8 @@
     </section>
   </div>
 
-  <script type="module" src="js/pages/admin-quests-page.js?v=1.1.0"></script>
-  <script src="js/qol-ui.js?v=94.2.4" defer></script>
+  <script type="module" src="js/pages/admin-quests-page.js?v=1.2.0"></script>
+  <script src="js/shared-ui.js?v=1.6.16"></script>
+  <script src="js/qol-ui.js?v=94.2.8" defer></script>
 </body>
 </html>

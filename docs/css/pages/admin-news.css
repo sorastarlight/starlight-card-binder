@@ -1,7 +1,4 @@
 *{box-sizing:border-box}
-body{min-height:100vh}
-.page{width:min(100%,1300px);margin:auto;padding:24px}
-.panel{padding:26px;border:2px solid rgba(107,198,248,.4);border-radius:25px;background:rgba(255,255,255,.96);box-shadow:0 20px 55px rgba(61,83,132,.14)}
 h1,h2,h3{color:#405fa1}
 .lead{color:#6d7692;line-height:1.55}
 .toolbar,.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}

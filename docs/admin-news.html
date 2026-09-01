@@ -3,30 +3,33 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>News & Updates Management</title>
+  <title>News &amp; Updates | Starlight Card Binder</title>
   <link rel="stylesheet" href="css/style.css?v=1.0.2">
-  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.15">
-  <link rel="stylesheet" href="css/pages/admin-news.css?v=1.1">
-    <link rel="stylesheet" href="css/qol-ui.css?v=94.2.4">
+  <link rel="stylesheet" href="css/shared-ui.css?v=1.6.16">
+  <link rel="stylesheet" href="css/pages/admin-shell.css?v=1.0.0">
+  <link rel="stylesheet" href="css/pages/admin-news.css?v=1.2.0">
+  <link rel="stylesheet" href="css/qol-ui.css?v=94.2.8">
   <script src="js/browser-performance.js?v=1.0.0" defer></script>
 </head>
-<body>
+<body class="admin-suite">
   <script src="js/embed-mode.js" type="module"></script>
-  <div class="sky"></div>
-  <main class="page">
-    <section class="panel">
-      <p class="eyebrow">Administration Hub</p>
-      <div class="toolbar">
-        <div>
-          <h1>News & Updates Management</h1>
-          <p class="lead">Publish announcements, development notes, event news, and featured updates to the Home page.</p>
-        </div>
-        <button id="newPost" class="btn primary" type="button">＋ New Update</button>
+  <div class="admin-suite-frame">
+    <nav class="admin-suite-crumb" id="adminCrumb" aria-label="Administration breadcrumb"></nav>
+    <header class="admin-suite-header">
+      <div>
+        <h1>News &amp; Updates Management</h1>
+        <p class="admin-suite-lead">Publish announcements, development notes, event news, and featured updates to the Home page.</p>
       </div>
-      <p id="status" class="status" role="status">Loading news posts…</p>
+      <div class="admin-suite-actions">
+        <button id="newPost" class="admin-btn admin-btn--primary" type="button">＋ New Update</button>
+      </div>
+    </header>
+    <p id="status" class="admin-status status" role="status">Loading news posts…</p>
+    <div class="admin-panel">
       <div id="list" class="list"></div>
-    </section>
-  </main>
+    </div>
+    <a class="admin-back-link" href="admin-hub.html">Return to Administration Hub</a>
+  </div>
 
   <div id="editor" class="st-dialog-overlay editor hidden" aria-hidden="true">
     <section class="st-dialog st-dialog--xl card" role="dialog" aria-modal="true" aria-labelledby="editorTitle" tabindex="-1">
@@ -40,7 +43,7 @@
         <div class="field full"><label>Full update<textarea id="body"></textarea></label></div>
         <div class="field full">
           <label>Header image URL<input id="imageUrl" placeholder="Upload or paste an image URL"></label>
-          <label class="btn upload-button">Browse & Upload Image<input id="imageFile" type="file" accept="image/*" hidden></label>
+          <label class="btn upload-button">Browse &amp; Upload Image<input id="imageFile" type="file" accept="image/*" hidden></label>
           <img id="preview" class="preview" alt="Selected news header preview" hidden>
         </div>
         <div class="field"><label>Publish date<input id="publishedAt" type="datetime-local"></label></div>
@@ -57,8 +60,8 @@
     </section>
   </div>
 
-  <script src="js/shared-ui.js?v=1.6.15"></script>
-  <script type="module" src="js/pages/admin-news-page.js?v=1.1"></script>
-  <script src="js/qol-ui.js?v=94.2.4" defer></script>
+  <script type="module" src="js/pages/admin-news-page.js?v=1.2.0"></script>
+  <script src="js/shared-ui.js?v=1.6.16"></script>
+  <script src="js/qol-ui.js?v=94.2.8" defer></script>
 </body>
 </html>

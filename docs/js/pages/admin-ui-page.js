@@ -13,6 +13,7 @@ import {
 import { uploadStudioAsset } from '../content-studio-service.js';
 import { buildShellStudioPreviewUrl, STUDIO_MSG } from '../studio-preview.js';
 import { renderShellNavIcon } from '../shell-nav-icons.js';
+import { mountAdminCrumb } from '../admin-shell.js';
 
 const byId = (id) => document.getElementById(id);
 const esc = (value) =>
@@ -20,13 +21,28 @@ const esc = (value) =>
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
   }[m]))))(value);
 
+mountAdminCrumb({ tool: 'Navigation Studio' });
+
 const FEATURES = [
-  { id: 'dailyBadge', label: 'Daily badge' },
+  { id: 'dailyBadge', label: 'Daily badge (READY)' },
   { id: 'tradeOfferBadge', label: 'Trade offer badge' },
   { id: 'notificationBadge', label: 'Notification badge' },
   { id: 'receivedGiftBadge', label: 'Received gift badge' },
   { id: 'clearSeries', label: 'Clear series filter (gallery)' },
-  { id: 'sectionLabel', label: 'Section label (no destination)' }
+  { id: 'clearCardSet', label: 'Clear event/special card set' },
+  { id: 'eventCards', label: 'Event cards gallery filter' },
+  { id: 'specialCards', label: 'Special cards gallery filter' },
+  { id: 'seriesLinksSlot', label: 'Series catalog links slot' },
+  { id: 'sectionLabel', label: 'Section label (no destination)' },
+  { id: 'staffOnly', label: 'Staff / admin only' }
+];
+
+const TOP_BAR_FEATURES = [
+  { id: 'dailyBadge', label: 'Daily badge (READY)' },
+  { id: 'tradeOfferBadge', label: 'Trade offer badge' },
+  { id: 'notificationBadge', label: 'Notification badge' },
+  { id: 'receivedGiftBadge', label: 'Received gift badge' },
+  { id: 'staffOnly', label: 'Staff / admin only' }
 ];
 
 const ACCOUNT_FEATURES = [
@@ -60,7 +76,7 @@ const saveBtn = byId('saveBtn');
 const resetBtn = byId('resetBtn');
 
 let navigation = null;
-let activeTab = 'sidebar';
+let activeTab = 'topbar';
 let busy = false;
 let shellPreviewReady = false;
 let shellPreviewTimer = 0;
@@ -198,7 +214,10 @@ function renderSidebar() {
                     </div>
                   </div>
                   ${renderIconControls(item.icon, `data-section="${sIndex}" data-item="${iIndex}" data-target="item"`)}
-                  <div class="checks">
+                  <label>CSS class
+                    <input type="text" maxlength="80" value="${esc(item.className || '')}" data-field="itemClassName" data-section="${sIndex}" data-item="${iIndex}" placeholder="optional chrome class">
+                  </label>
+                  <div class="checks admin-feature-grid">
                     ${FEATURES.map((feature) => `
                       <label>
                         <input type="checkbox" data-field="feature" data-feature="${feature.id}" data-section="${sIndex}" data-item="${iIndex}" ${features.has(feature.id) ? 'checked' : ''}>
@@ -230,27 +249,41 @@ function renderSidebar() {
 function renderTopBar() {
   const links = navigation?.topBar?.quickLinks || [];
   topbarPanel.innerHTML = `
-    <div class="link-list">
-      ${links.map((link, index) => `
-        <article class="link-card" data-link="${index}">
-          <label>Label
-            <input type="text" maxlength="40" value="${esc(link.label || '')}" data-field="linkLabel" data-link="${index}">
-          </label>
-          <label>Destination
-            <select data-field="linkDestination" data-link="${index}">
-              ${destinationOptions(link.destination || 'home')}
-            </select>
-          </label>
-          <div class="checks">
+    <p class="lead">Top-bar quick links appear in the dark masthead strip. Reorder, rename, enable/disable, and attach badges or CSS class hooks used by the live shell.</p>
+    <div class="link-list admin-editor-list">
+      ${links.map((link, index) => {
+        const features = new Set(link.features || []);
+        return `
+        <article class="link-card admin-editor-card" data-link="${index}">
+          <div class="admin-editor-card__row item-fields">
+            <label>Label
+              <input type="text" maxlength="40" value="${esc(link.label || '')}" data-field="linkLabel" data-link="${index}">
+            </label>
+            <label>Destination
+              <select data-field="linkDestination" data-link="${index}">
+                ${destinationOptions(link.destination || 'home')}
+              </select>
+            </label>
+            <label>CSS class
+              <input type="text" maxlength="80" value="${esc(link.className || '')}" data-field="linkClassName" data-link="${index}" placeholder="e.g. shell-daily-top-link">
+            </label>
+          </div>
+          <div class="checks admin-feature-grid">
             <label><input type="checkbox" data-field="linkEnabled" data-link="${index}" ${link.enabled !== false ? 'checked' : ''}> Enabled</label>
+            ${TOP_BAR_FEATURES.map((feature) => `
+              <label>
+                <input type="checkbox" data-field="linkFeature" data-feature="${feature.id}" data-link="${index}" ${features.has(feature.id) ? 'checked' : ''}>
+                ${esc(feature.label)}
+              </label>
+            `).join('')}
           </div>
           <div class="row-tools">
             <button type="button" class="btn small" data-action="move-link" data-link="${index}" data-delta="-1" ${index === 0 ? 'disabled' : ''}>↑</button>
             <button type="button" class="btn small" data-action="move-link" data-link="${index}" data-delta="1" ${index === links.length - 1 ? 'disabled' : ''}>↓</button>
             <button type="button" class="btn small danger" data-action="remove-link" data-link="${index}">Remove</button>
           </div>
-        </article>
-      `).join('') || '<p class="lead">No top-bar quick links yet.</p>'}
+        </article>`;
+      }).join('') || '<p class="lead">No top-bar quick links yet.</p>'}
     </div>
     <div class="panel-actions">
       <button type="button" class="btn" data-action="add-link">＋ Add quick link</button>
@@ -624,6 +657,29 @@ function onEditorInput(event) {
     renderPreview();
     return;
   }
+  if (field === 'linkClassName') {
+    const link = navigation.topBar.quickLinks[Number(el.dataset.link)];
+    if (link) link.className = el.value;
+    renderPreview();
+    return;
+  }
+  if (field === 'linkFeature') {
+    const link = navigation.topBar.quickLinks[Number(el.dataset.link)];
+    if (!link) return;
+    const feature = el.dataset.feature;
+    const set = new Set(link.features || []);
+    if (el.checked) set.add(feature);
+    else set.delete(feature);
+    link.features = [...set];
+    renderPreview();
+    return;
+  }
+  if (field === 'itemClassName') {
+    const item = getItem(Number(el.dataset.section), Number(el.dataset.item));
+    if (item) item.className = el.value;
+    renderPreview();
+    return;
+  }
   if (field === 'pageTitle') {
     const key = el.dataset.key;
     if (key) navigation.pageTitles[key] = el.value;
@@ -761,7 +817,9 @@ async function onEditorClick(event) {
       id: uid('top'),
       label: 'Link',
       destination: 'home',
-      enabled: true
+      enabled: true,
+      features: [],
+      className: ''
     });
     renderAll();
     return;
@@ -835,8 +893,8 @@ saveBtn.addEventListener('click', async () => {
     navigation.brandRibbon = brandInput.value;
     navigation = await saveShellNavigation(navigation);
     renderAll();
-    setStatus('Website UI settings saved.', 'success');
-    window.StarlightUI?.toast?.('Website UI saved.', 'success');
+    setStatus('Navigation Studio settings saved.', 'success');
+    window.StarlightUI?.toast?.('Navigation saved.', 'success');
   } catch (error) {
     setStatus(error.message || 'Save failed.', 'error');
   } finally {
@@ -848,7 +906,7 @@ saveBtn.addEventListener('click', async () => {
 resetBtn.addEventListener('click', async () => {
   if (busy) return;
   const ok = await window.StarlightUI.confirm({
-    title: 'Reset website UI?',
+    title: 'Reset navigation?',
     message: 'This restores the default masthead menus, top bar, account menu, brand ribbon, and page titles. Unsaved edits will be lost.',
     confirmText: 'Reset to Defaults',
     danger: true
@@ -860,8 +918,8 @@ resetBtn.addEventListener('click', async () => {
   try {
     navigation = await resetShellNavigation();
     renderAll();
-    setStatus('Website UI reset to defaults.', 'success');
-    window.StarlightUI?.toast?.('Website UI reset.', 'success');
+    setStatus('Navigation reset to defaults.', 'success');
+    window.StarlightUI?.toast?.('Navigation reset.', 'success');
   } catch (error) {
     setStatus(error.message || 'Reset failed.', 'error');
   } finally {
@@ -874,19 +932,19 @@ async function boot() {
   try {
     const access = await getMyStaffAccess();
     if (!canEditUi(access)) {
-      setStatus('Administrator access is required to edit the website UI.', 'error');
+      setStatus('Administrator access is required to edit Navigation Studio.', 'error');
       return;
     }
-    setStatus('Loading website UI settings…');
+    setStatus('Loading navigation settings…');
     navigation = await getShellNavigation();
     appEl.hidden = false;
-    appEl.classList.remove('hidden');
+    appEl.classList.remove('hidden', 'admin-hidden');
     saveBtn.hidden = false;
     resetBtn.hidden = false;
     renderAll();
-    setStatus('Ready to edit. Live shell preview updates as you type; Save publishes.', 'success');
+    setStatus('Ready. Live shell preview updates as you edit; Save publishes.', 'success');
   } catch (error) {
-    setStatus(error.message || 'Unable to load website UI settings.', 'error');
+    setStatus(error.message || 'Unable to load navigation settings.', 'error');
   }
 }
 

@@ -1,4 +1,6 @@
 import { isSiteAdmin,createRewardCode,listRewardCodes,setRewardCodeActive,loadAdminCardCatalog } from '../redemption-service.js';
+import { mountAdminCrumb } from '../admin-shell.js';
+mountAdminCrumb({ tool: 'Reward Code Console' });
 const gate=document.getElementById('gate-status'),content=document.getElementById('admin-content'),type=document.getElementById('reward-type'),single=document.getElementById('single-card-fields'),booster=document.getElementById('booster-fields'),bits=document.getElementById('star-bits-fields'),pick=document.getElementById('card-pick'),singleSelect=document.getElementById('single-card'),list=document.getElementById('code-list'),form=document.getElementById('create-form'),createStatus=document.getElementById('create-status');let catalog=[];
 function randomCode(){const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';const bytes=crypto.getRandomValues(new Uint8Array(12));return 'STAR-'+Array.from(bytes,b=>alphabet[b%alphabet.length]).join('')}
 function toggleFields(){single.classList.toggle('hidden',type.value!=='single_card');booster.classList.toggle('hidden',type.value!=='booster');bits.classList.toggle('hidden',type.value!=='star_bits')}

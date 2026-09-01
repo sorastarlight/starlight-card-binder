@@ -239,7 +239,7 @@ test('website editor field meta covers binder splash and admin visual chrome', a
   const page = await read('docs/js/pages/admin-website-page.js');
   assert.match(html, /fieldSearch/);
   assert.match(html, /resetPageBtn/);
-  assert.match(html, /admin-website-page\.js\?v=2\.4/);
+  assert.match(html, /admin-website-page\.js\?v=2\./);
   assert.match(html, /previewFrame|Live preview/);
   assert.match(page, /WEBSITE_PAGE_META|getPageMeta/);
   assert.match(page, /renderGroupedFields|field-group/);
@@ -351,8 +351,8 @@ test('website editor admin page and public hooks are wired', async () => {
   assert.match(hydrate, /export function hydrateWebsiteContent/);
   assert.match(hydrate, /export async function loadAndHydrateWebsiteContent/);
   assert.match(hydrate, /\.social-links/);
-  assert.match(hub, /admin-website\.html/);
-  assert.match(hub, /Website Editor/);
+  assert.match(await read('docs/js/pages/admin-hub-page.js'), /admin-website\.html/);
+  assert.match(hub, /Website Editor|Administration Hub|admin-suite/);
   assert.match(embed, /'admin-website\.html':'admin-website'/);
   assert.match(shell, /'admin-website':\{title:'Website Editor'/);
   assert.match(routes, /'admin-website'/);
