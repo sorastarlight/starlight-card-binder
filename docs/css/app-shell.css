@@ -862,8 +862,8 @@ body.shell-masthead-layout .shell-masthead-brand{
 }
 body.shell-masthead-layout .shell-masthead-brand .logo{
   width:auto;
-  height:48px;
-  max-width:min(400px,38vw);
+  height:62px;
+  max-width:min(520px,46vw);
   object-fit:contain;
   flex:none;
 }
@@ -871,12 +871,12 @@ body.shell-masthead-layout .shell-brand-lockup{
   display:flex;
   flex-direction:row;
   align-items:center;
-  gap:10px;
+  gap:12px;
   min-width:0;
 }
 body.shell-masthead-layout .shell-masthead-brand .binder-ribbon{
   font-family:inherit;
-  font-size:.56rem;
+  font-size:.72rem;
   letter-spacing:.1em;
   text-transform:uppercase;
   text-align:center;
