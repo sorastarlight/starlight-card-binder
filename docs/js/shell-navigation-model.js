@@ -261,6 +261,10 @@ function normalizeCollectSection(sections, defaults) {
   if (starBits && /^star bits$/i.test(String(starBits.label || '').trim())) {
     starBits.label = 'My Star Bits';
   }
+  const collectionItem = collect.items.find(item => item.destination === 'collection');
+  if (collectionItem && /^my collection$/i.test(String(collectionItem.label || '').trim())) {
+    collectionItem.label = 'My Card Binder';
+  }
   return sections;
 }
 

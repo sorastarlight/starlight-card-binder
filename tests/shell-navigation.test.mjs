@@ -22,7 +22,7 @@ test('default shell navigation includes core destinations and staff account link
   ));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'offers'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'feed' && entry.label === 'Activity Feed'));
-  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'collection' && entry.label === 'My Collection'));
+  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'collection' && entry.label === 'My Card Binder'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'daily' && entry.label === 'Free Daily Starlight Pack'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'shop' && entry.label === 'Card Shop'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'season-pass' && entry.label === 'Twitch Season Pass'));
@@ -49,7 +49,7 @@ test('default shell navigation includes core destinations and staff account link
   assert.ok(cards.items.some(item => item.id === 'event-cards' && item.label === 'Event Cards'));
   assert.ok(cards.items.some(item => item.id === 'special-cards' && item.label === 'Special Cards'));
   assert.ok(!cards.items.some(item => item.destination === 'daily'));
-  assert.ok(collect.items.some(item => item.destination === 'collection' && item.label === 'My Collection'));
+  assert.ok(collect.items.some(item => item.destination === 'collection' && item.label === 'My Card Binder'));
   assert.ok(!collect.items.some(item => item.id === 'card-series'));
   assert.ok(collect.items.some(item => item.destination === 'checklist' && item.label === 'Card Checklist'));
   assert.ok(collect.items.some(item => item.destination === 'star-bits' && item.label === 'My Star Bits'));
@@ -65,7 +65,7 @@ test('default shell navigation includes core destinations and staff account link
   assert.ok(community.items.some(item => item.destination === 'feed' && item.label === 'Activity Feed'));
   assert.ok(account.items.some(item => item.destination === 'rewards' && item.label === 'Gifts'));
   assert.equal(account.mobileOnly, false);
-  assert.equal(nav.pageTitles.collection, 'My Collection');
+  assert.equal(nav.pageTitles.collection, 'My Card Binder');
   assert.equal(nav.pageTitles.binder, 'Card Gallery');
   assert.equal(nav.pageTitles.checklist, 'Card Checklist');
   assert.equal(nav.pageTitles.shop, 'Card Shop');
@@ -147,7 +147,7 @@ test('sanitizeShellNavigation overwrites legacy product labels with new defaults
       }]
     }
   });
-  assert.equal(renamed.pageTitles.collection, 'My Collection');
+  assert.equal(renamed.pageTitles.collection, 'My Card Binder');
   assert.equal(renamed.pageTitles.daily, 'Free Daily Starlight Pack');
   assert.equal(renamed.pageTitles.shop, 'Card Shop');
   assert.equal(renamed.pageTitles.checklist, 'Card Checklist');
@@ -155,7 +155,7 @@ test('sanitizeShellNavigation overwrites legacy product labels with new defaults
   assert.equal(renamed.pageTitles.trades, 'Trade');
   assert.equal(renamed.pageTitles.profile, 'Profile');
   assert.equal(renamed.pageTitles.feed, 'Activity Feed');
-  assert.equal(renamed.sidebar.sections[0].items[0].label, 'My Collection');
+  assert.equal(renamed.sidebar.sections[0].items[0].label, 'My Card Binder');
   assert.ok(!renamed.sidebar.sections[0].items.some(item => item.destination === 'daily'));
   assert.ok(renamed.sidebar.sections[0].items.some(item => item.destination === 'feed' && item.label === 'Activity Feed'));
 });

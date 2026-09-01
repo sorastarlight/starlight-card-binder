@@ -17,10 +17,10 @@ test('keeps the requested collection navigation labels in the shared shell', asy
   assert.doesNotMatch(defaults, /id: 'series'/);
   assert.match(defaults, /id: 'admin-hub'/);
   assert.match(defaults, /Redeem Code/);
-  assert.match(defaults, /pageTitles:[\s\S]*collection: 'My Collection'/);
+  assert.match(defaults, /pageTitles:[\s\S]*collection: 'My Card Binder'/);
   assert.match(defaults, /pageTitles:[\s\S]*checklist: 'Card Checklist'/);
 
-  assert.match(shell, /collection:\{title:'My Collection'/);
+  assert.match(shell, /collection:\{title:'My Card Binder'/);
   assert.match(shell, /binder:\{title:'Card Gallery'/);
 });
 

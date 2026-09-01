@@ -11,7 +11,7 @@ export const PUBLIC_SHELL_DESTINATIONS = Object.freeze([
   { value: 'shop', label: 'Card Shop' },
   { value: 'events', label: 'Events' },
   { value: 'redeem', label: 'Redeem Code' },
-  { value: 'collection', label: 'My Collection' },
+  { value: 'collection', label: 'My Card Binder' },
   { value: 'star-bits', label: 'My Star Bits' },
   { value: 'checklist', label: 'Card Checklist' },
   { value: 'quests', label: 'Missions' },
@@ -57,6 +57,7 @@ export const SHELL_LABEL_REWRITES = Object.freeze({
     'Card Boutique'
   ]),
   collection: Object.freeze([
+    'My Collection',
     'My Starlight Album',
     'My Card Collection & Favorites',
     'My Card Collection',
@@ -136,7 +137,7 @@ export function createDefaultShellNavigation() {
     pageTitles: {
       home: 'Home',
       binder: 'Card Gallery',
-      collection: 'My Collection',
+      collection: 'My Card Binder',
       daily: 'Free Daily Starlight Pack',
       shop: 'Card Shop',
       events: 'Events',
@@ -188,7 +189,7 @@ export function createDefaultShellNavigation() {
           staffOnly: false,
           mega: true,
           items: [
-            { id: 'collection', label: 'My Collection', icon: shellNavIcon('collection'), destination: 'collection', enabled: true, features: [] },
+            { id: 'collection', label: 'My Card Binder', icon: shellNavIcon('collection'), destination: 'collection', enabled: true, features: [] },
             { id: 'checklist', label: 'Card Checklist', icon: shellNavIcon('checklist'), destination: 'checklist', enabled: true, features: [] },
             { id: 'star-bits', label: 'My Star Bits', icon: starBitNavIcon(), destination: 'star-bits', enabled: true, features: [] },
             { id: 'quests', label: 'Missions', icon: shellNavIcon('missions'), destination: 'quests', enabled: true, features: [] }
