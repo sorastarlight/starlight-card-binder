@@ -219,12 +219,16 @@ function stripDailyFromSidebar(sections = []) {
 
 /**
  * Migrate legacy Cards megas that still bury Daily Pack or use a non-clickable
- * Card Series label slot. Preserve editor-authored modern Cards trees.
+ * Card Series label slot. Always ensure the canonical Cards destinations exist:
+ * Card Gallery, Card Series, Event Cards, Special Cards.
  */
 function normalizeCardsSection(sections, defaults) {
   const cards = sections.find(section => section.id === 'cards');
   const defaultCards = (defaults.sidebar?.sections || []).find(section => section.id === 'cards');
   if (!cards || !defaultCards) return sections;
+
+  cards.label = cards.label || defaultCards.label || 'Cards';
+  cards.mega = true;
 
   const items = [...(cards.items || [])];
   const seriesIndex = items.findIndex(item =>
@@ -244,7 +248,44 @@ function normalizeCardsSection(sections, defaults) {
 
   if (needsLegacyReset) {
     cards.items = defaultCards.items.map((item, index) => sanitizeItem(item, index));
+    return sections;
   }
+
+  const defaultItems = defaultCards.items || [];
+  const used = new Set();
+  const ordered = [];
+
+  for (const def of defaultItems) {
+    const matchIndex = items.findIndex((item, index) => {
+      if (used.has(index)) return false;
+      if (item.id && item.id === def.id) return true;
+      if (def.id === 'binder' && item.destination === 'binder' && /gallery/i.test(String(item.label || ''))) return true;
+      if (def.id === 'card-series' && /^card series$/i.test(String(item.label || '').trim())) return true;
+      if (def.id === 'event-cards' && (/^event cards$/i.test(String(item.label || '').trim()) || (item.features || []).includes('eventCards'))) return true;
+      if (def.id === 'special-cards' && (/^special cards$/i.test(String(item.label || '').trim()) || (item.features || []).includes('specialCards'))) return true;
+      return false;
+    });
+    if (matchIndex >= 0) {
+      used.add(matchIndex);
+      const match = { ...items[matchIndex] };
+      match.id = match.id || def.id;
+      match.label = match.label || def.label;
+      match.destination = match.destination || def.destination;
+      if (!Array.isArray(match.features) || match.features.length === 0) {
+        match.features = [...(def.features || [])];
+      }
+      ordered.push(sanitizeItem(match, ordered.length));
+    } else {
+      ordered.push(sanitizeItem(def, ordered.length));
+    }
+  }
+
+  items.forEach((item, index) => {
+    if (used.has(index)) return;
+    ordered.push(sanitizeItem(item, ordered.length));
+  });
+
+  cards.items = ordered;
   return sections;
 }
 

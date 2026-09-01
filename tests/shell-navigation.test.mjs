@@ -160,6 +160,33 @@ test('sanitizeShellNavigation overwrites legacy product labels with new defaults
   assert.ok(renamed.sidebar.sections[0].items.some(item => item.destination === 'feed' && item.label === 'Activity Feed'));
 });
 
+test('sanitizeShellNavigation injects missing Cards destinations', () => {
+  const patched = sanitizeShellNavigation({
+    ...cloneDefaultShellNavigation(),
+    sidebar: {
+      sections: [
+        {
+          id: 'cards',
+          label: 'Cards',
+          icon: { type: 'emoji', value: '' },
+          staffOnly: false,
+          items: [
+            { id: 'binder', label: 'Card Gallery', destination: 'binder', enabled: true, features: ['clearSeries', 'clearCardSet'] }
+          ]
+        },
+        ...cloneDefaultShellNavigation().sidebar.sections.filter(section => section.id !== 'cards')
+      ]
+    }
+  });
+  const cards = patched.sidebar.sections.find(section => section.id === 'cards');
+  assert.deepEqual(
+    cards.items.map(item => item.label),
+    ['Card Gallery', 'Card Series', 'Event Cards', 'Special Cards']
+  );
+  assert.ok(cards.items.some(item => item.id === 'event-cards' && (item.features || []).includes('eventCards')));
+  assert.ok(cards.items.some(item => item.id === 'special-cards' && (item.features || []).includes('specialCards')));
+});
+
 test('sanitizeShellNavigation relocates checklist to Collection and keeps Daily off Cards', () => {
   const relocated = sanitizeShellNavigation({
     ...cloneDefaultShellNavigation(),

@@ -6,19 +6,19 @@
   <title>Website Editor | Starlight Card Binder</title>
   <link rel="stylesheet" href="css/style.css?v=1.0.2">
   <link rel="stylesheet" href="css/shared-ui.css?v=1.6.16">
-  <link rel="stylesheet" href="css/pages/admin-shell.css?v=1.0.0">
-  <link rel="stylesheet" href="css/pages/admin-website.css?v=2.2.0">
+  <link rel="stylesheet" href="css/pages/admin-shell.css?v=1.1.1">
+  <link rel="stylesheet" href="css/pages/admin-website.css?v=2.3.0">
   <link rel="stylesheet" href="css/qol-ui.css?v=94.2.8">
   <script src="js/browser-performance.js?v=1.0.0" defer></script>
 </head>
 <body class="admin-suite">
   <script src="js/embed-mode.js" type="module"></script>
-  <div class="admin-suite-frame">
+  <div class="admin-suite-frame admin-suite-frame--wide">
     <nav class="admin-suite-crumb" id="adminCrumb" aria-label="Administration breadcrumb"></nav>
     <header class="admin-suite-header">
       <div>
         <h1>Website Editor</h1>
-        <p class="admin-suite-lead">Pick a page, edit its copy, and watch the live preview update instantly. Save publishes site-wide.</p>
+        <p class="admin-suite-lead">Pick a page and edit its copy. Save publishes site-wide. Navigation menus are edited in Navigation Studio.</p>
       </div>
       <div class="admin-suite-actions admin-toolbar">
         <button id="resetPageBtn" class="admin-btn" type="button" hidden>Reset This Page</button>
@@ -41,28 +41,12 @@
           <div id="pageMeta" class="page-meta"></div>
           <section id="editorPanel" class="tab-panel editor-scroll" role="tabpanel"></section>
         </section>
-
-        <aside class="studio-preview" aria-label="Live page preview">
-          <div class="preview-toolbar">
-            <div>
-              <h2>Live preview</h2>
-              <p class="preview-hint">Draft changes appear here before Save.</p>
-            </div>
-            <div class="preview-actions">
-              <button type="button" class="btn small" id="reloadPreviewBtn">Reload</button>
-              <a class="btn small" id="openLivePage" href="home.html" target="_blank" rel="noopener">Open live</a>
-            </div>
-          </div>
-          <div class="preview-frame-wrap">
-            <iframe id="previewFrame" title="Website content preview" loading="lazy"></iframe>
-          </div>
-        </aside>
       </div>
     </div>
     <a class="admin-back-link" href="admin-hub.html">Return to Administration Hub</a>
   </div>
 
-  <script type="module" src="js/pages/admin-website-page.js?v=2.5.0"></script>
+  <script type="module" src="js/pages/admin-website-page.js?v=2.6.0"></script>
   <script src="js/shared-ui.js?v=1.6.16"></script>
   <script src="js/qol-ui.js?v=94.2.8" defer></script>
 </body>
