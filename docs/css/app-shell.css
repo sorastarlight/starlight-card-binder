@@ -804,6 +804,7 @@ body.unified-shell{padding-left:env(safe-area-inset-left);padding-right:env(safe
 /* ===== TCG Live?style sticky masthead ===== */
 body.shell-masthead-layout{
   --shell-masthead-h:76px;
+  --shell-masthead-nav-break:1440px;
   --shell-chrome-pad:clamp(16px, 2.2vw, 28px);
   --shell-chrome-top:var(--shell-masthead-h, 76px);
 }
@@ -885,11 +886,13 @@ body.shell-masthead-layout .shell-masthead-brand .binder-ribbon{
 }
 body.shell-masthead-layout .shell-masthead-nav{
   display:flex;
-  flex-wrap:wrap;
+  flex:1 1 auto;
+  flex-wrap:nowrap;
   align-items:center;
   justify-content:center;
   gap:clamp(2px, .35vw, 6px);
   min-width:0;
+  max-width:100%;
   overflow:visible;
 }
 body.shell-masthead-layout .shell-mega{position:relative;flex:none;z-index:1}
@@ -900,13 +903,14 @@ body.shell-masthead-layout .shell-top-link{
   align-items:center;
   gap:4px;
   min-height:var(--shell-masthead-h, 76px);
-  padding:0 clamp(10px, 1.2vw, 16px);
+  max-width:100%;
+  padding:0 clamp(8px, 1vw, 14px);
   border:0;
   border-radius:0;
   background:transparent;
   color:#405fa1;
   font:inherit;
-  font-size:.78rem;
+  font-size:clamp(.66rem, .62rem + .18vw, .78rem);
   font-weight:850;
   letter-spacing:.08em;
   text-transform:uppercase;
@@ -1149,22 +1153,22 @@ body.shell-masthead-layout .shell-drawer .unified-nav{
   background:transparent;
   padding:0;
 }
-@media(max-width:1180px) and (min-width:981px){
+@media(max-width:1440px) and (min-width:981px){
   body.shell-masthead-layout .shell-masthead-actions .shell-account-main span[data-shell-account-sub],
   body.shell-masthead-layout .shell-profile-mini-stats{display:none}
 }
-@media(max-width:980px){
+@media(max-width:1440px){
   body.shell-masthead-layout .shell-masthead-inner{
     grid-template-columns:auto auto 1fr;
   }
   body.shell-masthead-layout .shell-masthead-nav{display:none}
   body.shell-masthead-layout .shell-menu-button{display:inline-grid;place-items:center;order:0}
   body.shell-masthead-layout .shell-masthead-brand{order:1}
-  body.shell-masthead-layout .shell-masthead-actions{order:2;grid-column:1 / -1;justify-content:flex-end}
+  body.shell-masthead-layout .shell-masthead-actions{order:2;justify-content:flex-end}
   body.shell-masthead-layout .shell-masthead-actions .shell-account-main span:not([data-shell-account-sub]),
   body.shell-masthead-layout .shell-profile-mini-stats{display:none}
 }
-@media(min-width:981px){
+@media(min-width:1441px){
   body.shell-masthead-layout .shell-menu-button{display:none}
   body.shell-masthead-layout .shell-mega.is-mobile-only{display:none}
 }

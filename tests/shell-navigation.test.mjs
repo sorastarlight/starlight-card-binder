@@ -668,6 +668,16 @@ test('daily nav indicator module and READY badge markup are wired', async () => 
   assert.match(shell, /hydrateDailyNavIndicator/);
 });
 
+test('masthead nav collapses before typical laptop overlap widths', async () => {
+  const [chrome, shell] = await Promise.all([
+    read('docs/css/starlight-chrome.css'),
+    read('docs/css/app-shell.css')
+  ]);
+  assert.match(chrome, /1440px[\s\S]*shell-masthead-nav[\s\S]*display:\s*none/);
+  assert.match(shell, /max-width:1440px[\s\S]*shell-masthead-nav\{display:none\}/);
+  assert.match(shell, /min-width:1441px[\s\S]*shell-menu-button\{display:none\}/);
+});
+
 test('shell masthead wires mega menus and series browse params', async () => {
   const [shell, defaults, render] = await Promise.all([
     read('docs/js/app-shell.js'),
