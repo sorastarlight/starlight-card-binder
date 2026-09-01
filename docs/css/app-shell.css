@@ -863,15 +863,15 @@ body.shell-masthead-layout .shell-masthead-brand{
 body.shell-masthead-layout .shell-masthead-brand .logo{
   width:auto;
   height:48px;
-  max-width:min(400px,42vw);
+  max-width:min(400px,38vw);
   object-fit:contain;
   flex:none;
 }
 body.shell-masthead-layout .shell-brand-lockup{
   display:flex;
-  flex-direction:column;
+  flex-direction:row;
   align-items:center;
-  gap:3px;
+  gap:10px;
   min-width:0;
 }
 body.shell-masthead-layout .shell-masthead-brand .binder-ribbon{
