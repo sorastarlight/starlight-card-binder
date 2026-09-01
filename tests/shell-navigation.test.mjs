@@ -40,11 +40,17 @@ test('default shell navigation includes core destinations and staff account link
   const account = nav.sidebar.sections.find(section => section.id === 'account');
   assert.ok(home.items.some(item => item.destination === 'home' && item.label === 'Home'));
   assert.ok(cards.items.some(item => item.destination === 'binder' && item.label === 'Card Gallery'));
-  assert.ok(cards.items.some(item => item.id === 'card-series' && item.label === 'Card Series'));
   assert.ok(cards.items.some(item => item.id === 'event-cards' && item.label === 'Event Cards'));
   assert.ok(cards.items.some(item => item.id === 'special-cards' && item.label === 'Special Cards'));
+  assert.ok(!cards.items.some(item => item.id === 'card-series'));
   assert.ok(!cards.items.some(item => item.destination === 'daily'));
   assert.ok(collect.items.some(item => item.destination === 'collection' && item.label === 'My Collection'));
+  assert.ok(collect.items.some(item =>
+    item.id === 'card-series'
+    && item.label === 'Card Series'
+    && item.destination === 'binder'
+    && !(item.features || []).includes('sectionLabel')
+  ));
   assert.ok(collect.items.some(item => item.destination === 'checklist' && item.label === 'Card Checklist'));
   assert.ok(collect.items.some(item => item.destination === 'quests' && item.label === 'Missions'));
   assert.ok(!collect.items.some(item => item.destination === 'shop'));
@@ -165,6 +171,7 @@ test('sanitizeShellNavigation relocates checklist to Collection and keeps Daily 
           staffOnly: false,
           items: [
             { id: 'binder', label: 'Card Gallery', destination: 'binder', enabled: true, features: [] },
+            { id: 'card-series', label: 'Card Series', destination: '', enabled: true, features: ['sectionLabel', 'seriesLinksSlot'] },
             { id: 'checklist', label: 'Card Checklist', destination: 'checklist', enabled: true, features: [] },
             { id: 'daily', label: 'Daily Booster', destination: 'daily', enabled: true, features: ['dailyBadge'] }
           ]
@@ -188,12 +195,18 @@ test('sanitizeShellNavigation relocates checklist to Collection and keeps Daily 
   const collect = relocated.sidebar.sections.find(section => section.id === 'collect');
   const shop = relocated.sidebar.sections.find(section => section.id === 'shop');
   assert.ok(cards.items.some(item => item.label === 'Card Gallery'));
-  assert.ok(cards.items.some(item => item.label === 'Card Series'));
   assert.ok(cards.items.some(item => item.label === 'Event Cards'));
   assert.ok(cards.items.some(item => item.label === 'Special Cards'));
+  assert.ok(!cards.items.some(item => item.id === 'card-series'));
   assert.ok(!cards.items.some(item => item.destination === 'daily'));
   assert.ok(!cards.items.some(item => item.destination === 'checklist'));
   assert.ok(collect.items.some(item => item.destination === 'checklist' && item.label === 'Card Checklist'));
+  assert.ok(collect.items.some(item =>
+    item.id === 'card-series'
+    && item.label === 'Card Series'
+    && item.destination === 'binder'
+    && !(item.features || []).includes('sectionLabel')
+  ));
   assert.ok(!collect.items.some(item => item.destination === 'daily'));
   assert.ok(!collect.items.some(item => item.destination === 'shop'));
   assert.ok(!collect.items.some(item => item.destination === 'season-pass'));
