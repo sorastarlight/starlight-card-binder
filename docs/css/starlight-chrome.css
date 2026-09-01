@@ -132,16 +132,22 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-top-link.active {
 
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-top-link.shell-daily-top-link {
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   gap: 0;
-  /* Reserve badge lane so label never shifts and never sits under READY */
-  padding-top: 22px;
+  padding-top: 0;
   overflow: visible;
+}
+
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-top-link.shell-daily-top-link > span:not(.shell-daily-ready-badge) {
+  line-height: 1.2;
 }
 
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-top-link .shell-daily-ready-badge {
   position: absolute;
-  top: 5px;
   left: 50%;
+  top: 50%;
   bottom: auto;
   z-index: 2;
   margin: 0 !important;
@@ -151,7 +157,8 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-top-link .shell-dail
   line-height: 1;
   white-space: nowrap;
   pointer-events: none;
-  transform: translateX(-50%);
+  /* Sit just above the centered label without shifting it */
+  transform: translate(-50%, calc(-50% - 0.95rem));
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35), 0 0 12px rgba(255, 130, 200, 0.55);
 }
 

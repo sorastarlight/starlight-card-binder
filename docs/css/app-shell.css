@@ -925,14 +925,17 @@ body.shell-masthead-layout .shell-top-link.active{
 }
 body.shell-masthead-layout .shell-top-link.shell-daily-top-link{
   position:relative;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
   gap:0;
-  padding-top:22px;
+  padding-top:0;
   overflow:visible;
 }
 body.shell-masthead-layout .shell-top-link .shell-daily-ready-badge{
   position:absolute;
-  top:5px;
   left:50%;
+  top:50%;
   bottom:auto;
   z-index:2;
   margin:0!important;
@@ -941,7 +944,7 @@ body.shell-masthead-layout .shell-top-link .shell-daily-ready-badge{
   line-height:1;
   white-space:nowrap;
   pointer-events:none;
-  transform:translateX(-50%);
+  transform:translate(-50%, calc(-50% - 0.95rem));
 }
 body.shell-masthead-layout .shell-top-link .shell-daily-ready-badge[hidden]{
   display:none!important;
