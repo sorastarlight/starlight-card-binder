@@ -10,7 +10,7 @@
   --st-chrome-bar-ink: #fff;
   --st-chrome-bar-muted: rgba(255, 255, 255, 0.82);
   --st-chrome-bar-line: rgba(255, 130, 200, 0.28);
-  --st-masthead-nav-break: 1440px;
+  --st-masthead-nav-break: 1920px;
   --st-magic-lavender: #e8d4ff;
   --st-magic-rose: #ffe8f4;
   --st-magic-sky: #e8f6ff;
@@ -36,17 +36,19 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead {
 }
 
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-inner {
+  container-type: inline-size;
+  container-name: shell-masthead;
   max-width: none;
   margin: 0;
   padding: 0 var(--st-chrome-pad-inline);
   min-height: var(--st-chrome-bar-h);
   height: var(--st-chrome-bar-h);
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: clamp(16px, 2.5vw, 36px);
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr) minmax(0, auto);
+  gap: clamp(10px, 1.6vw, 24px);
   align-items: center;
 }
 
-/* Brand lockup: full SORA★STARLIGHT logo + hub badge to the right */
+/* Brand lockup: logo only in the masthead — ribbon overlaps nav on laptop widths */
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-brand {
   display: inline-flex !important;
   align-items: center;
@@ -54,6 +56,8 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-brand {
   color: var(--st-chrome-bar-ink) !important;
   text-decoration: none;
   min-width: 0;
+  flex: 0 1 auto;
+  max-width: min(320px, 30vw);
 }
 
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-brand-lockup {
@@ -67,31 +71,14 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-brand-lockup {
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-brand .logo {
   width: auto !important;
   height: 40px !important;
-  max-width: min(340px, 38vw) !important;
+  max-width: min(300px, 100%) !important;
   object-fit: contain;
   flex: none;
   filter: drop-shadow(0 2px 8px rgba(255, 130, 200, 0.35));
 }
 
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-brand .binder-ribbon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0;
-  padding: 6px 12px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, #ff4fa7, #ff82c8);
-  color: #fff;
-  font-family: inherit;
-  font-size: 0.78rem;
-  font-weight: 900;
-  letter-spacing: 0.1em;
-  line-height: 1.2;
-  text-transform: uppercase;
-  text-align: center;
-  white-space: nowrap;
-  box-shadow: none;
-  transform: none;
+  display: none !important;
 }
 
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-menu-button {
@@ -110,6 +97,14 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-nav {
   flex-wrap: nowrap;
   min-width: 0;
   max-width: 100%;
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-mega,
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-top-link {
+  flex: 0 1 auto;
+  min-width: 0;
 }
 
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-mega-trigger,
@@ -196,9 +191,16 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-mega-panel {
   transform: none;
 }
 
-/* Account cluster — roomy, not squished */
+/* Account cluster — compact on laptop widths */
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions {
   gap: 10px;
+  flex: 0 0 auto;
+  min-width: 0;
+  justify-self: end;
+}
+
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-account-menu-button {
+  max-width: min(220px, 24vw);
 }
 
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-sfx-button,
@@ -389,17 +391,32 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-drawer {
   color: #fff;
 }
 
-@media (max-width: 1500px) {
-  body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-brand .binder-ribbon {
-    display: none;
+@container shell-masthead (max-width: 1820px) {
+  .shell-masthead-nav {
+    display: none !important;
   }
 
-  body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-brand .logo {
-    max-width: min(280px, 34vw) !important;
+  .shell-menu-button {
+    display: inline-grid !important;
+    place-items: center;
+  }
+
+  .shell-masthead-inner {
+    grid-template-columns: auto auto minmax(0, 1fr) !important;
+  }
+
+  .shell-masthead-actions .shell-account-main {
+    display: none !important;
+  }
+
+  .shell-masthead-actions .shell-account-menu-button {
+    max-width: none;
+    padding: 3px;
+    border-radius: 999px;
   }
 }
 
-@media (max-width: 1440px) {
+@media (max-width: 1920px) {
   body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-nav {
     display: none;
   }
@@ -413,6 +430,9 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-drawer {
     grid-template-columns: auto auto minmax(0, 1fr);
   }
 
+  body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-account-main strong,
+  body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-account-handle,
+  body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-profile-mini-stats,
   body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-account-main {
     display: none;
   }
@@ -424,8 +444,8 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-drawer {
   }
 }
 
-@media (max-width: 900px) {
-  body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-brand .binder-ribbon {
+@media (min-width: 1921px) {
+  body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-menu-button {
     display: none;
   }
 }
