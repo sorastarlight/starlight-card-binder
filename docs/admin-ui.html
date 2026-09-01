@@ -6,8 +6,8 @@
   <title>Navigation Studio | Starlight Card Binder</title>
   <link rel="stylesheet" href="css/style.css?v=1.0.2">
   <link rel="stylesheet" href="css/shared-ui.css?v=1.6.16">
-  <link rel="stylesheet" href="css/pages/admin-shell.css?v=1.0.0">
-  <link rel="stylesheet" href="css/pages/admin-ui.css?v=3.0.0">
+  <link rel="stylesheet" href="css/pages/admin-shell.css?v=1.1.0">
+  <link rel="stylesheet" href="css/pages/admin-ui.css?v=3.1.0">
   <link rel="stylesheet" href="css/qol-ui.css?v=94.2.8">
   <script src="js/browser-performance.js?v=1.0.0" defer></script>
 </head>
@@ -18,7 +18,7 @@
     <header class="admin-suite-header">
       <div>
         <h1>Navigation Studio</h1>
-        <p class="admin-suite-lead">Dynamically reorder, edit, and restructure the live top bar, masthead mega menus, account menu, brand ribbon, and page titles. Draft changes preview instantly; Save publishes for every collector.</p>
+        <p class="admin-suite-lead">Edit the live top navigation: strip links, dropdown menus, brand ribbon, and live feed. Draft changes preview instantly; Save publishes for every collector.</p>
       </div>
       <div class="admin-suite-actions">
         <button id="saveBtn" class="admin-btn admin-btn--primary btn primary" type="button" hidden>Save Changes</button>
@@ -33,15 +33,6 @@
         <input id="brandRibbon" maxlength="40" placeholder="Collectible Card Hub">
       </div>
 
-      <div class="admin-field layout-field">
-        <label for="shellLayout">Site layout</label>
-        <select id="shellLayout" aria-describedby="shellLayoutHint">
-          <option value="masthead">Top masthead — mega menus across the top</option>
-          <option value="hybrid">Hybrid — left sidebar navigation + slim top quick links</option>
-        </select>
-        <p id="shellLayoutHint" class="admin-panel__hint">Masthead matches the live Pokémon-style top bar. Hybrid keeps full section links in a left sidebar.</p>
-      </div>
-
       <div class="admin-field live-feed-field">
         <label class="admin-checkbox-row" for="shellLiveFeedToggle">
           <input type="checkbox" id="shellLiveFeedToggle" checked>
@@ -49,19 +40,13 @@
         </label>
       </div>
 
-      <div class="admin-tabs tabs" role="tablist" aria-label="Navigation Studio editors">
-        <button type="button" class="tab active" role="tab" aria-selected="true" data-tab="topbar" id="tab-topbar" aria-controls="panel-topbar">Top Bar</button>
-        <button type="button" class="tab" role="tab" aria-selected="false" data-tab="sidebar" id="tab-sidebar" aria-controls="panel-sidebar">Masthead Menus</button>
-        <button type="button" class="tab" role="tab" aria-selected="false" data-tab="account" id="tab-account" aria-controls="panel-account">Account Menu</button>
-        <button type="button" class="tab" role="tab" aria-selected="false" data-tab="titles" id="tab-titles" aria-controls="panel-titles">Page Titles</button>
-      </div>
+      <h2 class="admin-panel__title" id="topNavHeading">Top Navigation</h2>
+      <p class="admin-panel__hint">Strip links appear beside the logo cluster. Dropdown menus power Cards, My Collection, Shop, and Community.</p>
 
       <div class="editor-layout admin-split">
         <div class="editor-main">
-          <section id="panel-topbar" class="tab-panel" role="tabpanel" aria-labelledby="tab-topbar" data-panel="topbar"></section>
-          <section id="panel-sidebar" class="tab-panel admin-hidden" role="tabpanel" aria-labelledby="tab-sidebar" data-panel="sidebar" hidden></section>
-          <section id="panel-account" class="tab-panel admin-hidden" role="tabpanel" aria-labelledby="tab-account" data-panel="account" hidden></section>
-          <section id="panel-titles" class="tab-panel admin-hidden" role="tabpanel" aria-labelledby="tab-titles" data-panel="titles" hidden></section>
+          <section id="panel-topbar" class="tab-panel" aria-labelledby="topNavHeading" data-panel="topbar"></section>
+          <section id="panel-sidebar" class="tab-panel" aria-labelledby="topNavHeading" data-panel="sidebar"></section>
         </div>
         <aside class="preview-panel" aria-label="Live shell preview">
           <div class="preview-toolbar">
@@ -85,7 +70,7 @@
   </div>
 
   <script src="js/shared-ui.js?v=1.6.16"></script>
-  <script type="module" src="js/pages/admin-ui-page.js?v=3.0.0"></script>
+  <script type="module" src="js/pages/admin-ui-page.js?v=3.1.0"></script>
   <script src="js/qol-ui.js?v=94.2.8" defer></script>
 </body>
 </html>

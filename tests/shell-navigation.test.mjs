@@ -327,11 +327,10 @@ test('website UI admin page and migration are wired', async () => {
     read('docs/js/app-shell.js')
   ]);
   assert.match(html, /Navigation Studio/);
-  assert.match(html, /Masthead Menus/);
-  assert.match(html, /data-tab="account"/);
-  assert.match(html, /data-tab="topbar"/);
+  assert.match(html, /Top Navigation/);
+  assert.match(html, /Dropdown menus|panel-sidebar/);
   assert.match(html, /64[\u00d7x]64/i);
-  assert.match(page, /Mega menu \(desktop masthead\)/);
+  assert.match(page, /Dropdown menu/);
   assert.match(page, /clearSeries/);
   assert.match(page, /eventCards/);
   assert.match(page, /specialCards/);
@@ -339,11 +338,12 @@ test('website UI admin page and migration are wired', async () => {
   assert.match(page, /data-field="mega"/);
   assert.match(page, /uploadStudioAsset\(file, 'nav-icons'\)/);
   assert.match(page, /shellPreviewFrame|NAV_DRAFT|buildShellStudioPreviewUrl/);
-  assert.match(html, /id="shellLayout"/);
+  assert.doesNotMatch(html, /id="shellLayout"/);
+  assert.doesNotMatch(html, /data-tab="account"/);
+  assert.doesNotMatch(html, /data-tab="titles"/);
   assert.match(html, /id="shellLiveFeedToggle"/);
   assert.match(page, /navigation\.chrome\.layout/);
   assert.match(page, /navigation\.chrome\.showLiveFeed/);
-  assert.match(page, /layoutSelect/);
   assert.match(page, /liveFeedToggle/);
   assert.match(hub, /Navigation Studio/);
   assert.match(hub, /admin-suite/);

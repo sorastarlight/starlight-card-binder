@@ -3,7 +3,7 @@
  * ~76px dark bar, large logo + badge lockup left, nav + account right.
  */
 :root {
-  --st-chrome-max: 1240px;
+  --st-chrome-max: none;
   --st-chrome-pad-inline: clamp(18px, 3vw, 40px);
   --st-chrome-bar-h: 76px;
   --st-chrome-bar: #0d0d0f;
@@ -133,12 +133,16 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-top-link.active {
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-top-link.shell-daily-top-link {
   position: relative;
   gap: 0;
+  /* Reserve badge lane so label never shifts and never sits under READY */
+  padding-top: 22px;
+  overflow: visible;
 }
 
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-top-link .shell-daily-ready-badge {
   position: absolute;
+  top: 5px;
   left: 50%;
-  bottom: calc(100% - 10px);
+  bottom: auto;
   z-index: 2;
   margin: 0 !important;
   padding: 3px 7px !important;
@@ -153,6 +157,12 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-top-link .shell-dail
 
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-top-link .shell-daily-ready-badge[hidden] {
   display: none !important;
+}
+
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead,
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-nav,
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-mega {
+  overflow: visible;
 }
 
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-mega-panel {

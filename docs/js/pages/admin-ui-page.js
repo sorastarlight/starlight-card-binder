@@ -167,12 +167,9 @@ function renderIconControls(icon, scopeAttrs) {
 
 function renderSidebar() {
   const sections = navigation?.sidebar?.sections || [];
-  const layout = navigation?.chrome?.layout === 'hybrid' ? 'hybrid' : 'masthead';
-  const layoutNote = layout === 'hybrid'
-    ? 'Hybrid layout shows these sections in the persistent left sidebar. Top Bar quick links appear as slim links in the masthead.'
-    : 'These sections power the sticky top masthead mega menus and the mobile drawer. Enable “Mega menu” for desktop dropdowns.';
   sidebarPanel.innerHTML = `
-    <p class="lead">${esc(layoutNote)}</p>
+    <h3 class="admin-panel__title">Dropdown menus</h3>
+    <p class="lead">These menus appear in the top navigation (Cards, My Collection, Shop, Community, and any custom menus you add).</p>
     <div class="section-list">
       ${sections.map((section, sIndex) => `
         <article class="section-card" data-section="${sIndex}">
@@ -183,8 +180,7 @@ function renderSidebar() {
               </label>
               ${renderIconControls(section.icon, `data-section="${sIndex}" data-target="section"`)}
               <div class="checks">
-                <label><input type="checkbox" data-field="mega" data-section="${sIndex}" ${section.mega ? 'checked' : ''}> Mega menu (desktop masthead)</label>
-                <label><input type="checkbox" data-field="mobileOnly" data-section="${sIndex}" ${section.mobileOnly ? 'checked' : ''}> Mobile drawer only</label>
+                <label><input type="checkbox" data-field="mega" data-section="${sIndex}" ${section.mega ? 'checked' : ''}> Dropdown menu</label>
                 <label><input type="checkbox" data-field="staffOnly" data-section="${sIndex}" ${section.staffOnly ? 'checked' : ''}> Staff only</label>
               </div>
             </div>
@@ -238,7 +234,7 @@ function renderSidebar() {
             <button type="button" class="btn small" data-action="add-item" data-section="${sIndex}">＋ Add item</button>
           </div>
         </article>
-      `).join('') || '<p class="lead">No masthead menus yet.</p>'}
+      `).join('') || '<p class="lead">No top navigation menus yet.</p>'}
     </div>
     <div class="panel-actions">
       <button type="button" class="btn" data-action="add-section">＋ Add menu</button>
@@ -249,7 +245,8 @@ function renderSidebar() {
 function renderTopBar() {
   const links = navigation?.topBar?.quickLinks || [];
   topbarPanel.innerHTML = `
-    <p class="lead">Top-bar quick links appear in the dark masthead strip. Reorder, rename, enable/disable, and attach badges or CSS class hooks used by the live shell.</p>
+    <h3 class="admin-panel__title">Strip links</h3>
+    <p class="lead">Top-navigation strip links (for example Home and Free Daily Card Pack). Reorder, rename, enable/disable, and attach badges without shifting neighboring menus.</p>
     <div class="link-list admin-editor-list">
       ${links.map((link, index) => {
         const features = new Set(link.features || []);
@@ -283,10 +280,10 @@ function renderTopBar() {
             <button type="button" class="btn small danger" data-action="remove-link" data-link="${index}">Remove</button>
           </div>
         </article>`;
-      }).join('') || '<p class="lead">No top-bar quick links yet.</p>'}
+      }).join('') || '<p class="lead">No strip links yet.</p>'}
     </div>
     <div class="panel-actions">
-      <button type="button" class="btn" data-action="add-link">＋ Add quick link</button>
+      <button type="button" class="btn" data-action="add-link">＋ Add strip link</button>
     </div>
   `;
 }
@@ -459,21 +456,23 @@ function loadShellPreview({ force = false } = {}) {
 
 function renderAll() {
   if (brandInput && navigation) brandInput.value = navigation.brandRibbon || '';
-  if (layoutSelect && navigation) {
-    navigation.chrome = navigation.chrome && typeof navigation.chrome === 'object'
-      ? navigation.chrome
-      : { layout: 'masthead', showLiveFeed: true };
-    layoutSelect.value = navigation.chrome.layout === 'masthead' ? 'masthead' : 'hybrid';
-    if (liveFeedToggle) liveFeedToggle.checked = navigation.chrome.showLiveFeed !== false;
-  }
-  ensureAccountMenu();
-  renderSidebar();
+  navigation.chrome = navigation.chrome && typeof navigation.chrome === 'object'
+    ? navigation.chrome
+    : { layout: 'masthead', showLiveFeed: true };
+  navigation.chrome.layout = 'masthead';
+  if (liveFeedToggle) liveFeedToggle.checked = navigation.chrome.showLiveFeed !== false;
   renderTopBar();
-  renderAccountMenu();
-  renderTitles();
+  renderSidebar();
+  if (topbarPanel) {
+    topbarPanel.classList.remove('hidden', 'admin-hidden');
+    topbarPanel.hidden = false;
+  }
+  if (sidebarPanel) {
+    sidebarPanel.classList.remove('hidden', 'admin-hidden');
+    sidebarPanel.hidden = false;
+  }
   renderPreview();
   loadShellPreview();
-  showTab(activeTab);
 }
 
 function showTab(name) {
@@ -551,20 +550,12 @@ brandInput?.addEventListener('input', () => {
   renderPreview();
 });
 
-layoutSelect?.addEventListener('change', () => {
-  if (!navigation) return;
-  navigation.chrome = navigation.chrome && typeof navigation.chrome === 'object'
-    ? navigation.chrome
-    : { layout: 'masthead', showLiveFeed: true };
-  navigation.chrome.layout = layoutSelect.value === 'masthead' ? 'masthead' : 'hybrid';
-  renderAll();
-});
-
 liveFeedToggle?.addEventListener('change', () => {
   if (!navigation) return;
   navigation.chrome = navigation.chrome && typeof navigation.chrome === 'object'
     ? navigation.chrome
     : { layout: 'masthead', showLiveFeed: true };
+  navigation.chrome.layout = 'masthead';
   navigation.chrome.showLiveFeed = Boolean(liveFeedToggle.checked);
   renderPreview();
 });
@@ -595,7 +586,7 @@ function onEditorInput(event) {
   }
   if (field === 'mobileOnly') {
     const section = getSection(Number(el.dataset.section));
-    if (section) section.mobileOnly = el.checked;
+    if (section) section.mobileOnly = false;
     renderPreview();
     return;
   }
@@ -891,6 +882,10 @@ saveBtn.addEventListener('click', async () => {
   try {
     syncFromDom();
     navigation.brandRibbon = brandInput.value;
+    navigation.chrome = navigation.chrome && typeof navigation.chrome === 'object'
+      ? navigation.chrome
+      : { layout: 'masthead', showLiveFeed: true };
+    navigation.chrome.layout = 'masthead';
     navigation = await saveShellNavigation(navigation);
     renderAll();
     setStatus('Navigation Studio settings saved.', 'success');

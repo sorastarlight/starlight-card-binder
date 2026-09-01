@@ -3,7 +3,7 @@
  * Used inside the binder shell iframe and standalone public routes.
  */
 :root {
-  --st-pub-max: min(1360px, 100%);
+  --st-pub-max: none;
   --st-pub-pad: clamp(16px, 2.5vw, 28px);
   --st-pub-ink: var(--st-color-ink, #3d5088);
   --st-pub-muted: var(--st-color-muted, #6b7089);

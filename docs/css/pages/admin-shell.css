@@ -15,7 +15,7 @@
   --admin-radius-lg: var(--st-radius-lg, 1.5rem);
   --admin-shadow: var(--st-shadow-sm, 0 8px 22px rgba(45, 62, 105, 0.12));
   --admin-bar: #0d0d0f;
-  --admin-max: 1180px;
+  --admin-max: none;
 }
 
 body.admin-suite {
@@ -29,13 +29,15 @@ body.admin-suite {
 }
 
 .admin-suite-frame {
-  width: min(100%, var(--admin-max));
-  margin: 0 auto;
-  padding: 22px clamp(14px, 3vw, 28px) 56px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 22px clamp(14px, 2.4vw, 32px) 56px;
 }
 
 .admin-suite-frame--wide {
-  --admin-max: 1500px;
+  width: 100%;
+  max-width: none;
 }
 
 .admin-suite-crumb {

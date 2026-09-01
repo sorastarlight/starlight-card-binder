@@ -8,6 +8,11 @@
   padding-top: 8px;
 }
 
+#panel-topbar,
+#panel-sidebar {
+  margin-bottom: 18px;
+}
+
 .lead {
   color: var(--admin-muted, #68738e);
   line-height: 1.55;

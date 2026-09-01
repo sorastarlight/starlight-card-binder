@@ -926,11 +926,14 @@ body.shell-masthead-layout .shell-top-link.active{
 body.shell-masthead-layout .shell-top-link.shell-daily-top-link{
   position:relative;
   gap:0;
+  padding-top:22px;
+  overflow:visible;
 }
 body.shell-masthead-layout .shell-top-link .shell-daily-ready-badge{
   position:absolute;
+  top:5px;
   left:50%;
-  bottom:calc(100% - 10px);
+  bottom:auto;
   z-index:2;
   margin:0!important;
   padding:3px 7px!important;
@@ -942,6 +945,11 @@ body.shell-masthead-layout .shell-top-link .shell-daily-ready-badge{
 }
 body.shell-masthead-layout .shell-top-link .shell-daily-ready-badge[hidden]{
   display:none!important;
+}
+body.shell-masthead-layout .shell-masthead,
+body.shell-masthead-layout .shell-masthead-nav,
+body.shell-masthead-layout .shell-mega{
+  overflow:visible;
 }
 body.shell-masthead-layout .shell-mega-panel{
   position:absolute;
