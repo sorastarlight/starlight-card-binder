@@ -29,7 +29,7 @@ const routes = {
   'star-bits':{title:'Star Bits',src:'star-bits.html'},
   checklist:{title:'Card Checklist',src:'checklist.html'},
   quests:{title:'Missions',src:'collection-quests.html'},
-  'season-pass':{title:'Season Pass',src:'season-pass.html'},
+  'season-pass':{title:'Twitch Season Pass',src:'season-pass.html'},
   trades:{title:'Trade',src:'trade-lists.html'}, offers:{title:'Trade',src:'trade-lists.html'},
   rankings:{title:'Rankings',src:'trade-lists.html'},
   feed:{title:'Activity Feed',src:'pull-feed.html'},

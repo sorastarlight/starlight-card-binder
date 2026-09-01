@@ -235,6 +235,66 @@ function normalizeCardsSection(sections, defaults) {
   return sections;
 }
 
+const SHOP_SECTION_DESTINATIONS = new Set(['shop', 'season-pass', 'redeem']);
+
+/** Ensure Shop is its own mega with Card Shop / Twitch Season Pass / Redeem Code. */
+function normalizeShopSection(sections, defaults) {
+  const defaultShop = (defaults.sidebar?.sections || []).find(section => section.id === 'shop');
+  if (!defaultShop) return sections;
+
+  const collect = sections.find(section => section.id === 'collect');
+  if (collect) {
+    collect.items = (collect.items || []).filter(item => !SHOP_SECTION_DESTINATIONS.has(item.destination));
+  }
+
+  let shop = sections.find(section => section.id === 'shop');
+  const needsReset = !shop
+    || !(shop.items || []).some(item => item.destination === 'shop')
+    || !(shop.items || []).some(item => item.destination === 'season-pass')
+    || !(shop.items || []).some(item => item.destination === 'redeem')
+    || (shop.items || []).some(item => item.destination === 'shop' && /^shop$/i.test(String(item.label || '').trim()));
+
+  if (!shop) {
+    shop = sanitizeSection(structuredClone(defaultShop), sections.length);
+    const collectIndex = sections.findIndex(section => section.id === 'collect');
+    const communityIndex = sections.findIndex(section => section.id === 'community');
+    const insertAt = collectIndex >= 0
+      ? collectIndex + 1
+      : (communityIndex >= 0 ? communityIndex : sections.length);
+    sections.splice(insertAt, 0, shop);
+  } else if (needsReset) {
+    shop.label = 'Shop';
+    shop.mega = true;
+    shop.items = defaultShop.items.map((item, index) => sanitizeItem(item, index));
+  } else {
+    shop.label = 'Shop';
+    shop.mega = true;
+  }
+
+  return sections;
+}
+
+function ensureDefaultSidebarSections(sections, defaults) {
+  const defaultSections = defaults.sidebar?.sections || [];
+  const result = [...sections];
+
+  defaultSections.forEach((defaultSection, defaultIndex) => {
+    if (result.some(section => section.id === defaultSection.id)) return;
+    const insert = sanitizeSection(structuredClone(defaultSection), defaultIndex);
+    let insertAt = result.length;
+    for (let i = defaultIndex - 1; i >= 0; i -= 1) {
+      const prevIndex = result.findIndex(section => section.id === defaultSections[i].id);
+      if (prevIndex >= 0) {
+        insertAt = prevIndex + 1;
+        break;
+      }
+    }
+    result.splice(insertAt, 0, insert);
+  });
+
+  return result;
+}
+
 function ensureDefaultSidebarItems(sections, defaults) {
   const defaultSections = defaults.sidebar?.sections || [];
   const presentDestinations = new Set();
@@ -274,6 +334,7 @@ function rewriteSectionLabel(section) {
   if (id === 'home') return '';
   if (id === 'cards' && /^(cards|starlight cards gallery)$/i.test(label)) return 'Cards';
   if (id === 'collect' && /^(collect|collection|my collection)$/i.test(label)) return 'My Collection';
+  if (id === 'shop' && /^(shop|card shop)$/i.test(label)) return 'Shop';
   if (id === 'community' && /^(community|community hub)$/i.test(label)) return 'Community';
   if (id === 'account' && /^account$/i.test(label)) return 'Account';
   return label || section.label;
@@ -389,17 +450,23 @@ export function sanitizeShellNavigation(input) {
     defaults
   );
 
-  const sections = normalizeCardsSection(
-    stripDailyFromSidebar(
-      ensureDefaultSidebarItems(
-        relocateSidebarDestinations(
-          Array.isArray(source.sidebar?.sections)
-            ? source.sidebar.sections.map(sanitizeSection).slice(0, 8)
-            : defaults.sidebar.sections.map(sanitizeSection),
+  const sections = normalizeShopSection(
+    normalizeCardsSection(
+      stripDailyFromSidebar(
+        ensureDefaultSidebarItems(
+          ensureDefaultSidebarSections(
+            relocateSidebarDestinations(
+              Array.isArray(source.sidebar?.sections)
+                ? source.sidebar.sections.map(sanitizeSection).slice(0, 8)
+                : defaults.sidebar.sections.map(sanitizeSection),
+              defaults
+            ),
+            defaults
+          ),
           defaults
-        ),
-        defaults
-      )
+        )
+      ),
+      defaults
     ),
     defaults
   ).filter(section => section.id !== 'series' && section.id !== 'admin');

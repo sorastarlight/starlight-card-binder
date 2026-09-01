@@ -10,10 +10,11 @@ const read = relativePath => readFile(new URL(`../${relativePath}`, import.meta.
 test('default shell navigation includes core destinations and staff account link', () => {
   const nav = cloneDefaultShellNavigation();
   const ids = nav.sidebar.sections.map(section => section.id);
-  assert.deepEqual(ids, ['home', 'cards', 'collect', 'community', 'account']);
+  assert.deepEqual(ids, ['home', 'cards', 'collect', 'shop', 'community', 'account']);
   assert.equal(nav.sidebar.sections[0].label, '');
   assert.equal(nav.sidebar.sections[1].label, 'Cards');
   assert.equal(nav.sidebar.sections[2].label, 'My Collection');
+  assert.equal(nav.sidebar.sections[3].label, 'Shop');
   assert.ok(!nav.sidebar.sections.some(section => section.id === 'series'));
   assert.ok(!nav.sidebar.sections.some(section => section.staffOnly));
   assert.ok(nav.accountMenu.signedIn.some(item =>
@@ -23,7 +24,8 @@ test('default shell navigation includes core destinations and staff account link
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'feed' && entry.label === 'Activity Feed'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'collection' && entry.label === 'My Collection'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'daily' && entry.label === 'Free Daily Starlight Pack'));
-  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'shop' && entry.label === 'Shop'));
+  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'shop' && entry.label === 'Card Shop'));
+  assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'season-pass' && entry.label === 'Twitch Season Pass'));
   assert.equal(nav.brandRibbon, 'Collectible Card Hub');
   assert.equal(nav.chrome?.layout, 'masthead');
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'checklist' && entry.label === 'Card Checklist'));
@@ -33,6 +35,7 @@ test('default shell navigation includes core destinations and staff account link
   const home = nav.sidebar.sections.find(section => section.id === 'home');
   const cards = nav.sidebar.sections.find(section => section.id === 'cards');
   const collect = nav.sidebar.sections.find(section => section.id === 'collect');
+  const shop = nav.sidebar.sections.find(section => section.id === 'shop');
   const community = nav.sidebar.sections.find(section => section.id === 'community');
   const account = nav.sidebar.sections.find(section => section.id === 'account');
   assert.ok(home.items.some(item => item.destination === 'home' && item.label === 'Home'));
@@ -43,8 +46,13 @@ test('default shell navigation includes core destinations and staff account link
   assert.ok(!cards.items.some(item => item.destination === 'daily'));
   assert.ok(collect.items.some(item => item.destination === 'collection' && item.label === 'My Collection'));
   assert.ok(collect.items.some(item => item.destination === 'checklist' && item.label === 'Card Checklist'));
-  assert.ok(collect.items.some(item => item.destination === 'shop' && item.label === 'Shop'));
   assert.ok(collect.items.some(item => item.destination === 'quests' && item.label === 'Missions'));
+  assert.ok(!collect.items.some(item => item.destination === 'shop'));
+  assert.ok(!collect.items.some(item => item.destination === 'season-pass'));
+  assert.ok(!collect.items.some(item => item.destination === 'redeem'));
+  assert.ok(shop.items.some(item => item.destination === 'shop' && item.label === 'Card Shop'));
+  assert.ok(shop.items.some(item => item.destination === 'season-pass' && item.label === 'Twitch Season Pass'));
+  assert.ok(shop.items.some(item => item.destination === 'redeem' && item.label === 'Redeem Code'));
   assert.ok(community.items.some(item => item.destination === 'trades' && item.label === 'Trade'));
   assert.ok(community.items.some(item => item.destination === 'rankings' && item.label === 'Rankings'));
   assert.ok(community.items.some(item => item.destination === 'feed' && item.label === 'Activity Feed'));
@@ -53,14 +61,14 @@ test('default shell navigation includes core destinations and staff account link
   assert.equal(nav.pageTitles.collection, 'My Collection');
   assert.equal(nav.pageTitles.binder, 'Card Gallery');
   assert.equal(nav.pageTitles.checklist, 'Card Checklist');
-  assert.equal(nav.pageTitles.shop, 'Shop');
+  assert.equal(nav.pageTitles.shop, 'Card Shop');
   assert.equal(nav.pageTitles.daily, 'Free Daily Starlight Pack');
   assert.equal(nav.pageTitles.quests, 'Missions');
   assert.equal(nav.pageTitles.trades, 'Trade');
   assert.equal(nav.pageTitles.rewards, 'Gifts');
   assert.equal(nav.pageTitles.rankings, 'Rankings');
   assert.equal(nav.pageTitles['star-bits'], 'Star Bits');
-  assert.equal(nav.pageTitles['season-pass'], 'Season Pass');
+  assert.equal(nav.pageTitles['season-pass'], 'Twitch Season Pass');
   assert.equal(nav.pageTitles.events, 'Events');
   assert.equal(nav.pageTitles.redeem, 'Redeem Code');
   assert.equal(nav.pageTitles.feed, 'Activity Feed');
@@ -134,7 +142,7 @@ test('sanitizeShellNavigation overwrites legacy product labels with new defaults
   });
   assert.equal(renamed.pageTitles.collection, 'My Collection');
   assert.equal(renamed.pageTitles.daily, 'Free Daily Starlight Pack');
-  assert.equal(renamed.pageTitles.shop, 'Shop');
+  assert.equal(renamed.pageTitles.shop, 'Card Shop');
   assert.equal(renamed.pageTitles.checklist, 'Card Checklist');
   assert.equal(renamed.pageTitles.quests, 'Missions');
   assert.equal(renamed.pageTitles.trades, 'Trade');
@@ -168,7 +176,9 @@ test('sanitizeShellNavigation relocates checklist to Collection and keeps Daily 
           staffOnly: false,
           items: [
             { id: 'collection', label: 'My Collection', destination: 'collection', enabled: true, features: [] },
-            { id: 'shop', label: 'Shop', destination: 'shop', enabled: true, features: [] }
+            { id: 'shop', label: 'Shop', destination: 'shop', enabled: true, features: [] },
+            { id: 'season-pass', label: 'Season Pass', destination: 'season-pass', enabled: true, features: [] },
+            { id: 'redeem', label: 'Redeem Code', destination: 'redeem', enabled: true, features: [] }
           ]
         }
       ]
@@ -176,6 +186,7 @@ test('sanitizeShellNavigation relocates checklist to Collection and keeps Daily 
   });
   const cards = relocated.sidebar.sections.find(section => section.id === 'cards');
   const collect = relocated.sidebar.sections.find(section => section.id === 'collect');
+  const shop = relocated.sidebar.sections.find(section => section.id === 'shop');
   assert.ok(cards.items.some(item => item.label === 'Card Gallery'));
   assert.ok(cards.items.some(item => item.label === 'Card Series'));
   assert.ok(cards.items.some(item => item.label === 'Event Cards'));
@@ -184,6 +195,12 @@ test('sanitizeShellNavigation relocates checklist to Collection and keeps Daily 
   assert.ok(!cards.items.some(item => item.destination === 'checklist'));
   assert.ok(collect.items.some(item => item.destination === 'checklist' && item.label === 'Card Checklist'));
   assert.ok(!collect.items.some(item => item.destination === 'daily'));
+  assert.ok(!collect.items.some(item => item.destination === 'shop'));
+  assert.ok(!collect.items.some(item => item.destination === 'season-pass'));
+  assert.ok(!collect.items.some(item => item.destination === 'redeem'));
+  assert.ok(shop?.items.some(item => item.destination === 'shop' && item.label === 'Card Shop'));
+  assert.ok(shop?.items.some(item => item.destination === 'season-pass' && item.label === 'Twitch Season Pass'));
+  assert.ok(shop?.items.some(item => item.destination === 'redeem' && item.label === 'Redeem Code'));
 });
 
 test('sanitizeShellNavigation rewrites Journal profile labels to Profile', () => {

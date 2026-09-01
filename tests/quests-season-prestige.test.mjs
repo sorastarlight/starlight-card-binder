@@ -24,8 +24,11 @@ test('quests and season pass are shell destinations', () => {
   );
   const nav = createDefaultShellNavigation();
   const collect = nav.sidebar.sections.find((section) => section.id === 'collect');
+  const shop = nav.sidebar.sections.find((section) => section.id === 'shop');
   assert.ok(collect.items.some((item) => item.destination === 'quests'));
-  assert.ok(collect.items.some((item) => item.destination === 'season-pass'));
+  assert.ok(shop.items.some((item) => item.destination === 'season-pass'));
+  assert.ok(shop.items.some((item) => item.destination === 'shop'));
+  assert.ok(shop.items.some((item) => item.destination === 'redeem'));
   assert.equal(
     collect.items.some((item) => item.destination === 'starlight-evolution'),
     false
@@ -51,7 +54,7 @@ test('quests and season pass pages wire services and claim UI', async () => {
   assert.match(questsHtml, /collection-quests-page\.js/);
   assert.match(seasonHtml, /season-pass-page\.js/);
   assert.match(shell, /quests:\{title:'Missions',src:'collection-quests\.html'\}/);
-  assert.match(shell, /'season-pass':\{title:'Season Pass',src:'season-pass\.html'\}/);
+  assert.match(shell, /'season-pass':\{title:'Twitch Season Pass',src:'season-pass\.html'\}/);
   assert.doesNotMatch(shell, /starlight-evolution/);
   assert.match(questsPage, /data-cadence-tab|activeCadence/);
   assert.match(questsHtml, /Daily Missions|data-cadence-tab="daily"/);

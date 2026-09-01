@@ -8,14 +8,14 @@ export const PUBLIC_SHELL_DESTINATIONS = Object.freeze([
   { value: 'home', label: 'Home' },
   { value: 'binder', label: 'Card Gallery' },
   { value: 'daily', label: 'Free Daily Starlight Pack' },
-  { value: 'shop', label: 'Shop' },
+  { value: 'shop', label: 'Card Shop' },
   { value: 'events', label: 'Events' },
   { value: 'redeem', label: 'Redeem Code' },
   { value: 'collection', label: 'My Collection' },
   { value: 'star-bits', label: 'Star Bits' },
   { value: 'checklist', label: 'Card Checklist' },
   { value: 'quests', label: 'Missions' },
-  { value: 'season-pass', label: 'Season Pass' },
+  { value: 'season-pass', label: 'Twitch Season Pass' },
   { value: 'trades', label: 'Trade' },
   { value: 'offers', label: 'Trade' },
   { value: 'rankings', label: 'Rankings' },
@@ -53,6 +53,7 @@ export const SHELL_LABEL_REWRITES = Object.freeze({
   shop: Object.freeze([
     'Starlight Card Shop',
     'Card Shop',
+    'Shop',
     'Card Boutique'
   ]),
   collection: Object.freeze([
@@ -78,7 +79,8 @@ export const SHELL_LABEL_REWRITES = Object.freeze({
     'Starlight Missions'
   ]),
   'season-pass': Object.freeze([
-    'Seasonal Collection Pass'
+    'Seasonal Collection Pass',
+    'Season Pass'
   ]),
   redeem: Object.freeze([
     'Redeem A Code'
@@ -136,13 +138,13 @@ export function createDefaultShellNavigation() {
       binder: 'Card Gallery',
       collection: 'My Collection',
       daily: 'Free Daily Starlight Pack',
-      shop: 'Shop',
+      shop: 'Card Shop',
       events: 'Events',
       redeem: 'Redeem Code',
       'star-bits': 'Star Bits',
       checklist: 'Card Checklist',
       quests: 'Missions',
-      'season-pass': 'Season Pass',
+      'season-pass': 'Twitch Season Pass',
       trades: 'Trade',
       offers: 'Trade',
       rankings: 'Rankings',
@@ -188,10 +190,19 @@ export function createDefaultShellNavigation() {
           items: [
             { id: 'collection', label: 'My Collection', icon: shellNavIcon('collection'), destination: 'collection', enabled: true, features: [] },
             { id: 'checklist', label: 'Card Checklist', icon: shellNavIcon('checklist'), destination: 'checklist', enabled: true, features: [] },
-            { id: 'shop', label: 'Shop', icon: shellNavIcon('shop'), destination: 'shop', enabled: true, features: [], className: 'shell-shop-link' },
             { id: 'star-bits', label: 'Star Bits', icon: starBitNavIcon(), destination: 'star-bits', enabled: true, features: [] },
-            { id: 'quests', label: 'Missions', icon: shellNavIcon('missions'), destination: 'quests', enabled: true, features: [] },
-            { id: 'season-pass', label: 'Season Pass', icon: shellNavIcon('season-pass'), destination: 'season-pass', enabled: true, features: [] },
+            { id: 'quests', label: 'Missions', icon: shellNavIcon('missions'), destination: 'quests', enabled: true, features: [] }
+          ]
+        },
+        {
+          id: 'shop',
+          label: 'Shop',
+          icon: shellNavIcon('shop'),
+          staffOnly: false,
+          mega: true,
+          items: [
+            { id: 'shop', label: 'Card Shop', icon: shellNavIcon('shop'), destination: 'shop', enabled: true, features: [], className: 'shell-shop-link' },
+            { id: 'season-pass', label: 'Twitch Season Pass', icon: shellNavIcon('season-pass'), destination: 'season-pass', enabled: true, features: [] },
             { id: 'redeem', label: 'Redeem Code', icon: shellNavIcon('redeem'), destination: 'redeem', enabled: true, features: [] }
           ]
         },
