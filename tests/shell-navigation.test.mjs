@@ -629,17 +629,20 @@ test('shell navigation render and static shell HTML use extensionless binder hre
 });
 
 test('daily nav indicator module and rainbow markup are wired', async () => {
-  const [indicator, render, dashboard, shell] = await Promise.all([
+  const [indicator, render, dashboard, shell, shellCss] = await Promise.all([
     read('docs/js/daily-nav-indicator.js'),
     read('docs/js/shell-navigation-render.js'),
     read('docs/js/site-dashboard.js'),
-    read('docs/js/app-shell.js')
+    read('docs/js/app-shell.js'),
+    read('docs/css/app-shell.css')
   ]);
   assert.match(indicator, /applyDailyNavReadyState/);
   assert.match(indicator, /data-daily-nav-rainbow/);
   assert.match(indicator, /is-daily-ready/);
   assert.match(render, /data-daily-nav-rainbow/);
   assert.match(render, /shell-daily-rainbow-link/);
+  assert.match(shellCss, /mask-composite:exclude/);
+  assert.match(shellCss, /shellDailyRainbowOrbit/);
   assert.match(dashboard, /applyDailyNavReadyState/);
   assert.match(shell, /hydrateDailyNavIndicator/);
 });
