@@ -125,7 +125,7 @@ export const SHELL_LAYOUT_MODES = Object.freeze(['masthead', 'hybrid']);
 export function createDefaultShellNavigation() {
   return {
     version: 3,
-    brandRibbon: 'Starlight Cards',
+    brandRibbon: 'Collectible Card Hub',
     chrome: {
       layout: 'masthead',
       showLiveFeed: true

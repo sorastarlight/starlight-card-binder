@@ -24,7 +24,7 @@ test('default shell navigation includes core destinations and staff account link
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'collection' && entry.label === 'My Collection'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'daily' && entry.label === 'Free Daily Starlight Pack'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'shop' && entry.label === 'Shop'));
-  assert.equal(nav.brandRibbon, 'Starlight Cards');
+  assert.equal(nav.brandRibbon, 'Collectible Card Hub');
   assert.equal(nav.chrome?.layout, 'masthead');
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'checklist' && entry.label === 'Card Checklist'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'quests' && entry.label === 'Missions'));
@@ -222,7 +222,7 @@ test('sanitizeShellNavigation injects User Rankings when remote nav omits it', (
 
 test('sanitizeShellNavigation rejects unknown destinations and merges empty remote', () => {
   const merged = mergeShellNavigation({});
-  assert.equal(merged.brandRibbon, 'Starlight Cards');
+  assert.equal(merged.brandRibbon, 'Collectible Card Hub');
   assert.ok(merged.accountMenu.signedIn.length > 0);
   const renamed = sanitizeShellNavigation({
     ...cloneDefaultShellNavigation(),
@@ -511,7 +511,7 @@ test('shell masthead wires mega menus and series browse params', async () => {
   assert.match(render, /Home/);
   assert.match(defaults, /mega:\s*true/);
   assert.match(defaults, /clearSeries/);
-  assert.match(defaults, /brandRibbon: 'Starlight Cards'/);
+  assert.match(defaults, /brandRibbon: 'Collectible Card Hub'/);
   assert.match(defaults, /home-top/);
 });
 
