@@ -923,11 +923,25 @@ body.shell-masthead-layout .shell-top-link.active{
   background:rgba(107,198,248,.16);
   outline:none;
 }
-body.shell-masthead-layout .shell-top-link.shell-daily-top-link{gap:8px}
+body.shell-masthead-layout .shell-top-link.shell-daily-top-link{
+  position:relative;
+  gap:0;
+}
 body.shell-masthead-layout .shell-top-link .shell-daily-ready-badge{
-  margin-left:0!important;
+  position:absolute;
+  left:50%;
+  bottom:calc(100% - 10px);
+  z-index:2;
+  margin:0!important;
   padding:3px 7px!important;
   font-size:.58rem!important;
+  line-height:1;
+  white-space:nowrap;
+  pointer-events:none;
+  transform:translateX(-50%);
+}
+body.shell-masthead-layout .shell-top-link .shell-daily-ready-badge[hidden]{
+  display:none!important;
 }
 body.shell-masthead-layout .shell-mega-panel{
   position:absolute;
