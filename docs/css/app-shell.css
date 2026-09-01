@@ -861,9 +861,9 @@ body.shell-masthead-layout .shell-masthead-brand{
   font-weight:900;
 }
 body.shell-masthead-layout .shell-masthead-brand .logo{
-  width:auto;
-  height:68px;
-  max-width:min(580px,50vw);
+  width:auto !important;
+  height:70px !important;
+  max-width:min(620px,52vw) !important;
   object-fit:contain;
   flex:none;
 }
