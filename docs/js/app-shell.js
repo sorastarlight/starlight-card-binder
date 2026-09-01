@@ -308,7 +308,11 @@ function navigate(route,{push=true,extra={}}={}){
     if(frame)setFrameLocation('about:blank');
     document.title='Card Gallery | Starlight Card Binder';
     const series = extra?.series;
-    if(series && window.applyStarlightSeriesFilter){
+    const hasCardSet = Object.prototype.hasOwnProperty.call(extra || {}, 'cardSet');
+    if (hasCardSet && window.applyStarlightCardSetFilter) {
+      window.applyStarlightCardSetFilter(extra.cardSet, { render: false });
+    }
+    if (series && window.applyStarlightSeriesFilter) {
       window.applyStarlightSeriesFilter(series);
     } else {
       window.renderAll?.();
@@ -667,6 +671,7 @@ document.addEventListener('click',e=>{
     const extra = {};
     if (a.dataset.seriesKey) extra.series = a.dataset.seriesKey;
     if (a.dataset.clearSeries === '1') extra.series = 'All Series';
+    if (a.hasAttribute('data-card-set')) extra.cardSet = a.dataset.cardSet || '';
     const href = a.getAttribute('href') || '';
     try {
       const parsed = new URL(href, location.href);

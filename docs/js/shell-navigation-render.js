@@ -44,9 +44,40 @@ function itemHref(item) {
   const destination = item.destination || 'home';
   const features = item.features || [];
   const params = {};
-  if (features.includes('clearSeries')) params.series = 'All Series';
+  if (
+    features.includes('clearSeries')
+    || features.includes('eventCards')
+    || features.includes('specialCards')
+    || features.includes('clearCardSet')
+  ) {
+    params.series = 'All Series';
+  }
   if (item.seriesKey) params.series = item.seriesKey;
+  if (features.includes('eventCards')) params.cardSet = 'event';
+  else if (features.includes('specialCards')) params.cardSet = 'special';
+  else if (features.includes('clearCardSet') || features.includes('clearSeries')) params.cardSet = '';
   return shellHref(destination, params);
+}
+
+function renderNavLink(item) {
+  if (item.enabled === false) return '';
+  const features = item.features || [];
+  if (features.includes('sectionLabel')) {
+    const seriesSlot = features.includes('seriesLinksSlot')
+      ? '<div class="shell-series-links" data-series-links></div>'
+      : '';
+    return `<p class="shell-nav-label shell-nav-label-sub">${renderIcon(item.icon)} ${esc(item.label)}</p>${seriesSlot}`;
+  }
+  const destination = item.destination || 'home';
+  const classes = ['shell-nav-item', item.className || ''].filter(Boolean).join(' ');
+  const staffClass = features.includes('staffOnly') ? ' staff-link' : '';
+  const seriesAttr = item.seriesKey ? ` data-series-key="${esc(item.seriesKey)}"` : '';
+  const clearAttr = features.includes('clearSeries') || features.includes('clearCardSet') ? ' data-clear-series="1"' : '';
+  const cardSet = features.includes('eventCards')
+    ? 'event'
+    : (features.includes('specialCards') ? 'special' : (features.includes('clearCardSet') ? '' : null));
+  const cardSetAttr = cardSet != null ? ` data-card-set="${esc(cardSet)}"` : '';
+  return `<a class="${esc(classes)}${staffClass}" data-shell-view="${esc(destination)}" href="${itemHref(item)}"${seriesAttr}${clearAttr}${cardSetAttr}>${renderIcon(item.icon)} <span>${esc(item.label)}</span>${itemBadge(features)}</a>`;
 }
 
 function renderAccountMenuItem(item, { isStaff = false } = {}) {
@@ -71,20 +102,6 @@ function renderAccountMenuItem(item, { isStaff = false } = {}) {
   const destination = item.destination || 'home';
   const staffClass = features.includes('staffOnly') ? ' staff-link visible' : '';
   return `<a role="menuitem" class="${staffClass.trim()}" data-shell-view="${esc(destination)}" href="${shellHref(destination)}">${esc(item.label || destination)}${itemBadge(features)}</a>`;
-}
-
-function renderNavLink(item) {
-  if (item.enabled === false) return '';
-  const features = item.features || [];
-  if (features.includes('sectionLabel')) {
-    return `<p class="shell-nav-label shell-nav-label-sub">${renderIcon(item.icon)} ${esc(item.label)}</p>`;
-  }
-  const destination = item.destination || 'home';
-  const classes = ['shell-nav-item', item.className || ''].filter(Boolean).join(' ');
-  const staffClass = features.includes('staffOnly') ? ' staff-link' : '';
-  const seriesAttr = item.seriesKey ? ` data-series-key="${esc(item.seriesKey)}"` : '';
-  const clearAttr = features.includes('clearSeries') ? ' data-clear-series="1"' : '';
-  return `<a class="${esc(classes)}${staffClass}" data-shell-view="${esc(destination)}" href="${itemHref(item)}"${seriesAttr}${clearAttr}>${renderIcon(item.icon)} <span>${esc(item.label)}</span>${itemBadge(features)}</a>`;
 }
 
 function renderMegaSection(section) {
@@ -237,25 +254,30 @@ export function applyShellNavigationToDom(navigation, { isStaff = false } = {}) 
   return config;
 }
 
-/** Fill Series mega menu + drawer section from catalog groups. */
+/** Fill Card Series slots (and legacy series panels) from catalog groups. */
 export function populateSeriesMegaMenus(groups = []) {
   const list = Array.isArray(groups) ? groups : [];
   const links = list.map((group) => {
     const key = group.series || group.seriesName || '';
     if (!key) return '';
-    return `<a class="shell-nav-item" data-shell-view="binder" data-series-key="${esc(key)}" href="${shellHref('binder', { series: key })}">${renderShellNavIcon('gallery', esc)} <span>${esc(group.seriesName || key)}</span></a>`;
+    return `<a class="shell-nav-item" data-shell-view="binder" data-series-key="${esc(key)}" data-card-set="" href="${shellHref('binder', { series: key })}">${renderShellNavIcon('gallery', esc)} <span>${esc(group.seriesName || key)}</span></a>`;
   }).join('');
 
-  const allLink = `<a class="shell-nav-item shell-series-all" data-shell-view="binder" data-clear-series="1" href="${shellHref('binder', { series: 'All Series' })}">${renderShellNavIcon('cards', esc)} <span>All Series</span></a>`;
+  const allLink = `<a class="shell-nav-item shell-series-all" data-shell-view="binder" data-clear-series="1" data-card-set="" href="${shellHref('binder', { series: 'All Series' })}">${renderShellNavIcon('cards', esc)} <span>All Series</span></a>`;
+  const seriesHtml = `${allLink}${links}` || '<p class="shell-nav-empty">Series will appear here when the catalog loads.</p>';
+
+  document.querySelectorAll('[data-series-links]').forEach(slot => {
+    slot.innerHTML = seriesHtml;
+  });
 
   document.querySelectorAll('[data-series-mega-panel]').forEach(panel => {
-    panel.innerHTML = `${allLink}${links}`;
+    panel.innerHTML = seriesHtml;
   });
 
   const drawerSeries = document.querySelector('.unified-nav [data-nav-section="series"]');
   if (drawerSeries) {
     const label = drawerSeries.querySelector('.shell-nav-label');
-    drawerSeries.innerHTML = `${label ? label.outerHTML : '<p class="shell-nav-label">Series</p>'}${allLink}${links}`;
+    drawerSeries.innerHTML = `${label ? label.outerHTML : '<p class="shell-nav-label">Series</p>'}${seriesHtml}`;
   }
 
   return list.length;

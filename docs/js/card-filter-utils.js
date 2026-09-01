@@ -3,6 +3,13 @@
  * Pure functions so Node tests can import them without a DOM.
  */
 
+export function cardSetHeading(cardSet = '') {
+  const key = String(cardSet || '').trim().toLowerCase();
+  if (key === 'event') return 'Event Cards';
+  if (key === 'special') return 'Special Cards';
+  return '';
+}
+
 export function buildCardSearchHaystack(card = {}) {
   return [
     card.number,
@@ -30,7 +37,17 @@ export function filterCardList(
     const ownershipMatches = !respectOwnership || !filters.view || filters.view === 'all'
       || (filters.view === 'collected' ? isCollected(card.id) : !isCollected(card.id));
     const favoriteMatches = !filters.favoritesOnly || isFavorite(card.id);
-    return seriesMatches && rarityMatches && searchMatches && ownershipMatches && favoriteMatches;
+    const cardSet = String(filters.cardSet || '').trim().toLowerCase();
+    const distribution = String(card.distributionType || '').trim().toLowerCase();
+    const cardSetMatches = !cardSet
+      || (cardSet === 'event' && Boolean(card.isEventExclusive))
+      || (cardSet === 'special' && (
+        Boolean(card.isPromo)
+        || distribution === 'promo'
+        || distribution === 'special'
+        || distribution === 'special_distribution'
+      ));
+    return seriesMatches && rarityMatches && searchMatches && ownershipMatches && favoriteMatches && cardSetMatches;
   });
   sortCards(list, filters.sort);
   return list;
@@ -53,9 +70,10 @@ export function resolveBinderBrowseList(cards, filters = {}, options = {}) {
 
   const list = filterCardList(pool, { ...filters, series: 'All Series' }, options);
   const owned = list.filter(card => options.isCollected?.(card.id)).length;
-  const heading = series === 'All Series'
-    ? (searching ? 'Search results' : 'Card Gallery')
-    : series;
+  const heading = cardSetHeading(filters.cardSet)
+    || (series === 'All Series'
+      ? (searching ? 'Search results' : 'Card Gallery')
+      : series);
   const favoriteNote = favoritesOnly ? ' · favorites only' : '';
   const summary = searching
     ? `Showing ${list.length} of ${pool.length} cards matching “${query}”${favoriteNote}`

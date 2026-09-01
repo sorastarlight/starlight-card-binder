@@ -37,7 +37,10 @@ test('default shell navigation includes core destinations and staff account link
   const account = nav.sidebar.sections.find(section => section.id === 'account');
   assert.ok(home.items.some(item => item.destination === 'home' && item.label === 'Home'));
   assert.ok(cards.items.some(item => item.destination === 'binder' && item.label === 'Card Gallery'));
-  assert.ok(cards.items.some(item => item.destination === 'daily' && item.label === 'Free Daily Starlight Pack'));
+  assert.ok(cards.items.some(item => item.id === 'card-series' && item.label === 'Card Series'));
+  assert.ok(cards.items.some(item => item.id === 'event-cards' && item.label === 'Event Cards'));
+  assert.ok(cards.items.some(item => item.id === 'special-cards' && item.label === 'Special Cards'));
+  assert.ok(!cards.items.some(item => item.destination === 'daily'));
   assert.ok(collect.items.some(item => item.destination === 'collection' && item.label === 'My Collection'));
   assert.ok(collect.items.some(item => item.destination === 'checklist' && item.label === 'Card Checklist'));
   assert.ok(collect.items.some(item => item.destination === 'shop' && item.label === 'Shop'));
@@ -138,11 +141,11 @@ test('sanitizeShellNavigation overwrites legacy product labels with new defaults
   assert.equal(renamed.pageTitles.profile, 'Profile');
   assert.equal(renamed.pageTitles.feed, 'Activity Feed');
   assert.equal(renamed.sidebar.sections[0].items[0].label, 'My Collection');
-  assert.equal(renamed.sidebar.sections[0].items[1].label, 'Free Daily Starlight Pack');
-  assert.equal(renamed.sidebar.sections[0].items[2].label, 'Activity Feed');
+  assert.ok(!renamed.sidebar.sections[0].items.some(item => item.destination === 'daily'));
+  assert.ok(renamed.sidebar.sections[0].items.some(item => item.destination === 'feed' && item.label === 'Activity Feed'));
 });
 
-test('sanitizeShellNavigation relocates checklist to Collection and daily to Cards', () => {
+test('sanitizeShellNavigation relocates checklist to Collection and keeps Daily off Cards', () => {
   const relocated = sanitizeShellNavigation({
     ...cloneDefaultShellNavigation(),
     sidebar: {
@@ -154,7 +157,8 @@ test('sanitizeShellNavigation relocates checklist to Collection and daily to Car
           staffOnly: false,
           items: [
             { id: 'binder', label: 'Card Gallery', destination: 'binder', enabled: true, features: [] },
-            { id: 'checklist', label: 'Card Checklist', destination: 'checklist', enabled: true, features: [] }
+            { id: 'checklist', label: 'Card Checklist', destination: 'checklist', enabled: true, features: [] },
+            { id: 'daily', label: 'Daily Booster', destination: 'daily', enabled: true, features: ['dailyBadge'] }
           ]
         },
         {
@@ -164,7 +168,6 @@ test('sanitizeShellNavigation relocates checklist to Collection and daily to Car
           staffOnly: false,
           items: [
             { id: 'collection', label: 'My Collection', destination: 'collection', enabled: true, features: [] },
-            { id: 'daily', label: 'Daily Booster', destination: 'daily', enabled: true, features: ['dailyBadge'] },
             { id: 'shop', label: 'Shop', destination: 'shop', enabled: true, features: [] }
           ]
         }
@@ -173,7 +176,11 @@ test('sanitizeShellNavigation relocates checklist to Collection and daily to Car
   });
   const cards = relocated.sidebar.sections.find(section => section.id === 'cards');
   const collect = relocated.sidebar.sections.find(section => section.id === 'collect');
-  assert.ok(cards.items.some(item => item.destination === 'daily' && item.label === 'Free Daily Starlight Pack'));
+  assert.ok(cards.items.some(item => item.label === 'Card Gallery'));
+  assert.ok(cards.items.some(item => item.label === 'Card Series'));
+  assert.ok(cards.items.some(item => item.label === 'Event Cards'));
+  assert.ok(cards.items.some(item => item.label === 'Special Cards'));
+  assert.ok(!cards.items.some(item => item.destination === 'daily'));
   assert.ok(!cards.items.some(item => item.destination === 'checklist'));
   assert.ok(collect.items.some(item => item.destination === 'checklist' && item.label === 'Card Checklist'));
   assert.ok(!collect.items.some(item => item.destination === 'daily'));

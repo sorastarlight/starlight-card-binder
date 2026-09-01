@@ -20,6 +20,7 @@ const RARITY_SCORE = { Legendary: 5, Epic: 4, Rare: 3, Uncommon: 2, Common: 1 };
 let cards = [];
 let filtered = [];
 let page = 1;
+let activeCardSet = '';
 let selectedIndex = 0;
 let selected = null;
 let sfxOn = localStorage.getItem(SFX_KEY) !== "off";
@@ -475,6 +476,7 @@ function applyLoadedCards(data, fromCache = false) {
   selectedIndex = Math.max(0, cards.findIndex(c => c.id === selected?.id));
   hydrateFilters();
   applySeriesQueryFromUrl();
+  applyCardSetQueryFromUrl();
   renderAll();
   warmCriticalAssets();
   scheduleIdleImagePreload();
@@ -676,6 +678,14 @@ function readSeriesQueryParam() {
   }
 }
 
+function readCardSetQueryParam() {
+  try {
+    return String(new URLSearchParams(location.search).get('cardSet') || '').trim().toLowerCase();
+  } catch {
+    return '';
+  }
+}
+
 function applySeriesQueryFromUrl() {
   const requested = readSeriesQueryParam();
   if (!requested) return;
@@ -685,6 +695,10 @@ function applySeriesQueryFromUrl() {
   if (requested === 'All Series' || options.includes(requested)) {
     select.value = requested;
   }
+}
+
+function applyCardSetQueryFromUrl() {
+  activeCardSet = readCardSetQueryParam();
 }
 
 function syncShellSeriesMenus() {
@@ -987,7 +1001,8 @@ function activeFilters() {
     rarity: ($('[data-rarity]')?.value || 'All Rarities'),
     view: ($('[name="viewFilter"]:checked')?.value || 'all'),
     sort: ($('#sortSelect')?.value || 'numberAsc'),
-    favoritesOnly: Boolean($('[data-filter-favorites]')?.checked)
+    favoritesOnly: Boolean($('[data-filter-favorites]')?.checked),
+    cardSet: activeCardSet || readCardSetQueryParam()
   };
 }
 
@@ -1786,6 +1801,15 @@ window.applyStarlightSeriesFilter = (seriesName) => {
   page = 1;
   renderAll();
 };
+window.applyStarlightCardSetFilter = (cardSet, { render = true } = {}) => {
+  activeCardSet = String(cardSet || '').trim().toLowerCase();
+  if (activeCardSet) {
+    const select = $('[data-series]');
+    if (select) select.value = 'All Series';
+  }
+  page = 1;
+  if (render) renderAll();
+};
 
 
 
@@ -1950,6 +1974,7 @@ document.addEventListener('DOMContentLoaded', () => {
       refreshBinderFiltersForDisplay();
       applyBinderDisplayLayout();
       applySeriesQueryFromUrl();
+  applyCardSetQueryFromUrl();
       renderSeriesHero();
       renderBinder();
     });

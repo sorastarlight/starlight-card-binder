@@ -962,6 +962,29 @@ body.shell-masthead-layout .shell-mega-panel .shell-nav-item:hover,
 body.shell-masthead-layout .shell-mega-panel .shell-nav-item:focus-visible{
   background:rgba(107,198,248,.14);
 }
+body.shell-masthead-layout .shell-mega-panel .shell-nav-label-sub{
+  margin:8px 10px 4px;
+  padding:6px 8px;
+  border-radius:8px;
+  font-size:.62rem;
+  font-weight:950;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:#8a93aa;
+}
+body.shell-masthead-layout .shell-mega-panel .shell-series-links{
+  display:grid;
+  gap:2px;
+  margin:0 0 4px;
+}
+body.shell-masthead-layout .shell-mega-panel .shell-series-links .shell-nav-item{
+  padding-left:18px;
+}
+body.shell-masthead-layout .shell-mega-panel .shell-nav-empty{
+  margin:0 12px 8px;
+  color:#8a93aa;
+  font-size:.75rem;
+}
 body.shell-masthead-layout .shell-masthead-actions{
   display:flex;
   align-items:center;

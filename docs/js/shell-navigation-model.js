@@ -153,11 +153,10 @@ function consolidateTradingNavItems(items = []) {
   return result;
 }
 
-/** Move checklist → Collection and daily → Cards when remote nav still uses the prior layout. */
+/** Move checklist → Collection when remote nav still uses the prior layout. */
 function relocateSidebarDestinations(sections, defaults) {
   const moves = [
-    { destination: 'checklist', targetSectionId: 'collect' },
-    { destination: 'daily', targetSectionId: 'cards' }
+    { destination: 'checklist', targetSectionId: 'collect' }
   ];
 
   for (const move of moves) {
@@ -207,6 +206,32 @@ function relocateSidebarDestinations(sections, defaults) {
     targetSection.items.splice(insertAt, 0, relocated);
   }
 
+  return sections;
+}
+
+/** Daily Pack lives on the top bar; keep it out of sidebar/mega sections. */
+function stripDailyFromSidebar(sections = []) {
+  for (const section of sections) {
+    section.items = (section.items || []).filter(item => item.destination !== 'daily');
+  }
+  return sections;
+}
+
+/** Refresh Cards mega to Gallery / Series / Event / Special when remote nav is still on the old Daily layout. */
+function normalizeCardsSection(sections, defaults) {
+  const cards = sections.find(section => section.id === 'cards');
+  const defaultCards = (defaults.sidebar?.sections || []).find(section => section.id === 'cards');
+  if (!cards || !defaultCards) return sections;
+
+  const items = cards.items || [];
+  const needsReset = items.some(item => item.destination === 'daily')
+    || !items.some(item => item.id === 'event-cards')
+    || !items.some(item => item.id === 'special-cards')
+    || !items.some(item => item.id === 'card-series' || (item.features || []).includes('seriesLinksSlot'));
+
+  if (needsReset) {
+    cards.items = defaultCards.items.map((item, index) => sanitizeItem(item, index));
+  }
   return sections;
 }
 
@@ -364,12 +389,17 @@ export function sanitizeShellNavigation(input) {
     defaults
   );
 
-  const sections = ensureDefaultSidebarItems(
-    relocateSidebarDestinations(
-      Array.isArray(source.sidebar?.sections)
-        ? source.sidebar.sections.map(sanitizeSection).slice(0, 8)
-        : defaults.sidebar.sections.map(sanitizeSection),
-      defaults
+  const sections = normalizeCardsSection(
+    stripDailyFromSidebar(
+      ensureDefaultSidebarItems(
+        relocateSidebarDestinations(
+          Array.isArray(source.sidebar?.sections)
+            ? source.sidebar.sections.map(sanitizeSection).slice(0, 8)
+            : defaults.sidebar.sections.map(sanitizeSection),
+          defaults
+        ),
+        defaults
+      )
     ),
     defaults
   ).filter(section => section.id !== 'series' && section.id !== 'admin');

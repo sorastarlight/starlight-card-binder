@@ -173,8 +173,10 @@ export function createDefaultShellNavigation() {
           staffOnly: false,
           mega: true,
           items: [
-            { id: 'binder', label: 'Card Gallery', icon: shellNavIcon('gallery'), destination: 'binder', enabled: true, features: ['clearSeries'] },
-            { id: 'daily', label: 'Free Daily Starlight Pack', icon: shellNavIcon('daily'), destination: 'daily', enabled: true, features: ['dailyBadge'], className: 'shell-daily-link' }
+            { id: 'binder', label: 'Card Gallery', icon: shellNavIcon('gallery'), destination: 'binder', enabled: true, features: ['clearSeries', 'clearCardSet'] },
+            { id: 'card-series', label: 'Card Series', icon: shellNavIcon('cards'), destination: '', enabled: true, features: ['sectionLabel', 'seriesLinksSlot'] },
+            { id: 'event-cards', label: 'Event Cards', icon: shellNavIcon('events'), destination: 'binder', enabled: true, features: ['eventCards', 'clearSeries'] },
+            { id: 'special-cards', label: 'Special Cards', icon: shellNavIcon('season-pass'), destination: 'binder', enabled: true, features: ['specialCards', 'clearSeries'] }
           ]
         },
         {
