@@ -217,17 +217,26 @@ function stripDailyFromSidebar(sections = []) {
   return sections;
 }
 
-/** Refresh Cards mega to Gallery / Series / Event / Special when remote nav is still on the old Daily layout. */
+/** Refresh Cards mega to Gallery / Series / Event / Special when remote nav is stale. */
 function normalizeCardsSection(sections, defaults) {
   const cards = sections.find(section => section.id === 'cards');
   const defaultCards = (defaults.sidebar?.sections || []).find(section => section.id === 'cards');
   if (!cards || !defaultCards) return sections;
 
-  const items = cards.items || [];
+  const items = [...(cards.items || [])];
+  const seriesIndex = items.findIndex(item =>
+    item.id === 'card-series' || /^card series$/i.test(String(item.label || '').trim())
+  );
+  const seriesItem = seriesIndex >= 0 ? items[seriesIndex] : null;
+  const seriesIsClickable = seriesItem
+    && seriesItem.destination === 'binder'
+    && !(seriesItem.features || []).includes('sectionLabel')
+    && !(seriesItem.features || []).includes('seriesLinksSlot');
+
   const needsReset = items.some(item => item.destination === 'daily')
-    || items.some(item => item.id === 'card-series' || (item.features || []).includes('seriesLinksSlot'))
     || !items.some(item => item.id === 'event-cards')
-    || !items.some(item => item.id === 'special-cards');
+    || !items.some(item => item.id === 'special-cards')
+    || !seriesIsClickable;
 
   if (needsReset) {
     cards.items = defaultCards.items.map((item, index) => sanitizeItem(item, index));
@@ -235,38 +244,25 @@ function normalizeCardsSection(sections, defaults) {
   return sections;
 }
 
-/** Keep Card Series as a clickable My Collection item (not a Cards section label). */
+const SHOP_SECTION_DESTINATIONS = new Set(['shop', 'season-pass', 'redeem']);
+
+/** Keep shop/economy items out of My Collection, and Card Series under Cards. */
 function normalizeCollectSection(sections, defaults) {
   const collect = sections.find(section => section.id === 'collect');
-  const defaultCollect = (defaults.sidebar?.sections || []).find(section => section.id === 'collect');
-  if (!collect || !defaultCollect) return sections;
+  if (!collect) return sections;
 
-  const defaultSeries = (defaultCollect.items || []).find(item => item.id === 'card-series');
-  if (!defaultSeries) return sections;
-
-  const items = [...(collect.items || [])];
-  const seriesIndex = items.findIndex(item =>
-    item.id === 'card-series' || /^card series$/i.test(String(item.label || '').trim())
+  collect.items = (collect.items || []).filter(item =>
+    item.id !== 'card-series'
+    && !/^card series$/i.test(String(item.label || '').trim())
+    && !SHOP_SECTION_DESTINATIONS.has(item.destination)
   );
-  const seriesItem = seriesIndex >= 0 ? items[seriesIndex] : null;
-  const seriesIsClickable = seriesItem
-    && seriesItem.destination === 'binder'
-    && !(seriesItem.features || []).includes('sectionLabel');
 
-  if (seriesIsClickable) return sections;
-
-  const insert = sanitizeItem(defaultSeries, items.length);
-  if (seriesIndex >= 0) {
-    items[seriesIndex] = insert;
-  } else {
-    const collectionIndex = items.findIndex(item => item.destination === 'collection');
-    items.splice(collectionIndex >= 0 ? collectionIndex + 1 : 0, 0, insert);
+  const starBits = collect.items.find(item => item.destination === 'star-bits');
+  if (starBits && /^star bits$/i.test(String(starBits.label || '').trim())) {
+    starBits.label = 'My Star Bits';
   }
-  collect.items = items;
   return sections;
 }
-
-const SHOP_SECTION_DESTINATIONS = new Set(['shop', 'season-pass', 'redeem']);
 
 /** Ensure Shop is its own mega with Card Shop / Twitch Season Pass / Redeem Code. */
 function normalizeShopSection(sections, defaults) {

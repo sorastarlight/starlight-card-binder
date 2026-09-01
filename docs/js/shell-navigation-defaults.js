@@ -12,7 +12,7 @@ export const PUBLIC_SHELL_DESTINATIONS = Object.freeze([
   { value: 'events', label: 'Events' },
   { value: 'redeem', label: 'Redeem Code' },
   { value: 'collection', label: 'My Collection' },
-  { value: 'star-bits', label: 'Star Bits' },
+  { value: 'star-bits', label: 'My Star Bits' },
   { value: 'checklist', label: 'Card Checklist' },
   { value: 'quests', label: 'Missions' },
   { value: 'season-pass', label: 'Twitch Season Pass' },
@@ -86,7 +86,7 @@ export const SHELL_LABEL_REWRITES = Object.freeze({
     'Redeem A Code'
   ]),
   'star-bits': Object.freeze([
-    'My Star Bits',
+    'Star Bits',
     'Star Bits Exchange'
   ]),
   events: Object.freeze([
@@ -141,7 +141,7 @@ export function createDefaultShellNavigation() {
       shop: 'Card Shop',
       events: 'Events',
       redeem: 'Redeem Code',
-      'star-bits': 'Star Bits',
+      'star-bits': 'My Star Bits',
       checklist: 'Card Checklist',
       quests: 'Missions',
       'season-pass': 'Twitch Season Pass',
@@ -176,6 +176,7 @@ export function createDefaultShellNavigation() {
           mega: true,
           items: [
             { id: 'binder', label: 'Card Gallery', icon: shellNavIcon('gallery'), destination: 'binder', enabled: true, features: ['clearSeries', 'clearCardSet'] },
+            { id: 'card-series', label: 'Card Series', icon: shellNavIcon('cards'), destination: 'binder', enabled: true, features: ['clearSeries', 'clearCardSet'] },
             { id: 'event-cards', label: 'Event Cards', icon: shellNavIcon('events'), destination: 'binder', enabled: true, features: ['eventCards', 'clearSeries'] },
             { id: 'special-cards', label: 'Special Cards', icon: shellNavIcon('season-pass'), destination: 'binder', enabled: true, features: ['specialCards', 'clearSeries'] }
           ]
@@ -188,9 +189,8 @@ export function createDefaultShellNavigation() {
           mega: true,
           items: [
             { id: 'collection', label: 'My Collection', icon: shellNavIcon('collection'), destination: 'collection', enabled: true, features: [] },
-            { id: 'card-series', label: 'Card Series', icon: shellNavIcon('cards'), destination: 'binder', enabled: true, features: ['clearSeries', 'clearCardSet'] },
             { id: 'checklist', label: 'Card Checklist', icon: shellNavIcon('checklist'), destination: 'checklist', enabled: true, features: [] },
-            { id: 'star-bits', label: 'Star Bits', icon: starBitNavIcon(), destination: 'star-bits', enabled: true, features: [] },
+            { id: 'star-bits', label: 'My Star Bits', icon: starBitNavIcon(), destination: 'star-bits', enabled: true, features: [] },
             { id: 'quests', label: 'Missions', icon: shellNavIcon('missions'), destination: 'quests', enabled: true, features: [] }
           ]
         },

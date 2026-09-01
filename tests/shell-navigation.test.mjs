@@ -40,18 +40,19 @@ test('default shell navigation includes core destinations and staff account link
   const account = nav.sidebar.sections.find(section => section.id === 'account');
   assert.ok(home.items.some(item => item.destination === 'home' && item.label === 'Home'));
   assert.ok(cards.items.some(item => item.destination === 'binder' && item.label === 'Card Gallery'));
-  assert.ok(cards.items.some(item => item.id === 'event-cards' && item.label === 'Event Cards'));
-  assert.ok(cards.items.some(item => item.id === 'special-cards' && item.label === 'Special Cards'));
-  assert.ok(!cards.items.some(item => item.id === 'card-series'));
-  assert.ok(!cards.items.some(item => item.destination === 'daily'));
-  assert.ok(collect.items.some(item => item.destination === 'collection' && item.label === 'My Collection'));
-  assert.ok(collect.items.some(item =>
+  assert.ok(cards.items.some(item =>
     item.id === 'card-series'
     && item.label === 'Card Series'
     && item.destination === 'binder'
     && !(item.features || []).includes('sectionLabel')
   ));
+  assert.ok(cards.items.some(item => item.id === 'event-cards' && item.label === 'Event Cards'));
+  assert.ok(cards.items.some(item => item.id === 'special-cards' && item.label === 'Special Cards'));
+  assert.ok(!cards.items.some(item => item.destination === 'daily'));
+  assert.ok(collect.items.some(item => item.destination === 'collection' && item.label === 'My Collection'));
+  assert.ok(!collect.items.some(item => item.id === 'card-series'));
   assert.ok(collect.items.some(item => item.destination === 'checklist' && item.label === 'Card Checklist'));
+  assert.ok(collect.items.some(item => item.destination === 'star-bits' && item.label === 'My Star Bits'));
   assert.ok(collect.items.some(item => item.destination === 'quests' && item.label === 'Missions'));
   assert.ok(!collect.items.some(item => item.destination === 'shop'));
   assert.ok(!collect.items.some(item => item.destination === 'season-pass'));
@@ -73,7 +74,7 @@ test('default shell navigation includes core destinations and staff account link
   assert.equal(nav.pageTitles.trades, 'Trade');
   assert.equal(nav.pageTitles.rewards, 'Gifts');
   assert.equal(nav.pageTitles.rankings, 'Rankings');
-  assert.equal(nav.pageTitles['star-bits'], 'Star Bits');
+  assert.equal(nav.pageTitles['star-bits'], 'My Star Bits');
   assert.equal(nav.pageTitles['season-pass'], 'Twitch Season Pass');
   assert.equal(nav.pageTitles.events, 'Events');
   assert.equal(nav.pageTitles.redeem, 'Redeem Code');
@@ -195,18 +196,18 @@ test('sanitizeShellNavigation relocates checklist to Collection and keeps Daily 
   const collect = relocated.sidebar.sections.find(section => section.id === 'collect');
   const shop = relocated.sidebar.sections.find(section => section.id === 'shop');
   assert.ok(cards.items.some(item => item.label === 'Card Gallery'));
-  assert.ok(cards.items.some(item => item.label === 'Event Cards'));
-  assert.ok(cards.items.some(item => item.label === 'Special Cards'));
-  assert.ok(!cards.items.some(item => item.id === 'card-series'));
-  assert.ok(!cards.items.some(item => item.destination === 'daily'));
-  assert.ok(!cards.items.some(item => item.destination === 'checklist'));
-  assert.ok(collect.items.some(item => item.destination === 'checklist' && item.label === 'Card Checklist'));
-  assert.ok(collect.items.some(item =>
+  assert.ok(cards.items.some(item =>
     item.id === 'card-series'
     && item.label === 'Card Series'
     && item.destination === 'binder'
     && !(item.features || []).includes('sectionLabel')
   ));
+  assert.ok(cards.items.some(item => item.label === 'Event Cards'));
+  assert.ok(cards.items.some(item => item.label === 'Special Cards'));
+  assert.ok(!cards.items.some(item => item.destination === 'daily'));
+  assert.ok(!cards.items.some(item => item.destination === 'checklist'));
+  assert.ok(collect.items.some(item => item.destination === 'checklist' && item.label === 'Card Checklist'));
+  assert.ok(!collect.items.some(item => item.id === 'card-series'));
   assert.ok(!collect.items.some(item => item.destination === 'daily'));
   assert.ok(!collect.items.some(item => item.destination === 'shop'));
   assert.ok(!collect.items.some(item => item.destination === 'season-pass'));

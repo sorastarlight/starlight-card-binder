@@ -26,7 +26,7 @@ const routes = {
   home:{title:'Home',src:'home.html'},
   binder:{title:'Card Gallery',src:null}, collection:{title:'My Collection',src:'collection.html'},
   daily:{title:'Free Daily Starlight Pack',src:'daily-booster.html'}, shop:{title:'Shop',src:'booster-shop.html'}, events:{title:'Events',src:'events.html'}, redeem:{title:'Redeem Code',src:'redeem.html'},
-  'star-bits':{title:'Star Bits',src:'star-bits.html'},
+  'star-bits':{title:'My Star Bits',src:'star-bits.html'},
   checklist:{title:'Card Checklist',src:'checklist.html'},
   quests:{title:'Missions',src:'collection-quests.html'},
   'season-pass':{title:'Twitch Season Pass',src:'season-pass.html'},
