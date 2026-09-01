@@ -135,9 +135,20 @@ function wireMastheadMenus(){
       setShellMenuOpen(false);
     }
   });
+  // Close when clicking anywhere outside an open mega (logo, account, chrome, empty page chrome).
   document.addEventListener('click', event=>{
-    if(event.target.closest('.shell-mega, .shell-masthead-nav')) return;
+    if(event.target.closest('.shell-mega.is-open')) return;
     closeAllMegaMenus();
+  });
+  // Content views load in an iframe, so parent document clicks never see them.
+  window.addEventListener('blur', ()=>{
+    requestAnimationFrame(()=>{
+      const frame=document.getElementById('shellViewIframe');
+      if(frame && document.activeElement===frame){
+        closeAllMegaMenus();
+        setShellMenuOpen(false);
+      }
+    });
   });
   document.addEventListener('keydown', event=>{
     if(event.key==='Escape'){
@@ -740,6 +751,11 @@ window.addEventListener('popstate',()=>{
 window.addEventListener('message',async e=>{
   if(e.origin!==location.origin)return;
   const data=e.data||{};
+  if(data.type==='starlight-shell-dismiss-menus'){
+    closeAllMegaMenus();
+    setShellMenuOpen(false);
+    return;
+  }
   if(data.type==='starlight-close-notifications')closeNotificationPopover();
   if(data.type==='starlight-auth-changed'){
     await syncShellSessionFromMessage(data.session);

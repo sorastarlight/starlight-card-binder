@@ -218,6 +218,13 @@ if (!embedded && shouldRedirectToShell()) {
     html.starlight-embedded .page-status:not(.error),html.starlight-embedded .status.success{display:none!important}
   `;
   document.head.appendChild(style);
+  document.addEventListener('pointerdown', () => {
+    try {
+      parent.postMessage({ type: 'starlight-shell-dismiss-menus' }, location.origin);
+    } catch {
+      /* ignore */
+    }
+  }, true);
   document.addEventListener('click', event => {
     const a = event.target.closest('a[href]');
     if (!a) return;
