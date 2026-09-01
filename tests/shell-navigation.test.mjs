@@ -337,7 +337,8 @@ test('website UI admin page and migration are wired', async () => {
   assert.match(page, /linkFeature|TOP_BAR_FEATURES/);
   assert.match(page, /data-field="mega"/);
   assert.match(page, /uploadStudioAsset\(file, 'nav-icons'\)/);
-  assert.match(page, /shellPreviewFrame|NAV_DRAFT|buildShellStudioPreviewUrl/);
+  assert.doesNotMatch(html, /shellPreviewFrame|Live shell preview/);
+  assert.doesNotMatch(page, /shellPreviewFrame|NAV_DRAFT|buildShellStudioPreviewUrl/);
   assert.doesNotMatch(html, /id="shellLayout"/);
   assert.doesNotMatch(html, /data-tab="account"/);
   assert.doesNotMatch(html, /data-tab="titles"/);

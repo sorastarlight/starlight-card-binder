@@ -11,7 +11,6 @@ import {
   BRAND_ICON_IDS
 } from '../shell-navigation-defaults.js';
 import { uploadStudioAsset } from '../content-studio-service.js';
-import { buildShellStudioPreviewUrl, STUDIO_MSG } from '../studio-preview.js';
 import { renderShellNavIcon } from '../shell-nav-icons.js';
 import { mountAdminCrumb } from '../admin-shell.js';
 
@@ -45,41 +44,17 @@ const TOP_BAR_FEATURES = [
   { id: 'staffOnly', label: 'Staff / admin only' }
 ];
 
-const ACCOUNT_FEATURES = [
-  { id: 'notificationBadge', label: 'Notification count badge' },
-  { id: 'receivedGiftBadge', label: 'Received gifts count badge' },
-  { id: 'tradeOfferBadge', label: 'Trade offers count badge' },
-  { id: 'profileLink', label: 'My public profile link' },
-  { id: 'staffOnly', label: 'Staff / admin only' },
-  { id: 'separator', label: 'Separator line' },
-  { id: 'signOut', label: 'Sign out action' },
-  { id: 'signIn', label: 'Sign in action' },
-  { id: 'signUp', label: 'Register action' }
-];
-
-const ACCOUNT_SPECIAL = new Set(['separator', 'signOut', 'signIn', 'signUp', 'profileLink']);
-
 const statusEl = byId('status');
 const appEl = byId('app');
 const brandInput = byId('brandRibbon');
-const layoutSelect = byId('shellLayout');
 const liveFeedToggle = byId('shellLiveFeedToggle');
 const sidebarPanel = byId('panel-sidebar');
 const topbarPanel = byId('panel-topbar');
-const accountPanel = byId('panel-account');
-const titlesPanel = byId('panel-titles');
-const previewEl = byId('livePreview');
-const shellPreviewFrame = byId('shellPreviewFrame');
-const shellPreviewWrap = shellPreviewFrame?.parentElement;
-const reloadShellPreviewBtn = byId('reloadShellPreview');
 const saveBtn = byId('saveBtn');
 const resetBtn = byId('resetBtn');
 
 let navigation = null;
-let activeTab = 'topbar';
 let busy = false;
-let shellPreviewReady = false;
-let shellPreviewTimer = 0;
 
 function setStatus(message, type = '') {
   statusEl.textContent = message || '';
@@ -166,12 +141,20 @@ function renderIconControls(icon, scopeAttrs) {
 }
 
 function renderSidebar() {
-  const sections = navigation?.sidebar?.sections || [];
+  const sections = (navigation?.sidebar?.sections || []).filter((section) => {
+    // Keep top-nav menus; skip empty Home shell stubs and mobile-only drawers.
+    if (section.mobileOnly) return false;
+    if (section.id === 'home' && !String(section.label || '').trim()) return false;
+    return true;
+  });
+  const allSections = navigation?.sidebar?.sections || [];
   sidebarPanel.innerHTML = `
     <h3 class="admin-panel__title">Dropdown menus</h3>
-    <p class="lead">These menus appear in the top navigation (Cards, My Collection, Shop, Community, and any custom menus you add).</p>
+    <p class="lead">These menus appear in the top navigation — including <strong>Cards</strong> (Card Gallery, Card Series, Event Cards, Special Cards), My Collection, Shop, and Community.</p>
     <div class="section-list">
-      ${sections.map((section, sIndex) => `
+      ${sections.map((section) => {
+        const sIndex = allSections.indexOf(section);
+        return `
         <article class="section-card" data-section="${sIndex}">
           <header>
             <div class="section-meta">
@@ -185,8 +168,8 @@ function renderSidebar() {
               </div>
             </div>
             <div class="row-tools">
-              <button type="button" class="btn small" data-action="move-section" data-section="${sIndex}" data-delta="-1" ${sIndex === 0 ? 'disabled' : ''}>↑</button>
-              <button type="button" class="btn small" data-action="move-section" data-section="${sIndex}" data-delta="1" ${sIndex === sections.length - 1 ? 'disabled' : ''}>↓</button>
+              <button type="button" class="btn small" data-action="move-section" data-section="${sIndex}" data-delta="-1" ${sIndex <= 0 ? 'disabled' : ''}>↑</button>
+              <button type="button" class="btn small" data-action="move-section" data-section="${sIndex}" data-delta="1" ${sIndex >= allSections.length - 1 ? 'disabled' : ''}>↓</button>
               <button type="button" class="btn small danger" data-action="remove-section" data-section="${sIndex}">Remove menu</button>
             </div>
           </header>
@@ -233,8 +216,8 @@ function renderSidebar() {
           <div class="panel-actions">
             <button type="button" class="btn small" data-action="add-item" data-section="${sIndex}">＋ Add item</button>
           </div>
-        </article>
-      `).join('') || '<p class="lead">No top navigation menus yet.</p>'}
+        </article>`;
+      }).join('') || '<p class="lead">No top navigation menus yet.</p>'}
     </div>
     <div class="panel-actions">
       <button type="button" class="btn" data-action="add-section">＋ Add menu</button>
@@ -288,172 +271,6 @@ function renderTopBar() {
   `;
 }
 
-function ensureAccountMenu() {
-  if (!navigation.accountMenu || typeof navigation.accountMenu !== 'object') {
-    navigation.accountMenu = { signedIn: [], signedOut: [] };
-  }
-  if (!Array.isArray(navigation.accountMenu.signedIn)) navigation.accountMenu.signedIn = [];
-  if (!Array.isArray(navigation.accountMenu.signedOut)) navigation.accountMenu.signedOut = [];
-  return navigation.accountMenu;
-}
-
-function renderAccountMenuList(listKey, title, hint) {
-  ensureAccountMenu();
-  const items = navigation.accountMenu[listKey] || [];
-  return `
-    <article class="section-card account-menu-card">
-      <header>
-        <div class="section-meta">
-          <strong>${esc(title)}</strong>
-          <p class="lead">${esc(hint)}</p>
-        </div>
-      </header>
-      <div class="items">
-        ${items.map((item, index) => {
-          const features = new Set(item.features || []);
-          const isSpecial = [...ACCOUNT_SPECIAL].some((feature) => features.has(feature));
-          const needsDestination = !isSpecial || features.has('profileLink');
-          return `
-            <div class="item-row" data-account-list="${listKey}" data-account-item="${index}">
-              <div class="item-fields">
-                <label>Item label
-                  <input type="text" maxlength="80" value="${esc(item.label || '')}" data-field="accountLabel" data-account-list="${listKey}" data-account-item="${index}" ${features.has('separator') ? 'disabled' : ''}>
-                </label>
-                <label>Destination
-                  <select data-field="accountDestination" data-account-list="${listKey}" data-account-item="${index}" ${needsDestination ? '' : 'disabled'}>
-                    ${destinationOptions(item.destination || '', { allowEmpty: !needsDestination || features.has('profileLink') })}
-                  </select>
-                </label>
-                <div class="checks">
-                  <label><input type="checkbox" data-field="accountEnabled" data-account-list="${listKey}" data-account-item="${index}" ${item.enabled !== false ? 'checked' : ''}> Enabled</label>
-                </div>
-              </div>
-              <div class="checks">
-                ${ACCOUNT_FEATURES.map((feature) => `
-                  <label>
-                    <input type="checkbox" data-field="accountFeature" data-feature="${feature.id}" data-account-list="${listKey}" data-account-item="${index}" ${features.has(feature.id) ? 'checked' : ''}>
-                    ${esc(feature.label)}
-                  </label>
-                `).join('')}
-              </div>
-              <div class="row-tools">
-                <button type="button" class="btn small" data-action="move-account-item" data-account-list="${listKey}" data-account-item="${index}" data-delta="-1" ${index === 0 ? 'disabled' : ''}>↑</button>
-                <button type="button" class="btn small" data-action="move-account-item" data-account-list="${listKey}" data-account-item="${index}" data-delta="1" ${index === items.length - 1 ? 'disabled' : ''}>↓</button>
-                <button type="button" class="btn small danger" data-action="remove-account-item" data-account-list="${listKey}" data-account-item="${index}">Remove</button>
-              </div>
-            </div>
-          `;
-        }).join('') || '<p class="lead">No menu items yet.</p>'}
-      </div>
-      <div class="panel-actions">
-        <button type="button" class="btn small" data-action="add-account-item" data-account-list="${listKey}">＋ Add menu item</button>
-      </div>
-    </article>
-  `;
-}
-
-function renderAccountMenu() {
-  if (!accountPanel) return;
-  accountPanel.innerHTML = `
-    <div class="section-list">
-      ${renderAccountMenuList('signedIn', 'Signed-in menu', 'Shown when a collector is signed in. Use count badges for notifications, gifts, and trades.')}
-      ${renderAccountMenuList('signedOut', 'Signed-out menu', 'Shown on the profile button when nobody is signed in.')}
-    </div>
-  `;
-}
-
-function renderTitles() {
-  const titles = navigation?.pageTitles || {};
-  const keys = Object.keys(titles);
-  titlesPanel.innerHTML = `
-    <div class="title-grid">
-      ${keys.map((key) => `
-        <label>${esc(key)}
-          <input type="text" maxlength="80" value="${esc(titles[key] || '')}" data-field="pageTitle" data-key="${esc(key)}">
-        </label>
-      `).join('') || '<p class="lead">No page titles configured.</p>'}
-    </div>
-  `;
-}
-
-function previewIcon(icon) {
-  if (icon?.type === 'image' && icon.url) {
-    return `<img class="preview-icon-img" src="${esc(icon.url)}" alt="">`;
-  }
-  return `<span>${esc(icon?.value || '')}</span>`;
-}
-
-function renderPreview() {
-  if (!navigation) {
-    if (previewEl) previewEl.innerHTML = '';
-    return;
-  }
-  // Keep a compact schematic as an accessibility/fallback snapshot under the live iframe.
-  if (previewEl) {
-    const sections = navigation.sidebar?.sections || [];
-    const links = (navigation.topBar?.quickLinks || []).filter(Boolean);
-    previewEl.innerHTML = `
-      <div class="preview-ribbon">${esc(navigation.brandRibbon || 'Card Binder')}</div>
-      ${sections.map((section) => `
-        <div class="preview-section">
-          <strong>${previewIcon(section.icon)} ${esc(section.label || 'Menu')}${section.mega ? ' <small>(mega)</small>' : ''}${section.mobileOnly ? ' <small>(mobile)</small>' : ''}${section.staffOnly ? ' <small>(staff)</small>' : ''}</strong>
-          <ul>
-            ${(section.items || []).map((item) => {
-              const isLabel = (item.features || []).includes('sectionLabel');
-              const classes = [
-                item.enabled === false ? 'disabled' : '',
-                isLabel ? 'label' : ''
-              ].filter(Boolean).join(' ');
-              return `<li class="${classes}">${previewIcon(item.icon)} <span>${esc(item.label || 'Item')}</span></li>`;
-            }).join('')}
-          </ul>
-        </div>
-      `).join('')}
-      <div class="preview-top">
-        ${links.map((link) => `
-          <span class="preview-chip ${link.enabled === false ? 'disabled' : ''}">${esc(link.label || link.destination)}</span>
-        `).join('') || '<span class="lead">No quick links</span>'}
-      </div>
-      <div class="preview-top">
-        <strong>Account ↓</strong>
-        ${(navigation.accountMenu?.signedIn || []).filter((item) => item.enabled !== false).map((item) => {
-          const features = item.features || [];
-          if (features.includes('separator')) return '<span class="preview-chip">—</span>';
-          return `<span class="preview-chip">${esc(item.label || item.destination || 'Item')}</span>`;
-        }).join('') || '<span class="lead">No signed-in items</span>'}
-      </div>
-    `;
-  }
-  pushShellPreviewDraft();
-}
-
-function pushShellPreviewDraft() {
-  window.clearTimeout(shellPreviewTimer);
-  shellPreviewTimer = window.setTimeout(() => {
-    if (!shellPreviewFrame?.contentWindow || !navigation || !shellPreviewReady) return;
-    try {
-      shellPreviewFrame.contentWindow.postMessage({
-        type: STUDIO_MSG.NAV_DRAFT,
-        navigation
-      }, window.location.origin);
-    } catch (_error) {
-      /* ignore while loading */
-    }
-  }, 100);
-}
-
-function loadShellPreview({ force = false } = {}) {
-  if (!shellPreviewFrame) return;
-  if (!force && shellPreviewFrame.dataset.loaded === '1' && shellPreviewReady) {
-    pushShellPreviewDraft();
-    return;
-  }
-  shellPreviewReady = false;
-  shellPreviewWrap?.classList.add('is-loading');
-  shellPreviewFrame.dataset.loaded = '1';
-  shellPreviewFrame.src = buildShellStudioPreviewUrl('home');
-}
-
 function renderAll() {
   if (brandInput && navigation) brandInput.value = navigation.brandRibbon || '';
   navigation.chrome = navigation.chrome && typeof navigation.chrome === 'object'
@@ -461,33 +278,16 @@ function renderAll() {
     : { layout: 'masthead', showLiveFeed: true };
   navigation.chrome.layout = 'masthead';
   if (liveFeedToggle) liveFeedToggle.checked = navigation.chrome.showLiveFeed !== false;
-  renderTopBar();
   renderSidebar();
-  if (topbarPanel) {
-    topbarPanel.classList.remove('hidden', 'admin-hidden');
-    topbarPanel.hidden = false;
-  }
+  renderTopBar();
   if (sidebarPanel) {
     sidebarPanel.classList.remove('hidden', 'admin-hidden');
     sidebarPanel.hidden = false;
   }
-  renderPreview();
-  loadShellPreview();
-}
-
-function showTab(name) {
-  activeTab = name;
-  document.querySelectorAll('.tabs .tab').forEach((btn) => {
-    const selected = btn.dataset.tab === name;
-    btn.classList.toggle('active', selected);
-    btn.setAttribute('aria-selected', selected ? 'true' : 'false');
-  });
-  [sidebarPanel, topbarPanel, accountPanel, titlesPanel].forEach((panel) => {
-    if (!panel) return;
-    const match = panel.dataset.panel === name;
-    panel.classList.toggle('hidden', !match);
-    panel.hidden = !match;
-  });
+  if (topbarPanel) {
+    topbarPanel.classList.remove('hidden', 'admin-hidden');
+    topbarPanel.hidden = false;
+  }
 }
 
 function getSection(index) {
@@ -496,11 +296,6 @@ function getSection(index) {
 
 function getItem(sectionIndex, itemIndex) {
   return getSection(sectionIndex)?.items?.[itemIndex];
-}
-
-function getAccountItem(listKey, itemIndex) {
-  ensureAccountMenu();
-  return navigation.accountMenu?.[listKey]?.[itemIndex];
 }
 
 function setIconBrand(target, brandId) {
@@ -538,16 +333,9 @@ function syncFromDom() {
   // Values are applied on change; this is a safety no-op placeholder.
 }
 
-document.querySelector('.tabs')?.addEventListener('click', (event) => {
-  const tab = event.target.closest('[data-tab]');
-  if (!tab) return;
-  showTab(tab.dataset.tab);
-});
-
 brandInput?.addEventListener('input', () => {
   if (!navigation) return;
   navigation.brandRibbon = brandInput.value;
-  renderPreview();
 });
 
 liveFeedToggle?.addEventListener('change', () => {
@@ -557,7 +345,6 @@ liveFeedToggle?.addEventListener('change', () => {
     : { layout: 'masthead', showLiveFeed: true };
   navigation.chrome.layout = 'masthead';
   navigation.chrome.showLiveFeed = Boolean(liveFeedToggle.checked);
-  renderPreview();
 });
 
 function onEditorInput(event) {
@@ -569,25 +356,16 @@ function onEditorInput(event) {
   if (field === 'sectionLabel') {
     const section = getSection(Number(el.dataset.section));
     if (section) section.label = el.value;
-    renderPreview();
     return;
   }
   if (field === 'staffOnly') {
     const section = getSection(Number(el.dataset.section));
     if (section) section.staffOnly = el.checked;
-    renderPreview();
     return;
   }
   if (field === 'mega') {
     const section = getSection(Number(el.dataset.section));
     if (section) section.mega = el.checked;
-    renderPreview();
-    return;
-  }
-  if (field === 'mobileOnly') {
-    const section = getSection(Number(el.dataset.section));
-    if (section) section.mobileOnly = false;
-    renderPreview();
     return;
   }
   if (field === 'iconEmoji') {
@@ -595,13 +373,11 @@ function onEditorInput(event) {
     const iIndex = el.dataset.item != null ? Number(el.dataset.item) : null;
     const target = el.dataset.target === 'item' ? getItem(sIndex, iIndex) : getSection(sIndex);
     if (target) setIconEmoji(target, el.value);
-    renderPreview();
     return;
   }
   if (field === 'itemLabel') {
     const item = getItem(Number(el.dataset.section), Number(el.dataset.item));
     if (item) item.label = el.value;
-    renderPreview();
     return;
   }
   if (field === 'destination') {
@@ -612,7 +388,6 @@ function onEditorInput(event) {
   if (field === 'enabled') {
     const item = getItem(Number(el.dataset.section), Number(el.dataset.item));
     if (item) item.enabled = el.checked;
-    renderPreview();
     return;
   }
   if (field === 'feature') {
@@ -626,15 +401,17 @@ function onEditorInput(event) {
     if (feature === 'sectionLabel') {
       if (el.checked) item.destination = '';
       renderAll();
-    } else {
-      renderPreview();
     }
+    return;
+  }
+  if (field === 'itemClassName') {
+    const item = getItem(Number(el.dataset.section), Number(el.dataset.item));
+    if (item) item.className = el.value;
     return;
   }
   if (field === 'linkLabel') {
     const link = navigation.topBar.quickLinks[Number(el.dataset.link)];
     if (link) link.label = el.value;
-    renderPreview();
     return;
   }
   if (field === 'linkDestination') {
@@ -645,13 +422,11 @@ function onEditorInput(event) {
   if (field === 'linkEnabled') {
     const link = navigation.topBar.quickLinks[Number(el.dataset.link)];
     if (link) link.enabled = el.checked;
-    renderPreview();
     return;
   }
   if (field === 'linkClassName') {
     const link = navigation.topBar.quickLinks[Number(el.dataset.link)];
     if (link) link.className = el.value;
-    renderPreview();
     return;
   }
   if (field === 'linkFeature') {
@@ -662,58 +437,6 @@ function onEditorInput(event) {
     if (el.checked) set.add(feature);
     else set.delete(feature);
     link.features = [...set];
-    renderPreview();
-    return;
-  }
-  if (field === 'itemClassName') {
-    const item = getItem(Number(el.dataset.section), Number(el.dataset.item));
-    if (item) item.className = el.value;
-    renderPreview();
-    return;
-  }
-  if (field === 'pageTitle') {
-    const key = el.dataset.key;
-    if (key) navigation.pageTitles[key] = el.value;
-  }
-  if (field === 'accountLabel') {
-    const item = getAccountItem(el.dataset.accountList, Number(el.dataset.accountItem));
-    if (item) item.label = el.value;
-    renderPreview();
-    return;
-  }
-  if (field === 'accountDestination') {
-    const item = getAccountItem(el.dataset.accountList, Number(el.dataset.accountItem));
-    if (item) item.destination = el.value;
-    return;
-  }
-  if (field === 'accountEnabled') {
-    const item = getAccountItem(el.dataset.accountList, Number(el.dataset.accountItem));
-    if (item) item.enabled = el.checked;
-    renderPreview();
-    return;
-  }
-  if (field === 'accountFeature') {
-    const item = getAccountItem(el.dataset.accountList, Number(el.dataset.accountItem));
-    if (!item) return;
-    const feature = el.dataset.feature;
-    const set = new Set(item.features || []);
-    if (el.checked) {
-      if (ACCOUNT_SPECIAL.has(feature)) {
-        for (const special of ACCOUNT_SPECIAL) set.delete(special);
-      }
-      set.add(feature);
-      if (feature === 'separator') {
-        item.label = '';
-        item.destination = '';
-      }
-      if (feature === 'signOut' || feature === 'signIn' || feature === 'signUp') {
-        item.destination = '';
-      }
-    } else {
-      set.delete(feature);
-    }
-    item.features = [...set];
-    renderAll();
   }
 }
 
@@ -824,36 +547,6 @@ async function onEditorClick(event) {
     moveItem(navigation.topBar.quickLinks, lIndex, delta);
     renderAll();
   }
-  if (action === 'add-account-item') {
-    const listKey = btn.dataset.accountList;
-    ensureAccountMenu();
-    if (!navigation.accountMenu[listKey]) return;
-    navigation.accountMenu[listKey].push({
-      id: uid('account'),
-      label: listKey === 'signedOut' ? 'Sign In' : 'Menu item',
-      destination: listKey === 'signedOut' ? '' : 'profile',
-      enabled: true,
-      features: listKey === 'signedOut' ? ['signIn'] : []
-    });
-    renderAll();
-    return;
-  }
-  if (action === 'remove-account-item') {
-    const listKey = btn.dataset.accountList;
-    const aIndex = Number(btn.dataset.accountItem);
-    ensureAccountMenu();
-    navigation.accountMenu[listKey]?.splice(aIndex, 1);
-    renderAll();
-    return;
-  }
-  if (action === 'move-account-item') {
-    const listKey = btn.dataset.accountList;
-    const aIndex = Number(btn.dataset.accountItem);
-    ensureAccountMenu();
-    const list = navigation.accountMenu[listKey];
-    if (list) moveItem(list, aIndex, delta);
-    renderAll();
-  }
 }
 
 async function onEditorChange(event) {
@@ -902,7 +595,7 @@ resetBtn.addEventListener('click', async () => {
   if (busy) return;
   const ok = await window.StarlightUI.confirm({
     title: 'Reset navigation?',
-    message: 'This restores the default masthead menus, top bar, account menu, brand ribbon, and page titles. Unsaved edits will be lost.',
+    message: 'This restores the default top navigation, brand ribbon, and live-feed setting. Unsaved edits will be lost.',
     confirmText: 'Reset to Defaults',
     danger: true
   });
@@ -937,24 +630,10 @@ async function boot() {
     saveBtn.hidden = false;
     resetBtn.hidden = false;
     renderAll();
-    setStatus('Ready. Live shell preview updates as you edit; Save publishes.', 'success');
+    setStatus('Ready. Save publishes top navigation for every collector.', 'success');
   } catch (error) {
     setStatus(error.message || 'Unable to load navigation settings.', 'error');
   }
 }
-
-window.addEventListener('message', (event) => {
-  if (event.origin !== window.location.origin) return;
-  const data = event.data || {};
-  if (data.type === STUDIO_MSG.READY && data.kind === 'shell') {
-    shellPreviewReady = true;
-    shellPreviewWrap?.classList.remove('is-loading');
-    pushShellPreviewDraft();
-  }
-});
-
-reloadShellPreviewBtn?.addEventListener('click', () => {
-  loadShellPreview({ force: true });
-});
 
 boot();

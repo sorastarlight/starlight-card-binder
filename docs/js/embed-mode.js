@@ -206,6 +206,13 @@ if (!embedded && shouldRedirectToShell()) {
     html.starlight-embedded .daily-page,html.starlight-embedded .bits-page,html.starlight-embedded .collector-page,
     html.starlight-embedded .profile-settings-page,html.starlight-embedded .admin-page,html.starlight-embedded .redeem-page,
     html.starlight-embedded .trade-offers-page,html.starlight-embedded .trade-hub-page,html.starlight-embedded .shop-page,html.starlight-embedded .login-page{padding:clamp(10px,1.6vw,16px)!important;min-height:0!important}
+    html.starlight-embedded .admin-suite,
+    html.starlight-embedded .admin-suite-frame,
+    html.starlight-embedded .admin-panel,
+    html.starlight-embedded .studio-app{
+      width:100%!important;max-width:none!important;margin-left:0!important;margin-right:0!important;box-sizing:border-box!important
+    }
+    html.starlight-embedded .admin-suite-frame{padding-inline:clamp(10px,1.6vw,18px)!important}
     html.starlight-embedded .page-head:first-child{margin-top:0!important}
     html.starlight-embedded .embedded-filter-panel{margin:0 0 14px!important}
     html.starlight-embedded .page-status:not(.error),html.starlight-embedded .status.success{display:none!important}

@@ -6,8 +6,8 @@
   <title>Navigation Studio | Starlight Card Binder</title>
   <link rel="stylesheet" href="css/style.css?v=1.0.2">
   <link rel="stylesheet" href="css/shared-ui.css?v=1.6.16">
-  <link rel="stylesheet" href="css/pages/admin-shell.css?v=1.1.0">
-  <link rel="stylesheet" href="css/pages/admin-ui.css?v=3.1.0">
+  <link rel="stylesheet" href="css/pages/admin-shell.css?v=1.1.1">
+  <link rel="stylesheet" href="css/pages/admin-ui.css?v=3.2.0">
   <link rel="stylesheet" href="css/qol-ui.css?v=94.2.8">
   <script src="js/browser-performance.js?v=1.0.0" defer></script>
 </head>
@@ -18,7 +18,7 @@
     <header class="admin-suite-header">
       <div>
         <h1>Navigation Studio</h1>
-        <p class="admin-suite-lead">Edit the live top navigation: strip links, dropdown menus, brand ribbon, and live feed. Draft changes preview instantly; Save publishes for every collector.</p>
+        <p class="admin-suite-lead">Edit the live top navigation: dropdown menus (Cards, My Collection, Shop, Community), strip links, brand ribbon, and live feed. Save publishes for every collector.</p>
       </div>
       <div class="admin-suite-actions">
         <button id="saveBtn" class="admin-btn admin-btn--primary btn primary" type="button" hidden>Save Changes</button>
@@ -41,26 +41,11 @@
       </div>
 
       <h2 class="admin-panel__title" id="topNavHeading">Top Navigation</h2>
-      <p class="admin-panel__hint">Strip links appear beside the logo cluster. Dropdown menus power Cards, My Collection, Shop, and Community.</p>
+      <p class="admin-panel__hint">Dropdown menus appear in the top bar (Cards, My Collection, Shop, Community). Strip links sit beside them (Home, Free Daily Card Pack).</p>
 
-      <div class="editor-layout admin-split">
-        <div class="editor-main">
-          <section id="panel-topbar" class="tab-panel" aria-labelledby="topNavHeading" data-panel="topbar"></section>
-          <section id="panel-sidebar" class="tab-panel" aria-labelledby="topNavHeading" data-panel="sidebar"></section>
-        </div>
-        <aside class="preview-panel" aria-label="Live shell preview">
-          <div class="preview-toolbar">
-            <div>
-              <h2 class="admin-panel__title">Live shell preview</h2>
-              <p class="preview-hint">Real binder chrome. Draft navigation updates as you edit.</p>
-            </div>
-            <button type="button" class="admin-btn btn small" id="reloadShellPreview">Reload</button>
-          </div>
-          <div id="livePreview" class="live-preview schematic-preview admin-hidden" hidden></div>
-          <div class="shell-preview-wrap is-loading">
-            <iframe id="shellPreviewFrame" class="admin-preview-frame" title="Navigation Studio shell preview" loading="lazy"></iframe>
-          </div>
-        </aside>
+      <div class="editor-main">
+        <section id="panel-sidebar" class="tab-panel" aria-labelledby="topNavHeading" data-panel="sidebar"></section>
+        <section id="panel-topbar" class="tab-panel" aria-labelledby="topNavHeading" data-panel="topbar"></section>
       </div>
 
       <p class="upload-guide">Icon uploads: square PNG or WebP, 64×64 recommended (48–96px). Max 5 MB. Transparent background preferred.</p>
@@ -70,7 +55,7 @@
   </div>
 
   <script src="js/shared-ui.js?v=1.6.16"></script>
-  <script type="module" src="js/pages/admin-ui-page.js?v=3.1.0"></script>
+  <script type="module" src="js/pages/admin-ui-page.js?v=3.2.0"></script>
   <script src="js/qol-ui.js?v=94.2.8" defer></script>
 </body>
 </html>

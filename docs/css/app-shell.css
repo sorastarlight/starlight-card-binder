@@ -930,21 +930,25 @@ body.shell-masthead-layout .shell-top-link.shell-daily-top-link{
   justify-content:center;
   gap:0;
   padding-top:0;
+  padding-bottom:0;
   overflow:visible;
 }
 body.shell-masthead-layout .shell-top-link .shell-daily-ready-badge{
   position:absolute;
-  left:50%;
-  top:50%;
+  left:0;
+  right:0;
+  top:8px;
   bottom:auto;
   z-index:2;
-  margin:0!important;
-  padding:3px 7px!important;
-  font-size:.58rem!important;
+  width:max-content;
+  max-width:calc(100% - 8px);
+  margin:0 auto!important;
+  padding:2px 7px!important;
+  font-size:.55rem!important;
   line-height:1;
   white-space:nowrap;
   pointer-events:none;
-  transform:translate(-50%, calc(-50% - 0.95rem));
+  transform:none;
 }
 body.shell-masthead-layout .shell-top-link .shell-daily-ready-badge[hidden]{
   display:none!important;
@@ -953,6 +957,9 @@ body.shell-masthead-layout .shell-masthead,
 body.shell-masthead-layout .shell-masthead-nav,
 body.shell-masthead-layout .shell-mega{
   overflow:visible;
+}
+body.shell-masthead-layout .site{
+  padding-inline:0;
 }
 body.shell-masthead-layout .shell-mega-panel{
   position:absolute;
