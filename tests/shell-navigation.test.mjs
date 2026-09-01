@@ -13,7 +13,7 @@ test('default shell navigation includes core destinations and staff account link
   assert.deepEqual(ids, ['home', 'cards', 'collect', 'community', 'account']);
   assert.equal(nav.sidebar.sections[0].label, '');
   assert.equal(nav.sidebar.sections[1].label, 'Cards');
-  assert.equal(nav.sidebar.sections[2].label, 'Collection');
+  assert.equal(nav.sidebar.sections[2].label, 'My Collection');
   assert.ok(!nav.sidebar.sections.some(section => section.id === 'series'));
   assert.ok(!nav.sidebar.sections.some(section => section.staffOnly));
   assert.ok(nav.accountMenu.signedIn.some(item =>
@@ -62,11 +62,43 @@ test('default shell navigation includes core destinations and staff account link
   assert.equal(nav.pageTitles.redeem, 'Redeem Code');
   assert.equal(nav.pageTitles.feed, 'Activity Feed');
   assert.ok(nav.topBar.quickLinks.some(link => link.destination === 'home' && link.label === 'Home'));
-  assert.ok(nav.topBar.quickLinks.some(link => link.destination === 'events'));
+  assert.ok(nav.topBar.quickLinks.some(link =>
+    link.destination === 'daily'
+    && link.label === 'Free Daily Card Pack'
+    && (link.features || []).includes('dailyBadge')
+  ));
+  assert.ok(!nav.topBar.quickLinks.some(link => link.destination === 'events'));
+  assert.ok(!nav.topBar.quickLinks.some(link => link.destination === 'trades'));
   assert.ok(nav.accountMenu.signedIn.some(item => (item.features || []).includes('notificationBadge')));
   assert.ok(nav.accountMenu.signedIn.some(item => (item.features || []).includes('receivedGiftBadge')));
   assert.ok(nav.accountMenu.signedIn.some(item => (item.features || []).includes('tradeOfferBadge')));
   assert.ok(nav.accountMenu.signedOut.some(item => (item.features || []).includes('signIn')));
+});
+
+test('sanitizeShellNavigation migrates top bar off Events/Trade and onto Daily Pack', () => {
+  const migrated = sanitizeShellNavigation({
+    ...cloneDefaultShellNavigation(),
+    topBar: {
+      quickLinks: [
+        { id: 'home-top', label: 'Home', destination: 'home', enabled: true },
+        { id: 'events-top', label: 'Events', destination: 'events', enabled: true },
+        { id: 'trades-top', label: 'Trade', destination: 'trades', enabled: true }
+      ]
+    },
+    sidebar: {
+      sections: cloneDefaultShellNavigation().sidebar.sections.map((section) => (
+        section.id === 'collect' ? { ...section, label: 'Collection' } : section
+      ))
+    }
+  });
+  assert.equal(migrated.sidebar.sections.find(section => section.id === 'collect')?.label, 'My Collection');
+  assert.ok(!migrated.topBar.quickLinks.some(link => link.destination === 'events'));
+  assert.ok(!migrated.topBar.quickLinks.some(link => link.destination === 'trades'));
+  assert.ok(migrated.topBar.quickLinks.some(link =>
+    link.destination === 'daily'
+    && link.label === 'Free Daily Card Pack'
+    && (link.features || []).includes('dailyBadge')
+  ));
 });
 
 test('sanitizeShellNavigation overwrites legacy product labels with new defaults', () => {
@@ -509,6 +541,8 @@ test('shell masthead wires mega menus and series browse params', async () => {
   assert.doesNotMatch(shell, /pointerenter[\s\S]*openMegaMenu/);
   assert.match(render, /destination === 'home'/);
   assert.match(render, /Home/);
+  assert.match(render, /shell-daily-top-link|dailyBadge/);
+  assert.match(defaults, /Free Daily Card Pack/);
   assert.match(defaults, /mega:\s*true/);
   assert.match(defaults, /clearSeries/);
   assert.match(defaults, /brandRibbon: 'Collectible Card Hub'/);

@@ -248,10 +248,62 @@ function rewriteSectionLabel(section) {
   const label = String(section.label || '').trim();
   if (id === 'home') return '';
   if (id === 'cards' && /^(cards|starlight cards gallery)$/i.test(label)) return 'Cards';
-  if (id === 'collect' && /^(collect|my collection)$/i.test(label)) return 'Collection';
+  if (id === 'collect' && /^(collect|collection|my collection)$/i.test(label)) return 'My Collection';
   if (id === 'community' && /^(community|community hub)$/i.test(label)) return 'Community';
   if (id === 'account' && /^account$/i.test(label)) return 'Account';
   return label || section.label;
+}
+
+/** Drop Events/Trade from the top bar (they live under Community) and keep Daily Pack + READY badge. */
+function normalizeTopBarQuickLinks(links, defaults) {
+  const defaultLinks = Array.isArray(defaults.topBar?.quickLinks) ? defaults.topBar.quickLinks : [];
+  const defaultHome = defaultLinks.find(link => link.destination === 'home') || {
+    id: 'home-top',
+    label: 'Home',
+    destination: 'home',
+    enabled: true,
+    features: []
+  };
+  const defaultDaily = defaultLinks.find(link => link.destination === 'daily') || {
+    id: 'daily-top',
+    label: 'Free Daily Card Pack',
+    destination: 'daily',
+    enabled: true,
+    features: ['dailyBadge'],
+    className: 'shell-daily-top-link'
+  };
+
+  const communityDupes = new Set(['events', 'trades', 'offers']);
+  const cleaned = (Array.isArray(links) ? links : [])
+    .filter(link => link && !communityDupes.has(String(link.destination || '')));
+
+  const withHome = cleaned.some(link => link.destination === 'home')
+    ? cleaned
+    : [defaultHome, ...cleaned];
+
+  const dailyIndex = withHome.findIndex(link => link.destination === 'daily');
+  let next;
+  if (dailyIndex < 0) {
+    next = [...withHome, { ...defaultDaily, features: [...(defaultDaily.features || [])] }];
+  } else {
+    next = withHome.map((link, index) => {
+      if (index !== dailyIndex) return link;
+      const features = new Set(link.features || []);
+      features.add('dailyBadge');
+      const label = /^free daily( starlight)? (card )?pack$/i.test(String(link.label || '').trim())
+        || !String(link.label || '').trim()
+        ? defaultDaily.label
+        : link.label;
+      return {
+        ...link,
+        label,
+        features: [...features],
+        className: link.className || defaultDaily.className || 'shell-daily-top-link'
+      };
+    });
+  }
+
+  return next.slice(0, 10);
 }
 
 function sanitizeSection(section = {}, index = 0) {
@@ -288,21 +340,29 @@ export function sanitizeShellNavigation(input) {
     }
   }
 
-  const quickLinks = Array.isArray(source.topBar?.quickLinks)
-    ? source.topBar.quickLinks.slice(0, 10).map((link, index) => {
-      const destination = String(link.destination || '').trim();
-      if (!ALLOWED_DESTINATIONS.has(destination)) {
-        throw new Error(`Unsupported top-bar destination: ${destination || '(empty)'}`);
-      }
-      const rawLabel = String(link.label || destination).trim().slice(0, 40) || destination;
-      return {
-        id: String(link.id || `top-${index}`).slice(0, 64),
-        label: rewriteLegacyLabel(destination, rawLabel, destination).slice(0, 40),
-        destination,
-        enabled: link.enabled !== false
-      };
-    })
-    : defaults.topBar.quickLinks;
+  const quickLinks = normalizeTopBarQuickLinks(
+    Array.isArray(source.topBar?.quickLinks)
+      ? source.topBar.quickLinks.slice(0, 10).map((link, index) => {
+        const destination = String(link.destination || '').trim();
+        if (!ALLOWED_DESTINATIONS.has(destination)) {
+          throw new Error(`Unsupported top-bar destination: ${destination || '(empty)'}`);
+        }
+        const features = Array.isArray(link.features)
+          ? link.features.map(String).filter(Boolean).slice(0, 8)
+          : [];
+        const rawLabel = String(link.label || destination).trim().slice(0, 40) || destination;
+        return {
+          id: String(link.id || `top-${index}`).slice(0, 64),
+          label: rewriteLegacyLabel(destination, rawLabel, destination).slice(0, 40),
+          destination,
+          enabled: link.enabled !== false,
+          features,
+          className: String(link.className || '').trim().slice(0, 80)
+        };
+      })
+      : defaults.topBar.quickLinks,
+    defaults
+  );
 
   const sections = ensureDefaultSidebarItems(
     relocateSidebarDestinations(

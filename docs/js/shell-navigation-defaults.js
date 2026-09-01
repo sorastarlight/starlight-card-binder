@@ -179,7 +179,7 @@ export function createDefaultShellNavigation() {
         },
         {
           id: 'collect',
-          label: 'Collection',
+          label: 'My Collection',
           icon: shellNavIcon('collection'),
           staffOnly: false,
           mega: true,
@@ -223,9 +223,8 @@ export function createDefaultShellNavigation() {
     },
     topBar: {
       quickLinks: [
-        { id: 'home-top', label: 'Home', destination: 'home', enabled: true },
-        { id: 'events-top', label: 'Events', destination: 'events', enabled: true },
-        { id: 'trades-top', label: 'Trade', destination: 'trades', enabled: true }
+        { id: 'home-top', label: 'Home', destination: 'home', enabled: true, features: [] },
+        { id: 'daily-top', label: 'Free Daily Card Pack', destination: 'daily', enabled: true, features: ['dailyBadge'], className: 'shell-daily-top-link' }
       ]
     },
     accountMenu: {

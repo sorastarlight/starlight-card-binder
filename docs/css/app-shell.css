@@ -923,6 +923,12 @@ body.shell-masthead-layout .shell-top-link.active{
   background:rgba(107,198,248,.16);
   outline:none;
 }
+body.shell-masthead-layout .shell-top-link.shell-daily-top-link{gap:8px}
+body.shell-masthead-layout .shell-top-link .shell-daily-ready-badge{
+  margin-left:0!important;
+  padding:3px 7px!important;
+  font-size:.58rem!important;
+}
 body.shell-masthead-layout .shell-mega-panel{
   position:absolute;
   top:calc(100% + 8px);

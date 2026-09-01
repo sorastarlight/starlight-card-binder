@@ -176,8 +176,15 @@ export function applyShellNavigationToDom(navigation, { isStaff = false } = {}) 
     const topQuick = (config.topBar.quickLinks || []).filter(link => link.enabled !== false);
     const homeQuick = topQuick.find(link => link.destination === 'home');
     const otherQuick = topQuick.filter(link => link.destination !== 'home');
-    const linkHtml = (link) =>
-      `<a class="shell-top-link" data-shell-view="${esc(link.destination)}" href="${shellHref(link.destination)}">${esc(link.label)}</a>`;
+    const linkHtml = (link) => {
+      const features = link.features || [];
+      const classes = [
+        'shell-top-link',
+        link.className || '',
+        features.includes('dailyBadge') ? 'shell-daily-top-link' : ''
+      ].filter(Boolean).join(' ');
+      return `<a class="${esc(classes)}" data-shell-view="${esc(link.destination)}" href="${shellHref(link.destination)}"><span>${esc(link.label)}</span>${itemBadge(features)}</a>`;
+    };
     const homeHtml = homeQuick
       ? linkHtml(homeQuick)
       : `<a class="shell-top-link" data-shell-view="home" href="${shellHref('home')}">Home</a>`;
