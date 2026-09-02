@@ -945,7 +945,7 @@ body.shell-masthead-layout .shell-masthead-inner{
   width:100%;
   max-width:none;
   margin:0;
-  padding:0 var(--shell-chrome-pad);
+  padding:0 max(6px, env(safe-area-inset-right, 0px)) 0 var(--shell-chrome-pad);
   min-height:var(--shell-masthead-h, 76px);
   height:var(--shell-masthead-h, 76px);
   flex:none;
@@ -1012,10 +1012,10 @@ body.shell-masthead-layout .shell-masthead-actions{
   display:flex;
   align-items:center;
   justify-content:flex-end;
-  gap:2px;
+  gap:0;
   min-width:0;
   justify-self:end;
-  margin-right:0;
+  margin-inline-end:0;
 }
 body.shell-masthead-layout .shell-menu-button{
   display:inline-grid;

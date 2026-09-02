@@ -41,7 +41,7 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-inner {
   container-name: shell-masthead;
   max-width: none;
   margin: 0;
-  padding: 0 var(--st-chrome-pad-inline);
+  padding: 0 max(6px, env(safe-area-inset-right, 0px)) 0 var(--st-chrome-pad-inline);
   min-height: var(--st-chrome-bar-h);
   height: var(--st-chrome-bar-h);
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -54,9 +54,10 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions {
   grid-area: actions;
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 0;
   min-width: 0;
   justify-self: end;
+  margin-inline-end: 0;
 }
 
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-nav {
@@ -230,9 +231,9 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-mega-panel {
   transform: none;
 }
 
-/* Account cluster — far right after menu */
+/* Account cluster — flush to the far right beside the profile icon */
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions {
-  gap: 2px;
+  gap: 0;
   flex: 0 0 auto;
   min-width: 0;
 }
