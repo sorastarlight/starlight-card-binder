@@ -368,6 +368,52 @@ body.unified-shell{padding-left:env(safe-area-inset-left);padding-right:env(safe
 .shell-avatar-silhouette{display:block}
 .shell-account-menu{position:absolute;right:0;top:calc(100% + 8px);z-index:1200;min-width:230px;padding:8px;border:1px solid rgba(107,198,248,.35);border-radius:15px;background:#fff;box-shadow:0 18px 40px rgba(45,60,105,.2)}
 .shell-account-menu[hidden]{display:none!important}
+.shell-account-menu-summary{
+  display:grid;
+  gap:6px;
+  margin:0 0 6px;
+  padding:10px 12px 12px;
+  border-radius:12px;
+  background:linear-gradient(135deg,rgba(107,198,248,.12),rgba(255,130,200,.1));
+  border:1px solid rgba(107,198,248,.22);
+}
+.shell-account-menu-summary[hidden]{display:none!important}
+.shell-account-menu-name{
+  color:#334f8d;
+  font-size:.95rem;
+  font-weight:900;
+  line-height:1.2;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.shell-account-menu-handle{
+  color:#7a89ad;
+  font-size:.74rem;
+  font-weight:700;
+  line-height:1.2;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.shell-account-menu-summary .shell-profile-mini-stats{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:4px 0 0;
+  color:#405fa1;
+  font-size:.78rem;
+  font-weight:850;
+}
+.shell-account-menu-summary .shell-account-stat{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:4px 9px;
+  border-radius:999px;
+  background:rgba(255,255,255,.88);
+  border:1px solid rgba(107,198,248,.28);
+}
 .shell-account-menu a,.shell-account-menu button{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:10px 12px;border:0;border-radius:10px;background:transparent;color:#405fa1;text-align:left;font:inherit;font-weight:800;text-decoration:none;cursor:pointer}
 .shell-account-menu a:hover,.shell-account-menu button:hover{background:rgba(107,198,248,.13)}
 .shell-account-menu .shell-nav-badge{margin-left:auto;flex:none}
@@ -918,9 +964,10 @@ body.shell-masthead-layout .shell-masthead-actions{
   display:flex;
   align-items:center;
   justify-content:flex-end;
-  gap:clamp(4px, .7vw, 8px);
+  gap:4px;
   min-width:0;
   justify-self:end;
+  margin-right:-2px;
 }
 body.shell-masthead-layout .shell-menu-button{
   display:inline-grid;
@@ -1083,9 +1130,14 @@ body.shell-masthead-layout .shell-masthead-actions .shell-notify-bell-dot{
   height:7px;
 }
 body.shell-masthead-layout .shell-masthead-actions .shell-account-menu-button{
-  min-height:52px;
-  gap:10px;
-  padding:4px 12px 4px 4px;
+  min-height:0;
+  width:42px;
+  height:42px;
+  max-width:none;
+  gap:0;
+  padding:0;
+  border-radius:999px;
+  justify-content:center;
 }
 body.shell-masthead-layout .shell-masthead-actions .shell-avatar{
   width:42px;
@@ -1094,27 +1146,6 @@ body.shell-masthead-layout .shell-masthead-actions .shell-avatar{
 body.shell-masthead-layout .shell-masthead-actions .shell-avatar-silhouette{
   width:22px;
   height:22px;
-}
-body.shell-masthead-layout .shell-masthead-actions .shell-account-main strong{
-  max-width:none;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  font-size:.88rem;
-  line-height:1.15;
-}
-body.shell-masthead-layout .shell-masthead-actions .shell-account-main>span{
-  font-size:.72rem;
-  line-height:1.15;
-}
-body.shell-masthead-layout .shell-masthead-actions .shell-profile-mini-stats{
-  margin-top:0;
-  gap:8px;
-  font-size:.72rem;
-}
-body.shell-masthead-layout .shell-masthead-actions .shell-profile-mini-stats .star-bit-icon{
-  width:12px;
-  height:12px;
 }
 body.shell-masthead-layout .shell-masthead-actions .shell-account-menu{
   left:auto;
@@ -1204,10 +1235,7 @@ body.shell-masthead-layout .shell-drawer .unified-nav{
   body.shell-masthead-layout .shell-mega.is-mobile-only{display:none}
 }
 @media(max-width:1999px){
-  body.shell-masthead-layout .shell-masthead-actions .shell-account-main span:not([data-shell-account-sub]),
-  body.shell-masthead-layout .shell-masthead-actions .shell-account-main strong,
-  body.shell-masthead-layout .shell-profile-mini-stats{display:none}
-  body.shell-masthead-layout .shell-masthead-actions .shell-account-menu-button{max-width:none;padding:3px;border-radius:999px}
+  body.shell-masthead-layout .shell-masthead-actions .shell-account-menu-button{max-width:none;padding:0;border-radius:999px}
 }
 @media(max-width:600px){
   body.shell-masthead-layout .shell-masthead-brand .binder-ribbon{display:none}
