@@ -44,9 +44,28 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-inner {
   padding: 0 var(--st-chrome-pad-inline);
   min-height: var(--st-chrome-bar-h);
   height: var(--st-chrome-bar-h);
-  grid-template-columns: auto auto minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: "leading nav brand";
   gap: clamp(10px, 1.6vw, 24px);
   align-items: center;
+}
+
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-leading {
+  grid-area: leading;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  justify-self: start;
+}
+
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-nav {
+  grid-area: nav;
+}
+
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-brand {
+  grid-area: brand;
+  justify-self: end;
 }
 
 /* Brand lockup: logo only in the masthead — ribbon overlaps nav on laptop widths */
@@ -92,11 +111,11 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-menu-button {
   height: 40px;
 }
 
-/* Nav grouped to the right of the bar, before account */
+/* Nav centered between leading controls and brand */
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-nav {
   display: none;
   flex: 1 1 auto;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 2px;
   flex-wrap: nowrap;
   min-width: 0;
@@ -195,20 +214,24 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-mega-panel {
   transform: none;
 }
 
-/* Account cluster — compact on laptop widths */
-body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions {
+/* Account cluster — left side before menu */
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-leading {
   gap: 10px;
   flex: 0 0 auto;
   min-width: 0;
-  justify-self: end;
 }
 
-body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-account-menu-button {
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-leading .shell-account-menu-button {
   max-width: min(220px, 24vw);
 }
 
-body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-sfx-button,
-body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-notify-bell {
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-leading .shell-account-menu {
+  left: 0;
+  right: auto;
+}
+
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-leading .shell-sfx-button,
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-leading .shell-notify-bell {
   width: 38px;
   height: 38px;
   min-width: 38px;
@@ -219,12 +242,12 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .sh
   box-shadow: none;
 }
 
-body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-notify-bell-icon {
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-leading .shell-notify-bell-icon {
   width: 18px;
   height: 18px;
 }
 
-body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-account-menu-button {
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-leading .shell-account-menu-button {
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -237,18 +260,18 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .sh
   border-radius: 999px;
 }
 
-body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-avatar {
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-leading .shell-avatar {
   width: 42px;
   height: 42px;
   flex: none;
 }
 
-body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-avatar-silhouette {
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-leading .shell-avatar-silhouette {
   width: 22px;
   height: 22px;
 }
 
-body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-account-main {
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-leading .shell-account-main {
   display: grid;
   grid-template-columns: 1fr;
   gap: 3px;
@@ -256,7 +279,7 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .sh
   flex: 1 1 auto;
 }
 
-body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-account-main strong {
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-leading .shell-account-main strong {
   max-width: none;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -268,11 +291,11 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .sh
 }
 
 /* Hide @handle in the chip — keeps the button readable */
-body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-account-handle {
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-leading .shell-account-handle {
   display: none !important;
 }
 
-body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-profile-mini-stats {
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-leading .shell-profile-mini-stats {
   display: flex;
   flex-wrap: nowrap;
   gap: 8px;
@@ -283,7 +306,7 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .sh
   line-height: 1;
 }
 
-body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-account-stat {
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-leading .shell-account-stat {
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -293,12 +316,12 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .sh
   white-space: nowrap;
 }
 
-body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-profile-mini-stats .star-bit-icon {
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-leading .shell-profile-mini-stats .star-bit-icon {
   width: 12px;
   height: 12px;
 }
 
-body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-account-caret {
+body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-leading .shell-account-caret {
   color: rgba(255, 255, 255, 0.7);
   font-size: 0.7rem;
   flex: none;
@@ -415,7 +438,8 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-inner.shell
   }
 
   .shell-masthead-inner {
-    grid-template-columns: minmax(0, auto) minmax(0, 1fr) minmax(0, auto) !important;
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+    grid-template-areas: "leading nav brand" !important;
   }
 }
 
@@ -440,7 +464,8 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-inner.shell
   }
 
   body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-inner {
-    grid-template-columns: minmax(0, auto) minmax(0, 1fr) minmax(0, auto);
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: "leading nav brand";
   }
 
   body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-inner.shell-masthead--force-collapse .shell-masthead-nav {
@@ -454,14 +479,14 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-inner.shell
 }
 
 @media (max-width: 1999px) {
-  body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-account-main strong,
-  body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-account-handle,
-  body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-profile-mini-stats,
-  body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-account-main {
+  body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-leading .shell-account-main strong,
+  body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-leading .shell-account-handle,
+  body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-leading .shell-profile-mini-stats,
+  body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-leading .shell-account-main {
     display: none;
   }
 
-  body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions .shell-account-menu-button {
+  body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-leading .shell-account-menu-button {
     max-width: none;
     padding: 3px;
     border-radius: 999px;

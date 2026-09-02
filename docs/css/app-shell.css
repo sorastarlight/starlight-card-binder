@@ -844,7 +844,8 @@ body.shell-masthead-layout .shell-masthead-inner{
   container-type:inline-size;
   container-name:shell-masthead;
   display:grid;
-  grid-template-columns:auto auto minmax(0, 1fr);
+  grid-template-columns:auto minmax(0, 1fr) auto;
+  grid-template-areas:"leading nav brand";
   align-items:center;
   gap:clamp(10px, 1.6vw, 24px);
   width:100%;
@@ -856,6 +857,8 @@ body.shell-masthead-layout .shell-masthead-inner{
   flex:none;
 }
 body.shell-masthead-layout .shell-masthead-brand{
+  grid-area:brand;
+  justify-self:end;
   display:inline-flex;
   align-items:center;
   gap:12px;
@@ -884,27 +887,29 @@ body.shell-masthead-layout .shell-masthead-brand .binder-ribbon{
   display:none !important;
 }
 body.shell-masthead-layout .shell-masthead-nav{
+  grid-area:nav;
   display:none;
   flex:1 1 auto;
   flex-wrap:nowrap;
   align-items:center;
-  justify-content:flex-end;
+  justify-content:center;
   gap:clamp(2px, .35vw, 6px);
   min-width:0;
   max-width:100%;
   overflow-x:clip;
   overflow-y:visible;
 }
+body.shell-masthead-layout .shell-masthead-leading{
+  grid-area:leading;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:clamp(4px, .7vw, 8px);
+  min-width:0;
+}
 body.shell-masthead-layout .shell-menu-button{
   display:inline-grid;
   place-items:center;
-  order:0;
-}
-body.shell-masthead-layout .shell-masthead-brand{
-  order:1;
-}
-body.shell-masthead-layout .shell-masthead-actions{
-  order:2;
 }
 body.shell-masthead-layout .shell-masthead-inner.shell-masthead--force-collapse .shell-masthead-nav{
   display:none!important;
@@ -1039,50 +1044,43 @@ body.shell-masthead-layout .shell-mega-panel .shell-nav-empty{
   color:#8a93aa;
   font-size:.75rem;
 }
-body.shell-masthead-layout .shell-masthead-actions{
-  display:flex;
-  align-items:center;
-  justify-content:flex-end;
-  gap:clamp(4px, .7vw, 8px);
-  min-width:0;
-}
-body.shell-masthead-layout .shell-masthead-actions .shell-sfx-button{
+body.shell-masthead-layout .shell-masthead-leading .shell-sfx-button{
   width:32px;
   height:32px;
   min-width:32px;
   font-size:.92rem;
   box-shadow:0 4px 12px rgba(255,130,200,.22);
 }
-body.shell-masthead-layout .shell-masthead-actions .shell-notify-bell{
+body.shell-masthead-layout .shell-masthead-leading .shell-notify-bell{
   width:32px;
   height:32px;
   border-radius:10px;
   box-shadow:0 4px 12px rgba(61,83,132,.08);
 }
-body.shell-masthead-layout .shell-masthead-actions .shell-notify-bell-icon{
+body.shell-masthead-layout .shell-masthead-leading .shell-notify-bell-icon{
   width:16px;
   height:16px;
 }
-body.shell-masthead-layout .shell-masthead-actions .shell-notify-bell-dot{
+body.shell-masthead-layout .shell-masthead-leading .shell-notify-bell-dot{
   top:4px;
   right:5px;
   width:7px;
   height:7px;
 }
-body.shell-masthead-layout .shell-masthead-actions .shell-account-menu-button{
+body.shell-masthead-layout .shell-masthead-leading .shell-account-menu-button{
   min-height:52px;
   gap:10px;
   padding:4px 12px 4px 4px;
 }
-body.shell-masthead-layout .shell-masthead-actions .shell-avatar{
+body.shell-masthead-layout .shell-masthead-leading .shell-avatar{
   width:42px;
   height:42px;
 }
-body.shell-masthead-layout .shell-masthead-actions .shell-avatar-silhouette{
+body.shell-masthead-layout .shell-masthead-leading .shell-avatar-silhouette{
   width:22px;
   height:22px;
 }
-body.shell-masthead-layout .shell-masthead-actions .shell-account-main strong{
+body.shell-masthead-layout .shell-masthead-leading .shell-account-main strong{
   max-width:none;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -1090,18 +1088,22 @@ body.shell-masthead-layout .shell-masthead-actions .shell-account-main strong{
   font-size:.88rem;
   line-height:1.15;
 }
-body.shell-masthead-layout .shell-masthead-actions .shell-account-main>span{
+body.shell-masthead-layout .shell-masthead-leading .shell-account-main>span{
   font-size:.72rem;
   line-height:1.15;
 }
-body.shell-masthead-layout .shell-masthead-actions .shell-profile-mini-stats{
+body.shell-masthead-layout .shell-masthead-leading .shell-profile-mini-stats{
   margin-top:0;
   gap:8px;
   font-size:.72rem;
 }
-body.shell-masthead-layout .shell-masthead-actions .shell-profile-mini-stats .star-bit-icon{
+body.shell-masthead-layout .shell-masthead-leading .shell-profile-mini-stats .star-bit-icon{
   width:12px;
   height:12px;
+}
+body.shell-masthead-layout .shell-masthead-leading .shell-account-menu{
+  left:0;
+  right:auto;
 }
 body.shell-masthead-layout .shell-account-menu{
   z-index:5200;
@@ -1173,26 +1175,24 @@ body.shell-masthead-layout .shell-drawer .unified-nav{
 }
 @container shell-masthead (min-width: 2000px) {
   .shell-masthead-nav{display:flex!important}
-  .shell-menu-button{display:none!important}
-  .shell-masthead-inner{grid-template-columns:minmax(0, auto) minmax(0, 1fr) minmax(0, auto)!important}
-  .shell-masthead-brand{order:0}
-  .shell-masthead-actions{order:0}
+  .shell-masthead-leading .shell-menu-button{display:none!important}
+  .shell-masthead-inner{grid-template-columns:auto minmax(0, 1fr) auto!important;grid-template-areas:"leading nav brand"!important}
   .shell-masthead-inner.shell-masthead--force-collapse .shell-masthead-nav{display:none!important}
-  .shell-masthead-inner.shell-masthead--force-collapse .shell-menu-button{display:inline-grid!important;place-items:center;order:0}
+  .shell-masthead-inner.shell-masthead--force-collapse .shell-masthead-leading .shell-menu-button{display:inline-grid!important;place-items:center}
 }
 @media(min-width:2000px){
   body.shell-masthead-layout .shell-masthead-nav{display:flex}
-  body.shell-masthead-layout .shell-menu-button{display:none}
-  body.shell-masthead-layout .shell-masthead-inner{grid-template-columns:minmax(0, auto) minmax(0, 1fr) minmax(0, auto)}
+  body.shell-masthead-layout .shell-masthead-leading .shell-menu-button{display:none}
+  body.shell-masthead-layout .shell-masthead-inner{grid-template-columns:auto minmax(0, 1fr) auto;grid-template-areas:"leading nav brand"}
   body.shell-masthead-layout .shell-masthead-inner.shell-masthead--force-collapse .shell-masthead-nav{display:none!important}
-  body.shell-masthead-layout .shell-masthead-inner.shell-masthead--force-collapse .shell-menu-button{display:inline-grid!important;place-items:center;order:0}
+  body.shell-masthead-layout .shell-masthead-inner.shell-masthead--force-collapse .shell-masthead-leading .shell-menu-button{display:inline-grid!important;place-items:center}
   body.shell-masthead-layout .shell-mega.is-mobile-only{display:none}
 }
 @media(max-width:1999px){
-  body.shell-masthead-layout .shell-masthead-actions .shell-account-main span:not([data-shell-account-sub]),
-  body.shell-masthead-layout .shell-masthead-actions .shell-account-main strong,
+  body.shell-masthead-layout .shell-masthead-leading .shell-account-main span:not([data-shell-account-sub]),
+  body.shell-masthead-layout .shell-masthead-leading .shell-account-main strong,
   body.shell-masthead-layout .shell-profile-mini-stats{display:none}
-  body.shell-masthead-layout .shell-masthead-actions .shell-account-menu-button{max-width:none;padding:3px;border-radius:999px}
+  body.shell-masthead-layout .shell-masthead-leading .shell-account-menu-button{max-width:none;padding:3px;border-radius:999px}
 }
 
 /* Full-bleed content under masthead — fluid pages fill remaining viewport */
