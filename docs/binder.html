@@ -6,8 +6,8 @@
 <title>Card Gallery | Starlight Card Binder</title>
 <link href="css/style.css?v=1.0.3" rel="stylesheet"/>
 <link href="css/v80-8-ui.css" rel="stylesheet"/>
-<link href="css/app-shell.css?v=1.6.36" rel="stylesheet"/>
-<link href="css/starlight-chrome.css?v=1.2.28" rel="stylesheet"/>
+<link href="css/app-shell.css?v=1.6.37" rel="stylesheet"/>
+<link href="css/starlight-chrome.css?v=1.2.29" rel="stylesheet"/>
 <link href="css/card-filters.css?v=1.1.1" rel="stylesheet"/>
 <link href="css/pages/card-gallery-page.css?v=2.4.0" rel="stylesheet"/>
 <link href="css/card-view-transition.css?v=1.0.0" rel="stylesheet"/>
@@ -22,7 +22,20 @@
 
 <header class="shell-masthead" id="shellMasthead">
   <div class="shell-masthead-inner">
-    <div class="shell-masthead-leading">
+    <a class="brand shell-masthead-brand" href="binder?view=home" data-shell-view="home" aria-label="Go to Home">
+      <span class="shell-brand-lockup">
+        <img alt="Sora Starlight" class="logo" src="site_assets/sora-starlight-header-logo.png?v=2" width="332" height="40" decoding="async"/>
+        <span class="binder-ribbon">Collectible Card Hub</span>
+      </span>
+    </a>
+    <nav class="shell-masthead-nav" aria-label="Primary"></nav>
+    <div class="shell-masthead-actions">
+      <button aria-label="Toggle sound effects" class="shell-sfx-button sfx-toggle on" id="sfxToggle" title="Turn sound effects on or off" type="button">♪</button>
+      <a class="shell-notify-bell" data-shell-view="notifications" href="binder?view=notifications" aria-label="Open notifications" data-shell-signed-in hidden>
+        <svg class="shell-notify-bell-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm8-5.2c-.8-.9-2.3-2.3-2.3-6.1 0-3.3-2.1-6-5-6.7V3.5a1.7 1.7 0 1 0-3.4 0v.5c-2.9.7-5 3.4-5 6.7 0 3.8-1.5 5.2-2.3 6.1A1 1 0 0 0 3 18h18a1 1 0 0 0 .8-1.2Z"/></svg>
+        <b class="shell-notify-bell-dot" data-notification-dot hidden></b>
+      </a>
+      <button aria-label="Open navigation" class="shell-menu-button" id="shellMenuButton" type="button">☰</button>
       <div class="shell-account-menu-wrap">
         <button type="button" class="shell-account-menu-button" id="shellAccountMenuButton" aria-expanded="false" aria-haspopup="menu" aria-controls="shellAccountMenu">
           <span class="shell-avatar is-placeholder" data-shell-avatar="" aria-hidden="true"><svg class="shell-avatar-silhouette" viewBox="0 0 40 40" width="22" height="22" focusable="false"><circle cx="20" cy="14" r="7" fill="currentColor"/><path d="M8 33c1.8-7.2 6.4-10.5 12-10.5S30.2 25.8 32 33" fill="currentColor"/></svg></span>
@@ -53,20 +66,7 @@
           </div>
         </div>
       </div>
-      <button aria-label="Toggle sound effects" class="shell-sfx-button sfx-toggle on" id="sfxToggle" title="Turn sound effects on or off" type="button">♪</button>
-      <a class="shell-notify-bell" data-shell-view="notifications" href="binder?view=notifications" aria-label="Open notifications" data-shell-signed-in hidden>
-        <svg class="shell-notify-bell-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm8-5.2c-.8-.9-2.3-2.3-2.3-6.1 0-3.3-2.1-6-5-6.7V3.5a1.7 1.7 0 1 0-3.4 0v.5c-2.9.7-5 3.4-5 6.7 0 3.8-1.5 5.2-2.3 6.1A1 1 0 0 0 3 18h18a1 1 0 0 0 .8-1.2Z"/></svg>
-        <b class="shell-notify-bell-dot" data-notification-dot hidden></b>
-      </a>
-      <button aria-label="Open navigation" class="shell-menu-button" id="shellMenuButton" type="button">☰</button>
     </div>
-    <nav class="shell-masthead-nav" aria-label="Primary"></nav>
-    <a class="brand shell-masthead-brand" href="binder?view=home" data-shell-view="home" aria-label="Go to Home">
-      <span class="shell-brand-lockup">
-        <img alt="Sora Starlight" class="logo" src="site_assets/sora-starlight-header-logo.png?v=2" width="332" height="40" decoding="async"/>
-        <span class="binder-ribbon">Collectible Card Hub</span>
-      </span>
-    </a>
   </div>
 </header>
 
