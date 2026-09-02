@@ -102,21 +102,8 @@ function sanitizeAccountMenuItems(items, fallback) {
 }
 
 function ensureAccountMenuAdminHub(signedIn, defaults) {
-  const list = Array.isArray(signedIn) ? [...signedIn] : [];
-  const hasAdmin = list.some(item =>
-    item.destination === 'admin'
-    || item.id === 'admin-hub'
-    || ((item.features || []).includes('staffOnly') && /admin/i.test(item.label || ''))
-  );
-  if (hasAdmin) return list;
-  const adminItem = (defaults.accountMenu?.signedIn || [])
-    .find(item => item.destination === 'admin' || item.id === 'admin-hub');
-  if (!adminItem) return list;
-  const insert = sanitizeItem(adminItem, list.length);
-  const sepIndex = list.findIndex(item => (item.features || []).includes('separator'));
-  if (sepIndex >= 0) list.splice(sepIndex, 0, insert);
-  else list.push(insert);
-  return list;
+  // Administration Hub lives in the drawer/sidebar; keep account menu slim.
+  return Array.isArray(signedIn) ? [...signedIn] : [];
 }
 
 function consolidateTradingNavItems(items = []) {
@@ -599,9 +586,16 @@ export function sanitizeShellNavigation(input) {
     ? source.accountMenu
     : defaults.accountMenu;
 
+  const sourceVersion = Number(source.version) || 0;
+  const defaultVersion = Number(defaults.version) || 3;
+  const useSlimAccountMenu = sourceVersion < 4;
+
   const accountMenu = {
     signedIn: ensureAccountMenuAdminHub(
-      sanitizeAccountMenuItems(accountMenuSource.signedIn, defaults.accountMenu.signedIn),
+      sanitizeAccountMenuItems(
+        useSlimAccountMenu ? defaults.accountMenu.signedIn : accountMenuSource.signedIn,
+        defaults.accountMenu.signedIn
+      ),
       defaults
     ),
     signedOut: sanitizeAccountMenuItems(accountMenuSource.signedOut, defaults.accountMenu.signedOut)
@@ -614,8 +608,6 @@ export function sanitizeShellNavigation(input) {
   }
 
   const chromeSource = source.chrome && typeof source.chrome === 'object' ? source.chrome : {};
-  const sourceVersion = Number(source.version) || 0;
-  const defaultVersion = Number(defaults.version) || 3;
   let layoutRaw = String(chromeSource.layout || defaults.chrome?.layout || 'masthead').trim().toLowerCase();
   if (sourceVersion < 3 && layoutRaw === 'hybrid') {
     layoutRaw = 'masthead';

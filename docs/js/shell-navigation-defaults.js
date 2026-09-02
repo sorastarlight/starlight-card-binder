@@ -109,7 +109,6 @@ export const SHELL_LABEL_REWRITES = Object.freeze({
   ]),
   profile: Object.freeze([
     'Profile & Settings',
-    'Profile Settings',
     'My Journal',
     'Journal'
   ]),
@@ -127,7 +126,7 @@ export const SHELL_LAYOUT_MODES = Object.freeze(['masthead', 'hybrid']);
 
 export function createDefaultShellNavigation() {
   return {
-    version: 3,
+    version: 4,
     brandRibbon: 'Collectible Card Hub',
     chrome: {
       layout: 'masthead',
@@ -244,14 +243,8 @@ export function createDefaultShellNavigation() {
     accountMenu: {
       signedIn: [
         { id: 'view-profile', label: 'View My Profile', destination: 'collector', enabled: true, features: ['profileLink'] },
-        { id: 'profile-settings', label: 'Profile', destination: 'profile', enabled: true, features: [] },
-        { id: 'notifications', label: 'Notifications', destination: 'notifications', enabled: true, features: ['notificationBadge'] },
-        { id: 'rewards', label: 'Gifts', destination: 'rewards', enabled: true, features: ['receivedGiftBadge'] },
-        { id: 'trades', label: 'Trade', destination: 'trades', enabled: true, features: ['tradeOfferBadge'] },
-        { id: 'redeem', label: 'Redeem Code', destination: 'redeem', enabled: true, features: [] },
-        { id: 'admin-hub', label: 'Administration Hub', destination: 'admin', enabled: true, features: ['staffOnly'] },
-        { id: 'sep-1', label: '', destination: '', enabled: true, features: ['separator'] },
-        { id: 'sign-out', label: 'Sign Out', destination: '', enabled: true, features: ['signOut'] }
+        { id: 'profile-settings', label: 'Profile Settings', destination: 'profile', enabled: true, features: [] },
+        { id: 'notifications', label: 'Notifications', destination: 'notifications', enabled: true, features: ['notificationBadge'] }
       ],
       signedOut: [
         { id: 'sign-in', label: 'Sign In', destination: '', enabled: true, features: ['signIn'] },

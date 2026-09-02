@@ -7,7 +7,7 @@ import { readFile } from 'node:fs/promises';
 
 const read = relativePath => readFile(new URL(`../${relativePath}`, import.meta.url), 'utf8');
 
-test('default shell navigation includes core destinations and staff account link', () => {
+test('default shell navigation includes core destinations and slim account menu', () => {
   const nav = cloneDefaultShellNavigation();
   const ids = nav.sidebar.sections.map(section => section.id);
   assert.deepEqual(ids, ['home', 'cards', 'collect', 'shop', 'community', 'account']);
@@ -17,9 +17,13 @@ test('default shell navigation includes core destinations and staff account link
   assert.equal(nav.sidebar.sections[3].label, 'Shop');
   assert.ok(!nav.sidebar.sections.some(section => section.id === 'series'));
   assert.ok(!nav.sidebar.sections.some(section => section.staffOnly));
-  assert.ok(nav.accountMenu.signedIn.some(item =>
+  assert.ok(!nav.accountMenu.signedIn.some(item =>
     item.destination === 'admin' && (item.features || []).includes('staffOnly')
   ));
+  assert.deepEqual(
+    nav.accountMenu.signedIn.map(item => item.label),
+    ['View My Profile', 'Profile Settings', 'Notifications']
+  );
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'offers'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'feed' && entry.label === 'Activity Feed'));
   assert.ok(PUBLIC_SHELL_DESTINATIONS.some(entry => entry.value === 'collection' && entry.label === 'My Card Binder'));
@@ -88,8 +92,9 @@ test('default shell navigation includes core destinations and staff account link
   assert.ok(!nav.topBar.quickLinks.some(link => link.destination === 'events'));
   assert.ok(!nav.topBar.quickLinks.some(link => link.destination === 'trades'));
   assert.ok(nav.accountMenu.signedIn.some(item => (item.features || []).includes('notificationBadge')));
-  assert.ok(nav.accountMenu.signedIn.some(item => (item.features || []).includes('receivedGiftBadge')));
-  assert.ok(nav.accountMenu.signedIn.some(item => (item.features || []).includes('tradeOfferBadge')));
+  assert.ok(!nav.accountMenu.signedIn.some(item => (item.features || []).includes('receivedGiftBadge')));
+  assert.ok(!nav.accountMenu.signedIn.some(item => (item.features || []).includes('tradeOfferBadge')));
+  assert.ok(!nav.accountMenu.signedIn.some(item => (item.features || []).includes('signOut')));
   assert.ok(nav.accountMenu.signedOut.some(item => (item.features || []).includes('signIn')));
 });
 
@@ -478,9 +483,10 @@ test('signed-out CTAs avoid standalone login.html links', async () => {
   assert.match(importPage, /binder\?view=login/);
 });
 
-test('sanitizeShellNavigation strips Series/Admin sidebar and keeps Admin Hub in account menu', () => {
+test('sanitizeShellNavigation strips Series/Admin sidebar and keeps account menu slim', () => {
   const cleaned = sanitizeShellNavigation({
     ...cloneDefaultShellNavigation(),
+    version: 3,
     sidebar: {
       sections: [
         {
@@ -531,9 +537,11 @@ test('sanitizeShellNavigation strips Series/Admin sidebar and keeps Admin Hub in
     cleaned.sidebar.sections.find(section => section.id === 'cards')?.items?.[0]?.label,
     'Card Gallery'
   );
-  assert.ok(cleaned.accountMenu.signedIn.some(item =>
-    item.destination === 'admin' && (item.features || []).includes('staffOnly')
-  ));
+  assert.deepEqual(
+    cleaned.accountMenu.signedIn.map(item => item.label),
+    ['View My Profile', 'Profile Settings', 'Notifications']
+  );
+  assert.equal(cleaned.version, 4);
 });
 
 test('shell navigation render gates staff account items', async () => {
@@ -548,7 +556,7 @@ test('sanitizeShellNavigation upgrades legacy hybrid chrome to masthead', () => 
     version: 2,
     chrome: { layout: 'hybrid', showLiveFeed: true }
   });
-  assert.equal(legacy.version, 3);
+  assert.equal(legacy.version, 4);
   assert.equal(legacy.chrome.layout, 'masthead');
 
   const explicitHybrid = sanitizeShellNavigation({

@@ -6,8 +6,8 @@
 <title>Card Gallery | Starlight Card Binder</title>
 <link href="css/style.css?v=1.0.3" rel="stylesheet"/>
 <link href="css/v80-8-ui.css" rel="stylesheet"/>
-<link href="css/app-shell.css?v=1.6.38" rel="stylesheet"/>
-<link href="css/starlight-chrome.css?v=1.2.30" rel="stylesheet"/>
+<link href="css/app-shell.css?v=1.6.39" rel="stylesheet"/>
+<link href="css/starlight-chrome.css?v=1.2.31" rel="stylesheet"/>
 <link href="css/card-filters.css?v=1.1.1" rel="stylesheet"/>
 <link href="css/pages/card-gallery-page.css?v=2.4.0" rel="stylesheet"/>
 <link href="css/card-view-transition.css?v=1.0.0" rel="stylesheet"/>
@@ -30,11 +30,6 @@
     </a>
     <nav class="shell-masthead-nav" aria-label="Primary"></nav>
     <div class="shell-masthead-actions">
-      <button aria-label="Toggle sound effects" class="shell-sfx-button sfx-toggle on" id="sfxToggle" title="Turn sound effects on or off" type="button">♪</button>
-      <a class="shell-notify-bell" data-shell-view="notifications" href="binder?view=notifications" aria-label="Open notifications" data-shell-signed-in hidden>
-        <svg class="shell-notify-bell-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm8-5.2c-.8-.9-2.3-2.3-2.3-6.1 0-3.3-2.1-6-5-6.7V3.5a1.7 1.7 0 1 0-3.4 0v.5c-2.9.7-5 3.4-5 6.7 0 3.8-1.5 5.2-2.3 6.1A1 1 0 0 0 3 18h18a1 1 0 0 0 .8-1.2Z"/></svg>
-        <b class="shell-notify-bell-dot" data-notification-dot hidden></b>
-      </a>
       <button aria-label="Open navigation" class="shell-menu-button" id="shellMenuButton" type="button">☰</button>
       <div class="shell-account-menu-wrap">
         <button type="button" class="shell-account-menu-button" id="shellAccountMenuButton" aria-label="Account menu" aria-expanded="false" aria-haspopup="menu" aria-controls="shellAccountMenu">
@@ -51,13 +46,15 @@
           </div>
           <div class="shell-account-menu-signed-in" data-shell-signed-in hidden>
             <a role="menuitem" class="shell-profile-link" data-shell-profile-link="" href="binder?view=profile">View My Profile</a>
-            <a role="menuitem" data-shell-view="profile" href="binder?view=profile">Profile</a>
-            <a role="menuitem" data-shell-view="notifications" href="binder?view=notifications">View My Notifications<span class="shell-nav-badge" data-notification-badge hidden>0</span></a>
-            <a role="menuitem" data-shell-view="rewards" href="binder?view=rewards">Gifts<span class="shell-nav-badge" data-received-reward-badge hidden>0</span></a>
-            <a role="menuitem" data-shell-view="trades" href="binder?view=trades&section=progress">Trade<span class="shell-nav-badge" data-trade-offer-badge hidden>0</span></a>
-            <a role="menuitem" data-shell-view="redeem" href="binder?view=redeem">Redeem Code</a>
-            <hr class="shell-account-menu-sep" aria-hidden="true"/>
-            <button role="menuitem" type="button" class="shell-signout-button" data-shell-signout>Sign Out</button>
+            <a role="menuitem" data-shell-view="profile" href="binder?view=profile">Profile Settings</a>
+            <a role="menuitem" data-shell-view="notifications" href="binder?view=notifications">Notifications<span class="shell-nav-badge" data-notification-badge hidden>0</span></a>
+          </div>
+          <div class="shell-account-menu-tools">
+            <button type="button" role="menuitem" class="shell-account-sfx shell-sfx-button sfx-toggle on" id="sfxToggle" aria-pressed="true" title="Turn sound effects on or off">
+              <span class="shell-account-sfx-icon" aria-hidden="true">♪</span>
+              <span class="shell-account-sfx-label">Sound effects</span>
+              <span class="shell-account-sfx-state" data-shell-sfx-state>On</span>
+            </button>
           </div>
           <div class="shell-account-menu-signed-out" data-shell-signed-out hidden>
             <a role="menuitem" data-shell-auth="signin" href="binder?view=login&amp;mode=signin">Sign In</a>
@@ -118,7 +115,7 @@
 <script src="js/cloud-collection.js?v=1.3.9" type="module"></script>
 <script src="js/site-dashboard.js?v=1.2" type="module"></script>
 <script src="js/pages/binder-page.js?v=1.0"></script>
-<script src="js/app-shell.js?v=1.8.2" type="module"></script>
+<script src="js/app-shell.js?v=1.8.3" type="module"></script>
 <script src="js/card-tile.js?v=1.0.0"></script>
 <script src="js/binder-theme-config.js?v=1.0.0"></script>
 <script src="js/starlight-perspective-card.js?v=1.0.0"></script>

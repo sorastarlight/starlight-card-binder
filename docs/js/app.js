@@ -1984,6 +1984,21 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#prevPage')?.addEventListener('click', () => { page = Math.max(1, page - 1); renderAll(); playSfx('page'); });
   $('#nextPage')?.addEventListener('click', () => { page += 1; renderAll(); playSfx('page'); });
   $('#sfxToggle')?.addEventListener('click', () => { sfxOn = !sfxOn; localStorage.setItem(SFX_KEY, sfxOn ? 'on' : 'off'); renderAll(); });
+  window.addEventListener('starlight-sfx-changed', (event) => {
+    if (typeof event.detail?.sfxOn !== 'boolean') return;
+    sfxOn = event.detail.sfxOn;
+    $('#sfxToggle')?.classList.toggle('on', sfxOn);
+    document.body.classList.toggle('sfx-on', sfxOn);
+  });
+  window.addEventListener('message', (event) => {
+    if (event.origin !== location.origin) return;
+    if (event.data?.type === 'starlight-sfx' && typeof event.data.sfxOn === 'boolean') {
+      sfxOn = event.data.sfxOn;
+      localStorage.setItem(SFX_KEY, sfxOn ? 'on' : 'off');
+      $('#sfxToggle')?.classList.toggle('on', sfxOn);
+      document.body.classList.toggle('sfx-on', sfxOn);
+    }
+  });
   $('#exportData')?.addEventListener('click', exportCollectionData);
   $('#importData')?.addEventListener('click', () => $('#importFile')?.click());
   $('#importFile')?.addEventListener('change', e => { importCollectionData(e.target.files?.[0]); e.target.value = ''; });

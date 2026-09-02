@@ -180,6 +180,15 @@ if (!embedded && shouldRedirectToShell()) {
     if (data.type === 'starlight-shell-layout') {
       document.documentElement.dataset.shellLayout = data.layout === 'hybrid' ? 'hybrid' : 'masthead';
     }
+    if (data.type === 'starlight-sfx' && typeof data.sfxOn === 'boolean') {
+      try {
+        localStorage.setItem('sora-starlight-card-binder-v7-sfx', data.sfxOn ? 'on' : 'off');
+      } catch {
+        /* ignore */
+      }
+      document.body.classList.toggle('sfx-on', data.sfxOn);
+      window.dispatchEvent(new CustomEvent('starlight-sfx-changed', { detail: { sfxOn: data.sfxOn } }));
+    }
   });
   const style = document.createElement('style');
   style.textContent = `

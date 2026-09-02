@@ -23,6 +23,7 @@ import { applyDailyNavReadyState } from './daily-nav-indicator.js';
 const SHELL_BUILD = '94.5.0';
 const VIEW_READY_TIMEOUT_MS = 6500;
 const MAX_VIEW_RETRIES = 1;
+const SFX_KEY = 'sora-starlight-card-binder-v7-sfx';
 
 const routes = {
   home:{title:'Home',src:'home.html'},
@@ -543,6 +544,42 @@ function refreshShellBadges(){
   hydrateDailyNavIndicator();
 }
 
+function isShellSfxOn(){
+  try{
+    return localStorage.getItem(SFX_KEY) !== 'off';
+  }catch{
+    return true;
+  }
+}
+
+function syncShellSfxToggle(){
+  const on = isShellSfxOn();
+  const btn = document.getElementById('sfxToggle');
+  if(btn){
+    btn.classList.toggle('on', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+  const state = document.querySelector('[data-shell-sfx-state]');
+  if(state) state.textContent = on ? 'On' : 'Off';
+  document.body.classList.toggle('sfx-on', on);
+  try{
+    const frame = document.getElementById('shellViewIframe');
+    frame?.contentWindow?.postMessage({ type: 'starlight-sfx', sfxOn: on }, location.origin);
+  }catch{
+    /* iframe may be unavailable */
+  }
+}
+
+function toggleShellSfx(){
+  const next = !isShellSfxOn();
+  try{
+    localStorage.setItem(SFX_KEY, next ? 'on' : 'off');
+  }catch{
+    /* ignore */
+  }
+  syncShellSfxToggle();
+}
+
 function applyAccountChrome(isSignedIn){
   document.querySelectorAll('[data-shell-signed-out]').forEach(node=>{
     if(isSignedIn)node.setAttribute('hidden','');
@@ -728,6 +765,13 @@ accountMenuButton?.addEventListener('click',e=>{
   setAccountMenuOpen(Boolean(accountMenu?.hidden));
 });
 accountMenu?.addEventListener('click',async e=>{
+  const sfxBtn=e.target.closest('#sfxToggle');
+  if(sfxBtn){
+    e.preventDefault();
+    e.stopPropagation();
+    toggleShellSfx();
+    return;
+  }
   const signOutBtn=e.target.closest('[data-shell-signout]');
   if(signOutBtn){
     e.preventDefault();
@@ -815,6 +859,7 @@ window.addEventListener('message',async e=>{
       const layout = document.body.dataset.shellLayout || 'masthead';
       try {
         frame.contentWindow.postMessage({ type: 'starlight-shell-layout', layout }, location.origin);
+        frame.contentWindow.postMessage({ type: 'starlight-sfx', sfxOn: isShellSfxOn() }, location.origin);
       } catch {
         /* iframe not ready */
       }
@@ -879,6 +924,7 @@ if (isStudioPreview()) {
 }
 
 navigate(initial,{push:false,extra:locationExtraParams()});
+syncShellSfxToggle();
 supabase.auth.onAuthStateChange((event)=>{
   if(event==='INITIAL_SESSION'||event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='USER_UPDATED'||event==='TOKEN_REFRESHED'){
     scheduleHydrateAccount();

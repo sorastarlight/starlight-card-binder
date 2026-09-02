@@ -54,7 +54,7 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions {
   grid-area: actions;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
   justify-self: end;
 }
@@ -232,7 +232,7 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-mega-panel {
 
 /* Account cluster — far right after menu */
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions {
-  gap: 4px;
+  gap: 2px;
   flex: 0 0 auto;
   min-width: 0;
 }
