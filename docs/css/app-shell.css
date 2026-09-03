@@ -902,6 +902,7 @@ body.shell-masthead-layout{
   --shell-masthead-nav-expand:2000px;
   --shell-chrome-pad:clamp(16px, 2.2vw, 28px);
   --shell-chrome-top:var(--shell-masthead-h, 76px);
+  overflow-x:clip;
 }
 
 /* LIVE row sits inside the masthead, directly under nav + account actions. */
@@ -941,11 +942,13 @@ body.shell-masthead-layout .shell-masthead-inner{
   grid-template-columns:auto minmax(0, 1fr) auto;
   grid-template-areas:"brand nav actions";
   align-items:center;
-  gap:clamp(10px, 1.6vw, 24px);
+  column-gap:8px;
+  row-gap:0;
   width:100%;
-  max-width:none;
+  max-width:100%;
+  box-sizing:border-box;
   margin:0;
-  padding:0 max(6px, env(safe-area-inset-right, 0px)) 0 var(--shell-chrome-pad);
+  padding:0 var(--shell-chrome-pad);
   min-height:var(--shell-masthead-h, 76px);
   height:var(--shell-masthead-h, 76px);
   flex:none;
@@ -1000,7 +1003,7 @@ body.shell-masthead-layout .shell-masthead-nav{
   flex:1 1 auto;
   flex-wrap:nowrap;
   align-items:center;
-  justify-content:center;
+  justify-content:flex-end;
   gap:clamp(2px, .35vw, 6px);
   min-width:0;
   max-width:100%;

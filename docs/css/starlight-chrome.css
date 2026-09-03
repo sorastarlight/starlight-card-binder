@@ -41,13 +41,17 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-inner {
   container-name: shell-masthead;
   max-width: none;
   margin: 0;
-  padding: 0 max(6px, env(safe-area-inset-right, 0px)) 0 var(--st-chrome-pad-inline);
+  padding: 0 var(--st-chrome-pad-inline);
   min-height: var(--st-chrome-bar-h);
   height: var(--st-chrome-bar-h);
   grid-template-columns: auto minmax(0, 1fr) auto;
   grid-template-areas: "brand nav actions";
-  gap: clamp(10px, 1.6vw, 24px);
+  column-gap: 8px;
+  row-gap: 0;
   align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-actions {
@@ -128,11 +132,11 @@ body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-menu-button {
   height: 40px;
 }
 
-/* Nav centered between brand and actions */
+/* Nav packed against the profile/actions cluster on the right */
 body.shell-masthead-layout:not(.shell-hybrid-layout) .shell-masthead-nav {
   display: none;
   flex: 1 1 auto;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 2px;
   flex-wrap: nowrap;
   min-width: 0;
